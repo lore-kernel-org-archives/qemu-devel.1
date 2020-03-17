@@ -2,83 +2,97 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E02C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49856C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12F62205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 143BD2051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhPNfB1g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12F62205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cauJigdW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143BD2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jECyu-00058r-9y
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51788)
+	id 1jECzh-0006D6-7m
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:14:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52943)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jECy3-0004Xz-9n
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1jECyr-0005HM-Sz
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jECy1-0005hb-SV
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24925)
+ (envelope-from <philmd@redhat.com>) id 1jECyq-0001hp-MU
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:05 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35061)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jECy1-0005ed-NI
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:13 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jECyq-0001gH-Ih
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584454393;
+ s=mimecast20190719; t=1584454444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WaxJQScd3Zk21rf7Xu3I7yi9+2aJYAFts8hQzgk2fNs=;
- b=YhPNfB1gfaQwFGMkG3/u8NTpnVGE9H/LAQfQBBESCXU3riVUPO6NtjCimuIRCbfinx8nwt
- wKdlopGUAg7qCvDSCUbqqLv/K6Zb78hOK+PQ7y0Ik3mM4wRDEP9yAzkfqHWBP++5D1m0P8
- RnvYNBV4H0h2odl6vum4FwkXngsNKVc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-bLldfXJ-MaC5ZpEiDLpcEw-1; Tue, 17 Mar 2020 10:13:05 -0400
-X-MC-Unique: bLldfXJ-MaC5ZpEiDLpcEw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B9FA800D50;
- Tue, 17 Mar 2020 14:13:04 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-2.rdu2.redhat.com [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9812D7E317;
- Tue, 17 Mar 2020 14:12:59 +0000 (UTC)
-Date: Tue, 17 Mar 2020 10:12:57 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
-Message-ID: <20200317141257.GA5724@localhost.localdomain>
-References: <20200312193616.438922-1-crosa@redhat.com>
- <CAFEAcA_PiX7LffcT9+1Bdn764fsqsSzUZib-yp=Og0Vpa3oOrw@mail.gmail.com>
- <20200312221619.GA483011@dhcp-17-173.bos.redhat.com>
- <CAFEAcA8=3zcffu8FYEenyNR5O=kHh8OJmMCJj6Uwh5HJw_b-WA@mail.gmail.com>
- <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
- <CAFEAcA-jiZ=Pv7Co6gdkqKans=m6-9RwKAQuB9mri-baM5Gssw@mail.gmail.com>
- <849930679.1334346.1584361606961.JavaMail.zimbra@redhat.com>
- <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
- <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
- <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
+ bh=+UBbZ9tWGjNN43eJbMmPxd6cZVaNwzYUMssw08TDUBA=;
+ b=cauJigdW/VGHvhEs5SGMqNlBg/++cqVu5QPpGmkHCyfGxH9FGtahOGp7/rcyZSGxI+88M0
+ engAsqg6PSlQFHVIdjWQdjFi3zMph+lvjs45H7rdUXDJT91UN0F0aW+RGa+Vr5DpKCc8Zx
+ sOke7cBhLNP2KXs86ByoLdRCRcbE44g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-2b85kIidMXuzKPxun816nQ-1; Tue, 17 Mar 2020 10:14:02 -0400
+X-MC-Unique: 2b85kIidMXuzKPxun816nQ-1
+Received: by mail-wr1-f70.google.com with SMTP id s4so5336707wrb.19
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 07:14:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6leC9Z3btxw4uzyY0SvMMxSG88hUVvd55XNZE52mFTQ=;
+ b=dFt2c3OyMuwg+zCTucfz18oI03Owkbppx68r2jgHmsUfSvfiOACXx+UhkbidWopHUw
+ 8uixvMj0DhwXToP4W57GfzVv/q1IelPzeepjBA11CcQqE+HmCUOHbBe5vfMdtG5+YuS/
+ d+w4tDl7pbgWAA7fjI0fpXEyXg7r54O3/O3zmpHT5rGsk0QViUmKQR8LqiHi+fucBF/9
+ tK7sglDlAWo6Yv33p/9DuvyzQtzDEdO6WE2OZUE+zGGVvVyvYviU8N6TFqucuLYEt3ut
+ 46CAb4NLNZC0dNFHbOhdkoq5WCY7Ngumz0DUnxuoBb5mX51NS9sxWBnOuEt0fBU/rgQm
+ d3tQ==
+X-Gm-Message-State: ANhLgQ3LLz6/wFmNBt8BUv/Waq4AzZ5ThpCB7xF+YQ1mOKqSFR5upxmI
+ nRArZ5r1oulEozs/LZun6Pxj2Sxq8dtlONYrwlBSQz5WJwdCJdBWOLSrXhCT2rcJXcaniWE9WIu
+ UBF/RxB2oycY9eGU=
+X-Received: by 2002:a5d:63d2:: with SMTP id c18mr6271509wrw.163.1584454441445; 
+ Tue, 17 Mar 2020 07:14:01 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuaW0sPCdO+wAc3KufETCkO+J3gQ7g58rcDtbhc3o9CR+3d8VkHlfMmUQM61Rfiih04pZsyKQ==
+X-Received: by 2002:a5d:63d2:: with SMTP id c18mr6271497wrw.163.1584454441289; 
+ Tue, 17 Mar 2020 07:14:01 -0700 (PDT)
+Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
+ [83.59.163.96])
+ by smtp.gmail.com with ESMTPSA id r3sm3036366wrn.35.2020.03.17.07.14.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Mar 2020 07:14:00 -0700 (PDT)
+Subject: Re: [PATCH v10 4/3] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200313170517.22480-1-armbru@redhat.com>
+ <20200317125741.15301-1-vsementsov@virtuozzo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d340d29b-f99c-f192-c00d-c1af16a562e5@redhat.com>
+Date: Tue, 17 Mar 2020 15:13:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200317125741.15301-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
-Content-Disposition: inline
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,112 +106,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Wainer Moschetta <wmoschet@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: alxndr@bu.edu, ashijeetacharya@gmail.com, paul.durrant@citrix.com,
+ armbru@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---qMm9M+Fa2AknHoGS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Mar 17, 2020 at 09:29:32AM +0000, Peter Maydell wrote:
-> On Tue, 17 Mar 2020 at 04:59, Cleber Rosa <crosa@redhat.com> wrote:
-> > Yes, that did the trick and I can now see the configuration.  What I ca=
-n
-> > *not* see is any "Specific Runner" configured.  So maybe:
-> >
-> > 1) The documentation I included is not clear enough about the fact that
-> > setup steps need to be done on a machine so that it becomes a "Runner"
-> >
-> > 2) The (Ansible) playbooks (especially contrib/ci/orgs/qemu/gitlab-runn=
-er.yml)
-> > is not working as intended
-> >
-> > 3) Some expectations misalignment on machines that would be available t=
-o run
-> > those jobs
-> >
-> > In any case, none of those should be big problems.  Please let me know =
-what
-> > you did/experienced/expected up to this point, and we can continue from=
- there.
+On 3/17/20 1:57 PM, Vladimir Sementsov-Ogievskiy wrote:
+> It's wrong to use same err object as errp parameter for several
+> function calls without intermediate checking for error: we'll crash if
+> try to set err object twice. Fix that.
 >=20
-> Ah, I see. My assumption was that this was all stuff that you were
-> working on, so that I would then be able to test that it worked correctly=
-,
-> not that I would need to do configuration of the gitlab.com setup.
-
-Hi Peter,
-
-So, I had to use temporary hardware resources to set this up (and set
-it up countless times TBH).  I had the understanding based on the list
-of machines you documented[1] that at least some of them would be used
-for the permanent setup.
-
-> I thought all the stuff about "how to set up runners" was only for
-> people who wanted to set up some 3rd-party CI for non-official
-> forks or for when we wanted to add extra runners in future (eg for
-> architectures not yet covered). So the only thing I did was follow
-> your "just push to staging" instructions.
->
-
-OK, I see it, now it makes more sense.  So we're "only" missing the
-setup for the machines we'll use for the more permanent setup.  Would
-you like to do a staged setup/migration using one or some of the
-machines you documented?  I'm 100% onboard to help with this, meaning
-that I can assist you with instructions, or do "pair setup" of the
-machines if needed.  I think a good part of the evaluation here comes
-down to how manageable/reproducible the setup is, so it'd make sense
-for one to be part of the setup itself.
-
-FIY there's also the possibility of grabbing some free VMs on GCP,
-Azure, etc and setting them up as GitLab runners in a temporary way
-(because of the temporarily free and VM nature).  I have a few
-problems with this approach, including the fact that it doesn't yield
-the complete experience wrt using hardware one owns and will have to
-manage, besides the hardware limitations themselves.
-
-Please let me know how you want to move on from here.
-
-Cheers,
-- Cleber.
-
-> thanks
-> -- PMM
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>=20
+> Forgive me for sending this into your series, but seems it is very
+> appropriate.
+>=20
+> It's rephrasing  of my
+>   [PATCH v9 03/10] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
+> for partI series but but without use of ERRP_AUTO_PROPAGATE.
+>=20
+>   hw/sd/ssi-sd.c | 16 ++++++++++++++--
+>   1 file changed, 14 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+> index 91db069212..829797b597 100644
+> --- a/hw/sd/ssi-sd.c
+> +++ b/hw/sd/ssi-sd.c
+> @@ -255,13 +255,25 @@ static void ssi_sd_realize(SSISlave *d, Error **err=
+p)
+>       carddev =3D qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+>       if (dinfo) {
+>           qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo=
+), &err);
+> +        if (err) {
+> +            goto fail;
+> +        }
+>       }
+> +
+>       object_property_set_bool(OBJECT(carddev), true, "spi", &err);
+> +    if (err) {
+> +        goto fail;
+> +    }
+> +
+>       object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+>       if (err) {
+> -        error_setg(errp, "failed to init SD card: %s", error_get_pretty(=
+err));
+> -        return;
+> +        goto fail;
+>       }
+> +
+> +    return;
+> +
+> +fail:
+> +    error_propagate_prepend(errp, err, "failed to init SD card: ");
+>   }
+>  =20
+>   static void ssi_sd_reset(DeviceState *dev)
 >=20
 
-[1] https://wiki.qemu.org/Requirements/GatingCI#Current_Tests
-
---qMm9M+Fa2AknHoGS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl5w2uUACgkQZX6NM6Xy
-CfNnERAApKFlDSnkXnGqbt3Uclb5qEAhjtxVAFlp83OHnntinkBbFFMRWr9eLGzg
-dMUgiqSGGMZie5AcSyEeBwh/VYnDFgnODSh5NlRjLBhJUTe4n9db50N6yXmmE2ON
-OJ+QYY7i/vsnsoljYOuDylVYF8JbL7e+dKLCCVotq96WC3fV7b8WgJ1CjyIfo+yj
-Xxo6JWc+H1Jzt64YT0vRNl5LrMpg2p46F2+lo21TOGPR+uSyeh63rZUz+dXk9hkB
-t5K17Oa8X89axKMMjbQmHtBvoyrVnccPzX3xH1hHznnD/Xhe58VtDn6FESc/uKzH
-MGe2bcQXtuivYGfheyXH6DOvNHN/iD9ERH0DNv3eewBiw6iReqAP25xK14DmWy3F
-f6r5N86uhE0h44/AHhAFr85NSANfWu8CwSdOzx6J665q6feuBcANsqCfw5Nnqq6G
-caEONZB4c57KqA8dj8eBotj/GScof5l4RDXjz99hLg+mcofFGg+ThRahzaLlvV16
-g+Fuag2YUkvHYA9x7QbRzZa6rIB+R3id7grZl7rDq4ZcTqlI1tVs2u5uf5Xni28b
-zyVhiTGBtR/sSS4G/ROka9nqPM9NJrV0H3fKX5kEbWo0cCrecnlLJs7MTLeecymY
-+9qA2jVZI5JZoOgQ8ZVBL9rkj602pRPYtqcbSta7VWdBh1I702E=
-=N9Kl
------END PGP SIGNATURE-----
-
---qMm9M+Fa2AknHoGS--
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 
