@@ -2,99 +2,58 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FBEC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4BAC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:45:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D30E220663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:43:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2xbD2lB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30E220663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 858CF20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:45:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 858CF20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEENg-0007Mw-03
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:43:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38864)
+	id 1jEEPX-0001dw-HU
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:45:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jEE42-0004kG-NN
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:23:31 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEELN-00056w-Fx
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jEE41-0000fA-G7
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:23:30 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27217)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEELL-0004iT-MT
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:41:25 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:36625)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEE41-0000bq-9Y
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:23:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584458605;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VAd7TGQuwmnGh0gRhtsgfxgXkdeiRCQDX/ppoRr5I3k=;
- b=S2xbD2lBqLsA2loGgV7i2qQwFmvZFEX8nYYs4jwIdXM++fpSlNKf94scEUnpB4NJJfOASf
- b0m+6WlerHPcilZLl/D1QBJf/wRJ7d+fePpM8BNndYlKGkDTTXkv4RqMbmigIwa5hoH+Ty
- u6GOQTUvFiopPNQi/jHoXBAqXbuMBV0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-svYzEs0hNoKhTPkpDy1zQA-1; Tue, 17 Mar 2020 11:23:22 -0400
-X-MC-Unique: svYzEs0hNoKhTPkpDy1zQA-1
-Received: by mail-wm1-f69.google.com with SMTP id r23so7301559wmn.3
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 08:23:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9V0MuUsVFzNiBW4fwUsGHbWAkRWSoWXMiHtd49rqK5U=;
- b=XiAl9pq9OAv7s8jelnPdHKrKPhbP21FOJRoaBenQJtjWl4cbqMHxqZtrfrQ2b4byp2
- zR8I7Lv5C77Zbt9f2NKYs1/1VzvGolKAU80F3ssFizZ79Ir0oWkXtDJ1DKDMfkLp/+ot
- 424+JCMftXLn81MH/q+5DFg9S/oG9y2Giywm7RdS4Wz4Kq1g3USItAxIEr32kdfJeLdR
- TSzO3/EX3EpvzlJBQy7Cv+VIakefaQHV+gOcnhc0rHGGsQxQGhvBIIJ5vu8UaW4vrqpb
- w1+PNDcUvoMUDSP/GSmXznsYZyCO8Qk4S2QIFXKJ31eTeQypEgV4+2Pei0wMgvyEmtRm
- /1Eg==
-X-Gm-Message-State: ANhLgQ0MrsnRusmbTLfNAGt+AdMuhwsyrDIlsb/F7DtOLr8brCi6sQ/O
- jjlhc9qBsbDsI1wpApZowRhEMACvF8ltNlflg7qFPOx/akQxvHZCsBq2ESIg9mrGuITkOkPakbG
- VabQU9PelWpSQq+k=
-X-Received: by 2002:a5d:6344:: with SMTP id b4mr6534071wrw.354.1584458599813; 
- Tue, 17 Mar 2020 08:23:19 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu47ytdIQpk6V0d8FcAZBREsB3SgTZQ8o2LoD4LAvHhSTEzI23NmTO9nKDDfRPSU5d53J6clQ==
-X-Received: by 2002:a5d:6344:: with SMTP id b4mr6534055wrw.354.1584458599599; 
- Tue, 17 Mar 2020 08:23:19 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id b203sm4397022wmc.45.2020.03.17.08.23.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Mar 2020 08:23:18 -0700 (PDT)
-Subject: Re: [PATCH v3 2/8] hw/isa/piix4.c: Introduce variable to store devfn
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <cover.1584457537.git.balaton@eik.bme.hu>
- <1020e0bfcfc6e364f967ccb2a9a3778ac174ccbe.1584457537.git.balaton@eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ad5acdc7-25e6-9a65-3b1d-681edf3aa2f2@redhat.com>
-Date: Tue, 17 Mar 2020 16:23:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEELL-0004Ue-3w; Tue, 17 Mar 2020 11:41:23 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07449815|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.273484-0.00573218-0.720784;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16367; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H1-CFhz_1584459675; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H1-CFhz_1584459675)
+ by smtp.aliyun-inc.com(10.147.41.187);
+ Tue, 17 Mar 2020 23:41:16 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 17/61] target/riscv: vector integer min/max instructions
+Date: Tue, 17 Mar 2020 23:06:09 +0800
+Message-Id: <20200317150653.9008-18-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <1020e0bfcfc6e364f967ccb2a9a3778ac174ccbe.1584457537.git.balaton@eik.bme.hu>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,67 +65,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 4:05 PM, BALATON Zoltan wrote:
-> To avoid any problem with reassigning pci variable store devfn in a
-> variable instead of acessing it from the PCIDevice.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->   hw/isa/piix4.c | 12 +++++++-----
->   1 file changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-> index 7edec5e149..2cbdcd7700 100644
-> --- a/hw/isa/piix4.c
-> +++ b/hw/isa/piix4.c
-> @@ -247,9 +247,10 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **=
-isa_bus,
->       DriveInfo **hd;
->       PCIDevice *pci;
->       DeviceState *dev;
-> +    int devfn =3D PCI_DEVFN(10, 0);
->  =20
-> -    pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
-> -                                          true, TYPE_PIIX4_PCI_DEVICE);
-> +    pci =3D pci_create_simple_multifunction(pci_bus, devfn,  true,
-> +                                          TYPE_PIIX4_PCI_DEVICE);
->       dev =3D DEVICE(pci);
->       if (isa_bus) {
->           *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-> @@ -257,11 +258,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus *=
-*isa_bus,
->  =20
->       hd =3D g_new(DriveInfo *, ide_drives);
->       ide_drive_get(hd, ide_drives);
-> -    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
-> +    pci_piix4_ide_init(pci_bus, hd, devfn + 1);
->       g_free(hd);
-> -    pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
-> +
-> +    pci_create_simple(pci_bus, devfn + 2, "piix4-usb-uhci");
->       if (smbus) {
-> -        *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
-> +        *smbus =3D piix4_pm_init(pci_bus, devfn + 3, 0x1100,
->                                  isa_get_irq(NULL, 9), NULL, 0, NULL);
->      }
->  =20
->=20
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   | 33 ++++++++++++
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 10 ++++
+ target/riscv/vector_helper.c            | 71 +++++++++++++++++++++++++
+ 4 files changed, 122 insertions(+)
 
-This looks better, thanks (and sorry for not being more verbose earlier)
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Now this looks
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 4e6c47c2d2..c7d4ff185a 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -492,3 +492,36 @@ DEF_HELPER_6(vmsgt_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vminu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index df6181980d..aafbdc6be7 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -355,6 +355,14 @@ vmsgtu_vx       011110 . ..... ..... 100 ..... 1010111 @r_vm
+ vmsgtu_vi       011110 . ..... ..... 011 ..... 1010111 @r_vm
+ vmsgt_vx        011111 . ..... ..... 100 ..... 1010111 @r_vm
+ vmsgt_vi        011111 . ..... ..... 011 ..... 1010111 @r_vm
++vminu_vv        000100 . ..... ..... 000 ..... 1010111 @r_vm
++vminu_vx        000100 . ..... ..... 100 ..... 1010111 @r_vm
++vmin_vv         000101 . ..... ..... 000 ..... 1010111 @r_vm
++vmin_vx         000101 . ..... ..... 100 ..... 1010111 @r_vm
++vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
++vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
++vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
++vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 53c00d914f..53c49ee15c 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1442,3 +1442,13 @@ GEN_OPIVI_TRANS(vmsleu_vi, 1, vmsleu_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsle_vi, 0, vmsle_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsgtu_vi, 1, vmsgtu_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsgt_vi, 0, vmsgt_vx, opivx_cmp_check)
++
++/* Vector Integer Min/Max Instructions */
++GEN_OPIVV_GVEC_TRANS(vminu_vv, umin)
++GEN_OPIVV_GVEC_TRANS(vmin_vv,  smin)
++GEN_OPIVV_GVEC_TRANS(vmaxu_vv, umax)
++GEN_OPIVV_GVEC_TRANS(vmax_vv,  smax)
++GEN_OPIVX_TRANS(vminu_vx, opivx_check)
++GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
++GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
++GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index d1fc543e98..32c2760a8a 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -848,6 +848,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+ #define OP_SSS_H int16_t, int16_t, int16_t, int16_t, int16_t
+ #define OP_SSS_W int32_t, int32_t, int32_t, int32_t, int32_t
+ #define OP_SSS_D int64_t, int64_t, int64_t, int64_t, int64_t
++#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
++#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
++#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
++#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
+ 
+ /* operation of two vector elements */
+ typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+@@ -1514,3 +1518,70 @@ GEN_VEXT_CMP_VX(vmsgt_vx_b, int8_t,  H1, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_h, int16_t, H2, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_w, int32_t, H4, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_d, int64_t, H8, DO_MSGT)
++
++/* Vector Integer Min/Max Instructions */
++RVVCALL(OPIVV2, vminu_vv_b, OP_UUU_B, H1, H1, H1, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_h, OP_UUU_H, H2, H2, H2, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_w, OP_UUU_W, H4, H4, H4, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_d, OP_UUU_D, H8, H8, H8, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_b, OP_SSS_B, H1, H1, H1, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_h, OP_SSS_H, H2, H2, H2, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_w, OP_SSS_W, H4, H4, H4, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_d, OP_SSS_D, H8, H8, H8, DO_MIN)
++RVVCALL(OPIVV2, vmaxu_vv_b, OP_UUU_B, H1, H1, H1, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_h, OP_UUU_H, H2, H2, H2, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_w, OP_UUU_W, H4, H4, H4, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_d, OP_UUU_D, H8, H8, H8, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_b, OP_SSS_B, H1, H1, H1, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_h, OP_SSS_H, H2, H2, H2, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_w, OP_SSS_W, H4, H4, H4, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_d, OP_SSS_D, H8, H8, H8, DO_MAX)
++GEN_VEXT_VV(vminu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vminu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vminu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vminu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmin_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmin_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmin_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmin_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmaxu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmaxu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmaxu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmaxu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmax_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmax_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmax_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmax_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2, vminu_vx_b, OP_UUU_B, H1, H1, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_h, OP_UUU_H, H2, H2, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_w, OP_UUU_W, H4, H4, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_d, OP_UUU_D, H8, H8, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_b, OP_SSS_B, H1, H1, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_h, OP_SSS_H, H2, H2, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_w, OP_SSS_W, H4, H4, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_d, OP_SSS_D, H8, H8, DO_MIN)
++RVVCALL(OPIVX2, vmaxu_vx_b, OP_UUU_B, H1, H1, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_h, OP_UUU_H, H2, H2, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_w, OP_UUU_W, H4, H4, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_d, OP_UUU_D, H8, H8, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_b, OP_SSS_B, H1, H1, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_h, OP_SSS_H, H2, H2, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_w, OP_SSS_W, H4, H4, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_d, OP_SSS_D, H8, H8, DO_MAX)
++GEN_VEXT_VX(vminu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vminu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vminu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vminu_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmin_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmin_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmin_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmin_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmaxu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmaxu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmaxu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmaxu_vx_d, 8, 8,  clearq)
++GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
+-- 
+2.23.0
 
 
