@@ -2,92 +2,84 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1687DC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 05:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D39DAC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 05:04:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB72F20674
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 05:00:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DCDD20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 05:04:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WlOJU/vT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB72F20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gaxxeB6x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DCDD20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE4LO-0005oE-U5
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 01:00:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45798)
+	id 1jE4Ox-000833-Lx
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 01:04:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49522)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jE4KY-0005NY-1p
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:59:55 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jE4Nm-0006bO-0t
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 01:03:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jE4KW-0007MJ-EM
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:59:53 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:28652)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jE4KW-0007HS-AE
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:59:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584421191;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9w2/MbmqR0vOcDwPInDjxKSYDK13HymlDPzPtZk4gd4=;
- b=WlOJU/vTePSgs1x6xMiy9mVwgKcYH662c37ilBwBs7K0OsaCq4hE3tJLKcedV4/EqtAYXr
- MZFW9AZv7vOkcWWW/TJCDRefnbCwai5+eqeu83arW2AQu53rPMDOoGqiJLWo61PI9f4fiH
- Uk8wgwTHqBadkAxpfgo5Tg1j0gkmYPs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-zZ9X5XO9OFiuJo3vBRVvXg-1; Tue, 17 Mar 2020 00:59:47 -0400
-X-MC-Unique: zZ9X5XO9OFiuJo3vBRVvXg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3008C1005514;
- Tue, 17 Mar 2020 04:59:46 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E15A19C58;
- Tue, 17 Mar 2020 04:59:46 +0000 (UTC)
-Received: from zmail17.collab.prod.int.phx2.redhat.com
- (zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id D27EE86FED;
- Tue, 17 Mar 2020 04:59:45 +0000 (UTC)
-Date: Tue, 17 Mar 2020 00:59:45 -0400 (EDT)
-From: Cleber Rosa <crosa@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
-References: <20200312193616.438922-1-crosa@redhat.com>
- <CAFEAcA_PiX7LffcT9+1Bdn764fsqsSzUZib-yp=Og0Vpa3oOrw@mail.gmail.com>
- <20200312221619.GA483011@dhcp-17-173.bos.redhat.com>
- <CAFEAcA8=3zcffu8FYEenyNR5O=kHh8OJmMCJj6Uwh5HJw_b-WA@mail.gmail.com>
- <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
- <CAFEAcA-jiZ=Pv7Co6gdkqKans=m6-9RwKAQuB9mri-baM5Gssw@mail.gmail.com>
- <849930679.1334346.1584361606961.JavaMail.zimbra@redhat.com>
- <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
+ (envelope-from <npiggin@gmail.com>) id 1jE4Nk-0000Qm-Sz
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 01:03:13 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55242)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1jE4Nh-0008Mc-UG; Tue, 17 Mar 2020 01:03:10 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id np9so2841823pjb.4;
+ Mon, 16 Mar 2020 22:03:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=L93AIua+E4VlrTK56r4lLI1nlwbf++6T6nKZNGo78Ig=;
+ b=gaxxeB6xfyLxlDNje+3fCvqHDSdOtVVy3fvmlRov+60vBa0DsaDWAn/yPEG7eakU+o
+ v1HlXNBeZDuEsWaSAYHqqP5MFEmexDzUvofJybvxmkmI8aB3n7U3J0PxtBtsdHVb0NfP
+ aHtaEnCccOKb/RTc7rYcE9mF+s0E4VEL26PZM21WJkJJ+FLRLUB99gFemgdqadzj4KAt
+ wsEJssNG1wT7MjHbphCc40YZ5LHrPQMI24MVdTs9xWpNu03OoAAfOdr8NCFlWnhz6VVB
+ G84b8kphFVdq/mIhFHoD+Wxq8CbCwBm4UvqUZ4Ru6/njbPsW22cs+b08W3B+EStdLEaw
+ LbIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=L93AIua+E4VlrTK56r4lLI1nlwbf++6T6nKZNGo78Ig=;
+ b=aowyz9XFJYPBbq3n93KuOpFKxZbEQCgymbSxxnc5fBym5+++NlT6IFH+DEHpTUYRAb
+ 9rdipwntMwCQ+r3i6nm8su8CbpqYR/5Ur9Pg+FKiX6O1fLS2zpkv+Ooq0fJqSzUk6vHX
+ oZxgwldJXbzQNANacmfzA8DHBiuxtIiEaXDM/raVgoUN0VyvsEXlwxLvuid0E6+mOkJs
+ aImNbfbGbhsIg0h+eFe7Xqg01KKYoiwmiqU4Wzkp1f/gzLiYwmNnPolxMfa/B+wx8FQY
+ lGO29Ki63p+UJ/nsVjxtdwz1ossUVQJr3TfzST4vPE18mG5NE1AwXutb4VQSsb+jI3En
+ rM9w==
+X-Gm-Message-State: ANhLgQ0uAjegg9OA2xUEzkdqHL8VlNL56i/Mr5uT/hmuBBy6mwMK1Hl1
+ hH7rSu6fjBEKrsVeA/XLiH8nxNgv
+X-Google-Smtp-Source: ADFU+vvxD34VE/3IKn+vyk0ROcMsuWBYvYWt0uwMczEieMYJw+0hl6Rbtx4dfisGuOHkubgzK9SHsw==
+X-Received: by 2002:a17:902:eed1:: with SMTP id
+ h17mr2545062plb.135.1584421388374; 
+ Mon, 16 Mar 2020 22:03:08 -0700 (PDT)
+Received: from bobo.ozlabs.ibm.com (14-202-190-183.tpgi.com.au.
+ [14.202.190.183])
+ by smtp.gmail.com with ESMTPSA id k67sm994803pga.91.2020.03.16.22.03.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 22:03:07 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: qemu-ppc@nongnu.org
+Subject: [PATCH 0/5] FWNMI follow up patches
+Date: Tue, 17 Mar 2020 15:02:10 +1000
+Message-Id: <20200317050215.159334-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-X-Originating-IP: [10.10.112.137, 10.4.195.18]
-Thread-Topic: QEMU Gating CI
-Thread-Index: LK4AdQ3x3bq5va7rGyWJ8Kf1QmwUCA==
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,70 +91,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer Moschetta <wmoschet@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
+ Nicholas Piggin <npiggin@gmail.com>, Greg Kurz <groug@kaod.org>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@fr.ibm.com>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Here's a bunch of other patches remaining  after the last round,
+for some less critical issues. Take these before or after the 5.0
+freeze as you like.
 
+Patch 1 is the main thing I think should be considered as a fix:
+without it, non-FWNMI guests under KVM see behaviour change with
+the FWNMI feature. I kept it out of the "must have" round because
+Linux has long been FWNMI capable (I don't know state of FreeBSD
+though), and because I have not tested under KVM with hardware
+MCE injection.
 
------ Original Message -----
-> From: "Peter Maydell" <peter.maydell@linaro.org>
-> To: "Cleber Rosa" <crosa@redhat.com>
-> Cc: "Fam Zheng" <fam@euphon.net>, "Thomas Huth" <thuth@redhat.com>, "Bera=
-ldo Leal" <bleal@redhat.com>, "Erik
-> Skultety" <eskultet@redhat.com>, "Alex Benn=C3=A9e" <alex.bennee@linaro.o=
-rg>, "Wainer Moschetta" <wmoschet@redhat.com>,
-> "QEMU Developers" <qemu-devel@nongnu.org>, "Wainer dos Santos Moschetta" =
-<wainersm@redhat.com>, "Willian Rampazzo"
-> <wrampazz@redhat.com>, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>,=
- "Eduardo Habkost" <ehabkost@redhat.com>
-> Sent: Monday, March 16, 2020 10:57:30 AM
-> Subject: Re: [PATCH 0/5] QEMU Gating CI
->=20
-> On Mon, 16 Mar 2020 at 12:26, Cleber Rosa <crosa@redhat.com> wrote:
-> > About the runners and the fact that the job is stuck without them,
-> > the message seems straightforward enough, but I can't get to the
-> > project configuration to look at the registered runners with my
-> > current permissions (set as "developer").
->=20
-> I've moved you up to 'maintainer' status, hopefully that is
-> sufficient to look at the relevant config ?
->=20
-> thanks
-> -- PMM
->=20
->=20
+2-3 are hopefully quite harmless comments and messages.
 
-Hi Peter,
+Patch 4 helps the guest stay up under some QoS corner cases.
+Lastly is a machine check injection monitor command which helps
+test things, it may not be ready for merge but it's useful for
+the series.
 
-Yes, that did the trick and I can now see the configuration.  What I can
-*not* see is any "Specific Runner" configured.  So maybe:
+Patch 5 is monitor command to inject MCEs, it's a bit janky
+but it works to test qemu and guests.
 
-1) The documentation I included is not clear enough about the fact that
-setup steps need to be done on a machine so that it becomes a "Runner"
+Nicholas Piggin (5):
+  ppc/spapr: KVM FWNMI should not be enabled until guest requests it
+  ppc/spapr: Improve FWNMI machine check delivery corner case comments
+  ppc/spapr: Add FWNMI machine check delivery warnings
+  ppc/spapr: Don't kill the guest if a recovered FWNMI machine check
+    delivery fails
+  target/ppc: Implement simple monitor mce injection
 
-2) The (Ansible) playbooks (especially contrib/ci/orgs/qemu/gitlab-runner.y=
-ml)
-is not working as intended
+ hmp-commands.hx        | 20 +++++++++++++++++++-
+ hw/ppc/spapr.c         | 42 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_caps.c    |  5 +++--
+ hw/ppc/spapr_events.c  | 40 +++++++++++++++++++++++++++++-----------
+ hw/ppc/spapr_rtas.c    | 11 +++++++++++
+ include/hw/ppc/spapr.h |  3 +++
+ target/ppc/cpu.h       |  3 +++
+ target/ppc/kvm.c       |  7 +++++++
+ target/ppc/kvm_ppc.h   |  6 ++++++
+ target/ppc/monitor.c   | 26 ++++++++++++++++++++++++++
+ 10 files changed, 149 insertions(+), 14 deletions(-)
 
-3) Some expectations misalignment on machines that would be available to ru=
-n
-those jobs
-
-In any case, none of those should be big problems.  Please let me know what
-you did/experienced/expected up to this point, and we can continue from the=
-re.
-
-Regards,
-- Cleber.
+-- 
+2.23.0
 
 
