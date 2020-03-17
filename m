@@ -2,91 +2,59 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE23C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 910ABC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:46:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE46D2073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:46:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dVlUAW+b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE46D2073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 638F220724
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:46:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 638F220724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEFM8-0007x6-0T
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:46:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36051)
+	id 1jEFMf-0000ax-II
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:46:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60669)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jEFCo-000420-P0
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:36:40 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFA7-0006sE-DS
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jEFCm-0004An-Tf
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:36:38 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50677)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jEFCm-000445-L4
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:36:36 -0400
-Received: by mail-wm1-x343.google.com with SMTP id z13so6136154wml.0
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 09:36:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=T0CiFFiWYIaYPKYRBKJcJx8291mmGW0+BGwrLGbj5DM=;
- b=dVlUAW+bq0fqQaimnqyzzZBO/DO3zzFS0V4nYLEc05tUX9r2CRZEZ7ijYbpJS6s6K7
- W9765FKZNyNMlk0THX3LriDxOJ2cCBxsgFfFKLIi8qAZKIg47zI7b1n8zhpZwOrGWdoq
- YzV8t2N+RbxTA7EsRWGNMsKcO2bz6Pwt7KScCC6VPWsx3d2dCuv/Vx778DxHsIY53/uX
- QPwiy4F7OPCEgOSMTjaEKqwe2cOaR384QHupu/v5Ve6/DtQoQ702fuRYePN0o3xuq2+F
- K+gCjDk5BC/0eLnL3WWCLi6NlvYwqcQgVBXarhEVfh+Tz2VN65vdoD12f1VyGt8qkM5s
- MTGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=T0CiFFiWYIaYPKYRBKJcJx8291mmGW0+BGwrLGbj5DM=;
- b=ekPOSJxbC1b63ZCgKStZnNP8nvDad2xWcdICH/T0PmEIN6Vq/F5i5lwas8QxhJUe6O
- DKH1PmgTa2uOi+4yJw7yBI5nAdMo5jboxtCfmewL+dz0SUHoS8AKI5AEiQVDEy0MrQAk
- qcGnKwHNipFpAs9KUGGqR2nC+4Nr4mi9E+4oLcHejKWp2zgpylub6cEtI/f+HCAoWNVm
- sStpDKkSEg2rNf0LC3SQ8UGr7dqIwUxhfJ4xy3j7SfV9nMGN41B+2DqxRqYujVdvVoFO
- st9KR9QmjVFI48jHKQKOXKCd8ijarGiRCJj7rKQZzssdnqu9+FIylr1uhiUWnPZI58zo
- mjOQ==
-X-Gm-Message-State: ANhLgQ013OppKrQiWwTq+oWKkUAuSnSwI0z9rdBZ8LIimRKhu8xZEdzH
- s4Z/xpmiYAIKACUnnANSv5Rds3qZ
-X-Google-Smtp-Source: ADFU+vvuF0MIbiehFjIvk2RyW9VAOtipQBMe/iSeKTTdSiPULBYopShQ0WSmPqeolN0vy7qmcdPXmg==
-X-Received: by 2002:a05:600c:14d5:: with SMTP id
- i21mr167586wmh.82.1584462993256; 
- Tue, 17 Mar 2020 09:36:33 -0700 (PDT)
-Received: from x1w.redhat.com (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id b202sm4618697wmd.15.2020.03.17.09.36.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Mar 2020 09:36:32 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 11/13] target/rx: Collect all bytes during disassembly
-Date: Tue, 17 Mar 2020 17:36:14 +0100
-Message-Id: <20200317163616.30027-12-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200317163616.30027-1-f4bug@amsat.org>
-References: <20200317163616.30027-1-f4bug@amsat.org>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFA4-0004dc-Bv
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:33:51 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57539)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEFA3-0003Wh-DU; Tue, 17 Mar 2020 12:33:48 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08010915|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_regular_dialog|0.298853-0.000204171-0.700943;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H1.-HI0_1584462816; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H1.-HI0_1584462816)
+ by smtp.aliyun-inc.com(10.147.41.187);
+ Wed, 18 Mar 2020 00:33:36 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 43/61] target/riscv: widening floating-point/integer
+ type-convert instructions
+Date: Tue, 17 Mar 2020 23:06:35 +0800
+Message-Id: <20200317150653.9008-44-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,153 +66,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <rth@twiddle.net>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-Collected, to be used in the next patch.
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190531134315.4109-23-richard.henderson@linaro.org>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/rx/disas.c | 62 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 42 insertions(+), 20 deletions(-)
+ target/riscv/helper.h                   | 11 +++++++
+ target/riscv/insn32.decode              |  5 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 42 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 42 +++++++++++++++++++++++++
+ 4 files changed, 100 insertions(+)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 814ef97480..dcfb7baf99 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -25,43 +25,59 @@ typedef struct DisasContext {
-     disassemble_info *dis;
-     uint32_t addr;
-     uint32_t pc;
-+    uint8_t len;
-+    uint8_t bytes[8];
- } DisasContext;
- 
- 
- static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
--                           int i, int n)
-+                                  int i, int n)
- {
--    bfd_byte buf;
-+    uint32_t addr = ctx->addr;
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 5da6b8fcfa..b5985f78bf 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1007,3 +1007,14 @@ DEF_HELPER_5(vfcvt_f_xu_v_d, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfcvt_f_x_v_d, void, ptr, ptr, ptr, env, i32)
 +
-+    g_assert(ctx->len == i);
-+    g_assert(n <= ARRAY_SIZE(ctx->bytes));
++DEF_HELPER_5(vfwcvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfwcvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 53562c6663..e0efc63ec2 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -519,6 +519,11 @@ vfcvt_xu_f_v    100010 . ..... 00000 001 ..... 1010111 @r2_vm
+ vfcvt_x_f_v     100010 . ..... 00001 001 ..... 1010111 @r2_vm
+ vfcvt_f_xu_v    100010 . ..... 00010 001 ..... 1010111 @r2_vm
+ vfcvt_f_x_v     100010 . ..... 00011 001 ..... 1010111 @r2_vm
++vfwcvt_xu_f_v   100010 . ..... 01000 001 ..... 1010111 @r2_vm
++vfwcvt_x_f_v    100010 . ..... 01001 001 ..... 1010111 @r2_vm
++vfwcvt_f_xu_v   100010 . ..... 01010 001 ..... 1010111 @r2_vm
++vfwcvt_f_x_v    100010 . ..... 01011 001 ..... 1010111 @r2_vm
++vfwcvt_f_f_v    100010 . ..... 01100 001 ..... 1010111 @r2_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 0aa0001f12..7e8df1c663 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2076,3 +2076,45 @@ GEN_OPFV_TRANS(vfcvt_xu_f_v, opfv_check)
+ GEN_OPFV_TRANS(vfcvt_x_f_v, opfv_check)
+ GEN_OPFV_TRANS(vfcvt_f_xu_v, opfv_check)
+ GEN_OPFV_TRANS(vfcvt_f_x_v, opfv_check)
 +
-     while (++i <= n) {
--        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
--        insn |= buf << (32 - i * 8);
-+        ctx->dis->read_memory_func(addr++, &ctx->bytes[i - 1], 1, ctx->dis);
-+        insn |= ctx->bytes[i - 1] << (32 - i * 8);
-     }
-+    ctx->addr = addr;
-+    ctx->len = n;
++/* Widening Floating-Point/Integer Type-Convert Instructions */
 +
-     return insn;
- }
- 
- static int32_t li(DisasContext *ctx, int sz)
- {
--    int32_t addr;
--    bfd_byte buf[4];
--    addr = ctx->addr;
-+    uint32_t addr = ctx->addr;
-+    uintptr_t len = ctx->len;
- 
-     switch (sz) {
-     case 1:
-+        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
-         ctx->addr += 1;
--        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
--        return (int8_t)buf[0];
-+        ctx->len += 1;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-+        return (int8_t)ctx->bytes[len];
-     case 2:
-+        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
-         ctx->addr += 2;
--        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
--        return ldsw_le_p(buf);
-+        ctx->len += 2;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-+        return ldsw_le_p(ctx->bytes + len);
-     case 3:
-+        g_assert(len + 3 <= ARRAY_SIZE(ctx->bytes));
-         ctx->addr += 3;
--        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
--        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
-+        ctx->len += 3;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 3, ctx->dis);
-+        return (int8_t)ctx->bytes[len + 2] << 16 | lduw_le_p(ctx->bytes + len);
-     case 0:
-+        g_assert(len + 4 <= ARRAY_SIZE(ctx->bytes));
-         ctx->addr += 4;
--        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
--        return ldl_le_p(buf);
-+        ctx->len += 4;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 4, ctx->dis);
-+        return ldl_le_p(ctx->bytes + len);
-     default:
-         g_assert_not_reached();
-     }
-@@ -110,7 +126,7 @@ static const char psw[] = {
- static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
- {
-     uint32_t addr = ctx->addr;
--    uint8_t buf[2];
-+    uintptr_t len = ctx->len;
-     uint16_t dsp;
- 
-     switch (ld) {
-@@ -119,14 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
-         out[0] = '\0';
-         return;
-     case 1:
-+        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
-         ctx->addr += 1;
--        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
--        dsp = buf[0];
-+        ctx->len += 1;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-+        dsp = ctx->bytes[len];
-         break;
-     case 2:
-+        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
-         ctx->addr += 2;
--        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
--        dsp = lduw_le_p(buf);
-+        ctx->len += 2;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-+        dsp = lduw_le_p(ctx->bytes + len);
-         break;
-     default:
-         g_assert_not_reached();
-@@ -1392,8 +1412,10 @@ int print_insn_rx(bfd_vma addr, disassemble_info *dis)
-     DisasContext ctx;
-     uint32_t insn;
-     int i;
++/*
++ * If the current SEW does not correspond to a supported IEEE floating-point
++ * type, an illegal instruction exception is raised
++ */
++static bool opfv_widen_check(DisasContext *s, arg_rmr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, true) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
++                1 << s->lmul) &&
++            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++}
 +
-     ctx.dis = dis;
-     ctx.pc = ctx.addr = addr;
-+    ctx.len = 0;
- 
-     insn = decode_load(&ctx);
-     if (!decode(&ctx, insn)) {
++#define GEN_OPFV_WIDEN_TRANS(NAME)                                 \
++static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
++{                                                                  \
++    if (opfv_widen_check(s, a)) {                                  \
++        uint32_t data = 0;                                         \
++        static gen_helper_gvec_3_ptr * const fns[2] = {            \
++            gen_helper_##NAME##_h,                                 \
++            gen_helper_##NAME##_w,                                 \
++        };                                                         \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
++            vreg_ofs(s, a->rs2), cpu_env, 0,                       \
++            s->vlen / 8, data, fns[s->sew - 1]);                   \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
++}
++GEN_OPFV_WIDEN_TRANS(vfwcvt_xu_f_v)
++GEN_OPFV_WIDEN_TRANS(vfwcvt_x_f_v)
++GEN_OPFV_WIDEN_TRANS(vfwcvt_f_xu_v)
++GEN_OPFV_WIDEN_TRANS(vfwcvt_f_x_v)
++GEN_OPFV_WIDEN_TRANS(vfwcvt_f_f_v)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 0de986aed5..0eb0ce02a8 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4209,3 +4209,45 @@ RVVCALL(OPFVV1, vfcvt_f_x_v_d, OP_UU_D, H8, H8, int64_to_float64)
+ GEN_VEXT_V_ENV(vfcvt_f_x_v_h, 2, 2, clearh)
+ GEN_VEXT_V_ENV(vfcvt_f_x_v_w, 4, 4, clearl)
+ GEN_VEXT_V_ENV(vfcvt_f_x_v_d, 8, 8, clearq)
++
++/* Widening Floating-Point/Integer Type-Convert Instructions */
++/* (TD, T2, TX2) */
++#define WOP_UU_H uint32_t, uint16_t, uint16_t
++#define WOP_UU_W uint64_t, uint32_t, uint32_t
++/* vfwcvt.xu.f.v vd, vs2, vm # Convert float to double-width unsigned integer.*/
++RVVCALL(OPFVV1, vfwcvt_xu_f_v_h, WOP_UU_H, H4, H2, float16_to_uint32)
++RVVCALL(OPFVV1, vfwcvt_xu_f_v_w, WOP_UU_W, H8, H4, float32_to_uint64)
++GEN_VEXT_V_ENV(vfwcvt_xu_f_v_h, 2, 4, clearl)
++GEN_VEXT_V_ENV(vfwcvt_xu_f_v_w, 4, 8, clearq)
++
++/* vfwcvt.x.f.v vd, vs2, vm # Convert float to double-width signed integer. */
++RVVCALL(OPFVV1, vfwcvt_x_f_v_h, WOP_UU_H, H4, H2, float16_to_int32)
++RVVCALL(OPFVV1, vfwcvt_x_f_v_w, WOP_UU_W, H8, H4, float32_to_int64)
++GEN_VEXT_V_ENV(vfwcvt_x_f_v_h, 2, 4, clearl)
++GEN_VEXT_V_ENV(vfwcvt_x_f_v_w, 4, 8, clearq)
++
++/* vfwcvt.f.xu.v vd, vs2, vm # Convert unsigned integer to double-width float */
++RVVCALL(OPFVV1, vfwcvt_f_xu_v_h, WOP_UU_H, H4, H2, uint16_to_float32)
++RVVCALL(OPFVV1, vfwcvt_f_xu_v_w, WOP_UU_W, H8, H4, uint32_to_float64)
++GEN_VEXT_V_ENV(vfwcvt_f_xu_v_h, 2, 4, clearl)
++GEN_VEXT_V_ENV(vfwcvt_f_xu_v_w, 4, 8, clearq)
++
++/* vfwcvt.f.x.v vd, vs2, vm # Convert integer to double-width float. */
++RVVCALL(OPFVV1, vfwcvt_f_x_v_h, WOP_UU_H, H4, H2, int16_to_float32)
++RVVCALL(OPFVV1, vfwcvt_f_x_v_w, WOP_UU_W, H8, H4, int32_to_float64)
++GEN_VEXT_V_ENV(vfwcvt_f_x_v_h, 2, 4, clearl)
++GEN_VEXT_V_ENV(vfwcvt_f_x_v_w, 4, 8, clearq)
++
++/*
++ * vfwcvt.f.f.v vd, vs2, vm #
++ * Convert single-width float to double-width float.
++ */
++static uint32_t vfwcvtffv16(uint16_t a, float_status *s)
++{
++    return float16_to_float32(a, true, s);
++}
++
++RVVCALL(OPFVV1, vfwcvt_f_f_v_h, WOP_UU_H, H4, H2, vfwcvtffv16)
++RVVCALL(OPFVV1, vfwcvt_f_f_v_w, WOP_UU_W, H8, H4, float32_to_float64)
++GEN_VEXT_V_ENV(vfwcvt_f_f_v_h, 2, 4, clearl)
++GEN_VEXT_V_ENV(vfwcvt_f_f_v_w, 4, 8, clearq)
 -- 
-2.21.1
+2.23.0
 
 
