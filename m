@@ -2,62 +2,63 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19554C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AD5C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:13:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D947420714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:12:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F75D20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:13:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nS+LLB7/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D947420714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cMwT57Pb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F75D20714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9DI-0007Sl-VS
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:12:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45406)
+	id 1jE9EC-0000hL-Ow
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:13:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45063)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95m-00019R-QV
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:02 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95c-0000oF-Ao
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95j-0002xF-2H
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:58 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60955 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95a-0001rg-DT
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:48 -0400
+Received: from ozlabs.org ([203.11.71.1]:32925)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jE95h-0001v9-Hx; Tue, 17 Mar 2020 06:04:54 -0400
+ id 1jE95a-0001Gh-0o; Tue, 17 Mar 2020 06:04:46 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hTKw5hLBz9sT2; Tue, 17 Mar 2020 21:04:36 +1100 (AEDT)
+ id 48hTKv73BVz9sSW; Tue, 17 Mar 2020 21:04:35 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1584439476;
- bh=a78LN1DHf/xUKLvhVIm9tRfpO0P/QhRCfN+jcV/NO9A=;
+ bh=105uZzjK8EWkPkmRVAazKF6ikIMHnp8INylkLfXtmRo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=nS+LLB7/iPHDKwPIsKxM5TanK4pX9DjeRoB9V7Ele/zfUj86+XY1m3srt/LtEUi2B
- SpyfKWDDvrlzAPgPWxJI1Y2JgEWzrHk6nxm7A/BsVLfawirnUOrrE1gEOh3Pwue57x
- Htco8lXXZaT4F/V4febCFkLgmXjMGGt9WkyfHEdY=
+ b=cMwT57PbyoeLnTj3qnO/vavfWVTsvaXYv3V8KumOS0Wf1JQ9br2yp3EATOlAzRi6t
+ EVAgliIHZ9pqY/o8RcQasy1ihm6U2H9GfQDmHFunU2Xn1XsxT6LpkTbRmHuzMl3FTL
+ +fUi9DXdjlo1g54l/+j4wYCEp5zJ392uP74NNvKA=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 18/45] spapr,ppc: Simplify signature of kvmppc_rma_size()
-Date: Tue, 17 Mar 2020 21:03:56 +1100
-Message-Id: <20200317100423.622643-19-david@gibson.dropbear.id.au>
+Subject: [PULL 08/45] target/ppc: Correct handling of real mode accesses with
+ vhyp on hash MMU
+Date: Tue, 17 Mar 2020 21:03:46 +1100
+Message-Id: <20200317100423.622643-9-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,117 +71,146 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
- qemu-devel@nongnu.org, groug@kaod.org, Cedric Le Goater <clg@fr.ibm.com>,
- qemu-ppc@nongnu.org, clg@kaod.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function calculates the maximum size of the RMA as implied by the
-host's page size of structure of the VRMA (there are a number of other
-constraints on the RMA size which will supersede this one in many
-circumstances).
+On ppc we have the concept of virtual hypervisor ("vhyp") mode, where we
+only model the non-hypervisor-privileged parts of the cpu.  Essentially w=
+e
+model the hypervisor's behaviour from the point of view of a guest OS, bu=
+t
+we don't model the hypervisor's execution.
 
-The current interface takes the current RMA size estimate, and clamps it
-to the VRMA derived size.  The only current caller passes in an arguably
-wrong value (it will match the current RMA estimate in some but not all
-cases).
+In particular, in this mode, qemu's notion of target physical address is
+a guest physical address from the vcpu's point of view.  So accesses in
+guest real mode don't require translation.  If we were modelling the
+hypervisor mode, we'd need to translate the guest physical address into
+a host physical address.
 
-We want to fix that, but for now just keep concerns separated by having t=
-he
-KVM helper function just return the VRMA derived limit, and let the calle=
-r
-combine it with other constraints.  We call the new function
-kvmppc_vrma_limit() to more clearly indicate its limited responsibility.
+Currently, we handle this sloppily: we rely on setting up the virtual LPC=
+R
+and RMOR registers so that GPAs are simply HPAs plus an offset, which we
+set to zero.  This is already conceptually dubious, since the LPCR and RM=
+OR
+registers don't exist in the non-hypervisor portion of the CPU.  It gets
+worse with POWER9, where RMOR and LPCR[VPM0] no longer exist at all.
 
-The helper should only ever be called in the KVM enabled case, so replace
-its !CONFIG_KVM stub with an assert() rather than a dummy value.
+Clean this up by explicitly handling the vhyp case.  While we're there,
+remove some unnecessary nesting of if statements that made the logic to
+select the correct real mode behaviour a bit less clear than it could be.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Cedric Le Goater <clg@fr.ibm.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/ppc/spapr.c       | 5 +++--
- target/ppc/kvm.c     | 5 ++---
- target/ppc/kvm_ppc.h | 7 +++----
- 3 files changed, 8 insertions(+), 9 deletions(-)
+ target/ppc/mmu-hash64.c | 60 ++++++++++++++++++++++++-----------------
+ 1 file changed, 35 insertions(+), 25 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 510494ad87..18bf4bc3de 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1586,8 +1586,9 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *sp=
-apr)
-     spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index 3e0be4d55f..392f90e0ae 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -789,27 +789,30 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
+ddr eaddr,
+          */
+         raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
 =20
-     if (spapr->vrma_adjust) {
--        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(MACHINE(spa=
-pr)),
--                                          spapr->htab_shift);
-+        hwaddr vrma_limit =3D kvmppc_vrma_limit(spapr->htab_shift);
+-        /* In HV mode, add HRMOR if top EA bit is clear */
+-        if (msr_hv || !env->has_hv_mode) {
++        if (cpu->vhyp) {
++            /*
++             * In virtual hypervisor mode, there's nothing to do:
++             *   EA =3D=3D GPA =3D=3D qemu guest address
++             */
++        } else if (msr_hv || !env->has_hv_mode) {
++            /* In HV mode, add HRMOR if top EA bit is clear */
+             if (!(eaddr >> 63)) {
+                 raddr |=3D env->spr[SPR_HRMOR];
+             }
+-        } else {
+-            /* Otherwise, check VPM for RMA vs VRMA */
+-            if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+-                slb =3D &env->vrma_slb;
+-                if (slb->sps) {
+-                    goto skip_slb_search;
+-                }
+-                /* Not much else to do here */
++        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
++            /* Emulated VRMA mode */
++            slb =3D &env->vrma_slb;
++            if (!slb->sps) {
++                /* Invalid VRMA setup, machine check */
+                 cs->exception_index =3D POWERPC_EXCP_MCHECK;
+                 env->error_code =3D 0;
+                 return 1;
+-            } else if (raddr < env->rmls) {
+-                /* RMA. Check bounds in RMLS */
+-                raddr |=3D env->spr[SPR_RMOR];
+-            } else {
+-                /* The access failed, generate the approriate interrupt =
+*/
++            }
 +
-+        spapr->rma_size =3D MIN(spapr_node0_size(MACHINE(spapr)), vrma_l=
-imit);
-     }
- }
-=20
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 7f44b1aa1a..597f72be1b 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2113,7 +2113,7 @@ void kvmppc_error_append_smt_possible_hint(Error *c=
-onst *errp)
-=20
-=20
- #ifdef TARGET_PPC64
--uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
-+uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
- {
-     struct kvm_ppc_smmu_info info;
-     long rampagesize, best_page_shift;
-@@ -2140,8 +2140,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
-igned int hash_shift)
++            goto skip_slb_search;
++        } else {
++            /* Emulated old-style RMO mode, bounds check against RMLS */
++            if (raddr >=3D env->rmls) {
+                 if (rwx =3D=3D 2) {
+                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
+                 } else {
+@@ -821,6 +824,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+                 }
+                 return 1;
+             }
++
++            raddr |=3D env->spr[SPR_RMOR];
          }
-     }
+         tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_M=
+ASK,
+                      PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
+@@ -953,22 +958,27 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
+pu, target_ulong addr)
+         /* In real mode the top 4 effective address bits are ignored */
+         raddr =3D addr & 0x0FFFFFFFFFFFFFFFULL;
 =20
--    return MIN(current_size,
--               1ULL << (best_page_shift + hash_shift - 7));
-+    return 1ULL << (best_page_shift + hash_shift - 7);
- }
- #endif
-=20
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 9e4f2357cc..332fa0aa1c 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -47,7 +47,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t =
-page_shift,
-                               int *pfd, bool need_vfio);
- int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
- int kvmppc_reset_htab(int shift_hint);
--uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)=
-;
-+uint64_t kvmppc_vrma_limit(unsigned int hash_shift);
- bool kvmppc_has_cap_spapr_vfio(void);
- #endif /* !CONFIG_USER_ONLY */
- bool kvmppc_has_cap_epr(void);
-@@ -255,10 +255,9 @@ static inline int kvmppc_reset_htab(int shift_hint)
-     return 0;
- }
-=20
--static inline uint64_t kvmppc_rma_size(uint64_t current_size,
--                                       unsigned int hash_shift)
-+static inline uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
- {
--    return ram_size;
-+    g_assert_not_reached();
- }
-=20
- static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
+-        /* In HV mode, add HRMOR if top EA bit is clear */
+-        if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
++        if (cpu->vhyp) {
++            /*
++             * In virtual hypervisor mode, there's nothing to do:
++             *   EA =3D=3D GPA =3D=3D qemu guest address
++             */
++            return raddr;
++        } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
++            /* In HV mode, add HRMOR if top EA bit is clear */
+             return raddr | env->spr[SPR_HRMOR];
+-        }
+-
+-        /* Otherwise, check VPM for RMA vs VRMA */
+-        if (env->spr[SPR_LPCR] & LPCR_VPM0) {
++        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
++            /* Emulated VRMA mode */
+             slb =3D &env->vrma_slb;
+             if (!slb->sps) {
+                 return -1;
+             }
+-        } else if (raddr < env->rmls) {
+-            /* RMA. Check bounds in RMLS */
+-            return raddr | env->spr[SPR_RMOR];
+         } else {
+-            return -1;
++            /* Emulated old-style RMO mode, bounds check against RMLS */
++            if (raddr >=3D env->rmls) {
++                return -1;
++            }
++            return raddr | env->spr[SPR_RMOR];
+         }
+     } else {
+         slb =3D slb_lookup(cpu, addr);
 --=20
 2.24.1
 
