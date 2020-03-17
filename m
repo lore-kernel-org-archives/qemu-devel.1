@@ -2,99 +2,86 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D019C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D7CC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:30:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBEC2206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E11E206EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:30:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsU4ZhVQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBEC2206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XblnLDlu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E11E206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE8XF-0000qG-1i
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 05:29:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34483)
+	id 1jE8Yj-0002Nz-Fe
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 05:30:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jE8Wc-0000Os-IS
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:28:39 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jE8Xi-0001SQ-RS
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jE8Wb-00042W-Fw
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:28:38 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:31743)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jE8Wb-00040t-BX
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:28:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584437317;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UyDjqS/JT7sJAx/Obk30HpU3BrH9fPU9ECX7oiMfnpI=;
- b=hsU4ZhVQyV0tC216VK+E0uxnLic6A29CTGjdRObBMfH0FA1BFtqo/Ioc33zP86UeKDWEfQ
- mCKC9pkg0sfelH41YuGoBy7BRqyN/kycEdfU2g6Z4PLHYaIs2js47/0kFCNiE+9D4Uv5ij
- zhQAjtlmHnRNW+2Lpg5AYQ0/M/4qRyk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-T7JJCwv9M0aXW58J3OYyxg-1; Tue, 17 Mar 2020 05:28:34 -0400
-X-MC-Unique: T7JJCwv9M0aXW58J3OYyxg-1
-Received: by mail-wm1-f70.google.com with SMTP id z26so5703289wmk.1
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 02:28:34 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jE8Xh-0000ej-MZ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:29:46 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:46714)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jE8Xh-0000Zs-G0
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:29:45 -0400
+Received: by mail-ot1-x330.google.com with SMTP id 111so20847374oth.13
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 02:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lnOKmgu1sNl0XqBjfHs1rrPrWm0VhQNaLDMjjMjtNYo=;
+ b=XblnLDluido2eTh/Bj6PFaoLC+eV4o2Tv0a77qwBBevbIOQ8B1L6sPYDAWw3Tk2epf
+ L37p8GGYlaP3w8eqp1YymEwxJsb7EIvFv/089Vj7YNfZSEC8YcMTlsThqIGHaWc3Wycc
+ MIbJUjXn5kQ3e8U80qPsZgig6BVakuSN4vlN/2AlJeeBfLubjAiXR+tX5ZTCkHDC6eKj
+ ilhobqbCk/LciMfbS3lg+CxNcGwEgz7GGBTjKmhm8ripDkWSZ7stdRkN04dmoFXaRfsa
+ beLVWpirwDWJeY97xqnA0J49JLFfA+RSymUvDurEx9OvbETZgDMoSbcggnIZ0C4N4PLU
+ j57A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sgtlN/gnrp2Ocnkq97eBSGz6X6FdYdpaperbPDTjot8=;
- b=gYimeMqqka8x+hPsKMtxRT2Hwwtr7FozuPBvSyiQI4lPmCKWUlVqmtqupJEeXaeC94
- BIUqAAl1PFaZCHablscRh19vr5rWSr67jdW29HLSLaSTxUm+ABsc1Fl1cMCitAYM1spq
- xIZkILaweo7XQaQLLwX0NXT3r3hCNkNCn5NBRrkmq5fXBNgbiguAPxscIPS3g+eS8uZ0
- o2t+sLxc4rQ7YG/TKow0dfCjLVKHSEtq/0muOgSP43zZhJx7eKK1e1yPdW9lEozuQlOH
- XTsPv4kXwX5uZRaaEoLo4CqHm7TGM1W7mF00JaIq9FqL2gpDWeIa21HHviNq9N31JPVk
- hteA==
-X-Gm-Message-State: ANhLgQ2a0cbm2fUFklynmbB6hQ1XIFgcglNDZyDL9GeFWYRUtWxz9ObJ
- kG2TKlEj7Zf2d0Ili14IpggclV2foZ98Kp5ciDxXtBpbfBzY+2lbANxNJiGeRfjY+4YYczwnjiG
- AW2cBe9fNGsfdkD0=
-X-Received: by 2002:a7b:cf33:: with SMTP id m19mr4298827wmg.168.1584437313754; 
- Tue, 17 Mar 2020 02:28:33 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu1IFcG5l8pdW7rAJ+9UEeyk2P48wkJLbXUvHE0Fv0Ag5ghO4lC3iaGcfac+5Zx1QMkPmJnZg==
-X-Received: by 2002:a7b:cf33:: with SMTP id m19mr4298812wmg.168.1584437313564; 
- Tue, 17 Mar 2020 02:28:33 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id s131sm3211408wmf.35.2020.03.17.02.28.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Mar 2020 02:28:32 -0700 (PDT)
-Subject: Re: [PATCH] hd-geo-test: Clean up use of buf[] in
- create_qcow2_with_mbr()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200317092354.31831-1-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d782061c-5c63-941f-97c8-d743aed0ed94@redhat.com>
-Date: Tue, 17 Mar 2020 10:28:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lnOKmgu1sNl0XqBjfHs1rrPrWm0VhQNaLDMjjMjtNYo=;
+ b=gvR8r0xIRAaF1fGYHQYrcIN4xy9DFJw4eyCHyDUkIwD8fOCSb3xDNhsEF+WRhOeoVF
+ TrMasZGEfjooQJsBdWXXu5mYy3/oiJf34s59WqgdIOXUAyyyUdjJfSDLz0tTHAshR81l
+ lDUjsleR3Qf4KsNGgWJmXzO6UJ1aaKMVhU6jmZk6AJEzwh/BQ9Z4caWMUd3Uuuf0KBLB
+ H9+Fm9mClLdTl0g99xHvgH99f40hyLoFsAhUfYocKPjNyTwUp1HzZWczYzuGaIRHLIV7
+ YzE9yM8xYUH6hHcEvRfnhlElNmFmCVbr0fjiC+Z/VfNx0PH4glFRuWKkefCEe/op3fq3
+ naTw==
+X-Gm-Message-State: ANhLgQ3GBURn0AqvPFNoJt/z2b+4rC4sbjlBu8g3s2ICgqC8Q5SqxEds
+ 6Xy2CvD90066rA7Ey6NNvFHm17rFN/gULk6eafMyMA==
+X-Google-Smtp-Source: ADFU+vuU0uJIMlOE4mZElweW3lz41Sd0z+UeCpJGyWjwfYhPc2I5FuVqAmBg0sKf+5vufzgDfiVMgkrAHr7iyhI3zKo=
+X-Received: by 2002:a9d:19ca:: with SMTP id k68mr2940204otk.232.1584437384344; 
+ Tue, 17 Mar 2020 02:29:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200317092354.31831-1-armbru@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200312193616.438922-1-crosa@redhat.com>
+ <CAFEAcA_PiX7LffcT9+1Bdn764fsqsSzUZib-yp=Og0Vpa3oOrw@mail.gmail.com>
+ <20200312221619.GA483011@dhcp-17-173.bos.redhat.com>
+ <CAFEAcA8=3zcffu8FYEenyNR5O=kHh8OJmMCJj6Uwh5HJw_b-WA@mail.gmail.com>
+ <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-jiZ=Pv7Co6gdkqKans=m6-9RwKAQuB9mri-baM5Gssw@mail.gmail.com>
+ <849930679.1334346.1584361606961.JavaMail.zimbra@redhat.com>
+ <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
+ <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Mar 2020 09:29:32 +0000
+Message-ID: <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+To: Cleber Rosa <crosa@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::330
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,54 +93,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sam Eiderman <shmuel.eiderman@oracle.com>, John Snow <jsnow@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Wainer Moschetta <wmoschet@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 10:23 AM, Markus Armbruster wrote:
-> valgrind reports write unitialized bytes from buf[].  Clear them.
->=20
-> ASan reports we store to misaligned address in buf[].  Use stl_le_p()
-> for that.
->=20
-> Cc: Sam Eiderman <shmuel.eiderman@oracle.com>
-> Cc: John Snow <jsnow@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   tests/qtest/hd-geo-test.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tests/qtest/hd-geo-test.c b/tests/qtest/hd-geo-test.c
-> index a249800544..48e8e02d6e 100644
-> --- a/tests/qtest/hd-geo-test.c
-> +++ b/tests/qtest/hd-geo-test.c
-> @@ -421,7 +421,7 @@ static char *create_qcow2_with_mbr(MBRpartitions mbr,=
- uint64_t sectors)
->       char *raw_path =3D strdup(template);
->       char *qcow2_path =3D strdup(template);
->       char cmd[100 + 2 * PATH_MAX];
-> -    uint8_t buf[512];
-> +    uint8_t buf[512] =3D {};
->       int i, ret, fd, offset;
->       uint64_t qcow2_size =3D sectors * 512;
->       uint8_t status, parttype, head, sector, cyl;
-> @@ -457,8 +457,8 @@ static char *create_qcow2_with_mbr(MBRpartitions mbr,=
- uint64_t sectors)
->           buf[offset + 0x6] =3D sector;
->           buf[offset + 0x7] =3D cyl;
->  =20
-> -        (*(uint32_t *)&buf[offset + 0x8]) =3D cpu_to_le32(mbr[i].start_s=
-ect);
-> -        (*(uint32_t *)&buf[offset + 0xc]) =3D cpu_to_le32(mbr[i].nr_sect=
-s);
-> +        stl_le_p(&buf[offset + 0x8], mbr[i].start_sect);
-> +        stl_le_p(&buf[offset + 0xc], mbr[i].nr_sects);
->  =20
->           offset +=3D 0x10;
->       }
->=20
+On Tue, 17 Mar 2020 at 04:59, Cleber Rosa <crosa@redhat.com> wrote:
+> Yes, that did the trick and I can now see the configuration.  What I can
+> *not* see is any "Specific Runner" configured.  So maybe:
+>
+> 1) The documentation I included is not clear enough about the fact that
+> setup steps need to be done on a machine so that it becomes a "Runner"
+>
+> 2) The (Ansible) playbooks (especially contrib/ci/orgs/qemu/gitlab-runner.yml)
+> is not working as intended
+>
+> 3) Some expectations misalignment on machines that would be available to run
+> those jobs
+>
+> In any case, none of those should be big problems.  Please let me know what
+> you did/experienced/expected up to this point, and we can continue from there.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Ah, I see. My assumption was that this was all stuff that you were
+working on, so that I would then be able to test that it worked correctly,
+not that I would need to do configuration of the gitlab.com setup.
+I thought all the stuff about "how to set up runners" was only for
+people who wanted to set up some 3rd-party CI for non-official
+forks or for when we wanted to add extra runners in future (eg for
+architectures not yet covered). So the only thing I did was follow
+your "just push to staging" instructions.
 
+thanks
+-- PMM
 
