@@ -2,79 +2,94 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CCBC1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3718BC1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A23920714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:47:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 006DA20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:50:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRjCuHFj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A23920714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwMjjJ5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 006DA20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEL07-0006bz-KX
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 18:47:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39036)
+	id 1jEL2o-00087S-75
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 18:50:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jEKzH-0006CB-Cj
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:47:04 -0400
+ (envelope-from <peterx@redhat.com>) id 1jEL1l-0007Nw-IH
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jEKzF-0003Qt-JA
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:47:02 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41539)
+ (envelope-from <peterx@redhat.com>) id 1jEL1j-0001Ys-LV
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:49:37 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33206)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jEKzF-0003Ns-Dk
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:47:01 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jEL1j-0001Xo-F0
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:49:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584485220;
+ s=mimecast20190719; t=1584485375;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WBXt7T9CF1zfcLhUsrGUyeKYQkAmFkOOAYap4NK9n7Y=;
- b=YRjCuHFj5VYy/KIWbjX3Vj54lcklj7F+DW+nfk9/7+ke0jyMUBdZ7UU2hf33qnKulxTnbb
- PjRSBgoeLq3wjw5CJ/b/eGOzxFJUDIbjsuJBhQb/yQxvcJVahKTDXmfvBWrSF0e/BGX02V
- 4A8DVwBnCqE91l9IADdmlaaxfCS0K1E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-swkI6xwvNEKRHX1I_irTxQ-1; Tue, 17 Mar 2020 18:46:58 -0400
-X-MC-Unique: swkI6xwvNEKRHX1I_irTxQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6777F18B5FA1;
- Tue, 17 Mar 2020 22:46:57 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-2.rdu2.redhat.com [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E73FE5C1BB;
- Tue, 17 Mar 2020 22:46:50 +0000 (UTC)
-Date: Tue, 17 Mar 2020 18:46:48 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 1/4] tests/vm: write raw console log
-Message-ID: <20200317224648.GB104204@localhost.localdomain>
-References: <20200310083218.26355-1-kraxel@redhat.com>
- <20200310083218.26355-2-kraxel@redhat.com>
- <87wo7kjsfp.fsf@linaro.org>
- <80b6dd22-aae9-268f-21a9-7add0dd3fa51@redhat.com>
+ bh=6AlvO2I8xrJN8XHFLPtdSesti3GlwCI5uONmmlGardc=;
+ b=gwMjjJ5Ck5fMY9UG47kPeX/wGs8/6yuXMvqUomrxc2Ja7H3ezckYJDHjL72ihzUmg78rb4
+ wuQf2+INAr5j9L6lKDVdJW7Su5iJkvHjNTNWCSLLcSfUdH74DZ6hn9y8MKEP83l2pDRF47
+ 40RX1eGa4jCHZdA9UkTIPVCqPxVzs1E=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-5IYf_kA9Maitmmo9J3ruHg-1; Tue, 17 Mar 2020 18:49:30 -0400
+X-MC-Unique: 5IYf_kA9Maitmmo9J3ruHg-1
+Received: by mail-wr1-f70.google.com with SMTP id c6so11293419wrm.18
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 15:49:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=mSSK3zxBu9mfMjKQ2oZapFH8RNWFD9wpHHtx8bf8Km4=;
+ b=ROvmG+jOw6Aq8yFYL4jPlF8zjXa1DVTN4Oy1kQyUCwaBj8gtZbB0cFPLQRjcRQ9wX7
+ wGOXYzJyDEwyDu4LNTSZVBccyo6dnEb27kNBkdNSN3uwToqLy1o3B30/tl6CQPrf9CrQ
+ T6M51mXas34L2aASUgbm5hXQqO3UUQArnhgc6mddLHBez7ulR51V93ZV4xi+XnNBBSFq
+ gCInCVImZaD1PjubXripZcJRnXb5U79zgD3cvmPuHGUXYjj9fDj6UlEPQHpTiSrFVN9W
+ MzQYvsmJF5p1dqMemwpZR5dhLFQN2YDn+J2FhQezJFQXz2lBg8JDy6lfq0cLxtCbZVhA
+ zu5w==
+X-Gm-Message-State: ANhLgQ1CMxIU/RxZ9y5hMNDkIqqIvQipoY8ZHdmzAMY28uwLIxU3A6w3
+ cSS0ztgrLvnZ0zdl2dYI9eAxWSLYN4qAMCAWPuNMDQogLYH2gkxXByGxOjU8/IZEKDKCxqZin59
+ HiBJVw9gMKFklBic=
+X-Received: by 2002:adf:f18a:: with SMTP id h10mr1311716wro.255.1584485369078; 
+ Tue, 17 Mar 2020 15:49:29 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuMsmGl5fESMMa+eU7MfD13L99aM4rO2t6vbNyeJmxLXcJbJZp+AYVKVQ55XC0kP4j3KHEagQ==
+X-Received: by 2002:adf:f18a:: with SMTP id h10mr1311691wro.255.1584485368787; 
+ Tue, 17 Mar 2020 15:49:28 -0700 (PDT)
+Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id s1sm6339798wrp.41.2020.03.17.15.49.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 Mar 2020 15:49:28 -0700 (PDT)
+From: Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3.1 4/5] KVM: Kick resamplefd for split kernel irqchip
+Date: Tue, 17 Mar 2020 18:49:23 -0400
+Message-Id: <20200317224923.506330-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200317195042.282977-5-peterx@redhat.com>
+References: 
 MIME-Version: 1.0
-In-Reply-To: <80b6dd22-aae9-268f-21a9-7add0dd3fa51@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="hQiwHBbRI9kgIhsi"
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,162 +101,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---hQiwHBbRI9kgIhsi
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is majorly only for X86 because that's the only one that supports
+split irqchip for now.
 
-On Mon, Mar 16, 2020 at 03:22:07PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 3/16/20 3:16 PM, Alex Benn=E9e wrote:
-> >=20
-> > Gerd Hoffmann <kraxel@redhat.com> writes:
-> >=20
-> > > Run "tail -f /var/tmp/*/qemu*console.raw" in another terminal
-> > > to watch the install console.
-> > >=20
-> > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> >=20
-> > I suspect this is what's breaking "make check-acceptance" so I've
-> > dropped the series from testing/next for now.
-> >
-> >    2020-03-11 12:12:30,546 stacktrace       L0039 ERROR|
-> >    2020-03-11 12:12:30,546 stacktrace       L0042 ERROR| Reproduced tra=
-ceback from: /home/alex.bennee/lsrc/qemu.git/builds/all/tests/venv/lib/pyth=
-on3.6/site-packages/avocado/c\
-> >    ore/test.py:860
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR| Traceback (mos=
-t recent call last):
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "/home/=
-alex.bennee/lsrc/qemu.git/builds/all/tests/venv/lib/python3.6/site-packages=
-/avocado/core/test.py", line \
-> >    1456, in test
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|     self.error=
-(self.exception)
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "/home/=
-alex.bennee/lsrc/qemu.git/builds/all/tests/venv/lib/python3.6/site-packages=
-/avocado/core/test.py", line \
-> >    1064, in error
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|     raise exce=
-ptions.TestError(message)
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR| avocado.core.e=
-xceptions.TestError: Traceback (most recent call last):
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "/usr/l=
-ib/python3.6/imp.py", line 235, in load_module
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|     return loa=
-d_source(name, filename, file)
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "/usr/l=
-ib/python3.6/imp.py", line 172, in load_source
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|     module =3D=
- _load(spec)
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "<froze=
-n importlib._bootstrap>", line 684, in _load
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "<froze=
-n importlib._bootstrap>", line 665, in _load_unlocked
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "<froze=
-n importlib._bootstrap_external>", line 678, in exec_module
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "<froze=
-n importlib._bootstrap>", line 219, in _call_with_frames_removed
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "/home/=
-alex.bennee/lsrc/qemu.git/builds/all/tests/acceptance/machine_mips_malta.py=
-", line 15, in <module>
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|     from avoca=
-do_qemu import Test
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "/home/=
-alex.bennee/lsrc/qemu.git/builds/all/tests/acceptance/avocado_qemu/__init__=
-.py", line 22, in <module>
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|     from qemu.=
-machine import QEMUMachine
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|   File "/home/=
-alex.bennee/lsrc/qemu.git/builds/all/tests/acceptance/avocado_qemu/../../..=
-/python/qemu/machine.py", lin\
-> >    e 27, in <module>
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|     from qemu.=
-console_socket import ConsoleSocket
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR| ModuleNotFound=
-Error: No module named 'qemu.console_socket'
->=20
-> Cc'ing Wainer/Cleber in case...
->
+When the irqchip is split, we face a dilemma that KVM irqfd will be
+enabled, however the slow irqchip is still running in the userspace.
+It means that the resamplefd in the kernel irqfds won't take any
+effect and it will miss to ack INTx interrupts on EOIs.
 
-I've applied the "[PATCH v4 00/10] tests/vm: Add support for aarch64
-VMs" series and this patch (on top of d649689a8) and could not
-replicate this issue with "make check-acceptance".
+One example is split irqchip with VFIO INTx, which will break if we
+use the VFIO INTx fast path.
 
-Maybe I'm missing some other patch?
+This patch can potentially supports the VFIO fast path again for INTx,
+that the IRQ delivery will still use the fast path, while we don't
+need to trap MMIOs in QEMU for the device to emulate the EIOs (see the
+callers of vfio_eoi() hook).  However the EOI of the INTx will still
+need to be done from the userspace by caching all the resamplefds in
+QEMU and kick properly for IOAPIC EOI broadcast.
 
-- Cleber.
+This is tricky because in this case the userspace ioapic irr &
+remote-irr will be bypassed.  However such a change will greatly boost
+performance for assigned devices using INTx irqs (TCP_RR boosts 46%
+after this patch applied).
 
-> >    2020-03-11 12:12:30,547 stacktrace       L0045 ERROR|
-> >    2020-03-11 12:12:30,547 stacktrace       L0046 ERROR|
-> >    2020-03-11 12:12:30,548 test             L0865 DEBUG| Local variable=
-s:
-> >    2020-03-11 12:12:30,561 test             L0868 DEBUG|  -> self <clas=
-s 'avocado.core.test.TestError'>: 1-./tests/acceptance/machine_mips_malta.p=
-y:MaltaMachineFramebuffer.tes\
-> >    t_mips_malta_i6400_framebuffer_logo_1core
-> >=20
-> >=20
-> > > ---
-> > >   tests/vm/basevm.py | 6 ++++++
-> > >   1 file changed, 6 insertions(+)
-> > >=20
-> > > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> > > index 8400b0e07f65..c53fd354d955 100644
-> > > --- a/tests/vm/basevm.py
-> > > +++ b/tests/vm/basevm.py
-> > > @@ -213,6 +213,9 @@ class BaseVM(object):
-> > >       def console_init(self, timeout =3D 120):
-> > >           vm =3D self._guest
-> > >           vm.console_socket.settimeout(timeout)
-> > > +        self.console_raw_path =3D os.path.join(vm._temp_dir,
-> > > +                                             vm._name + "-console.ra=
-w")
-> > > +        self.console_raw_file =3D open(self.console_raw_path, 'wb')
-> > >       def console_log(self, text):
-> > >           for line in re.split("[\r\n]", text):
-> > > @@ -234,6 +237,9 @@ class BaseVM(object):
-> > >           while True:
-> > >               try:
-> > >                   chars =3D vm.console_socket.recv(1)
-> > > +                if self.console_raw_file:
-> > > +                    self.console_raw_file.write(chars)
-> > > +                    self.console_raw_file.flush()
-> > >               except socket.timeout:
-> > >                   sys.stderr.write("console: *** read timeout ***\n")
-> > >                   sys.stderr.write("console: waiting for: '%s'\n" % e=
-xpect)
-> >=20
-> >=20
->=20
+When the userspace is responsible for the resamplefd kickup, don't
+register it on the kvm_irqfd anymore, because on newer kernels (after
+commit 654f1f13ea56, 5.2+) the KVM_IRQFD will fail if with both split
+irqchip and resamplefd.  This will make sure that the fast path will
+work for all supported kernels.
 
---hQiwHBbRI9kgIhsi
-Content-Type: application/pgp-signature; name="signature.asc"
+https://patchwork.kernel.org/patch/10738541/#22609933
 
------BEGIN PGP SIGNATURE-----
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v3.1 changelog
+- only kick resamplefd for level triggered irqs [Alex]
+ accel/kvm/kvm-all.c    | 79 ++++++++++++++++++++++++++++++++++++++++--
+ accel/kvm/trace-events |  1 +
+ hw/intc/ioapic.c       | 17 +++++++++
+ include/sysemu/kvm.h   |  4 +++
+ 4 files changed, 99 insertions(+), 2 deletions(-)
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl5xU1UACgkQZX6NM6Xy
-CfPhcw//fr5k12M7COb3jSwa6gWyvK5X9o3kBAWuy66NsgO0xhbxbsGwx4CQSidC
-e5HpPK/8Gwa8XPspFzLqRTVNvk17mx8V+x8f0dVwcaiFzMeYXutNxlB8iK2M2T88
-vkgRnk2XN/3cK0ZzXv3pLL0+6B2ZTZMIyN8o+Kg+gXotZDACWKgv9wWWUqd86OTV
-uWYs+Jd9Su6z8W22M5YRCYzkARe4rQHJCuOv+7Km30CgfO+FoZvM2WBzOJAzQYVn
-16iTXcejtKebfbas4MuhtfvVQRkE4d2CJTtLHjRSpOdHlgPQrdo7qnobX5bEN8rh
-/SPWORO0+8rEezIMaLEtTz7HLyAg8ibpSlxG6MrHC0O786jHnDY4t+4cF9WP8BnW
-Qv9m26M0EngBR5TFrZ2Q5nLx3syIkhmyv8WQ0Sl8OQW2nrMSBLJubYfkgv2vIJB8
-1Wu+DxinJ/OfoRbfZF4IevCmpL6dmr75VanAKDMA5rNcc08DlxnPE2f1OspyH54R
-yHvppMT4kHsdU2yASUBYobmtPVB3/WLWQf+Liu/I5N1pwKHNqhvumdCvfvohWdfn
-GbGtse3QD5+l10EoRfzUJ+8r3hTPGz8J4ZMfvWQJiQ8V+ElsKIfmOySzJCVAe6tK
-EklM6nttXbNjwA366w6yl3Bkjt7ou1i5L85xaLMuAJ+i/CtnyDc=
-=E/oF
------END PGP SIGNATURE-----
-
---hQiwHBbRI9kgIhsi--
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index d49b74512a..9a85fd1b8f 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -159,9 +159,59 @@ static const KVMCapabilityInfo kvm_required_capabilite=
+s[] =3D {
+ static NotifierList kvm_irqchip_change_notifiers =3D
+     NOTIFIER_LIST_INITIALIZER(kvm_irqchip_change_notifiers);
+=20
++struct KVMResampleFd {
++    int gsi;
++    EventNotifier *resample_event;
++    QLIST_ENTRY(KVMResampleFd) node;
++};
++typedef struct KVMResampleFd KVMResampleFd;
++
++/*
++ * Only used with split irqchip where we need to do the resample fd
++ * kick for the kernel from userspace.
++ */
++static QLIST_HEAD(, KVMResampleFd) kvm_resample_fd_list =3D
++    QLIST_HEAD_INITIALIZER(kvm_resample_fd_list);
++
+ #define kvm_slots_lock(kml)      qemu_mutex_lock(&(kml)->slots_lock)
+ #define kvm_slots_unlock(kml)    qemu_mutex_unlock(&(kml)->slots_lock)
+=20
++static inline void kvm_resample_fd_remove(int gsi)
++{
++    KVMResampleFd *rfd;
++
++    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
++        if (rfd->gsi =3D=3D gsi) {
++            QLIST_REMOVE(rfd, node);
++            g_free(rfd);
++            break;
++        }
++    }
++}
++
++static inline void kvm_resample_fd_insert(int gsi, EventNotifier *event)
++{
++    KVMResampleFd *rfd =3D g_new0(KVMResampleFd, 1);
++
++    rfd->gsi =3D gsi;
++    rfd->resample_event =3D event;
++
++    QLIST_INSERT_HEAD(&kvm_resample_fd_list, rfd, node);
++}
++
++void kvm_resample_fd_notify(int gsi)
++{
++    KVMResampleFd *rfd;
++
++    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
++        if (rfd->gsi =3D=3D gsi) {
++            event_notifier_set(rfd->resample_event);
++            trace_kvm_resample_fd_notify(gsi);
++            return;
++        }
++    }
++}
++
+ int kvm_get_max_memslots(void)
+ {
+     KVMState *s =3D KVM_STATE(current_accel());
+@@ -1642,8 +1692,33 @@ static int kvm_irqchip_assign_irqfd(KVMState *s, Eve=
+ntNotifier *event,
+     };
+=20
+     if (rfd !=3D -1) {
+-        irqfd.flags |=3D KVM_IRQFD_FLAG_RESAMPLE;
+-        irqfd.resamplefd =3D rfd;
++        assert(assign);
++        if (kvm_irqchip_is_split()) {
++            /*
++             * When the slow irqchip (e.g. IOAPIC) is in the
++             * userspace, KVM kernel resamplefd will not work because
++             * the EOI of the interrupt will be delivered to userspace
++             * instead, so the KVM kernel resamplefd kick will be
++             * skipped.  The userspace here mimics what the kernel
++             * provides with resamplefd, remember the resamplefd and
++             * kick it when we receive EOI of this IRQ.
++             *
++             * This is hackery because IOAPIC is mostly bypassed
++             * (except EOI broadcasts) when irqfd is used.  However
++             * this can bring much performance back for split irqchip
++             * with INTx IRQs (for VFIO, this gives 93% perf of the
++             * full fast path, which is 46% perf boost comparing to
++             * the INTx slow path).
++             */
++            kvm_resample_fd_insert(virq, resample);
++        } else {
++            irqfd.flags |=3D KVM_IRQFD_FLAG_RESAMPLE;
++            irqfd.resamplefd =3D rfd;
++        }
++    } else if (!assign) {
++        if (kvm_irqchip_is_split()) {
++            kvm_resample_fd_remove(virq);
++        }
+     }
+=20
+     if (!kvm_irqfds_enabled()) {
+diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
+index 4fb6e59d19..a68eb66534 100644
+--- a/accel/kvm/trace-events
++++ b/accel/kvm/trace-events
+@@ -16,4 +16,5 @@ kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t va=
+l, bool assign, uint32_
+ kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, ui=
+nt32_t size, bool datamatch) "fd: %d @0x%x val=3D0x%x assign: %d size: %d m=
+atch: %d"
+ kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_add=
+r, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=
+=3D0x%x gpa=3D0x%"PRIx64 " size=3D0x%"PRIx64 " ua=3D0x%"PRIx64 " ret=3D%d"
+ kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"=
+PRId32" start 0x%"PRIx64" size 0x%"PRIx32
++kvm_resample_fd_notify(int gsi) "gsi %d"
+=20
+diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+index 15747fe2c2..2ae96e10be 100644
+--- a/hw/intc/ioapic.c
++++ b/hw/intc/ioapic.c
+@@ -241,6 +241,23 @@ void ioapic_eoi_broadcast(int vector)
+                 continue;
+             }
+=20
++            /*
++             * When IOAPIC is in the userspace while APIC is still in
++             * the kernel (i.e., split irqchip), we have a trick to
++             * kick the resamplefd logic for registered irqfds from
++             * userspace to deactivate the IRQ.  When that happens, it
++             * means the irq bypassed userspace IOAPIC (so the irr and
++             * remote-irr of the table entry should be bypassed too
++             * even if interrupt come).  Still kick the resamplefds if
++             * they're bound to the IRQ, to make sure to EOI the
++             * interrupt for the hardware correctly.
++             *
++             * Note: We still need to go through the irr & remote-irr
++             * operations below because we don't know whether there're
++             * emulated devices that are using/sharing the same IRQ.
++             */
++            kvm_resample_fd_notify(n);
++
+             if (!(entry & IOAPIC_LVT_REMOTE_IRR)) {
+                 continue;
+             }
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 141342de98..583a976f8a 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -555,4 +555,8 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *so=
+urce);
+ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+ struct ppc_radix_page_info *kvm_get_radix_page_info(void);
+ int kvm_get_max_memslots(void);
++
++/* Notify resamplefd for EOI of specific interrupts. */
++void kvm_resample_fd_notify(int gsi);
++
+ #endif
+--=20
+2.24.1
 
 
