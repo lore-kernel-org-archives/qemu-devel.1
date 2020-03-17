@@ -2,114 +2,54 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC62C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E174EC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:24:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 661A520753
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:23:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pIzDgNM2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 661A520753
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id B6A8D20753
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:24:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A8D20753
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEE4S-0004rD-Gy
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:23:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33123)
+	id 1jEE4h-0005Jz-Sw
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:24:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58791)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxj-0002jM-5g
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:17:01 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jEDuj-0007EK-5X
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxg-0001A4-Qx
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:16:58 -0400
-Received: from mail-he1eur04on071a.outbound.protection.outlook.com
- ([2a01:111:f400:fe0d::71a]:20196
- helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jEDxg-0000ji-24; Tue, 17 Mar 2020 11:16:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UVEMCZv+ONK07qBJgPkDvTM7RfSk14a96c/4EdMRjEk2qkLwlnlbin8YNC8cjTbzsKHvAuZ6djMytumFOBdA1RnWR5XDv2Y9IBpl/gxvH2xCNuXBc88OddZv2PfMlQPjF64Wc06q+3QSdWlLzgcF7aZL/MxYuL//pCsLIdYgbbkJs+DHU/cxGl6AH405iFIg1x8qM8vWpf+W0DWFeYnLoqqB1dHtE8pK2IePTd57j2/jR1ZTYCG9SQ1LoFpRzGZzgMtgi1ko8aBHDI1JOGmkToWTcDFtoFbzxmCTTH80/U9EFA7STRjFfEdbff2y/b79qSZ4mLXwFP9k5D+P7Tejsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GUsq6mR0U4wxUIuZKye6yt7jGndO+qzgMrMfGLSdFzs=;
- b=m2H59Chm4uAtheuYGErpNynN7uDHT5suK0H/yOAzedwxRPlB4O/MCkaEFU+lm/bN/VxsklJrZjbl5LkvOE81rcerCbhAzm0CRwK3JU64PztAuybTWEOu5hv3YZfvSRPr3rCexopcURqN9kfjdVpf+MsajkdahWObdrO6LK2LyTMzjnU84Y9IeLC8waJJ16Fz+2Q0HpdlfjxxAnlNcVDbflHzZoYgYchwOFMz6cOH/xi9prY+KngRyAX3jgmQLaUJz8DLu4q3B6OkUSraUoGjSPw3XV5SrtdN93d7MrJfOhQgJUDol4eB0wcv9ml9W+kxAZvwhCTPKfqYwjyfYlE4nQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GUsq6mR0U4wxUIuZKye6yt7jGndO+qzgMrMfGLSdFzs=;
- b=pIzDgNM2VRDqJKmtTS+3vuiKCPjx5qNugj8Qd5qwm6+Y8evLDosUb29ZcE6Ldo+mstbzhRd6RNv68z9TqvkBKLBZ1hBagPzQESWL1fibEMyyezXKN7bODXoW0TepHkPZupLRO30Z5IoJVv5aCEV/+5xP+M4fIlZx783FQlUNSeE=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) by
- HE1PR0802MB2620.eurprd08.prod.outlook.com (10.175.36.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2814.21; Tue, 17 Mar 2020 15:16:52 +0000
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f]) by HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f%12]) with mapi id 15.20.2814.021; Tue, 17 Mar
- 2020 15:16:52 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v10 0/9] error: auto propagated local_err part I
-Date: Tue, 17 Mar 2020 18:16:16 +0300
-Message-ID: <20200317151625.20797-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::15) To HE1PR0802MB2507.eurprd08.prod.outlook.com
- (2603:10a6:3:e1::8)
+ (envelope-from <balaton@eik.bme.hu>) id 1jEDuh-0001gq-Iz
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:53 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:49475)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1jEDua-0000sW-RB; Tue, 17 Mar 2020 11:13:48 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id D77C1747E17;
+ Tue, 17 Mar 2020 16:13:42 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 57AE5746383; Tue, 17 Mar 2020 16:13:42 +0100 (CET)
+Message-Id: <adddfa21552783020d64e1314318cab6d24362c3.1584457537.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1584457537.git.balaton@eik.bme.hu>
+References: <cover.1584457537.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: [PATCH v3 1/8] hw/ide: Get rid of piix3_init functions
+Date: Tue, 17 Mar 2020 16:05:37 +0100
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.248) by
- AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.15 via Frontend
- Transport; Tue, 17 Mar 2020 15:16:50 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.248]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 600065ec-ee0e-4cbc-097b-08d7ca8638aa
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2620:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB2620DB66CA79529558EFB236C1F60@HE1PR0802MB2620.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1360;
-X-Forefront-PRVS: 0345CFD558
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(39850400004)(376002)(136003)(346002)(366004)(396003)(199004)(66946007)(6666004)(1076003)(66556008)(54906003)(66476007)(86362001)(6486002)(16526019)(5660300002)(6916009)(186003)(966005)(6506007)(52116002)(4326008)(81166006)(6512007)(81156014)(8676002)(8936002)(316002)(7416002)(2906002)(26005)(478600001)(956004)(36756003)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2620;
- H:HE1PR0802MB2507.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 54KyzpFy68TOS/M26bHvYqYr+edhElwjXOkwblYZ+sZGwOPh2PEpf9PetGsWmuPqsi+DighC/gjgkh3GweeLsTpXRu/NCiiNgf3hhpJOmpXDT54nxvwxM16S7bgFSJs8KHuxDZk2cPLlg58wM3hgwz/uXKlPG90GFvqBOFNweN6L6xG5QA4VpDWbnoNtv6DwymbxMva/X1yj0ItPZ9JNsYWTWVy2F5i/0fO9aVdGC9mg/vNbc8b/eiqpW00kX00FflmwkKxO2sz1EBSBQnK1k0jEbN6GgkmsL4xNKHwiCijx1cQxLbC2sdeBF+wuNekxzkAO8VXQ/uyWEMDTYzHWBn5a89jGZ7Se/1EsclVKaV+TNIv6LETjngY/RUu1wG5fq7sYxWAwMnn02Q+GdjI+vXcxtvCaoNrkUmxI5+ZX+mJk5iZnV4kfcD8gpIwtSluIo0SR7MEza+ouRnO6DZOE3QqYHVXiyD5aJncvaBISy9xi71rdO6PiRmNUcsir0dZpyef1yQHDMmb3Q+10P5EVKQ==
-X-MS-Exchange-AntiSpam-MessageData: PZD43QbGR8vV34Dyn87Fuija2za1kCvIDdC1uU3+mFdKUlxZc4JGoXFhr/34jPsM7GU7Z7bKDqHBau+9wuiQRZq0lTHshQoQrpsfnpOJ7lMaYxpSddcz738q4sIpBRWScEMhT/LNVaEmP0QWigOT+g==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 600065ec-ee0e-4cbc-097b-08d7ca8638aa
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 15:16:52.4119 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i2KMNcUJV88TNrSh52fl28gvkv+nKshGiDpzqkUec9IcJhl0b+OKxvXqUiy0Uj0xalvK8ViNOXhep5LqrKtRZsQYb49KNb9MSOQDIUPIOV8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2620
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0d::71a
+Content-Type: text/plain; charset=UTF-8
+To: qemu-devel@nongnu.org,
+    qemu-block@nongnu.org
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,133 +61,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v10: (based-on "[PATCH 0/3] Minor error handling cleanups" including my 4/3=
- in it)
-02: Change some comments.
-    Do not chain check1 and check2 rules to rule1 to cover move
-    unusual cases to warn about.
-    Add positions to check1 rule.
-    Move check1 and check2 above rule1, otherwise our ___ hack will break c=
-heck2
-    rule.
-03: add hunk, due to rebasing and
-09: rebased. Change is trivial, I keep r-b.
+This removes pci_piix3_ide_init() and pci_piix3_xen_ide_init()
+functions similar to clean up done to other ide devices.
 
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/i386/pc_piix.c | 10 +++++-----
+ hw/ide/pci.c      |  1 +
+ hw/ide/piix.c     | 21 +--------------------
+ include/hw/ide.h  |  2 --
+ 4 files changed, 7 insertions(+), 27 deletions(-)
 
-v10 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-par=
-tI-v10
-v9 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-par=
-tI-v9
-
-
-In these series, there is no commit-per-subsystem script, each generated
-commit is generated in separate.
-
-Still, generating commands are very similar, and looks like
-
-    sed -n '/^<Subsystem name>$/,/^$/{s/^F: //p}' MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Note, that in each generated commit, generation command is the only
-text, indented by 8 spaces in 'git log -1' output, so, to regenerate all
-commits (for example, after rebase, or change in coccinelle script), you
-may use the following command:
-
-git rebase -x "sh -c \"git show --pretty=3D --name-only | xargs git checkou=
-t HEAD^ -- ; git reset; git log -1 | grep '^        ' | sh\"" HEAD~7
-
-Which will start automated interactive rebase for generated patches,
-which will stop if generated patch changed
-(you may do git commit --amend to apply updated generated changes).
-
-Note:
-  git show --pretty=3D --name-only   - lists files, changed in HEAD
-  git log -1 | grep '^        ' | sh   - rerun generation command of HEAD
-
-
-Check for compilation of changed .c files
-git rebase -x "sh -c \"git show --pretty=3D --name-only | sed -n 's/\.c$/.o=
-/p' | xargs make -j9\"" HEAD~7
-
-Vladimir Sementsov-Ogievskiy (9):
-  error: auto propagated local_err
-  scripts: Coccinelle script to use ERRP_AUTO_PROPAGATE()
-  SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
-  pflash: introduce ERRP_AUTO_PROPAGATE
-  fw_cfg: introduce ERRP_AUTO_PROPAGATE
-  virtio-9p: introduce ERRP_AUTO_PROPAGATE
-  TPM: introduce ERRP_AUTO_PROPAGATE
-  nbd: introduce ERRP_AUTO_PROPAGATE
-  xen: introduce ERRP_AUTO_PROPAGATE
-
- scripts/coccinelle/auto-propagated-errp.cocci | 336 ++++++++++++++++++
- include/block/nbd.h                           |   1 +
- include/qapi/error.h                          | 208 +++++++++--
- block/nbd.c                                   |  21 +-
- hw/9pfs/9p-local.c                            |  12 +-
- hw/9pfs/9p.c                                  |   1 +
- hw/block/dataplane/xen-block.c                |  17 +-
- hw/block/pflash_cfi01.c                       |   7 +-
- hw/block/pflash_cfi02.c                       |   7 +-
- hw/block/xen-block.c                          | 122 +++----
- hw/nvram/fw_cfg.c                             |  14 +-
- hw/pci-host/xen_igd_pt.c                      |   7 +-
- hw/sd/sdhci-pci.c                             |   7 +-
- hw/sd/sdhci.c                                 |  21 +-
- hw/sd/ssi-sd.c                                |  16 +-
- hw/tpm/tpm_util.c                             |   7 +-
- hw/xen/xen-backend.c                          |   7 +-
- hw/xen/xen-bus.c                              |  92 ++---
- hw/xen/xen-host-pci-device.c                  |  27 +-
- hw/xen/xen_pt.c                               |  25 +-
- hw/xen/xen_pt_config_init.c                   |  20 +-
- nbd/client.c                                  |   5 +
- nbd/server.c                                  |   5 +
- tpm.c                                         |   7 +-
- MAINTAINERS                                   |   1 +
- 25 files changed, 715 insertions(+), 278 deletions(-)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
-
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Stefan Berger <stefanb@linux.ibm.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Cc: xen-devel@lists.xenproject.org
-
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index e2d98243bc..c399398739 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -39,6 +39,7 @@
+ #include "hw/usb.h"
+ #include "net/net.h"
+ #include "hw/ide.h"
++#include "hw/ide/pci.h"
+ #include "hw/irq.h"
+ #include "sysemu/kvm.h"
+ #include "hw/kvm/clock.h"
+@@ -242,11 +243,10 @@ static void pc_init1(MachineState *machine,
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+     if (pcmc->pci_enabled) {
+         PCIDevice *dev;
+-        if (xen_enabled()) {
+-            dev =3D pci_piix3_xen_ide_init(pci_bus, hd, piix3_devfn + 1)=
+;
+-        } else {
+-            dev =3D pci_piix3_ide_init(pci_bus, hd, piix3_devfn + 1);
+-        }
++
++        dev =3D pci_create_simple(pci_bus, piix3_devfn + 1,
++                                xen_enabled() ? "piix3-ide-xen" : "piix3=
+-ide");
++        pci_ide_create_devs(dev, hd);
+         idebus[0] =3D qdev_get_child_bus(&dev->qdev, "ide.0");
+         idebus[1] =3D qdev_get_child_bus(&dev->qdev, "ide.1");
+         pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
+diff --git a/hw/ide/pci.c b/hw/ide/pci.c
+index 1a6a287e76..4fc76c5225 100644
+--- a/hw/ide/pci.c
++++ b/hw/ide/pci.c
+@@ -476,6 +476,7 @@ const VMStateDescription vmstate_ide_pci =3D {
+     }
+ };
+=20
++/* hd_table must contain 4 block drivers */
+ void pci_ide_create_devs(PCIDevice *dev, DriveInfo **hd_table)
+ {
+     PCIIDEState *d =3D PCI_IDE(dev);
+diff --git a/hw/ide/piix.c b/hw/ide/piix.c
+index bc575b4d70..8bcd6b72c2 100644
+--- a/hw/ide/piix.c
++++ b/hw/ide/piix.c
+@@ -197,15 +197,6 @@ int pci_piix3_xen_ide_unplug(DeviceState *dev, bool =
+aux)
+     return 0;
+ }
+=20
+-PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int=
+ devfn)
+-{
+-    PCIDevice *dev;
+-
+-    dev =3D pci_create_simple(bus, devfn, "piix3-ide-xen");
+-    pci_ide_create_devs(dev, hd_table);
+-    return dev;
+-}
+-
+ static void pci_piix_ide_exitfn(PCIDevice *dev)
+ {
+     PCIIDEState *d =3D PCI_IDE(dev);
+@@ -217,17 +208,6 @@ static void pci_piix_ide_exitfn(PCIDevice *dev)
+     }
+ }
+=20
+-/* hd_table must contain 4 block drivers */
+-/* NOTE: for the PIIX3, the IRQs and IOports are hardcoded */
+-PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
+fn)
+-{
+-    PCIDevice *dev;
+-
+-    dev =3D pci_create_simple(bus, devfn, "piix3-ide");
+-    pci_ide_create_devs(dev, hd_table);
+-    return dev;
+-}
+-
+ /* hd_table must contain 4 block drivers */
+ /* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
+ PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
+fn)
+@@ -239,6 +219,7 @@ PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo =
+**hd_table, int devfn)
+     return dev;
+ }
+=20
++/* NOTE: for the PIIX3, the IRQs and IOports are hardcoded */
+ static void piix3_ide_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+diff --git a/include/hw/ide.h b/include/hw/ide.h
+index dea0ecf5be..883bbaeb9b 100644
+--- a/include/hw/ide.h
++++ b/include/hw/ide.h
+@@ -12,8 +12,6 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int io=
+base2, int isairq,
+                         DriveInfo *hd0, DriveInfo *hd1);
+=20
+ /* ide-pci.c */
+-PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int=
+ devfn);
+-PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
+fn);
+ PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
+fn);
+ int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
+=20
 --=20
-2.21.0
+2.21.1
 
 
