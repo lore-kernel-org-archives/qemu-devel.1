@@ -2,100 +2,62 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E99C18E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8CE0C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:17:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DEA82071C
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:16:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2E5C206EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:17:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7xp2v+H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DEA82071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MxarlFhT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E5C206EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9HE-00060g-Fo
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:16:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46371)
+	id 1jE9HT-0006XF-P0
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:17:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45935)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jE96O-0002AG-7s
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:37 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jE967-0001iB-EG
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jE96M-0007TG-I6
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:35 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26830)
+ (envelope-from <dgibson@ozlabs.org>) id 1jE965-0005YK-Qc
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:19 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:57809 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jE96M-0007N7-Bz
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584439533;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rRy5gbVbBssfqnTE4/fNCnzS8878j1YS+ngVXy5RyKY=;
- b=e7xp2v+Hi9fX8/hVwVPmFAZeOzEbCQSaKb+o+LF8rrGHkmh44awd8a48Xkmv+I7YiTAi9J
- DfNLt364H7Z5cOUy50qnX5lKApok0uCcqpJwJqhLrcW6N1/0jDAzW7qPJp5dqzjGJff06r
- 6fNUQcjWpe36wUQCrbg+oYjcme/iq8k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-m93T5rbBPoqIJ3O_TkRE2Q-1; Tue, 17 Mar 2020 06:05:31 -0400
-X-MC-Unique: m93T5rbBPoqIJ3O_TkRE2Q-1
-Received: by mail-wr1-f69.google.com with SMTP id t10so4133942wrp.15
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 03:05:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mbViYDInhtzhzOnjgxz8a5DkEbv4zhEsie9K0pgxCUE=;
- b=DXzbFG7diO8uIp1CSmEecRbh7s7a1dhdkwtFHxLoXZyx6ouDpomkpke2YZ2ltxOrOx
- N8Qsuazj5YD0RGz++GaYjUq2QR1Z5PCT85TPQ4wc0TcN3oRtTs1q9oFahZq1oEuYjv7/
- sabfbMqVe2s0eG3Yp+e3CJn3kjnLdT5+cdgVnvgCFwC5ykEID8YrWkAp4ZOHl71Oqfde
- isUPVWstbKveVvwdWaTEsV4k/uYzK9NT5kxZDfZygtlbUMuHswWT4jeb1NCUwkJPfQ4k
- PnrRzZQose7Z+TzE0U7JgLj7leNDIqkgDacge75VMQ2agOSU7MeENXT03yex/91wIZSu
- QIUw==
-X-Gm-Message-State: ANhLgQ1Eru550WGDozq5kpQT28PKY3hPka+Y+2GEgVAssFFdkUgyFTa/
- y2mEZ9LAa1O6mukXNxyKM59WpppEuvni0zzkfruZfhZ41UDlqrk5rquy5PTv4/M/AtFXCtGkMTa
- 9aKxuAgXG5Jvzphc=
-X-Received: by 2002:a7b:c354:: with SMTP id l20mr4408351wmj.40.1584439530596; 
- Tue, 17 Mar 2020 03:05:30 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vt6u34pm614WVrq7zZdFsaPqPDK8EhQkAC1WEOxfgMCctMtYiZDP4RtOx3kvuN3Z2y5Ii9rtg==
-X-Received: by 2002:a7b:c354:: with SMTP id l20mr4408243wmj.40.1584439529181; 
- Tue, 17 Mar 2020 03:05:29 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id h15sm3608071wrw.97.2020.03.17.03.05.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Mar 2020 03:05:28 -0700 (PDT)
-Subject: Re: [PATCH v1 13/28] target/i386: use gdb_get_reg helpers
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200316172155.971-1-alex.bennee@linaro.org>
- <20200316172155.971-14-alex.bennee@linaro.org>
- <9ecb1d64-c447-5c0d-0280-ce9cd6537fa6@redhat.com>
-Message-ID: <59d09313-963f-ffaa-a069-f89e597ac28f@redhat.com>
-Date: Tue, 17 Mar 2020 11:05:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jE965-0002os-Bl; Tue, 17 Mar 2020 06:05:17 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48hTKx6jdnz9sTC; Tue, 17 Mar 2020 21:04:36 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1584439477;
+ bh=o7N/dshst+CIkSfq9Go1qUnQPzkKuFsVjI0nGOok1OU=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=MxarlFhTsBJfLcn+OBdW+1z9HbK7kbwamUkQIbmqchS2vq2HRzBvk+oJyjNKqqhXh
+ GQTIKY196jYmQdFqAdqd5Rr/2u5axjGOlcFJIT78cAA26n+95ZWuFjlr+u8c2QFlyk
+ CHKq2qD927Odkv+6/6QxbNkAv+/19dBKClEW43+M=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 21/45] spapr: Clean up RMA size calculation
+Date: Tue, 17 Mar 2020 21:03:59 +1100
+Message-Id: <20200317100423.622643-22-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
+References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <9ecb1d64-c447-5c0d-0280-ce9cd6537fa6@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,129 +69,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 10:53 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 3/16/20 6:21 PM, Alex Benn=C3=A9e wrote:
->> This is cleaner than poking memory directly and will make later
->> clean-ups easier.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> ---
->> v7
->> =C2=A0=C2=A0 - remove stray space
->> =C2=A0=C2=A0 - fixup the floatx80 set/get routines
->> ---
->> =C2=A0 target/i386/gdbstub.c | 27 +++++++++++----------------
->> =C2=A0 1 file changed, 11 insertions(+), 16 deletions(-)
->>
->> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
->> index 572ead641ca..e4d8cb66c00 100644
->> --- a/target/i386/gdbstub.c
->> +++ b/target/i386/gdbstub.c
->> @@ -98,26 +98,22 @@ int x86_cpu_gdb_read_register(CPUState *cs,=20
->> uint8_t *mem_buf, int n)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return gdb_get_reg64(mem_buf,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 env->regs[gpr_map[n]] &=20
->> 0xffffffffUL);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 } else {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 memset(mem_buf, 0, sizeof(target_ulong));
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return sizeof(target_ulong);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return gdb_get_regl(mem_buf, 0);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return gdb_get_reg32(mem_buf, env->regs[gpr_map32[n]]);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (n >=3D IDX_FP_REGS && n < IDX_=
-FP_REGS + 8) {
->> -#ifdef USE_X86LDOUBLE
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* FIXME: byteswap float val=
-ues - after fixing fpregs layout. */
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memcpy(mem_buf, &env->fpregs=
-[n - IDX_FP_REGS], 10);
->> -#else
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(mem_buf, 0, 10);
->> -#endif
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 10;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 floatx80 *fp =3D (floatx80 *=
-) &env->fpregs[n - IDX_FP_REGS];
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int len =3D gdb_get_reg64(me=
-m_buf, cpu_to_le64(fp->low));
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 len +=3D gdb_get_reg16(mem_b=
-uf + len, cpu_to_le16(fp->high));
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return len;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (n >=3D IDX_XMM_REGS && n < IDX=
-_XMM_REGS + CPU_NB_REGS) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 n -=3D IDX_XMM_RE=
-GS;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (n < CPU_NB_RE=
-GS32 || TARGET_LONG_BITS =3D=3D 64) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stq_=
-p(mem_buf, env->xmm_regs[n].ZMM_Q(0));
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stq_=
-p(mem_buf + 8, env->xmm_regs[n].ZMM_Q(1));
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn 16;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn gdb_get_reg128(mem_buf,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 env->xmm_regs[n].ZMM=
-_Q(0),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 env->xmm_regs[n].ZMM=
-_Q(1));
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (n) {
->> @@ -290,10 +286,9 @@ int x86_cpu_gdb_write_register(CPUState *cs,=20
->> uint8_t *mem_buf, int n)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return 4;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (n >=3D IDX_FP_REGS && n < IDX_=
-FP_REGS + 8) {
->> -#ifdef USE_X86LDOUBLE
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* FIXME: byteswap float val=
-ues - after fixing fpregs layout. */
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memcpy(&env->fpregs[n - IDX_=
-FP_REGS], mem_buf, 10);
->> -#endif
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 floatx80 *fp =3D (floatx80 *=
-) &env->fpregs[n - IDX_FP_REGS];
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fp->low =3D le64_to_cpu(* (u=
-int64_t *) mem_buf);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fp->high =3D le16_to_cpu(* (=
-uint16_t *) (mem_buf + 8));
+Move the calculation of the Real Mode Area (RMA) size into a helper
+function.  While we're there clean it up and correct it in a few ways:
+  * Add comments making it clearer where the various constraints come fro=
+m
+  * Remove a pointless check that the RMA fits within Node 0 (we've just
+    clamped it so that it does)
 
-Note, checkpatch complains for both lines:
-ERROR: space prohibited after that '*' (ctx:BxW)
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/ppc/spapr.c | 61 ++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 37 insertions(+), 24 deletions(-)
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 10;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (n >=3D IDX_XMM_REGS && n < IDX=
-_XMM_REGS + CPU_NB_REGS) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 n -=3D IDX_XMM_RE=
-GS;
->>
->=20
-> I'd prefer both USE_X86LDOUBLE hunks in a separate patch, anyway:
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 95bda4a615..1950fc303e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2648,6 +2648,42 @@ static PCIHostState *spapr_create_default_phb(void=
+)
+     return PCI_HOST_BRIDGE(dev);
+ }
+=20
++static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
++{
++    MachineState *machine =3D MACHINE(spapr);
++    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
++    hwaddr rma_size =3D machine->ram_size;
++    hwaddr node0_size =3D spapr_node0_size(machine);
++
++    /* RMA has to fit in the first NUMA node */
++    rma_size =3D MIN(rma_size, node0_size);
++
++    /*
++     * VRMA access is via a special 1TiB SLB mapping, so the RMA can
++     * never exceed that
++     */
++    rma_size =3D MIN(rma_size, 1 * TiB);
++
++    /*
++     * Clamp the RMA size based on machine type.  This is for
++     * migration compatibility with older qemu versions, which limited
++     * the RMA size for complicated and mostly bad reasons.
++     */
++    if (smc->rma_limit) {
++        rma_size =3D MIN(rma_size, smc->rma_limit);
++    }
++
++    if (rma_size < MIN_RMA_SLOF) {
++        error_setg(errp,
++                   "pSeries SLOF firmware requires >=3D %" HWADDR_PRIx
++                   "ldMiB guest RMA (Real Mode Area memory)",
++                   MIN_RMA_SLOF / MiB);
++        return 0;
++    }
++
++    return rma_size;
++}
++
+ /* pSeries LPAR / sPAPR hardware init */
+ static void spapr_machine_init(MachineState *machine)
+ {
+@@ -2659,7 +2695,6 @@ static void spapr_machine_init(MachineState *machin=
+e)
+     PCIHostState *phb;
+     int i;
+     MemoryRegion *sysmem =3D get_system_memory();
+-    hwaddr node0_size =3D spapr_node0_size(machine);
+     long load_limit, fw_size;
+     char *filename;
+     Error *resize_hpt_err =3D NULL;
+@@ -2699,22 +2734,7 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+         exit(1);
+     }
+=20
+-    spapr->rma_size =3D node0_size;
+-
+-    /*
+-     * Clamp the RMA size based on machine type.  This is for
+-     * migration compatibility with older qemu versions, which limited
+-     * the RMA size for complicated and mostly bad reasons.
+-     */
+-    if (smc->rma_limit) {
+-        spapr->rma_size =3D MIN(spapr->rma_size, smc->rma_limit);
+-    }
+-
+-    if (spapr->rma_size > node0_size) {
+-        error_report("Numa node 0 has to span the RMA (%#08"HWADDR_PRIx"=
+)",
+-                     spapr->rma_size);
+-        exit(1);
+-    }
++    spapr->rma_size =3D spapr_rma_size(spapr, &error_fatal);
+=20
+     /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
+*/
+     load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+@@ -2951,13 +2971,6 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+         }
+     }
+=20
+-    if (spapr->rma_size < MIN_RMA_SLOF) {
+-        error_report(
+-            "pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real =
+Mode Area memory)",
+-            MIN_RMA_SLOF / MiB);
+-        exit(1);
+-    }
+-
+     if (kernel_filename) {
+         uint64_t lowaddr =3D 0;
+=20
+--=20
+2.24.1
 
 
