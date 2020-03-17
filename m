@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F0FC1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C36C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:23:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A427020714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:23:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0223B20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:23:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DlsQQ9RN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A427020714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="TEZBYmI0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0223B20714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEGru-0002ma-RC
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:23:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48310)
+	id 1jEGsI-0003a2-40
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:23:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48313)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jEGma-0002oE-W4
+ (envelope-from <berto@igalia.com>) id 1jEGmb-0002oI-14
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jEGmZ-0007Ul-1R
+ (envelope-from <berto@igalia.com>) id 1jEGmZ-0007VS-2N
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:17:40 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:57716)
+Received: from fanzine.igalia.com ([178.60.130.6]:57721)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jEGmX-0005Ux-An; Tue, 17 Mar 2020 14:17:38 -0400
+ id 1jEGmX-0005V8-AI; Tue, 17 Mar 2020 14:17:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=7sHbHchVW1ZG6KSFzVDN96AUHkkExtfWiKVvhF1b2ew=; 
- b=DlsQQ9RNg/Btd8ks46DNOKBlT7EGXo14flT8mmprdlBH7nnEO+iAZtR51Z2JrO9ugiR2A7q+5/5BRlocyDeWgPSO2eWkxUwItpCy8UB2MV7/ILv4a+RgWxGAhkW3yj9u0kHngLIuwsROVw/MAuZyCcfIWIcDOefhMnKArVu3QuR01b6XOlMZB0HW+ip7paDuO89Jzr7qiYaoW+d0QxeS+KfGJUKd+gZ8VSiS7xediJIDj17jPgmbgDXd9JHRt07WUGI2NXh0M7GOosmNo44MCXGc/V8hlE2vVqY6v7jiFe8CMWLq3+zQZih8QS7y0E/N+jaqO82Bsr1WfD3gQk0DPg==;
+ bh=2dD5+fpTCs+s9KvpJKL8lqwrOb+2rBZz05GePv9EoMw=; 
+ b=TEZBYmI0Tv5TNCV7Jr+W9K9pKfNbWmuMcr/i5fNIhaTPrF+dJx6dhDE9LRHwdxHdURqsAPHksfLaLQXbA7vtYQTPnL0a7r8QKYCXAUUJobxfwMvTlMS1Tabr9DrgPBsSOFZZEEdeF59Qa/hkrN2fQMv5qQf3ymUc7Ve1htasFrNaDwd3bPwEwIBc4NHs8m575NuuDQXsmsUEO7utIl5+II/FbBqq5Ol1ldiGEOGM1ZnTE5JutlZqxi6zKp62ub8jhaXzzXrkaquFVu7CO441xf0kWd1O9CjTFpgGnMiwOl6+TeC9YmWObLjDc5TqSWUlhOUhZVO3sfeagyr5VBAJow==;
 Received: from [81.0.35.138] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jEGmD-00015X-0N; Tue, 17 Mar 2020 19:17:17 +0100
+ id 1jEGmC-00015U-Sz; Tue, 17 Mar 2020 19:17:16 +0100
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jEGlw-0006OR-Ed; Tue, 17 Mar 2020 19:17:00 +0100
+ id 1jEGlw-0006Ol-PT; Tue, 17 Mar 2020 19:17:00 +0100
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 12/30] qcow2: Update get/set_l2_entry() and add
- get/set_l2_bitmap()
-Date: Tue, 17 Mar 2020 19:16:09 +0100
-Message-Id: <c3d6c8e03c353a694b6415d9f6ae253f22a620ea.1584468723.git.berto@igalia.com>
+Subject: [PATCH v4 22/30] qcow2: Fix offset calculation in
+ handle_dependencies()
+Date: Tue, 17 Mar 2020 19:16:19 +0100
+Message-Id: <46d9ec6dca0b054a529ee776d1c04b002098c127.1584468723.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1584468723.git.berto@igalia.com>
 References: <cover.1584468723.git.berto@igalia.com>
@@ -81,66 +81,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Extended L2 entries are 128-bit wide: 64 bits for the entry itself and
-64 bits for the subcluster allocation bitmap.
-
-In order to support them correctly get/set_l2_entry() need to be
-updated so they take the entry width into account in order to
-calculate the correct offset.
-
-This patch also adds the get/set_l2_bitmap() functions that are
-used to access the bitmaps. For convenience we allow calling
-get_l2_bitmap() on images without subclusters, although the caller
-does not need and should ignore the returned value.
+l2meta_cow_start() and l2meta_cow_end() are not necessarily
+cluster-aligned if the image has subclusters, so update the
+calculation of old_start and old_end to guarantee that no two requests
+try to write on the same cluster.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.h | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ block/qcow2-cluster.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1eb4b46807..9611efbc52 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -518,15 +518,37 @@ static inline size_t l2_entry_size(BDRVQcow2State *s)
- static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
-                                     int idx)
- {
-+    idx *= l2_entry_size(s) / sizeof(uint64_t);
-     return be64_to_cpu(l2_slice[idx]);
- }
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 824c710760..ceacd91ea3 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1306,8 +1306,8 @@ static int handle_dependencies(BlockDriverState *bs, uint64_t guest_offset,
  
-+static inline uint64_t get_l2_bitmap(BDRVQcow2State *s, uint64_t *l2_slice,
-+                                     int idx)
-+{
-+    if (has_subclusters(s)) {
-+        idx *= l2_entry_size(s) / sizeof(uint64_t);
-+        return be64_to_cpu(l2_slice[idx + 1]);
-+    } else {
-+        /* For convenience only; the caller should ignore this value. */
-+        return 0;
-+    }
-+}
-+
- static inline void set_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
-                                 int idx, uint64_t entry)
- {
-+    idx *= l2_entry_size(s) / sizeof(uint64_t);
-     l2_slice[idx] = cpu_to_be64(entry);
- }
+         uint64_t start = guest_offset;
+         uint64_t end = start + bytes;
+-        uint64_t old_start = l2meta_cow_start(old_alloc);
+-        uint64_t old_end = l2meta_cow_end(old_alloc);
++        uint64_t old_start = start_of_cluster(s, l2meta_cow_start(old_alloc));
++        uint64_t old_end = ROUND_UP(l2meta_cow_end(old_alloc), s->cluster_size);
  
-+static inline void set_l2_bitmap(BDRVQcow2State *s, uint64_t *l2_slice,
-+                                 int idx, uint64_t bitmap)
-+{
-+    assert(has_subclusters(s));
-+    idx *= l2_entry_size(s) / sizeof(uint64_t);
-+    l2_slice[idx + 1] = cpu_to_be64(bitmap);
-+}
-+
- static inline bool has_data_file(BlockDriverState *bs)
- {
-     BDRVQcow2State *s = bs->opaque;
+         if (end <= old_start || start >= old_end) {
+             /* No intersection */
 -- 
 2.20.1
 
