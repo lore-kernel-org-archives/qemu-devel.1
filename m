@@ -2,56 +2,85 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBF1C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE89C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:09:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DF8D20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:08:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DF8D20714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id CA8A920714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:09:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d4oTy5aT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA8A920714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEDpJ-0001Ef-R5
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:08:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53161)
+	id 1jEDqJ-0002dV-1b
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:09:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEDoO-0008Cx-8z
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:07:22 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jEDor-0000gI-9h
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:07:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEDoM-0003pp-7Y
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:07:19 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56035)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jEDoL-0001uJ-8O; Tue, 17 Mar 2020 11:07:18 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0746686|-1; CH=green; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.0230443-0.00100222-0.975954;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H0zOLJH_1584457618; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H0zOLJH_1584457618)
- by smtp.aliyun-inc.com(10.147.44.129);
- Tue, 17 Mar 2020 23:06:58 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v6 00/61]  target/riscv: support vector extension v0.7.1
-Date: Tue, 17 Mar 2020 23:05:52 +0800
-Message-Id: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <peter.maydell@linaro.org>) id 1jEDop-0007EI-P4
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:07:48 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:39921)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jEDop-00079a-Gy
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:07:47 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id r2so6538108otn.6
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 08:07:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=C7Y4UJGLKwFelm6HlTF0wyLG/bfxpxmk307g3iM1ISI=;
+ b=d4oTy5aTQ7kI3i5RR1G/dK6bFzGiO1gBScdqq2J/XZcikOnEALnDA8lDLXoLLbnBXG
+ wJzmFKZAHvhf+AMiCxQGmyq2lkztFVyYGoMkAdVFYQXeYDb5B7Gp2CizjOxlwwnbxfYS
+ BETcDvO2gixzSJ5QEiBLtw+mZ9BcGUzI7K/LxGbATZ1MBJrJKg+Qe1qHH0lYfLUVoxhp
+ WXwl5YGevTWo4dkkTDwL9zPDfM3AhFUiLqdEp/VWpVQA4+uhguBX3M86hrda/X2tpnlp
+ YFEZPvmYFtffejGE0vun8sjl+yeZn5hPok/bXXPwsG+uDYbPK1dgD5uZIFc1cn5GB0kL
+ 7myQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=C7Y4UJGLKwFelm6HlTF0wyLG/bfxpxmk307g3iM1ISI=;
+ b=n9e5byZ9ZbKdU8mbRaxJ0uJ1hdK/FXKiwoR46t1Fd00q1p7Y4bzNF48WdM1BRU2vde
+ oihalRPnynkn/6zfiTy3Yo26vLmzUfF3WpuvoZmL2LNm7e58k9iUmRDn2HxjtmyP21FY
+ s65kDyp2beCz7YAit7lkWSkOEmaU8TShfJ332sEy/9SFabPA1a+pEQSJjnvrIzVpeXt3
+ 2bSeden2ncfL91XNN81YNwR7lxy0BLSvwlQKndTQYS4U7Vwvwzg67FPHMeph+Vi4n2LI
+ F2UxKZGRMYe2LQHHoDF48laJFBbeD+kLlznwylS6r+0X8H7pDWo9jliF3xWWkzUoYHjg
+ /pSw==
+X-Gm-Message-State: ANhLgQ34bRDa7/22NdpWjYpTIj7mSV2hCG6ke5mGiTAa5R0SjLVKO4y3
+ SwENvpv2BGka1Ml/nEyYLUxgnlfKkGzPquZ5d1kHBw==
+X-Google-Smtp-Source: ADFU+vsflQdwfBOmcNngY5g9Hzi8MxNNOxpmkIJ8h27l1doV8wK1Zc/T6GXj1Yhd6WTK4aM0oPQXnwVgjH0vvoihWmo=
+X-Received: by 2002:a9d:19ca:: with SMTP id k68mr4114688otk.232.1584457665736; 
+ Tue, 17 Mar 2020 08:07:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+References: <20200317043819.20197-1-jsnow@redhat.com>
+ <CAFEAcA_=DHpNZ+b9Hrim39R74Jik8MKqu8MPJm80wMsQS0FADQ@mail.gmail.com>
+ <5805273e-0a2f-850a-a07a-97dac0d7211e@redhat.com>
+ <20200317145703.GH2041016@redhat.com>
+ <CAFEAcA9-YLNcZPPsHsdLB0O2Ac4WKPspMe=Re2S7tyTZu=kwFA@mail.gmail.com>
+ <20200317150528.GK2041016@redhat.com>
+In-Reply-To: <20200317150528.GK2041016@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Mar 2020 15:07:34 +0000
+Message-ID: <CAFEAcA_pLvupGhgeuevVBxhNz-NVkKWOUrr=nJaPAEKquHaqxw@mail.gmail.com>
+Subject: Re: [PULL 00/10] Bitmaps patches
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,151 +92,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchset implements the vector extension for RISC-V on QEMU.
+On Tue, 17 Mar 2020 at 15:05, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> On Tue, Mar 17, 2020 at 03:00:48PM +0000, Peter Maydell wrote:
+> > On Tue, 17 Mar 2020 at 14:57, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> > > I don't feel like -Wno-unused-function looses anything significant, a=
+s
+> > > the GCC builds will still be reporting unused functions which will
+> > > catch majority of cases.
+> >
+> > The most interesting difference is that clang will catch unused
+> > static inline functions which gcc does not.
+>
+> That's mostly just about dead code cruft detection IIUC. That code won't
+> make it into the binary if it isn't used.
 
-You can also find the patchset and all *test cases* in
-my repo(https://github.com/romanheros/qemu.git branch:vector-upstream-v3).
-All the test cases are in the directory qemu/tests/riscv/vector/. They are
-riscv64 linux user mode programs.
+Indeed, but it's nice to have the dead code cruft detection. You
+can always mark the function as __attribute__((unused)) if you really
+mean that it might be present but not used.
 
-You can test the patchset by the script qemu/tests/riscv/vector/runcase.sh.
-
-Features:
-  * support specification riscv-v-spec-0.7.1.(https://github.com/riscv/riscv-v-spec/releases/tag/0.7.1/)
-  * support basic vector extension.
-  * support Zvlsseg.
-  * support Zvamo.
-  * not support Zvediv as it is changing.
-  * SLEN always equals VLEN.
-  * element width support 8bit, 16bit, 32bit, 64bit.
-
-Changelog:
-v6
-  * use gvec_dup Gvec IR to accellerate move and merge.
-  * a better way to implement fixed point instructions.
-  * a global check when vl == 0.
-  * limit some macros to only one inline function call.
-  * fixup sew error when use Gvec IR.
-  * fixup bugs for corner cases.
-v5
-  * fixup a bug in tb flags.
-v4
-  * no change
-v3
-  * move check code from execution-time to translation-time
-  * use a continous memory block for vector register description.
-  * vector registers as direct fields in RISCVCPUState.
-  * support VLEN configure from qemu command line.
-  * support ELEN configure from qemu command line.
-  * support vector specification version configure from qemu command line.
-  * probe pages before real load or store access.
-  * use probe_page_check for no-fault operations in linux user mode.
-  * generation atomic exit exception when in parallel environment.
-  * fixup a lot of concrete bugs.
-
-V2
-  * use float16_compare{_quiet}
-  * only use GETPC() in outer most helper
-  * add ctx.ext_v Property
-
-LIU Zhiwei (61):
-  target/riscv: add vector extension field in CPURISCVState
-  target/riscv: implementation-defined constant parameters
-  target/riscv: support vector extension csr
-  target/riscv: add vector configure instruction
-  target/riscv: add an internals.h header
-  target/riscv: add vector stride load and store instructions
-  target/riscv: add vector index load and store instructions
-  target/riscv: add fault-only-first unit stride load
-  target/riscv: add vector amo operations
-  target/riscv: vector single-width integer add and subtract
-  target/riscv: vector widening integer add and subtract
-  target/riscv: vector integer add-with-carry / subtract-with-borrow
-    instructions
-  target/riscv: vector bitwise logical instructions
-  target/riscv: vector single-width bit shift instructions
-  target/riscv: vector narrowing integer right shift instructions
-  target/riscv: vector integer comparison instructions
-  target/riscv: vector integer min/max instructions
-  target/riscv: vector single-width integer multiply instructions
-  target/riscv: vector integer divide instructions
-  target/riscv: vector widening integer multiply instructions
-  target/riscv: vector single-width integer multiply-add instructions
-  target/riscv: vector widening integer multiply-add instructions
-  target/riscv: vector integer merge and move instructions
-  target/riscv: vector single-width saturating add and subtract
-  target/riscv: vector single-width averaging add and subtract
-  target/riscv: vector single-width fractional multiply with rounding
-    and saturation
-  target/riscv: vector widening saturating scaled multiply-add
-  target/riscv: vector single-width scaling shift instructions
-  target/riscv: vector narrowing fixed-point clip instructions
-  target/riscv: vector single-width floating-point add/subtract
-    instructions
-  target/riscv: vector widening floating-point add/subtract instructions
-  target/riscv: vector single-width floating-point multiply/divide
-    instructions
-  target/riscv: vector widening floating-point multiply
-  target/riscv: vector single-width floating-point fused multiply-add
-    instructions
-  target/riscv: vector widening floating-point fused multiply-add
-    instructions
-  target/riscv: vector floating-point square-root instruction
-  target/riscv: vector floating-point min/max instructions
-  target/riscv: vector floating-point sign-injection instructions
-  target/riscv: vector floating-point compare instructions
-  target/riscv: vector floating-point classify instructions
-  target/riscv: vector floating-point merge instructions
-  target/riscv: vector floating-point/integer type-convert instructions
-  target/riscv: widening floating-point/integer type-convert
-    instructions
-  target/riscv: narrowing floating-point/integer type-convert
-    instructions
-  target/riscv: vector single-width integer reduction instructions
-  target/riscv: vector wideing integer reduction instructions
-  target/riscv: vector single-width floating-point reduction
-    instructions
-  target/riscv: vector widening floating-point reduction instructions
-  target/riscv: vector mask-register logical instructions
-  target/riscv: vector mask population count vmpopc
-  target/riscv: vmfirst find-first-set mask bit
-  target/riscv: set-X-first mask bit
-  target/riscv: vector iota instruction
-  target/riscv: vector element index instruction
-  target/riscv: integer extract instruction
-  target/riscv: integer scalar move instruction
-  target/riscv: floating-point scalar move instructions
-  target/riscv: vector slide instructions
-  target/riscv: vector register gather instruction
-  target/riscv: vector compress instruction
-  target/riscv: configure and turn on vector extension from command line
-
- target/riscv/Makefile.objs              |    2 +-
- target/riscv/cpu.c                      |   49 +
- target/riscv/cpu.h                      |   82 +-
- target/riscv/cpu_bits.h                 |   15 +
- target/riscv/csr.c                      |   75 +-
- target/riscv/fpu_helper.c               |   33 +-
- target/riscv/helper.h                   | 1073 +++++
- target/riscv/insn32-64.decode           |   11 +
- target/riscv/insn32.decode              |  372 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 2710 +++++++++++++
- target/riscv/internals.h                |   35 +
- target/riscv/translate.c                |   24 +-
- target/riscv/vector_helper.c            | 4928 +++++++++++++++++++++++
- 13 files changed, 9366 insertions(+), 43 deletions(-)
- create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
- create mode 100644 target/riscv/internals.h
- create mode 100644 target/riscv/vector_helper.c
-
--- 
-2.23.0
-
+thanks
+-- PMM
 
