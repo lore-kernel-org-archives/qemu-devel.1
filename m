@@ -7,52 +7,53 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93643C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF897C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61372205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:06:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF72F205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:06:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k5dWZuU5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61372205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jAqguzUo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF72F205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE975-0002oK-Hz
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:06:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44881)
+	id 1jE97C-0002xa-Rh
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:06:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95X-0000kD-6e
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:44 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95c-0000oJ-Bf
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95V-0001BZ-Gy
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:43 -0400
-Received: from ozlabs.org ([203.11.71.1]:60245)
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95a-0001s3-EY
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:48 -0400
+Received: from ozlabs.org ([203.11.71.1]:45151)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jE95U-0000Qk-VC; Tue, 17 Mar 2020 06:04:41 -0400
+ id 1jE95a-0001Go-1L; Tue, 17 Mar 2020 06:04:46 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hTKv4q2Kz9sRf; Tue, 17 Mar 2020 21:04:35 +1100 (AEDT)
+ id 48hTKw0bH8z9sSY; Tue, 17 Mar 2020 21:04:35 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584439475;
- bh=uz03V/ru9X630/rRDbbXvWwKAd0CRMRYWvPqvXbXi8o=;
+ d=gibson.dropbear.id.au; s=201602; t=1584439476;
+ bh=+B1mCWC4t6yy2Tx65wsvNsRLsoZ3PfvGpSRZfwW2BjM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=k5dWZuU5jjvwnvN2Tbe2yr+UY6YRmWlkzyMAHmg5kCteGxfq+OOoZcrzOEfxfmMPW
- 8r6+9ncCqrIHz4219ioGUh+5uUy6sOZwuTfxgyJV5juN/fGfEDsCHrSIEL/BGR4+ZO
- i2d2y0xYV0fVMVJRx3JQoWocYl/62g75LHLaJi4Q=
+ b=jAqguzUoPqeepq1qwHglZLEBGJ3/YADqABhhxD6vs11ds2jTCHkiIwW4TM32v4wfG
+ CXEa/2rRxQRakgA7ks6s9C0fMpZaTcTzqAVNM6SxI2DH0j9GrgxmW8Hx++XA3Y57PU
+ nZPFNjz5AfuV3PenC5ET31X7wE52ykX6wRhXesXM=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 03/45] ppc: Officially deprecate the CPU "compat" property
-Date: Tue, 17 Mar 2020 21:03:41 +1100
-Message-Id: <20200317100423.622643-4-david@gibson.dropbear.id.au>
+Subject: [PULL 07/45] ppc: Remove stub of PPC970 HID4 implementation
+Date: Tue, 17 Mar 2020 21:03:45 +1100
+Message-Id: <20200317100423.622643-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,168 +76,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+The PowerPC 970 CPU was a cut-down POWER4, which had hypervisor capabilit=
+y.
+However, it can be (and often was) strapped into "Apple mode", where the
+hypervisor capabilities were disabled (essentially putting it always in
+hypervisor mode).
 
-Server class POWER CPUs have a "compat" property, which was obsoleted
-by commit 7843c0d60d and replaced by a "max-cpu-compat" property on the
-pseries machine type. A hack was introduced so that passing "compat" to
--cpu would still produce the desired effect, for the sake of backward
-compatibility : it strips the "compat" option from the CPU properties
-and applies internally it to the pseries machine. The accessors of the
-"compat" property were updated to do nothing but warn the user about the
-deprecated status when doing something like:
+That's actually the only mode of the 970 we support in qemu, and we're
+unlikely to change that any time soon.  However, we do have a partial
+implementation of the 970's HID4 register which affects things only
+relevant for hypervisor mode.
 
-$ qemu-system-ppc64 -global POWER9-family-powerpc64-cpu.compat=3Dpower9
-qemu-system-ppc64: warning: CPU 'compat' property is deprecated and has n=
-o
- effect; use max-cpu-compat machine property instead
+That stub is also really ugly, since it attempts to duplicate the effects
+of HID4 by re-encoding it into the LPCR register used in newer CPUs, but
+in a really confusing way.
 
-This was merged during the QEMU 2.10 timeframe, a few weeks before we
-formalized our deprecation process. As a consequence, the "compat"
-property fell through the cracks and was never listed in the officialy
-deprecated features.
+Just get rid of it.
 
-We are now eight QEMU versions later, it is largely time to mention it
-in qemu-deprecated.texi. Also, since -global XXX-powerpc64-cpu.compat=3D
-has been emitting warnings since QEMU 2.10 and the usual way of setting
-CPU properties is with -cpu, completely remove the "compat" property.
-Keep the hack so that -cpu XXX,compat=3D stays functional some more time,
-as required by our deprecation process.
-
-The now empty powerpc_servercpu_properties[] list which was introduced
-for "compat" and never had any other use is removed on the way. We can
-re-add it in the future if the need for a server class POWER CPU specific
-property arises again.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <158274357799.140275.12263135811731647490.stgit@bahia.lan>
-[dwg: Convert from .texi to .rst to match upstream change]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- docs/system/deprecated.rst      |  7 ++++++
- target/ppc/translate_init.inc.c | 44 ++-------------------------------
- 2 files changed, 9 insertions(+), 42 deletions(-)
+ target/ppc/mmu-hash64.c         | 29 +----------------------------
+ target/ppc/translate_init.inc.c | 20 ++++++++------------
+ 2 files changed, 9 insertions(+), 40 deletions(-)
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 0838338d8f..412b1b166d 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -289,6 +289,13 @@ The RISC-V no MMU cpus have been depcreated. The two=
- CPUs: ``rv32imacu-nommu`` a
- ``rv64imacu-nommu`` should no longer be used. Instead the MMU status can=
- be specified
- via the CPU ``mmu`` option when using the ``rv32`` or ``rv64`` CPUs.
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index da8966ccf5..3e0be4d55f 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -1091,33 +1091,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong =
+val)
 =20
-+``compat`` property of server class POWER CPUs (since 5.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``compat`` property used to set backwards compatibility modes for
-+the processor has been deprecated. The ``max-cpu-compat`` property of
-+the ``pseries`` machine type should be used instead.
-+
- System emulator devices
- -----------------------
-=20
+     /* Filter out bits */
+     switch (env->mmu_model) {
+-    case POWERPC_MMU_64B: /* 970 */
+-        if (val & 0x40) {
+-            lpcr |=3D LPCR_LPES0;
+-        }
+-        if (val & 0x8000000000000000ull) {
+-            lpcr |=3D LPCR_LPES1;
+-        }
+-        if (val & 0x20) {
+-            lpcr |=3D (0x4ull << LPCR_RMLS_SHIFT);
+-        }
+-        if (val & 0x4000000000000000ull) {
+-            lpcr |=3D (0x2ull << LPCR_RMLS_SHIFT);
+-        }
+-        if (val & 0x2000000000000000ull) {
+-            lpcr |=3D (0x1ull << LPCR_RMLS_SHIFT);
+-        }
+-        env->spr[SPR_RMOR] =3D ((lpcr >> 41) & 0xffffull) << 26;
+-
+-        /*
+-         * XXX We could also write LPID from HID4 here
+-         * but since we don't tag any translation on it
+-         * it doesn't actually matter
+-         *
+-         * XXX For proper emulation of 970 we also need
+-         * to dig HRMOR out of HID5
+-         */
+-        break;
+     case POWERPC_MMU_2_03: /* P5p */
+         lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
+                       LPCR_LPES0 | LPCR_LPES1 |
+@@ -1154,7 +1127,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
+al)
+         }
+         break;
+     default:
+-        ;
++        g_assert_not_reached();
+     }
+     env->spr[SPR_LPCR] =3D lpcr;
+     ppc_hash64_update_rmls(cpu);
 diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
 inc.c
-index 53995f62ea..2f7125c51f 100644
+index df3401cf06..aecad96db3 100644
 --- a/target/ppc/translate_init.inc.c
 +++ b/target/ppc/translate_init.inc.c
-@@ -8492,44 +8492,6 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *dat=
-a)
-     pcc->l1_icache_size =3D 0x10000;
+@@ -7895,25 +7895,21 @@ static void spr_write_lpcr(DisasContext *ctx, int=
+ sprn, int gprn)
+ {
+     gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
  }
-=20
--/*
-- * The CPU used to have a "compat" property which set the
-- * compatibility mode PVR.  However, this was conceptually broken - it
-- * only makes sense on the pseries machine type (otherwise the guest
-- * owns the PCR and can control the compatibility mode itself).  It's
-- * been replaced with the 'max-cpu-compat' property on the pseries
-- * machine type.  For backwards compatibility, pseries specially
-- * parses the -cpu parameter and converts old compat=3D parameters into
-- * the appropriate machine parameters.  This stub implementation of
-- * the parameter catches any uses on explicitly created CPUs.
-- */
--static void getset_compat_deprecated(Object *obj, Visitor *v, const char=
- *name,
--                                     void *opaque, Error **errp)
--{
--    QNull *null =3D NULL;
 -
--    if (!qtest_enabled()) {
--        warn_report("CPU 'compat' property is deprecated and has no effe=
-ct; "
--                    "use max-cpu-compat machine property instead");
--    }
--    visit_type_null(v, name, &null, NULL);
--    qobject_unref(null);
+-static void spr_write_970_hid4(DisasContext *ctx, int sprn, int gprn)
+-{
+-#if defined(TARGET_PPC64)
+-    spr_write_generic(ctx, sprn, gprn);
+-    gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
+-#endif
 -}
 -
--static const PropertyInfo ppc_compat_deprecated_propinfo =3D {
--    .name =3D "str",
--    .description =3D "compatibility mode (deprecated)",
--    .get =3D getset_compat_deprecated,
--    .set =3D getset_compat_deprecated,
--};
--static Property powerpc_servercpu_properties[] =3D {
--    {
--        .name =3D "compat",
--        .info =3D &ppc_compat_deprecated_propinfo,
--    },
--    DEFINE_PROP_END_OF_LIST(),
--};
--
- static void init_proc_POWER7(CPUPPCState *env)
+ #endif /* !defined(CONFIG_USER_ONLY) */
+=20
+ static void gen_spr_970_lpar(CPUPPCState *env)
  {
-     /* Common Registers */
-@@ -8611,7 +8573,6 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
-=20
-     dc->fw_name =3D "PowerPC,POWER7";
-     dc->desc =3D "POWER7";
--    device_class_set_props(dc, powerpc_servercpu_properties);
-     pcc->pvr_match =3D ppc_pvr_match_power7;
-     pcc->pcr_mask =3D PCR_VEC_DIS | PCR_VSX_DIS | PCR_COMPAT_2_05;
-     pcc->pcr_supported =3D PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
-@@ -8776,7 +8737,6 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
-=20
-     dc->fw_name =3D "PowerPC,POWER8";
-     dc->desc =3D "POWER8";
--    device_class_set_props(dc, powerpc_servercpu_properties);
-     pcc->pvr_match =3D ppc_pvr_match_power8;
-     pcc->pcr_mask =3D PCR_TM_DIS | PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
-     pcc->pcr_supported =3D PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_COMPA=
-T_2_05;
-@@ -8988,7 +8948,6 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-=20
-     dc->fw_name =3D "PowerPC,POWER9";
-     dc->desc =3D "POWER9";
--    device_class_set_props(dc, powerpc_servercpu_properties);
-     pcc->pvr_match =3D ppc_pvr_match_power9;
-     pcc->pcr_mask =3D PCR_COMPAT_2_05 | PCR_COMPAT_2_06 | PCR_COMPAT_2_0=
-7;
-     pcc->pcr_supported =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPA=
-T_2_06 |
-@@ -9198,7 +9157,6 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data=
-)
-=20
-     dc->fw_name =3D "PowerPC,POWER10";
-     dc->desc =3D "POWER10";
--    device_class_set_props(dc, powerpc_servercpu_properties);
-     pcc->pvr_match =3D ppc_pvr_match_power10;
-     pcc->pcr_mask =3D PCR_COMPAT_2_05 | PCR_COMPAT_2_06 | PCR_COMPAT_2_0=
-7 |
-                     PCR_COMPAT_3_00;
-@@ -10486,6 +10444,8 @@ static void ppc_cpu_parse_featurestr(const char *=
-type, char *features,
-         *s =3D '\0';
-         for (i =3D 0; inpieces[i]; i++) {
-             if (g_str_has_prefix(inpieces[i], "compat=3D")) {
-+                warn_report_once("CPU 'compat' property is deprecated; "
-+                    "use max-cpu-compat machine property instead");
-                 compat_str =3D inpieces[i];
-                 continue;
-             }
+ #if !defined(CONFIG_USER_ONLY)
+-    /* Logical partitionning */
+-    /* PPC970: HID4 is effectively the LPCR */
++    /*
++     * PPC970: HID4 covers things later controlled by the LPCR and
++     * RMOR in later CPUs, but with a different encoding.  We only
++     * support the 970 in "Apple mode" which has all hypervisor
++     * facilities disabled by strapping, so we can basically just
++     * ignore it
++     */
+     spr_register(env, SPR_970_HID4, "HID4",
+                  SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_970_hid4,
++                 &spr_read_generic, &spr_write_generic,
+                  0x00000000);
+ #endif
+ }
 --=20
 2.24.1
 
