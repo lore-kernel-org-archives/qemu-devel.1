@@ -6,73 +6,75 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1016DC5ACD6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5D0C1975A
 	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:34:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAF0B20738
+	by mail.kernel.org (Postfix) with ESMTPS id C83CA20714
 	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:33:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcR3eNv2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF0B20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faoR57YO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C83CA20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jELih-0007Lm-0C
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:33:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55035)
+	id 1jELig-0007LS-Uq
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:33:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54536)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jELan-0002lj-LS
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:50 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jELaR-0002C6-PJ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jELal-0003KP-AQ
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:49 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:53700)
+ (envelope-from <jsnow@redhat.com>) id 1jELaO-0001Jz-Kv
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:27 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:57086)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jELak-0003Hi-Pi
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:47 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jELaO-0001I9-Gu
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584487546;
+ s=mimecast20190719; t=1584487524;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pCCSGLhwJCGa6fW/xmoL2oVSV5CWJA33+UBKKk99HzE=;
- b=GcR3eNv2EHkCgoISlg0zvopNxjwCBTSBGWcVmpw23VI1+bphZJsZkXoli3/zrK+3BMlVo9
- RRiC8VBQe6dAKqtbVBv0hVWT+1PjRajS4+JTJsUOslqZEhWimhckz9Gd278eBLhYlHtMNf
- Cm4z7ReKOnIb610qqMS0BBr2Q/5QW2s=
+ bh=qVcbRFfRi8J5PAMXWOGMjOOSCw5AkybzeTOriUoBA2Q=;
+ b=faoR57YOgDCwabXyzPQr0gI3YBqtQVTXxBXw7OnyD3KOu+LviNZEho1yxRjGkzUmCfPgi7
+ gZEQam6rYaW6DcE3JuISXMr85t9rl3kcjAW+X+Xv65RaWIe9yogmfkwwtpN1YY3n6hS3ym
+ /qyKhsFepYhvpIXh9uiR0emkDlJ5YYs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-5I3DhKzKNEaRFtnLm1G8zw-1; Tue, 17 Mar 2020 19:25:42 -0400
-X-MC-Unique: 5I3DhKzKNEaRFtnLm1G8zw-1
+ us-mta-185-Iv0F6AWWNcyWQ_YVxWeTeA-1; Tue, 17 Mar 2020 19:25:20 -0400
+X-MC-Unique: Iv0F6AWWNcyWQ_YVxWeTeA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 463A3DB60;
- Tue, 17 Mar 2020 23:25:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE0B5100550D;
+ Tue, 17 Mar 2020 23:25:17 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A4E260BE0;
- Tue, 17 Mar 2020 23:25:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8BE8160BE0;
+ Tue, 17 Mar 2020 23:25:12 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 19/20] hw/ide: Move MAX_IDE_DEVS define to hw/ide/internal.h
-Date: Tue, 17 Mar 2020 19:23:28 -0400
-Message-Id: <20200317232329.22362-20-jsnow@redhat.com>
+Subject: [PULL 16/20] hw/ide: Remove now unneded #include "hw/pci/pci.h" from
+ hw/ide.h
+Date: Tue, 17 Mar 2020 19:23:25 -0400
+Message-Id: <20200317232329.22362-17-jsnow@redhat.com>
 In-Reply-To: <20200317232329.22362-1-jsnow@redhat.com>
 References: <20200317232329.22362-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,59 +105,72 @@ Sender: "Qemu-devel"
 
 From: BALATON Zoltan <balaton@eik.bme.hu>
 
-We can move this define now that less files use it to internal.h to
-further reduce dependency on hw/ide.h.
+After previous patches we don't need hw/pci/pci.h any more in
+hw/ide.h. Some files depended on implicit inclusion by this header
+which are also fixed up here.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-id: e68675d2f6252f229cf788b7cd163bb76fa3e26b.1584457537.git.balaton=
+Message-id: 444a5e34331bf1f7880541b8d46e0353f470f5a6.1584457537.git.balaton=
 @eik.bme.hu
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- include/hw/ide.h          | 2 --
- include/hw/ide/internal.h | 2 ++
- hw/mips/mips_r4k.c        | 1 +
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ hw/ide/ahci_internal.h        | 1 +
+ include/hw/ide.h              | 1 -
+ include/hw/ide/pci.h          | 1 +
+ include/hw/misc/macio/macio.h | 1 +
+ 4 files changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
+index 73424516da..bab0459774 100644
+--- a/hw/ide/ahci_internal.h
++++ b/hw/ide/ahci_internal.h
+@@ -27,6 +27,7 @@
+ #include "hw/ide/ahci.h"
+ #include "hw/ide/internal.h"
+ #include "hw/sysbus.h"
++#include "hw/pci/pci.h"
+=20
+ #define AHCI_MEM_BAR_SIZE         0x1000
+ #define AHCI_MAX_PORTS            32
 diff --git a/include/hw/ide.h b/include/hw/ide.h
-index d52c211f32..c5ce5da4f4 100644
+index 21bd8f23f1..d52c211f32 100644
 --- a/include/hw/ide.h
 +++ b/include/hw/ide.h
-@@ -4,8 +4,6 @@
+@@ -2,7 +2,6 @@
+ #define HW_IDE_H
+=20
  #include "hw/isa/isa.h"
+-#include "hw/pci/pci.h"
  #include "exec/memory.h"
 =20
--#define MAX_IDE_DEVS=092
--
- /* ide-isa.c */
- ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int isairq,
-                         DriveInfo *hd0, DriveInfo *hd1);
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 1bc1fc73e5..55da35d768 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -27,6 +27,8 @@ typedef struct IDEDMAOps IDEDMAOps;
- #define TYPE_IDE_BUS "IDE"
- #define IDE_BUS(obj) OBJECT_CHECK(IDEBus, (obj), TYPE_IDE_BUS)
+ #define MAX_IDE_DEVS=092
+diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
+index a9f2c33e68..98ffa7dfcd 100644
+--- a/include/hw/ide/pci.h
++++ b/include/hw/ide/pci.h
+@@ -2,6 +2,7 @@
+ #define HW_IDE_PCI_H
 =20
-+#define MAX_IDE_DEVS 2
-+
- /* Bits of HD_STATUS */
- #define ERR_STAT=09=090x01
- #define INDEX_STAT=09=090x02
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index ad8b75e286..3487013a4a 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -26,6 +26,7 @@
- #include "qemu/log.h"
- #include "hw/mips/bios.h"
- #include "hw/ide.h"
-+#include "hw/ide/internal.h"
- #include "hw/loader.h"
- #include "elf.h"
- #include "hw/rtc/mc146818rtc.h"
+ #include "hw/ide/internal.h"
++#include "hw/pci/pci.h"
+=20
+ #define BM_STATUS_DMAING 0x01
+ #define BM_STATUS_ERROR  0x02
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+index 070a694eb5..87335a991c 100644
+--- a/include/hw/misc/macio/macio.h
++++ b/include/hw/misc/macio/macio.h
+@@ -27,6 +27,7 @@
+ #define MACIO_H
+=20
+ #include "hw/char/escc.h"
++#include "hw/pci/pci.h"
+ #include "hw/ide/internal.h"
+ #include "hw/intc/heathrow_pic.h"
+ #include "hw/misc/macio/cuda.h"
 --=20
 2.21.1
 
