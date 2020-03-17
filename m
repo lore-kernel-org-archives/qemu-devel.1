@@ -7,45 +7,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1907C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 17:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EACCC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 17:00:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C30A20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 17:00:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C30A20714
+	by mail.kernel.org (Postfix) with ESMTPS id 73CBD20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 17:00:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73CBD20714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEFZa-0006jd-Gq
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 13:00:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57221)
+	id 1jEFaI-0007ly-Hd
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 13:00:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFTW-00055x-HW
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:53:55 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFXR-0003f9-2w
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:57:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFTV-0001UA-7g
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:53:54 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40025)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFXP-0003l3-N2
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:57:56 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:48668)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jEFTU-0000I2-Mi; Tue, 17 Mar 2020 12:53:53 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07966728|-1; BR=01201311R111ec; CH=green;
- DM=||false|; DS=SPAM|spam_blackmail|0.843017-4.05004e-05-0.156943;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16368; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H1.e5rA_1584464023; 
+ id 1jEFXP-0002JL-7D; Tue, 17 Mar 2020 12:57:55 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07470568|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_alarm|0.192127-0.000262492-0.80761; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e02c03312; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=10; RT=10; SR=0;
+ TI=SMTPD_---.H1.prKF_1584464265; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H1.e5rA_1584464023) by smtp.aliyun-inc.com(10.147.40.7);
- Wed, 18 Mar 2020 00:53:44 +0800
+ fp:SMTPD_---.H1.prKF_1584464265)
+ by smtp.aliyun-inc.com(10.147.42.253);
+ Wed, 18 Mar 2020 00:57:45 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: richard.henderson@linaro.org, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v6 53/61] target/riscv: vector iota instruction
-Date: Tue, 17 Mar 2020 23:06:45 +0800
-Message-Id: <20200317150653.9008-54-zhiwei_liu@c-sky.com>
+Subject: [PATCH v6 55/61] target/riscv: integer extract instruction
+Date: Tue, 17 Mar 2020 23:06:47 +0800
+Message-Id: <20200317150653.9008-56-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
@@ -72,108 +73,122 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/helper.h                   |  5 ++++
  target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 22 ++++++++++++++++++
- target/riscv/vector_helper.c            | 31 +++++++++++++++++++++++++
- 4 files changed, 59 insertions(+)
+ target/riscv/insn_trans/trans_rvv.inc.c | 91 +++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 3761b48eca..8e7bef8f96 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1099,3 +1099,8 @@ DEF_HELPER_4(vmfirst_m, tl, ptr, ptr, env, i32)
- DEF_HELPER_5(vmsbf_m, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vmsif_m, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vmsof_m, void, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index b2bc6ab3dd..37756fa76d 100644
+index 1231628cb2..26dd0f1b1b 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -558,6 +558,7 @@ vmfirst_m       010101 . ..... ----- 010 ..... 1010111 @r2_vm
- vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
- vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
+@@ -561,6 +561,7 @@ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
  vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
-+viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+ vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
++vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 7faaa6c51b..798e7c7cff 100644
+index fae72acaa1..4d7bb6b54e 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2304,3 +2304,25 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
- GEN_M_TRANS(vmsbf_m)
- GEN_M_TRANS(vmsif_m)
- GEN_M_TRANS(vmsof_m)
-+
-+/* Vector Iota Instruction */
-+static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
-+{
-+    if (vext_check_isa_ill(s) &&
-+        vext_check_reg(s, a->rd, false) &&
-+        vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2, 1) &&
-+        (a->vm != 0 || a->rd != 0)) {
-+        uint32_t data = 0;
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+        static gen_helper_gvec_3_ptr * const fns[4] = {
-+            gen_helper_viota_m_b, gen_helper_viota_m_h,
-+            gen_helper_viota_m_w, gen_helper_viota_m_d,
-+        };
-+        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+            vreg_ofs(s, a->rs2), cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 0bcb05a9dd..43bf61caca 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4616,3 +4616,34 @@ void HELPER(vmsof_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
- {
-     vmsetm(vd, v0, vs2, env, desc, ONLY_FIRST);
+@@ -2347,3 +2347,94 @@ static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
+     }
+     return false;
  }
 +
-+/* Vector Iota Instruction */
-+#define GEN_VEXT_VIOTA_M(NAME, ETYPE, H, CLEAR_FN)                        \
-+void HELPER(NAME)(void *vd, void *v0, void *vs2, CPURISCVState *env,      \
-+        uint32_t desc)                                                    \
-+{                                                                         \
-+    uint32_t mlen = vext_mlen(desc);                                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
-+    uint32_t vm = vext_vm(desc);                                          \
-+    uint32_t vl = env->vl;                                                \
-+    uint32_t sum = 0;                                                     \
-+    int i;                                                                \
-+                                                                          \
-+    if (vl == 0) {                                                        \
-+        return;                                                           \
-+    }                                                                     \
-+    for (i = 0; i < vl; i++) {                                            \
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
-+            continue;                                                     \
-+        }                                                                 \
-+        *((ETYPE *)vd + H(i)) = sum;                                      \
-+        if (vext_elem_mask(vs2, mlen, i)) {                               \
-+            sum++;                                                        \
-+        }                                                                 \
-+    }                                                                     \
-+    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
++/*
++ *** Vector Permutation Instructions
++ */
++/* Integer Extract Instruction */
++static void extract_element(TCGv dest, TCGv_ptr base,
++                            int ofs, int sew)
++{
++    switch (sew) {
++    case MO_8:
++        tcg_gen_ld8u_tl(dest, base, ofs);
++        break;
++    case MO_16:
++        tcg_gen_ld16u_tl(dest, base, ofs);
++        break;
++    default:
++        tcg_gen_ld32u_tl(dest, base, ofs);
++        break;
++#if TARGET_LONG_BITS == 64
++    case MO_64:
++        tcg_gen_ld_i64(dest, base, ofs);
++        break;
++#endif
++    }
 +}
-+GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
-+GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
-+GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
-+GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
++
++/* offset of the idx element with base regsiter r */
++static uint32_t endian_ofs(DisasContext *s, int r, int idx)
++{
++#ifdef HOST_WORDS_BIGENDIAN
++    return vreg_ofs(s, r) + ((idx ^ (7 >> s->sew)) << s->sew);
++#else
++    return vreg_ofs(s, r) + (idx << s->sew);
++#endif
++}
++
++/* adjust the index according to the endian */
++static void endian_adjust(TCGv_i32 ofs, int sew)
++{
++#ifdef HOST_WORDS_BIGENDIAN
++    tcg_gen_xori_i32(ofs, ofs, 7 >> sew);
++#endif
++}
++
++static bool trans_vext_x_v(DisasContext *s, arg_r *a)
++{
++    TCGv dest = tcg_temp_new();
++
++    if (a->rs1 == 0) {
++        /* Special case vmv.x.s rd, vs2. */
++        extract_element(dest, cpu_env,
++                        endian_ofs(s, a->rs2, 0), s->sew);
++    } else {
++        int vlen = s->vlen >> (3 + s->sew);
++        TCGv_i32 ofs = tcg_temp_new_i32();
++        TCGv_ptr  base = tcg_temp_new_ptr();
++        TCGv t_vlen, t_zero;
++
++        /*
++         * Mask the index to the length so that we do
++         * not produce an out-of-range load.
++         */
++        tcg_gen_trunc_tl_i32(ofs, cpu_gpr[a->rs1]);
++        tcg_gen_andi_i32(ofs, ofs, vlen - 1);
++
++        /* Convert the index to an offset. */
++        endian_adjust(ofs, s->sew);
++        tcg_gen_shli_i32(ofs, ofs, s->sew);
++
++        /* Convert the index to a pointer. */
++        tcg_gen_ext_i32_ptr(base, ofs);
++        tcg_gen_add_ptr(base, base, cpu_env);
++
++        /* Perform the load. */
++        extract_element(dest, base,
++                        vreg_ofs(s, a->rs2), s->sew);
++        tcg_temp_free_ptr(base);
++        tcg_temp_free_i32(ofs);
++
++        /* Flush out-of-range indexing to zero.  */
++        t_vlen = tcg_const_tl(vlen);
++        t_zero = tcg_const_tl(0);
++        tcg_gen_movcond_tl(TCG_COND_LTU, dest, cpu_gpr[a->rs1],
++                           t_vlen, dest, t_zero);
++        tcg_temp_free(t_vlen);
++        tcg_temp_free(t_zero);
++    }
++    gen_set_gpr(a->rd, dest);
++    tcg_temp_free(dest);
++    return true;
++}
 -- 
 2.23.0
 
