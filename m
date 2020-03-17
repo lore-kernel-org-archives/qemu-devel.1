@@ -4,67 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E01C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CA9C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:59:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6B9820724
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:59:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B9820724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 2617920735
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:59:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2617920735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEEcm-0002bk-S1
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:59:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36996)
+	id 1jEEcn-0002eU-97
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:59:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jEEVK-0004n4-Oi
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:44 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEERN-0005TK-Uz
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jEEVJ-0007Er-8p
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:42 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:45607)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jEEVI-00079X-TO
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:41 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MEFnP-1j6mEs38wH-00AG8X; Tue, 17 Mar 2020 16:51:28 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 05/37] linux-user: Flush out implementation of gettimeofday
-Date: Tue, 17 Mar 2020 16:50:44 +0100
-Message-Id: <20200317155116.1227513-6-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200317155116.1227513-1-laurent@vivier.eu>
-References: <20200317155116.1227513-1-laurent@vivier.eu>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEERM-0000Dt-4k
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:47:37 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57481)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEERL-0007ZJ-5K; Tue, 17 Mar 2020 11:47:36 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07440888|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.68344-0.000122694-0.316437;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03312; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H1-CLrA_1584460038; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H1-CLrA_1584460038)
+ by smtp.aliyun-inc.com(10.147.41.187);
+ Tue, 17 Mar 2020 23:47:18 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 20/61] target/riscv: vector widening integer multiply
+ instructions
+Date: Tue, 17 Mar 2020 23:06:12 +0800
+Message-Id: <20200317150653.9008-21-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:KIjloFeouvdqoRQtjFpfzvMOSrLAOXzEk5nAgrs4TWepSBGo5Wi
- /h5/Hj436gRPs0M20Q4PhgUoYHs2f7k1XCJi3D2fel07GWw2QmCM1bscH2zM7raqRafhK2t
- fBD82+V/wS70jihJO9KPVHt3fIB2x9qFa+11+2n62SUq1gSbY91Wq7pHaf8ZLjAIWYhEuEQ
- XrLgBOnypEwWRQ8i7oVvA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PsR78ypMXdE=:q0xGaGQa6YRnauCRYk4qaa
- +g1kNI49Ny94IMtoYSaTaMgEZkgAS+JVe7AkRz3qcShd4f+I5fThjIpVFaY+EPKeWpevTGVbv
- uPdjw7QpzKJ67FBcWNBubJgV7ahfKKVSH98/6cMzM0pWLThJ3J/YkCQJia4XySjNQnzJfWnP8
- PGnj3IgtoLVq1rL2LTfNZcYlKSIQYCObeTFEEauibqzIpqTHHKn55ipsyAHwSD7A10LSdnkUf
- SVBtIsHKejP18bk3XWpWVU8cSzcu27T1xFb4uGq9BFj7V/oxtMRECVVZvyoV7QYZv2NEq2lbf
- bw//fmVeaVCZ+ifyawi6MCIQABZeL3llBEeH4UIUKYtQiCgt2iYeYNx6bq6c+K1fE+4vb5aUw
- aKvQQd4o9QilDdZKX8Z7ry03zvZNagqe3R21GCS5r+1Qro/hOMC8iid9R1PknZLmrImblNleb
- 9MpVbVNm7+YLRguX04KdhGvjHEDhgMnoXDTRPLQYXkLYG8Kox9kl1AMgczheFOU8pc2y+msiJ
- I9zUndGWy/Pdd8rtg1R5jIkgCkUhUfvNOmthnOlwc+nAUOirIq8CEunPvQYUMWnVh2DKKs92k
- xQpLWxsOWWQGxxXKYIiXTeelcLotc+TcbwOT34zLtQNRMVsBJMgIjYEAf4xTVG5HTNg++Oqs0
- vlUh2g9mqVKKQeaP5Qy8sStQLZ0uXZU8mJvLePTReG3vzyP4FOQPqGTiijlHCb9P+AfH+m00+
- 5Z6uKn7EbIRFRzS7TuXA7lwudh86W1zAhkl5rJHZCLdy/E5tKlHalWOr3a+htj6YaRNubX0H9
- uICzpsa99szhFHrg6+ydlBF47gF7O8Tm4NAcQfnZy1B6FtKhGdAtNhq5nH4nuWWSuD2CPAx
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,79 +66,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-The first argument, timeval, is allowed to be NULL.
-
-The second argument, timezone, was missing.  While its use is
-deprecated, it is still present in the syscall.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200213032223.14643-6-richard.henderson@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+ target/riscv/helper.h                   | 19 +++++++++
+ target/riscv/insn32.decode              |  6 +++
+ target/riscv/insn_trans/trans_rvv.inc.c |  8 ++++
+ target/riscv/vector_helper.c            | 51 +++++++++++++++++++++++++
+ 4 files changed, 84 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5479d67a10be..811495c3a0bc 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1228,6 +1228,23 @@ static inline abi_long host_to_target_timespec64(abi_ulong target_addr,
-     return 0;
- }
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 357f149198..1704b8c512 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -591,3 +591,22 @@ DEF_HELPER_6(vrem_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrem_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrem_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrem_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vwmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 7fb8f8fad8..ae7cfa3e28 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -379,6 +379,12 @@ vremu_vv        100010 . ..... ..... 010 ..... 1010111 @r_vm
+ vremu_vx        100010 . ..... ..... 110 ..... 1010111 @r_vm
+ vrem_vv         100011 . ..... ..... 010 ..... 1010111 @r_vm
+ vrem_vx         100011 . ..... ..... 110 ..... 1010111 @r_vm
++vwmulu_vv       111000 . ..... ..... 010 ..... 1010111 @r_vm
++vwmulu_vx       111000 . ..... ..... 110 ..... 1010111 @r_vm
++vwmulsu_vv      111010 . ..... ..... 010 ..... 1010111 @r_vm
++vwmulsu_vx      111010 . ..... ..... 110 ..... 1010111 @r_vm
++vwmul_vv        111011 . ..... ..... 010 ..... 1010111 @r_vm
++vwmul_vx        111011 . ..... ..... 110 ..... 1010111 @r_vm
  
-+static inline abi_long copy_to_user_timezone(abi_ulong target_tz_addr,
-+                                             struct timezone *tz)
-+{
-+    struct target_timezone *target_tz;
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index ed53eaaef5..98df7e2daa 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1472,3 +1472,11 @@ GEN_OPIVX_TRANS(vdivu_vx, opivx_check)
+ GEN_OPIVX_TRANS(vdiv_vx, opivx_check)
+ GEN_OPIVX_TRANS(vremu_vx, opivx_check)
+ GEN_OPIVX_TRANS(vrem_vx, opivx_check)
 +
-+    if (!lock_user_struct(VERIFY_WRITE, target_tz, target_tz_addr, 1)) {
-+        return -TARGET_EFAULT;
-+    }
++/* Vector Widening Integer Multiply Instructions */
++GEN_OPIVV_WIDEN_TRANS(vwmul_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmulu_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmulsu_vv, opivv_widen_check)
++GEN_OPIVX_WIDEN_TRANS(vwmul_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmulu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmulsu_vx)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 4fc7a08954..35c6aa8494 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -856,6 +856,18 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+ #define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
+ #define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
+ #define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
++#define WOP_UUU_B uint16_t, uint8_t, uint8_t, uint16_t, uint16_t
++#define WOP_UUU_H uint32_t, uint16_t, uint16_t, uint32_t, uint32_t
++#define WOP_UUU_W uint64_t, uint32_t, uint32_t, uint64_t, uint64_t
++#define WOP_SSS_B int16_t, int8_t, int8_t, int16_t, int16_t
++#define WOP_SSS_H int32_t, int16_t, int16_t, int32_t, int32_t
++#define WOP_SSS_W int64_t, int32_t, int32_t, int64_t, int64_t
++#define WOP_SUS_B int16_t, uint8_t, int8_t, uint16_t, int16_t
++#define WOP_SUS_H int32_t, uint16_t, int16_t, uint32_t, int32_t
++#define WOP_SUS_W int64_t, uint32_t, int32_t, uint64_t, int64_t
++#define WOP_SSU_B int16_t, int8_t, uint8_t, int16_t, uint16_t
++#define WOP_SSU_H int32_t, int16_t, uint16_t, int32_t, uint32_t
++#define WOP_SSU_W int64_t, int32_t, uint32_t, int64_t, uint64_t
+ 
+ /* operation of two vector elements */
+ typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+@@ -1815,3 +1827,42 @@ GEN_VEXT_VX(vrem_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vrem_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vrem_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vrem_vx_d, 8, 8, clearq)
 +
-+    __put_user(tz->tz_minuteswest, &target_tz->tz_minuteswest);
-+    __put_user(tz->tz_dsttime, &target_tz->tz_dsttime);
++/* Vector Widening Integer Multiply Instructions */
++RVVCALL(OPIVV2, vwmul_vv_b, WOP_SSS_B, H2, H1, H1, DO_MUL)
++RVVCALL(OPIVV2, vwmul_vv_h, WOP_SSS_H, H4, H2, H2, DO_MUL)
++RVVCALL(OPIVV2, vwmul_vv_w, WOP_SSS_W, H8, H4, H4, DO_MUL)
++RVVCALL(OPIVV2, vwmulu_vv_b, WOP_UUU_B, H2, H1, H1, DO_MUL)
++RVVCALL(OPIVV2, vwmulu_vv_h, WOP_UUU_H, H4, H2, H2, DO_MUL)
++RVVCALL(OPIVV2, vwmulu_vv_w, WOP_UUU_W, H8, H4, H4, DO_MUL)
++RVVCALL(OPIVV2, vwmulsu_vv_b, WOP_SUS_B, H2, H1, H1, DO_MUL)
++RVVCALL(OPIVV2, vwmulsu_vv_h, WOP_SUS_H, H4, H2, H2, DO_MUL)
++RVVCALL(OPIVV2, vwmulsu_vv_w, WOP_SUS_W, H8, H4, H4, DO_MUL)
++GEN_VEXT_VV(vwmul_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmul_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmul_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmulu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmulu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmulu_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmulsu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmulsu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmulsu_vv_w, 4, 8, clearq)
 +
-+    unlock_user_struct(target_tz, target_tz_addr, 1);
-+
-+    return 0;
-+}
-+
- static inline abi_long copy_from_user_timezone(struct timezone *tz,
-                                                abi_ulong target_tz_addr)
- {
-@@ -8642,10 +8659,16 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_gettimeofday:
-         {
-             struct timeval tv;
--            ret = get_errno(gettimeofday(&tv, NULL));
-+            struct timezone tz;
-+
-+            ret = get_errno(gettimeofday(&tv, &tz));
-             if (!is_error(ret)) {
--                if (copy_to_user_timeval(arg1, &tv))
-+                if (arg1 && copy_to_user_timeval(arg1, &tv)) {
-                     return -TARGET_EFAULT;
-+                }
-+                if (arg2 && copy_to_user_timezone(arg2, &tz)) {
-+                    return -TARGET_EFAULT;
-+                }
-             }
-         }
-         return ret;
++RVVCALL(OPIVX2, vwmul_vx_b, WOP_SSS_B, H2, H1, DO_MUL)
++RVVCALL(OPIVX2, vwmul_vx_h, WOP_SSS_H, H4, H2, DO_MUL)
++RVVCALL(OPIVX2, vwmul_vx_w, WOP_SSS_W, H8, H4, DO_MUL)
++RVVCALL(OPIVX2, vwmulu_vx_b, WOP_UUU_B, H2, H1, DO_MUL)
++RVVCALL(OPIVX2, vwmulu_vx_h, WOP_UUU_H, H4, H2, DO_MUL)
++RVVCALL(OPIVX2, vwmulu_vx_w, WOP_UUU_W, H8, H4, DO_MUL)
++RVVCALL(OPIVX2, vwmulsu_vx_b, WOP_SUS_B, H2, H1, DO_MUL)
++RVVCALL(OPIVX2, vwmulsu_vx_h, WOP_SUS_H, H4, H2, DO_MUL)
++RVVCALL(OPIVX2, vwmulsu_vx_w, WOP_SUS_W, H8, H4, DO_MUL)
++GEN_VEXT_VX(vwmul_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmul_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmul_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmulu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmulu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmulu_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmulsu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmulsu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmulsu_vx_w, 4, 8, clearq)
 -- 
-2.24.1
+2.23.0
 
 
