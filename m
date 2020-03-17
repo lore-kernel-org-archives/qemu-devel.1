@@ -2,64 +2,82 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C48A4C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37138C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:48:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93DDD20724
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0609D20735
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:48:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="dUZk+CMP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93DDD20724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ONUApIrZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0609D20735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEHEc-00028V-P4
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:46:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39637)
+	id 1jEHGG-0003sW-6B
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:48:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jEH8C-0003IZ-5h
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:40:01 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jEHFJ-0002ww-6U
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:47:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jEH89-0003Dl-VN
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:39:59 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:56363)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jEH89-00032A-Lq; Tue, 17 Mar 2020 14:39:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=L90L256eetdjrBb3hySz2ppZX/NPByekqjWwyfvU14w=; 
- b=dUZk+CMPZSuvfYH2YhKq3zAdcs+O9zL56s1HA7YtxtyU6PE4OKls+q7WTkrgYRJ1ntqOHJb+HwPel7P6pbF8ULHakg1bINxFVY4OIotWlK5oPofrNvLrcMaPp0kztbkMPDGWnBorXz4I7kMZnEnRFuZh4dUvU85rWkzNibUWcciyA8ELkOxz4OSPlMsFSFYn3gk5thwHNG/fZcBEmoVyzOrf3x7VO5JOxKW8J8RIR7SASHx9kzsyr2GZBQZaUg3veEixqrgrB08PPrIY4NWW51ObxcgGuDEJqcUWw8mhQLI2UPAZGJKo1LZHU3Ep/KHmP4JRlNCyMT5qjAGOkED9+w==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jEH86-0002yz-Pm; Tue, 17 Mar 2020 19:39:54 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jEH86-0006bv-GQ; Tue, 17 Mar 2020 19:39:54 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 0/2] Convert qcow2_get_cluster_offset() into
- qcow2_get_host_offset()
-In-Reply-To: <cover.1582828123.git.berto@igalia.com>
-References: <cover.1582828123.git.berto@igalia.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Tue, 17 Mar 2020 19:39:54 +0100
-Message-ID: <w51d09a6d1h.fsf@maestria.local.igalia.com>
+ (envelope-from <dgilbert@redhat.com>) id 1jEHFG-0001Ky-Gh
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:47:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:31573)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jEHFG-00019F-69
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:47:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584470837;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Hb/jeQrMCW50m/+UIP6st28TnpAt97WjUAjdWDevMeo=;
+ b=ONUApIrZomnlpYoEqZ5n2x5+VYsw3pAMXwaUKLr9nfQw7WLAAyZaGOmxof/IZNWXfrahx5
+ 3TPF1D8PvecypAKiN5bPbvQPBDtDTsi/mO2AgGBJ29kuxpDnGamXJKvcWcbj+N+BwUqxq6
+ ZQTgV40sNUf//J2GjPE1YtssWCNbxds=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-ZOQbi3LRPM-hrDooL8S4xw-1; Tue, 17 Mar 2020 14:47:12 -0400
+X-MC-Unique: ZOQbi3LRPM-hrDooL8S4xw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2230800D5C;
+ Tue, 17 Mar 2020 18:47:11 +0000 (UTC)
+Received: from work-vm (ovpn-114-234.ams2.redhat.com [10.36.114.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EB305E242;
+ Tue, 17 Mar 2020 18:47:06 +0000 (UTC)
+Date: Tue, 17 Mar 2020 18:47:04 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] tools/virtiofsd: add support for --socket-group
+Message-ID: <20200317184704.GG3369@work-vm>
+References: <20200312104142.21259-1-alex.bennee@linaro.org>
+ <20200312104913.GB4089516@redhat.com>
+ <CAJ+F1CJWy2gEHHjzqyqnvHFf6EP4mEGABLt4aA7xptkXDwPGiw@mail.gmail.com>
+ <20200316103331.GC1528804@redhat.com>
+ <20200317095414.GC492272@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+In-Reply-To: <20200317095414.GC492272@stefanha-x1.localdomain>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,20 +89,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 27 Feb 2020 07:34:24 PM CET, Alberto Garcia wrote:
-> Hi,
->
-> this is something I did while working on the subcluster series but
-> it's independent from it so I thought to send it already.
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> On Mon, Mar 16, 2020 at 10:33:31AM +0000, Daniel P. Berrang=E9 wrote:
+> > On Sat, Mar 14, 2020 at 02:33:25PM +0100, Marc-Andr=E9 Lureau wrote:
+> > > Hi
+> > >=20
+> > > On Thu, Mar 12, 2020 at 11:49 AM Daniel P. Berrang=E9 <berrange@redha=
+t.com> wrote:
+> > > >
+> > > > On Thu, Mar 12, 2020 at 10:41:42AM +0000, Alex Benn=E9e wrote:
+> > > > > If you like running QEMU as a normal user (very common for TCG ru=
+ns)
+> > > > > but you have to run virtiofsd as a root user you run into connect=
+ion
+> > > > > problems. Adding support for an optional --socket-group allows th=
+e
+> > > > > users to keep using the command line.
+> > > >
+> > > > If we're going to support this, then I think we need to put it in
+> > > > the vhost-user.rst specification so we standardize across backends.
+> > > >
+> > > >
+> > >=20
+> > > Perhaps. Otoh, I wonder if the backend spec should be more limited to
+> > > arguments/introspection that are used by programs.
+> > >=20
+> > > In this case, I even consider --socket-path to be unnecessary, as a
+> > > management layer can/should provide a preopened & setup fd directly.
+> > >=20
+> > > What do you think?
+> >=20
+> > I think there's value in standardization even if it is an option target=
+ted
+> > at human admins, rather than machine usage. You are right though that
+> > something like libvirt would never use --socket-group, or --socket-path=
+.
+> > Even admins would benefit if all programs followed the same naming for
+> > these.  We could document such options as "SHOULD" rather than "MUST"
+> > IOW, we don't mandate --socket-group, but if you're going to provide a
+> > way to control socket group, this option should be used.
+>=20
+> I agree.  It's still useful to have a convention that most vhost-user
+> backend programs follow.
 
-I included this patches in v4 of the main series so you can ignore this
-thread.
+Alex:
+  Can you add the doc entry that Stefan and Marc-Andr=E9 are asking
+for;  it's probably good they go together.
 
-Berto
+Dave
+
+> Stefan
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
