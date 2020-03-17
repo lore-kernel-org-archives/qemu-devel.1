@@ -2,69 +2,68 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD85C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3F7C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F8E620663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F8E620663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BF4C020663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4C020663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEEYc-0002Tb-2k
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:55:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36908)
+	id 1jEEZ3-0003hu-UH
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:55:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52369)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jEEVI-0004jg-QX
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:42 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jEEI1-0008IP-3F
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:37:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jEEVH-0007A4-JS
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:40 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:58169)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jEEVC-00074I-Tg
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:35 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N8onQ-1jK1n00q0c-015moE; Tue, 17 Mar 2020 16:51:32 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 09/37] linux-user: Update TASK_UNMAPPED_BASE for aarch64
-Date: Tue, 17 Mar 2020 16:50:48 +0100
-Message-Id: <20200317155116.1227513-10-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200317155116.1227513-1-laurent@vivier.eu>
-References: <20200317155116.1227513-1-laurent@vivier.eu>
+ (envelope-from <no-reply@patchew.org>) id 1jEEHy-0003iy-Nj
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:37:56 -0400
+Resent-Date: Tue, 17 Mar 2020 11:37:56 -0400
+Resent-Message-Id: <E1jEEHy-0003iy-Nj@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21126)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jEEHy-0003XG-DQ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:37:54 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584459463; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=H8pvayZtcNXHYib+FOP/efLy19Tn7pzYrBcFKeFTC/zxRI1hmpkzzI25yoxZkfPEGG68Eetj8B3L+ogGWVNwraNX4QaTQfWCKoyxFWrQy7Mc6PlsKlMtSlcwf6wzT+5VJwjyGPbQH0+mmNEN1rixds07NVxS3SeSQftl4c7zT+4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584459463;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=RM/Jku03U9xlfFrW+LwnSKWJkvAU/zukYxKapQTk/cE=; 
+ b=ElutwA1EbrBPfauJhkZuf6HMDhccB+3zUaeAGqG7HnWN/SOe5VB1+O6FaZ1136uyqcdiK2rx/am65AQOr3JUWZV3NAcx3qaIvVEG/66lFGcUYEF++G7vl1mGM8AuBum0iYM/eVrgue1idsxQdAHl+lBZNIcquaF163je8WF0uDw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 158445946088653.02815593272385;
+ Tue, 17 Mar 2020 08:37:40 -0700 (PDT)
+In-Reply-To: <20200317135803.2682384-1-marcandre.lureau@redhat.com>
+Subject: Re: [PATCH] slirp: update submodule to v4.2.0
+Message-ID: <158445945964.25100.11060721921655386960@39012742ff91>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:VpaJU59AIPv4rBbxgxCk9XEvAnAIat9XyRL9WouSEjiUJMHWOA4
- 3bN9wKn7H/qd5Zm+R3dJYMZ2Vk+/2HeYcLd/tqfza2tSpZePCerGW1s7Kkw6D6Oxivyofdm
- VzLT4M8zkg4G2UF9WPeqzsFQfXRFWYAUJp8RyfxHijQX4v5YS60ZW0xnhsmNjoVvTU8Ejqd
- 6AWsdqkvwxdMmaKanONbw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:bo2fGl5hh3E=:HGQxFXzkwAiYZqUnDAeRRO
- X2OTuYV8pSdLvK4E3SDk0aEkuRxUH/7h9krxiy42JnQtOJIb0l/Pke8plVk6zmWJcqIemHsGG
- 9D2sfUSv9diOCsWcLf3Dxe8p2pF3oHqtlnvr5SvdNuwdrC7771f5rgkSvXwxnxZG7BuH0FYLG
- rmPmGu1q2M+p+EvncdAYWA8RCLSkPJfpiVQFKBfnslK+Tt+APGXZxrd4qTl+vjRCTMUe9ADvS
- BuNxrO2BQseCyEgp5jzENloaAEv+GPw3Ii4OVXn3gPfY5DNdzwyasdI9IzKDuxo0t5rB9Iwwc
- DXbrvZCeJ1sXA4FsTFHdJ7S+K1GDInyuX/IEPQFGprpa6yaHatry9qex9WYVUARzwaI+Ij3rI
- H7M9MIgaRlwKYxocXpD2tXHwPbg1b7uw8Lj8aLDamwUfSxyp2kFfJjUAWWxn8EfKJ1YIfOzWW
- 1KQYLU/y0YSpUfOJEUrIP/cbJe9lpv9TfJVztBVlxll8OVet0h5ZVuUooz6WGjOFtR4h7faTU
- YS/godcOgnU0PiAbuBckyIusqqaMbCMqQcVsMKpgdQbwqpB8hYUyRSi7vU8loV5P75Xucftnw
- vV+78FvwpBPPSg4uYyGTwKudSb0dPWuRyCZnwxXZ4HJU7oHSBC75qgKdINZtbwGYvjshTVUXs
- zfht8a5WtoCw9DYznY6sEtBzTbSQc1Gzs9GRCRT/BkYT97tQo/YSoERY8hhzLGDo7uWvh+Gyi
- qBb9NeLkhI6Y5X5KuUzTyVDoDH9vlevSFVYn/9GqdVkz283E6eqIzRrcWe0o0EITkQON6qit1
- R3Rrmec0M54jHC62iCoehzI5+7XvNLP6/lPKqiSlp4XokI8icz0pnMPZKsA8U5gNgLaOJJF
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: marcandre.lureau@redhat.com
+Date: Tue, 17 Mar 2020 08:37:40 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,42 +75,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Lirong Yuan <yuanzi@google.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ samuel.thibault@ens-lyon.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lirong Yuan <yuanzi@google.com>
-
-This change updates TASK_UNMAPPED_BASE (the base address for guest programs) for aarch64. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
-https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
-
-Signed-off-by: Lirong Yuan <yuanzi@google.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200313002813.3857-1-yuanzi@google.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/mmap.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 8685f02e7e90..e37803379747 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -184,7 +184,11 @@ static int mmap_frag(abi_ulong real_start,
- }
- 
- #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
-+#ifdef TARGET_AARCH64
-+# define TASK_UNMAPPED_BASE  0x5500000000
-+#else
- # define TASK_UNMAPPED_BASE  (1ul << 38)
-+#endif
- #else
- # define TASK_UNMAPPED_BASE  0x40000000
- #endif
--- 
-2.24.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxNzEzNTgwMy4yNjgy
+Mzg0LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
+aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
+dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
+ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1h
+a2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
+dC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
+R0VOICAgICBody9pMzg2L3hlbi90cmFjZS5oCiAgQ0MgICAgICAvdG1wL3FlbXUtdGVzdC9idWls
+ZC9zbGlycC9zcmMvdXRpbC5vCi90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zcmMvc29ja2V0LmM6
+IEluIGZ1bmN0aW9uICdzb3RyYW5zbGF0ZV9vdXQ2JzoKL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJw
+L3NyYy9zb2NrZXQuYzo4NDM6NDc6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDIgb2YgJ2dldF9k
+bnM2X2FkZHInIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBh
+dGlibGUtcG9pbnRlci10eXBlc10KICAgICAgICAgcmV0dXJuIGdldF9kbnM2X2FkZHIoJnNpbi0+
+c2luNl9hZGRyLCAmc2luLT5zaW42X3Njb3BlX2lkKSA+PSAwOwogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBp
+bmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zcmMvc29ja2V0LmM6NjoKLS0t
+CiBpbnQgZ2V0X2RuczZfYWRkcihzdHJ1Y3QgaW42X2FkZHIgKnBkbnM2X2FkZHIsIHVpbnQzMl90
+ICpzY29wZV9pZCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIH5+fn5+fn5+fn5efn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
+IGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjQ0OiAvdG1wL3FlbXUtdGVzdC9idWlsZC9z
+bGlycC9zcmMvc29ja2V0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmlu
+aXNoZWQgam9icy4uLi4KICBHRU4gICAgIGh3L2lkZS90cmFjZS5oCiAgR0VOICAgICBody9pbnB1
+dC90cmFjZS5oCi0tLQogICAgICAgICBERVAgZHRjLWxleGVyLmxleC5jCiAgICAgICAgQ0hLIHZl
+cnNpb25fZ2VuLmgKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgJy90bXAvcWVtdS10ZXN0L3Ny
+Yy9zbGlycCcKbWFrZTogKioqIFtNYWtlZmlsZTo1NTg6IHNsaXJwL2FsbF0gRXJyb3IgMgptYWtl
+OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogICAgICAgIFVQRCB2ZXJzaW9u
+X2dlbi5oCiAgICAgICAgIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3V0aWwuYwotLS0KICAg
+IHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVk
+UHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICct
+LWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZjIwYWFiODVhZGFmNDE2NTg1MGY4Njhi
+Mjc5NWRiZWYnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29u
+ZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklH
+VVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1l
+JywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdics
+ICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hl
+OnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWRnZzlpamlzL3NyYy9kb2Nr
+ZXItc3JjLjIwMjAtMDMtMTctMTEuMzYuMTIuMjI1MzQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3Fl
+bXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQg
+bm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmlu
+c3RhbmNlLnV1aWQ9ZjIwYWFiODVhZGFmNDE2NTg1MGY4NjhiMjc5NWRiZWYKbWFrZVsxXTogKioq
+IFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3Rt
+cC9wYXRjaGV3LXRlc3Rlci10bXAtZGdnOWlqaXMvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4t
+dGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMW0yNy44MTFzCnVzZXIgICAgMG04
+LjA2OHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMjAwMzE3MTM1ODAzLjI2ODIzODQtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20v
+dGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
