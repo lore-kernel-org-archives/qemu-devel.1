@@ -2,80 +2,74 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C77E7C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DB2C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DB3620753
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:41:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TiINNWTJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DB3620753
+	by mail.kernel.org (Postfix) with ESMTPS id E913E20409
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:42:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E913E20409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEJ1w-0002Ex-PI
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:41:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58949)
+	id 1jEJ2b-000391-2l
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mansourweb@gmail.com>) id 1jEJ0j-0000nZ-0j
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:25 -0400
+ (envelope-from <bounces@canonical.com>) id 1jEJ1D-0001do-FP
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mansourweb@gmail.com>) id 1jEJ0g-0001Pw-Vr
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:24 -0400
-Received: from mail-lf1-x131.google.com ([2a00:1450:4864:20::131]:41567)
+ (envelope-from <bounces@canonical.com>) id 1jEJ1C-0005oQ-59
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46874)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mansourweb@gmail.com>)
- id 1jEJ0g-00017S-Nf
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:22 -0400
-Received: by mail-lf1-x131.google.com with SMTP id u26so6175116lfu.8
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 13:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=q6W6dATC1dY65IVQ96i99f6AL59x7lL28EmyFVVXC3g=;
- b=TiINNWTJnX2y7JafHilom7hb42RJ2haIf5OVGHIhNq+wvOoXWUoXQb7v46OrPqPyO2
- zPy0JNGYAXwcGeJRNtoGJbwgabDGNbtvHkUX0iUtXDdXFww0TOdXW903mTEGe+wsUXKY
- kLxXftMe0Quu+lq8LoIf8CcdYlEthWU0viHD0qMvt3jA2Untzkhws6tRXKt91gALbMZ6
- rbU7Z9xEpWbYiBaX3yfEFNnV5/p4qZdd0uVppYxIVnr3XnMmMrk2l9DReuHQU5mQXJSL
- h7q2eoZ0B+D2Cv5gSaKQJVYHYkyTCq/3GQyQLYtahSOIc4yf/hRdpxTkkxWaIO6GcZnr
- /k9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=q6W6dATC1dY65IVQ96i99f6AL59x7lL28EmyFVVXC3g=;
- b=t7ZyBnZ7SveHDTH4UCHS+FtRfNWJ4wxBUU/dpnY3/Cjcq3nOMJ+SN6CDYsfCVrofnD
- WFGTMOanCPHznIY5H3MMlYhTKd9k0Fmftp9pxIwihoxTH5icDtNlqq27fvQLhWFtjcnP
- BtQWq5ahdD+xvInmJZ114OJBVOTTupQWfYgZdfhf7Z22ptq9n1JVTsyuaHA2yW7F33LJ
- i3zOmFOAoiESLvirNi/UgbdhXyOhw3rN3fZn12OooH76XfYdB0Pgej0HjLwb+AfL3lb/
- BPRqSJuGcViJwebexN4z8985tm+2ewlw+AnDJ0Jso1XogBbERWzwM3jslLDUVwE/Ge9n
- cZ/A==
-X-Gm-Message-State: ANhLgQ3yKemp8i9dwvuDYKUpYnMfFZl0HO+jRglXHVu3pM63pyg3jdCq
- tJUT9jOxbC3fLzOtZqkGsGS13fVuuT5oMd7IPWqCm6A5xwU=
-X-Google-Smtp-Source: ADFU+vtH28asMw8ZAviZYbJvokgdRCiEKLLUtrtZtOAMqD38QIGJZFyVUYoAy2h8jkJ0fFUTWrkW9EnpJwg1z5OPplM=
-X-Received: by 2002:a19:f611:: with SMTP id x17mr716627lfe.89.1584477620654;
- Tue, 17 Mar 2020 13:40:20 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jEJ1B-0005ar-Uf
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jEJ1A-0006aq-8Q
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 20:40:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3EC172E80C8
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 20:40:52 +0000 (UTC)
 MIME-Version: 1.0
-From: Mansour Ahmadi <ManSoSec@gmail.com>
-Date: Tue, 17 Mar 2020 16:40:09 -0400
-Message-ID: <CAGT9xrB039Q7_fG1NpKv7w3t1N0OH93U9HPNawtpq9TsNr5hfA@mail.gmail.com>
-Subject: Missing Null check
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Mar 2020 20:35:26 -0000
+From: carlosedp <carlosedp@gmail.com>
 To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="000000000000bbd9b005a112f1b9"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::131
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: carlosedp laurent-vivier
+X-Launchpad-Bug-Reporter: carlosedp (carlosedp)
+X-Launchpad-Bug-Modifier: carlosedp (carlosedp)
+References: <158445595923.20060.16174990100496488911.malonedeb@wampee.canonical.com>
+Message-Id: <158447732650.11338.4872950680078287954.malone@soybean.canonical.com>
+Subject: [Bug 1867786] Re: Qemu PPC64 freezes with multi-core CPU
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 52d85593e3b1ec00a70bd44a8f34b68e0c0679d9
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,95 +78,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1867786 <1867786@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000bbd9b005a112f1b9
-Content-Type: text/plain; charset="UTF-8"
+I just reverted to 4.2.0 and it works fine. No freezes for the past
+hour.
 
-Is a NULL check on 'drv1->format_name' missing here?
-https://github.com/qemu/qemu/blob/cc818a2148c5f321bdeb8e5564bdb2914e824600/block.c#L400-L403
+=E2=9D=AF qemu-system-ppc64 --version
+QEMU emulator version 4.2.0
+Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
 
-if (!strcmp(drv1->format_name, format_name)) {
+Couldn't bisect to find the bad commit.
 
-While it is checked in similar case:
-https://github.com/qemu/qemu/blob/cc818a2148c5f321bdeb8e5564bdb2914e824600/block.c#L797-L800
+Carlos
 
-if (drv1->protocol_name && !strcmp(drv1->protocol_name, protocol)) {
+-- =
 
---000000000000bbd9b005a112f1b9
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1867786
 
-<div dir=3D"ltr"><div class=3D"gmail_default" style=3D"font-family:garamond=
-,serif;font-size:large">Is a NULL check on &#39;<span style=3D"color:rgb(36=
-,41,46);font-family:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Men=
-lo,monospace;font-size:12px;white-space:pre;background-color:rgb(255,251,22=
-1)">drv1-&gt;</span><span class=3D"gmail-pl-smi" style=3D"box-sizing:border=
--box;color:rgb(36,41,46);font-family:SFMono-Regular,Consolas,&quot;Liberati=
-on Mono&quot;,Menlo,monospace;font-size:12px;white-space:pre">format_name</=
-span>&#39; missing here?</div><div class=3D"gmail_default" style=3D"font-fa=
-mily:garamond,serif;font-size:large"><a href=3D"https://github.com/qemu/qem=
-u/blob/cc818a2148c5f321bdeb8e5564bdb2914e824600/block.c#L400-L403">https://=
-github.com/qemu/qemu/blob/cc818a2148c5f321bdeb8e5564bdb2914e824600/block.c#=
-L400-L403</a><br></div><div class=3D"gmail_default" style=3D"font-family:ga=
-ramond,serif;font-size:large"><br></div><div class=3D"gmail_default" style=
-=3D"font-family:garamond,serif;font-size:large"><span class=3D"gmail-pl-k" =
-style=3D"box-sizing:border-box;color:rgb(215,58,73);font-family:SFMono-Regu=
-lar,Consolas,&quot;Liberation Mono&quot;,Menlo,monospace;font-size:12px;whi=
-te-space:pre">if</span><span style=3D"color:rgb(36,41,46);font-family:SFMon=
-o-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,monospace;font-size:12=
-px;white-space:pre;background-color:rgb(255,251,221)"> (!</span><span class=
-=3D"gmail-pl-c1" style=3D"box-sizing:border-box;color:rgb(0,92,197);font-fa=
-mily:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,monospace;fo=
-nt-size:12px;white-space:pre">strcmp</span><span style=3D"color:rgb(36,41,4=
-6);font-family:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,mo=
-nospace;font-size:12px;white-space:pre;background-color:rgb(255,251,221)">(=
-drv1-&gt;</span><span class=3D"gmail-pl-smi" style=3D"box-sizing:border-box=
-;color:rgb(36,41,46);font-family:SFMono-Regular,Consolas,&quot;Liberation M=
-ono&quot;,Menlo,monospace;font-size:12px;white-space:pre">format_name</span=
-><span style=3D"color:rgb(36,41,46);font-family:SFMono-Regular,Consolas,&qu=
-ot;Liberation Mono&quot;,Menlo,monospace;font-size:12px;white-space:pre;bac=
-kground-color:rgb(255,251,221)">, format_name)) {</span><br></div><div clas=
-s=3D"gmail_default" style=3D"font-family:garamond,serif;font-size:large"><b=
-r></div><div class=3D"gmail_default" style=3D"font-family:garamond,serif;fo=
-nt-size:large">While it is checked in similar case:</div><div class=3D"gmai=
-l_default" style=3D"font-family:garamond,serif;font-size:large"><a href=3D"=
-https://github.com/qemu/qemu/blob/cc818a2148c5f321bdeb8e5564bdb2914e824600/=
-block.c#L797-L800">https://github.com/qemu/qemu/blob/cc818a2148c5f321bdeb8e=
-5564bdb2914e824600/block.c#L797-L800</a><br></div><div class=3D"gmail_defau=
-lt" style=3D"font-family:garamond,serif;font-size:large"><br></div><div cla=
-ss=3D"gmail_default" style=3D"font-family:garamond,serif;font-size:large"><=
-span class=3D"gmail-pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,7=
-3);font-family:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,mo=
-nospace;font-size:12px;white-space:pre">if</span><span style=3D"color:rgb(3=
-6,41,46);font-family:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Me=
-nlo,monospace;font-size:12px;white-space:pre;background-color:rgb(255,251,2=
-21)"> (drv1-&gt;</span><span class=3D"gmail-pl-smi" style=3D"box-sizing:bor=
-der-box;color:rgb(36,41,46);font-family:SFMono-Regular,Consolas,&quot;Liber=
-ation Mono&quot;,Menlo,monospace;font-size:12px;white-space:pre">protocol_n=
-ame</span><span style=3D"color:rgb(36,41,46);font-family:SFMono-Regular,Con=
-solas,&quot;Liberation Mono&quot;,Menlo,monospace;font-size:12px;white-spac=
-e:pre;background-color:rgb(255,251,221)"> &amp;&amp; !</span><span class=3D=
-"gmail-pl-c1" style=3D"box-sizing:border-box;color:rgb(0,92,197);font-famil=
-y:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,monospace;font-=
-size:12px;white-space:pre">strcmp</span><span style=3D"color:rgb(36,41,46);=
-font-family:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,monos=
-pace;font-size:12px;white-space:pre;background-color:rgb(255,251,221)">(drv=
-1-&gt;</span><span class=3D"gmail-pl-smi" style=3D"box-sizing:border-box;co=
-lor:rgb(36,41,46);font-family:SFMono-Regular,Consolas,&quot;Liberation Mono=
-&quot;,Menlo,monospace;font-size:12px;white-space:pre">protocol_name</span>=
-<span style=3D"color:rgb(36,41,46);font-family:SFMono-Regular,Consolas,&quo=
-t;Liberation Mono&quot;,Menlo,monospace;font-size:12px;white-space:pre;back=
-ground-color:rgb(255,251,221)">, protocol)) {</span></div><div><div dir=3D"=
-ltr" class=3D"gmail_signature" data-smartmail=3D"gmail_signature"><div dir=
-=3D"ltr"><div><div dir=3D"ltr"><div><div dir=3D"ltr"><div dir=3D"ltr"><span=
- style=3D"border-collapse:collapse;white-space:pre-wrap"><span style=3D"bor=
-der-collapse:separate;white-space:normal"><font color=3D"#000000" size=3D"2=
-"><div style=3D"font-family:Calibri"><div style=3D"font-family:arial,sans-s=
-erif"></div></div></font></span></span></div></div></div></div></div></div>=
-</div></div></div>
+Title:
+  Qemu PPC64 freezes with multi-core CPU
 
---000000000000bbd9b005a112f1b9--
+Status in QEMU:
+  New
+
+Bug description:
+  I installed Debian 10 on a Qemu PPC64 VM running with the following
+  flags:
+
+  qemu-system-ppc64 \
+       -nographic -nodefaults -monitor pty -serial stdio \
+       -M pseries -cpu POWER9 -smp cores=3D4,threads=3D1 -m 4G \
+       -drive file=3Ddebian-ppc64el-qemu.qcow2,format=3Dqcow2,if=3Dvirtio \
+       -netdev user,id=3Dnetwork01,$ports -device rtl8139,netdev=3Dnetwork0=
+1 \
+
+  =
+
+  Within a couple minutes on any operation (could be a Go application or si=
+mply changing the hostname with hostnamectl, the VM freezes and prints this=
+ on the console:
+
+  ```
+  root@debian:~# [  950.428255] rcu: INFO: rcu_sched self-detected stall on=
+ CPU
+  [  950.428453] rcu:     3-....: (5318 ticks this GP) idle=3D8e2/1/0x40000=
+00000000004 softirq=3D5957/5960 fqs=3D2544
+  [  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! [zsh:462]
+
+  Message from syslogd@debian at Mar 17 11:35:24 ...
+   kernel:[  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! =
+[zsh:462]
+  [  980.110018] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tas=
+ks: { 3-... } 5276 jiffies s: 93 root: 0x8/.
+  [  980.111177] rcu: blocking rcu_node structures:
+  [ 1013.442268] rcu: INFO: rcu_sched self-detected stall on CPU
+  [ 1013.442365] rcu:     3-....: (21071 ticks this GP) idle=3D8e2/1/0x4000=
+000000000004 softirq=3D5957/5960 fqs=3D9342
+  ```
+
+  If I change to 1 core on the command line, I haven't seen these
+  freezes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1867786/+subscriptions
 
