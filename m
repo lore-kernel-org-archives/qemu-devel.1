@@ -2,90 +2,99 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BB2C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7E6C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:15:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7132D20735
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:14:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD17820674
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z8emhfso"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7132D20735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5U1cQFh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD17820674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEGj4-0007R2-JQ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:14:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36952)
+	id 1jEGk7-0000Dx-T7
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:15:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jEGUd-0005tZ-6W
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 13:59:08 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jEGY9-00018m-AQ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jEGUb-0001D1-Td
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 13:59:07 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52856)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jEGUb-00017C-Li
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 13:59:05 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 11so282009wmo.2
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 10:59:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=/er0YYsHIwE0mZN9mnJ6X1m0HeTDXCeZYTdLs35Tmio=;
- b=z8emhfso8Got270aizEytcNYUCxFPHHSre6nGBDWQVuf1JopFRdnTOEYjkBk80UVEi
- p86OHjGiGfgiux1z5sti7OwuSiBW3svKHweTR6tqOTOUdVSTQtU6wDEroY/CJL9mvlyH
- WTp4+1IsCLGGD3s4ie4YKlH3GAIKwvnUMW1snNpYpvIxrDALlKqBftNvE6FT0xFmDn/a
- GMzGB/8sHAwGfO1oVsC+Qa+EDAwQWZO+ptM9ZtLwnbH6/zFe2E2Pc1cC2NWOsECP7Kkn
- pdkVJBymlrR8Q3DgVIPLSo7VNySm9twYqvaA2YDY4nSl1Eb0b1odtPFXupvyc7bHN1v8
- EffA==
+ (envelope-from <pbonzini@redhat.com>) id 1jEGY7-0003qZ-Q4
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:02:45 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:22167)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jEGY7-0003iI-Je
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:02:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584468162;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j2JvZ4mNO0mNgyt/45woZ9rfXmSd3dHVZzJ+Ul0wVn4=;
+ b=Z5U1cQFh4VinL8rrWA7fpGXm5nuIf8p60HQenraB1p4+MRG5TDdw5I7uk5ZStyYL1ypo9/
+ II5+tZExS2DROuGFgtAfTyEW3KJ+wLxZaMpzZ2o1F5pxWqTDXISztAVPFScCv/ajVf+kF1
+ zMzgXPzEFFDymKTdvAYT1gT09qz5C2Q=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-130-eelFbVHpOfq9vIuOA_RIyw-1; Tue, 17 Mar 2020 14:02:41 -0400
+X-MC-Unique: eelFbVHpOfq9vIuOA_RIyw-1
+Received: by mail-wr1-f71.google.com with SMTP id h17so1381598wru.16
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 11:02:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/er0YYsHIwE0mZN9mnJ6X1m0HeTDXCeZYTdLs35Tmio=;
- b=fbRzt6FeJy5EnzIkIFQFsiB5ryV1IGqSiXiXeYAUO0My+UASZXCJeJg+hWQSOEi6IW
- KrmNkq0S+GRNICTZ0Q/Ah3iBuFCGAEazSDrqN/hwRrAn8oiVgjXk/WQLvW/mm6bVAWAd
- 0cUQIKIs3pRYpovu2RLeMeBapMGdaxHGmiFnQmxKwToEOngq6QgJcHhz+CAif3rityNL
- TfAiT0Qs0gy9rGTqNIqeAaKz0hP79r4qufzv63XqxdHNYTrGe6Y5MBdbQtsTh0wsRIra
- ndzFC8lxb7xAbzlG/kxG1Okdar95Bwr6fjbxsxKpvTFddw3Wggz1ZZY8TMr5g6+F+nOn
- 9kMQ==
-X-Gm-Message-State: ANhLgQ1/PPE+FuGjaTiKFpINLOCU/6cPVlFA3g07Id9hc5D0sK5SAM+K
- uqfCKsrfWyb3v8Wwi6/fa9IUWw==
-X-Google-Smtp-Source: ADFU+vtWNa6cXqeQ0LT3RkBKwVEknPNKH7B3euwtmGVwA0lU4+MkfgtUpbjYAp7brlCQMItg364gTA==
-X-Received: by 2002:a7b:ce81:: with SMTP id q1mr236610wmj.156.1584467944667;
- Tue, 17 Mar 2020 10:59:04 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s131sm215016wmf.35.2020.03.17.10.58.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Mar 2020 10:58:54 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 244871FFB4;
- Tue, 17 Mar 2020 17:50:56 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 28/28] gdbstub: Fix single-step issue by confirming
- 'vContSupported+' feature to gdb
-Date: Tue, 17 Mar 2020 17:50:53 +0000
-Message-Id: <20200317175053.5278-29-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200317175053.5278-1-alex.bennee@linaro.org>
-References: <20200317175053.5278-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j2JvZ4mNO0mNgyt/45woZ9rfXmSd3dHVZzJ+Ul0wVn4=;
+ b=sfFmSKr5LoVBELphW+A87RCZ2KOwMCj72GNZIPEyNKhBWGlwCzXFJ+ECiN4kqFwzJ7
+ o/KE5sLeTxugMpCCSQFFSccil1mU6eB/8MwURnupyPtObzHrKAtFIBRbpzb+xm6W7WXv
+ kbEXG+7wSsZv+N1sX6SgUJdn19U+Cc+2ZznHUuNezOXWGI+Zn2YQ7NbTqVCXI1ZbJYA8
+ uc5azEi4J5JEfPTvmtOGnIyERl/GVhQtJvm1gbocER0S5aWqm9Rf3RqElWsMcov1Fcof
+ cuPfybNyovDDRQ4oix5toAU9q4iwFisbRr1CuMMc1JoKmDyhU+JdveEJ/HNvgsZBONwL
+ Y7iw==
+X-Gm-Message-State: ANhLgQ06EQe2fEaa7wWJ6BXH2ngGhM7K2Kfp67aNtFPK8bX3TcM1taMs
+ q9vRczRyPfOSsdVYRbxzEl8DjPq9bkE6L21dVqlmwHf7zRM9VBVV18EngOzcYTwr7DbWsL/Swge
+ /yBoO23mNhRuCqBQ=
+X-Received: by 2002:a05:600c:2f01:: with SMTP id
+ r1mr213311wmn.31.1584468158016; 
+ Tue, 17 Mar 2020 11:02:38 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvTSLWGVo+qyK1mzEiXAPC9fg8Q6hP/DNsMpm3wBzp1AFIrl2lOMe52++xWuHx27PSU9DuCEA==
+X-Received: by 2002:a05:600c:2f01:: with SMTP id
+ r1mr213291wmn.31.1584468157761; 
+ Tue, 17 Mar 2020 11:02:37 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.227])
+ by smtp.gmail.com with ESMTPSA id 9sm211878wmo.38.2020.03.17.11.02.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Mar 2020 11:02:37 -0700 (PDT)
+Subject: Re: [PATCH] i386/kvm: Add CPU property to expose VMware CPUID
+ signature
+To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+References: <20200310004017.100484-1-liran.alon@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6cd902ba-c90b-b600-c460-a9b8fba2ebc7@redhat.com>
+Date: Tue, 17 Mar 2020 19:02:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <20200310004017.100484-1-liran.alon@oracle.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,67 +106,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Luc Michel <luc.michel@greensocs.com>,
- Changbin Du <changbin.du@gmail.com>
+Cc: mtosatti@redhat.com, ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Changbin Du <changbin.du@gmail.com>
+On 10/03/20 01:40, Liran Alon wrote:
+> Some guests are only familiar with VMware PV interface. Therefore, in
+> order for these guests to run properly on KVM, we need to be able to
+> expose VMware main CPUID leaf. i.e. leaf 0x40000000.
+> 
+> E.g. Without exposing this VMware CPUID leaf, some guests will fail to boot.
+> For example, because of guest attempt to calibrate TSC.
+> 
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
 
-Recently when debugging an arm32 system on qemu, I found sometimes the
-single-step command (stepi) is not working. This can be reproduced by
-below steps:
- 1) start qemu-system-arm -s -S .. and wait for gdb connection.
- 2) start gdb and connect to qemu. In my case, gdb gets a wrong value
-    (0x60) for PC, which is an another bug.
- 3) After connected, type 'stepi' and expect it will stop at next ins.
+Looks good, thanks.  It was submitted quite close to soft freeze so I
+couldn't get to it quickly.  But I've queued it now, either for 5.0 or 5.1.
 
-But, it has never stopped. This because:
- 1) We doesn't report ‘vContSupported’ feature to gdb explicitly and gdb
-    think we do not support it. In this case, gdb use a software breakpoint
-    to emulate single-step.
- 2) Since gdb gets a wrong initial value of PC, then gdb inserts a
-    breakpoint to wrong place (PC+4).
+Paolo
 
-Not only for the arm target, Philippe has also encountered this on MIPS.
-Probably gdb has different assumption for different architectures.
-
-Since we do support ‘vContSupported’ query command, so let's tell gdb that
-we support it.
-
-Before this change, gdb send below 'Z0' packet to implement single-step:
-gdb_handle_packet: Z0,4,4
-
-After this change, gdb send "vCont;s.." which is expected:
-gdb_handle_packet: vCont?
-put_packet: vCont;c;C;s;S
-gdb_handle_packet: vCont;s:p1.1;c:p1.-1
-
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200221002559.6768-1-changbin.du@gmail.com>
-[AJB: fix for static gdbstub]
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Message-Id: <20200316172155.971-29-alex.bennee@linaro.org>
-
-diff --git a/gdbstub.c b/gdbstub.c
-index 9ae148cd1ff..013fb1ac0f1 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2130,7 +2130,7 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-         gdbserver_state.multiprocess = true;
-     }
- 
--    g_string_append(gdbserver_state.str_buf, ";multiprocess+");
-+    g_string_append(gdbserver_state.str_buf, ";vContSupported+;multiprocess+");
-     put_strbuf();
- }
- 
--- 
-2.20.1
+> ---
+>  target/i386/cpu.c |  1 +
+>  target/i386/cpu.h |  1 +
+>  target/i386/kvm.c | 35 +++++++++++++++++++++++++++++------
+>  3 files changed, 31 insertions(+), 6 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 92fafa265914..694766d45a9b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7127,6 +7127,7 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
+>      DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
+>                       false),
+> +    DEFINE_PROP_BOOL("vmware-cpuid", X86CPU, expose_vmware, false),
+>      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+>      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+>      DEFINE_PROP_BOOL("x-migrate-smi-count", X86CPU, migrate_smi_count,
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 9c7cd7cde107..bca626963e25 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1647,6 +1647,7 @@ struct X86CPU {
+>       */
+>      bool force_features;
+>      bool expose_kvm;
+> +    bool expose_vmware;
+>      bool expose_tcg;
+>      bool migratable;
+>      bool migrate_smi_count;
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 00917196dffb..2656258b96b3 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1187,6 +1187,15 @@ static int hyperv_handle_properties(CPUState *cs,
+>      if (!hyperv_enabled(cpu))
+>          return 0;
+>  
+> +    /*
+> +     * VMware & Hyper-V conflicts in CPUID leafs.
+> +     * Therefore, they cannot exists together.
+> +     */
+> +    if (cpu->expose_vmware) {
+> +        error_report("vmware-cpuid not compatible with hyperv options");
+> +        return -ENOTSUP;
+> +    }
+> +
+>      if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ||
+>          cpu->hyperv_passthrough) {
+>          uint16_t evmcs_version;
+> @@ -1508,6 +1517,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          has_msr_hv_hypercall = true;
+>      }
+>  
+> +    if (cpu->expose_vmware) {
+> +        c = &cpuid_data.entries[cpuid_i++];
+> +        c->function = KVM_CPUID_SIGNATURE;
+> +        memcpy(signature, "VMwareVMware", 12);
+> +        c->eax = KVM_CPUID_SIGNATURE;
+> +        c->ebx = signature[0];
+> +        c->ecx = signature[1];
+> +        c->edx = signature[2];
+> +
+> +        kvm_base = KVM_CPUID_SIGNATURE_NEXT;
+> +    }
+> +
+>      if (cpu->expose_kvm) {
+>          memcpy(signature, "KVMKVMKVM\0\0\0", 12);
+>          c = &cpuid_data.entries[cpuid_i++];
+> @@ -1791,11 +1812,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          }
+>      }
+>  
+> -    if (cpu->vmware_cpuid_freq
+> -        /* Guests depend on 0x40000000 to detect this feature, so only expose
+> -         * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V) */
+> -        && cpu->expose_kvm
+> -        && kvm_base == KVM_CPUID_SIGNATURE
+> +    if (cpu->vmware_cpuid_freq &&
+> +        (cpu->expose_vmware ||
+> +         /*
+> +          * Guests depend on 0x40000000 to detect this feature, so only expose
+> +          * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V)
+> +          */
+> +          (cpu->expose_kvm && kvm_base == KVM_CPUID_SIGNATURE))
+>          /* TSC clock must be stable and known for this feature. */
+>          && tsc_is_stable_and_known(env)) {
+>  
+> @@ -1805,7 +1828,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          c->ebx = env->apic_bus_freq / 1000; /* Hz to KHz */
+>          c->ecx = c->edx = 0;
+>  
+> -        c = cpuid_find_entry(&cpuid_data.cpuid, kvm_base, 0);
+> +        c = cpuid_find_entry(&cpuid_data.cpuid, KVM_CPUID_SIGNATURE, 0);
+>          c->eax = MAX(c->eax, KVM_CPUID_SIGNATURE | 0x10);
+>      }
+>  
+> 
 
 
