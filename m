@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3011C0044D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA477C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EA2220674
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA9CB20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:44:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N34Bgip8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA2220674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T41mPmGH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA9CB20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE0L3-000114-LM
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 20:44:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41371)
+	id 1jE0L5-00012A-Ut
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 20:44:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41431)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jE0IF-0003wv-2K
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:16 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jE0IH-00041w-9G
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jE0IE-0004r2-1C
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:14 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35748)
+ (envelope-from <jsnow@redhat.com>) id 1jE0IF-0004yV-Tv
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:17 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:38671)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jE0ID-0004q3-Tv
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:13 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jE0IF-0004xu-Pe
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584405673;
+ s=mimecast20190719; t=1584405675;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tg7R8UMMs6xG0ZD4hetM81xCnjtrpp1MvWpvCci3eF0=;
- b=N34Bgip8izDICgpDQjsvoM/ttYtl32h2QctUuUDL1VRuDZ2zfGM+xWrsIx1UW2UzWlQCj5
- kHbQfgmsSIloaACo7L6P0SLhjpsM/tXMX21JOBHu4eXW8/kkfBtCHGgbrdLCjQ2IvhOQ6n
- 9fgdgtK8VMkpgUEU5pIFIwedg8jbtpg=
+ bh=KQBnYkEn5mABwOQVjYOEtia36Kc/+snsuX5m5kADB2o=;
+ b=T41mPmGHu3HlexyaXvccPjkL+hF0Mts08K2Mwjyiz0jSiyjOFoCUCXZRkkDqbQKxW6tlKH
+ wVSgcA43/vJIT/zRIbTuOYHFJopmga6ZnkalNNCrv/IDRZo77v0GhVSVFZEHvmTU9PhkaW
+ EqgUsEF70IkTA+GwjHEW5nwWKecpNxY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-xGPyf5hrOpCTwae3s5csWg-1; Mon, 16 Mar 2020 20:41:12 -0400
-X-MC-Unique: xGPyf5hrOpCTwae3s5csWg-1
+ us-mta-269-z2CnrJbxNsO4r9nOcgPXTw-1; Mon, 16 Mar 2020 20:41:13 -0400
+X-MC-Unique: z2CnrJbxNsO4r9nOcgPXTw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F36821005513;
- Tue, 17 Mar 2020 00:41:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D355107ACC7;
+ Tue, 17 Mar 2020 00:41:12 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CBF007A411;
- Tue, 17 Mar 2020 00:41:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 23E3F7A411;
+ Tue, 17 Mar 2020 00:41:11 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 03/11] iotests: ignore import warnings from pylint
-Date: Mon, 16 Mar 2020 20:40:57 -0400
-Message-Id: <20200317004105.27059-4-jsnow@redhat.com>
+Subject: [PATCH v8 04/11] iotests: replace mutable list default args
+Date: Mon, 16 Mar 2020 20:40:58 -0400
+Message-Id: <20200317004105.27059-5-jsnow@redhat.com>
 In-Reply-To: <20200317004105.27059-1-jsnow@redhat.com>
 References: <20200317004105.27059-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -91,30 +91,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The right way to solve this is to come up with a virtual environment
-infrastructure that sets all the paths correctly, and/or to create
-installable python modules that can be imported normally.
+It's bad hygiene: if we modify this list, it will be modified across all
+invocations.
 
-That's hard, so just silence this error for now.
+(Remaining bad usages are fixed in a subsequent patch which changes the
+function signature anyway.)
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qemu-iotests/iotests.py | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index a6b2889932..cb9c2cd05d 100644
+index cb9c2cd05d..7cd74e7cb1 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -29,6 +29,7 @@
- import io
- from collections import OrderedDict
+@@ -136,7 +136,7 @@ def qemu_img_log(*args):
+     log(result, filters=3D[filter_testfiles])
+     return result
 =20
-+# pylint: disable=3Dimport-error, wrong-import-position
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pytho=
-n'))
- from qemu import qtest
+-def img_info_log(filename, filter_path=3DNone, imgopts=3DFalse, extra_args=
+=3D[]):
++def img_info_log(filename, filter_path=3DNone, imgopts=3DFalse, extra_args=
+=3D()):
+     args =3D ['info']
+     if imgopts:
+         args.append('--image-opts')
+@@ -350,7 +350,7 @@ def _filter(_key, value):
+         return value
+     return filter_qmp(qmsg, _filter)
 =20
+-def log(msg, filters=3D[], indent=3DNone):
++def log(msg, filters=3D(), indent=3DNone):
+     '''Logs either a string message or a JSON serializable message (like Q=
+MP).
+     If indent is provided, JSON serializable messages are pretty-printed.'=
+''
+     for flt in filters:
+@@ -566,7 +566,7 @@ def get_qmp_events_filtered(self, wait=3D60.0):
+             result.append(filter_qmp_event(ev))
+         return result
+=20
+-    def qmp_log(self, cmd, filters=3D[], indent=3DNone, **kwargs):
++    def qmp_log(self, cmd, filters=3D(), indent=3DNone, **kwargs):
+         full_cmd =3D OrderedDict((
+             ("execute", cmd),
+             ("arguments", ordered_qmp(kwargs))
+@@ -970,7 +970,7 @@ def case_notrun(reason):
+     open('%s/%s.casenotrun' % (output_dir, seq), 'a').write(
+         '    [case not run] ' + reason + '\n')
+=20
+-def verify_image_format(supported_fmts=3D[], unsupported_fmts=3D[]):
++def verify_image_format(supported_fmts=3D(), unsupported_fmts=3D()):
+     assert not (supported_fmts and unsupported_fmts)
+=20
+     if 'generic' in supported_fmts and \
+@@ -984,7 +984,7 @@ def verify_image_format(supported_fmts=3D[], unsupporte=
+d_fmts=3D[]):
+     if not_sup or (imgfmt in unsupported_fmts):
+         notrun('not suitable for this image format: %s' % imgfmt)
+=20
+-def verify_protocol(supported=3D[], unsupported=3D[]):
++def verify_protocol(supported=3D(), unsupported=3D()):
+     assert not (supported and unsupported)
+=20
+     if 'generic' in supported:
+@@ -1003,11 +1003,11 @@ def verify_platform(supported=3DNone, unsupported=
+=3DNone):
+         if not any((sys.platform.startswith(x) for x in supported)):
+             notrun('not suitable for this OS: %s' % sys.platform)
+=20
+-def verify_cache_mode(supported_cache_modes=3D[]):
++def verify_cache_mode(supported_cache_modes=3D()):
+     if supported_cache_modes and (cachemode not in supported_cache_modes):
+         notrun('not suitable for this cache mode: %s' % cachemode)
+=20
+-def verify_aio_mode(supported_aio_modes=3D[]):
++def verify_aio_mode(supported_aio_modes=3D()):
+     if supported_aio_modes and (aiomode not in supported_aio_modes):
+         notrun('not suitable for this aio mode: %s' % aiomode)
+=20
+@@ -1047,7 +1047,7 @@ def supported_formats(read_only=3DFalse):
+=20
+     return supported_formats.formats[read_only]
+=20
+-def skip_if_unsupported(required_formats=3D[], read_only=3DFalse):
++def skip_if_unsupported(required_formats=3D(), read_only=3DFalse):
+     '''Skip Test Decorator
+        Runs the test if all the required formats are whitelisted'''
+     def skip_test_decorator(func):
+@@ -1098,11 +1098,11 @@ def execute_unittest(output, verbosity, debug):
+             sys.stderr.write(out)
+=20
+ def execute_test(test_function=3DNone,
+-                 supported_fmts=3D[],
++                 supported_fmts=3D(),
+                  supported_platforms=3DNone,
+-                 supported_cache_modes=3D[], supported_aio_modes=3D{},
+-                 unsupported_fmts=3D[], supported_protocols=3D[],
+-                 unsupported_protocols=3D[]):
++                 supported_cache_modes=3D(), supported_aio_modes=3D(),
++                 unsupported_fmts=3D(), supported_protocols=3D(),
++                 unsupported_protocols=3D()):
+     """Run either unittest or script-style tests."""
+=20
+     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
 --=20
 2.21.1
 
