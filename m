@@ -2,100 +2,78 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2BDC18E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03687C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 683F5205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1119205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/huaabQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 683F5205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FFWyQilh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1119205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE8Of-0004GV-Fn
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 05:20:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53471)
+	id 1jE8PG-00053u-0B
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 05:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jE8Ny-0003ne-V8
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:19:43 -0400
+ (envelope-from <jwsu1986@gmail.com>) id 1jE8OM-000494-H8
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:20:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jE8Nx-0007P3-J4
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:19:42 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34018)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jE8Nx-0007M9-EI
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:19:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584436780;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=L+5eD9iy2AhNSwNN7eWQAyXjCcfesMWZUS8MRElj/m8=;
- b=N/huaabQOgpgKGlhvv9+GqIGP8YAPdWiBK+Mm7SeUOTxCRL1W9B4xKMes7wVAAyk3i0dtS
- TdWcJXugqSxQ5SNvcZTVF5w7aFNslAtEsGXWkmb72bTthSRfryY2wDCIsqjSaeoSJw9GsC
- wiF5fvZIfQx+GB+eYAdAAj9yjkTtE+s=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-EP-_LvZBMsqgL06urLblAg-1; Tue, 17 Mar 2020 05:19:37 -0400
-X-MC-Unique: EP-_LvZBMsqgL06urLblAg-1
-Received: by mail-wm1-f72.google.com with SMTP id 20so5501508wmk.1
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 02:19:36 -0700 (PDT)
+ (envelope-from <jwsu1986@gmail.com>) id 1jE8OK-0000tE-SL
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:20:06 -0400
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:33024)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jwsu1986@gmail.com>) id 1jE8OK-0000os-MO
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:20:04 -0400
+Received: by mail-oi1-x22e.google.com with SMTP id r7so20986955oij.0
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 02:20:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to
+ :content-transfer-encoding;
+ bh=3Qz+rnWBILkn5XnVQ/tujq1kU4ZbGWF2lZYzHSHCsVU=;
+ b=FFWyQilhv0aoKYjiM5YJgMqgAdFQ9hP2j3RNtirTzECbQpX4BpVNsP4UOUWVRUkimW
+ D958mmcVgem5MnMOUGzf8e6uw3Xc+WZJ61Q1w3kHBX2MrjDxOcwy+Isk6bwr6KyNZ9DC
+ 0EHI2EsqTyhiTTQ+LKuk7RZXSQ72quNg4EEtx+XMJO4U00FrM2dC3YoaJgJx2poovgoI
+ tXteHVWJHVPgn3fKNL1K9Y5Om4vQStLqXjipsLcMvQgwhbTZ637LtyKto4Dfts9L6Bl/
+ vyJbYHqS7Qlxdgw9UoCcsgR7XA59x6lzrPHzynGEh2euPN+fGplMosMakdV/RqQG3X20
+ mykg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to
  :content-transfer-encoding;
- bh=nhoFl6x3SqA2NNDhjhe6Zdi5T9mkk0HewZl6AQxhCGk=;
- b=g7NeuBk5ZinOelBYLoe1tdDOpbCsEZzGnyBUnyoupcOH3TSkjESYnqTJqS+a4ZZ2Jc
- WVxLo7MbTNZvtIDD4CXAPbz9QdPHAgIbl5PUSC/yrgOhsuLd/T7492XlpeySCbScYLbe
- lP7kUOAn27C3I7q2lbDSe0aC5rEv8BTi3oCMAaT2Xt7NrQAuOzGPvnvx9f4nY5J6BM84
- lo/4tX6v+sFWDSOBduerceqI8Jm/K6LaE5sEJPMIeBMqut1BVZ7hp7GRjpZZgtCA/6Mx
- H+zHNyxlQm+o37wx1uOzXelcTohdB0uozwhld3SyJW1ls+EZaDhJ8zZEKT/sIQr8Wq2/
- wo3Q==
-X-Gm-Message-State: ANhLgQ2AFgOR900Zd+qRpu0JTr87v0hDGrE4Bea3qvH9sbw3xeeGLWog
- lZqArcEwUcMCMLdt1pP1+rxxOLgLKYBy0UrpgTOZFCu3HUsnFkNSp2dy8Jrb6mRqz6b05eBVqr9
- rN4CVV390hmRMu2Q=
-X-Received: by 2002:a05:600c:2f10:: with SMTP id
- r16mr4267452wmn.92.1584436775966; 
- Tue, 17 Mar 2020 02:19:35 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vunMKy7Vf2xVjMl2Pqzg0NlOIvTTDrCa+X+usuHApfW6ZenI7/zIZ89s6cnzI1meTnh50hpAA==
-X-Received: by 2002:a05:600c:2f10:: with SMTP id
- r16mr4267429wmn.92.1584436775691; 
- Tue, 17 Mar 2020 02:19:35 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id x5sm3675489wrv.67.2020.03.17.02.19.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Mar 2020 02:19:35 -0700 (PDT)
-Subject: Re: [PATCH] Enable strace for TARGET_NR_llseek
-To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
-References: <1584391940-29281-1-git-send-email-tsimpson@quicinc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f61c50e4-4d71-2260-c3aa-555d7bf300b5@redhat.com>
-Date: Tue, 17 Mar 2020 10:19:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=3Qz+rnWBILkn5XnVQ/tujq1kU4ZbGWF2lZYzHSHCsVU=;
+ b=lJWWoQ3ytePuJTBSNq9V8/BJoX6vdbOyMTAMRigs8rNCUvlEUULSdtXJnI813Z3o0T
+ HtHCVDTxreQcwAw7MCbfmKHcHeag0sfZiOv01eo+lWPHe//qa7RrsWedISt/UwKTbkrp
+ 33nM1tS4MKTGLgALgoEFbaEk+rmWUvhrVrSdLiyVNgldmbd4t8ryUI1mFzUCE5+IOG8D
+ YAY52cC5cWswE65JK3zDztDX0T2RmYypAyC3rnnONX/Yy14xIjLgCrNqepnXBGgKQgcj
+ qEL+Gq3S9rSb0hoByWnoWwI9hNAse9hMwLGUByVOvOVEHnTzmZskWGRMgR2zf4j4xJZC
+ r1iQ==
+X-Gm-Message-State: ANhLgQ1Rjcg4OSG7esG9lgizDpTzQAFnZ1K70LwJYhoZto3u8kYrdVql
+ bRUBlGSgR2qwjK/XiC3nuAXlf0lWSk5itKrMidFyo3S0SXE=
+X-Google-Smtp-Source: ADFU+vuqzGEGoQbJCj3qV3IHznx3mN2Nru1pPrhM7scKMTfHWtb3pgFFG24uHdONw+38RNAHq++TUmzByfTsDny2XY4=
+X-Received: by 2002:aca:dc45:: with SMTP id t66mr2825185oig.39.1584436802950; 
+ Tue, 17 Mar 2020 02:20:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1584391940-29281-1-git-send-email-tsimpson@quicinc.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Jing-Wei Su <jwsu1986@gmail.com>
+Date: Tue, 17 Mar 2020 17:19:51 +0800
+Message-ID: <CAFKS8hXFwmcoeUHfn48N8FZ7Q-BN4zW8pHU2o-N6u4_UX=iYkg@mail.gmail.com>
+Subject: "guest-reset" and "invalid runstate transition" in COLO SVM
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,59 +85,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/16/20 9:52 PM, Taylor Simpson wrote:
-> linux-user/syscall.c handles the case where TARGET_NR_llseek (one undersc=
-ore)
-> is defined and TARGET_NR__llseek (two underscores)
->      /* Newer kernel ports have llseek() instead of _llseek() */
->      #if defined(TARGET_NR_llseek) && !defined(TARGET_NR__llseek)
->      #define TARGET_NR__llseek TARGET_NR_llseek
->      #endif
->=20
-> Unfortunately, strace will print "Unknown syscall" in this case.  This pa=
-tch
-> fixes that problem.
->=20
-> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
-> ---
->   linux-user/strace.c    | 2 +-
->   linux-user/strace.list | 3 +++
->   2 files changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 4f7130b..4bcc00b 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -1667,7 +1667,7 @@ print_linkat(const struct syscallname *name,
->   }
->   #endif
->  =20
-> -#ifdef TARGET_NR__llseek
-> +#ifdef defined(TARGET_NR__llseek) || defined(TARGET_NR_llseek)
->   static void
->   print__llseek(const struct syscallname *name,
->       abi_long arg0, abi_long arg1, abi_long arg2,
-> diff --git a/linux-user/strace.list b/linux-user/strace.list
-> index d49a1e9..5a01e95 100644
-> --- a/linux-user/strace.list
-> +++ b/linux-user/strace.list
-> @@ -503,6 +503,9 @@
->   #ifdef TARGET_NR__llseek
->   { TARGET_NR__llseek, "_llseek" , NULL, print__llseek, NULL },
->   #endif
-> +#ifdef TARGET_NR_llseek
-> +{ TARGET_NR_llseek, "_llseek" , NULL, print__llseek, NULL },
-> +#endif
->   #ifdef TARGET_NR_lock
->   { TARGET_NR_lock, "lock" , NULL, NULL, NULL },
->   #endif
->=20
+Hello,
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+I'm testing  COLO in qemu-4.2.0 with the commit
+https://github.com/qemu/qemu/commit/f51d0b4178738bba87d796eba7444f6cdb3aa0f=
+d.
 
+The qmp of SVM sometimes show the following errors ("guest-reset"
+or/and "invalid runstate transition") .
+Does any have idea about this?
+
+{"timestamp": {"seconds": 1584435907, "microseconds": 610964},
+"event": "RESUME"}
+{"timestamp": {"seconds": 1584435927, "microseconds": 553683}, "event": "ST=
+OP"}
+{"timestamp": {"seconds": 1584435980, "microseconds": 533344},
+"event": "RESUME"}
+{"timestamp": {"seconds": 1584435980, "microseconds": 579256},
+"event": "RESET", "data": {"guest": true, "reason": "guest-reset"}}
+{"timestamp": {"seconds": 1584435980, "microseconds": 588350}, "event": "ST=
+OP"}
+{"timestamp": {"seconds": 1584435980, "microseconds": 801483},
+"event": "RESUME"}
+{"timestamp": {"seconds": 1584435980, "microseconds": 802061}, "event": "ST=
+OP"}
+{"timestamp": {"seconds": 1584435980, "microseconds": 803988},
+"event": "RESET", "data": {"guest": true, "reason": "guest-reset"}}
+qemu-system-x86_64: invalid runstate transition: 'colo' -> 'prelaunch'
+secondary-nonshared.sh: line 25: 23457 Aborted                 (core
+dumped) qemu-system-x86_64 -name secondary -enable-kvm -cpu
+qemu64,+kvmclock -m 2048 -global kvm-apic.vapic=3Dfalse -netdev
+tap,id=3Dhn0,vhost=3Doff,helper=3D/usr/local/libexec/qemu-bridge-helper
+-device e1000,id=3De0,netdev=3Dhn0 -chardev
+socket,id=3Dred0,host=3D$primary_ip,port=3D9003,reconnect=3D1 -chardev
+socket,id=3Dred1,host=3D$primary_ip,port=3D9004,reconnect=3D1 -object
+filter-redirector,id=3Df1,netdev=3Dhn0,queue=3Dtx,indev=3Dred0 -object
+filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dred1 -object
+filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall -drive
+if=3Dnone,id=3Dparent0,file.filename=3D$imagefolder/secondary.qcow2,driver=
+=3Dqcow2
+-drive if=3Dnone,id=3Dchilds0,driver=3Dreplication,mode=3Dsecondary,file.dr=
+iver=3Dqcow2,top-id=3Dcolo-disk0,file.file.filename=3D$imagefolder/secondar=
+y-active.qcow2,file.backing.driver=3Dqcow2,file.backing.file.filename=3D$im=
+agefolder/secondary-hidden.qcow2,file.backing.backing=3Dparent0
+-drive if=3Dide,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vote-th=
+reshold=3D1,children.0=3Dchilds0
+-qmp unix:/tmp/qmp-svm-sock,server,nowait -qmp stdio -vnc :5 -incoming
+tcp:0.0.0.0:9998
+
+My PVM and SVM are on the same PC.
+Here are the steps to setup my testing
+(1) Start PVM
+qemu-system-x86_64 -name primary -enable-kvm -cpu qemu64,+kvmclock -m
+2048 -global kvm-apic.vapic=3Dfalse \
+-netdev tap,id=3Dhn0,vhost=3Doff,helper=3D/usr/local/libexec/qemu-bridge-he=
+lper \
+-device e1000,id=3De0,netdev=3Dhn0 \
+-drive if=3Dide,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vote-th=
+reshold=3D1,children.0.file.filename=3D$imagefolder/primary.qcow2,children.=
+0.driver=3Dqcow2
+\
+-qmp stdio -vnc :4
+
+(2) Add chardevs to PVM via qmp
+{'execute': 'qmp_capabilities'}
+{'execute': 'chardev-add', 'arguments':{ 'id': 'mirror0', 'backend':
+{'type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': {
+'host': '0.0.0.0', 'port': '9003' } }, 'server': true } } } }
+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare1', 'backend':
+{'type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': {
+'host': '0.0.0.0', 'port': '9004' } }, 'server': true } } } }
+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare0', 'backend':
+{'type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': {
+'host': '127.0.0.1', 'port': '9001' } }, 'server': true } } } }
+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare0-0',
+'backend': {'type': 'socket', 'data': {'addr': { 'type': 'inet',
+'data': { 'host': '127.0.0.1', 'port': '9001' } }, 'server': false } }
+} }
+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare_out',
+'backend': {'type': 'socket', 'data': {'addr': { 'type': 'inet',
+'data': { 'host': '127.0.0.1', 'port': '9005' } }, 'server': true } }
+} }
+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare_out0',
+'backend': {'type': 'socket', 'data': {'addr': { 'type': 'inet',
+'data': { 'host': '127.0.0.1', 'port': '9005' } }, 'server': false } }
+} }
+
+(3) Start SVM
+primary_ip=3D127.0.0.1
+qemu-system-x86_64 -name secondary -enable-kvm -cpu qemu64,+kvmclock
+-m 2048 -global kvm-apic.vapic=3Dfalse \
+-netdev tap,id=3Dhn0,vhost=3Doff,helper=3D/usr/local/libexec/qemu-bridge-he=
+lper \
+-device e1000,id=3De0,netdev=3Dhn0 \
+-chardev socket,id=3Dred0,host=3D$primary_ip,port=3D9003,reconnect=3D1 \
+-chardev socket,id=3Dred1,host=3D$primary_ip,port=3D9004,reconnect=3D1 \
+-object filter-redirector,id=3Df1,netdev=3Dhn0,queue=3Dtx,indev=3Dred0 \
+-object filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dred1 \
+-object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall \
+-drive if=3Dnone,id=3Dparent0,file.filename=3D$imagefolder/secondary.qcow2,=
+driver=3Dqcow2
+\
+-drive if=3Dnone,id=3Dchilds0,driver=3Dreplication,mode=3Dsecondary,file.dr=
+iver=3Dqcow2,top-id=3Dcolo-disk0,file.file.filename=3D$imagefolder/secondar=
+y-active.qcow2,file.backing.driver=3Dqcow2,file.backing.file.filename=3D$im=
+agefolder/secondary-hidden.qcow2,file.backing.backing=3Dparent0
+\
+-drive if=3Dide,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vote-th=
+reshold=3D1,children.0=3Dchilds0
+\
+-qmp stdio -vnc :5 -incoming tcp:0.0.0.0:9998
+
+(4) Start NBD server of SVM
+{'execute':'qmp_capabilities'}
+{'execute': 'nbd-server-start', 'arguments': {'addr': {'type': 'inet',
+'data': {'host': '0.0.0.0', 'port': '9999'} } } }
+{'execute': 'nbd-server-add', 'arguments': {'device': 'parent0',
+'writable': true } }
+
+(5) Invoke drive-mirror in PVM side
+{'execute': 'drive-mirror', 'arguments':{ 'device': 'colo-disk0',
+'job-id': 'resync', 'target': 'nbd://127.0.0.2:9999/parent0', 'mode':
+'existing', 'format': 'raw', 'sync': 'full'} }
+
+Wait until disk is synced, then:
+{'execute': 'stop'}
+{'execute': 'block-job-cancel', 'arguments':{ 'device': 'resync'} }
+
+(6) Add Filters and Start COLO Migrate
+{'execute': 'human-monitor-command', 'arguments':{ 'command-line':
+'drive_add -n buddy
+driver=3Dreplication,mode=3Dprimary,file.driver=3Dnbd,file.host=3D127.0.0.1=
+,file.port=3D9999,file.export=3Dparent0,node-name=3Dreplication0'}}
+{'execute': 'x-blockdev-change', 'arguments':{ 'parent': 'colo-disk0',
+'node': 'replication0' } }
+{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-mirror',
+'id': 'm0', 'props': { 'netdev': 'hn0', 'queue': 'tx', 'outdev':
+'mirror0' } } }
+{'execute': 'object-add', 'arguments':{ 'qom-type':
+'filter-redirector', 'id': 'redire0', 'props': { 'netdev': 'hn0',
+'queue': 'rx', 'indev': 'compare_out' } } }
+{'execute': 'object-add', 'arguments':{ 'qom-type':
+'filter-redirector', 'id': 'redire1', 'props': { 'netdev': 'hn0',
+'queue': 'rx', 'outdev': 'compare0' } } }
+{'execute': 'object-add', 'arguments':{ 'qom-type': 'iothread', 'id':
+'iothread1' } }
+{'execute': 'object-add', 'arguments':{ 'qom-type': 'colo-compare',
+'id': 'comp0', 'props': { 'primary_in': 'compare0-0', 'secondary_in':
+'compare1', 'outdev': 'compare_out0', 'iothread': 'iothread1' } } }
+{'execute': 'migrate-set-capabilities', 'arguments':{ 'capabilities':
+[ {'capability': 'x-colo', 'state': true } ] } }
+{'execute': 'migrate', 'arguments':{ 'uri': 'tcp:127.0.0.1:9998' } }
+
+Thanks!
+Sincerely,
+Jing-Wei
 
