@@ -2,83 +2,80 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E9EC1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11498C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:03:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B66A2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:00:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB2292051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:03:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J2DlaLA5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B66A2051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RI/1KNgW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB2292051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEJJg-000218-B2
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 17:00:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48859)
+	id 1jEJMt-0004ai-SO
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 17:03:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51377)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEJIc-0001R8-MC
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:58:55 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEJL3-0002oH-Nu
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEJIb-0004jF-AO
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:58:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:43332)
+ (envelope-from <armbru@redhat.com>) id 1jEJL1-0002TM-OZ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:25 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:38125)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEJIb-0004a5-5K
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:58:53 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEJL0-0002LV-Mh
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584478732;
+ s=mimecast20190719; t=1584478882;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2kWLVj57CUSNpMF3wx/rqYzLNYm+65ZiBlFdSEqgqjk=;
- b=J2DlaLA5C5mt5ZZ8Ul5iM0wwWc3IBb1sAtB5utlz2RV7dUiY0Q4ZyKHtQz765bY+leJXSI
- KRXAaximVbHQYhIX+/x5xycmTsIA9bs/Fd5NZ3gLDnYlHeXabF9rGWPAqj7aj96sRccCHr
- 89YbsbbEY9dD5n7BA0yzlmSyvKeYZpI=
+ bh=YVwz7PUsyqO80utBkXkeDHLx+QsqZFvQIujwd9NSv+w=;
+ b=RI/1KNgWR9KuIwGdfJGvSRLkCHMCkKXSYTsbPzjQWtAPjwGW8RNBvSDdDLCbWbdMXEo8+c
+ 8HKoRlxj0zDFqhBvciNh5B3RiflpgHuZWmoBzvseBsNWUEQiNwP+TAqz+2l6ZuJYtgypb1
+ HmFfqdMNlqunlor/rdRX63iKDTWHAvs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-ZvDVhzY2MNWlph4fh8-P8g-1; Tue, 17 Mar 2020 16:58:49 -0400
-X-MC-Unique: ZvDVhzY2MNWlph4fh8-P8g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-312-o9CEpoyTMRWSxBBv9wxDkg-1; Tue, 17 Mar 2020 17:01:20 -0400
+X-MC-Unique: o9CEpoyTMRWSxBBv9wxDkg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EB7318FE860;
- Tue, 17 Mar 2020 20:58:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9882C801E67
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 21:01:19 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
  [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DEE425D9E2;
- Tue, 17 Mar 2020 20:58:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BA605C1D8;
+ Tue, 17 Mar 2020 21:01:18 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5F42B1138404; Tue, 17 Mar 2020 21:58:41 +0100 (CET)
+ id 5570511366F2; Tue, 17 Mar 2020 22:01:15 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v4 00/34] Configurable policy for handling deprecated
- interfaces
-References: <20200317115459.31821-1-armbru@redhat.com>
-Date: Tue, 17 Mar 2020 21:58:41 +0100
-In-Reply-To: <20200317115459.31821-1-armbru@redhat.com> (Markus Armbruster's
- message of "Tue, 17 Mar 2020 12:54:25 +0100")
-Message-ID: <877dziitq6.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Subject: [PULL 11/30] tests/test-qmp-event: Check event is actually emitted
+Date: Tue, 17 Mar 2020 22:00:56 +0100
+Message-Id: <20200317210115.8864-12-armbru@redhat.com>
+In-Reply-To: <20200317210115.8864-1-armbru@redhat.com>
+References: <20200317210115.8864-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,49 +87,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, libvir-list@redhat.com,
- mdroth@linux.vnet.ibm.com, marcandre.lureau@gmail.com, libguestfs@redhat.com
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200317115459.31821-11-armbru@redhat.com>
+---
+ tests/test-qmp-event.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-> This series extends QMP introspection to cover deprecation.
-> Additionally, new option -compat lets you configure what to do when
-> deprecated interfaces get used.  This is intended for testing users of
-> the management interfaces.  It is experimental.
->
-> -compat deprecated-input=3D<in-policy> configures what to do when
-> deprecated input is received.  Available policies:
->
-> * accept: Accept deprecated commands and arguments (default)
-> * reject: Reject them
-> * crash: Crash
->
-> -compat deprecated-output=3D<out-policy> configures what to do when
-> deprecated output is sent.  Available output policies:
->
-> * accept: Emit deprecated command results and events (default)
-> * hide: Suppress them
->
-> For now, -compat covers only deprecated syntactic aspects of QMP.  We
-> may want to extend it to cover semantic aspects, CLI, and experimental
-> features.
->
-> PATCH 01-04: Documentation fixes
-> PATCH 05-10: Test improvements
-> PATCH 11-24: Add feature flags to remaining user-defined types and to
->       =09     struct members
-> PATCH 25-26: New special feature 'deprecated', visible in
->       =09     introspection
-> PATCH 27-34: New -compat to set policy for handling stuff marked with
->       =09     feature 'deprecated'
-
-Queued PATCH 01-26.  Thanks for the reviews that made this possible!
-
-PATCH 27-34 will have to wait for 5.1.
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index d64066139c..7dd0053190 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -26,6 +26,7 @@
+=20
+ typedef struct TestEventData {
+     QDict *expect;
++    bool emitted;
+ } TestEventData;
+=20
+ TestEventData *test_event_data;
+@@ -52,7 +53,7 @@ void test_qapi_event_emit(test_QAPIEvent event, QDict *d)
+     qdict_del(d, "timestamp");
+=20
+     g_assert(qobject_is_equal(QOBJECT(d), QOBJECT(test_event_data->expect)=
+));
+-
++    test_event_data->emitted =3D true;
+ }
+=20
+ static void event_prepare(TestEventData *data,
+@@ -87,6 +88,7 @@ static void test_event_a(TestEventData *data,
+ {
+     data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_A' }");
+     qapi_event_send_event_a();
++    g_assert(data->emitted);
+     qobject_unref(data->expect);
+ }
+=20
+@@ -95,6 +97,7 @@ static void test_event_b(TestEventData *data,
+ {
+     data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_B' }");
+     qapi_event_send_event_b();
++    g_assert(data->emitted);
+     qobject_unref(data->expect);
+ }
+=20
+@@ -107,6 +110,7 @@ static void test_event_c(TestEventData *data,
+         "{ 'event': 'EVENT_C', 'data': {"
+         " 'a': 1, 'b': { 'integer': 2, 'string': 'test1' }, 'c': 'test2' }=
+ }");
+     qapi_event_send_event_c(true, 1, true, &b, "test2");
++    g_assert(data->emitted);
+     qobject_unref(data->expect);
+ }
+=20
+@@ -132,6 +136,7 @@ static void test_event_d(TestEventData *data,
+         "  'string': 'test2', 'enum2': 'value2' },"
+         " 'b': 'test3', 'enum3': 'value3' } }");
+     qapi_event_send_event_d(&a, "test3", false, NULL, true, ENUM_ONE_VALUE=
+3);
++    g_assert(data->emitted);
+     qobject_unref(data->expect);
+ }
+=20
+--=20
+2.21.1
 
 
