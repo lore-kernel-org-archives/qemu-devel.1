@@ -2,78 +2,62 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C0EDC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A03C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:20:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C574520735
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:19:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KOC0zyl+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C574520735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A39B20735
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:20:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A39B20735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEBCI-0008OQ-NJ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:19:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35405)
+	id 1jEBDL-0000xN-FD
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:20:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jEB0w-0005aN-HB
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:08:07 -0400
+ (envelope-from <groug@kaod.org>) id 1jEB9v-0004xs-0O
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jEB0v-0001QE-C1
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:08:06 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:29953)
+ (envelope-from <groug@kaod.org>) id 1jEB9t-0003Pa-MB
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:17:22 -0400
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:59374)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jEB0v-0001NY-7M
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:08:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584446884;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=85UA8eN3Fx/37KkDpbibaVHK721nHlHEAF75KDVHNvA=;
- b=KOC0zyl+srAoQL//galTAnCf3zGwZ0EHDU0o5lm8NqjTQd78WW9ipL4Zke/bU9yKZa947g
- coXrTcfxoMPY+iUg5Ug+IlPPB8d7NE8V8ZosBTo8pP+6dOXYbmekzeGjfuGKtIvT3t+mm0
- c4BdalIi7mX9p7DPazkXqF3eQ7A9Wpg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-ah7nfDc4Pmmb3J2mRLGW5A-1; Tue, 17 Mar 2020 08:08:02 -0400
-X-MC-Unique: ah7nfDc4Pmmb3J2mRLGW5A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCD09107B26F
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 12:08:01 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-114-234.ams2.redhat.com
- [10.36.114.234])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF6825DA7B;
- Tue, 17 Mar 2020 12:08:00 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	imammedo@redhat.com,
-	pbonzini@redhat.com
-Subject: [PATCH] vl.c/memdev: Error on bad memory backend
-Date: Tue, 17 Mar 2020 12:07:59 +0000
-Message-Id: <20200317120759.49367-1-dgilbert@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jEB9t-0003L8-F4
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:17:21 -0400
+Received: from player798.ha.ovh.net (unknown [10.110.208.168])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id 5C17795046
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 13:17:19 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player798.ha.ovh.net (Postfix) with ESMTPSA id A44A5109DE53E;
+ Tue, 17 Mar 2020 12:17:02 +0000 (UTC)
+Date: Tue, 17 Mar 2020 13:16:55 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 2/5] ppc/spapr: Improve FWNMI machine check delivery
+ corner case comments
+Message-ID: <20200317125420.79fe2432@bahia.lan>
+In-Reply-To: <20200317050215.159334-3-npiggin@gmail.com>
+References: <20200317050215.159334-1-npiggin@gmail.com>
+ <20200317050215.159334-3-npiggin@gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13821265783635220931
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefhedgfeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 46.105.44.197
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,42 +69,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
+ =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@fr.ibm.com>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Tue, 17 Mar 2020 15:02:12 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-If memory-backend is a non-existent object, qemu crashes.
-Check that the backend actually resolves.
+> Some of the conditions are not as clearly documented as they could be.
+> Also the non-FWNMI case does not need a large comment.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
 
-e.g.   ./qemu-system-x86_64 -machine pc,accel=3Dkvm,memory-backend=3Dfoo
+LGTM
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- softmmu/vl.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index ff2685dff8..76507e99c4 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -4288,6 +4288,11 @@ void qemu_init(int argc, char **argv, char **envp)
-=20
-         backend =3D object_resolve_path_type(current_machine->ram_memdev_i=
-d,
-                                            TYPE_MEMORY_BACKEND, NULL);
-+        if (!backend) {
-+            error_report("Unknown memory backend object id '%s'",
-+                         current_machine->ram_memdev_id);
-+            exit(EXIT_FAILURE);
-+        }
-         backend_size =3D object_property_get_uint(backend, "size",  &error=
-_abort);
-         if (have_custom_ram_size && backend_size !=3D ram_size) {
-                 error_report("Size specified by -m option must match size =
-of "
---=20
-2.24.1
+>  hw/ppc/spapr_events.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 323fcef4aa..05337f0671 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -834,17 +834,13 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>      Error *local_err = NULL;
+>  
+>      if (spapr->fwnmi_machine_check_addr == -1) {
+> -        /*
+> -         * This implies that we have hit a machine check either when the
+> -         * guest has not registered FWNMI (i.e., "ibm,nmi-register" not
+> -         * called) or between system reset and "ibm,nmi-register".
+> -         * Fall back to the old machine check behavior in such cases.
+> -         */
+> +        /* Non-FWNMI case, deliver it like an architected CPU interrupt. */
+>          cs->exception_index = POWERPC_EXCP_MCHECK;
+>          ppc_cpu_do_interrupt(cs);
+>          return;
+>      }
+>  
+> +    /* Wait for FWNMI interlock. */
+>      while (spapr->fwnmi_machine_check_interlock != -1) {
+>          /*
+>           * Check whether the same CPU got machine check error
+> @@ -856,8 +852,13 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>              return;
+>          }
+>          qemu_cond_wait_iothread(&spapr->fwnmi_machine_check_interlock_cond);
+> -        /* Meanwhile if the system is reset, then just return */
+>          if (spapr->fwnmi_machine_check_addr == -1) {
+> +            /*
+> +             * If the machine was reset while waiting for the interlock,
+> +             * abort the delivery. The machine check applies to a context
+> +             * that no longer exists, so it wouldn't make sense to deliver
+> +             * it now.
+> +             */
+>              return;
+>          }
+>      }
+> @@ -868,7 +869,9 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>           * We don't want to abort so we let the migration to continue.
+>           * In a rare case, the machine check handler will run on the target.
+>           * Though this is not preferable, it is better than aborting
+> -         * the migration or killing the VM.
+> +         * the migration or killing the VM. It is okay to call
+> +         * migrate_del_blocker on a blocker that was not added (which the
+> +         * nmi-interlock handler would do when it's called after this).
+>           */
+>          warn_report("Received a fwnmi while migration was in progress");
+>      }
 
 
