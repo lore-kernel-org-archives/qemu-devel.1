@@ -2,83 +2,83 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 334F6C5ACD7
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D7EC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3E7720714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:36:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEA9B20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:37:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJpWztH4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3E7720714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKK9FdtE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA9B20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEIxF-0006iA-68
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:36:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53156)
+	id 1jEIyD-0007sl-QR
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:37:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54029)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEIwX-0006JO-99
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:36:07 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEIxO-00070E-BZ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEIwW-0003cL-1U
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:36:05 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44470)
+ (envelope-from <armbru@redhat.com>) id 1jEIxM-0005Hu-M7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:36:57 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:49097)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEIwV-0003Wi-Tk
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:36:03 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEIxM-0005DS-H0
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:36:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584477363;
+ s=mimecast20190719; t=1584477416;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qRjw6/ZuXFkJQKPsdq1mTnZqZIVNPB7nbxH+cV0VxTI=;
- b=iJpWztH4k6iM0e4z8NRgjhkLDhDojglCif8RN2p4zw54n9y+Q2UA5yMu6JLTURP0Wyx5aw
- OBsmndbwrqeeQ8pjKfC/M1VN5J712+hnabZ4vPOX6V+0TT0ZEmuBMdxBTrT92/6O+Sqti5
- OmNpF8V5SRQunuhhN4i40HSkgI238Qw=
+ bh=jHZl9QrxyF0cBJjriHUNqKkZr2K1a1FK5PtvK/DZiDk=;
+ b=CKK9FdtEi/ROEGRN1dIIq+0OPnfGaFP95Mw0ePaA1d16AdOFmok1W9uIpntRBDDxXOSSqW
+ sNvCehDPpdUvRe7CgwO8kFd2K+7JSZUpx4Y7PPuqIZh8BHcZE4oqQRYHb3n1HEOhB5QEw9
+ FSuEW5+FetBTx55vke/hvBatuEery6Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-v25_jyPSNNao45FVVfCqZw-1; Tue, 17 Mar 2020 16:36:00 -0400
-X-MC-Unique: v25_jyPSNNao45FVVfCqZw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-333-ugrd8N1QPxa0znhkFm0rYw-1; Tue, 17 Mar 2020 16:36:54 -0400
+X-MC-Unique: ugrd8N1QPxa0znhkFm0rYw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF62C1084455;
- Tue, 17 Mar 2020 20:35:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5140B477;
+ Tue, 17 Mar 2020 20:36:53 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
  [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 60EBC90812;
- Tue, 17 Mar 2020 20:35:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CC0260BEE;
+ Tue, 17 Mar 2020 20:36:53 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C1A8F1138404; Tue, 17 Mar 2020 21:35:56 +0100 (CET)
+ id C00131138404; Tue, 17 Mar 2020 21:36:51 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v2 2/2] net: Track netdevs in NetClientState rather than
- QemuOpt
+Subject: Re: [PATCH v2 1/2] net: Complete qapi-fication of netdev_add
 References: <20200317201711.322764-1-eblake@redhat.com>
- <20200317201711.322764-3-eblake@redhat.com>
-Date: Tue, 17 Mar 2020 21:35:56 +0100
-In-Reply-To: <20200317201711.322764-3-eblake@redhat.com> (Eric Blake's message
- of "Tue, 17 Mar 2020 15:17:11 -0500")
-Message-ID: <87h7ymk9cj.fsf@dusky.pond.sub.org>
+ <20200317201711.322764-2-eblake@redhat.com>
+Date: Tue, 17 Mar 2020 21:36:51 +0100
+In-Reply-To: <20200317201711.322764-2-eblake@redhat.com> (Eric Blake's message
+ of "Tue, 17 Mar 2020 15:17:10 -0500")
+Message-ID: <87d09ak9b0.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,135 +98,80 @@ Sender: "Qemu-devel"
 
 Eric Blake <eblake@redhat.com> writes:
 
-> As mentioned in the previous patch, our use of QemuOpt group "netdev"
-> has two purposes: collect the CLI arguments, and serve as a witness
-> for monitor hotplug actions.  As the latter didn't use anything but an
-> id, it felt rather unclean to have to touch QemuOpts at all when going
-> through QMP, so let's instead track things with a bool field in
-> NetClientState.
+> We've had all the required pieces for doing a type-safe representation
+> of netdev_add as a flat union for quite some time now (since
+> 0e55c381f6 in v2.7.0, released in 2016), but did not make the final
+> switch to using it because of concern about whether a command-line
+> regression in accepting "1" in place of 1 for integer arguments would
+> be problematic.  Back then, we did not have the deprecation cycle to
+> allow us to make progress.  But now that we have waited so long, other
+> problems have crept in: for example, our desire to add
+> qemu-storage-daemon is hampered by the inability to express net
+> objects, and we are unable to introspect what we actually accept.
+> Additionally, our round-trip through QemuOpts silently eats any
+> argument that expands to an array, rendering dnssearch, hostfwd, and
+> guestfwd useless through QMP:
 >
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> {"execute": "netdev_add", "arguments": { "id": "netdev0",
+>   "type": "user", "dnssearch": [
+>     { "str": "8.8.8.8" }, { "str": "8.8.4.4" }
+>   ]}}
+>
+> So without further ado, let's turn on proper QAPI.  netdev_add() was a
+> trivial wrapper around net_client_init(), which did a few steps prior
+> to calling net_client_init1(); with this patch, we now skip directly
+> to net_client_init1().  In addition to fixing array parameters, the
+> following additional differences occur:
+>
+> -  {"execute": "netdev_add", "arguments": {"type": "help"}}
+> no longer attempts to print help to stdout and exit.  Bug fix, broken
+> in 547203ead4 'net: List available netdevs with "-netdev help"',
+> v2.12.0.
+>
+> -  {"execute": "netdev_add", "arguments': {... "ip6-net": "..." }}
+> no longer attempts to desugar the undocumented ip6-net magic string
+> into the proper "ipv6-prefix" and "ipv6-prefixlen".  Undocumented
+> misfeature, introduced in commit 7aac531ef2 "qapi-schema, qemu-options
+> & slirp: Adding Qemu options for IPv6 addresses", v2.6.0.
+>
+> -  {'execute':'netdev_add',
+>      'arguments':{'id':'net2', 'type':'hubport', 'hubid':"2"}}
+>    {"error": {"class": "GenericError", "desc": "Invalid parameter type fo=
+r 'hubid', expected: integer"}}
+> Used to succeed: since our command line treats everything as strings,
+> our not-so-round-trip conversion from QAPI -> QemuOpts -> QAPI lost
+> the original typing and turned everything into a string; now that we
+> skip the QemuOpts, the JSON input has to match the exact QAPI type.
+> But this stricter QMP is desirable, and introspection is sufficient
+> for any affected applications to make sure they use it correctly.
+>
+> In qmp_netdev_add(), we still have to create a QemuOpts object so that
+> qmp_netdev_del() will be able to remove a hotplugged network device;
+> but the opts->head remains empty since we now manage all parsing
+> through the QAPI object rather than QemuOpts; a separate patch will
+> address the abuse of QemuOpts as a witness for whether a
+> NetClientState is a netdev.  In the meantime, our argument that we are
+> okay requires auditing all uses of option group "netdev":
+>
+> - qemu_netdev_opts: option group definition, empty .desc[]
+> - CLI (CLI netdev parsing ends before monitors start, so while
+>   monitors can mess with CLI netdevs, CLI cannot mess with
+>   monitor netdevs):
+>   - main() case QEMU_OPTION_netdev: store CLI definition
+>   - main() case QEMU_OPTION_readconfig, case QEMU_OPTION_writeconfig:
+>   similar, dealing only with CLI
+>   - net_init_clients(): Pass CLI to net_client_init()
+> - Monitor:
+>   - hmp_netdev_add(): straightforward parse into net_client_init()
+>   - qmp_netdev_add(): subject of this patch, used to add full
+>   object to option group, now just adds bare-bones id
+>   - qmp_netdev_del(), netdev_del_completion(): check the option group
+>   solely for id, as a 'is this a netdev' predicate
+>
+> Reported-by: Alex Kirillov <lekiravi@yandex-team.ru>
 > Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  include/net/net.h |  1 +
->  monitor/misc.c    |  4 +---
->  net/net.c         | 37 +++++++++++--------------------------
->  3 files changed, 13 insertions(+), 29 deletions(-)
->
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 96e6eae8176e..094e966af9ec 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -98,6 +98,7 @@ struct NetClientState {
->      unsigned rxfilter_notify_enabled:1;
->      int vring_enable;
->      int vnet_hdr_len;
-> +    bool is_netdev;
->      QTAILQ_HEAD(, NetFilterState) filters;
->  };
->
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index 41a86e7012a1..6c45fa490ff5 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -2035,13 +2035,11 @@ void netdev_del_completion(ReadLineState *rs, int=
- nb_args, const char *str)
->      count =3D qemu_find_net_clients_except(NULL, ncs, NET_CLIENT_DRIVER_=
-NIC,
->                                           MAX_QUEUE_NUM);
->      for (i =3D 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
-> -        QemuOpts *opts;
->          const char *name =3D ncs[i]->name;
->          if (strncmp(str, name, len)) {
->              continue;
->          }
-> -        opts =3D qemu_opts_find(qemu_find_opts_err("netdev", NULL), name=
-);
-> -        if (opts) {
-> +        if (ncs[i]->is_netdev) {
->              readline_add_completion(rs, name);
->          }
->      }
-> diff --git a/net/net.c b/net/net.c
-> index a2065aabede2..38778e831da2 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -1060,6 +1060,15 @@ static int net_client_init1(const void *object, bo=
-ol is_netdev, Error **errp)
->          }
->          return -1;
->      }
-> +
-> +    if (is_netdev) {
-> +        NetClientState *nc;
-> +
-> +        nc =3D qemu_find_netdev(netdev->id);
-> +        assert(nc);
-> +        nc->is_netdev =3D true;
-> +    }
-> +
->      return 0;
->  }
->
 
-Would be simpler if net_client_init_fun[]() returned the NetClientState.
-But that's clearly more than we can get done today.
-
-> @@ -1172,34 +1181,12 @@ void netdev_add(QemuOpts *opts, Error **errp)
->
->  void qmp_netdev_add(Netdev *netdev, Error **errp)
->  {
-> -    Error *local_err =3D NULL;
-> -    QemuOptsList *opts_list;
-> -    QemuOpts *opts;
-> -
-> -    opts_list =3D qemu_find_opts_err("netdev", &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
-> -    opts =3D qemu_opts_create(opts_list, netdev->id, 1, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
-> -    net_client_init1(netdev, true, &local_err);
-> -    if (local_err) {
-> -        qemu_opts_del(opts);
-> -        goto out;
-> -    }
-> -
-> -out:
-> -    error_propagate(errp, local_err);
-> +    net_client_init1(netdev, true, errp);
->  }
-
-Nice!
-
->
->  void qmp_netdev_del(const char *id, Error **errp)
->  {
->      NetClientState *nc;
-> -    QemuOpts *opts;
->
->      nc =3D qemu_find_netdev(id);
->      if (!nc) {
-> @@ -1208,14 +1195,12 @@ void qmp_netdev_del(const char *id, Error **errp)
->          return;
->      }
->
-> -    opts =3D qemu_opts_find(qemu_find_opts_err("netdev", NULL), id);
-> -    if (!opts) {
-> +    if (!nc->is_netdev) {
->          error_setg(errp, "Device '%s' is not a netdev", id);
->          return;
->      }
->
->      qemu_del_net_client(nc);
-> -    qemu_opts_del(opts);
->  }
->
->  static void netfilter_print_info(Monitor *mon, NetFilterState *nf)
+Thanks for the nice commit message.
 
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
