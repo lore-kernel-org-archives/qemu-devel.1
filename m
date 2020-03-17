@@ -2,80 +2,59 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A3BC18E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD7AC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7726320735
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:42:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbuFH6jy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7726320735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8813720735
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:42:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8813720735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEFI8-0008H7-Ia
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:42:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60706)
+	id 1jEFIL-0000Pc-Lb
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEFA8-0006uP-At
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:33:53 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEF6C-0001Fy-8m
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEFA7-0004wn-1X
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:33:52 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:42116)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEF6A-0008DS-PA
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:29:48 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:47501)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEFA6-0004uo-T7
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:33:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584462830;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Px0X9H785H2y1QeaPhBzK01f4MiNP9U/SjH/J6SPl6k=;
- b=JbuFH6jywPCuksszQcEBM2QPaK75yW9zrncwoyJkJ0C+8/fl3DFThVTNhk1mIRNxrjpV7B
- GME7DUUE8cj0XYbN97+ioevqI3BtThdDWnQfGJUv6yLuidOtwTmMZ6gGeim1UhoOR6Cmcb
- 6nyRELDbB0jXPt0h4orbEJ+cIeXNl7s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-kDzL92RMOb-Ml7aitxhz4g-1; Tue, 17 Mar 2020 12:33:46 -0400
-X-MC-Unique: kDzL92RMOb-Ml7aitxhz4g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55E5F800D5A;
- Tue, 17 Mar 2020 16:33:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
- [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 256E790808;
- Tue, 17 Mar 2020 16:33:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A719B11366CC; Tue, 17 Mar 2020 17:33:43 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/4] hw/misc/ivshmem: Use one Error * variable instead of two
-Date: Tue, 17 Mar 2020 17:33:41 +0100
-Message-Id: <20200317163343.25028-3-armbru@redhat.com>
-In-Reply-To: <20200317163343.25028-1-armbru@redhat.com>
-References: <20200317163343.25028-1-armbru@redhat.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEF6A-0007Cm-7Q; Tue, 17 Mar 2020 12:29:46 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08761626|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.205042-0.00078411-0.794174;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H1-rbOH_1584462574; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H1-rbOH_1584462574)
+ by smtp.aliyun-inc.com(10.147.44.129);
+ Wed, 18 Mar 2020 00:29:35 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 41/61] target/riscv: vector floating-point merge
+ instructions
+Date: Tue, 17 Mar 2020 23:06:33 +0800
+Message-Id: <20200317150653.9008-42-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,54 +66,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit fe44dc9180 "migration: disallow migrate_add_blocker during
-migration" accidentally added a second Error * variable.  Use the
-first one instead.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200313170517.22480-3-armbru@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- hw/misc/ivshmem.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ target/riscv/helper.h                   |  4 +++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 34 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 30 ++++++++++++++++++++++
+ 4 files changed, 70 insertions(+)
 
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 1a0fad74e1..a8dc9b377d 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -832,7 +832,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Erro=
-r **errp)
-     IVShmemState *s =3D IVSHMEM_COMMON(dev);
-     Error *err =3D NULL;
-     uint8_t *pci_conf;
--    Error *local_err =3D NULL;
-=20
-     /* IRQFD requires MSI */
-     if (ivshmem_has_feature(s, IVSHMEM_IOEVENTFD) &&
-@@ -899,9 +898,9 @@ static void ivshmem_common_realize(PCIDevice *dev, Erro=
-r **errp)
-     if (!ivshmem_is_master(s)) {
-         error_setg(&s->migration_blocker,
-                    "Migration is disabled when using feature 'peer mode' i=
-n device 'ivshmem'");
--        migrate_add_blocker(s->migration_blocker, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        migrate_add_blocker(s->migration_blocker, &err);
-+        if (err) {
-+            error_propagate(errp, err);
-             error_free(s->migration_blocker);
-             return;
-         }
---=20
-2.21.1
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 93914fc7c4..3c813d23d1 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -990,3 +990,7 @@ DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_5(vfclass_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfclass_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfclass_v_d, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_6(vfmerge_vfm_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmerge_vfm_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmerge_vfm_d, void, ptr, ptr, i64, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 23e80fe954..14cb4e2e66 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -513,6 +513,8 @@ vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
+ vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
+ vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
+ vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
++vfmerge_vfm     010111 0 ..... ..... 101 ..... 1010111 @r_vm_0
++vfmv_v_f        010111 1 00000 ..... 101 ..... 1010111 @r2
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index b7327a2972..7cdeec9cd0 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2036,3 +2036,37 @@ GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
+ 
+ /* Vector Floating-Point Classify Instruction */
+ GEN_OPFV_TRANS(vfclass_v, opfv_check)
++
++/* Vector Floating-Point Merge Instruction */
++GEN_OPFVF_TRANS(vfmerge_vfm,  opfvf_check)
++
++static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
++{
++    if (vext_check_isa_ill(s) &&
++        vext_check_reg(s, a->rd, false) &&
++        (s->sew != 0)) {
++
++        if (s->vl_eq_vlmax) {
++            tcg_gen_gvec_dup_i64(s->sew, vreg_ofs(s, a->rd),
++                                 MAXSZ(s), MAXSZ(s), cpu_fpr[a->rs1]);
++        } else {
++            TCGv_ptr dest = tcg_temp_new_ptr();
++            TCGv_i32 desc;
++            uint32_t data = FIELD_DP32(0, VDATA, LMUL, s->lmul);
++            static gen_helper_vmv_vx * const fns[3] = {
++                gen_helper_vmv_v_x_h,
++                gen_helper_vmv_v_x_w,
++                gen_helper_vmv_v_x_d,
++            };
++
++            desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
++            tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, a->rd));
++            fns[s->sew - 1](dest, cpu_fpr[a->rs1], cpu_env, desc);
++
++            tcg_temp_free_ptr(dest);
++            tcg_temp_free_i32(desc);
++        }
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index c1a0d14ea8..650a17cc1c 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4146,3 +4146,33 @@ RVVCALL(OPIVV1, vfclass_v_d, OP_UU_D, H8, H8, fclass_d)
+ GEN_VEXT_V(vfclass_v_h, 2, 2, clearh)
+ GEN_VEXT_V(vfclass_v_w, 4, 4, clearl)
+ GEN_VEXT_V(vfclass_v_d, 8, 8, clearq)
++
++/* Vector Floating-Point Merge Instruction */
++#define GEN_VFMERGE_VF(NAME, ETYPE, H, CLEAR_FN)          \
++void HELPER(NAME)(void *vd, void *v0, uint64_t s1,        \
++        void *vs2, CPURISCVState *env, uint32_t desc)     \
++{                                                         \
++    uint32_t mlen = vext_mlen(desc);                      \
++    uint32_t vm = vext_vm(desc);                          \
++    uint32_t vl = env->vl;                                \
++    uint32_t esz = sizeof(ETYPE);                         \
++    uint32_t vlmax = vext_maxsz(desc) / esz;              \
++    uint32_t i;                                           \
++                                                          \
++    if (vl == 0) {                                        \
++        return;                                           \
++    }                                                     \
++    for (i = 0; i < vl; i++) {                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {        \
++            ETYPE s2 = *((ETYPE *)vs2 + H(i));            \
++            *((ETYPE *)vd + H1(i)) = s2;                  \
++        } else {                                          \
++            *((ETYPE *)vd + H(i)) = (ETYPE)s1;            \
++        }                                                 \
++    }                                                     \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);              \
++}
++
++GEN_VFMERGE_VF(vfmerge_vfm_h, int16_t, H2, clearh)
++GEN_VFMERGE_VF(vfmerge_vfm_w, int32_t, H4, clearl)
++GEN_VFMERGE_VF(vfmerge_vfm_d, int64_t, H8, clearq)
+-- 
+2.23.0
 
 
