@@ -2,70 +2,70 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1239C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5E6C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:24:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4B0F20724
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8285220724
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:24:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpjmYMAG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4B0F20724
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I+y5y7VT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8285220724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEJfq-0006Wq-Lx
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 17:22:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51602)
+	id 1jEJgt-00084u-M1
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 17:23:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51893)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEJLD-0002tT-LH
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:36 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEJLV-0003F7-AW
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEJLB-00035U-9y
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:35 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:51402)
+ (envelope-from <armbru@redhat.com>) id 1jEJLT-0004eP-Qt
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:53 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:21519)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEJLB-0002zb-2g
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:33 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEJLR-0004a3-UF
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584478892;
+ s=mimecast20190719; t=1584478909;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sY3Y6qJLLd/kOvvX9S37wL/scXUbBQr1Fi5kv3BKMck=;
- b=fpjmYMAGcx2+MAsyW5/HRBdRhI5YU89uXQhNKmv8shKr98YWEii3QuWDZ+W6gQ3GIlV9Wu
- SXCH3mHhWtwqQj32NKglyXO6MCQv6kDB1Q/g+uaP1/h40SF2LTebA8aqrKUUICvghOCjWo
- zspTVOz7Pi0Tlsm4MKcxJsey8rrwU8s=
+ bh=o83Eyled8X0fr2m5QHDMR1IsxIiMbVHgbSJ98uRmFvQ=;
+ b=I+y5y7VTdam8f3iIpc6QnBseUupyWOJccTKvbuwK2V4jjZkNDZhjIrGzak/O3vTUBUj5nO
+ q8M4AxwnJNffakVVnwo2MizgLUllfka89BJq0oeVlH6mbuWJEQv4RAcqZLuCsRzOaGUmsm
+ bDUty+bvlWqUCIJdbaypU15DytALLUM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-VaP-iEpDOOiWeyt12mwZbg-1; Tue, 17 Mar 2020 17:01:22 -0400
-X-MC-Unique: VaP-iEpDOOiWeyt12mwZbg-1
+ us-mta-360-46DWmezrMPGb6XKQec8hLA-1; Tue, 17 Mar 2020 17:01:22 -0400
+X-MC-Unique: 46DWmezrMPGb6XKQec8hLA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44DAA13F5
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65A3913F6
  for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 21:01:21 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
  [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 89B111001DD8;
- Tue, 17 Mar 2020 21:01:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E17A1001938;
+ Tue, 17 Mar 2020 21:01:20 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5890711366F3; Tue, 17 Mar 2020 22:01:15 +0100 (CET)
+ id 662E81135A59; Tue, 17 Mar 2020 22:01:15 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/30] qapi/schema: Clean up around
- QAPISchemaEntity.connect_doc()
-Date: Tue, 17 Mar 2020 22:00:57 +0100
-Message-Id: <20200317210115.8864-13-armbru@redhat.com>
+Subject: [PULL 16/30] qapi/introspect: Factor out _make_tree()
+Date: Tue, 17 Mar 2020 22:01:01 +0100
+Message-Id: <20200317210115.8864-17-armbru@redhat.com>
 In-Reply-To: <20200317210115.8864-1-armbru@redhat.com>
 References: <20200317210115.8864-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -92,81 +92,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QAPISchemaEntity calls doc.connect_feature() in .check().  Improper
-since commit ee1e6a1f6c8 split .connect_doc() off .check().  Move the
-call.  Requires making the children call super().connect_doc() as they
-should.
+The value of @qmp_schema_qlit is generated from an expression tree.
+Tree nodes are created in several places.  Factor out the common code
+into _make_tree().  This isn't much of a win now.  It will pay off
+when we add feature flags in the next few commits.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200317115459.31821-12-armbru@redhat.com>
+Message-Id: <20200317115459.31821-16-armbru@redhat.com>
 ---
- scripts/qapi/schema.py | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ scripts/qapi/introspect.py | 44 +++++++++++++++++++++-----------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index d759308b4e..2a2b495987 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -53,13 +53,13 @@ class QAPISchemaEntity:
-         seen =3D {}
-         for f in self.features:
-             f.check_clash(self.info, seen)
--            if self.doc:
--                self.doc.connect_feature(f)
--
-         self._checked =3D True
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index e4fc9d90f1..a3fa9865db 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -16,6 +16,18 @@ from qapi.schema import (QAPISchemaArrayType, QAPISchema=
+BuiltinType,
+                          QAPISchemaType)
 =20
-     def connect_doc(self, doc=3DNone):
--        pass
-+        doc =3D doc or self.doc
-+        if doc:
-+            for f in self.features:
-+                doc.connect_feature(f)
 =20
-     def check_doc(self):
-         if self.doc:
-@@ -250,6 +250,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-             m.check_clash(self.info, seen)
++def _make_tree(obj, ifcond, features, extra=3DNone):
++    if extra is None:
++        extra =3D {}
++    if ifcond:
++        extra['if'] =3D ifcond
++    if features:
++        obj['features'] =3D [(f.name, {'if': f.ifcond}) for f in features]
++    if extra:
++        return (obj, extra)
++    return obj
++
++
+ def _tree_to_qlit(obj, level=3D0, suppress_first_indent=3DFalse):
 =20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             for m in self.members:
-@@ -392,6 +393,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-             m.check_clash(info, seen)
+     def indent(level):
+@@ -146,47 +158,38 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         return self._name(typ.name)
 =20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             if self.base and self.base.is_implicit():
-@@ -667,6 +669,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
-                 types_seen[qt] =3D v.name
+     def _gen_tree(self, name, mtype, obj, ifcond, features):
+-        extra =3D {}
++        extra =3D None
+         if mtype not in ('command', 'event', 'builtin', 'array'):
+             if not self._unmask:
+                 # Output a comment to make it easy to map masked names
+                 # back to the source when reading the generated output.
+-                extra['comment'] =3D '"%s" =3D %s' % (self._name(name), na=
+me)
++                extra =3D {'comment': '"%s" =3D %s' % (self._name(name), n=
+ame)}
+             name =3D self._name(name)
+         obj['name'] =3D name
+         obj['meta-type'] =3D mtype
+-        if features:
+-            obj['features'] =3D [(f.name, {'if': f.ifcond}) for f in featu=
+res]
+-        if ifcond:
+-            extra['if'] =3D ifcond
+-        if extra:
+-            self._trees.append((obj, extra))
+-        else:
+-            self._trees.append(obj)
++        self._trees.append(_make_tree(obj, ifcond, features, extra))
 =20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             for v in self.variants.variants:
-@@ -733,6 +736,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-                         % self.ret_type.describe())
+     def _gen_member(self, member):
+-        ret =3D {'name': member.name, 'type': self._use_type(member.type)}
++        obj =3D {'name': member.name, 'type': self._use_type(member.type)}
+         if member.optional:
+-            ret['default'] =3D None
+-        if member.ifcond:
+-            ret =3D (ret, {'if': member.ifcond})
+-        return ret
++            obj['default'] =3D None
++        return _make_tree(obj, member.ifcond, None)
 =20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             if self.arg_type and self.arg_type.is_implicit():
-@@ -775,6 +779,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
-                     % self.arg_type.describe())
+     def _gen_variants(self, tag_name, variants):
+         return {'tag': tag_name,
+                 'variants': [self._gen_variant(v) for v in variants]}
 =20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             if self.arg_type and self.arg_type.is_implicit():
+     def _gen_variant(self, variant):
+-        return ({'case': variant.name, 'type': self._use_type(variant.type=
+)},
+-                {'if': variant.ifcond})
++        obj =3D {'case': variant.name, 'type': self._use_type(variant.type=
+)}
++        return _make_tree(obj, variant.ifcond, None)
+=20
+     def visit_builtin_type(self, name, info, json_type):
+         self._gen_tree(name, 'builtin', {'json-type': json_type}, [], None=
+)
+=20
+     def visit_enum_type(self, name, info, ifcond, features, members, prefi=
+x):
+         self._gen_tree(name, 'enum',
+-                       {'values':
+-                        [(m.name, {'if': m.ifcond}) for m in members]},
++                       {'values': [_make_tree(m.name, m.ifcond, None)
++                                   for m in members]},
+                        ifcond, features)
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+@@ -206,7 +209,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+     def visit_alternate_type(self, name, info, ifcond, features, variants)=
+:
+         self._gen_tree(name, 'alternate',
+                        {'members': [
+-                           ({'type': self._use_type(m.type)}, {'if': m.ifc=
+ond})
++                           _make_tree({'type': self._use_type(m.type)},
++                                      m.ifcond, None)
+                            for m in variants.variants]},
+                        ifcond, features)
+=20
 --=20
 2.21.1
 
