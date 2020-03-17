@@ -6,73 +6,82 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CA9C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FF4C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8459220663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51C7120735
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:21:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGfD+14j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8459220663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MoUcSA3R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C7120735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jED5N-0007iR-Ng
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:20:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55941)
+	id 1jED5t-0008Oe-Fe
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jED1s-0001J1-Fs
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:13 -0400
+ (envelope-from <quintela@redhat.com>) id 1jED3e-0004ox-DV
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:19:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jED1q-0007q4-V2
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:12 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:22902)
+ (envelope-from <quintela@redhat.com>) id 1jED3c-0006xg-4a
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:19:01 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:29717)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jED1q-0007md-P4
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:10 -0400
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1jED3c-0006sm-0l
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:19:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584454630;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1584454739;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OJ6N3ZIGpEi4htj+IIYiXAxC4McwXmKYBpZAwEc7nAo=;
- b=iGfD+14jo+k3+JsGvMEvhu5zCmW1QsXhwh5D86iXi3GbEUG+ISlaLUlcGu+Q597B0Yh9Zs
- p/Hir7CEhVR2XQ17Ykvgg0n7YbVts1TmujNg9GhcHg0IyXC8r1LDaVgqxGJWi7ZTM7M6f3
- 2KKeegE9tP2lbpDFm+eFScmFt/maApg=
+ bh=Tddhxcu2x2sx9OdbnksqVNcc3Ynm5AMOxFfshVcxZ10=;
+ b=MoUcSA3R7uNhBZaj1HfFJe65gC7tPs0w/L1tIAZe14lb83SKv22GxAA4jHcFbWc6e3fink
+ kxJ93hUM+3ChPvwuqbjwTEJiNm8EtAKksbQMbdRBJP8+daVjnlNHLPhYdMVjEG9E7aNAU0
+ unelSgRNVaGcQGyPWH4a9/2qQxs9Rbc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-bkwBeFwZOcC9LMn5dXpQLA-1; Tue, 17 Mar 2020 10:17:08 -0400
-X-MC-Unique: bkwBeFwZOcC9LMn5dXpQLA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-355-5Guh89B4PqOJlAqWCYrUCQ-1; Tue, 17 Mar 2020 10:18:57 -0400
+X-MC-Unique: 5Guh89B4PqOJlAqWCYrUCQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 401D418A6EC6;
- Tue, 17 Mar 2020 14:17:05 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-2.rdu2.redhat.com
- [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 04ADF73873;
- Tue, 17 Mar 2020 14:17:00 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v10 1/3] Acceptance tests: introduce BUILD_DIR and SOURCE_DIR
-Date: Tue, 17 Mar 2020 10:16:52 -0400
-Message-Id: <20200317141654.29355-2-crosa@redhat.com>
-In-Reply-To: <20200317141654.29355-1-crosa@redhat.com>
-References: <20200317141654.29355-1-crosa@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01BF885EE7E;
+ Tue, 17 Mar 2020 14:18:56 +0000 (UTC)
+Received: from redhat.com (ovpn-114-9.ams2.redhat.com [10.36.114.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E95601001DDE;
+ Tue, 17 Mar 2020 14:18:39 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 1/2] migration: avoid suspicious strncpy() use
+In-Reply-To: <20200317141513.GA517094@stefanha-x1.localdomain> (Stefan
+ Hajnoczi's message of "Tue, 17 Mar 2020 14:15:13 +0000")
+References: <20200316160702.478964-1-stefanha@redhat.com>
+ <20200316160702.478964-2-stefanha@redhat.com>
+ <24d36e90-5880-02ad-fa24-761eb3d9074f@redhat.com>
+ <62dbe165-8311-71f0-fcf6-d020d7e93fd8@redhat.com>
+ <20200317095222.GB492272@stefanha-x1.localdomain>
+ <87k13jl15p.fsf@secure.laptop>
+ <20200317141513.GA517094@stefanha-x1.localdomain>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Tue, 17 Mar 2020 15:18:37 +0100
+Message-ID: <87fte7kqte.fsf@secure.laptop>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,97 +93,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <willianr@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>, qemu-devel@nongnu.org, "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some tests may benefit from using resources from a build directory.
-This introduces three variables that can help tests find resources in
-those directories.
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> On Tue, Mar 17, 2020 at 11:35:14AM +0100, Juan Quintela wrote:
+>> Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>> > On Mon, Mar 16, 2020 at 01:15:35PM -0500, Eric Blake wrote:
+>> >> On 3/16/20 1:09 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> >> > On 3/16/20 5:07 PM, Stefan Hajnoczi wrote:
+>> >>=20
+>> >> >=20
+>> >> > >=20
+>> >> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> >> > > ---
+>> >> > > =C2=A0 migration/global_state.c | 4 ++--
+>> >> > > =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
+>> >> > >=20
+>> >> > > diff --git a/migration/global_state.c b/migration/global_state.c
+>> >> > > index 25311479a4..cbe07f21a8 100644
+>> >> > > --- a/migration/global_state.c
+>> >> > > +++ b/migration/global_state.c
+>> >> > > @@ -44,8 +44,8 @@ void global_state_store_running(void)
+>> >> > > =C2=A0 {
+>> >> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *state =3D RunState_str=
+(RUN_STATE_RUNNING);
+>> >> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(strlen(state) < sizeof(glob=
+al_state.runstate));
+>> >> > > -=C2=A0=C2=A0=C2=A0 strncpy((char *)global_state.runstate,
+>> >> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sta=
+te, sizeof(global_state.runstate));
+>> >> > > +=C2=A0=C2=A0=C2=A0 pstrcpy((char *)global_state.runstate,
+>> >> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 sizeof(global_state.runstate), state);
+>> >>=20
+>> >> Can we guarantee that the padding bytes have been previously set to 0=
+, or do
+>> >> we need to go the extra mile with a memset() or strpadcpy() to guaran=
+tee
+>> >> that we have set the entire buffer?
+>> >
+>> > I don't understand GlobalState:
+>>=20
+>> Welcome to the club O:-)
+>>=20
+>> And I thought that with the reviewed-by I had finished here O:-)
+>>=20
+>> > 1. You ask if runstate[] must be padded with NULs but neither
+>> >    global_state_store() nor register_global_state() do that.  Is it
+>> >    really necessary to pad runstate[]?
+>> >
+>> >    If yes, is it safe for global_state_store() and
+>> >    register_global_state() to not pad runstate[]?
+>>=20
+>> it is an error.  All should be padded.
+>>=20
+>> >    If we decide the pad runstate[] to prevent information leaks to the
+>> >    migration destination then I think it should be done in the pre-sav=
+e
+>> >    function so that it's guaranteed to happen no matter which of the 3
+>> >    functions that write runstate[] has been called.
+>>=20
+>> Ok.
+>> Taking a look at this.
+>>=20
+>> > 2. There is a GlobalState::size field that is only written and then
+>> >    migrated but never read from what I can tell.  :?
+>>=20
+>> Grrr.  It should be used, but it is not :-(
+>>=20
+>> What we have here:
+>> - A static buffer
+>>=20
+>>     uint8_t runstate[100];
+>>=20
+>> That is partially filled.
+>> size: is the size of that buffer that is filled.
+>>=20
+>> But, as we are using
+>>=20
+>>         VMSTATE_BUFFER(runstate, GlobalState),
+>>=20
+>> We are always sending/receiving the whole buffer.  THat is why we have
+>> trouble with padding.  What should we being doing?
+>>=20
+>> Sending just the size, the filled bytes, and making sure that there is
+>> enough space on destination.
+>>=20
+>> But we aren't donig that.  And at this point, I think that I am only
+>> going to fix the 1st part (always zero pad everything sent).
+>>=20
+>> For fixing the other bit, I need to do an incompatible change.
+>>=20
+>> > Juan: Please clarify the above.  Thanks!
+>>=20
+>> Thanks a lot.
+>>=20
+>> Later, Juan.
+>>=20
+>> PD: Why is it done this way?
+>>     Because at the moment, the problem was that qcow2 (as a system, not
+>>     as a device) didn't have a place where to plug pending requests.  So
+>>     I created this section that always exist, and anything that has not
+>>     a device associated can hang a subsection here.  Once that I created
+>>     it, nobody used it.
+>>     And now, just seing what you are telling, I didn't even used the
+>>     right approach.
+>
+> Great, thanks for looking into this.
+>
+> Could you base your patches on top of this series?  Then you can send
+> them all together in a single pull request.  That way we can be sure
+> that padding will be added even after switching to pstrcpy() in my
+> patch.
 
-First, a BUILD_DIR is assumed to exist, given that the primary form of
-running the acceptance tests is from a build directory (which may or
-may not be the same as the source tree, that is, the SOURCE_DIR).
+Sure thing.
 
-If the directory containing the acceptance tests happens to be a link
-to a directory, it's assumed to it points to the source tree
-(SOURCE_DIR), which is the behavior defined on the QEMU Makefiles.  If
-the directory containing the acceptance tests is not a link, then a
-in-tree build is assumed, and the BUILD_DIR and SOURCE_DIR have the
-same value.
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Reviewed-by: Willian Rampazzo <willianr@redhat.com>
-Tested-by: Willian Rampazzo <willianr@redhat.com>
----
- tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
-
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/a=
-vocado_qemu/__init__.py
-index d4358eb431..59e7b4f763 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -16,8 +16,21 @@ import tempfile
-=20
- import avocado
-=20
--SRC_ROOT_DIR =3D os.path.join(os.path.dirname(__file__), '..', '..', '..')
--sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
-+#: The QEMU build root directory.  It may also be the source directory
-+#: if building from the source dir, but it's safer to use BUILD_DIR for
-+#: that purpose.  Be aware that if this code is moved outside of a source
-+#: and build tree, it will not be accurate.
-+BUILD_DIR =3D os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirn=
-ame(__file__))))
-+
-+if os.path.islink(os.path.dirname(os.path.dirname(__file__))):
-+    # The link to the acceptance tests dir in the source code directory
-+    lnk =3D os.path.dirname(os.path.dirname(__file__))
-+    #: The QEMU root source directory
-+    SOURCE_DIR =3D os.path.dirname(os.path.dirname(os.readlink(lnk)))
-+else:
-+    SOURCE_DIR =3D BUILD_DIR
-+
-+sys.path.append(os.path.join(SOURCE_DIR, 'python'))
-=20
- from qemu.machine import QEMUMachine
-=20
-@@ -49,10 +62,10 @@ def pick_default_qemu_bin(arch=3DNone):
-     if is_readable_executable_file(qemu_bin_relative_path):
-         return qemu_bin_relative_path
-=20
--    qemu_bin_from_src_dir_path =3D os.path.join(SRC_ROOT_DIR,
-+    qemu_bin_from_bld_dir_path =3D os.path.join(BUILD_DIR,
-                                               qemu_bin_relative_path)
--    if is_readable_executable_file(qemu_bin_from_src_dir_path):
--        return qemu_bin_from_src_dir_path
-+    if is_readable_executable_file(qemu_bin_from_bld_dir_path):
-+        return qemu_bin_from_bld_dir_path
-=20
-=20
- def _console_interaction(test, success_message, failure_message,
-@@ -153,7 +166,7 @@ class Test(avocado.Test):
-         self.qemu_bin =3D self.params.get('qemu_bin',
-                                         default=3Ddefault_qemu_bin)
-         if self.qemu_bin is None:
--            self.cancel("No QEMU binary defined or found in the source tre=
-e")
-+            self.cancel("No QEMU binary defined or found in the build tree=
-")
-=20
-     def _new_vm(self, *args):
-         vm =3D QEMUMachine(self.qemu_bin, sock_dir=3Dtempfile.mkdtemp())
---=20
-2.25.1
+Thanks, Juan.
 
 
