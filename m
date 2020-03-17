@@ -2,116 +2,57 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E89AC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6B72C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:36:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6A2F20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:36:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HhOwkesu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A2F20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6540F20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:36:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6540F20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEEGF-0004lQ-QY
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:36:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33385)
+	id 1jEEGY-0005MG-H3
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:36:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxr-00031M-IR
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:17:09 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEE5n-0006uF-G0
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:25:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxp-00026b-9w
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:17:07 -0400
-Received: from mail-he1eur04on071f.outbound.protection.outlook.com
- ([2a01:111:f400:fe0d::71f]:1794
- helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jEDxo-0001d5-W2; Tue, 17 Mar 2020 11:17:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P0ZcAaXrXGmMovhF7rw/HK/NbPgSFaajvYMlK+ZepegGmLa67yIFzyKnig6eU5HVjIvZySkjYeKdGRrJQmcxWJJM6mmfvEWvcwwPpd/qZe3kjfr0HAeMVJ+qkAu872beqcBDFvb2W33lgj8VgNhxGEbZDQUEcbiQWLkJz53UySW1lKRUCliipdRm5WC9yhAqwpNAJgwN3BxIDuvDnGcfwrrXYQL80tdahwfjA7wdVwQovJwS3Y47/PHQlEkyLeeHVJFJGAIEjUr95BMET8deFaynss+vlGnC/3TxHmPNJFD1J8ec13CUZI9GKg92svFpXJg9SYCQaVenYFjTGtWOmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e7uKuyhOaN/R2LP3MIYa/l3K/LuWZKfyTBTfXvt6ofs=;
- b=n8yqpw0U07opdHNmo44eWEiURhtKw84l84FcD10lnnn7okoOCnZSF/Me+wfM51RqQoLeh++S3BxcC6DbGl7yWXpbpWQVGl9iO6FheSYEUnnTQgGHgW3MLDuv9RY9SOYfrh+GHfIhQNNjVe0OBi3b4kSQBMNkOITNgMJjVBP6BzXALYGtU8uKDVTlYGgYwNC67LUpHkKZ2oG+iz4sHNDdaObxNax1QmxO0cBWjjnqO79Drcm5Pv0hci5NiRrxmGQMs6ikWDgSJUUGvFp8h17/nK33ihCFo9Sda/iZFHVhgej0hZM4D8Wrx9/0qXEKzP2R+78W91Vc6ZwxnyHjwZfu3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e7uKuyhOaN/R2LP3MIYa/l3K/LuWZKfyTBTfXvt6ofs=;
- b=HhOwkesuPK9bGgy02+t69wII3NRZRT6vjYCXZrSVUNj0jcGb8Hd7C4ougpakTknyQfeZUT+y4hIkkAKEHLvoqG1WqGWGQvwnBia8bcsSfEHtEV/LROki9NNg7XwzpcWzK/jNEQr7teSaCgmyMX+I+V3LCaCXUMrlpMUdKoEJzRQ=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) by
- HE1PR0802MB2620.eurprd08.prod.outlook.com (10.175.36.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2814.21; Tue, 17 Mar 2020 15:17:04 +0000
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f]) by HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f%12]) with mapi id 15.20.2814.021; Tue, 17 Mar
- 2020 15:17:04 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v10 8/9] nbd: introduce ERRP_AUTO_PROPAGATE
-Date: Tue, 17 Mar 2020 18:16:24 +0300
-Message-ID: <20200317151625.20797-9-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200317151625.20797-1-vsementsov@virtuozzo.com>
-References: <20200317151625.20797-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::15) To HE1PR0802MB2507.eurprd08.prod.outlook.com
- (2603:10a6:3:e1::8)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEE5k-00078W-Ol
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:25:19 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:52575)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEE5j-0006lQ-PK; Tue, 17 Mar 2020 11:25:16 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.656872-0.000448044-0.34268;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03296; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H0zh39e_1584458706; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H0zh39e_1584458706)
+ by smtp.aliyun-inc.com(10.147.43.95); Tue, 17 Mar 2020 23:25:07 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 09/61] target/riscv: add vector amo operations
+Date: Tue, 17 Mar 2020 23:06:01 +0800
+Message-Id: <20200317150653.9008-10-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.248) by
- AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.15 via Frontend
- Transport; Tue, 17 Mar 2020 15:17:03 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.248]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9e130296-abd6-4113-74fc-08d7ca863f96
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2620:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB2620900DECF5F4BF38FA85D2C1F60@HE1PR0802MB2620.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:162;
-X-Forefront-PRVS: 0345CFD558
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(39850400004)(376002)(136003)(346002)(366004)(396003)(199004)(66946007)(6666004)(1076003)(66556008)(54906003)(66476007)(86362001)(6486002)(16526019)(5660300002)(6916009)(186003)(69590400007)(6506007)(52116002)(4326008)(81166006)(6512007)(81156014)(8676002)(8936002)(316002)(2906002)(26005)(478600001)(956004)(36756003)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2620;
- H:HE1PR0802MB2507.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YOp3IvYIPeBC3VXovrATsOylD6EL3sBr19SKIuTis5mV2AP+nB8p64SUc2oJPTRlbF+rZDCR0WOaItKgfPFahQ2KZfllxRJDzD7UwweRkeLj8sjXja1MsetLMVsKSdHoF0WAYteM992a08CjIHlFggo6B/aI5c9nYYx49P0wtTSciCQiwKnCHgQGykA64OPzhgq2VzSea2bqh6L/wXBIgzhnhJJDJxMQRvilyyal7uCoPDCRDHqOykDPP2/+e8Zv08X8JWo+CEW871Uaw5zMGDrMT+s3DI/nLBasm6gWCYXdHPTjZd4wWTSGo4vL4Z/lPWd5qvoED41qRtQE36U8JCoNVesKvV70FxHv9w/+mM5JhuUglnMgiqdhMNuO4/gRzJ/ASuM2QvYlMvKMSrsbJApm59oyK621gF+bM7VYDtGL9tNlgf1Nl5yVeM7igfcWu3B4UGIHBEGs6IhW/usp+p25plOYAqEPRVonJJMStCTaLOzVS+YH6DwrRZLOV8D0
-X-MS-Exchange-AntiSpam-MessageData: t0KoMwRoljyQVQ771eSFaCxggFM8dM2zlXz87xzpioT4G3mQphIFFvVO1GZn8Dv1rWQmnoww+bQaJk+sR4Ydp8TIrYBBCYTj6fId2aSrlQCzjDGGeEJMqcor8nRjiwpa4pqm2CfhkhIBGDQ+79ZDEA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e130296-abd6-4113-74fc-08d7ca863f96
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 15:17:03.9906 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IHP6MddRN9gQfXGnZFcMAEQ7uHYY1PsJFJHgczelq6EIqf/6mqWWVjWKCsQaJ7sIVkjP9DkrzKmup9dsuFQzV/64CKFEbmqTriSe/R/00VA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2620
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0d::71f
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,231 +64,436 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
- Greg Kurz <groug@kaod.org>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp =3D=3D &error_fatal
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+Vector AMOs operate as if aq and rl bits were zero on each element
+with regard to ordering relative to other instructions in the same hart.
+Vector AMOs provide no ordering guarantee between element operations
+in the same vector AMO instruction
 
-If we want to check error after errp-function call, we need to
-introduce local_err and then propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatal, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit is generated by command
-
-    sed -n '/^Network Block Device (NBD)$/,/^$/{s/^F: //p}' \
-        MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- include/block/nbd.h |  1 +
- block/nbd.c         | 21 +++++++++------------
- nbd/client.c        |  5 +++++
- nbd/server.c        |  5 +++++
- 4 files changed, 20 insertions(+), 12 deletions(-)
+ target/riscv/helper.h                   |  29 +++++
+ target/riscv/insn32-64.decode           |  11 ++
+ target/riscv/insn32.decode              |  13 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 134 ++++++++++++++++++++++
+ target/riscv/internals.h                |   1 +
+ target/riscv/vector_helper.c            | 143 ++++++++++++++++++++++++
+ 6 files changed, 331 insertions(+)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 20363280ae..f7d87636d3 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -361,6 +361,7 @@ void nbd_server_start_options(NbdServerOptions *arg, Er=
-ror **errp);
- static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
-                            const char *desc, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret =3D qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO :=
- 0;
-=20
-     if (ret < 0) {
-diff --git a/block/nbd.c b/block/nbd.c
-index 976be76647..70274c31de 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1410,16 +1410,15 @@ static void nbd_client_close(BlockDriverState *bs)
- static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
-                                                   Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     QIOChannelSocket *sioc;
--    Error *local_err =3D NULL;
-=20
-     sioc =3D qio_channel_socket_new();
-     qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
-=20
--    qio_channel_socket_connect_sync(sioc, saddr, &local_err);
--    if (local_err) {
-+    qio_channel_socket_connect_sync(sioc, saddr, errp);
-+    if (*errp) {
-         object_unref(OBJECT(sioc));
--        error_propagate(errp, local_err);
-         return NULL;
-     }
-=20
-@@ -1725,10 +1724,10 @@ static bool nbd_process_legacy_socket_options(QDict=
- *output_options,
- static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
-                                  Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SocketAddress *saddr =3D NULL;
-     QDict *addr =3D NULL;
-     Visitor *iv =3D NULL;
--    Error *local_err =3D NULL;
-=20
-     qdict_extract_subqdict(options, &addr, "server.");
-     if (!qdict_size(addr)) {
-@@ -1741,9 +1740,8 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDi=
-ct *options,
-         goto done;
-     }
-=20
--    visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    visit_type_SocketAddress(iv, NULL, &saddr, errp);
-+    if (*errp) {
-         goto done;
-     }
-=20
-@@ -1836,15 +1834,14 @@ static QemuOptsList nbd_runtime_opts =3D {
- static int nbd_process_options(BlockDriverState *bs, QDict *options,
-                                Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVNBDState *s =3D bs->opaque;
-     QemuOpts *opts;
--    Error *local_err =3D NULL;
-     int ret =3D -EINVAL;
-=20
-     opts =3D qemu_opts_create(&nbd_runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_absorb_qdict(opts, options, errp);
-+    if (*errp) {
-         goto error;
-     }
-=20
-diff --git a/nbd/client.c b/nbd/client.c
-index ba173108ba..e258ef3f7e 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -68,6 +68,7 @@ static int nbd_send_option_request(QIOChannel *ioc, uint3=
-2_t opt,
-                                    uint32_t len, const char *data,
-                                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     NBDOption req;
-     QEMU_BUILD_BUG_ON(sizeof(req) !=3D 16);
-=20
-@@ -153,6 +154,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, ui=
-nt32_t opt,
- static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
-                                 bool strict, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     g_autofree char *msg =3D NULL;
-=20
-     if (!(reply->type & (1 << 31))) {
-@@ -337,6 +339,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **nam=
-e, char **description,
- static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
-                               NBDExportInfo *info, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     NBDOptionReply reply;
-     uint32_t len =3D strlen(info->name);
-     uint16_t type;
-@@ -882,6 +885,7 @@ static int nbd_start_negotiate(AioContext *aio_context,=
- QIOChannel *ioc,
-                                bool structured_reply, bool *zeroes,
-                                Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     uint64_t magic;
-=20
-     trace_nbd_start_negotiate(tlscreds, hostname ? hostname : "<null>");
-@@ -1017,6 +1021,7 @@ int nbd_receive_negotiate(AioContext *aio_context, QI=
-OChannel *ioc,
-                           const char *hostname, QIOChannel **outioc,
-                           NBDExportInfo *info, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int result;
-     bool zeroes;
-     bool base_allocation =3D info->base_allocation;
-diff --git a/nbd/server.c b/nbd/server.c
-index 11a31094ff..ffc0cc69a7 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -211,6 +211,7 @@ static int GCC_FMT_ATTR(4, 0)
- nbd_negotiate_send_rep_verr(NBDClient *client, uint32_t type,
-                             Error **errp, const char *fmt, va_list va)
- {
-+    ERRP_AUTO_PROPAGATE();
-     g_autofree char *msg =3D NULL;
-     int ret;
-     size_t len;
-@@ -369,6 +370,7 @@ static int nbd_opt_read_name(NBDClient *client, char **=
-name, uint32_t *length,
- static int nbd_negotiate_send_rep_list(NBDClient *client, NBDExport *exp,
-                                        Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     size_t name_len, desc_len;
-     uint32_t len;
-     const char *name =3D exp->name ? exp->name : "";
-@@ -432,6 +434,7 @@ static void nbd_check_meta_export(NBDClient *client)
- static int nbd_negotiate_handle_export_name(NBDClient *client, bool no_zer=
-oes,
-                                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     g_autofree char *name =3D NULL;
-     char buf[NBD_REPLY_EXPORT_NAME_SIZE] =3D "";
-     size_t len;
-@@ -1272,6 +1275,7 @@ static int nbd_negotiate_options(NBDClient *client, E=
-rror **errp)
-  */
- static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     char buf[NBD_OLDSTYLE_NEGOTIATE_SIZE] =3D "";
-     int ret;
-=20
-@@ -1646,6 +1650,7 @@ void nbd_export_close(NBDExport *exp)
-=20
- void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **e=
-rrp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     if (mode =3D=3D NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clie=
-nts)) {
-         nbd_export_close(exp);
-         return;
---=20
-2.21.0
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 72ba4d9bdb..70a4b05f75 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -240,3 +240,32 @@ DEF_HELPER_5(vlhuff_v_w, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vlhuff_v_d, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vlwuff_v_w, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vlwuff_v_d, void, ptr, ptr, tl, env, i32)
++#ifdef TARGET_RISCV64
++DEF_HELPER_6(vamoswapw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapd_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxord_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorw_v_d,   void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoord_v_d,   void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomind_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominud_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxud_v_d, void, ptr, ptr, tl, ptr, env, i32)
++#endif
++DEF_HELPER_6(vamoswapw_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorw_v_w,   void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+index 380bf791bc..86153d93fa 100644
+--- a/target/riscv/insn32-64.decode
++++ b/target/riscv/insn32-64.decode
+@@ -57,6 +57,17 @@ amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
+ amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
+ amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
+ 
++#*** Vector AMO operations (in addition to Zvamo) ***
++vamoswapd_v     00001 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoaddd_v      00000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoxord_v      00100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoandd_v      01100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoord_v       01000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomind_v      10000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomaxd_v      10100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamominud_v     11000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomaxud_v     11100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++
+ # *** RV64F Standard Extension (in addition to RV32F) ***
+ fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
+ fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b76c09c8c0..1330703720 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -44,6 +44,7 @@
+ &u    imm rd
+ &shift     shamt rs1 rd
+ &atomic    aq rl rs2 rs1 rd
++&rwdvm     vm wd rd rs1 rs2
+ &r2nfvm    vm rd rs1 nf
+ &rnfvm     vm rd rs1 rs2 nf
+ 
+@@ -67,6 +68,7 @@
+ @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+ @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
+ @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
++@r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... &rwdvm %rs2 %rs1 %rd
+ @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
+ 
+ @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+@@ -261,6 +263,17 @@ vsxh_v     ... -11 . ..... ..... 101 ..... 0100111 @r_nfvm
+ vsxw_v     ... -11 . ..... ..... 110 ..... 0100111 @r_nfvm
+ vsxe_v     ... -11 . ..... ..... 111 ..... 0100111 @r_nfvm
+ 
++#*** Vector AMO operations are encoded under the standard AMO major opcode ***
++vamoswapw_v     00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoaddw_v      00000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoxorw_v      00100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoandw_v      01100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoorw_v       01000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamominw_v      10000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamomaxw_v      10100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamominuw_v     11000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamomaxuw_v     11100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++
+ # *** new major opcode OP-V ***
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index ce0fafde92..a8722ed9d2 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -606,3 +606,137 @@ GEN_VEXT_TRANS(vleff_v, 3, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vlbuff_v, 4, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vlhuff_v, 5, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vlwuff_v, 6, r2nfvm, ldff_op, ld_us_check)
++
++/*
++ *** vector atomic operation
++ */
++typedef void gen_helper_amo(TCGv_ptr, TCGv_ptr, TCGv, TCGv_ptr,
++        TCGv_env, TCGv_i32);
++
++static bool amo_trans(uint32_t vd, uint32_t rs1, uint32_t vs2,
++        uint32_t data, gen_helper_amo *fn, DisasContext *s)
++{
++    TCGv_ptr dest, mask, index;
++    TCGv base;
++    TCGv_i32 desc;
++
++    dest = tcg_temp_new_ptr();
++    mask = tcg_temp_new_ptr();
++    index = tcg_temp_new_ptr();
++    base = tcg_temp_new();
++    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
++
++    gen_get_gpr(base, rs1);
++    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
++    tcg_gen_addi_ptr(index, cpu_env, vreg_ofs(s, vs2));
++    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
++
++    fn(dest, mask, base, index, cpu_env, desc);
++
++    tcg_temp_free_ptr(dest);
++    tcg_temp_free_ptr(mask);
++    tcg_temp_free_ptr(index);
++    tcg_temp_free(base);
++    tcg_temp_free_i32(desc);
++    return true;
++}
++
++static bool amo_op(DisasContext *s, arg_rwdvm *a, uint8_t seq)
++{
++    uint32_t data = 0;
++    gen_helper_amo *fn;
++    static gen_helper_amo *const fnsw[9] = {
++        /* no atomic operation */
++        gen_helper_vamoswapw_v_w,
++        gen_helper_vamoaddw_v_w,
++        gen_helper_vamoxorw_v_w,
++        gen_helper_vamoandw_v_w,
++        gen_helper_vamoorw_v_w,
++        gen_helper_vamominw_v_w,
++        gen_helper_vamomaxw_v_w,
++        gen_helper_vamominuw_v_w,
++        gen_helper_vamomaxuw_v_w
++    };
++#ifdef TARGET_RISCV64
++    static gen_helper_amo *const fnsd[18] = {
++        gen_helper_vamoswapw_v_d,
++        gen_helper_vamoaddw_v_d,
++        gen_helper_vamoxorw_v_d,
++        gen_helper_vamoandw_v_d,
++        gen_helper_vamoorw_v_d,
++        gen_helper_vamominw_v_d,
++        gen_helper_vamomaxw_v_d,
++        gen_helper_vamominuw_v_d,
++        gen_helper_vamomaxuw_v_d,
++        gen_helper_vamoswapd_v_d,
++        gen_helper_vamoaddd_v_d,
++        gen_helper_vamoxord_v_d,
++        gen_helper_vamoandd_v_d,
++        gen_helper_vamoord_v_d,
++        gen_helper_vamomind_v_d,
++        gen_helper_vamomaxd_v_d,
++        gen_helper_vamominud_v_d,
++        gen_helper_vamomaxud_v_d
++    };
++#endif
++
++    if (tb_cflags(s->base.tb) & CF_PARALLEL) {
++        gen_helper_exit_atomic(cpu_env);
++        s->base.is_jmp = DISAS_NORETURN;
++        return true;
++    } else {
++        if (s->sew == 3) {
++#ifdef TARGET_RISCV64
++            fn = fnsd[seq];
++#else
++            /* Check done in amo_check(). */
++            g_assert_not_reached();
++#endif
++        } else {
++            fn = fnsw[seq];
++        }
++    }
++
++    data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++    data = FIELD_DP32(data, VDATA, VM, a->vm);
++    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++    data = FIELD_DP32(data, VDATA, WD, a->wd);
++    return amo_trans(a->rd, a->rs1, a->rs2, data, fn, s);
++}
++/*
++ * There are two rules check here.
++ *
++ * 1. SEW must be at least as wide as the AMO memory element size.
++ *
++ * 2. If SEW is greater than XLEN, an illegal instruction exception is raised.
++ */
++static bool amo_check(DisasContext *s, arg_rwdvm* a)
++{
++    return (!s->vill && has_ext(s, RVA) &&
++            (!a->wd || vext_check_overlap_mask(s, a->rd, a->vm, false)) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            ((1 << s->sew) <= sizeof(target_ulong)) &&
++            ((1 << s->sew) >= 4));
++}
++
++GEN_VEXT_TRANS(vamoswapw_v, 0, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddw_v, 1, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxorw_v, 2, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandw_v, 3, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoorw_v, 4, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominw_v, 5, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxw_v, 6, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominuw_v, 7, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxuw_v, 8, rwdvm, amo_op, amo_check)
++#ifdef TARGET_RISCV64
++GEN_VEXT_TRANS(vamoswapd_v, 9, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddd_v, 10, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxord_v, 11, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandd_v, 12, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoord_v, 13, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomind_v, 14, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxd_v, 15, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominud_v, 16, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxud_v, 17, rwdvm, amo_op, amo_check)
++#endif
+diff --git a/target/riscv/internals.h b/target/riscv/internals.h
+index 614e41437d..6a27d7c716 100644
+--- a/target/riscv/internals.h
++++ b/target/riscv/internals.h
+@@ -26,4 +26,5 @@ FIELD(VDATA, MLEN, 0, 8)
+ FIELD(VDATA, VM, 8, 1)
+ FIELD(VDATA, LMUL, 9, 2)
+ FIELD(VDATA, NF, 11, 4)
++FIELD(VDATA, WD, 11, 1)
+ #endif
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index f72831a523..45da43ade9 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -95,6 +95,11 @@ static inline uint32_t vext_lmul(uint32_t desc)
+     return FIELD_EX32(simd_data(desc), VDATA, LMUL);
+ }
+ 
++static uint32_t vext_wd(uint32_t desc)
++{
++    return (simd_data(desc) >> 11) & 0x1;
++}
++
+ /*
+  * Get vector group length in bytes. Its range is [64, 2048].
+  *
+@@ -684,3 +689,141 @@ GEN_VEXT_LDFF(vlhuff_v_w, uint16_t, uint32_t, MO_LEUW, ldhu_w, clearl)
+ GEN_VEXT_LDFF(vlhuff_v_d, uint16_t, uint64_t, MO_LEUW, ldhu_d, clearq)
+ GEN_VEXT_LDFF(vlwuff_v_w, uint32_t, uint32_t, MO_LEUL, ldwu_w, clearl)
+ GEN_VEXT_LDFF(vlwuff_v_d, uint32_t, uint64_t, MO_LEUL, ldwu_d, clearq)
++
++/*
++ *** Vector AMO Operations (Zvamo)
++ */
++typedef void vext_amo_noatomic_fn(void *vs3, target_ulong addr,
++        uint32_t wd, uint32_t idx, CPURISCVState *env, uintptr_t retaddr);
++
++/* no atomic opreation for vector atomic insructions */
++#define DO_SWAP(N, M) (M)
++#define DO_AND(N, M)  (N & M)
++#define DO_XOR(N, M)  (N ^ M)
++#define DO_OR(N, M)   (N | M)
++#define DO_ADD(N, M)  (N + M)
++
++#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, ESZ, MSZ, H, DO_OP, SUF) \
++static void vext_##NAME##_noatomic_op(void *vs3,                \
++            target_ulong addr, uint32_t wd, uint32_t idx,       \
++                CPURISCVState *env, uintptr_t retaddr)          \
++{                                                               \
++    typedef int##ESZ##_t ETYPE;                                 \
++    typedef int##MSZ##_t MTYPE;                                 \
++    typedef uint##MSZ##_t UMTYPE __attribute__((unused));       \
++    ETYPE *pe3 = (ETYPE *)vs3 + H(idx);                         \
++    MTYPE a = *pe3, b = cpu_ld##SUF##_data(env, addr);          \
++    a = DO_OP(a, b);                                            \
++    cpu_st##SUF##_data(env, addr, a);                           \
++    if (wd) {                                                   \
++        *pe3 = a;                                               \
++    }                                                           \
++}
++
++/* Signed min/max */
++#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
++#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
++
++/* Unsigned min/max */
++#define DO_MAXU(N, M) DO_MAX((UMTYPE)N, (UMTYPE)M)
++#define DO_MINU(N, M) DO_MIN((UMTYPE)N, (UMTYPE)M)
++
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_w, 32, 32, H4, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_w,  32, 32, H4, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_w,  32, 32, H4, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_w,  32, 32, H4, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_w,   32, 32, H4, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_w,  32, 32, H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_w,  32, 32, H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_w, 32, 32, H4, DO_MINU, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_w, 32, 32, H4, DO_MAXU, l)
++#ifdef TARGET_RISCV64
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_d, 64, 32, H8, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapd_v_d, 64, 64, H8, DO_SWAP, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_d,  64, 32, H8, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddd_v_d,  64, 64, H8, DO_ADD,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_d,  64, 32, H8, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxord_v_d,  64, 64, H8, DO_XOR,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_d,  64, 32, H8, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandd_v_d,  64, 64, H8, DO_AND,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_d,   64, 32, H8, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoord_v_d,   64, 64, H8, DO_OR,   q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_d,  64, 32, H8, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomind_v_d,  64, 64, H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_d,  64, 32, H8, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxd_v_d,  64, 64, H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_d, 64, 32, H8, DO_MINU, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominud_v_d, 64, 64, H8, DO_MINU, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_d, 64, 32, H8, DO_MAXU, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxud_v_d, 64, 64, H8, DO_MAXU, q)
++#endif
++
++static inline void vext_amo_noatomic(void *vs3, void *v0, target_ulong base,
++        void *vs2, CPURISCVState *env, uint32_t desc,
++        vext_get_index_addr get_index_addr,
++        vext_amo_noatomic_fn *noatomic_op,
++        clear_fn *clear_elem,
++        uint32_t esz, uint32_t msz, uintptr_t ra)
++{
++    uint32_t i;
++    target_long addr;
++    uint32_t wd = vext_wd(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++
++    for (i = 0; i < env->vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_LOAD);
++        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_STORE);
++    }
++    for (i = 0; i < env->vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        addr = get_index_addr(base, i, vs2);
++        noatomic_op(vs3, addr, wd, i, env, ra);
++    }
++    clear_elem(vs3, env->vl, env->vl * esz, vlmax * esz);
++}
++
++#define GEN_VEXT_AMO(NAME, MTYPE, ETYPE, INDEX_FN, CLEAR_FN)    \
++void HELPER(NAME)(void *vs3, void *v0, target_ulong base,       \
++        void *vs2, CPURISCVState *env, uint32_t desc)           \
++{                                                               \
++    vext_amo_noatomic(vs3, v0, base, vs2, env, desc,            \
++        INDEX_FN, vext_##NAME##_noatomic_op, CLEAR_FN,          \
++        sizeof(ETYPE), sizeof(MTYPE), GETPC());                 \
++}
++
++#ifdef TARGET_RISCV64
++GEN_VEXT_AMO(vamoswapw_v_d, int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoswapd_v_d, int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoaddw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoaddd_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoxorw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoxord_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoandw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoandd_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoorw_v_d,   int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoord_v_d,   int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamominw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamomind_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamomaxw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamomaxd_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamominuw_v_d, uint32_t, uint64_t, idx_d, clearq)
++GEN_VEXT_AMO(vamominud_v_d, uint64_t, uint64_t, idx_d, clearq)
++GEN_VEXT_AMO(vamomaxuw_v_d, uint32_t, uint64_t, idx_d, clearq)
++GEN_VEXT_AMO(vamomaxud_v_d, uint64_t, uint64_t, idx_d, clearq)
++#endif
++GEN_VEXT_AMO(vamoswapw_v_w, int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoaddw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoxorw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoandw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoorw_v_w,   int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamominw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamomaxw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamominuw_v_w, uint32_t, uint32_t, idx_w, clearl)
++GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+-- 
+2.23.0
 
 
