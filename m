@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5056C0044D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A798CC0044D
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FA42206C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:45:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 769E5205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 00:45:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5V6Dr5H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA42206C0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z0c5L2nM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 769E5205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE0Mk-0003RN-Re
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 20:45:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41504)
+	id 1jE0Mn-0003SQ-LR
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 20:45:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jE0IL-00045y-D0
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:22 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jE0IQ-0004FO-3y
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jE0IJ-0005A0-EL
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27687)
+ (envelope-from <jsnow@redhat.com>) id 1jE0IO-0005Qt-N5
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:26 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47015)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jE0II-00056K-Tg
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:19 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jE0IO-0005Oj-Hv
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 20:41:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584405677;
+ s=mimecast20190719; t=1584405684;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=S0We64aQWj81gfK4BjbGVkVQfRzyf3QTE+z185OEnM4=;
- b=L5V6Dr5Hxq7HmwDN08mEuIml2UgSoNrDUH91KnZVOtHM47iHrJXfJ3Pq03hNvn3Njdl58H
- jzMUAatQnbDPyqRW4yLEWgu7ovrjkafncbQMl11V0uzfqrKcFfgOjSH9grZa5YpJnqMuh7
- CFblBztJMCwn5hbS94qUUSzPhrPKAEA=
+ bh=Y7jRjEibibgckQjO9NFz+8/WOaFK+Qeu2Tf4flFKXow=;
+ b=Z0c5L2nMutKOhnw4f5wdk7emyZznxmLWgfpvWss06GXw5lvA5K4TTpKQ49PMqxC0YL4Z8W
+ Tb+z7AE78I3CxRQXp7JW3KbwSCj//KFnENDuwrj8nCGdtE83M81cGenQdLGR4uEjHLqhAY
+ k/2Qm8GsGFsk8Y28IIfXR5wLoLcQMzM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-dB8CC8YvOMWg0uqXm0WI_A-1; Mon, 16 Mar 2020 20:41:14 -0400
-X-MC-Unique: dB8CC8YvOMWg0uqXm0WI_A-1
+ us-mta-147-jqn__ZfAN-C7o3YXMeWBeQ-1; Mon, 16 Mar 2020 20:41:22 -0400
+X-MC-Unique: jqn__ZfAN-C7o3YXMeWBeQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF1488010C7;
- Tue, 17 Mar 2020 00:41:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F26E100550D;
+ Tue, 17 Mar 2020 00:41:21 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 523F97A411;
- Tue, 17 Mar 2020 00:41:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5ACCF7A411;
+ Tue, 17 Mar 2020 00:41:20 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 05/11] iotests: add pylintrc file
-Date: Mon, 16 Mar 2020 20:40:59 -0400
-Message-Id: <20200317004105.27059-6-jsnow@redhat.com>
+Subject: [PATCH v8 10/11] iotests: Mark verify functions as private
+Date: Mon, 16 Mar 2020 20:41:04 -0400
+Message-Id: <20200317004105.27059-11-jsnow@redhat.com>
 In-Reply-To: <20200317004105.27059-1-jsnow@redhat.com>
 References: <20200317004105.27059-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -71,7 +71,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,50 +91,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows others to get repeatable results with pylint. If you run
-`pylint iotests.py`, you should see a 100% pass.
+Mark the verify functions as "private" with a leading underscore, to
+discourage their use.
+
+(Also, make pending patches not yet using the new entry points fail in a
+very obvious way.)
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/pylintrc | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
- create mode 100644 tests/qemu-iotests/pylintrc
+ tests/qemu-iotests/iotests.py | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/tests/qemu-iotests/pylintrc b/tests/qemu-iotests/pylintrc
-new file mode 100644
-index 0000000000..8720b6a0de
---- /dev/null
-+++ b/tests/qemu-iotests/pylintrc
-@@ -0,0 +1,22 @@
-+[MESSAGES CONTROL]
-+
-+# Disable the message, report, category or checker with the given id(s). Y=
-ou
-+# can either give multiple identifiers separated by comma (,) or put this
-+# option multiple times (only on the command line, not in the configuratio=
-n
-+# file where it should appear only once). You can also use "--disable=3Dal=
-l" to
-+# disable everything first and then reenable specific checks. For example,=
- if
-+# you want to run only the similarities checker, you can use "--disable=3D=
-all
-+# --enable=3Dsimilarities". If you want to run only the classes checker, b=
-ut have
-+# no Warning level messages displayed, use "--disable=3Dall --enable=3Dcla=
-sses
-+# --disable=3DW".
-+disable=3Dinvalid-name,
-+        no-else-return,
-+        too-many-lines,
-+        too-few-public-methods,
-+        too-many-arguments,
-+        too-many-locals,
-+        too-many-branches,
-+        too-many-public-methods,
-+        # These are temporary, and should be removed:
-+        missing-docstring,
-+        line-too-long,
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index ec7aa42a70..7d6cc430a4 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -988,7 +988,7 @@ def case_notrun(reason):
+     open('%s/%s.casenotrun' % (output_dir, seq), 'a').write(
+         '    [case not run] ' + reason + '\n')
+=20
+-def verify_image_format(supported_fmts=3D(), unsupported_fmts=3D()):
++def _verify_image_format(supported_fmts=3D(), unsupported_fmts=3D()):
+     assert not (supported_fmts and unsupported_fmts)
+=20
+     if 'generic' in supported_fmts and \
+@@ -1002,7 +1002,7 @@ def verify_image_format(supported_fmts=3D(), unsuppor=
+ted_fmts=3D()):
+     if not_sup or (imgfmt in unsupported_fmts):
+         notrun('not suitable for this image format: %s' % imgfmt)
+=20
+-def verify_protocol(supported=3D(), unsupported=3D()):
++def _verify_protocol(supported=3D(), unsupported=3D()):
+     assert not (supported and unsupported)
+=20
+     if 'generic' in supported:
+@@ -1012,7 +1012,7 @@ def verify_protocol(supported=3D(), unsupported=3D())=
+:
+     if not_sup or (imgproto in unsupported):
+         notrun('not suitable for this protocol: %s' % imgproto)
+=20
+-def verify_platform(supported=3D(), unsupported=3D()):
++def _verify_platform(supported=3D(), unsupported=3D()):
+     if any((sys.platform.startswith(x) for x in unsupported)):
+         notrun('not suitable for this OS: %s' % sys.platform)
+=20
+@@ -1020,11 +1020,11 @@ def verify_platform(supported=3D(), unsupported=3D(=
+)):
+         if not any((sys.platform.startswith(x) for x in supported)):
+             notrun('not suitable for this OS: %s' % sys.platform)
+=20
+-def verify_cache_mode(supported_cache_modes=3D()):
++def _verify_cache_mode(supported_cache_modes=3D()):
+     if supported_cache_modes and (cachemode not in supported_cache_modes):
+         notrun('not suitable for this cache mode: %s' % cachemode)
+=20
+-def verify_aio_mode(supported_aio_modes=3D()):
++def _verify_aio_mode(supported_aio_modes=3D()):
+     if supported_aio_modes and (aiomode not in supported_aio_modes):
+         notrun('not suitable for this aio mode: %s' % aiomode)
+=20
+@@ -1151,11 +1151,11 @@ def execute_setup_common(supported_fmts: Collection=
+[str] =3D (),
+         sys.stderr.write('Please run this test via the "check" script\n')
+         sys.exit(os.EX_USAGE)
+=20
+-    verify_image_format(supported_fmts, unsupported_fmts)
+-    verify_protocol(supported_protocols, unsupported_protocols)
+-    verify_platform(supported=3Dsupported_platforms)
+-    verify_cache_mode(supported_cache_modes)
+-    verify_aio_mode(supported_aio_modes)
++    _verify_image_format(supported_fmts, unsupported_fmts)
++    _verify_protocol(supported_protocols, unsupported_protocols)
++    _verify_platform(supported=3Dsupported_platforms)
++    _verify_cache_mode(supported_cache_modes)
++    _verify_aio_mode(supported_aio_modes)
+=20
+     debug =3D '-d' in sys.argv
+     if debug:
 --=20
 2.21.1
 
