@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 396ABC1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 531B4C5ACD7
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0987720714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:37:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FBD820714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:37:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Us9bL0NB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0987720714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="hQTVEwlu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FBD820714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEH5H-0006KE-6A
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:36:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48870)
+	id 1jEH5K-0006Oh-9o
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:37:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jEGmy-0003W8-Bi
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:18:06 -0400
+ (envelope-from <berto@igalia.com>) id 1jEGmx-0003Sx-08
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:18:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jEGmv-00009s-A2
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:18:04 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:58013)
+ (envelope-from <berto@igalia.com>) id 1jEGmu-000086-Tu
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:18:02 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:57999)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jEGmu-0005yB-43; Tue, 17 Mar 2020 14:18:01 -0400
+ id 1jEGmu-0005xk-6Z; Tue, 17 Mar 2020 14:18:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=C0eALyg6t8kHhqoCkYLe5gXMSMiybsgvLwFsI8EfjjI=; 
- b=Us9bL0NBDkov6frBccZz/YTvQdgQ+ViKkF6Xc4JKeHbpjnsUxnJWm5X4pVzvCE6pq49NR1OoCq4WrITqGV4Y0p+emAT7jdH3U52XtKiS8XSLkk1Q4ViXC3z4py1NrM6RqG3W3qdeAZNFXgToE+nFZDbeqtGkFKgLt2JzZykB5gSrGzW71LSbzrZ7CYvK/VMoevRYoDlNqTwlPPqafjeXgowx4ApIZX/B0lBL2PICn3PSPZbwJfDmXW9upDEj7p3498Yu9XkaJR6fYXbY7ACQzaHFiSw9v5wu32HerYE9ELSCU2HkrVjH63fY5j7+A3YrT4L1V2aleiqKzOalq1zKoQ==;
+ bh=s7dRHxBO3oqeFHBCKa67pRvg2ir7e1CHI3jX0YPDL6A=; 
+ b=hQTVEwlum3Sq6l/FFvFiETJzZQn+C2MQJUCN2MvxqTL0XagiRwaDizgDLYDBpEu3H3pg78M3z5Q/iTLvc8z2NkNtcvhkOvBObRrkn1vVudBepgu6l7teK/H+sZVy8+QT7rHGEJvU8YQ8GYVWVvDsqVhCRhc9vXRH5TjugzvbDu6Egyw6pPNU0GGO6I3QV+ANUa2szvK6ZsCIkvLTi1+In2tNlPqy/8+yngy6GuA+0edKa4Lgew5b49XSPSiIuMHcXQkilrS5QDKp8TTPHc5DV9i7T4bzQt2HACnldrM2gIjvEmb3vLgU5fMjgF7VHSqSaNOo9g/JDXCbuZkcgASIdg==;
 Received: from [81.0.35.138] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jEGmD-00015A-4V; Tue, 17 Mar 2020 19:17:17 +0100
+ id 1jEGmD-000156-4G; Tue, 17 Mar 2020 19:17:17 +0100
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jEGlw-0006Ov-Uz; Tue, 17 Mar 2020 19:17:00 +0100
+ id 1jEGlw-0006Op-Ry; Tue, 17 Mar 2020 19:17:00 +0100
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 27/30] qcow2: Assert that expand_zero_clusters_in_l1() does
- not support subclusters
-Date: Tue, 17 Mar 2020 19:16:24 +0100
-Message-Id: <5cc70489bfeb7d2f8f6c8a113dc530cab504db9e.1584468723.git.berto@igalia.com>
+Subject: [PATCH v4 24/30] qcow2: Clear the L2 bitmap when allocating a
+ compressed cluster
+Date: Tue, 17 Mar 2020 19:16:21 +0100
+Message-Id: <6d596d82ed62615a8565b661691a06bfaf32237e.1584468723.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1584468723.git.berto@igalia.com>
 References: <cover.1584468723.git.berto@igalia.com>
@@ -81,84 +81,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function is only used by qcow2_expand_zero_clusters() to
-downgrade a qcow2 image to a previous version. It is however not
-possible to downgrade an image with extended L2 entries because older
-versions of qcow2 do not have this feature.
+Compressed clusters always have the bitmap part of the extended L2
+entry set to 0.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c      | 8 +++++++-
- tests/qemu-iotests/061     | 6 ++++++
- tests/qemu-iotests/061.out | 5 +++++
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ block/qcow2-cluster.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 1f471db98c..125d2852f6 100644
+index dfd8b66958..1f471db98c 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -2039,6 +2039,9 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-     int ret;
-     int i, j;
+@@ -806,6 +806,9 @@ int qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+     BLKDBG_EVENT(bs->file, BLKDBG_L2_UPDATE_COMPRESSED);
+     qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+     set_l2_entry(s, l2_slice, l2_index, cluster_offset);
++    if (has_subclusters(s)) {
++        set_l2_bitmap(s, l2_slice, l2_index, 0);
++    }
+     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
  
-+    /* qcow2_downgrade() is not allowed in images with subclusters */
-+    assert(!has_subclusters(s));
-+
-     slice_size2 = s->l2_slice_size * l2_entry_size(s);
-     n_slices = s->cluster_size / slice_size2;
- 
-@@ -2107,7 +2110,8 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                 if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN) {
-                     if (!bs->backing) {
-                         /* not backed; therefore we can simply deallocate the
--                         * cluster */
-+                         * cluster. No need to call set_l2_bitmap(), this
-+                         * function doesn't support images with subclusters. */
-                         set_l2_entry(s, l2_slice, j, 0);
-                         l2_dirty = true;
-                         continue;
-@@ -2178,6 +2182,8 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                 } else {
-                     set_l2_entry(s, l2_slice, j, offset);
-                 }
-+                /* No need to call set_l2_bitmap() after set_l2_entry() because
-+                 * this function doesn't support images with subclusters. */
-                 l2_dirty = true;
-             }
- 
-diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index 36b040491f..66bfd23179 100755
---- a/tests/qemu-iotests/061
-+++ b/tests/qemu-iotests/061
-@@ -266,6 +266,12 @@ $QEMU_IMG amend -o "compat=0.10" "$TEST_IMG"
- _img_info --format-specific
- _check_test_img
- 
-+echo
-+echo "=== Testing version downgrade with extended L2 entries ==="
-+echo
-+_make_test_img -o "compat=1.1,extended_l2=on" 64M
-+$QEMU_IMG amend -o "compat=0.10" "$TEST_IMG"
-+
- echo
- echo "=== Try changing the external data file ==="
- echo
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index 8b3091a412..5d009867a2 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -498,6 +498,11 @@ Format specific information:
-     corrupt: false
- No errors were found on the image.
- 
-+=== Testing version downgrade with extended L2 entries ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+qemu-img: Cannot downgrade an image with incompatible features 0x10 set
-+
- === Try changing the external data file ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+     *host_offset = cluster_offset & s->cluster_offset_mask;
 -- 
 2.20.1
 
