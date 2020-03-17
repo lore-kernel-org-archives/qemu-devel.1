@@ -7,73 +7,93 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 393F5C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8CB3C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:57:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE7DA20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:56:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0A9620663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 09:57:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QF6ox37N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE7DA20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ss8fb6mG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0A9620663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE8xp-0006Nf-4s
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 05:56:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60095)
+	id 1jE8yW-0007WU-U9
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 05:57:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jE8vU-0002i5-ER
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:54:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1jE8xd-0006Ma-QY
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jE8vP-0006Uw-RX
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:54:17 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55397)
+ (envelope-from <philmd@redhat.com>) id 1jE8xc-0005xd-FN
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:56:33 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:34643)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jE8vP-0006TY-1l
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:54:15 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jE8xc-0005sF-At
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 05:56:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584438854;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1584438991;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lsZxlCLllkrWy4cl4MLHPAx/aKbZX762nwY5C0hUfxw=;
- b=QF6ox37NL451R4SufNRfGvjEv90YrEFlDPG9evo+iJkDsSU20KpX1O/mfFE8QrrIN3cjoE
- X1FETV7O6lblo8CkJkQgiMBCRodqe3FiJrXz6yvPGqiiBYKDxMRUhIPjB4nJpaoQdkkEQ1
- YLYqvPsu/4ORV5xWK1i4YjWgr5IyG7c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-K19EPyoiNoeQcMUHmd4P0Q-1; Tue, 17 Mar 2020 05:54:12 -0400
-X-MC-Unique: K19EPyoiNoeQcMUHmd4P0Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8E7D190680F
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 09:54:11 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E7A81036B3B;
- Tue, 17 Mar 2020 09:54:09 +0000 (UTC)
-Date: Tue, 17 Mar 2020 09:54:06 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] qom-qmp-cmds: Fix another memory leak in qmp_object_add()
-Message-ID: <20200317095406.GC2041016@redhat.com>
-References: <20200317092241.31660-1-armbru@redhat.com>
+ bh=LKb9voVP0DcRntiJe2qk76Bv9LmVh1K46wznR3c2LOY=;
+ b=Ss8fb6mG3R+FBNTGxJXn3Fk9qd+9rueCxbKAnCI1naWpLltN7AQekRRUUczMPtZFmPP+Q9
+ IvnRsthAus3anwq3+l4FmoWjXJJvYQdKHs9dxaPF6h144jXHe0bzhDas4nWrlC71J60cl4
+ MYq2C0o3CJFCpTojXZiB5SfldUbEjcE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-O6AHQzM4P7WuMmEVE5n0nQ-1; Tue, 17 Mar 2020 05:56:28 -0400
+X-MC-Unique: O6AHQzM4P7WuMmEVE5n0nQ-1
+Received: by mail-wm1-f70.google.com with SMTP id n25so5528186wmi.5
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 02:56:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ULRZbuCwsnyJRRqZMeMEz/jzykrdAzXvpLbJ6qxv3wY=;
+ b=j3hWeJ+hrUmihBKiRplcLpwojUDFf+ZobzYdqBgtjw0LQSKgbIQWJ2KmruVTCY+u7a
+ VHXgtY/eKKkap6RAQrKxmRiSW5Ib9h27e8a51/gauSagJqyvxf4YBPY1AdqxVj75skRL
+ MgowVOct0UVXrr0Ix7V03brkLRwtOK+G52kFD3j/Auw3Lh/on4sRXUnh+ZIsRfPHiPiM
+ 04NNqDbYzA5OTJycS7ULvAMVc1DkxYFPFXl3MnlKSHMJMdAWrJLAms6A4hHrHlBHQ2rD
+ i5e0pE7DwhIN+DPMSPOO701wMmP0TpAPhRpQ2zg3/GDLkEHMYbSajsE7a6MG7kOaF3Dp
+ EGPQ==
+X-Gm-Message-State: ANhLgQ3jyxCyqOQ30myrDIFscLouzp6ToxGjlY9QEw4A1IteO2hsKSbV
+ 2CTqkTFVcMDfl0+BeKOCdfHL82+AiZBoV1FrKRCi/VMLMXg5BR0WEseF8041bc3xWEy6LL9hCJh
+ p4ao2+AFu6ANwzC8=
+X-Received: by 2002:a1c:23d5:: with SMTP id j204mr4651686wmj.59.1584438987450; 
+ Tue, 17 Mar 2020 02:56:27 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsick/AaJ59hYzl2j0L4ccWTV4FeDghE+IJhpnzcbkiqWTZGJYVEdLJhu48LbNrsXfGOlW1rQ==
+X-Received: by 2002:a1c:23d5:: with SMTP id j204mr4651665wmj.59.1584438987221; 
+ Tue, 17 Mar 2020 02:56:27 -0700 (PDT)
+Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
+ [83.59.163.96])
+ by smtp.gmail.com with ESMTPSA id w19sm3242788wmi.0.2020.03.17.02.56.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Mar 2020 02:56:26 -0700 (PDT)
+Subject: Re: [PATCH v1 19/28] target/arm: don't bother with id_aa64pfr0_read
+ for USER_ONLY
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200316172155.971-1-alex.bennee@linaro.org>
+ <20200316172155.971-20-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c34eed7d-ee17-b06a-68e4-fecceab4b216@redhat.com>
+Date: Tue, 17 Mar 2020 10:56:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200317092241.31660-1-armbru@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200316172155.971-20-alex.bennee@linaro.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -87,60 +107,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 17, 2020 at 10:22:41AM +0100, Markus Armbruster wrote:
-> When user_creatable_add_type() fails, qmp_object_add() returns both
-> its error and the usual empty QDict success value.  The QMP core
-> handles the error, and ignores the success value, leaking it.  Exposed
-> by qmp-cmd-test case /x86_64/qmp/object-add-without-props, and duly
-> reported both by ASan and valgrind.
+On 3/16/20 6:21 PM, Alex Benn=C3=A9e wrote:
+> For system emulation we need to check the state of the GIC before we
+> report the value. However this isn't relevant to exporting of the
+> value to linux-user and indeed breaks the exported value as set by
+> modify_arm_cp_regs.
 >=20
-> To plug the leak, set the success value only on success.
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 >=20
-> Fixes: 5f07c4d60d091320186e7b0edaf9ed2cc16b2d1e
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  qom/qom-qmp-cmds.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
+> v2
+>    - extend the ifdef and make type CONST with no accessfn
+> ---
+>   target/arm/helper.c | 20 +++++++++++++++-----
+>   1 file changed, 15 insertions(+), 5 deletions(-)
 >=20
-> diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
-> index 435193b036..6bd137ccbf 100644
-> --- a/qom/qom-qmp-cmds.c
-> +++ b/qom/qom-qmp-cmds.c
-> @@ -287,8 +287,8 @@ void qmp_object_add(QDict *qdict, QObject **ret_data,=
- Error **errp)
->      visit_free(v);
->      if (obj) {
->          object_unref(obj);
-> +        *ret_data =3D QOBJECT(qdict_new());
->      }
-> -    *ret_data =3D QOBJECT(qdict_new());
->  }
-> =20
->  void qmp_object_del(const char *id, Error **errp)
-> --=20
-> 2.21.1
->=20
->=20
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 7e560ea7db6..d2ec2c53510 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6697,6 +6697,7 @@ static uint64_t id_pfr1_read(CPUARMState *env, cons=
+t ARMCPRegInfo *ri)
+>       return pfr1;
+>   }
+>  =20
+> +#ifndef CONFIG_USER_ONLY
+>   static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *=
+ri)
+>   {
+>       ARMCPU *cpu =3D env_archcpu(env);
+> @@ -6707,6 +6708,7 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, =
+const ARMCPRegInfo *ri)
+>       }
+>       return pfr0;
+>   }
+> +#endif
+>  =20
+>   /* Shared logic between LORID and the rest of the LOR* registers.
+>    * Secure state has already been delt with.
+> @@ -7280,16 +7282,24 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>            * define new registers here.
+>            */
+>           ARMCPRegInfo v8_idregs[] =3D {
+> -            /* ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST because we do=
+n't
+> -             * know the right value for the GIC field until after we
+> -             * define these regs.
+> +            /*
+> +             * ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST in system
+> +             * emulation because we don't know the right value for the
+> +             * GIC field until after we define these regs.
+>                */
+>               { .name =3D "ID_AA64PFR0_EL1", .state =3D ARM_CP_STATE_AA64=
+,
+>                 .opc0 =3D 3, .opc1 =3D 0, .crn =3D 0, .crm =3D 4, .opc2 =
+=3D 0,
+> -              .access =3D PL1_R, .type =3D ARM_CP_NO_RAW,
+> +              .access =3D PL1_R,
+> +#ifdef CONFIG_USER_ONLY
+> +              .type =3D ARM_CP_CONST,
+> +              .resetvalue =3D cpu->isar.id_aa64pfr0
+> +#else
+> +              .type =3D ARM_CP_NO_RAW,
+>                 .accessfn =3D access_aa64_tid3,
+>                 .readfn =3D id_aa64pfr0_read,
+> -              .writefn =3D arm_cp_write_ignore },
+> +              .writefn =3D arm_cp_write_ignore
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+I guess this is the implementation of what Peter described here:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg689388.html
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+> +#endif
+> +            },
+>               { .name =3D "ID_AA64PFR1_EL1", .state =3D ARM_CP_STATE_AA64=
+,
+>                 .opc0 =3D 3, .opc1 =3D 0, .crn =3D 0, .crm =3D 4, .opc2 =
+=3D 1,
+>                 .access =3D PL1_R, .type =3D ARM_CP_CONST,
+>=20
 
 
