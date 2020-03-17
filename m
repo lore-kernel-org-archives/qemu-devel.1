@@ -2,67 +2,128 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=0.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,YOU_INHERIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA6FC18E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:34:13 +0000 (UTC)
-Received: from lists.gnu.org (unknown [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08600C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:36:27 +0000 (UTC)
+Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B58B2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:26:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B58B2051A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B6E1F20658
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:36:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZbTdhF3P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6E1F20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEAMD-0007PS-2P
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:26:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56031)
+	id 1jEAWI-0004oe-02
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:36:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38285)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jEALY-0006lL-RC
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:25:23 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jEAVP-0004CW-9W
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:35:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jEALW-00065F-7S
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:25:20 -0400
-Resent-Date: Tue, 17 Mar 2020 07:25:20 -0400
-Resent-Message-Id: <E1jEALW-00065F-7S@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21186)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jEAVN-0008K7-Ik
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:35:31 -0400
+Received: from mail-eopbgr40118.outbound.protection.outlook.com
+ ([40.107.4.118]:23783 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jEALV-0005sn-Tc; Tue, 17 Mar 2020 07:25:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584444289; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=bVWsDa4ciuFaFw7ja1Y8at14oXMlrQ1dEb3kDZvcGh89MQZDJZxKjjHP4ftyB+db18aBH2TKt1ErIgc3G7VpRwVHyt/iJbsmO3OwFvFO0eylJixakWXCSBepw3ZCbighkgW5hqSQYv4whHjMRzR8eyj6d2L85FhnrWgKoAsIt2o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584444289;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=9w9MBjQmDkD20/wEe+Clw4YnFVqPPH4Nk0Gj7Arwu4s=; 
- b=QlplHEhZwPP6WhJYdQ6BlVXiIHi9L/C4lFiuiJ6mXoufXXuCA1TUECKa324hysxgo1wliFAw7q0IxWZ/zQ0Vc45OhSmr7dzTfVa6Kb/5qBUSm8ev6odwHyWi9Qmfasdc4rAuwppvkpqF0TgVcuJoRG1NFcOhRFe5dG42I3g3rdg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 158444428771467.80958912169308;
- Tue, 17 Mar 2020 04:24:47 -0700 (PDT)
-In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
-Subject: Re: [PULL 00/45] ppc-for-5.0 queue 20200317
-Message-ID: <158444428592.23095.4070833044575433692@39012742ff91>
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jEAVI-0007Be-4j; Tue, 17 Mar 2020 07:35:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZnWIqTMh8ilibbNEcyN3ZxCN5MPIp4d8bAdsxjWm0QRTTE0zyDkbP2ZhXeRoO9MPlZdza4kwCKLmt2rGob5Q7MUc0Yil2AueQqdSoXpTz4yvpeSLa5OURFrI/1Vo6QXDaDwi0qHLNz9s1711qR3uV6gN9Jav4wnDg0VbPDvn/QA1q6zlVqBNN5ce25Nr7/wx2SQXtbvIZclOsAngx86vd9rrfWTJFSOJ7Py5X3pGdiGYsgNbGTCRrvMVBf8SqHmzKNSQqUByepV7dJLY8XtuGAXNT9HNP/U8bNW1hDev8rdc3ynK4rmTYp05tqrpR7ZmIHf8pafkNAwhEwjP3guMxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y7Mlm90O9RAIhBshRzJi8VbFFsHYxFt206XYwQLpAlM=;
+ b=L5ZwOGlDEsZDzoUYBdN9ZNrKJmqU8h+lYapdLiuZCMgm580pi5y3ftK0f+rUwj1jGZdbalMK2DsDCVpBXeY+VMrjAwHCe6m3+74Z9uqZt9VCcuwlzI8XAuQNpxUJCdGXroBJK4AOjzd18faL8XV8LcRMzz9d3/2NvK8N0OebC96DG9fqDiAQQWqXjUEYlDdiaP4P0ncqRBc6PnFNmamJjZmF/7R1M453T+2dGJ9TnHHW7FkLtP6gHbsQ0qLdooSyFG7M1bVW7ljphQOCUjYhXqLpYgDf/KOg3f+d5YCcjYiECPuYl3/eBYp8cjicf2lZ0L6gebK1En9jolEiU24jXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y7Mlm90O9RAIhBshRzJi8VbFFsHYxFt206XYwQLpAlM=;
+ b=ZbTdhF3PO/GE2Txow6KaS2a2E0w/0jew0mzwEiGdqapEJJWd/4ml0ee4jDInWAp63uYvVh3iqmq4aqNdbR6wRD2Jp5/Oc2WVhwLC0/b5W1qOh5jEqHmm7PlFW3OUcY6A3o033zaHmeAx2Vex7RRWia+KROtCyMKmEKDeweztAtg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) by
+ HE1PR0802MB2540.eurprd08.prod.outlook.com (10.175.29.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2814.13; Tue, 17 Mar 2020 11:35:18 +0000
+Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com
+ ([fe80::4d32:e4e1:5b9f:240f]) by HE1PR0802MB2507.eurprd08.prod.outlook.com
+ ([fe80::4d32:e4e1:5b9f:240f%12]) with mapi id 15.20.2814.021; Tue, 17 Mar
+ 2020 11:35:18 +0000
+Subject: Re: [PATCH v9 02/10] scripts: Coccinelle script to use
+ ERRP_AUTO_PROPAGATE()
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200312085936.9552-1-vsementsov@virtuozzo.com>
+ <20200312085936.9552-3-vsementsov@virtuozzo.com>
+ <874kuto7hq.fsf@dusky.pond.sub.org>
+ <4a70c6ee-10a2-fdc3-f8df-88c05340398b@virtuozzo.com>
+ <875zf8gt2m.fsf@dusky.pond.sub.org>
+ <7c6f9a91-76cf-242d-8166-0693ec14b24d@virtuozzo.com>
+ <87blozex9v.fsf@dusky.pond.sub.org>
+ <f9c8de73-38d8-a14c-632a-8e57d18e00c8@virtuozzo.com>
+ <87o8swk8wc.fsf@dusky.pond.sub.org>
+ <db2fa8a3-48cc-51aa-a3d5-eba88fb29f66@virtuozzo.com>
+ <87wo7jqn8m.fsf@dusky.pond.sub.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200317143514980
+Message-ID: <c944511d-0a10-0840-258f-8e0bac19eb47@virtuozzo.com>
+Date: Tue, 17 Mar 2020 14:35:15 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <87wo7jqn8m.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR02CA0108.eurprd02.prod.outlook.com
+ (2603:10a6:208:154::49) To HE1PR0802MB2507.eurprd08.prod.outlook.com
+ (2603:10a6:3:e1::8)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: david@gibson.dropbear.id.au
-Date: Tue, 17 Mar 2020 04:24:47 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.248) by
+ AM0PR02CA0108.eurprd02.prod.outlook.com (2603:10a6:208:154::49) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.19 via Frontend
+ Transport; Tue, 17 Mar 2020 11:35:16 +0000
+X-Tagtoolbar-Keys: D20200317143514980
+X-Originating-IP: [185.215.60.248]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 11b8b2e8-5f0b-4aab-cd33-08d7ca674494
+X-MS-TrafficTypeDiagnostic: HE1PR0802MB2540:
+X-Microsoft-Antispam-PRVS: <HE1PR0802MB254091323ADACCF0B24DD417C1F60@HE1PR0802MB2540.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0345CFD558
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(4636009)(376002)(396003)(136003)(39850400004)(366004)(346002)(199004)(54906003)(8676002)(16576012)(81166006)(81156014)(316002)(53546011)(52116002)(478600001)(2616005)(6486002)(956004)(186003)(8936002)(16526019)(26005)(31696002)(86362001)(66556008)(66476007)(66946007)(36756003)(31686004)(7416002)(5660300002)(2906002)(6916009)(4326008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2540;
+ H:HE1PR0802MB2507.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /0DWNH5s4niM8Z2a9cWAuWwjQ7brxnf060EO4+4QD8e/gyE0TLkcwcrYPy7c5+YDIakYjuN1GlGuBYfA9ijBB4LJhhZaUwPt2WbNQZlIU1VrPbf6M4imCHSy79+3bTDnaY9MEyDe7ZROJfAK2p3pMOQM4WJohRr2Cu+Yp/aiKSquxznNX2Mpw84V3vycNiNFIB8vkZua92zxo5NIU2HF1nWTXB+xJg7A2Nehv4+WGtPX1Q8e7m4OiuhXEJJ5KScK9kkhTKTnJCeKzVniUckE6XEb1N9ECXausVTS1aSC0+1n2nAUXhSV7PKNNcTVbc4ujozug+lZ5eT0WWOXF6rfFuNnkQ0/TMvQcffLYVaogqEieJB7JqQEJoyVODVzjjZQ29uPYp2bwpCAsoCtrOp9DBshGXjIi3FPQt1QgSEa2sJWLrak6LwAYN9I3hJJlng0
+X-MS-Exchange-AntiSpam-MessageData: PiyR2O1+KvrW0D3zqPzLqpeP+wZcpOeQvA8I6EI8FVrB+1sZp0Q9YdXfGtUfqYb7ivPModAqKJXd/85p+LoReQpTRNvRXHs1k8AulWEEE0nYL7c2uFkIUQZd48OL/jksCjvYhHRGvfuoAyWLXMqU/A==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11b8b2e8-5f0b-4aab-cd33-08d7ca674494
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 11:35:18.2556 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bvgUI3aBPhPzmu7qVawFf/mhV9Tr9zF3gFsM7/keK0wveo/OdInIh7zWyBc4LT8/21j6UDOTFebpkIZkXjtvIU+Bkhktnh3gUEvfp1Kq00U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2540
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.4.118
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,245 +135,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
- aik@ozlabs.ru, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
- clg@kaod.org, david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
+ Laszlo Ersek <lersek@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxNzEwMDQyMy42MjI2
-NDMtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQVUxMIDAwLzQ1XSBwcGMtZm9yLTUuMCBx
-dWV1ZSAyMDIwMDMxNwpNZXNzYWdlLWlkOiAyMDIwMDMxNzEwMDQyMy42MjI2NDMtMS1kYXZpZEBn
-aWJzb24uZHJvcGJlYXIuaWQuYXUKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxNjg5ZWRhIHBz
-ZXJpZXM6IFVwZGF0ZSBTTE9GIGZpcm13YXJlIGltYWdlCjcyNzM1YTkgcHBjL3NwYXByOiBJZ25v
-cmUgY29tbW9uICJpYm0sbm1pLWludGVybG9jayIgTGludXggYnVnCjQ3ZGY2ZjEgcHBjL3NwYXBy
-OiBJbXBsZW1lbnQgRldOTUkgU3lzdGVtIFJlc2V0IGRlbGl2ZXJ5CmYxZmVmMWYgdGFyZ2V0L3Bw
-YzogYWxsb3cgcHBjX2NwdV9kb19zeXN0ZW1fcmVzZXQgdG8gdGFrZSBhbiBhbHRlcm5hdGUgdmVj
-dG9yCjNiZDIxNTkgcHBjL3NwYXByOiBBbGxvdyBGV05NSSBvbiBUQ0cKOTFkZWJhZSBwcGMvc3Bh
-cHI6IEZpeCBGV05NSSBtYWNoaW5lIGNoZWNrIGludGVycnVwdCBkZWxpdmVyeQpjOWRmNzUyIHBw
-Yy9zcGFwcjogQWRkIEZXTk1JIFN5c3RlbSBSZXNldCBzdGF0ZQpiZWQxMzFmIHBwYy9zcGFwcjog
-Q2hhbmdlIEZXTk1JIG5hbWVzCmI0YTM3ZGQgcHBjL3NwYXByOiBGaXggRldOTUkgbWFjaGluZSBj
-aGVjayBmYWlsdXJlIGhhbmRsaW5nCjZhMzJiMTkgc3BhcHI6IFJlbmFtZSBEVCBmdW5jdGlvbnMg
-dG8gbmV3ZXIgbmFtaW5nIGNvbnZlbnRpb24KNGU3OTQwNiBzcGFwcjogTW92ZSBjcmVhdGlvbiBv
-ZiBpYm0sYXJjaGl0ZWN0dXJlLXZlYy01IHByb3BlcnR5CjIxYTNhZTIgc3BhcHI6IE1vdmUgY3Jl
-YXRpb24gb2YgaWJtLCBkeW5hbWljLXJlY29uZmlndXJhdGlvbi1tZW1vcnkgZHQgbm9kZQpiZjUy
-NjVlIHNwYXByL3J0YXM6IFJlc2VydmUgc3BhY2UgZm9yIFJUQVMgYmxvYiBhbmQgbG9nCjQ0NmRh
-Y2UgcHNlcmllczogVXBkYXRlIFNMT0YgZmlybXdhcmUgaW1hZ2UKZjViYjQ0NSBwcGMvc3BhcHI6
-IE1vdmUgR1BScyBzZXR1cCB0byBvbmUgcGxhY2UKYjgyNDgyOCB0YXJnZXQvcHBjOiBGaXggcmx3
-aW5tIG9uIHBwYzY0CjBlNzU0Nzkgc3BhcHIveGl2ZTogdXNlIFNQQVBSX0lSUV9JUEkgdG8gZGVm
-aW5lIElQSSByYW5nZXMgZXhwb3NlZCB0byB0aGUgZ3Vlc3QKMzk3ZWMxNyBody9zY3NpL3NwYXBy
-X3ZzY3NpOiBDb252ZXJ0IGRlYnVnIGZwcmludGYoKSB0byB0cmFjZSBldmVudAplOGZmMzMyIGh3
-L3Njc2kvc3BhcHJfdnNjc2k6IFByZXZlbnQgYnVmZmVyIG92ZXJmbG93CjdiZGU2MDggaHcvc2Nz
-aS9zcGFwcl92c2NzaTogRG8gbm90IG1peCBTUlAgSVUgc2l6ZSB3aXRoIERNQSBidWZmZXIgc2l6
-ZQoxMGVmMjM4IGh3L3Njc2kvc3BhcHJfdnNjc2k6IEludHJvZHVjZSByZXFfaXUoKSBoZWxwZXIK
-MDZkMWQ5YSBody9zY3NpL3NwYXByX3ZzY3NpOiBTaW1wbGlmeSBhIGJpdAo4OTUxNGI0IGh3L3Nj
-c2kvc3BhcHJfdnNjc2k6IFVzZSBTUlBfTUFYX0lVX0xFTiBpbnN0ZWFkIG9mIHNpemVvZiBmbGV4
-aWJsZSBhcnJheQo4Y2FkOTk3IGh3L3Njc2kvdmlvc3JwOiBBZGQgbWlzc2luZyAnaHcvc2NzaS9z
-cnAuaCcgaW5jbHVkZQo2ODRlNzJmIHNwYXByOiBDbGVhbiB1cCBSTUEgc2l6ZSBjYWxjdWxhdGlv
-bgo0MDE1MTk0IHNwYXByOiBEb24ndCBjbGFtcCBSTUEgdG8gMTZHaUIgb24gbmV3IG1hY2hpbmUg
-dHlwZXMKNmJhMDU1ZCBzcGFwcjogRG9uJ3QgYXR0ZW1wdCB0byBjbGFtcCBSTUEgdG8gVlJNQSBj
-b25zdHJhaW50CjM3MTIwZDYgc3BhcHIscHBjOiBTaW1wbGlmeSBzaWduYXR1cmUgb2Yga3ZtcHBj
-X3JtYV9zaXplKCkKYWM3MjJmOCBzcGFwcjogRG9uJ3QgdXNlIHdlaXJkIHVuaXRzIGZvciBNSU5f
-Uk1BX1NMT0YKMmM4NjQ3MyB0YXJnZXQvcHBjOiBEb24ndCBzdG9yZSBWUk1BIFNMQkUgcGVyc2lz
-dGVudGx5CjJhNDU2NWYgdGFyZ2V0L3BwYzogT25seSBjYWxjdWxhdGUgUk1MUyBkZXJpdmVkIFJN
-QSBsaW1pdCBvbiBkZW1hbmQKZTY5NDRjYiB0YXJnZXQvcHBjOiBDb3JyZWN0IFJNTFMgdGFibGUK
-MjdiZDFmNSB0YXJnZXQvcHBjOiBTdHJlYW1saW5lIGNhbGN1bGF0aW9uIG9mIFJNQSBsaW1pdCBm
-cm9tIExQQ1JbUk1MU10KMWQ1YjY4NiB0YXJnZXQvcHBjOiBVc2UgY2xhc3MgZmllbGRzIHRvIHNp
-bXBsaWZ5IExQQ1IgbWFza2luZwo0MWYwYWVmIHRhcmdldC9wcGM6IFJlbW92ZSBSTU9SIHJlZ2lz
-dGVyIGZyb20gUE9XRVI5ICYgUE9XRVIxMApmMGJiNTZkIHNwYXByLCBwcGM6IFJlbW92ZSBWUE0w
-L1JNTFMgaGFja3MgZm9yIFBPV0VSOQo0OWQwOWZjIHRhcmdldC9wcGM6IEludHJvZHVjZSBwcGNf
-aGFzaDY0X3VzZV92cm1hKCkgaGVscGVyCmE2MDQxMDUgdGFyZ2V0L3BwYzogQ29ycmVjdCBoYW5k
-bGluZyBvZiByZWFsIG1vZGUgYWNjZXNzZXMgd2l0aCB2aHlwIG9uIGhhc2ggTU1VCjZmYmRmOGYg
-cHBjOiBSZW1vdmUgc3R1YiBvZiBQUEM5NzAgSElENCBpbXBsZW1lbnRhdGlvbgo2ODlkMjhmIHBw
-YzogUmVtb3ZlIHN0dWIgc3VwcG9ydCBmb3IgMzItYml0IGh5cGVydmlzb3IgbW9kZQo0MDVjMDI0
-IGh3L3BwYy9wbnY6IEZpeCB0eXBvIGluIGNvbW1lbnQKNzUzMmZiZiBzcGFwcjogRml4IENvdmVy
-aXR5IHdhcm5pbmcgd2hpbGUgdmFsaWRhdGluZyBudmRpbW0gb3B0aW9ucwo2NDU0NjNhIHBwYzog
-T2ZmaWNpYWxseSBkZXByZWNhdGUgdGhlIENQVSAiY29tcGF0IiBwcm9wZXJ0eQo2M2M0MGYxIHNw
-YXByOiBIYW5kbGUgcGVuZGluZyBob3QgcGx1Zy91bnBsdWcgcmVxdWVzdHMgYXQgQ0FTCjdkNzRl
-NGYgcHNlcmllczogVXBkYXRlIFNMT0YgZmlybXdhcmUgaW1hZ2UKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CjEvNDUgQ2hlY2tpbmcgY29tbWl0IDdkNzRlNGZlNmQ3NCAocHNlcmllczogVXBkYXRlIFNM
-T0YgZmlybXdhcmUgaW1hZ2UpCjIvNDUgQ2hlY2tpbmcgY29tbWl0IDYzYzQwZjFlNTNjMCAoc3Bh
-cHI6IEhhbmRsZSBwZW5kaW5nIGhvdCBwbHVnL3VucGx1ZyByZXF1ZXN0cyBhdCBDQVMpCjMvNDUg
-Q2hlY2tpbmcgY29tbWl0IDY0NTQ2M2FiOWE5OCAocHBjOiBPZmZpY2lhbGx5IGRlcHJlY2F0ZSB0
-aGUgQ1BVICJjb21wYXQiIHByb3BlcnR5KQo0LzQ1IENoZWNraW5nIGNvbW1pdCA3NTMyZmJmOTAx
-OGUgKHNwYXByOiBGaXggQ292ZXJpdHkgd2FybmluZyB3aGlsZSB2YWxpZGF0aW5nIG52ZGltbSBv
-cHRpb25zKQo1LzQ1IENoZWNraW5nIGNvbW1pdCA0MDVjMDI0ZjQwN2EgKGh3L3BwYy9wbnY6IEZp
-eCB0eXBvIGluIGNvbW1lbnQpCjYvNDUgQ2hlY2tpbmcgY29tbWl0IDY4OWQyOGY5NzVjZiAocHBj
-OiBSZW1vdmUgc3R1YiBzdXBwb3J0IGZvciAzMi1iaXQgaHlwZXJ2aXNvciBtb2RlKQo3LzQ1IENo
-ZWNraW5nIGNvbW1pdCA2ZmJkZjhmNDliMTcgKHBwYzogUmVtb3ZlIHN0dWIgb2YgUFBDOTcwIEhJ
-RDQgaW1wbGVtZW50YXRpb24pCjgvNDUgQ2hlY2tpbmcgY29tbWl0IGE2MDQxMDU0MDRiZSAodGFy
-Z2V0L3BwYzogQ29ycmVjdCBoYW5kbGluZyBvZiByZWFsIG1vZGUgYWNjZXNzZXMgd2l0aCB2aHlw
-IG9uIGhhc2ggTU1VKQo5LzQ1IENoZWNraW5nIGNvbW1pdCA0OWQwOWZjNzk1YTUgKHRhcmdldC9w
-cGM6IEludHJvZHVjZSBwcGNfaGFzaDY0X3VzZV92cm1hKCkgaGVscGVyKQoxMC80NSBDaGVja2lu
-ZyBjb21taXQgZjBiYjU2ZDMwMDIyIChzcGFwciwgcHBjOiBSZW1vdmUgVlBNMC9STUxTIGhhY2tz
-IGZvciBQT1dFUjkpCjExLzQ1IENoZWNraW5nIGNvbW1pdCA0MWYwYWVmYmY3NWUgKHRhcmdldC9w
-cGM6IFJlbW92ZSBSTU9SIHJlZ2lzdGVyIGZyb20gUE9XRVI5ICYgUE9XRVIxMCkKMTIvNDUgQ2hl
-Y2tpbmcgY29tbWl0IDFkNWI2ODYwOTU5ZCAodGFyZ2V0L3BwYzogVXNlIGNsYXNzIGZpZWxkcyB0
-byBzaW1wbGlmeSBMUENSIG1hc2tpbmcpCjEzLzQ1IENoZWNraW5nIGNvbW1pdCAyN2JkMWY1NzQx
-YTUgKHRhcmdldC9wcGM6IFN0cmVhbWxpbmUgY2FsY3VsYXRpb24gb2YgUk1BIGxpbWl0IGZyb20g
-TFBDUltSTUxTXSkKMTQvNDUgQ2hlY2tpbmcgY29tbWl0IGU2OTQ0Y2JmM2VkOSAodGFyZ2V0L3Bw
-YzogQ29ycmVjdCBSTUxTIHRhYmxlKQoxNS80NSBDaGVja2luZyBjb21taXQgMmE0NTY1ZmQxODUy
-ICh0YXJnZXQvcHBjOiBPbmx5IGNhbGN1bGF0ZSBSTUxTIGRlcml2ZWQgUk1BIGxpbWl0IG9uIGRl
-bWFuZCkKMTYvNDUgQ2hlY2tpbmcgY29tbWl0IDJjODY0NzM5YjUwNyAodGFyZ2V0L3BwYzogRG9u
-J3Qgc3RvcmUgVlJNQSBTTEJFIHBlcnNpc3RlbnRseSkKMTcvNDUgQ2hlY2tpbmcgY29tbWl0IGFj
-NzIyZjgzMmRhZCAoc3BhcHI6IERvbid0IHVzZSB3ZWlyZCB1bml0cyBmb3IgTUlOX1JNQV9TTE9G
-KQoxOC80NSBDaGVja2luZyBjb21taXQgMzcxMjBkNjkxZTMxIChzcGFwcixwcGM6IFNpbXBsaWZ5
-IHNpZ25hdHVyZSBvZiBrdm1wcGNfcm1hX3NpemUoKSkKMTkvNDUgQ2hlY2tpbmcgY29tbWl0IDZi
-YTA1NWRlYTYyYyAoc3BhcHI6IERvbid0IGF0dGVtcHQgdG8gY2xhbXAgUk1BIHRvIFZSTUEgY29u
-c3RyYWludCkKMjAvNDUgQ2hlY2tpbmcgY29tbWl0IDQwMTUxOTQ1NjMzZSAoc3BhcHI6IERvbid0
-IGNsYW1wIFJNQSB0byAxNkdpQiBvbiBuZXcgbWFjaGluZSB0eXBlcykKMjEvNDUgQ2hlY2tpbmcg
-Y29tbWl0IDY4NGU3MmYyNzdmNyAoc3BhcHI6IENsZWFuIHVwIFJNQSBzaXplIGNhbGN1bGF0aW9u
-KQoyMi80NSBDaGVja2luZyBjb21taXQgOGNhZDk5N2RkNGRkIChody9zY3NpL3Zpb3NycDogQWRk
-IG1pc3NpbmcgJ2h3L3Njc2kvc3JwLmgnIGluY2x1ZGUpCjIzLzQ1IENoZWNraW5nIGNvbW1pdCA4
-OTUxNGI0MGMxMWYgKGh3L3Njc2kvc3BhcHJfdnNjc2k6IFVzZSBTUlBfTUFYX0lVX0xFTiBpbnN0
-ZWFkIG9mIHNpemVvZiBmbGV4aWJsZSBhcnJheSkKMjQvNDUgQ2hlY2tpbmcgY29tbWl0IDA2ZDFk
-OWEzYzEyZiAoaHcvc2NzaS9zcGFwcl92c2NzaTogU2ltcGxpZnkgYSBiaXQpCjI1LzQ1IENoZWNr
-aW5nIGNvbW1pdCAxMGVmMjM4NWZlMzMgKGh3L3Njc2kvc3BhcHJfdnNjc2k6IEludHJvZHVjZSBy
-ZXFfaXUoKSBoZWxwZXIpCjI2LzQ1IENoZWNraW5nIGNvbW1pdCA3YmRlNjA4MDkzMmEgKGh3L3Nj
-c2kvc3BhcHJfdnNjc2k6IERvIG5vdCBtaXggU1JQIElVIHNpemUgd2l0aCBETUEgYnVmZmVyIHNp
-emUpCjI3LzQ1IENoZWNraW5nIGNvbW1pdCBlOGZmMzMyZDE0YWQgKGh3L3Njc2kvc3BhcHJfdnNj
-c2k6IFByZXZlbnQgYnVmZmVyIG92ZXJmbG93KQoyOC80NSBDaGVja2luZyBjb21taXQgMzk3ZWMx
-N2I2YWQ1IChody9zY3NpL3NwYXByX3ZzY3NpOiBDb252ZXJ0IGRlYnVnIGZwcmludGYoKSB0byB0
-cmFjZSBldmVudCkKMjkvNDUgQ2hlY2tpbmcgY29tbWl0IDBlNzU0NzkyMDFjZCAoc3BhcHIveGl2
-ZTogdXNlIFNQQVBSX0lSUV9JUEkgdG8gZGVmaW5lIElQSSByYW5nZXMgZXhwb3NlZCB0byB0aGUg
-Z3Vlc3QpCjMwLzQ1IENoZWNraW5nIGNvbW1pdCBiODI0ODI4YTBmOTEgKHRhcmdldC9wcGM6IEZp
-eCBybHdpbm0gb24gcHBjNjQpCjMxLzQ1IENoZWNraW5nIGNvbW1pdCBmNWJiNDQ1MDc4ODAgKHBw
-Yy9zcGFwcjogTW92ZSBHUFJzIHNldHVwIHRvIG9uZSBwbGFjZSkKMzIvNDUgQ2hlY2tpbmcgY29t
-bWl0IDQ0NmRhY2ViMzI1MCAocHNlcmllczogVXBkYXRlIFNMT0YgZmlybXdhcmUgaW1hZ2UpCjMz
-LzQ1IENoZWNraW5nIGNvbW1pdCBiZjUyNjVlYWZkYmUgKHNwYXByL3J0YXM6IFJlc2VydmUgc3Bh
-Y2UgZm9yIFJUQVMgYmxvYiBhbmQgbG9nKQozNC80NSBDaGVja2luZyBjb21taXQgMjFhM2FlMjc4
-ODkxIChzcGFwcjogTW92ZSBjcmVhdGlvbiBvZiBpYm0sIGR5bmFtaWMtcmVjb25maWd1cmF0aW9u
-LW1lbW9yeSBkdCBub2RlKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8q
-IG9uIGEgc2VwYXJhdGUgbGluZQojMzEwOiBGSUxFOiBody9wcGMvc3BhcHIuYzo2NTA6CisgICAg
-ICAgICAgICAvKiBzcGFwcl9tYWNoaW5lX2luaXQoKSBjaGVja3MgZm9yIHJtYV9zaXplIDw9IG5v
-ZGUwX3NpemUKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEg
-c2VwYXJhdGUgbGluZQojMzExOiBGSUxFOiBody9wcGMvc3BhcHIuYzo2NTE6CisgICAgICAgICAg
-ICAgKiBhbHJlYWR5ICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDAzOiBG
-SUxFOiBody9wcGMvc3BhcHIuYzo3NDI6CisgICAgX0ZEVCgoZmR0X3NldHByb3BfY2VsbChmZHQs
-IG9mZnNldCwgInNsYi1zaXplIiwgY3B1LT5oYXNoNjRfb3B0cy0+c2xiX3NpemUpKSk7CgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDA0OiBGSUxFOiBody9wcGMvc3BhcHIuYzo3
-NDM6CisgICAgX0ZEVCgoZmR0X3NldHByb3BfY2VsbChmZHQsIG9mZnNldCwgImlibSxzbGItc2l6
-ZSIsIGNwdS0+aGFzaDY0X29wdHMtPnNsYl9zaXplKSkpOwoKV0FSTklORzogQmxvY2sgY29tbWVu
-dHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzQyMDogRklMRTogaHcvcHBj
-L3NwYXByLmM6NzU5OgorICAgIC8qIEFkdmVydGlzZSBWU1ggKHZlY3RvciBleHRlbnNpb25zKSBp
-ZiBhdmFpbGFibGUKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9u
-IGEgc2VwYXJhdGUgbGluZQojNDI1OiBGSUxFOiBody9wcGMvc3BhcHIuYzo3NjQ6CisgICAgICog
-YXJlIHBvc3NpYmxlLCBhbmQgYWxsIG9mIHRob3NlIGhhdmUgVk1YICovCgpXQVJOSU5HOiBCbG9j
-ayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNDMyOiBGSUxF
-OiBody9wcGMvc3BhcHIuYzo3NzE6CisgICAgLyogQWR2ZXJ0aXNlIERGUCAoRGVjaW1hbCBGbG9h
-dGluZyBQb2ludCkgaWYgYXZhaWxhYmxlCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0
-cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzQzNDogRklMRTogaHcvcHBjL3NwYXByLmM6
-NzczOgorICAgICAqICAgMSAgICAgICAgICAgICAgID09IERGUCBhdmFpbGFibGUgKi8KCnRvdGFs
-OiAwIGVycm9ycywgOCB3YXJuaW5ncywgNTM0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDM0LzQ1IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjM1LzQ1IENoZWNraW5nIGNvbW1pdCA0ZTc5NDA2MGZh
-ZTEgKHNwYXByOiBNb3ZlIGNyZWF0aW9uIG9mIGlibSxhcmNoaXRlY3R1cmUtdmVjLTUgcHJvcGVy
-dHkpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMjM6IEZJTEU6IGh3L3BwYy9z
-cGFwci5jOjEwNjk6CisgICAgICAgIF9GRFQoZmR0X3NldHByb3BfY2VsbChmZHQsIGNob3Nlbiwg
-InFlbXUsZ3JhcGhpYy13aWR0aCIsIGdyYXBoaWNfd2lkdGgpKTsKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMxMjQ6IEZJTEU6IGh3L3BwYy9zcGFwci5jOjEwNzA6CisgICAgICAg
-IF9GRFQoZmR0X3NldHByb3BfY2VsbChmZHQsIGNob3NlbiwgInFlbXUsZ3JhcGhpYy1oZWlnaHQi
-LCBncmFwaGljX2hlaWdodCkpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEy
-NTogRklMRTogaHcvcHBjL3NwYXByLmM6MTA3MToKKyAgICAgICAgX0ZEVChmZHRfc2V0cHJvcF9j
-ZWxsKGZkdCwgY2hvc2VuLCAicWVtdSxncmFwaGljLWRlcHRoIiwgZ3JhcGhpY19kZXB0aCkpOwoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0MjogRklMRTogaHcvcHBjL3NwYXBy
-LmM6MTA4NToKKyAgICAgICAgICAgIF9GRFQoZmR0X3NldHByb3Bfc3RyaW5nKGZkdCwgY2hvc2Vu
-LCAicWVtdSxib290LWRldmljZSIsIGJvb3RfZGV2aWNlKSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMTUzOiBGSUxFOiBody9wcGMvc3BhcHIuYzoxMDk2OgorICAgICAgICAg
-ICAgX0ZEVChmZHRfc2V0cHJvcF9zdHJpbmcoZmR0LCBjaG9zZW4sICJsaW51eCxzdGRvdXQtcGF0
-aCIsIHN0ZG91dF9wYXRoKSk7Cgp0b3RhbDogMCBlcnJvcnMsIDUgd2FybmluZ3MsIDE5MyBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAzNS80NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozNi80NSBD
-aGVja2luZyBjb21taXQgNmEzMmIxOTUyMDljIChzcGFwcjogUmVuYW1lIERUIGZ1bmN0aW9ucyB0
-byBuZXdlciBuYW1pbmcgY29udmVudGlvbikKMzcvNDUgQ2hlY2tpbmcgY29tbWl0IGI0YTM3ZGRl
-ZWRiNyAocHBjL3NwYXByOiBGaXggRldOTUkgbWFjaGluZSBjaGVjayBmYWlsdXJlIGhhbmRsaW5n
-KQozOC80NSBDaGVja2luZyBjb21taXQgYmVkMTMxZmMyMDRjIChwcGMvc3BhcHI6IENoYW5nZSBG
-V05NSSBuYW1lcykKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
-IHNlcGFyYXRlIGxpbmUKIzMwNTogRklMRTogaW5jbHVkZS9ody9wcGMvc3BhcHIuaDoxOTc6Cisg
-ICAgLyogTWFjaGluZSBDaGVjayBOb3RpZmljYXRpb24gUm91dGluZSBhZGRyZXNzCgpXQVJOSU5H
-OiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzEy
-OiBGSUxFOiBpbmNsdWRlL2h3L3BwYy9zcGFwci5oOjIwMjoKKyAgICAvKiBNYWNoaW5lIENoZWNr
-IEZXTk1JIHN5bmNocm9uaXphdGlvbiwgZndubWlfbWFjaGluZV9jaGVja19pbnRlcmxvY2sgaXMK
-CnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMjcwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDM4
-LzQ1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjM5LzQ1IENoZWNraW5nIGNvbW1pdCBjOWRm
-NzUyYTE5ZDggKHBwYy9zcGFwcjogQWRkIEZXTk1JIFN5c3RlbSBSZXNldCBzdGF0ZSkKV0FSTklO
-RzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzgx
-OiBGSUxFOiBpbmNsdWRlL2h3L3BwYy9zcGFwci5oOjE5NzoKKyAgICAvKiBTeXN0ZW0gUmVzZXQg
-YW5kIE1hY2hpbmUgQ2hlY2sgTm90aWZpY2F0aW9uIFJvdXRpbmUgYWRkcmVzc2VzCgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDUxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDM5LzQ1IGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjQwLzQ1IENoZWNraW5nIGNvbW1pdCA5MWRlYmFlMzM3ZjYg
-KHBwYy9zcGFwcjogRml4IEZXTk1JIG1hY2hpbmUgY2hlY2sgaW50ZXJydXB0IGRlbGl2ZXJ5KQo0
-MS80NSBDaGVja2luZyBjb21taXQgM2JkMjE1OWE1MDkzIChwcGMvc3BhcHI6IEFsbG93IEZXTk1J
-IG9uIFRDRykKNDIvNDUgQ2hlY2tpbmcgY29tbWl0IGYxZmVmMWZhNzFkYSAodGFyZ2V0L3BwYzog
-YWxsb3cgcHBjX2NwdV9kb19zeXN0ZW1fcmVzZXQgdG8gdGFrZSBhbiBhbHRlcm5hdGUgdmVjdG9y
-KQo0My80NSBDaGVja2luZyBjb21taXQgNDdkZjZmMTc4NmY3IChwcGMvc3BhcHI6IEltcGxlbWVu
-dCBGV05NSSBTeXN0ZW0gUmVzZXQgZGVsaXZlcnkpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiM1MDogRklMRTogaHcvcHBjL3NwYXByLmM6OTc2OgorICAgICAgICAgICAgICAgICAg
-ICAgICAgIG1zLT5zbXAubWF4X2NwdXMgKiBzaXplb2YodWludDY0X3QpKjIgKyBzaXplb2YodWlu
-dDY0X3QpKSk7CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1MDog
-RklMRTogaHcvcHBjL3NwYXByLmM6OTc2OgorXkleSV5JICBtcy0+c21wLm1heF9jcHVzICogc2l6
-ZW9mKHVpbnQ2NF90KSoyICsgc2l6ZW9mKHVpbnQ2NF90KSkpOyQKCkVSUk9SOiBzcGFjZXMgcmVx
-dWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNTA6IEZJTEU6IGh3L3BwYy9zcGFwci5j
-Ojk3NjoKKyAgICAgICAgICAgICAgICAgICAgICAgICBtcy0+c21wLm1heF9jcHVzICogc2l6ZW9m
-KHVpbnQ2NF90KSoyICsgc2l6ZW9mKHVpbnQ2NF90KSkpOwogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzc1OiBGSUxFOiBody9wcGMvc3BhcHIuYzozNDI1OgorICAgICAg
-ICBhZGRyID0gcnRhc19hZGRyICsgUlRBU19FUlJPUl9MT0dfTUFYICsgY3MtPmNwdV9pbmRleCAq
-IHNpemVvZih1aW50NjRfdCkqMjsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQg
-JyonIChjdHg6VnhWKQojNzU6IEZJTEU6IGh3L3BwYy9zcGFwci5jOjM0MjU6CisgICAgICAgIGFk
-ZHIgPSBydGFzX2FkZHIgKyBSVEFTX0VSUk9SX0xPR19NQVggKyBjcy0+Y3B1X2luZGV4ICogc2l6
-ZW9mKHVpbnQ2NF90KSoyOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMyBlcnJv
-cnMsIDIgd2FybmluZ3MsIDU5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQzLzQ1IGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgo0NC80NSBDaGVja2luZyBjb21taXQgNzI3MzVhOTM5M2RhIChwcGMv
-c3BhcHI6IElnbm9yZSBjb21tb24gImlibSxubWktaW50ZXJsb2NrIiBMaW51eCBidWcpCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI4OiBGSUxFOiBody9wcGMvc3Bh
-cHJfcnRhcy5jOjQ2NToKK15JICogVGhlIHZDUFUgdGhhdCBoaXQgdGhlIE5NSSBzaG91bGQgaW52
-b2tlICJpYm0sbm1pLWludGVybG9jayIkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiMzMDogRklMRTogaHcvcHBjL3NwYXByX3J0YXMuYzo0Njc6CiteSSAqIGZvciBz
-eXN0ZW0gcmVzZXQgaW50ZXJydXB0cywgZGVzcGl0ZSB0aGVtIG5vdCBiZWluZyBpbnRlcmxvY2tl
-ZC4kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMTogRklMRTog
-aHcvcHBjL3NwYXByX3J0YXMuYzo0Njg6CiteSSAqIFBvd2VyVk0gc2lsZW50bHkgaWdub3JlcyB0
-aGlzIGFuZCByZXR1cm5zIHN1Y2Nlc3MgaGVyZS4gUmV0dXJuaW5nJAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzI6IEZJTEU6IGh3L3BwYy9zcGFwcl9ydGFzLmM6
-NDY5OgorXkkgKiBmYWlsdXJlIGNhdXNlcyBMaW51eCB0byBwcmludCB0aGUgZXJyb3IgIkZXTk1J
-OiBubWktaW50ZXJsb2NrJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojMzM6IEZJTEU6IGh3L3BwYy9zcGFwcl9ydGFzLmM6NDcwOgorXkkgKiBmYWlsZWQ6IC0zIiwg
-YWx0aG91Z2ggbm8gb3RoZXIgYXBwYXJlbnQgaWxsIGVmZmVjdHMsIHRoaXMgaXMgYSQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM0OiBGSUxFOiBody9wcGMvc3Bh
-cHJfcnRhcy5jOjQ3MToKK15JICogcmVncmVzc2lvbiBmb3IgdGhlIHVzZXIgd2hlbiBlbmFibGlu
-ZyBGV05NSS4gU28gZm9yIG5vdywgbWF0Y2gkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
-dmVyIHVzZSB0YWJzCiMzNTogRklMRTogaHcvcHBjL3NwYXByX3J0YXMuYzo0NzI6CiteSSAqIFBv
-d2VyVk0uIFdoZW4gbW9zdCBMaW51eCBjbGllbnRzIGFyZSBmaXhlZCwgdGhpcyBjb3VsZCBiZSQK
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM2OiBGSUxFOiBody9w
-cGMvc3BhcHJfcnRhcy5jOjQ3MzoKK15JICogY2hhbmdlZC4kCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzNzogRklMRTogaHcvcHBjL3NwYXByX3J0YXMuYzo0NzQ6
-CiteSSAqLyQKCnRvdGFsOiA5IGVycm9ycywgMCB3YXJuaW5ncywgMjAgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggNDQvNDUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQ1LzQ1IENoZWNraW5nIGNv
-bW1pdCAxNjg5ZWRhMjdiY2EgKHBzZXJpZXM6IFVwZGF0ZSBTTE9GIGZpcm13YXJlIGltYWdlKQo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMx
-NzEwMDQyMy42MjI2NDMtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUvdGVzdGluZy5jaGVj
-a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+17.03.2020 13:39, Markus Armbruster wrote:
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+> 
+>> 16.03.2020 11:21, Markus Armbruster wrote:
+>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>
+>>>> On 14.03.2020 00:54, Markus Armbruster wrote:
+>>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>>
+>>>>>> 13.03.2020 18:42, Markus Armbruster wrote:
+>>>>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>>>>
+>>>>>>>> 12.03.2020 19:36, Markus Armbruster wrote:
+>>>>>>>>> I may have a second look tomorrow with fresher eyes, but let's get this
+>>>>>>>>> out now as is.
+>>>>>>>>>
+>>>>>>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+> [...]
+>>>>>>>>>> +@@
+>>>>>>>>>> +
+>>>>>>>>>> + fn(..., Error ** ____, ...)
+>>>>>>>>>> + {
+>>>>>>>>>> +     ...
+>>>>>>>>>> +     Error *local_err = NULL;
+>>>>>>>>>> +     ... when any
+>>>>>>>>>> +     Error *local_err2 = NULL;
+>>>>>>>>>> +     ... when any
+>>>>>>>>>> + }
+>>>>>
+>>>>> This flags functions that have more than one declaration along any
+>>>>> control flow path.  It doesn't flag this one:
+>>>>>
+>>>>>        void gnat(bool b, Error **errp)
+>>>>>        {
+>>>>>            if (b) {
+>>>>>                Error *local_err = NULL;
+>>>>>                foo(arg, &local_err);
+>>>>>                error_propagate(errp, local_err);
+>>>>>            } else {
+>>>>>                Error *local_err = NULL;
+>>>>>                bar(arg, &local_err);
+>>>>>                error_propagate(errp, local_err);
+>>>>>            }
+>>>>>        }
+>>>>>
+>>>>> The Coccinelle script does the right thing for this one regardless.
+>>>>>
+>>>>> I'd prefer to have such functions flagged, too.  But spending time on
+>>>>> convincing Coccinelle to do it for me is not worthwhile; I can simply
+>>>>> search the diff produced by Coccinelle for deletions of declarations
+>>>>> that are not indented exactly four spaces.
+>>>>>
+>>>>> But if we keep this rule, we should adjust its comment
+>>>>>
+>>>>>        // Warn several Error * definitions.
+>>>>>
+>>>>> because it sure suggests it also catches functions like the one I gave
+>>>>> above.
+>>>>
+>>>> Hmm, yes.. We can write "Warn several Error * definitions in _one_
+>>>> control flow (it's not so trivial to match _any_ case with several
+>>>> definitions with coccinelle)" or something like this.
+>>>
+>>> Ha, "trivial" reminds me of a story.  The math professor, after having
+>>> spent a good chunk of his lecture developing a proof on the blackboad
+>>> turns to the audience to explain why this little part doesn't require
+>>> proof with the words familiar to any math student "and this is trivial."
+>>> Pause, puzzled look...  "Is it trivial?"  Pause, storms out of the
+>>> lecture hall.  A minute or three pass.  Professor comes back beaming,
+>>> "it is trivial!", and proceeds with the proof.
+>>>
+>>> My point is: it might be trivial with Coccinelle once you know how to do
+>>> it.  We don't.
+>>>
+>>> Suggest "(can't figure out how to match several definitions regardless
+>>> of control flow)".
+>>
+>> Wrong too, because I can:) for example, chaining two rules, catching the
+>> positions of definition and check that they are different.. Or, some
+>> cheating with python script.. That's why I wrote "not trivial",
+>>
+>> So, most correct would be "(can't figure out how to simply match several definitions regardless
+>>> of control flow)".
+> 
+> Works for me.
+> 
+>> But again, coccinelle is for matching control flows, so its probably impossible to match such thing..
+> [...]
+>>>> OK, I almost OK with it, the only thing I doubt a bit is the following:
+>>>>
+>>>> We want to keep rule1.local_err inheritance to keep connection with
+>>>> local_err definition.
+>>>
+>>> Yes.
+>>>
+>>>> Interesting, when we have both rule1.fn and rule1.local_err inherited,
+>>>> do we inherit them in separate (i.e. all possible combinations of fn
+>>>> and local_err symbols from rule1) or do we inherit a pair, i.e. only
+>>>> fn/local_err pairs, found by rule1? If the latter is correct, that
+>>>> with your script we loss this pair inheritance, and go to all possible
+>>>> combinations of fn and local_err from rule1, possibly adding some wrong
+>>>> conversion (OK, you've checked that no such cases in current code tree).
+>>>
+>>> The chaining "identifier rule1.FOO" is by name.  It's reliable only as
+>>> long as there is exactly one instance of the name.
+>>>
+>>> We already discussed the case of the function name: if there are two
+>>> instances of foo(), and rule1 matches only one of them, then we
+>>> nevertheless apply the rules chained to rule1 to both.  Because that can
+>>> be wrong, you came up with the ___ trick, which chains reliably.
+>>>
+>>> The same issue exists with the variable name: if there are two instances
+>>> of @local_err, and rule1 matches only one of them, then we nevertheless
+>>> apply the rules chained to rule1 to both.  Can also be wrong.
+>>>
+>>> What are the conditions for "wrong"?
+>>>
+>>> Because the ___ chaining is reliable, we know rule1 matched the
+>>> function, i.e. it has a parameter Error **errp, and it has a automatic
+>>> variable Error *local_err = NULL.
+>>>
+>>> We're good as long as *all* identifiers @local_err in this function are
+>>> declared that way.  This seems quite likely.  It's not certain, though.
+>>>
+>>> Since nested declarations of Error ** variables are rare, we can rely on
+>>> review to ensure we transform these functions correctly.
+>>>
+>>>> So, dropping inheritance in check-rules makes sence, as it may match
+>>>> (and warn) more interesting cases.
+>>>>
+>>>> But for other rules, I'd prefere to be safer, and explictly inherit all
+>>>> actually inherited identifiers..
+>>>
+>>> I still can't see what chaining by function name in addition to the ___
+>>> chaining buys us.
+>>
+>> I'll check this thing soon. And resend today.
+
+Checked.
+
+Yes, it inherits pair of fn and local_err, and it definitely makes sense. It more stable.
+
+Consider the following example:
+
+# cat a.c
+int f1(Error **errp)
+{
+     Error *err1 = NULL;
+     int err2 = 0;
+
+     error_propagate(errp, err1);
+
+     return err2;
+}
+
+int f2(Error **errp)
+{
+     Error *err2 = NULL;
+     int err1 = 0;
+
+     error_propagate(errp, err2);
+
+     return err1;
+}
+
+
+My script works correct and produces this change:
+--- a.c
++++ /tmp/cocci-output-1753-10842a-a.c
+@@ -1,19 +1,15 @@
+  int f1(Error **errp)
+  {
+-    Error *err1 = NULL;
++    ERRP_AUTO_PROPAGATE();
+      int err2 = 0;
+
+-    error_propagate(errp, err1);
+-
+      return err2;
+  }
+
+  int f2(Error **errp)
+  {
+-    Error *err2 = NULL;
++    ERRP_AUTO_PROPAGATE();
+      int err1 = 0;
+
+-    error_propagate(errp, err2);
+-
+      return err1;
+  }
+
+
+But yours script is caught:
+--- a.c
++++ /tmp/cocci-output-1814-b9b681-a.c
+@@ -1,19 +1,15 @@
+  int f1(Error **errp)
+  {
+-    Error *err1 = NULL;
++    ERRP_AUTO_PROPAGATE();
+      int err2 = 0;
+
+-    error_propagate(errp, err1);
+-
+-    return err2;
++    return *errp;
+  }
+
+  int f2(Error **errp)
+  {
+-    Error *err2 = NULL;
++    ERRP_AUTO_PROPAGATE();
+      int err1 = 0;
+
+-    error_propagate(errp, err2);
+-
+-    return err1;
++    return *errp;
+  }
+
+
+- see, it touches err1, which is unrelated to Error in f2. Hmm, interesting that it doesn't want to convert err1 declaration:)
+
+- this is because relation between local_err and fn is lost.
+
+So, understanding that there no such cases in the whole tree, and even if your patch works faster on the whole tree, I still don't want to drop inheritance, because it's just a correct thing to do. Yes, we've added ____ helper. It helps to avoid some problems. Pair-inheritance helps to avoid another problems. I understand, that there still may other, not-covered problems, but better to be as safe as possible. And inheritance here is native and correct thing to do, even with our ____ additional helper. What do you think?
+
+>>
+>>>
+>>>>                                    Still, I feel, we'll never be
+>>>> absolutely safe with coccinelle :)
+>>>
+>>> Right, although this particular problem is not really Coccinelle's
+>>> fault.  Blindly treating all instances of a certain identifier in a
+>>> certain area the same regardless of how they are bound to declarations
+>>> is fundamentally unreliable, regardless of your actual tooling.
+>>>
+>>
+>> Yes, still interesting, can coccinelle do more smart inheritance to match
+>> exactly same object... I think, I need to CC coccinelle mailing list
+>> to the next version
+> 
+> I'love to get taught how to chain reliably.
+> 
+
+
+-- 
+Best regards,
+Vladimir
 
