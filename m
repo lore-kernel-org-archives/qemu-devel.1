@@ -2,79 +2,61 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDB2C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1848C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:34:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE0C520663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D71D20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:34:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CeF3PI2x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE0C520663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QqAN9nmD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D71D20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9Xg-0001Ne-4V
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:33:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45015)
+	id 1jE9Xt-0001ht-J7
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:34:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jE9TE-0003O0-Gf
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:29:14 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jE96T-0002K8-Tv
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jE9TC-00047b-TO
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:29:12 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50227)
+ (envelope-from <dgibson@ozlabs.org>) id 1jE96S-0008A1-0w
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:41 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:47397 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jE9TC-000431-LU
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:29:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584440949;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=hrLU/2oKfFS7jSSW+98QZMDDPOalKw3bB3xVYxJoprQ=;
- b=CeF3PI2xvlFn1riq2PvnwCvwWMz8vyV+0QarjqBOUEv/Ua7Dc2BCvyDTyRQ31SL/xSdWRc
- QSCrlVI3zXlLieGLXgNIFjw9WtROLGh/FRcvSrOnU/Io37cKMkDupdXAx0S7GufA0hP1Gp
- mZoIuI6mGYu5u0a3V2EhuYEFbhfLuYI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-wTMFJFGWOqWZaHGoLnt6Sw-1; Tue, 17 Mar 2020 06:29:07 -0400
-X-MC-Unique: wTMFJFGWOqWZaHGoLnt6Sw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1468E800D4E;
- Tue, 17 Mar 2020 10:29:06 +0000 (UTC)
-Received: from gondolin (ovpn-113-156.ams2.redhat.com [10.36.113.156])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 335601001B07;
- Tue, 17 Mar 2020 10:29:02 +0000 (UTC)
-Date: Tue, 17 Mar 2020 11:28:50 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v9 07/15] s390x: protvirt: Move STSI data over SIDAD
-Message-ID: <20200317112850.70daa19c.cohuck@redhat.com>
-In-Reply-To: <4f99c8bc-932d-2d38-a4dd-71ef54399af6@linux.ibm.com>
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-8-frankja@linux.ibm.com>
- <5936071e-36d7-b456-5106-d377eab15785@de.ibm.com>
- <4f99c8bc-932d-2d38-a4dd-71ef54399af6@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jE96R-0005aq-Kq; Tue, 17 Mar 2020 06:05:39 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48hTL05lgtz9sTQ; Tue, 17 Mar 2020 21:04:40 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1584439480;
+ bh=KT5ze/+yN+LYC+I7poQ2KhjH7DVbMMJtLwam/nRyiCk=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=QqAN9nmD9i2Ily7p6eYGvvr65Aq/cr/YQbXfpcrPSV+6Q03Leze3rHbqD5rkUWZZw
+ I1y4FwDtPVZcL9wi7F/l5shL4owHr4J8P7rcv6egf+4szAaBsNfB7sp8Qox+K89k37
+ MGln+mvvjtrVXX2W3hZXLETW7YwjlhreI076b5eY=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 35/45] spapr: Move creation of ibm,architecture-vec-5 property
+Date: Tue, 17 Mar 2020 21:04:13 +1100
+Message-Id: <20200317100423.622643-36-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
+References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/V7weV+R62QnOVvXcheFEQe4";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,86 +68,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, david@redhat.com
+Cc: lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/V7weV+R62QnOVvXcheFEQe4
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This is currently called from spapr_dt_cas_updates() which is a hang
+over from when we created this only as a diff to the DT at CAS time.
+Now that we fully rebuild the DT at CAS time, just create it along
+with the rest of the properties in /chosen.
 
-On Thu, 12 Mar 2020 12:20:25 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr.c | 144 ++++++++++++++++++++++---------------------------
+ 1 file changed, 65 insertions(+), 79 deletions(-)
 
-> On 3/12/20 11:42 AM, Christian Borntraeger wrote:
-> >=20
-> >=20
-> > On 11.03.20 14:21, Janosch Frank wrote: =20
-> >> For protected guests, we need to put the STSI emulation results into
-> >> the SIDA, so SIE will write them into the guest at the next entry.
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> Reviewed-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  target/s390x/kvm.c | 11 +++++++++--
-> >>  1 file changed, 9 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> >> index cdcd538b4f7fb318..8085d5030e7c6454 100644
-> >> --- a/target/s390x/kvm.c
-> >> +++ b/target/s390x/kvm.c
-> >> @@ -50,6 +50,7 @@
-> >>  #include "exec/memattrs.h"
-> >>  #include "hw/s390x/s390-virtio-ccw.h"
-> >>  #include "hw/s390x/s390-virtio-hcall.h"
-> >> +#include "hw/s390x/pv.h"
-> >> =20
-> >>  #ifndef DEBUG_KVM
-> >>  #define DEBUG_KVM  0
-> >> @@ -1800,7 +1801,9 @@ static void insert_stsi_3_2_2(S390CPU *cpu, __u6=
-4 addr, uint8_t ar)
-> >>      SysIB_322 sysib;
-> >>      int del;
-> >> =20
-> >> -    if (s390_cpu_virt_mem_read(cpu, addr, ar, &sysib, sizeof(sysib)))=
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 5e938833f3..aff8c87fad 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -889,22 +889,6 @@ static int spapr_rng_populate_dt(void *fdt)
+     return ret ? -1 : 0;
+ }
+=20
+-static int spapr_dt_cas_updates(SpaprMachineState *spapr, void *fdt,
+-                                SpaprOptionVector *ov5_updates)
+-{
+-    int offset;
+-
+-    offset =3D fdt_path_offset(fdt, "/chosen");
+-    if (offset < 0) {
+-        offset =3D fdt_add_subnode(fdt, 0, "chosen");
+-        if (offset < 0) {
+-            return offset;
+-        }
+-    }
+-    return spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
+-                                  "ibm,architecture-vec-5");
+-}
+-
+ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
  {
-> >> +    if (s390_is_pv()) {
-> >> +        s390_cpu_pv_mem_read(cpu, 0, &sysib, sizeof(sysib)); =20
-> >=20
-> > Not strictly necessary, but do we also want to do an early exit if the =
-pv case fails?
-> >  =20
->=20
-> I'd rather do an early exit for the SIDA read/write ioctl itself
-
-Early exit in what respect? Abort?
-
-If not, checking the return code here and returning looks like
-something we want.
-
---Sig_/V7weV+R62QnOVvXcheFEQe4
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl5wpmIACgkQ3s9rk8bw
-L68ZVBAApwfpUO8/O754EB8vRFGkr95+L7EVjqeIE4rpvO7gSE+YYv2NMQx6dyTY
-192GG9FmHx82uymD57xzjsbIt42OWnbw0FGu0pKxgKx7pmEMA8EAllxIlenaSNqb
-3k+viPkdu45QSozJmj533JAIe+65ZVQRkKEg4Yx/2MGiooO29ouR+zLhp+q15otW
-CgMwBUi5qdaPgul9wSwbrgITZ9ipOC4oXAh/Qnv378OdxqAC3NPr5oqMBNdD1xTw
-WcvhNGOve/ehCnq3ycs9QlPITZZhUckaAi8NYPNEj7qy0eRYDkV4QpA6KjA8q3D1
-JB1PfLY7Jtyvi+xd7k8EYR9qZsvLn1Rn8Pr685HpFryOAckAZEtMpyVVvMyERw6d
-ZYH1on1zcCb9VM7oIy+MwezdbF1BnsGzUXDKwjTj8jeDrnI2BVpfPEFPn0rWI90m
-SMUAef0j3WXcauk67A1Rn+G07ENI6yMld9GkSFe6+B1SmVds3JTTmhWQN0de53wH
-jNYYFiSmYOoDBsSv3iP/914XHwMgftCbIN9WnvXcAxe0BaCuXxtr9W2FFoiJY1fa
-Y1R1LdpSerII/hjk5ZN9K6Zz6X1oiR43wSFa3RQ1zHtBZEII/6oNv0cubOjszVJB
-mBaj92XvG8jag4xl6cYnG2Jyc10No0FMpPpFP4lH1AIBCL/tYRU=
-=GCzt
------END PGP SIGNATURE-----
-
---Sig_/V7weV+R62QnOVvXcheFEQe4--
+     MachineState *ms =3D MACHINE(spapr);
+@@ -1043,81 +1027,92 @@ static void spapr_dt_ov5_platform_support(SpaprMa=
+chineState *spapr, void *fdt,
+                      val, sizeof(val)));
+ }
+=20
+-static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
++static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt, bool re=
+set)
+ {
+     MachineState *machine =3D MACHINE(spapr);
+     SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
+     int chosen;
+-    const char *boot_device =3D machine->boot_order;
+-    char *stdout_path =3D spapr_vio_stdout_path(spapr->vio_bus);
+-    size_t cb =3D 0;
+-    char *bootlist =3D get_boot_devices_list(&cb);
+=20
+     _FDT(chosen =3D fdt_add_subnode(fdt, 0, "chosen"));
+=20
+-    if (machine->kernel_cmdline && machine->kernel_cmdline[0]) {
+-        _FDT(fdt_setprop_string(fdt, chosen, "bootargs",
+-                                machine->kernel_cmdline));
+-    }
+-    if (spapr->initrd_size) {
+-        _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-start",
+-                              spapr->initrd_base));
+-        _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-end",
+-                              spapr->initrd_base + spapr->initrd_size));
+-    }
++    if (reset) {
++        const char *boot_device =3D machine->boot_order;
++        char *stdout_path =3D spapr_vio_stdout_path(spapr->vio_bus);
++        size_t cb =3D 0;
++        char *bootlist =3D get_boot_devices_list(&cb);
++
++        if (machine->kernel_cmdline && machine->kernel_cmdline[0]) {
++            _FDT(fdt_setprop_string(fdt, chosen, "bootargs",
++                                    machine->kernel_cmdline));
++        }
+=20
+-    if (spapr->kernel_size) {
+-        uint64_t kprop[2] =3D { cpu_to_be64(spapr->kernel_addr),
+-                              cpu_to_be64(spapr->kernel_size) };
++        if (spapr->initrd_size) {
++            _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-start",
++                                  spapr->initrd_base));
++            _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-end",
++                                  spapr->initrd_base + spapr->initrd_siz=
+e));
++        }
++
++        if (spapr->kernel_size) {
++            uint64_t kprop[2] =3D { cpu_to_be64(spapr->kernel_addr),
++                                  cpu_to_be64(spapr->kernel_size) };
+=20
+-        _FDT(fdt_setprop(fdt, chosen, "qemu,boot-kernel",
++            _FDT(fdt_setprop(fdt, chosen, "qemu,boot-kernel",
+                          &kprop, sizeof(kprop)));
+-        if (spapr->kernel_le) {
+-            _FDT(fdt_setprop(fdt, chosen, "qemu,boot-kernel-le", NULL, 0=
+));
++            if (spapr->kernel_le) {
++                _FDT(fdt_setprop(fdt, chosen, "qemu,boot-kernel-le", NUL=
+L, 0));
++            }
+         }
+-    }
+-    if (boot_menu) {
+-        _FDT((fdt_setprop_cell(fdt, chosen, "qemu,boot-menu", boot_menu)=
+));
+-    }
+-    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-width", graphic_wid=
+th));
+-    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-height", graphic_he=
+ight));
+-    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-depth", graphic_dep=
+th));
++        if (boot_menu) {
++            _FDT((fdt_setprop_cell(fdt, chosen, "qemu,boot-menu", boot_m=
+enu)));
++        }
++        _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-width", graphic=
+_width));
++        _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-height", graphi=
+c_height));
++        _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-depth", graphic=
+_depth));
+=20
+-    if (cb && bootlist) {
+-        int i;
++        if (cb && bootlist) {
++            int i;
+=20
+-        for (i =3D 0; i < cb; i++) {
+-            if (bootlist[i] =3D=3D '\n') {
+-                bootlist[i] =3D ' ';
++            for (i =3D 0; i < cb; i++) {
++                if (bootlist[i] =3D=3D '\n') {
++                    bootlist[i] =3D ' ';
++                }
+             }
++            _FDT(fdt_setprop_string(fdt, chosen, "qemu,boot-list", bootl=
+ist));
+         }
+-        _FDT(fdt_setprop_string(fdt, chosen, "qemu,boot-list", bootlist)=
+);
+-    }
+=20
+-    if (boot_device && strlen(boot_device)) {
+-        _FDT(fdt_setprop_string(fdt, chosen, "qemu,boot-device", boot_de=
+vice));
+-    }
++        if (boot_device && strlen(boot_device)) {
++            _FDT(fdt_setprop_string(fdt, chosen, "qemu,boot-device", boo=
+t_device));
++        }
++
++        if (!spapr->has_graphics && stdout_path) {
++            /*
++             * "linux,stdout-path" and "stdout" properties are
++             * deprecated by linux kernel. New platforms should only
++             * use the "stdout-path" property. Set the new property
++             * and continue using older property to remain compatible
++             * with the existing firmware.
++             */
++            _FDT(fdt_setprop_string(fdt, chosen, "linux,stdout-path", st=
+dout_path));
++            _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_p=
+ath));
++        }
+=20
+-    if (!spapr->has_graphics && stdout_path) {
+         /*
+-         * "linux,stdout-path" and "stdout" properties are deprecated by=
+ linux
+-         * kernel. New platforms should only use the "stdout-path" prope=
+rty. Set
+-         * the new property and continue using older property to remain
+-         * compatible with the existing firmware.
++         * We can deal with BAR reallocation just fine, advertise it
++         * to the guest
+          */
+-        _FDT(fdt_setprop_string(fdt, chosen, "linux,stdout-path", stdout=
+_path));
+-        _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path)=
+);
+-    }
++        if (smc->linux_pci_probe) {
++            _FDT(fdt_setprop_cell(fdt, chosen, "linux,pci-probe-only", 0=
+));
++        }
+=20
+-    /* We can deal with BAR reallocation just fine, advertise it to the =
+guest */
+-    if (smc->linux_pci_probe) {
+-        _FDT(fdt_setprop_cell(fdt, chosen, "linux,pci-probe-only", 0));
+-    }
++        spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+=20
+-    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
++        g_free(stdout_path);
++        g_free(bootlist);
++    }
+=20
+-    g_free(stdout_path);
+-    g_free(bootlist);
++    _FDT(spapr_ovec_populate_dt(fdt, chosen, spapr->ov5_cas,
++                                "ibm,architecture-vec-5"));
+ }
+=20
+ static void spapr_dt_hypervisor(SpaprMachineState *spapr, void *fdt)
+@@ -1243,9 +1238,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, boo=
+l reset, size_t space)
+     spapr_dt_rtas(spapr, fdt);
+=20
+     /* /chosen */
+-    if (reset) {
+-        spapr_dt_chosen(spapr, fdt);
+-    }
++    spapr_dt_chosen(spapr, fdt, reset);
+=20
+     /* /hypervisor */
+     if (kvm_enabled()) {
+@@ -1264,13 +1257,6 @@ void *spapr_build_fdt(SpaprMachineState *spapr, bo=
+ol reset, size_t space)
+         }
+     }
+=20
+-    /* ibm,client-architecture-support updates */
+-    ret =3D spapr_dt_cas_updates(spapr, fdt, spapr->ov5_cas);
+-    if (ret < 0) {
+-        error_report("couldn't setup CAS properties fdt");
+-        exit(1);
+-    }
+-
+     if (smc->dr_phb_enabled) {
+         ret =3D spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_PHB);
+         if (ret < 0) {
+--=20
+2.24.1
 
 
