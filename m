@@ -2,83 +2,98 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C79C5ACD7
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3178C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:48:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83D892076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:41:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D24620768
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:48:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fueVUYRU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D892076D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cF+l/Bdf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D24620768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEW8q-0007pv-Il
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:41:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49921)
+	id 1jEWF1-00027U-JS
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:48:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jEW7P-0006tx-4U
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:40:12 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jEWEN-0001hZ-PQ
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jEW7N-0005RA-Q8
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:40:11 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:49843)
+ (envelope-from <pbonzini@redhat.com>) id 1jEWEM-00027Z-IQ
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:47:23 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:29840)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jEW7N-0005KG-KU
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:40:09 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jEWEM-00026Y-DX
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:47:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584528009;
+ s=mimecast20190719; t=1584528441;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n5+TZTxFutCGJcqxFQSATlH259EPFe1+UdS/gxWcEWU=;
- b=fueVUYRUtUE2MMhnh7uTHOPrcHhKV70vZJ0tucyzELR8g+f1hqUJrg9tzInzk0qd7DPMqY
- HwCXRI+yjS6QJopXEZu/AFkpJsFP32M387YoN6H38gUIKl3eSOdOowtAosQyY6S+1/XF7c
- ueMFs22RA1wEofH33egEANJ03QMFBvI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-ZP8rKKKYPn6Z-GGyVsrJxw-1; Wed, 18 Mar 2020 06:40:04 -0400
-X-MC-Unique: ZP8rKKKYPn6Z-GGyVsrJxw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78A418017CE;
- Wed, 18 Mar 2020 10:40:03 +0000 (UTC)
-Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ECA9419C58;
- Wed, 18 Mar 2020 10:40:02 +0000 (UTC)
-Subject: Re: [PATCH v4 28/34] qapi: Implement deprecated-output=hide for QMP
- command results
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200317115459.31821-1-armbru@redhat.com>
- <20200317115459.31821-29-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <955280e0-7165-5e3c-b08d-522275eb2e30@redhat.com>
-Date: Wed, 18 Mar 2020 05:40:02 -0500
+ bh=LKbl2gdakDnsss68pO3DwNBI2RJLzcn3HLqrbDPnicE=;
+ b=cF+l/BdfaNlZ1RunCztSFMwt/hjvgJyg14QCnKcZVAiueGRungBlK3eYkRiRv8OWfIIKT7
+ 4Jbui5sR9d/OUtXhzF7/W3levB4cNI8QMHCt1vt6fIxJXvvLywnX0MjG2uTJgSSf731tXU
+ 57NukEjV+zSu7W8AJdcsTwu5BgyhOSk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-mUaTxi0JPb2ymfFYV-dTOw-1; Wed, 18 Mar 2020 06:47:20 -0400
+X-MC-Unique: mUaTxi0JPb2ymfFYV-dTOw-1
+Received: by mail-wr1-f70.google.com with SMTP id g4so4471185wrv.12
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 03:47:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LKbl2gdakDnsss68pO3DwNBI2RJLzcn3HLqrbDPnicE=;
+ b=FI4ovxsLYRgi5LQOtaqABeokVLWL8heIHx3h0mnJvFjSDPv9a8bv0lpgbY8kv3lBPI
+ rEzgjcM3tqTO14RRT0w4UOzrak0poU4ZaOhdtHJAxmR/30QS1EQp+x9qI84vlrOTS6Jx
+ NmVGbnLxSSl3kkw3/CznaR5bMW8cqw9BXTWKhLMZ+/z0uQD9pErjTIOn9o+xmgcpjSH3
+ cPb/coOpQBVo5ggrXk+FHmFsiwe0Q5L91N5ZZTfHEylX50GrfdhYpVYgo6unC5cA3IJi
+ awqzMCjsMsJiCYqdR3pOswmVGJZPHbPmu/4mh2/YluSNO3b2zOdhTL5xvahWh675JNY9
+ XRNw==
+X-Gm-Message-State: ANhLgQ1/amAChEo3hjxJdc0yp5R6zp3BzoOu7Rx2NyFp6fCZ2Cs2WNGU
+ Gmvdj8DzxSgnz6sS/mfHNQRsEdoR7ndM79V6Y2WtimOFtzcKyNQ+mvt6OdaWBgdh1Y4sQpRXV73
+ +pQM9BASKhLxdWw8=
+X-Received: by 2002:a05:600c:414a:: with SMTP id
+ h10mr4774630wmm.53.1584528438965; 
+ Wed, 18 Mar 2020 03:47:18 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vu6QEyK7MKwIlimvDdvXm+q/eoL1TfJoKZZRCh4m7XwIEtVFEoAQsBVgh3bhgZ7ZjODEfdsBw==
+X-Received: by 2002:a05:600c:414a:: with SMTP id
+ h10mr4774601wmm.53.1584528438752; 
+ Wed, 18 Mar 2020 03:47:18 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+ by smtp.gmail.com with ESMTPSA id p8sm8987104wrw.19.2020.03.18.03.47.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Mar 2020 03:47:16 -0700 (PDT)
+Subject: Re: [PATCH v2] MAINTAINERS: Add an entry for the HVF accelerator
+To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+References: <20200316171825.42544-1-r.bolshakov@yadro.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cb70fb93-7b2d-b684-c25f-f2fe6774381c@redhat.com>
+Date: Wed, 18 Mar 2020 11:47:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200317115459.31821-29-armbru@redhat.com>
+In-Reply-To: <20200316171825.42544-1-r.bolshakov@yadro.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,104 +105,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Cameron Esfahani <dirty@apple.com>,
+ Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>,
+ Patrick Colp <patrick.colp@oracle.com>, Liran Alon <liran.alon@oracle.com>,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Heiher <r@hev.cc>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 6:54 AM, Markus Armbruster wrote:
-> This policy suppresses deprecated bits in output, and thus permits
-> "testing the future".  Implement it for QMP command results.  Example:
-> when QEMU is run with -compat deprecated-output=hide, then
+On 16/03/20 18:18, Roman Bolshakov wrote:
+> Cc: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+> Cc: Patrick Colp <patrick.colp@oracle.com>
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Cc: Heiher <r@hev.cc>
 > 
->      {"execute": "query-cpus-fast"}
-> 
-> yields
-> 
->      {"return": [{"thread-id": 9805, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "qom-path": "/machine/unattached/device[0]", "cpu-index": 0, "target": "x86_64"}]}
-> 
-> instead of
-> 
->      {"return": [{"arch": "x86", "thread-id": 22436, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "qom-path": "/machine/unattached/device[0]", "cpu-index": 0, "target": "x86_64"}]}
-> 
-> Note the suppression of deprecated member "arch".
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 > ---
-
-> +++ b/tests/test-qmp-cmds.c
-> @@ -1,4 +1,5 @@
->   #include "qemu/osdep.h"
-> +#include "qapi/compat-policy.h"
->   #include "qapi/qmp/qdict.h"
->   #include "qapi/qmp/qjson.h"
->   #include "qapi/qmp/qnum.h"
-> @@ -45,12 +46,17 @@ void qmp_user_def_cmd1(UserDefOne * ud1, Error **errp)
->   {
->   }
->   
-> -void qmp_test_features0(FeatureStruct0 *fs0, FeatureStruct1 *fs1,
-> -                       FeatureStruct2 *fs2, FeatureStruct3 *fs3,
-> -                       FeatureStruct4 *fs4, CondFeatureStruct1 *cfs1,
-> -                       CondFeatureStruct2 *cfs2, CondFeatureStruct3 *cfs3,
-> -                       Error **errp)
-> +FeatureStruct1 *qmp_test_features0(bool has_fs0, FeatureStruct0 *fs0,
-> +                                   bool has_fs1, FeatureStruct1 *fs1,
-> +                                   bool has_fs2, FeatureStruct2 *fs2,
-> +                                   bool has_fs3, FeatureStruct3 *fs3,
-> +                                   bool has_fs4, FeatureStruct4 *fs4,
-> +                                   bool has_cfs1, CondFeatureStruct1 *cfs1,
-> +                                   bool has_cfs2, CondFeatureStruct2 *cfs2,
-> +                                   bool has_cfs3, CondFeatureStruct3 *cfs3,
-> +                                   Error **errp)
->   {
-> +    return g_new(FeatureStruct1, 1);
-
-Should this be using g_new0, rather than random contents?
-
->   }
->   
->   void qmp_test_command_features1(Error **errp)
-> @@ -271,6 +277,30 @@ static void test_dispatch_cmd_io(void)
->       qobject_unref(ret3);
->   }
->   
-> +static void test_dispatch_cmd_ret_deprecated(void)
-> +{
-> +    const char *cmd = "{ 'execute': 'test-features0' }";
-> +    QDict *ret;
+> 
+> Changes since v1:
+>   Status is changed to Maintained instead of Supported.
+> 
+>  MAINTAINERS | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 32867bc636..8649ff9cda 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -405,6 +405,13 @@ S: Supported
+>  F: target/i386/kvm.c
+>  F: scripts/kvm/vmxcap
+>  
+> +X86 HVF CPUs
+> +M: Roman Bolshakov <r.bolshakov@yadro.com>
+> +S: Maintained
+> +F: accel/stubs/hvf-stub.c
+> +F: target/i386/hvf/
+> +F: include/sysemu/hvf.h
 > +
-> +    memset(&compat_policy, 0, sizeof(compat_policy));
-> +
-> +    /* default accept */
-> +    ret = qobject_to(QDict, do_qmp_dispatch(false, cmd));
-> +    assert(ret && qdict_size(ret) == 1);
-> +    qobject_unref(ret);
-> +
-> +    compat_policy.has_deprecated_output = true;
-> +    compat_policy.deprecated_output = COMPAT_POLICY_OUTPUT_ACCEPT;
+>  WHPX CPUs
+>  M: Sunil Muthuswamy <sunilmut@microsoft.com>
+>  S: Supported
+> 
 
-Of course, if we ever enable defaults in QAPI, we can get rid of 
-has_deprecated_output by recording proper defaults for bools.  But 
-that's a different project ;)
+Queued, thanks.
 
-> +    ret = qobject_to(QDict, do_qmp_dispatch(false, cmd));
-> +    assert(ret && qdict_size(ret) == 1);
-> +    qobject_unref(ret);
-> +
-> +    compat_policy.deprecated_output = COMPAT_POLICY_OUTPUT_HIDE;
-> +    ret = qobject_to(QDict, do_qmp_dispatch(false, cmd));
-> +    assert(ret && qdict_size(ret) == 0);
-> +    qobject_unref(ret);
-> +}
-> +
-
-Otherwise,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Paolo
 
 
