@@ -6,91 +6,92 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2639C10DCE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9ABAC5ACD6
 	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 14:34:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAA1F20773
+	by mail.kernel.org (Postfix) with ESMTPS id 7829F20773
 	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 14:34:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAA1F20773
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7829F20773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEZmV-0006jF-UY
+	id 1jEZmV-0006lV-Lt
 	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 10:34:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58409)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jEZj9-0002gH-65
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:31:24 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jEZjB-0002iu-AT
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:31:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jEZj7-0001Uq-Pj
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:31:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30892)
+ (envelope-from <frankja@linux.ibm.com>) id 1jEZj8-0001Xt-Pl
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:31:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44040
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jEZj7-0001SG-H4
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:31:21 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02IETcuj142775
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 10:31:20 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8ad9thv-1
+ id 1jEZj8-0001Vl-HB
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:31:22 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02IE6CWY001391
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 10:31:22 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yu7ac512h-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 10:31:19 -0400
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 10:31:21 -0400
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 18 Mar 2020 14:31:13 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Wed, 18 Mar 2020 14:31:20 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Mar 2020 14:31:12 -0000
+ Wed, 18 Mar 2020 14:31:17 -0000
 Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
  [9.149.105.60])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02IEUASR5308838
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02IEVGsT52101208
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Mar 2020 14:30:11 GMT
+ Wed, 18 Mar 2020 14:31:16 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C331442041;
- Wed, 18 Mar 2020 14:31:11 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 1678842045;
+ Wed, 18 Mar 2020 14:31:16 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A7CC742042;
- Wed, 18 Mar 2020 14:31:10 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id EE3E642041;
+ Wed, 18 Mar 2020 14:31:14 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.78.199])
  by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 18 Mar 2020 14:31:10 +0000 (GMT)
+ Wed, 18 Mar 2020 14:31:14 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 04/16] s390x: protvirt: Add migration blocker
-Date: Wed, 18 Mar 2020 10:30:35 -0400
+Subject: [PATCH v10 07/16] s390x: Add SIDA memory ops
+Date: Wed, 18 Mar 2020 10:30:38 -0400
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200318143047.2335-1-frankja@linux.ibm.com>
 References: <20200318143047.2335-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20031814-0008-0000-0000-0000035F6376
+x-cbid: 20031814-0028-0000-0000-000003E6F277
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031814-0009-0000-0000-00004A80BE1F
-Message-Id: <20200318143047.2335-5-frankja@linux.ibm.com>
+x-cbparentid: 20031814-0029-0000-0000-000024AC4AAF
+Message-Id: <20200318143047.2335-8-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
  definitions=2020-03-18_06:2020-03-18,
  2020-03-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0
- lowpriorityscore=0 mlxscore=0 clxscore=1015 priorityscore=1501 spamscore=0
- malwarescore=0 impostorscore=0 suspectscore=3 bulkscore=0 mlxlogscore=628
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003180067
+ phishscore=0
+ priorityscore=1501 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ suspectscore=1 clxscore=1015 adultscore=0 spamscore=0 impostorscore=0
+ malwarescore=0 mlxlogscore=850 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2003180066
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,7 +109,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Migration is not yet supported.
+Protected guests save the instruction control blocks in the SIDA
+instead of QEMU/KVM directly accessing the guest's memory.
+
+Let's introduce new functions to access the SIDA.
+
+The memops for doing so are available with KVM_CAP_S390_PROTECTED, so
+let's check for that.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
@@ -116,54 +123,119 @@ Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ target/s390x/cpu.h        |  7 ++++++-
+ target/s390x/kvm.c        | 26 ++++++++++++++++++++++++++
+ target/s390x/kvm_s390x.h  |  2 ++
+ target/s390x/mmu_helper.c | 14 ++++++++++++++
+ 4 files changed, 48 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index afd499c59fffc848..8013c82236a36724 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -44,6 +44,9 @@
- #include "sysemu/sysemu.h"
- #include "hw/s390x/pv.h"
- #include <linux/kvm.h>
-+#include "migration/blocker.h"
-+
-+static Error *pv_mig_blocker;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 1d17709d6e10b5e0..035427521cec2528 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -823,7 +823,12 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+ #define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
+         s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
+ void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra);
+-
++int s390_cpu_pv_mem_rw(S390CPU *cpu, unsigned int offset, void *hostbuf,
++                       int len, bool is_write);
++#define s390_cpu_pv_mem_read(cpu, offset, dest, len)    \
++        s390_cpu_pv_mem_rw(cpu, offset, dest, len, false)
++#define s390_cpu_pv_mem_write(cpu, offset, dest, len)       \
++        s390_cpu_pv_mem_rw(cpu, offset, dest, len, true)
  
- S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
- {
-@@ -323,15 +326,30 @@ static void s390_machine_unprotect(S390CcwMachineState *ms)
- {
-     s390_pv_vm_disable();
-     ms->pv = false;
-+    migrate_del_blocker(pv_mig_blocker);
-+    error_free_or_abort(&pv_mig_blocker);
+ /* sigp.c */
+ int s390_cpu_restart(S390CPU *cpu);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index cbb71aa11b9a626a..cfca4c58df60eb85 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -154,6 +154,7 @@ static int cap_ri;
+ static int cap_gs;
+ static int cap_hpage_1m;
+ static int cap_vcpu_resets;
++static int cap_protected;
+ 
+ static int active_cmma;
+ 
+@@ -351,6 +352,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_mem_op = kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
+     cap_s390_irq = kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);
+     cap_vcpu_resets = kvm_check_extension(s, KVM_CAP_S390_VCPU_RESETS);
++    cap_protected = kvm_check_extension(s, KVM_CAP_S390_PROTECTED);
+ 
+     if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+         || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+@@ -851,6 +853,30 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+     return ret;
  }
  
- static int s390_machine_protect(S390CcwMachineState *ms)
- {
-+    Error *local_err = NULL;
-     int rc;
- 
-+    error_setg(&pv_mig_blocker,
-+               "protected VMs are currently not migrateable.");
-+    rc = migrate_add_blocker(pv_mig_blocker, &local_err);
-+    if (rc) {
-+        error_report_err(local_err);
-+        error_free_or_abort(&pv_mig_blocker);
-+        return rc;
++int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t offset, void *hostbuf,
++                       int len, bool is_write)
++{
++    struct kvm_s390_mem_op mem_op = {
++        .sida_offset = offset,
++        .size = len,
++        .op = is_write ? KVM_S390_MEMOP_SIDA_WRITE
++                       : KVM_S390_MEMOP_SIDA_READ,
++        .buf = (uint64_t)hostbuf,
++    };
++    int ret;
++
++    if (!cap_mem_op || !cap_protected) {
++        return -ENOSYS;
 +    }
 +
-     /* Create SE VM */
-     rc = s390_pv_vm_enable();
-     if (rc) {
-+        error_report_err(local_err);
-+        migrate_del_blocker(pv_mig_blocker);
-+        error_free_or_abort(&pv_mig_blocker);
-         return rc;
-     }
++    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
++    if (ret < 0) {
++        error_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
++        abort();
++    }
++    return ret;
++}
++
+ /*
+  * Legacy layout for s390:
+  * Older S390 KVM requires the topmost vma of the RAM to be
+diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
+index dea813f450153c34..6ab17c81b73a0011 100644
+--- a/target/s390x/kvm_s390x.h
++++ b/target/s390x/kvm_s390x.h
+@@ -19,6 +19,8 @@ void kvm_s390_vcpu_interrupt(S390CPU *cpu, struct kvm_s390_irq *irq);
+ void kvm_s390_access_exception(S390CPU *cpu, uint16_t code, uint64_t te_code);
+ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+                     int len, bool is_write);
++int kvm_s390_mem_op_pv(S390CPU *cpu, vaddr addr, void *hostbuf, int len,
++                       bool is_write);
+ void kvm_s390_program_interrupt(S390CPU *cpu, uint16_t code);
+ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state);
+ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu);
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 0be2f300bbe4ac8b..7d9f3059cd502c49 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -474,6 +474,20 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+     return 0;
+ }
  
++int s390_cpu_pv_mem_rw(S390CPU *cpu, unsigned int offset, void *hostbuf,
++                       int len, bool is_write)
++{
++    int ret;
++
++    if (kvm_enabled()) {
++        ret = kvm_s390_mem_op_pv(cpu, offset, hostbuf, len, is_write);
++    } else {
++        /* Protected Virtualization is a KVM/Hardware only feature */
++        g_assert_not_reached();
++    }
++    return ret;
++}
++
+ /**
+  * s390_cpu_virt_mem_rw:
+  * @laddr:     the logical start address
 -- 
 2.25.1
 
