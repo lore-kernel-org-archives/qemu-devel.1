@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68712C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6E1C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 328B8206EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69570206EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fVutRdIO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 328B8206EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VAa6s4CF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69570206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jENHN-0000Cm-Dy
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 21:13:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57374)
+	id 1jENHV-0000NT-HV
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 21:14:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57433)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1jENG0-0007Rt-Vm
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:34 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1jENG7-0007Ty-Bk
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1jENFz-0004UN-Gm
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:28 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32354)
+ (envelope-from <ehabkost@redhat.com>) id 1jENG5-0004i3-SN
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:35 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41668)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jENFz-0004QY-Bc
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:27 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jENG1-0004fx-LC
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584493946;
+ s=mimecast20190719; t=1584493949;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yKMemzxXZBqk7hT78k1ip1hdWck5pBCC98Uw9VTFjSo=;
- b=fVutRdIOZH3e+9Si4RSxAOYsVR+dJ5JUsO131hN3s4/yZs3eOmTH8ninORn89JJUjJWwKQ
- RUkdQ1czrfXOmQuCHVEAmyO+Hw3zl1L7eELIwsNfVJ7COOS11jdbpUduzSlQVdTRZca8qm
- GZlg/2sKYoUzxp8FEqaCahxnm2GUkLM=
+ bh=h6CSWcVjwf/mR4GA8o7TUHijgY6z8lbK7E/cQiK0XOA=;
+ b=VAa6s4CFrye3cuxw0zXCSlZ7iPwh7qElhp/DxPe8vZXvx2miNrrPUYXIQkzVNCV9LFWvpp
+ 6/zqZFwu0QwylVDi+RMw/kiiKYgkg545NVS62GHR6X0797gBCKmQgCL7gNGNGWHn8GtdvB
+ MC6OYFvD+HlYOPxnaTA+F22jNov6rnM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-xYSISwthPhuw69n-uEXj1g-1; Tue, 17 Mar 2020 21:12:22 -0400
-X-MC-Unique: xYSISwthPhuw69n-uEXj1g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-419-COwiw_BiM5Gjr-Rzf1XJkw-1; Tue, 17 Mar 2020 21:12:25 -0400
+X-MC-Unique: COwiw_BiM5Gjr-Rzf1XJkw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D591B1857BE0;
- Wed, 18 Mar 2020 01:12:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAB5E13F7;
+ Wed, 18 Mar 2020 01:12:23 +0000 (UTC)
 Received: from localhost (ovpn-118-148.rdu2.redhat.com [10.10.118.148])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 731B37386D;
- Wed, 18 Mar 2020 01:12:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 575898AC30;
+ Wed, 18 Mar 2020 01:12:23 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 1/4] scripts/simplebench: add simplebench.py
-Date: Tue, 17 Mar 2020 21:12:14 -0400
-Message-Id: <20200318011217.2102748-2-ehabkost@redhat.com>
+Subject: [PULL 2/4] scripts/simplebench: add qemu/bench_block_job.py
+Date: Tue, 17 Mar 2020 21:12:15 -0400
+Message-Id: <20200318011217.2102748-3-ehabkost@redhat.com>
 In-Reply-To: <20200318011217.2102748-1-ehabkost@redhat.com>
 References: <20200318011217.2102748-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,27 +94,27 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Add simple benchmark table creator.
+Add block-job benchmarking helper functions.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <20200228071914.11746-2-vsementsov@virtuozzo.com>
+Message-Id: <20200228071914.11746-3-vsementsov@virtuozzo.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/simplebench/simplebench.py | 128 +++++++++++++++++++++++++++++
- 1 file changed, 128 insertions(+)
- create mode 100644 scripts/simplebench/simplebench.py
+ scripts/simplebench/bench_block_job.py | 119 +++++++++++++++++++++++++
+ 1 file changed, 119 insertions(+)
+ create mode 100755 scripts/simplebench/bench_block_job.py
 
-diff --git a/scripts/simplebench/simplebench.py b/scripts/simplebench/simpl=
-ebench.py
-new file mode 100644
-index 0000000000..59e7314ff6
+diff --git a/scripts/simplebench/bench_block_job.py b/scripts/simplebench/b=
+ench_block_job.py
+new file mode 100755
+index 0000000000..9808d696cf
 --- /dev/null
-+++ b/scripts/simplebench/simplebench.py
-@@ -0,0 +1,128 @@
++++ b/scripts/simplebench/bench_block_job.py
+@@ -0,0 +1,119 @@
 +#!/usr/bin/env python
 +#
-+# Simple benchmarking framework
++# Benchmark block jobs
 +#
 +# Copyright (c) 2019 Virtuozzo International GmbH.
 +#
@@ -132,123 +133,109 @@ index 0000000000..59e7314ff6
 +#
 +
 +
-+def bench_one(test_func, test_env, test_case, count=3D5, initial_run=3DTru=
-e):
-+    """Benchmark one test-case
++import sys
++import os
++import socket
++import json
 +
-+    test_func   -- benchmarking function with prototype
-+                   test_func(env, case), which takes test_env and test_cas=
-e
-+                   arguments and returns {'seconds': int} (which is benchm=
-ark
-+                   result) on success and {'error': str} on error. Returne=
-d
-+                   dict may contain any other additional fields.
-+    test_env    -- test environment - opaque first argument for test_func
-+    test_case   -- test case - opaque second argument for test_func
-+    count       -- how many times to call test_func, to calculate average
-+    initial_run -- do initial run of test_func, which don't get into resul=
-t
++sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pytho=
+n'))
++from qemu.machine import QEMUMachine
++from qemu.qmp import QMPConnectError
 +
-+    Returns dict with the following fields:
-+        'runs':     list of test_func results
-+        'average':  average seconds per run (exists only if at least one r=
-un
-+                    succeeded)
-+        'delta':    maximum delta between test_func result and the average
-+                    (exists only if at least one run succeeded)
-+        'n-failed': number of failed runs (exists only if at least one run
-+                    failed)
++
++def bench_block_job(cmd, cmd_args, qemu_args):
++    """Benchmark block-job
++
++    cmd       -- qmp command to run block-job (like blockdev-backup)
++    cmd_args  -- dict of qmp command arguments
++    qemu_args -- list of Qemu command line arguments, including path to Qe=
+mu
++                 binary
++
++    Returns {'seconds': int} on success and {'error': str} on failure, dic=
+t may
++    contain addional 'vm-log' field. Return value is compatible with
++    simplebench lib.
 +    """
-+    if initial_run:
-+        print('  #initial run:')
-+        print('   ', test_func(test_env, test_case))
 +
-+    runs =3D []
-+    for i in range(count):
-+        print('  #run {}'.format(i+1))
-+        res =3D test_func(test_env, test_case)
-+        print('   ', res)
-+        runs.append(res)
++    vm =3D QEMUMachine(qemu_args[0], args=3Dqemu_args[1:])
 +
-+    result =3D {'runs': runs}
++    try:
++        vm.launch()
++    except OSError as e:
++        return {'error': 'popen failed: ' + str(e)}
++    except (QMPConnectError, socket.timeout):
++        return {'error': 'qemu failed: ' + str(vm.get_log())}
 +
-+    successed =3D [r for r in runs if ('seconds' in r)]
-+    if successed:
-+        avg =3D sum(r['seconds'] for r in successed) / len(successed)
-+        result['average'] =3D avg
-+        result['delta'] =3D max(abs(r['seconds'] - avg) for r in successed=
-)
++    try:
++        res =3D vm.qmp(cmd, **cmd_args)
++        if res !=3D {'return': {}}:
++            vm.shutdown()
++            return {'error': '"{}" command failed: {}'.format(cmd, str(res=
+))}
 +
-+    if len(successed) < count:
-+        result['n-failed'] =3D count - len(successed)
++        e =3D vm.event_wait('JOB_STATUS_CHANGE')
++        assert e['data']['status'] =3D=3D 'created'
++        start_ms =3D e['timestamp']['seconds'] * 1000000 + \
++            e['timestamp']['microseconds']
 +
-+    return result
++        e =3D vm.events_wait((('BLOCK_JOB_READY', None),
++                            ('BLOCK_JOB_COMPLETED', None),
++                            ('BLOCK_JOB_FAILED', None)), timeout=3DTrue)
++        if e['event'] not in ('BLOCK_JOB_READY', 'BLOCK_JOB_COMPLETED'):
++            vm.shutdown()
++            return {'error': 'block-job failed: ' + str(e),
++                    'vm-log': vm.get_log()}
++        end_ms =3D e['timestamp']['seconds'] * 1000000 + \
++            e['timestamp']['microseconds']
++    finally:
++        vm.shutdown()
++
++    return {'seconds': (end_ms - start_ms) / 1000000.0}
 +
 +
-+def ascii_one(result):
-+    """Return ASCII representation of bench_one() returned dict."""
-+    if 'average' in result:
-+        s =3D '{:.2f} +- {:.2f}'.format(result['average'], result['delta']=
-)
-+        if 'n-failed' in result:
-+            s +=3D '\n({} failed)'.format(result['n-failed'])
-+        return s
++# Bench backup or mirror
++def bench_block_copy(qemu_binary, cmd, source, target):
++    """Helper to run bench_block_job() for mirror or backup"""
++    assert cmd in ('blockdev-backup', 'blockdev-mirror')
++
++    source['node-name'] =3D 'source'
++    target['node-name'] =3D 'target'
++
++    return bench_block_job(cmd,
++                           {'job-id': 'job0', 'device': 'source',
++                            'target': 'target', 'sync': 'full'},
++                           [qemu_binary,
++                            '-blockdev', json.dumps(source),
++                            '-blockdev', json.dumps(target)])
++
++
++def drv_file(filename):
++    return {'driver': 'file', 'filename': filename,
++            'cache': {'direct': True}, 'aio': 'native'}
++
++
++def drv_nbd(host, port):
++    return {'driver': 'nbd',
++            'server': {'type': 'inet', 'host': host, 'port': port}}
++
++
++if __name__ =3D=3D '__main__':
++    import sys
++
++    if len(sys.argv) < 4:
++        print('USAGE: {} <qmp block-job command name> '
++              '<json string of arguments for the command> '
++              '<qemu binary path and arguments>'.format(sys.argv[0]))
++        exit(1)
++
++    res =3D bench_block_job(sys.argv[1], json.loads(sys.argv[2]), sys.argv=
+[3:])
++    if 'seconds' in res:
++        print('{:.2f}'.format(res['seconds']))
 +    else:
-+        return 'FAILED'
-+
-+
-+def bench(test_func, test_envs, test_cases, *args, **vargs):
-+    """Fill benchmark table
-+
-+    test_func -- benchmarking function, see bench_one for description
-+    test_envs -- list of test environments, see bench_one
-+    test_cases -- list of test cases, see bench_one
-+    args, vargs -- additional arguments for bench_one
-+
-+    Returns dict with the following fields:
-+        'envs':  test_envs
-+        'cases': test_cases
-+        'tab':   filled 2D array, where cell [i][j] is bench_one result fo=
-r
-+                 test_cases[i] for test_envs[j] (i.e., rows are test cases=
- and
-+                 columns are test environments)
-+    """
-+    tab =3D {}
-+    results =3D {
-+        'envs': test_envs,
-+        'cases': test_cases,
-+        'tab': tab
-+    }
-+    n =3D 1
-+    n_tests =3D len(test_envs) * len(test_cases)
-+    for env in test_envs:
-+        for case in test_cases:
-+            print('Testing {}/{}: {} :: {}'.format(n, n_tests,
-+                                                   env['id'], case['id']))
-+            if case['id'] not in tab:
-+                tab[case['id']] =3D {}
-+            tab[case['id']][env['id']] =3D bench_one(test_func, env, case,
-+                                                   *args, **vargs)
-+            n +=3D 1
-+
-+    print('Done')
-+    return results
-+
-+
-+def ascii(results):
-+    """Return ASCII representation of bench() returned dict."""
-+    from tabulate import tabulate
-+
-+    tab =3D [[""] + [c['id'] for c in results['envs']]]
-+    for case in results['cases']:
-+        row =3D [case['id']]
-+        for env in results['envs']:
-+            row.append(ascii_one(results['tab'][case['id']][env['id']]))
-+        tab.append(row)
-+
-+    return tabulate(tab)
++        print(res)
 --=20
 2.24.1
 
