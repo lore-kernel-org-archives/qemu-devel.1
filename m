@@ -4,139 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A3EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4983EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:53:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E952620724
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:51:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E952620724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C7F2E20724
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:53:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7F2E20724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEbuh-0000Yi-1X
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 12:51:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48061)
+	id 1jEbwq-0001rh-OH
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 12:53:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jEbu2-0008Vn-Uz
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:50:48 -0400
+ (envelope-from <groug@kaod.org>) id 1jEbw7-0001KH-QX
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jEbu1-0004hV-E4
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:50:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44496)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jEbu1-0004cZ-4L
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:50:45 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02IGXO7h145252
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 12:50:43 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8621k4c-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 12:50:43 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Wed, 18 Mar 2020 16:50:41 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Mar 2020 16:50:39 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02IGocmZ48758832
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Mar 2020 16:50:38 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2799442042;
- Wed, 18 Mar 2020 16:50:38 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 70F6642045;
- Wed, 18 Mar 2020 16:50:37 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.38.18])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 18 Mar 2020 16:50:37 +0000 (GMT)
-Subject: Re: [PATCH v10 15/16] docs: system: Add protvirt docs
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200318143047.2335-1-frankja@linux.ibm.com>
- <20200318143047.2335-16-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Wed, 18 Mar 2020 17:50:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <groug@kaod.org>) id 1jEbw6-0001aU-Fr
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:52:55 -0400
+Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:42076)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jEbw6-0000rS-8C
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:52:54 -0400
+Received: from player728.ha.ovh.net (unknown [10.108.35.103])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1244C1CE84D
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 17:52:43 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player728.ha.ovh.net (Postfix) with ESMTPSA id D6A0B107A6B1F;
+ Wed, 18 Mar 2020 16:52:37 +0000 (UTC)
+Date: Wed, 18 Mar 2020 17:52:32 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 1/2] target/ppc: Fix slbia TLB invalidation gap
+Message-ID: <20200318175232.37db1fd1@bahia.lan>
+In-Reply-To: <20200318044135.851716-1-npiggin@gmail.com>
+References: <20200318044135.851716-1-npiggin@gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200318143047.2335-16-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031816-0016-0000-0000-000002F34F9A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031816-0017-0000-0000-00003356D590
-Message-Id: <2e6b2eac-0e68-7467-1308-3055f4f61a25@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-18_07:2020-03-18,
- 2020-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0
- lowpriorityscore=0 malwarescore=0 spamscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 adultscore=0
- bulkscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2003180075
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Ovh-Tracer-Id: 5898308139141470659
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefjedgleduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 87.98.181.248
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,106 +67,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 18 Mar 2020 14:41:34 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-
-On 18.03.20 15:30, Janosch Frank wrote:
-> Let's add some documentation for the Protected VM functionality.
+> slbia must invalidate TLBs even if it does not remove a valid SLB
+> entry, because slbmte can overwrite valid entries without removing
+> their TLBs.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> As the architecture says, slbia invalidates all lookaside information,
+> not conditionally based on if it removed valid entries.
+> 
+> It does not seem possible for POWER8 or earlier Linux kernels to hit
+> this bug because it never changes its kernel SLB translations, and it
+> should always have valid entries if any accesses are made to usespace
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+s/usespace/userspace
 
+> regions. However other operating systems which may modify SLB entry 0
+> or do more fancy things with segments might be affected.
+> 
+> When POWER9 slbia support is added in the next patch, this becomes a
+> real problem because some new slbia variants don't invalidate all
+> non-zero entries.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->  docs/system/s390x/protvirt.rst | 59 ++++++++++++++++++++++++++++++++++
->  docs/system/target-s390x.rst   |  5 +++
->  2 files changed, 64 insertions(+)
->  create mode 100644 docs/system/s390x/protvirt.rst
+
+LGTM
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  target/ppc/mmu-hash64.c | 21 +++++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
 > 
-> diff --git a/docs/system/s390x/protvirt.rst b/docs/system/s390x/protvirt.rst
-> new file mode 100644
-> index 0000000000000000..71172511632f7bcb
-> --- /dev/null
-> +++ b/docs/system/s390x/protvirt.rst
-> @@ -0,0 +1,59 @@
-> +Protected Virtualization on s390x
-> +=================================
-> +
-> +The memory and most of the registers of Protected Virtual Machines
-> +(PVMs) are encrypted or inaccessible to the hypervisor, effectively
-> +prohibiting VM introspection when the VM is running. At rest, PVMs are
-> +encrypted and can only be decrypted by the firmware, represented by an
-> +entity called Ultravisor, of specific IBM Z machines.
-> +
-> +
-> +Prerequisites
-> +-------------
-> +
-> +To run PVMs, a machine with the Protected Virtualization feature, as
-> +indicated by the Ultravisor Call facility (stfle bit 158), is
-> +required. The Ultravisor needs to be initialized at boot by setting
-> +`prot_virt=1` on the host's kernel command line.
-> +
-> +Running PVMs requires using the KVM hypervisor.
-> +
-> +If those requirements are met, the capability `KVM_CAP_S390_PROTECTED`
-> +will indicate that KVM can support PVMs on that LPAR.
-> +
-> +
-> +QEMU Settings
-> +-------------
-> +
-> +To indicate to the VM that it can transition into protected mode, the
-> +`Unpack facility` (stfle bit 161 represented by the feature
-> +`unpack`/`S390_FEAT_UNPACK`) needs to be part of the cpu model of
-> +the VM.
-> +
-> +All I/O devices need to use the IOMMU.
-> +Passthrough (vfio) devices are currently not supported.
-> +
-> +Host huge page backings are not supported. However guests can use huge
-> +pages as indicated by its facilities.
-> +
-> +
-> +Boot Process
-> +------------
-> +
-> +A secure guest image can either be loaded from disk or supplied on the
-> +QEMU command line. Booting from disk is done by the unmodified
-> +s390-ccw BIOS. I.e., the bootmap is interpreted, multiple components
-> +are read into memory and control is transferred to one of the
-> +components (zipl stage3). Stage3 does some fixups and then transfers
-> +control to some program residing in guest memory, which is normally
-> +the OS kernel. The secure image has another component prepended
-> +(stage3a) that uses the new diag308 subcodes 8 and 10 to trigger the
-> +transition into secure mode.
-> +
-> +Booting from the image supplied on the QEMU command line requires that
-> +the file passed via -kernel has the same memory layout as would result
-> +from the disk boot. This memory layout includes the encrypted
-> +components (kernel, initrd, cmdline), the stage3a loader and
-> +metadata. In case this boot method is used, the command line
-> +options -initrd and -cmdline are ineffective. The preparation of a PVM
-> +image is done via the `genprotimg` tool from the s390-tools package.
-> diff --git a/docs/system/target-s390x.rst b/docs/system/target-s390x.rst
-> index 4c8b7cdd66154d26..8d97158dc804af1c 100644
-> --- a/docs/system/target-s390x.rst
-> +++ b/docs/system/target-s390x.rst
-> @@ -24,3 +24,8 @@ or vfio-ap is also available.
->  .. toctree::
->     s390x/vfio-ap
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 34f6009b1e..373d44de74 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -100,20 +100,29 @@ void helper_slbia(CPUPPCState *env)
+>      PowerPCCPU *cpu = env_archcpu(env);
+>      int n;
 >  
-> +Architectural features
-> +~~~~~~~~
+> +    /*
+> +     * slbia must always flush all TLB (which is equivalent to ERAT in ppc
+> +     * architecture). Matching on SLB_ESID_V is not good enough, because slbmte
+> +     * can overwrite a valid SLB without flushing its lookaside information.
+> +     *
+> +     * It would be possible to keep the TLB in synch with the SLB by flushing
+> +     * when a valid entry is overwritten by slbmte, and therefore slbia would
+> +     * not have to flush unless it evicts a valid SLB entry. However it is
+> +     * expected that slbmte is more common than slbia, and slbia is usually
+> +     * going to evict valid SLB entries, so that tradeoff is unlikely to be a
+> +     * good one.
+> +     */
 > +
-> +.. toctree::
-> +   s390x/protvirt
-> 
+>      /* XXX: Warning: slbia never invalidates the first segment */
+>      for (n = 1; n < cpu->hash64_opts->slb_size; n++) {
+>          ppc_slb_t *slb = &env->slb[n];
+>  
+>          if (slb->esid & SLB_ESID_V) {
+>              slb->esid &= ~SLB_ESID_V;
+> -            /*
+> -             * XXX: given the fact that segment size is 256 MB or 1TB,
+> -             *      and we still don't have a tlb_flush_mask(env, n, mask)
+> -             *      in QEMU, we just invalidate all TLBs
+> -             */
+> -            env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
+>          }
+>      }
+> +
+> +    env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
+>  }
+>  
+>  static void __helper_slbie(CPUPPCState *env, target_ulong addr,
 
 
