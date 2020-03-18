@@ -2,59 +2,87 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4D0C5AD43
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B0EC5ACD8
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:03:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5AE120757
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:01:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5AE120757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=xes-inc.com
+	by mail.kernel.org (Postfix) with ESMTPS id E496C20770
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:03:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="T3zuNSbE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E496C20770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEaCG-0002CJ-M8
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 11:01:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50249)
+	id 1jEaDl-0004D3-1j
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 11:03:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vfazio@xes-inc.com>) id 1jEaBM-0001Q7-0i
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:00:37 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jEaBW-0001Yp-0M
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:00:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vfazio@xes-inc.com>) id 1jEaBD-0007Hx-Ls
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:00:31 -0400
-Received: from xes-mad.com ([162.248.234.2]:20005 helo=mail.xes-mad.com)
+ (envelope-from <kwankhede@nvidia.com>) id 1jEaBT-0008A0-1A
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:00:41 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13262)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vfazio@xes-inc.com>)
- id 1jEaBD-0006zz-FU; Wed, 18 Mar 2020 11:00:23 -0400
-Received: from [10.52.16.140] (vfazio1.xes-mad.com [10.52.16.140])
- by mail.xes-mad.com (Postfix) with ESMTP id 2206D20296;
- Wed, 18 Mar 2020 10:00:20 -0500 (CDT)
-Subject: Re: [PATCH 1/1] target/ppc: fix ELFv2 signal handler endianness
-To: David Gibson <david@gibson.dropbear.id.au>,
- Vincent Fazio <vfazio@gmail.com>
-References: <20200315155202.13107-1-vfazio@xes-inc.com>
- <346e47c8-4a80-860c-ec55-e38d2021d63d@vivier.eu>
- <CAOrEah5Fq7Kp9wF_4Vtb4Qfcdm0gtwin_5b_ft7h7my+RnTOWA@mail.gmail.com>
- <20200316022107.GA2013@umbus.fritz.box>
-From: Vincent Fazio <vfazio@xes-inc.com>
-Message-ID: <0a4f5e07-3934-ea6b-4fe1-9fc3ec4c8d85@xes-inc.com>
-Date: Wed, 18 Mar 2020 10:00:20 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1jEaBS-0007rZ-J3
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:00:38 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e7237300001>; Wed, 18 Mar 2020 07:58:56 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Wed, 18 Mar 2020 08:00:33 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Wed, 18 Mar 2020 08:00:33 -0700
+Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 18 Mar
+ 2020 15:00:24 +0000
+Subject: Re: [PATCH v13 Kernel 7/7] vfio: Selective dirty page tracking if
+ IOMMU backed device pins pages
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1584035607-23166-1-git-send-email-kwankhede@nvidia.com>
+ <1584035607-23166-8-git-send-email-kwankhede@nvidia.com>
+ <20200313144911.72e727d4@x1.home>
+ <48f3b2b2-c066-f366-e5ff-2f39763a9463@nvidia.com>
+ <20200317130036.6f20003c@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <71c8ddff-42e7-ec1b-9761-00c4a6add16c@nvidia.com>
+Date: Wed, 18 Mar 2020 20:30:19 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200316022107.GA2013@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200317130036.6f20003c@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 162.248.234.2
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1584543536; bh=ULetPZhc4orU6Scshm3LQRT5Ld5fXI2UfoEwLbz9UaY=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=T3zuNSbEElL18JqEXfk/QCC1ef770V99Ju9Vs2MVQui8poRpcLy+kSVbzENdMYQk7
+ Nu0pOou6XbB93mwkmrhNGNmYY7RhIBcdf+CwiMqasgXOV21bGyh29M4eFxAoZ3a9rn
+ +dBI2wc0pHOKM8xBHajyQ7SOYcEjqZA7Hzxqc5T0YslIMghqJKVnIJEzH042mndfBR
+ viGLnHafEKENvVQ3vhzcqvs8E8+y5wuhI5aH9zaJBNJc66pKQeQrJ3OXwXRYjO15Gb
+ BHpXJitHYOEbOOavND3/3OfbHKe1Zg5jqePJ2IIGglepQEFzwJiVmULHoLHUNBqqla
+ bon4lSbRhsmEQ==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,136 +94,386 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
- qemu-ppc@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David, Laurent,
 
-On 3/15/20 9:21 PM, David Gibson wrote:
-> On Sun, Mar 15, 2020 at 07:29:04PM -0500, Vincent Fazio wrote:
->> Laurent,
->>
->> On Sun, Mar 15, 2020 at 1:10 PM Laurent Vivier <laurent@vivier.eu> wro=
-te:
->>> Le 15/03/2020 =E0 16:52, Vincent Fazio a =E9crit :
->>>> From: Vincent Fazio <vfazio@gmail.com>
+
+On 3/18/2020 12:30 AM, Alex Williamson wrote:
+> On Tue, 17 Mar 2020 23:58:38 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 3/14/2020 2:19 AM, Alex Williamson wrote:
+>>> On Thu, 12 Mar 2020 23:23:27 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+>>>> Added a check such that only singleton IOMMU groups can pin pages.
+>>>>   From the point when vendor driver pins any pages, consider IOMMU group
+>>>> dirty page scope to be limited to pinned pages.
 >>>>
->>>> In ELFv2, function pointers are entry points and are in host endiann=
-ess.
->>> "host endianness" is misleading here. "target endianness" is better.
-> Yeah, the trouble here is that I think the ELF spec will use "host"
-> and "target" in a quite different sense than qemu.
->
-I'll be simplifying the wording in the message to just mention the=20
-problematic cross-endian scenario
->> I do want to clarify here. In a mixed endian scenario (my test case
->> was an x86 host and e5500 PPC BE target), the function pointers are in
->> host endianness (little endian) so that the virtual address can be
->> dereferenced by the host for the target instructions to be
->> translated.
-> This can't be right.  The ELF is operating entirely within the guest,
-> and has no concept of a host (in the qemu sense).  Therefore it's
-> impossible for it to specify anything as "host endian" (again in the
-> qemu sense).
->
-> It *is* possible that it's little endian explicitly (in which case
-> we'd need a conditional swap that's different from the one we have
-> now).
->
-> But even that seems pretty odd.  AFAICT that target_sigaction
-> structure is copied verbatim from guest memory when the guest makes
-> the sigaction() syscall.  Are we expecting a BE process to put LE
-> parameters into a syscall structure?  That seems unlikely.
->
-> I really think you need to put some instrumentation in the sigaction()
-> call that comes before this, to see exactly what the guest process is
-> supplying there.
->
-> And then we maybe need to look at your guest side libc and/or a native
-> e5500 BE kernel to see what it expects in that structure.
-As we discussed in the other thread, I missed the endian swap done as=20
-part of get_user in do_sigaction. So while my initial determination for=20
-the root cause of the problem was wrong, the fix is still the same (drop=20
-the `tswapl` call). The commit message will be updated.
->>>> Previously, the signal handler would be swapped if the target CPU wa=
-s a
->>>> different endianness than the host. This would cause a SIGSEGV when
->>>> attempting to translate the opcode pointed to by the swapped address=
-.
->>> This is correct.
->>>
->>>>   Thread 1 "qemu-ppc64" received signal SIGSEGV, Segmentation fault.
->>>>   0x00000000600a9257 in ldl_he_p (ptr=3D0x4c2c061000000000) at qemu/=
-include/qemu/bswap.h:351
->>>>   351        __builtin_memcpy(&r, ptr, sizeof(r));
+>>>> To optimize to avoid walking list often, added flag
+>>>> pinned_page_dirty_scope to indicate if all of the vfio_groups for each
+>>>> vfio_domain in the domain_list dirty page scope is limited to pinned
+>>>> pages. This flag is updated on first pinned pages request for that IOMMU
+>>>> group and on attaching/detaching group.
 >>>>
->>>>   #0  0x00000000600a9257 in ldl_he_p (ptr=3D0x4c2c061000000000) at q=
-emu/include/qemu/bswap.h:351
->>>>   #1  0x00000000600a92fe in ldl_be_p (ptr=3D0x4c2c061000000000) at q=
-emu/include/qemu/bswap.h:449
->>>>   #2  0x00000000600c0790 in translator_ldl_swap at qemu/include/exec=
-/translator.h:201
->>>>   #3  0x000000006011c1ab in ppc_tr_translate_insn at qemu/target/ppc=
-/translate.c:7856
->>>>   #4  0x000000006005ae70 in translator_loop at qemu/accel/tcg/transl=
-ator.c:102
->>>>
->>>> Now, no swap is performed and execution continues properly.
->>>>
->>>> Signed-off-by: Vincent Fazio <vfazio@gmail.com>
+>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
 >>>> ---
->>>>   linux-user/ppc/signal.c | 10 +++++++---
->>>>   1 file changed, 7 insertions(+), 3 deletions(-)
+>>>>    drivers/vfio/vfio.c             |  9 +++++-
+>>>>    drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++--
+>>>>    include/linux/vfio.h            |  4 ++-
+>>>>    3 files changed, 80 insertions(+), 5 deletions(-)
 >>>>
->>>> diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
->>>> index 5b82af6cb6..c7f6455170 100644
->>>> --- a/linux-user/ppc/signal.c
->>>> +++ b/linux-user/ppc/signal.c
->>>> @@ -567,9 +567,13 @@ void setup_rt_frame(int sig, struct target_siga=
-ction *ka,
->>>>           env->nip =3D tswapl(handler->entry);
->>>>           env->gpr[2] =3D tswapl(handler->toc);
->>>>       } else {
->>>> -        /* ELFv2 PPC64 function pointers are entry points, but R12
->>>> -         * must also be set */
->>>> -        env->nip =3D tswapl((target_ulong) ka->_sa_handler);
->>>> +        /*
->>>> +         * ELFv2 PPC64 function pointers are entry points and are i=
-n host
->>>> +         * endianness so should not to be swapped.
->>> "target endianness"
+>>>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+>>>> index c8482624ca34..79108c1245a5 100644
+>>>> --- a/drivers/vfio/vfio.c
+>>>> +++ b/drivers/vfio/vfio.c
+>>>> @@ -85,6 +85,7 @@ struct vfio_group {
+>>>>    	atomic_t			opened;
+>>>>    	wait_queue_head_t		container_q;
+>>>>    	bool				noiommu;
+>>>> +	unsigned int			dev_counter;
+>>>>    	struct kvm			*kvm;
+>>>>    	struct blocking_notifier_head	notifier;
+>>>>    };
+>>>> @@ -555,6 +556,7 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
+>>>>    
+>>>>    	mutex_lock(&group->device_lock);
+>>>>    	list_add(&device->group_next, &group->device_list);
+>>>> +	group->dev_counter++;
+>>>>    	mutex_unlock(&group->device_lock);
+>>>>    
+>>>>    	return device;
+>>>> @@ -567,6 +569,7 @@ static void vfio_device_release(struct kref *kref)
+>>>>    	struct vfio_group *group = device->group;
+>>>>    
+>>>>    	list_del(&device->group_next);
+>>>> +	group->dev_counter--;
+>>>>    	mutex_unlock(&group->device_lock);
+>>>>    
+>>>>    	dev_set_drvdata(device->dev, NULL);
+>>>> @@ -1895,6 +1898,9 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
+>>>>    	if (!group)
+>>>>    		return -ENODEV;
+>>>>    
+>>>> +	if (group->dev_counter > 1)
+>>>> +		return -EINVAL;
+>>>> +
+>>>>    	ret = vfio_group_add_container_user(group);
+>>>>    	if (ret)
+>>>>    		goto err_pin_pages;
+>>>> @@ -1902,7 +1908,8 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
+>>>>    	container = group->container;
+>>>>    	driver = container->iommu_driver;
+>>>>    	if (likely(driver && driver->ops->pin_pages))
+>>>> -		ret = driver->ops->pin_pages(container->iommu_data, user_pfn,
+>>>> +		ret = driver->ops->pin_pages(container->iommu_data,
+>>>> +					     group->iommu_group, user_pfn,
+>>>>    					     npage, prot, phys_pfn);
+>>>>    	else
+>>>>    		ret = -ENOTTY;
+>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>> index 4f1f116feabc..18a284b230c0 100644
+>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
+>>>>    	bool			v2;
+>>>>    	bool			nesting;
+>>>>    	bool			dirty_page_tracking;
+>>>> +	bool			pinned_page_dirty_scope;
+>>>>    };
+>>>>    
+>>>>    struct vfio_domain {
+>>>> @@ -98,6 +99,7 @@ struct vfio_group {
+>>>>    	struct iommu_group	*iommu_group;
+>>>>    	struct list_head	next;
+>>>>    	bool			mdev_group;	/* An mdev group */
+>>>> +	bool			has_pinned_pages;
 >>>
->>>> +         *
->>>> +         * Note: R12 must also be set.
->>>> +         */
->>>> +        env->nip =3D (target_ulong) ka->_sa_handler;
->>> The cast is not needed: nip and _sa_handler are abi_ulong.
->> I'll drop this in v2
+>>> I'm afraid over time this name will be confusing, should we simply
+>>> call it pinned_page_dirty_scope per vfio_group as well?
 >>
->>>>           env->gpr[12] =3D env->nip;
->>>>       }
->>>>   #else
->>>>
->>> If you repost with the fix I've reported above you can add my:
->>>
->>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->>>
->> I'll hold off on reposting until the endianness wording is figured out=
-.
-I'll be submitting v2 shortly, but it will have a different commit=20
-message to better reflect the issue.
->>> Thanks,
->>> Laurent
->> Thanks,
->> -Vincent
+>> Updating as you suggested, but I hope it doesn't look confusing.
 >>
---=20
-Vincent Fazio
-Embedded Software Engineer - Linux
-Extreme Engineering Solutions, Inc
-http://www.xes-inc.com
+>>>   We might have
+>>> to adapt this over time as we get new ways to dirty pages, but each
+>>> group voting towards the same value being set on the vfio_iommu object
+>>> seems like a good starting point.
+>>>    
+>>>>    };
+>>>>    
+>>>>    struct vfio_iova {
+>>>> @@ -129,6 +131,10 @@ struct vfio_regions {
+>>>>    static int put_pfn(unsigned long pfn, int prot);
+>>>>    static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+>>>>    
+>>>> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>>>> +					       struct iommu_group *iommu_group);
+>>>> +
+>>>> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
+>>>>    /*
+>>>>     * This code handles mapping and unmapping of user data buffers
+>>>>     * into DMA'ble space using the IOMMU
+>>>> @@ -579,11 +585,13 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+>>>>    }
+>>>>    
+>>>>    static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>> +				      struct iommu_group *iommu_group,
+>>>>    				      unsigned long *user_pfn,
+>>>>    				      int npage, int prot,
+>>>>    				      unsigned long *phys_pfn)
+>>>>    {
+>>>>    	struct vfio_iommu *iommu = iommu_data;
+>>>> +	struct vfio_group *group;
+>>>>    	int i, j, ret;
+>>>>    	unsigned long remote_vaddr;
+>>>>    	struct vfio_dma *dma;
+>>>> @@ -662,8 +670,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>>    				   (vpfn->iova - dma->iova) >> pgshift, 1);
+>>>>    		}
+>>>>    	}
+>>>> -
+>>>>    	ret = i;
+>>>> +
+>>>> +	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
+>>>> +	if (!group->has_pinned_pages) {
+>>>> +		group->has_pinned_pages = true;
+>>>> +		update_pinned_page_dirty_scope(iommu);
+>>>> +	}
+>>>> +
+>>>>    	goto pin_done;
+>>>>    
+>>>>    pin_unwind:
+>>>> @@ -946,8 +960,11 @@ static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+>>>>    	npages = dma->size >> pgshift;
+>>>>    	bitmap_size = dirty_bitmap_bytes(npages);
+>>>>    
+>>>> -	/* mark all pages dirty if all pages are pinned and mapped. */
+>>>> -	if (dma->iommu_mapped)
+>>>> +	/*
+>>>> +	 * mark all pages dirty if any IOMMU capable device is not able
+>>>> +	 * to report dirty pages and all pages are pinned and mapped.
+>>>> +	 */
+>>>> +	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
+>>>>    		bitmap_set(dma->bitmap, 0, npages);
+>>>>    
+>>>>    	if (dma->bitmap) {
+>>>> @@ -1430,6 +1447,51 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
+>>>>    	return NULL;
+>>>>    }
+>>>>    
+>>>> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>>>> +					       struct iommu_group *iommu_group)
+>>>> +{
+>>>> +	struct vfio_domain *domain;
+>>>> +	struct vfio_group *group = NULL;
+>>>> +
+>>>> +	list_for_each_entry(domain, &iommu->domain_list, next) {
+>>>> +		group = find_iommu_group(domain, iommu_group);
+>>>> +		if (group)
+>>>> +			return group;
+>>>> +	}
+>>>> +
+>>>> +	if (iommu->external_domain)
+>>>> +		group = find_iommu_group(iommu->external_domain, iommu_group);
+>>>> +
+>>>> +	return group;
+>>>> +}
+>>>> +
+>>>> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>>>> +{
+>>>> +	struct vfio_domain *domain;
+>>>> +	struct vfio_group *group;
+>>>> +
+>>>> +	list_for_each_entry(domain, &iommu->domain_list, next) {
+>>>> +		list_for_each_entry(group, &domain->group_list, next) {
+>>>> +			if (!group->has_pinned_pages) {
+>>>> +				iommu->pinned_page_dirty_scope = false;
+>>>> +				return;
+>>>> +			}
+>>>> +		}
+>>>> +	}
+>>>> +
+>>>> +	if (iommu->external_domain) {
+>>>> +		domain = iommu->external_domain;
+>>>> +		list_for_each_entry(group, &domain->group_list, next) {
+>>>> +			if (!group->has_pinned_pages) {
+>>>> +				iommu->pinned_page_dirty_scope = false;
+>>>> +				return;
+>>>> +			}
+>>>> +		}
+>>>> +	}
+>>>> +
+>>>> +	iommu->pinned_page_dirty_scope = true;
+>>>> +}
+>>>> +
+>>>>    static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
+>>>>    				  phys_addr_t *base)
+>>>>    {
+>>>> @@ -1836,6 +1898,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>>>    
+>>>>    			list_add(&group->next,
+>>>>    				 &iommu->external_domain->group_list);
+>>>> +			update_pinned_page_dirty_scope(iommu);
+>>>>    			mutex_unlock(&iommu->lock);
+>>>>    
+>>>>    			return 0;
+>>>> @@ -1958,6 +2021,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>>>    done:
+>>>>    	/* Delete the old one and insert new iova list */
+>>>>    	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
+>>>> +	update_pinned_page_dirty_scope(iommu);
+>>>>    	mutex_unlock(&iommu->lock);
+>>>>    	vfio_iommu_resv_free(&group_resv_regions);
+>>>>      
+>>>
+>>> At this point we've added an iommu backed group that can't possibly
+>>> have pages pinned on behalf of this group yet, can't we just set
+>>> iommu->pinned_page_dirty_scope = false?
+>>>    
+>>
+>> Right, changing.
+>>
+>>> In the previous case, aren't we adding a non-iommu backed group, so
+>>> should we presume the scope is pinned pages even before we have any?
+>>
+>> Anyways we are updating it when pages are pinned, I think better not to
+>> presume.
+> 
+> If there's no iommu backing then the device doesn't have access to
+> dirty the pages itself, how else will they get dirty?  Perhaps I was a
+> little use in using the word "presume", I think there's a proof that
+> the pages must have limited dirty-scope.
+> 
 
+We need to handle below cases with non-iommu backed device:
+1. Only non-iommu mdev device
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope()=>iommu->pinned_page_dirty_scope=true
+
+2. First non-iommu mdev is attached then iommu backed device attached.
+1st non-iommu mdev device attached
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope()=>iommu->pinned_page_dirty_scope=true
+
+2nd iommu backed device attached:
+iommu->pinned_page_dirty_scope = false
+
+3. First iommu backed devices are attached then non-iommu backed devices 
+attached
+For iommu backed device attached
+iommu->pinned_page_dirty_scope = false
+
+Last non-iommu mdev device attached
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope()=>iommu->pinned_page_dirty_scope=false
+
+I think we can set group->pinned_page_dirty_scope = true, but not the 
+iommu->pinned_page_dirty_scope.
+
+Then if iommu backed device's driver pins pages through vfio_pin_pages(): 	
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope() will change 
+iommu->pinned_page_dirty_scope based on current group list - if any 
+group in the list doesn't support dirty scope - set false
+
+>>> We could almost forego the iommu scope update, but it could be the
+>>> first group added if we're going to preemptively assume the scope of
+>>> the group.
+>>>    
+>>>> @@ -1972,6 +2036,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>>>    out_free:
+>>>>    	kfree(domain);
+>>>>    	kfree(group);
+>>>> +	update_pinned_page_dirty_scope(iommu);
+>>>
+>>> This one looks like paranoia given how late we update when the group is
+>>> added.
+>>>    
+>>>>    	mutex_unlock(&iommu->lock);
+>>>>    	return ret;
+>>>>    }
+>>>> @@ -2176,6 +2241,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>>>    		vfio_iommu_iova_free(&iova_copy);
+>>>>    
+>>>>    detach_group_done:
+>>>> +	update_pinned_page_dirty_scope(iommu);
+>>>
+>>> We only need to do this if the group we're removing does not have
+>>> pinned page dirty scope, right?  I think we have all the info here to
+>>> make that optimization.
+>>>    
+>>
+>> There could be more than one group that doesn't have pinned page dirty
+>> scope, better to run through update_pinned_page_dirty_scope() function.
+> 
+> Maybe I stated it wrong above, but I think we have this table:
+> 
+> 
+> iommu|group
+> -----+--------+---------+
+> XXXXX|   0    |    1    |
+> -----+--------+---------+
+>    0  |   A    |    B    |
+> -----+--------+---------+
+>    1  |   C    |    D    |
+> -----+--------+---------+
+> 
+> A: If we are NOT dirty-page-scope at the iommu and we remove a group
+> that is NOT dirty-page-scope, we need to check because that might have
+> been the group preventing the iommu from being dirty-page-scope.
+> 
+> B: If we are NOT dirty-page-scope at the iommu and we remove a group
+> that IS dirty-page-scope, we know that group wasn't limiting the scope
+> at the iommu.
+> 
+> C: If the iommu IS dirty-page-scope, we can't remove a group that is
+> NOT dirty page scope, this case is impossible.
+> 
+> D: If the iommu IS dirty-page-scope and we remove a group that IS dirty-
+> page-scope, nothing changes.
+> 
+> So I think we only need to update on A, or A+C since C cannot happen.
+> In B and D removing a group with dirt-page-scope cannot change the
+> iommu scope.  Thanks,
+> 
+
+Ok. Updating iommu->pinned_page_dirty_scope only when removing a group 
+that is NOT dirty-page-scope.
+
+Thanks,
+Kirti
+
+> Alex
+> 
+>>>>    	mutex_unlock(&iommu->lock);
+>>>>    }
+>>>>    
+>>>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>>>> index e42a711a2800..da29802d6276 100644
+>>>> --- a/include/linux/vfio.h
+>>>> +++ b/include/linux/vfio.h
+>>>> @@ -72,7 +72,9 @@ struct vfio_iommu_driver_ops {
+>>>>    					struct iommu_group *group);
+>>>>    	void		(*detach_group)(void *iommu_data,
+>>>>    					struct iommu_group *group);
+>>>> -	int		(*pin_pages)(void *iommu_data, unsigned long *user_pfn,
+>>>> +	int		(*pin_pages)(void *iommu_data,
+>>>> +				     struct iommu_group *group,
+>>>> +				     unsigned long *user_pfn,
+>>>>    				     int npage, int prot,
+>>>>    				     unsigned long *phys_pfn);
+>>>>    	int		(*unpin_pages)(void *iommu_data,
+>>>    
+>>
+> 
 
