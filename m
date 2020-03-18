@@ -2,76 +2,79 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31755C10F29
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F632C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:26:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBD3F2077A
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC1062077A
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:26:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bj/WjY2S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD3F2077A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wf7tSuhn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC1062077A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEfFT-0007N6-1l
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:25:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56957)
+	id 1jEfGs-0001AM-T1
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57245)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jEfEZ-0006Oi-Uf
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:24:13 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jEfFZ-0007m8-GU
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jEfEU-0001uk-5M
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:24:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:32123)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jEfEU-0001tE-1e
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:24:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584563045;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=6aff+Oexu8GVzCGh8guZeMHgCwLBh5qD/PMA5J0MUKg=;
- b=bj/WjY2SNf5RgOhkOFM8cL30rcX/mS6Z0UvJY3X4WXJqdaPy7vfAtR6VW8R9zxssLj92OA
- pUlg2vjqYVOpci1gzf6F4lxBgLXxl7Hd+CPwNu5I0uqCIeVT7W3yG4RAwYsT8d/BCdXbYp
- B2jy4Spe7zWPe/fSjXFamAuU4bx2YL8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-449-LLekJM49PZexRwOn_RWaSw-1; Wed, 18 Mar 2020 16:24:01 -0400
-X-MC-Unique: LLekJM49PZexRwOn_RWaSw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92BFE18C35A0;
- Wed, 18 Mar 2020 20:24:00 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3FD48619A9;
- Wed, 18 Mar 2020 20:23:42 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org, jsnow@redhat.com,
- Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL v2 00/11] Bitmaps patches
-Date: Wed, 18 Mar 2020 16:23:30 -0400
-Message-Id: <20200318202341.6961-1-jsnow@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jEfFY-0003kX-4k
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:25:13 -0400
+Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:41054)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jEfFX-0003j5-UW
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:25:12 -0400
+Received: by mail-oi1-x229.google.com with SMTP id b17so206600oic.8
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 13:25:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=bZkQdV1RAJToKLRBg21j9Qa7EA7q2C8NxxzNAKY5oE8=;
+ b=Wf7tSuhnSOzKnLr3Eb9ROqf8ubxsBp/e9j12yQAQ4xVrB0zkhvYjLn1PxzZTEvhXcG
+ HqNCsKyoRw7oxJ1OI+CmfGfvvLd41mc7rp6adpMl8J8Hm/3M0vYITtZn4a6M7qFJWD4g
+ a+wIlkRlzlOw2La5M2sStSjUjiEYBrqaksIxWSIWEg6oafNZHLjFLo720V5Dgckje4QY
+ J/MuRTTw+UMT4UspKbFVz7yfT2csKgDyznPsgT+5UqelzYDoMmLGRRc3Ojy+7vjNj626
+ ssFVT4FxP84n7y8v3bUsizMRj7S9Q4ezuMTvSy/A7mQWmZRi2c7JOcQin6lEiLNHO3nL
+ HiZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=bZkQdV1RAJToKLRBg21j9Qa7EA7q2C8NxxzNAKY5oE8=;
+ b=kdqY3Eou8n+7eXmIv4DfsS8BqRGBKDCVXf2DzEgr+upLyLL5dbdgbw4Jc71lT4Mdvp
+ 1N1tFI8ryCQpVQbs2CoaOpB+piQ84hOj9Pc/xgFmhVPL0J52j2eQM0bsqMfmMmGoKAMX
+ 6ganJx4/8NdwGQqUlKF6k2a0uoNt1ZwYSvodSgS3LhoCQA8CSGEYVoLUNV8bXysPpmG9
+ 6GbHtksS4Lel8MeBH1g8TDS12mWzRGvqBAwqN0DS6pjyjUa3AGuCdtjaOpiNiCA5XGl1
+ ShqntIMZmGA9OYMC7l7bcnIzUCoTdPvSZiR5Hiqmu40gRFQNrE46hJriO0Et1k40oV47
+ b8hg==
+X-Gm-Message-State: ANhLgQ1/1NGDzXpS9/d/hsoyYpcfkYmThTGEGn2zxqlnhDqA/afyQZY5
+ oNZZeDyHnS6/Y0FHMSKJyJk/Q85+JfaCJkM5gc8O2Q==
+X-Google-Smtp-Source: ADFU+vtXaGoLg9BSXoZaaKhvhdRFqBMdvNauweYNQ/VrM24IckKnIDL2nf2zACW9dqQsNZ/SC8i6fWg3uQ5IL9vlvPI=
+X-Received: by 2002:aca:5b07:: with SMTP id p7mr4510757oib.146.1584563111106; 
+ Wed, 18 Mar 2020 13:25:11 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200317163343.25028-1-armbru@redhat.com>
+In-Reply-To: <20200317163343.25028-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 18 Mar 2020 20:24:59 +0000
+Message-ID: <CAFEAcA8R4eXrLSRBB3sQwBXz6XN9OLFf5_dPzx=1UbLHvDM9OQ@mail.gmail.com>
+Subject: Re: [PULL 0/4] Error reporting patches for 2020-03-17
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,62 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit d649689a8ecb2e276cc20d3af6d416e3c299cb17=
-:
+On Tue, 17 Mar 2020 at 16:38, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 40c67636f67c2a89745f2e698522fe917326a952:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200317-pull-request' into staging (2020-03-17 14:00:56 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-error-2020-03-17
+>
+> for you to fetch changes up to 709dfb64925ed2b2978bf4c17ab98b2c7a9a05c1:
+>
+>   hw/sd/ssi-sd: fix error handling in ssi_sd_realize (2020-03-17 17:30:03 +0100)
+>
+> ----------------------------------------------------------------
+> Error reporting patches for 2020-03-17
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (3):
+>       Use &error_abort instead of separate assert()
+>       hw/misc/ivshmem: Use one Error * variable instead of two
+>       xen-block: Use one Error * variable instead of two
+>
+> Vladimir Sementsov-Ogievskiy (1):
+>       hw/sd/ssi-sd: fix error handling in ssi_sd_realize
+>
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into sta=
-ging (2020-03-17 18:33:05 +0000)
+Applied, thanks.
 
-are available in the Git repository at:
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-  https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
-
-for you to fetch changes up to 2d00cbd8e222a4adc08f415c399e84590ee8ff9a:
-
-  block/qcow2-bitmap: use bdrv_dirty_bitmap_next_dirty (2020-03-18 14:03:46=
- -0400)
-
-----------------------------------------------------------------
-Pull request
-
-----------------------------------------------------------------
-
-Eric Blake (1):
-  build: Silence clang warning on older glib autoptr usage
-
-Vladimir Sementsov-Ogievskiy (10):
-  hbitmap: assert that we don't create bitmap larger than INT64_MAX
-  hbitmap: move hbitmap_iter_next_word to hbitmap.c
-  hbitmap: unpublish hbitmap_iter_skip_words
-  hbitmap: drop meta bitmaps as they are unused
-  block/dirty-bitmap: switch _next_dirty_area and _next_zero to int64_t
-  block/dirty-bitmap: add _next_dirty API
-  block/dirty-bitmap: improve _next_dirty_area API
-  nbd/server: introduce NBDExtentArray
-  nbd/server: use bdrv_dirty_bitmap_next_dirty_area
-  block/qcow2-bitmap: use bdrv_dirty_bitmap_next_dirty
-
- configure                    |  20 +++
- include/block/dirty-bitmap.h |   9 +-
- include/qemu/hbitmap.h       |  95 +++--------
- block/dirty-bitmap.c         |  16 +-
- block/qcow2-bitmap.c         |  15 +-
- nbd/server.c                 | 251 ++++++++++++++--------------
- tests/test-hbitmap.c         | 316 +++++++++++++----------------------
- util/hbitmap.c               | 134 +++++++++------
- 8 files changed, 395 insertions(+), 461 deletions(-)
-
---=20
-2.21.1
-
+-- PMM
 
