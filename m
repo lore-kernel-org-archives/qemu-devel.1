@@ -2,93 +2,119 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE161C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 07:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B97C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 08:00:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D56E20768
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 07:35:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D56E20768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E98CD2076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 08:00:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Y/6kU4jX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E98CD2076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jETEW-000307-MC
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 03:35:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40695)
+	id 1jETck-0006Wm-1v
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 04:00:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mahesh@linux.ibm.com>) id 1jETDj-0002Qo-AI
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 03:34:32 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jETbv-00066r-Ln
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 03:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mahesh@linux.ibm.com>) id 1jETDi-0008Lc-3E
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 03:34:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45013
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jETbt-0006Ra-RV
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 03:59:31 -0400
+Received: from mail-am6eur05on2102.outbound.protection.outlook.com
+ ([40.107.22.102]:12640 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mahesh@linux.ibm.com>)
- id 1jETDh-0008Km-U6
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 03:34:30 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02I7XYwa075354
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 03:34:29 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yucv4vc9j-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 03:34:28 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mahesh@linux.ibm.com>;
- Wed, 18 Mar 2020 07:34:27 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Mar 2020 07:34:24 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02I7YNo342795136
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Mar 2020 07:34:23 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0B8B85205A;
- Wed, 18 Mar 2020 07:34:23 +0000 (GMT)
-Received: from [192.168.0.24] (unknown [9.199.55.186])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D0B5D52051;
- Wed, 18 Mar 2020 07:34:21 +0000 (GMT)
-Subject: [PATCH v2] ppc/spapr: Set the effective address provided flag in mc
- error log.
-From: Mahesh Salgaonkar <mahesh@linux.ibm.com>
-To: Qemu-ppc <qemu-ppc@nongnu.org>
-Date: Wed, 18 Mar 2020 13:04:20 +0530
-User-Agent: StGit/unknown-version
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jETbt-0006P0-7d
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 03:59:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MaoAv0aAQWXjq3FIW1kyI5zpMUnUPfct9CHCyAq5Bi27DBOpVc7BTIeLDSfglxvHMXOY9rg1htWZpc6MdPh9AyYt3Iy3AAAiVcwYi2vq9/6ch5ie36I67gVbBn+m6XBz32z1IZg1UKATMVe/E6JWAXfdMlsMFnJKw7aMjGqyxG7uaWIR6mnNlTHKHdT7RVWg1aNUwDNMFGvcxL8bmjX6qpgcLSC32B2gXvMr2Y9ULK725cXA0vzXoSryf5lxI7RjjaU/tcQtzkeE3CiLyfVThro7I+RaZRmxBkcmtX3oTqdE3o+hdXSxGP2uoWyRESkNjVJPNzS+dH0jVU1HoF6Xuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z1s0PmxUrUsJxATbRZckibgTh49qSFDkmlaSn812JEM=;
+ b=FD94+ngO7ZxjM34rNbC4oEvuDfUWHQM251lVe/PXU+crX9lUbz7cI2Ah3kUn2rVZ+rmGX8T12rPLFPAGznleJEEZ6F/TYrVE5FGBEU+O19DNpJKNbfHKkG8n5Q29I8KFbtq+/4AtE52s1g8iP5If8ORA3oq/YWczz2w3I2ngpl31rL0e7v4vKFp9Fyv3+C10eeikyArgZUfdu/5VJ1u8dBgu4IwOCyMAgzils5nYlVpWZHZpO6uNmnBMnnGi3dTWQfTljKfirlE8vHX9hyan6kCMpgDmUancGU1K/Qj/T6Dqtb610YWYUwlP6SliBYZtMl4t4iETg7IxkqPTucf0Vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z1s0PmxUrUsJxATbRZckibgTh49qSFDkmlaSn812JEM=;
+ b=Y/6kU4jXJK3WmkJRCy32fEyl/tCLMI5FBo6183qOsmqt9Yj5tsgom/Yru/J8s2LhG763CRI822CBKNdKKNtp6Bkltm5Sh8iYg/Rbt22mz/dWRumco0E9J5DlbUAtIjQmzZI29SXHH+U3rQSzCnBIQrJCH3fahqdiSOWBX4kQ+i8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) by
+ HE1PR0802MB2185.eurprd08.prod.outlook.com (10.172.130.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2835.18; Wed, 18 Mar 2020 07:59:25 +0000
+Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com
+ ([fe80::4d32:e4e1:5b9f:240f]) by HE1PR0802MB2507.eurprd08.prod.outlook.com
+ ([fe80::4d32:e4e1:5b9f:240f%12]) with mapi id 15.20.2835.017; Wed, 18 Mar
+ 2020 07:59:25 +0000
+Subject: Re: [PULL 0/4] Python queue for 5.0 soft freeze
+To: qemu-devel@nongnu.org, ehabkost@redhat.com
+References: <158450473711.25478.16951249008771308992@39012742ff91>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200318105922212
+Message-ID: <04961888-5610-6805-c4c0-6f952df99d4f@virtuozzo.com>
+Date: Wed, 18 Mar 2020 10:59:22 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <158450473711.25478.16951249008771308992@39012742ff91>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031807-0016-0000-0000-000002F30926
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031807-0017-0000-0000-000033568D0A
-Message-Id: <158451653844.22972.17999316676230071087.stgit@jupiter>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-18_02:2020-03-17,
- 2020-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999
- clxscore=1015 suspectscore=0 bulkscore=0 impostorscore=0 mlxscore=0
- spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003180034
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-ClientProxiedBy: AM0PR01CA0115.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::20) To HE1PR0802MB2507.eurprd08.prod.outlook.com
+ (2603:10a6:3:e1::8)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.249) by
+ AM0PR01CA0115.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.15 via Frontend
+ Transport; Wed, 18 Mar 2020 07:59:23 +0000
+X-Tagtoolbar-Keys: D20200318105922212
+X-Originating-IP: [185.215.60.249]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6dcbdefd-d7a8-4618-98a1-08d7cb12462f
+X-MS-TrafficTypeDiagnostic: HE1PR0802MB2185:
+X-Microsoft-Antispam-PRVS: <HE1PR0802MB21856AEF3AAE5255D3B3B178C1F70@HE1PR0802MB2185.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
+X-Forefront-PRVS: 03468CBA43
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10001)(10019020)(4636009)(346002)(136003)(396003)(376002)(366004)(39850400004)(199004)(316002)(66476007)(66556008)(26005)(16576012)(36756003)(5660300002)(8936002)(16526019)(478600001)(186003)(6486002)(966005)(2616005)(31696002)(52116002)(956004)(81156014)(31686004)(86362001)(8676002)(4326008)(81166006)(66946007)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2185;
+ H:HE1PR0802MB2507.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iLXk3aHX/8cMh9i/419TEF8LVTMSX/DLrB/Fbed6AQ8fDZhso2T5XEWNXXIfT4QTR87S/k9FI6zTBgTNmwpfjqnJOnrta+XWioA8kLkuX1AEL7xCSqycxq5xr7Pzz1YHmmcR1Et8kcNjyWoaYXMaTIauvrZQpchqICwsl0c6Xajgev62HJzGIT+XgbCCQGr0monK1Nv3KRGbNv8ImSB9V/fGaPqQNh8sf1E8TgCvNm7JXaHkycM0FYQiyCtEXokXrEHyjL5kR1v+l3l0E4/u/HtnZvHmvRRDhMmdGYmLnC5nABrS9Pg7MLxtVv7CVKDofgve52EbNp8Un5U1fgEqgOeHtcXrf3ETjavdqZ7RsF5ZFJjiEdrz18Oesb1ExL3mgjgM03+D0733BGteGB0o+875vcDoyfzg6tkul7jLtxwXKU1bj+bK00tEu9ZZlx1PCGE2tgLPh8Ghn/J7IvRenyRoPmT3aTC68g8VzW99Hyz9lvHtWNGLmY2xsS68tBGRlY1marXcTF7MKtlCf2UIQJD2iBxGal74TNDYj+UdZFNN90KBE8LZVSlgNWm9xc150GdQYwxu/QmANS5/yZi3Vg==
+X-MS-Exchange-AntiSpam-MessageData: qvsDjc9Oh27Ji6bX07KZBlaJAT5sCh/K6Kovxf09eAJdIlfTq8fjJBOLqAu/Q624ie+N10ve8OHUf67f47tY2+9pjNwWDF7zbzPA2/jZhGOZZFunPvyKySUm7XeDXOIJ0zodkiGpg2eGZ8GlSXh2Ag==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6dcbdefd-d7a8-4618-98a1-08d7cb12462f
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2020 07:59:24.9576 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a4ijv7MYyEFTG5M10p0BlbKJF0Zz9h8EHy7j0e4Tkp9i3EeJCQ4B+3jjwdNqv5YgGvlCDK90ApTM7foQR6k2h1mGvNtFhEnx/2gciZFvnK0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2185
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.22.102
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,104 +126,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Greg Kurz <groug@kaod.org>,
- Nicholas Piggin <npiggin@gmail.com>, Qemu-devel <qemu-devel@nongnu.org>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Per PAPR, it is expected to set effective address provided flag in
-sub_err_type member of mc extended error log (i.e
-rtas_event_log_v6_mc.sub_err_type). This somehow got missed in original
-fwnmi-mce patch series. The current code just updates the effective address
-but does not set the flag to indicate that it is available. Hence guest
-fails to extract effective address from mce rtas log. This patch fixes
-that.
+18.03.2020 7:12, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200318011217.2102748-1-ehabkost@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Subject: [PULL 0/4] Python queue for 5.0 soft freeze
+> Message-id: 20200318011217.2102748-1-ehabkost@redhat.com
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 1b4f6f3 MAINTAINERS: add simplebench
+> 57b42b6 scripts/simplebench: add example usage of simplebench
+> 99ea4d7 scripts/simplebench: add qemu/bench_block_job.py
+> 196f97d scripts/simplebench: add simplebench.py
+> 
+> === OUTPUT BEGIN ===
+> 1/4 Checking commit 196f97d8566d (scripts/simplebench: add simplebench.py)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #16:
+> new file mode 100644
+> 
+> ERROR: please use python3 interpreter
+> #21: FILE: scripts/simplebench/simplebench.py:1:
+> +#!/usr/bin/env python
 
-Without this patch guest MCE logs fails print DAR value:
+Hmm, yes, we need to fix it.
 
-[   11.933608] Disabling lock debugging due to kernel taint
-[   11.933773] MCE: CPU0: machine check (Severe) Host TLB Multihit [Recovered]
-[   11.933979] MCE: CPU0: NIP: [c000000000090b34] radix__flush_tlb_range_psize+0x194/0xf00
-[   11.934223] MCE: CPU0: Initiator CPU
-[   11.934341] MCE: CPU0: Unknown
+Should I resend?
 
-After the change:
+> 
+> total: 1 errors, 1 warnings, 128 lines checked
+> 
+> Patch 1/4 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 2/4 Checking commit 99ea4d73bba8 (scripts/simplebench: add qemu/bench_block_job.py)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #16:
+> new file mode 100755
+> 
+> ERROR: please use python3 interpreter
+> #21: FILE: scripts/simplebench/bench_block_job.py:1:
+> +#!/usr/bin/env python
 
-[   22.454149] Disabling lock debugging due to kernel taint
-[   22.454316] MCE: CPU0: machine check (Severe) Host TLB Multihit DAR: deadbeefdeadbeef [Recovered]
-[   22.454605] MCE: CPU0: NIP: [c0000000003e5804] kmem_cache_alloc+0x84/0x330
-[   22.454820] MCE: CPU0: Initiator CPU
-[   22.454944] MCE: CPU0: Unknown
+and here.
+
+> 
+> total: 1 errors, 1 warnings, 119 lines checked
+> 
+> Patch 2/4 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 3/4 Checking commit 57b42b691f7b (scripts/simplebench: add example usage of simplebench)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #21:
+> new file mode 100644
+> 
+> total: 0 errors, 1 warnings, 80 lines checked
+> 
+> Patch 3/4 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 4/4 Checking commit 1b4f6f3850f4 (MAINTAINERS: add simplebench)
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20200318011217.2102748-1-ehabkost@redhat.com/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
 
 
-Signed-off-by: Mahesh Salgaonkar <mahesh@linux.ibm.com>
----
-Change in v2:
-- Fixed coding style issues.
----
- hw/ppc/spapr_events.c |   26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 8b32b7eea5..cb6bfedc53 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -243,6 +243,14 @@ struct rtas_event_log_v6_mc {
- #define RTAS_LOG_V6_MC_TLB_PARITY                        1
- #define RTAS_LOG_V6_MC_TLB_MULTIHIT                      2
- #define RTAS_LOG_V6_MC_TLB_INDETERMINATE                 3
-+/*
-+ * Per PAPR,
-+ * For UE error type, set bit 1 of sub_err_type to indicate effective addr is
-+ * provided. For other error types (SLB/ERAT/TLB), set bit 0 to indicate
-+ * same.
-+ */
-+#define RTAS_LOG_V6_MC_UE_EA_ADDR_PROVIDED               0x40
-+#define RTAS_LOG_V6_MC_EA_ADDR_PROVIDED                  0x80
-     uint8_t reserved_1[6];
-     uint64_t effective_address;
-     uint64_t logical_address;
-@@ -726,6 +734,22 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
-                             RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
- }
- 
-+static void spapr_mc_set_ea_provided_flag(struct mc_extended_log *ext_elog)
-+{
-+    switch (ext_elog->mc.error_type) {
-+    case RTAS_LOG_V6_MC_TYPE_UE:
-+        ext_elog->mc.sub_err_type |= RTAS_LOG_V6_MC_UE_EA_ADDR_PROVIDED;
-+        break;
-+    case RTAS_LOG_V6_MC_TYPE_SLB:
-+    case RTAS_LOG_V6_MC_TYPE_ERAT:
-+    case RTAS_LOG_V6_MC_TYPE_TLB:
-+        ext_elog->mc.sub_err_type |= RTAS_LOG_V6_MC_EA_ADDR_PROVIDED;
-+        break;
-+    default:
-+        break;
-+    }
-+}
-+
- static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
-                                         struct mc_extended_log *ext_elog)
- {
-@@ -751,6 +775,7 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
-             ext_elog->mc.sub_err_type = mc_derror_table[i].error_subtype;
-             if (mc_derror_table[i].dar_valid) {
-                 ext_elog->mc.effective_address = cpu_to_be64(env->spr[SPR_DAR]);
-+                spapr_mc_set_ea_provided_flag(ext_elog);
-             }
- 
-             summary |= mc_derror_table[i].initiator
-@@ -769,6 +794,7 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
-             ext_elog->mc.sub_err_type = mc_ierror_table[i].error_subtype;
-             if (mc_ierror_table[i].nip_valid) {
-                 ext_elog->mc.effective_address = cpu_to_be64(env->nip);
-+                spapr_mc_set_ea_provided_flag(ext_elog);
-             }
- 
-             summary |= mc_ierror_table[i].initiator
-
+-- 
+Best regards,
+Vladimir
 
