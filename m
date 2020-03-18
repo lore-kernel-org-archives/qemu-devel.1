@@ -7,64 +7,65 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD0FFC1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD4DC1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7459A20663
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:25:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F3E620663
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:26:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKY/t5oy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7459A20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NqT22ZW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3E620663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43635 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEMWF-00014N-M9
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 20:25:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45428)
+	id 1jEMXN-00025a-50
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 20:26:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jEMRE-0004PV-Bm
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:01 -0400
+ (envelope-from <crosa@redhat.com>) id 1jEMRS-0004ap-59
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jEMRD-0008QK-5f
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:00 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:28260)
+ (envelope-from <crosa@redhat.com>) id 1jEMRQ-00015t-PL
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:14 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58764)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jEMRC-0008Nj-VN
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:19:59 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jEMRJ-0000z1-V1
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584490798;
+ s=mimecast20190719; t=1584490805;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7GTfeyMlA9NY0+2uIEce259/4FRhvDkYKEV84F8mWe8=;
- b=BKY/t5oyLzhQpve1KkohiMqMtJ6zB2aOnv/vdaZJ1Rzl0DwKLKZbPwrS9jeTU9dLMwZTj7
- gLJ1EIdauXXoyNk2Lz2s3qMsZ7Dt3sXwVyiDNJA92NIhnOMUJt7rtAxqPt8SueDJaSHFVL
- vvv5dm1cmXkAr/q1Fc7UI2AsMYC6+J8=
+ bh=VFn7JO0XLVD9S827UyQBaSD7Qch6L16JMLs2kqWzCw4=;
+ b=NqT22ZW2XzsJw5XPwETIQVW/BSp1geJepS2VDqq4JZM1my37FEOg5Y68yBrlKuUrwooYo8
+ Kz9IR0dDypGTbEsCrd1qGIlPzxrJprawkkQJwZUK5yNIO1Es37c94NRx5+P1tfnmIJRLfC
+ nanP/C+ANzZYFwAUu550gcD+T3laMUs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-O-ACXTFsOVGqdOCI7pPYPA-1; Tue, 17 Mar 2020 20:19:56 -0400
-X-MC-Unique: O-ACXTFsOVGqdOCI7pPYPA-1
+ us-mta-164-7cdq6aWOPH2F4FkwRrAQ6A-1; Tue, 17 Mar 2020 20:20:01 -0400
+X-MC-Unique: 7cdq6aWOPH2F4FkwRrAQ6A-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22FCA800D50;
- Wed, 18 Mar 2020 00:19:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9BF4100550D;
+ Wed, 18 Mar 2020 00:19:59 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-117-2.rdu2.redhat.com
  [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA4C610016EB;
- Wed, 18 Mar 2020 00:19:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 58D2610016EB;
+ Wed, 18 Mar 2020 00:19:55 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 5/6] tests/docker: add CentOS 8 Dockerfile
-Date: Tue, 17 Mar 2020 20:19:31 -0400
-Message-Id: <20200318001932.180617-6-crosa@redhat.com>
+Subject: [PULL 6/6] tests/docker: make "buildah bud" output similar to "docker
+ build"
+Date: Tue, 17 Mar 2020 20:19:32 -0400
+Message-Id: <20200318001932.180617-7-crosa@redhat.com>
 In-Reply-To: <20200318001932.180617-1-crosa@redhat.com>
 References: <20200318001932.180617-1-crosa@redhat.com>
 MIME-Version: 1.0
@@ -100,57 +101,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Which is currenly missing, and will be referenced later in the
-contributed CI playbooks.
+Podman users will most often be using buildah to build containers.
+Among the differences between "buildah bud|build-using-dockerfile" and
+a traditional "docker build" is that buildah does not run a container
+during build.
+
+To the best of my knowledge and experiments, this means that runtime
+variables, such as ENV from one base image will not propagate into
+another.  The end result is that the location for the cross compiler
+binaries, defined in the base "qemu/debian9-mxe" image, are not passed
+through this image.  Consequently, the cross compilers are not on PATH
+and the build fails.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-Id: <20200312193616.438922-2-crosa@redhat.com>
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Message-Id: <20200312193616.438922-3-crosa@redhat.com>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/docker/dockerfiles/centos8.docker | 32 +++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
- create mode 100644 tests/docker/dockerfiles/centos8.docker
+ tests/docker/dockerfiles/debian-win32-cross.docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/dockerf=
-iles/centos8.docker
-new file mode 100644
-index 0000000000..bfa0d33c9c
---- /dev/null
-+++ b/tests/docker/dockerfiles/centos8.docker
-@@ -0,0 +1,32 @@
-+FROM centos:8.1.1911
-+
-+RUN dnf -y update
-+ENV PACKAGES \
-+    SDL-devel \
-+    bison \
-+    bzip2 \
-+    bzip2-devel \
-+    dbus-daemon \
-+    flex \
-+    gcc \
-+    gcc-c++ \
-+    gettext \
-+    git \
-+    glib2-devel \
-+    libaio-devel \
-+    libepoxy-devel \
-+    lzo-devel \
-+    make \
-+    mesa-libEGL-devel \
-+    nettle-devel \
-+    perl-Test-Harness \
-+    pixman-devel \
-+    python36 \
-+    rdma-core-devel \
-+    spice-glib-devel \
-+    spice-server \
-+    tar \
-+    zlib-devel
-+
-+RUN dnf install -y $PACKAGES
-+RUN rpm -q $PACKAGES | sort > /packages.txt
+diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/doc=
+ker/dockerfiles/debian-win32-cross.docker
+index 9d7053e59d..d16d6431bc 100644
+--- a/tests/docker/dockerfiles/debian-win32-cross.docker
++++ b/tests/docker/dockerfiles/debian-win32-cross.docker
+@@ -9,7 +9,7 @@ MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+=20
+ ENV TARGET i686
+=20
+-ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
++ENV PATH $PATH:/usr/lib/mxe/usr/bin:/usr/lib/mxe/usr/$TARGET-w64-mingw32.s=
+hared/bin
+=20
+ ENV PKG_CONFIG_PATH \
+     $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgco=
+nfig
 --=20
 2.25.1
 
