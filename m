@@ -6,74 +6,111 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90BDC10F29
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 18:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 392ECC5ACD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 18:36:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99E1F20719
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 18:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E76C20780
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 18:36:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iBbZDSAB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E1F20719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="MPAsEqle"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E76C20780
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEd1H-0002ka-Qz
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 14:02:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56995)
+	id 1jEdYl-0000pW-6n
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 14:36:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jEd0S-0002IG-Dq
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 14:01:29 -0400
+ (envelope-from <dirty@apple.com>) id 1jEdXv-0000CT-S4
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 14:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jEd0R-00010w-CR
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 14:01:28 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40473)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jEd0Q-0000wH-PE
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 14:01:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584554486;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sDzFhs3KkKd460ctC4viVpm/p8DiyWw+yODRcZg3+iI=;
- b=iBbZDSABC1+5iCvkI0LpPDfC1laLj7kH1wLMA7fYbetbMutrecxeFCIYMZpGGNCirSIMhk
- P6AIWrXGq5UD9KNAiL3ZYVF9NrTjXcA/NP38q44AzXoanaFboNEXtJcauLMv5x8re70d6k
- NEZ6YRzCbdMNNSHPOppmG88w/JAKKk0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-DK5mfmh8PaWx1KC_bc5XDw-1; Wed, 18 Mar 2020 14:01:24 -0400
-X-MC-Unique: DK5mfmh8PaWx1KC_bc5XDw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 802F6100550D;
- Wed, 18 Mar 2020 18:01:23 +0000 (UTC)
-Received: from gondolin (ovpn-113-129.ams2.redhat.com [10.36.113.129])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9F43B19757;
- Wed, 18 Mar 2020 18:01:19 +0000 (UTC)
-Date: Wed, 18 Mar 2020 19:00:43 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v10 10/16] s390x: protvirt: Set guest IPL PSW
-Message-ID: <20200318190043.1ba42bb2.cohuck@redhat.com>
-In-Reply-To: <20200318143047.2335-11-frankja@linux.ibm.com>
-References: <20200318143047.2335-1-frankja@linux.ibm.com>
- <20200318143047.2335-11-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ (envelope-from <dirty@apple.com>) id 1jEdXu-00036i-OX
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 14:36:03 -0400
+Received: from ma1-aaemail-dr-lapp02.apple.com ([17.171.2.68]:35046)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jEdXu-000340-I7
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 14:36:02 -0400
+Received: from pps.filterd (ma1-aaemail-dr-lapp02.apple.com [127.0.0.1])
+ by ma1-aaemail-dr-lapp02.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ 02IIRZbI028937; Wed, 18 Mar 2020 11:35:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : content-type
+ : mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=20180706;
+ bh=cRbXlKOYI5FWEHsemKaFBQy+r4jwXggqjh+IFYmrtOE=;
+ b=MPAsEqlekhC5bIl4T1k4dBwuNGBgPYO0Gwi/n+11u3FU1P0SGAg1oIIkbM0Rj0tPuccX
+ lb882jxEG5eU5IdX0SciOztz8JuP6atwEvK6K7KiUeWVMNxTxpd6OOiIKwsnAA7iyT2H
+ UjMBRTOGze05laDCvYT+acshKb4FRDuY58RvR9mR6OI50nXrI1mdHLl8cl5g+pfstfiu
+ RLJGltwcx+WNFMG7l7qxQelImpRzqrznWgfab7NzbxLdxd+sJhRU9rChFUfasasE8ZBE
+ U5s/wWcOtXDo1T0nyDuKUQDrilHX/tzg50VcRlpOUQ/jbgRUCwjLa8bZBUNdB4bqJDjT Ag== 
+Received: from rn-mailsvcp-mta-lapp03.rno.apple.com
+ (rn-mailsvcp-mta-lapp03.rno.apple.com [10.225.203.151])
+ by ma1-aaemail-dr-lapp02.apple.com with ESMTP id 2yruxu23ng-2
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Wed, 18 Mar 2020 11:35:57 -0700
+Received: from rn-mailsvcp-mmp-lapp01.rno.apple.com
+ (rn-mailsvcp-mmp-lapp01.rno.apple.com [17.179.253.14])
+ by rn-mailsvcp-mta-lapp03.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) with ESMTPS id <0Q7E00VNMJNV7M00@rn-mailsvcp-mta-lapp03.rno.apple.com>; 
+ Wed, 18 Mar 2020 11:35:55 -0700 (PDT)
+Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp01.rno.apple.com by
+ rn-mailsvcp-mmp-lapp01.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) id <0Q7E00800JFO0D00@rn-mailsvcp-mmp-lapp01.rno.apple.com>; Wed,
+ 18 Mar 2020 11:35:55 -0700 (PDT)
+X-Va-A: 
+X-Va-T-CD: b1aa2595368ad139bab7164dff388cf3
+X-Va-E-CD: d39bee373f7d7155fd3c1813e6410fde
+X-Va-R-CD: 90ebc19ed3c4b4977ee71a149d52c323
+X-Va-CD: 0
+X-Va-ID: cb874141-95a6-4b97-a629-b4ec42731e35
+X-V-A: 
+X-V-T-CD: b1aa2595368ad139bab7164dff388cf3
+X-V-E-CD: d39bee373f7d7155fd3c1813e6410fde
+X-V-R-CD: 90ebc19ed3c4b4977ee71a149d52c323
+X-V-CD: 0
+X-V-ID: a925d99d-8c29-4c12-811d-abc2ef9892b7
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-18_07:2020-03-18,
+ 2020-03-18 signatures=0
+Received: from [17.234.80.9] (unknown [17.234.80.9])
+ by rn-mailsvcp-mmp-lapp01.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020))
+ with ESMTPSA id <0Q7E00OZMJNVBFA0@rn-mailsvcp-mmp-lapp01.rno.apple.com>; Wed,
+ 18 Mar 2020 11:35:55 -0700 (PDT)
+Content-type: text/plain; charset=utf-8
+MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 04/11] MAINTAINERS: Add an entry for the HVF accelerator
+In-reply-to: <20200316120049.11225-5-philmd@redhat.com>
+Date: Wed, 18 Mar 2020 11:35:54 -0700
+Cc: Cameron Esfahani via <qemu-devel@nongnu.org>,
+ Patrick Colp <patrick.colp@oracle.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Liran Alon <liran.alon@oracle.com>,
+ "Reviewed-by : Nikita Leshenko" <nikita.leshchenko@oracle.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, Heiher <r@hev.cc>
+Content-transfer-encoding: quoted-printable
+Message-id: <C16A00EA-8D8B-4761-87DE-F636513DBFB7@apple.com>
+References: <20200316120049.11225-1-philmd@redhat.com>
+ <20200316120049.11225-5-philmd@redhat.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-18_07:2020-03-18,
+ 2020-03-18 signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 17.171.2.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,70 +122,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-On Wed, 18 Mar 2020 10:30:41 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Please add me to the HVF maintainers as well.
 
-> Handling of CPU reset and setting of the IPL psw from guest storage at
-> offset 0 is done by a Ultravisor call. Let's only fetch it if
-> necessary.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cameron Esfahani
+dirty@apple.com
+
+"In the elder days of Art, Builders wrought with greatest care each =
+minute and unseen part; For the gods see everywhere."
+
+"The Builders", H. W. Longfellow
+
+
+
+> On Mar 16, 2020, at 5:00 AM, Philippe Mathieu-Daud=C3=A9 =
+<philmd@redhat.com> wrote:
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  target/s390x/cpu.c | 26 +++++++++++++++++---------
->  1 file changed, 17 insertions(+), 9 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 84029f14814b4980..3ec7d4b2ec1e938f 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -78,16 +78,24 @@ static bool s390_cpu_has_work(CPUState *cs)
->  static void s390_cpu_load_normal(CPUState *s)
->  {
->      S390CPU *cpu = S390_CPU(s);
-> -    uint64_t spsw = ldq_phys(s->as, 0);
-> -
-> -    cpu->env.psw.mask = spsw & PSW_MASK_SHORT_CTRL;
-> -    /*
-> -     * Invert short psw indication, so SIE will report a specification
-> -     * exception if it was not set.
-> -     */
-> -    cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
-> -    cpu->env.psw.addr = spsw & PSW_MASK_SHORT_ADDR;
-> +    uint64_t spsw;
->  
-> +    if (!s390_is_pv()) {
-> +        spsw = ldq_phys(s->as, 0);
-> +        cpu->env.psw.mask = spsw & PSW_MASK_SHORT_CTRL;
-> +        /*
-> +         * Invert short psw indication, so SIE will report a specification
-> +         * exception if it was not set.
-> +         */
-> +        cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
-> +        cpu->env.psw.addr = spsw & PSW_MASK_SHORT_ADDR;
-> +    } else {
-> +        /*
-> +         * Firmware requires us to set the load state before we set
-> +         * the cpu to operating on protected guests.
-> +         */
-> +        s390_cpu_set_state(S390_CPU_STATE_LOAD, cpu);
-
-We probably could do that unconditionally, but this is fine.
-
-> +    }
->      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->  }
->  #endif
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Cc: Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+> Cc: Roman Bolshakov <r.bolshakov@yadro.com>
+> Cc: Patrick Colp <patrick.colp@oracle.com>
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Cc: Heiher <r@hev.cc>
+> ---
+> MAINTAINERS | 6 ++++++
+> 1 file changed, 6 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7ec42a18f7..bcf40afb85 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -420,6 +420,12 @@ F: accel/stubs/hax-stub.c
+> F: target/i386/hax-all.c
+> F: include/sysemu/hax.h
+>=20
+> +HVF Accelerator
+> +S: Orphan
+> +F: accel/stubs/hvf-stub.c
+> +F: target/i386/hvf/hvf.c
+> +F: include/sysemu/hvf.h
+> +
+> WHPX CPUs
+> M: Sunil Muthuswamy <sunilmut@microsoft.com>
+> S: Supported
+> --=20
+> 2.21.1
+>=20
+>=20
 
 
