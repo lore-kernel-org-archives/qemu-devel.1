@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2492C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 14:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A8E5C5ACD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 14:53:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7968120714
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 14:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D715820714
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 14:53:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="URpwk+1E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7968120714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8eRIGx1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D715820714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEa4G-0001Nu-L7
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 10:53:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46151)
+	id 1jEa4S-0001jF-1V
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 10:53:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jEa3Q-0000Jh-3a
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:52:21 -0400
+ (envelope-from <peterx@redhat.com>) id 1jEa3X-0000Tq-12
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jEa3P-0005Ri-0e
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:52:20 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:21286)
+ (envelope-from <peterx@redhat.com>) id 1jEa3V-0006ZB-OH
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:52:26 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:29564)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jEa3O-0005P6-Sx
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:52:18 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jEa3V-0006UL-Jv
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 10:52:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584543138;
+ s=mimecast20190719; t=1584543145;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N/FzVSHMR5XZjET3ZcevxZb9TJHsbHJRszWRidlyteM=;
- b=URpwk+1EGgiT/eF3V627nHN79bIffsfq+jpihC+BPB4zU7lfqRQY3Tr5TnuwCt03bv0lNJ
- M5y7+SdWjPRT/5ngw44Eqi8Tq9NTbTsZVlgkxpPJM5RF1c2Rax0eVhHC0iQ1c81FdIoN3K
- X+q1MwYiA4e2MQ5VPL9EcTBbS7QUM6s=
+ bh=d7VCARQpa543CzI17Qh3SwV/uYby6Bu6+9e0X/pxZcw=;
+ b=K8eRIGx1QV/oZKk4FoV8Djwpzn8m+uZNnmZ6KjK64y8HyfL/eCrbweNPJblrpJMKx9p+dG
+ HzPJNmgOlv6Ko7gG1Kbb0pwma6oo3Cy5MiYKBccc69IxXBARdbdm/84zjznaI455RaW5AZ
+ tIUS3gcNLhUAd+JUxEBf03xsgkLTdV4=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-IcYOk9j7P0ycMBo5xYAs7A-1; Wed, 18 Mar 2020 10:52:16 -0400
-X-MC-Unique: IcYOk9j7P0ycMBo5xYAs7A-1
-Received: by mail-wm1-f70.google.com with SMTP id z26so1145654wmk.1
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 07:52:16 -0700 (PDT)
+ us-mta-84-KILDF9pMNDmDXYUCFfFWrA-1; Wed, 18 Mar 2020 10:52:23 -0400
+X-MC-Unique: KILDF9pMNDmDXYUCFfFWrA-1
+Received: by mail-wm1-f70.google.com with SMTP id p18so1179528wmk.9
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 07:52:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZgrIZqCisTEH3B29D69xtc42FXCdiaXNL/5zv4PuJqI=;
- b=MwuNMtaAvkuH/JYnsFUhNSuEYUqyOokTDEtkQcilMybm3G9YZI9GBSCnQm2VEw1cwf
- spgPYhkOpVm/B2nxGVXGpStXfJai0yOa5h9dS4RXgl5MaF5bg3fmz/hmBXFqoSF0OZCt
- F8dplggzW7Pfx32Aqe63+IOY/uEB1Q+A2Ede5+7tv7BXtceCy428JHItLe0Ivc5lpljz
- RV7oEMsAp+mx2VSNrvm0jIQC2fdBO5wPuSGKthiOaS/aUOpOREafMBgGENSIK1caPGKJ
- GblsfunsO8h+erE9gq7Dp5jY+Hfs9ys7vtMFlxEX4D1KrfCgIhipMhRVvpI+TXPB8Y1S
- hfww==
-X-Gm-Message-State: ANhLgQ3lf70vgPwORGACYkGIVsB0Ka4j2z4GxJdFNQ2Ff6CwyrbIpUFL
- VCTYnwf/mklrky2Xr/XtrGCknclCH7Fbp7Lt5GamjYtB+Xn0/B2LhPeuqYWQnR+LsFVpsaj2dTR
- a1yDhnpZ8kuytHI4=
-X-Received: by 2002:a1c:f60d:: with SMTP id w13mr5781079wmc.171.1584543135071; 
- Wed, 18 Mar 2020 07:52:15 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vt+sMn4Jd6HnCPd+og48mBg7PRmrfzSJ0A8aDwUGv3z+q4KjCIAbU8od8/k1UqYA1bc/p2M4A==
-X-Received: by 2002:a1c:f60d:: with SMTP id w13mr5781059wmc.171.1584543134820; 
- Wed, 18 Mar 2020 07:52:14 -0700 (PDT)
+ bh=R4ymvWMCxrIfLkhgyjJ3vQ3SuCXiTnkkegIn5k6FWHQ=;
+ b=Xcr6fItjPYGJYf6Hz34MF2GRRJYdD8JzgtjjLRoF8tDsVzuSYBUNOKP8YmjFTEitON
+ Lzk+1k6c/Pz0UdmLyledrJkaGkyiSbtACOHYvdwb/yXg2qgjpgIYizgHkeb4aEWbI8gL
+ T+/XKZZM8UU/b/7sis5HLb2ivs/opwRepQJ0e/lxB8QNa6lOVTkJyGt6RT+DdtmqrmFL
+ ANsdH0pvrzVXkZ2V9uaskfqvNHleidwdG1Flc4jRIxTXcyfSBea4e992AWKa47wAAsog
+ WUHj6sDmHvxEU4Wm3ne9sIl6f1DUMwy2oAzCj9djCyCtkOclnkC18XweF5OQc9IqP8cV
+ J0IQ==
+X-Gm-Message-State: ANhLgQ3yR00lmQ0a45KXc3GDbiO9oqzbsUjUiLr5/MHFl7w4f32dbdVx
+ EWNqClWtJ88j5E4rA+nvfzraycXHodN6NeNZstHaYQ53JD3Dh4hyz0u3+J1W0YBCpIFQA2n5PVF
+ zBiN+5JqoTuTgqVQ=
+X-Received: by 2002:a1c:2e92:: with SMTP id u140mr5622803wmu.84.1584543141476; 
+ Wed, 18 Mar 2020 07:52:21 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtKnJco+TcUaI3QTwe7pmpsdrvaNbGxtpa2G8FyQoAWX0/FBt4bIUhcBOSmkrUCPYYvbZ2nwQ==
+X-Received: by 2002:a1c:2e92:: with SMTP id u140mr5622776wmu.84.1584543141233; 
+ Wed, 18 Mar 2020 07:52:21 -0700 (PDT)
 Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id c23sm8711520wrb.79.2020.03.18.07.52.12
+ by smtp.gmail.com with ESMTPSA id v10sm3912401wml.44.2020.03.18.07.52.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Mar 2020 07:52:14 -0700 (PDT)
+ Wed, 18 Mar 2020 07:52:20 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/5] vfio/pci: Disable INTx fast path if using split irqchip
-Date: Wed, 18 Mar 2020 10:52:00 -0400
-Message-Id: <20200318145204.74483-2-peterx@redhat.com>
+Subject: [PATCH v4 2/5] vfio/pci: Use kvm_irqchip_add_irqfd_notifier_gsi() for
+ irqfds
+Date: Wed, 18 Mar 2020 10:52:01 -0400
+Message-Id: <20200318145204.74483-3-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200318145204.74483-1-peterx@redhat.com>
 References: <20200318145204.74483-1-peterx@redhat.com>
@@ -88,8 +89,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,42 +109,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's currently broken.  Let's use the slow path to at least make it
-functional.
+VFIO is currently the only one left that is not using the generic
+function (kvm_irqchip_add_irqfd_notifier_gsi()) to register irqfds.
+Let VFIO use the common framework too.
 
-Tested-by: Eric Auger <eric.auger@redhat.com>
+Follow up patches will introduce extra features for kvm irqfd, so that
+VFIO can easily leverage that after the switch.
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
 Acked-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/vfio/pci.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ hw/vfio/pci.c | 37 +++++++++++++++----------------------
+ 1 file changed, 15 insertions(+), 22 deletions(-)
 
 diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 5e75a95129..98e0e0c994 100644
+index 98e0e0c994..09703362df 100644
 --- a/hw/vfio/pci.c
 +++ b/hw/vfio/pci.c
-@@ -128,6 +128,18 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, =
-Error **errp)
-         return;
+@@ -115,11 +115,7 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+ {
+ #ifdef CONFIG_KVM
+-    struct kvm_irqfd irqfd =3D {
+-        .fd =3D event_notifier_get_fd(&vdev->intx.interrupt),
+-        .gsi =3D vdev->intx.route.irq,
+-        .flags =3D KVM_IRQFD_FLAG_RESAMPLE,
+-    };
++    int irq_fd =3D event_notifier_get_fd(&vdev->intx.interrupt);
+     Error *err =3D NULL;
+=20
+     if (vdev->no_kvm_intx || !kvm_irqfds_enabled() ||
+@@ -141,7 +137,7 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, E=
+rror **errp)
      }
 =20
-+    if (kvm_irqchip_is_split()) {
-+        /*
-+         * VFIO INTx is currently not working with split kernel
-+         * irqchip for level triggered interrupts.  Go the slow path
-+         * as long as split is enabled so we can be at least
-+         * functional (even with poor performance).
-+         *
-+         * TODO: Remove this after all things fixed up.
-+         */
-+        return;
-+    }
-+
      /* Get to a known interrupt state */
-     qemu_set_fd_handler(irqfd.fd, NULL, NULL, vdev);
+-    qemu_set_fd_handler(irqfd.fd, NULL, NULL, vdev);
++    qemu_set_fd_handler(irq_fd, NULL, NULL, vdev);
      vfio_mask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+     vdev->intx.pending =3D false;
+     pci_irq_deassert(&vdev->pdev);
+@@ -152,17 +148,18 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev,=
+ Error **errp)
+         goto fail;
+     }
+=20
+-    /* KVM triggers it, VFIO listens for it */
+-    irqfd.resamplefd =3D event_notifier_get_fd(&vdev->intx.unmask);
+-
+-    if (kvm_vm_ioctl(kvm_state, KVM_IRQFD, &irqfd)) {
++    if (kvm_irqchip_add_irqfd_notifier_gsi(kvm_state,
++                                           &vdev->intx.interrupt,
++                                           &vdev->intx.unmask,
++                                           vdev->intx.route.irq)) {
+         error_setg_errno(errp, errno, "failed to setup resample irqfd");
+         goto fail_irqfd;
+     }
+=20
+     if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX, 0=
+,
+                                VFIO_IRQ_SET_ACTION_UNMASK,
+-                               irqfd.resamplefd, &err)) {
++                               event_notifier_get_fd(&vdev->intx.unmask),
++                               &err)) {
+         error_propagate(errp, err);
+         goto fail_vfio;
+     }
+@@ -177,12 +174,12 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev,=
+ Error **errp)
+     return;
+=20
+ fail_vfio:
+-    irqfd.flags =3D KVM_IRQFD_FLAG_DEASSIGN;
+-    kvm_vm_ioctl(kvm_state, KVM_IRQFD, &irqfd);
++    kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, &vdev->intx.interrupt=
+,
++                                          vdev->intx.route.irq);
+ fail_irqfd:
+     event_notifier_cleanup(&vdev->intx.unmask);
+ fail:
+-    qemu_set_fd_handler(irqfd.fd, vfio_intx_interrupt, NULL, vdev);
++    qemu_set_fd_handler(irq_fd, vfio_intx_interrupt, NULL, vdev);
+     vfio_unmask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+ #endif
+ }
+@@ -190,12 +187,6 @@ fail:
+ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+ {
+ #ifdef CONFIG_KVM
+-    struct kvm_irqfd irqfd =3D {
+-        .fd =3D event_notifier_get_fd(&vdev->intx.interrupt),
+-        .gsi =3D vdev->intx.route.irq,
+-        .flags =3D KVM_IRQFD_FLAG_DEASSIGN,
+-    };
+-
+     if (!vdev->intx.kvm_accel) {
+         return;
+     }
+@@ -209,7 +200,8 @@ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+     pci_irq_deassert(&vdev->pdev);
+=20
+     /* Tell KVM to stop listening for an INTx irqfd */
+-    if (kvm_vm_ioctl(kvm_state, KVM_IRQFD, &irqfd)) {
++    if (kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, &vdev->intx.inter=
+rupt,
++                                              vdev->intx.route.irq)) {
+         error_report("vfio: Error: Failed to disable INTx irqfd: %m");
+     }
+=20
+@@ -217,7 +209,8 @@ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+     event_notifier_cleanup(&vdev->intx.unmask);
+=20
+     /* QEMU starts listening for interrupt events. */
+-    qemu_set_fd_handler(irqfd.fd, vfio_intx_interrupt, NULL, vdev);
++    qemu_set_fd_handler(event_notifier_get_fd(&vdev->intx.interrupt),
++                        vfio_intx_interrupt, NULL, vdev);
+=20
+     vdev->intx.kvm_accel =3D false;
+=20
 --=20
 2.24.1
 
