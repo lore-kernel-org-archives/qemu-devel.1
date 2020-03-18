@@ -2,85 +2,141 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD86C5ACD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A3EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48E6C20714
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:48:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SsFmfwEA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48E6C20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E952620724
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:51:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E952620724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEbrx-0007ZQ-GT
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 12:48:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46020)
+	id 1jEbuh-0000Yi-1X
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 12:51:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEbrH-0006ut-2v
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:47:56 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jEbu2-0008Vn-Uz
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEbrF-0001Ai-Ls
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:47:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:56584)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEbrF-000195-Hr
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:47:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584550072;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=z2DCy50pr2+7e7rUAcjV+qA53fXAwpJyNnHZIy2EWkg=;
- b=SsFmfwEAz9fZeWmmX2bfibD0ITjxLiftUAh4NyXKZHg508zm3MTlifuJNBATa4svYQkzcR
- BRNFss5Mq7XFADoctdKk8FSxXIgHYuyWZUufeHDyFRmvbwqTRHrVfnl9kmeDjNU1lAsah2
- nkQkICEfmGX1iHYzGVw9mAmuHfU68Ks=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-gW-dhm-POtaQV05Ki44N5A-1; Wed, 18 Mar 2020 12:47:50 -0400
-X-MC-Unique: gW-dhm-POtaQV05Ki44N5A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 135D218AB2C0;
- Wed, 18 Mar 2020 16:47:49 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
- [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CFD8A6EF85;
- Wed, 18 Mar 2020 16:47:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7750D1138404; Wed, 18 Mar 2020 17:47:46 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v4 28/34] qapi: Implement deprecated-output=hide for QMP
- command results
-References: <20200317115459.31821-1-armbru@redhat.com>
- <20200317115459.31821-29-armbru@redhat.com>
- <955280e0-7165-5e3c-b08d-522275eb2e30@redhat.com>
-Date: Wed, 18 Mar 2020 17:47:46 +0100
-In-Reply-To: <955280e0-7165-5e3c-b08d-522275eb2e30@redhat.com> (Eric Blake's
- message of "Wed, 18 Mar 2020 05:40:02 -0500")
-Message-ID: <871rpp4nkd.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <borntraeger@de.ibm.com>) id 1jEbu1-0004hV-E4
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:50:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44496)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jEbu1-0004cZ-4L
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:50:45 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02IGXO7h145252
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 12:50:43 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8621k4c-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 12:50:43 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Wed, 18 Mar 2020 16:50:41 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 18 Mar 2020 16:50:39 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02IGocmZ48758832
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 18 Mar 2020 16:50:38 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2799442042;
+ Wed, 18 Mar 2020 16:50:38 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 70F6642045;
+ Wed, 18 Mar 2020 16:50:37 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.38.18])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 18 Mar 2020 16:50:37 +0000 (GMT)
+Subject: Re: [PATCH v10 15/16] docs: system: Add protvirt docs
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200318143047.2335-1-frankja@linux.ibm.com>
+ <20200318143047.2335-16-frankja@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
+ b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
+ gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
+ kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
+ NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
+ hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
+ QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
+ OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
+ tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
+ WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
+ DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
+ OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
+ t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
+ PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
+ Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
+ 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
+ PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
+ YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
+ REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
+ vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
+ DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
+ D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
+ 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
+ 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
+ v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
+ 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
+ JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
+ cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
+ i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
+ jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
+ ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Wed, 18 Mar 2020 17:50:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+In-Reply-To: <20200318143047.2335-16-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031816-0016-0000-0000-000002F34F9A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031816-0017-0000-0000-00003356D590
+Message-Id: <2e6b2eac-0e68-7467-1308-3055f4f61a25@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-18_07:2020-03-18,
+ 2020-03-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0
+ lowpriorityscore=0 malwarescore=0 spamscore=0 clxscore=1015
+ impostorscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 adultscore=0
+ bulkscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2003180075
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,115 +148,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
 
-> On 3/17/20 6:54 AM, Markus Armbruster wrote:
->> This policy suppresses deprecated bits in output, and thus permits
->> "testing the future".  Implement it for QMP command results.  Example:
->> when QEMU is run with -compat deprecated-output=3Dhide, then
->>
->>      {"execute": "query-cpus-fast"}
->>
->> yields
->>
->>      {"return": [{"thread-id": 9805, "props": {"core-id": 0, "thread-id"=
-: 0, "socket-id": 0}, "qom-path": "/machine/unattached/device[0]", "cpu-ind=
-ex": 0, "target": "x86_64"}]}
->>
->> instead of
->>
->>      {"return": [{"arch": "x86", "thread-id": 22436, "props": {"core-id"=
-: 0, "thread-id": 0, "socket-id": 0}, "qom-path": "/machine/unattached/devi=
-ce[0]", "cpu-index": 0, "target": "x86_64"}]}
->>
->> Note the suppression of deprecated member "arch".
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
->> +++ b/tests/test-qmp-cmds.c
->> @@ -1,4 +1,5 @@
->>   #include "qemu/osdep.h"
->> +#include "qapi/compat-policy.h"
->>   #include "qapi/qmp/qdict.h"
->>   #include "qapi/qmp/qjson.h"
->>   #include "qapi/qmp/qnum.h"
->> @@ -45,12 +46,17 @@ void qmp_user_def_cmd1(UserDefOne * ud1, Error **err=
-p)
->>   {
->>   }
->>   -void qmp_test_features0(FeatureStruct0 *fs0, FeatureStruct1 *fs1,
->> -                       FeatureStruct2 *fs2, FeatureStruct3 *fs3,
->> -                       FeatureStruct4 *fs4, CondFeatureStruct1 *cfs1,
->> -                       CondFeatureStruct2 *cfs2, CondFeatureStruct3 *cf=
-s3,
->> -                       Error **errp)
->> +FeatureStruct1 *qmp_test_features0(bool has_fs0, FeatureStruct0 *fs0,
->> +                                   bool has_fs1, FeatureStruct1 *fs1,
->> +                                   bool has_fs2, FeatureStruct2 *fs2,
->> +                                   bool has_fs3, FeatureStruct3 *fs3,
->> +                                   bool has_fs4, FeatureStruct4 *fs4,
->> +                                   bool has_cfs1, CondFeatureStruct1 *c=
-fs1,
->> +                                   bool has_cfs2, CondFeatureStruct2 *c=
-fs2,
->> +                                   bool has_cfs3, CondFeatureStruct3 *c=
-fs3,
->> +                                   Error **errp)
->>   {
->> +    return g_new(FeatureStruct1, 1);
->
-> Should this be using g_new0, rather than random contents?
 
-Accident.  It's not actually used.
+On 18.03.20 15:30, Janosch Frank wrote:
+> Let's add some documentation for the Protected VM functionality.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
->>   }
->>     void qmp_test_command_features1(Error **errp)
->> @@ -271,6 +277,30 @@ static void test_dispatch_cmd_io(void)
->>       qobject_unref(ret3);
->>   }
->>   +static void test_dispatch_cmd_ret_deprecated(void)
->> +{
->> +    const char *cmd =3D "{ 'execute': 'test-features0' }";
->> +    QDict *ret;
->> +
->> +    memset(&compat_policy, 0, sizeof(compat_policy));
->> +
->> +    /* default accept */
->> +    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
->> +    assert(ret && qdict_size(ret) =3D=3D 1);
->> +    qobject_unref(ret);
->> +
->> +    compat_policy.has_deprecated_output =3D true;
->> +    compat_policy.deprecated_output =3D COMPAT_POLICY_OUTPUT_ACCEPT;
->
-> Of course, if we ever enable defaults in QAPI, we can get rid of
-> has_deprecated_output by recording proper defaults for bools.  But
-> that's a different project ;)
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Yes.  The has_FOO have been annoying me since forever.  I just never get
-around to doing anything about it.
-
->> +    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
->> +    assert(ret && qdict_size(ret) =3D=3D 1);
->> +    qobject_unref(ret);
->> +
->> +    compat_policy.deprecated_output =3D COMPAT_POLICY_OUTPUT_HIDE;
->> +    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
->> +    assert(ret && qdict_size(ret) =3D=3D 0);
->> +    qobject_unref(ret);
->> +}
->> +
->
-> Otherwise,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+> ---
+>  docs/system/s390x/protvirt.rst | 59 ++++++++++++++++++++++++++++++++++
+>  docs/system/target-s390x.rst   |  5 +++
+>  2 files changed, 64 insertions(+)
+>  create mode 100644 docs/system/s390x/protvirt.rst
+> 
+> diff --git a/docs/system/s390x/protvirt.rst b/docs/system/s390x/protvirt.rst
+> new file mode 100644
+> index 0000000000000000..71172511632f7bcb
+> --- /dev/null
+> +++ b/docs/system/s390x/protvirt.rst
+> @@ -0,0 +1,59 @@
+> +Protected Virtualization on s390x
+> +=================================
+> +
+> +The memory and most of the registers of Protected Virtual Machines
+> +(PVMs) are encrypted or inaccessible to the hypervisor, effectively
+> +prohibiting VM introspection when the VM is running. At rest, PVMs are
+> +encrypted and can only be decrypted by the firmware, represented by an
+> +entity called Ultravisor, of specific IBM Z machines.
+> +
+> +
+> +Prerequisites
+> +-------------
+> +
+> +To run PVMs, a machine with the Protected Virtualization feature, as
+> +indicated by the Ultravisor Call facility (stfle bit 158), is
+> +required. The Ultravisor needs to be initialized at boot by setting
+> +`prot_virt=1` on the host's kernel command line.
+> +
+> +Running PVMs requires using the KVM hypervisor.
+> +
+> +If those requirements are met, the capability `KVM_CAP_S390_PROTECTED`
+> +will indicate that KVM can support PVMs on that LPAR.
+> +
+> +
+> +QEMU Settings
+> +-------------
+> +
+> +To indicate to the VM that it can transition into protected mode, the
+> +`Unpack facility` (stfle bit 161 represented by the feature
+> +`unpack`/`S390_FEAT_UNPACK`) needs to be part of the cpu model of
+> +the VM.
+> +
+> +All I/O devices need to use the IOMMU.
+> +Passthrough (vfio) devices are currently not supported.
+> +
+> +Host huge page backings are not supported. However guests can use huge
+> +pages as indicated by its facilities.
+> +
+> +
+> +Boot Process
+> +------------
+> +
+> +A secure guest image can either be loaded from disk or supplied on the
+> +QEMU command line. Booting from disk is done by the unmodified
+> +s390-ccw BIOS. I.e., the bootmap is interpreted, multiple components
+> +are read into memory and control is transferred to one of the
+> +components (zipl stage3). Stage3 does some fixups and then transfers
+> +control to some program residing in guest memory, which is normally
+> +the OS kernel. The secure image has another component prepended
+> +(stage3a) that uses the new diag308 subcodes 8 and 10 to trigger the
+> +transition into secure mode.
+> +
+> +Booting from the image supplied on the QEMU command line requires that
+> +the file passed via -kernel has the same memory layout as would result
+> +from the disk boot. This memory layout includes the encrypted
+> +components (kernel, initrd, cmdline), the stage3a loader and
+> +metadata. In case this boot method is used, the command line
+> +options -initrd and -cmdline are ineffective. The preparation of a PVM
+> +image is done via the `genprotimg` tool from the s390-tools package.
+> diff --git a/docs/system/target-s390x.rst b/docs/system/target-s390x.rst
+> index 4c8b7cdd66154d26..8d97158dc804af1c 100644
+> --- a/docs/system/target-s390x.rst
+> +++ b/docs/system/target-s390x.rst
+> @@ -24,3 +24,8 @@ or vfio-ap is also available.
+>  .. toctree::
+>     s390x/vfio-ap
+>  
+> +Architectural features
+> +~~~~~~~~
+> +
+> +.. toctree::
+> +   s390x/protvirt
+> 
 
 
