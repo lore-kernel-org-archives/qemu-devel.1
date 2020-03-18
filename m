@@ -2,70 +2,68 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95570C5ACD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D2F5C5ACD7
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:12:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B24620663
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:27:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B24620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2622206EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:12:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2622206EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEMYD-0002yW-Le
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 20:27:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47410)
+	id 1jENFa-00070Z-4B
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 21:12:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Colin.Xu@intel.com>) id 1jEMUS-00087C-Hp
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:23:21 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jENF1-0006aj-4g
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Colin.Xu@intel.com>) id 1jEMUQ-0006yk-P5
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:23:19 -0400
-Received: from mga05.intel.com ([192.55.52.43]:55569)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Colin.Xu@intel.com>) id 1jEMUQ-0006pC-G4
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:23:18 -0400
-IronPort-SDR: 9m7Z04/hM7cxD5+7e1RrAxH6ci5duohZDlGOFL2vuLC96DKRz4rYGWh1aRr7ZyWs/SvD/YMNWJ
- mgUgkT4gEMkg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Mar 2020 17:23:14 -0700
-IronPort-SDR: AK0VJkZQXsILYkl8HHmjXK9q+vBoe2ZAWfSylQagnbvid0EsduBc99jhLDWhSphuvryInl2ke0
- Mu9uW0d+oTGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,565,1574150400"; d="scan'208";a="391256814"
-Received: from coxu-arch-shz.sh.intel.com (HELO [10.239.160.52])
- ([10.239.160.52])
- by orsmga004.jf.intel.com with ESMTP; 17 Mar 2020 17:23:13 -0700
-Subject: Re: [PULL 09/61] MAINTAINERS: Add entry for Guest X86 HAXM CPUs
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
- <1584394048-44994-10-git-send-email-pbonzini@redhat.com>
- <d9e9e44f-ba54-c2e7-01c8-72337d3f5993@intel.com>
- <bc354cda-b731-183f-3860-43c3a0af434c@redhat.com>
- <41756673-bbd4-593f-ade8-3232db8b512e@intel.com>
- <1eead546-c06f-2ec0-e3b7-fdc5bb426620@redhat.com>
-From: Colin Xu <Colin.Xu@intel.com>
-Message-ID: <aba00b92-26a4-d80d-79ec-eb0e1df7b747@intel.com>
-Date: Wed, 18 Mar 2020 08:23:12 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <no-reply@patchew.org>) id 1jENEy-0004kW-SN
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:11:26 -0400
+Resent-Date: Tue, 17 Mar 2020 21:11:26 -0400
+Resent-Message-Id: <E1jENEy-0004kW-SN@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21135)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jENEy-0004O1-JA
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:11:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584493861; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=QjJ/p7i2QNnTbgia8+jU9XjBta42bDRslv4s57Ad+Mwu/3e3KPtw3I0sO8PRByXuzC9i7BOop7Dcx8PPCbyl31M9PA9fnE8SXQvlU70ONsV8RG444N0Ox2GHC0DUTeaZHBpQ+jjcTRzYN5WI/N8jp3cK/zC98d++KD0l2zhKwzs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584493861;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=X64piri+hQjwl3pslSFv8fbzM6gAzqb2pwPhofHGFaY=; 
+ b=e4o4jiUidCrW+J5EAjjkePe0yTZGHKlfrdoyBVph5OLj7tM+qdLMShma4QLk+JEVSHK1iMFpbmIv4S4KzfLRgBN/UNRc56z807O6A9mrQ95NTNTYcvmnKGA0AZT/MveN6SRyTVwBLinKUcBHvgeJ/u0EeP1OkO9PLU80TGC6kn0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1584493858655148.7701209273887;
+ Tue, 17 Mar 2020 18:10:58 -0700 (PDT)
+In-Reply-To: <20200317163616.30027-1-f4bug@amsat.org>
+Subject: Re: [PULL 00/13] target: Add the Renesas RX architecture
+Message-ID: <158449385745.25478.4858094171368231753@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <1eead546-c06f-2ec0-e3b7-fdc5bb426620@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.43
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: f4bug@amsat.org
+Date: Tue, 17 Mar 2020 18:10:58 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,42 +75,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Colin.Xu@intel.com
-Cc: Wenchao Wang <wenchao.wang@intel.com>, Hang Yuan <hang.yuan@intel.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, qemu-devel@nongnu.org, ysato@users.sourceforge.jp,
+ f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020-03-17 18:27, Paolo Bonzini wrote:
-> On 17/03/20 09:55, Colin Xu wrote:
->> On 2020-03-17 16:26, Paolo Bonzini wrote:
->>> On 17/03/20 08:46, Colin Xu wrote:
->>>> Hi Paolo,
->>>>
->>>> For future HAX patch, once it's "Reviewed-by" haxm maintainers and other
->>>> reviewers, do we need "SubmitAPullRequest" separately or you will do it
->>>> together with other patches?
->>> As you prefer.  I wouldn't mind having to send fewer pull requests. :)
->>>
->>> Paolo
->> Would you mind continue help HAX send pull request? It feels like easier
->> to track the changes when stay together with other accelerator patches.
->> We'll regularly check the reviewed patches and do necessary tests, and
->> send you a list of patches that can be queued for next pull.
->>
->> What do you think?
-> Sure, that's okay.  The number of patches is low enough.
->
-> Paolo
-
-Cool. Thanks a lot for the help.
-
-Colin.
-
--- 
-
-Best Regards,
-Colin Xu
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxNzE2MzYxNi4zMDAy
+Ny0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMTNdIHRhcmdldDogQWRkIHRoZSBSZW5lc2FzIFJY
+IGFyY2hpdGVjdHVyZQpNZXNzYWdlLWlkOiAyMDIwMDMxNzE2MzYxNi4zMDAyNy0xLWY0YnVnQGFt
+c2F0Lm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRj
+aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTM1Y2Y2OCBBZGQgcngtc29mdG1tdQphNGRlYzI3
+IHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQpk
+NzU5OGE4IHRhcmdldC9yeDogQ29sbGVjdCBhbGwgYnl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5CmRj
+ZDFmYzQgdGFyZ2V0L3J4OiBFbWl0IGFsbCBkaXNhc3NlbWJseSBpbiBvbmUgcHJ0KCkKMWYyZjM1
+MCB0YXJnZXQvcng6IFVzZSBwcnRfbGRtaSBmb3IgWENIR19tciBkaXNhc3NlbWJseQo3MzJkMTQ4
+IHRhcmdldC9yeDogUmVwbGFjZSBvcGVyYW5kIHdpdGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVy
+CjQ5ODZmMmUgdGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJp
+bmcKNzdmYTg2YiB0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcgphNWRiYzJiIHRhcmdldC9yeDog
+Q1BVIGRlZmluaXRpb25zCjBjYTZiNDYgdGFyZ2V0L3J4OiBUQ0cgaGVscGVycwo1ZGM0YmVkIHRh
+cmdldC9yeDogVENHIHRyYW5zbGF0aW9uCmU3YjJiNzcgTUFJTlRBSU5FUlM6IEFkZCBlbnRyeSBm
+b3IgdGhlIFJlbmVzYXMgUlggYXJjaGl0ZWN0dXJlCjgzNGQ0MzUgaHcvcmVnaXN0ZXJmaWVsZHMu
+aDogQWRkIDhiaXQgYW5kIDE2Yml0IHJlZ2lzdGVyIG1hY3JvcwoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KMS8xMyBDaGVja2luZyBjb21taXQgODM0ZDQzNTY5NGY4IChody9yZWdpc3RlcmZpZWxkcy5o
+OiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFjcm9zKQpFUlJPUjogTWFjcm9zIHdpdGgg
+bXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxv
+b3AKIzI5OiBGSUxFOiBpbmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6MjU6CisjZGVmaW5lIFJF
+RzgocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIFwKKyAgICBlbnVtIHsgQV8gIyMgcmVnID0gKGFkZHIpIH07ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBSXyAjIyByZWcgPSAoYWRk
+cikgfTsKCkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBl
+bmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMzM6IEZJTEU6IGluY2x1ZGUvaHcvcmVnaXN0
+ZXJmaWVsZHMuaDoyOToKKyNkZWZpbmUgUkVHMTYocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcg
+PSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
+ICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSAvIDIgfTsKCnRvdGFsOiAyIGVycm9ycywgMCB3
+YXJuaW5ncywgNDggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8xMyBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKMi8xMyBDaGVja2luZyBjb21taXQgZTdiMmI3N2ZiZWEyIChNQUlOVEFJTkVSUzog
+QWRkIGVudHJ5IGZvciB0aGUgUmVuZXNhcyBSWCBhcmNoaXRlY3R1cmUpCjMvMTMgQ2hlY2tpbmcg
+Y29tbWl0IDVkYzRiZWRkYmNjNyAodGFyZ2V0L3J4OiBUQ0cgdHJhbnNsYXRpb24pCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzIyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
+YXJuaW5ncywgMzA2NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzEzIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCjQvMTMgQ2hlY2tpbmcgY29tbWl0IDBjYTZiNDZlYThkMiAodGFyZ2V0L3J4OiBU
+Q0cgaGVscGVycykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
+cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
+dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NTAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8x
+MyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzEzIENoZWNraW5nIGNvbW1pdCBhNWRiYzJi
+ZDU5ZmUgKHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb25zKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
+b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjog
+Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDcwNiBs
+aW5lcyBjaGVja2VkCgpQYXRjaCA1LzEzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjYvMTMg
+Q2hlY2tpbmcgY29tbWl0IDc3ZmE4NmJlOTE4NyAodGFyZ2V0L3J4OiBSWCBkaXNhc3NlbWJsZXIp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
+cm9ycywgMSB3YXJuaW5ncywgMTQ5NyBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEzIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjcvMTMgQ2hlY2tpbmcgY29tbWl0IDQ5ODZmMmVjNzkwMSAodGFy
+Z2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcpCjgvMTMgQ2hl
+Y2tpbmcgY29tbWl0IDczMmQxNDhjNzQ4ZSAodGFyZ2V0L3J4OiBSZXBsYWNlIG9wZXJhbmQgd2l0
+aCBwcnRfbGRtaSBpbiBkaXNhc3NlbWJsZXIpCjkvMTMgQ2hlY2tpbmcgY29tbWl0IDFmMmYzNTBj
+NWVhMSAodGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkpCjEw
+LzEzIENoZWNraW5nIGNvbW1pdCBkY2QxZmM0MmUwYTkgKHRhcmdldC9yeDogRW1pdCBhbGwgZGlz
+YXNzZW1ibHkgaW4gb25lIHBydCgpKQoxMS8xMyBDaGVja2luZyBjb21taXQgZDc1OThhODJiZjZi
+ICh0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseSkKMTIvMTMg
+Q2hlY2tpbmcgY29tbWl0IGE0ZGVjMjdmN2Y1MCAodGFyZ2V0L3J4OiBEdW1wIGJ5dGVzIGZvciBl
+YWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5KQoxMy8xMyBDaGVja2luZyBjb21taXQgNTM1Y2Y2
+ODc4MmY3IChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
+ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjk6IApuZXcgZmlsZSBt
+b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA3NiBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCAxMy8xMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
+YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMxNzE2MzYxNi4zMDAyNy0x
+LWY0YnVnQGFtc2F0Lm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
 
