@@ -2,96 +2,61 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42947C4332E
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1173C4332D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A2972076F
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:44:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YrEwuN1x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2972076F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 74F522071C
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:49:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F522071C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEfXp-0001Wx-5Q
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:44:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41015)
+	id 1jEfct-0003tJ-Lm
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:49:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46159)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jEfWp-0000mR-57
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:43:04 -0400
+ (envelope-from <benh@kernel.crashing.org>) id 1jEfbK-0002lG-3n
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jEfWm-0004SB-KI
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:43:02 -0400
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:34668)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jEfWm-0004IJ-D1
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:43:00 -0400
-Received: by mail-pl1-x635.google.com with SMTP id a23so29550plm.1
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 13:42:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=QMlGyf6XU8H/aF/j5XakScQRHR+DuK9n0raQudfFQvQ=;
- b=YrEwuN1xWidcZTBVwMlsIdNooUepEDnytUJUljON85lAHZ9xxpnOJf6J3uBmVBi2Rq
- mT1w5Wmti2xUPj/5qNqQ4+SUOZUJkAwzX96yazz03t4VkJjSsmhJ8AnXtislDHhWcQmb
- N3DMtsY/ziPJONTH7I4yZ154uqFlajL4ix3M4/hLBOHarU1lAXrVGp4U08kO1PufrPiB
- j85pHfwxsgJHAK6u0a4q55zZuAdS8ebYvY+mQYyCtC59UiqbKQGwtX8FPqcNTUUPDMoc
- 2PRDJbGOdLPwNrHJToWM9lIk7+2O0K8u2MkMi6z4rtCgk64PWhEsNDa0Q2Zh+I6mxKFv
- 88fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=QMlGyf6XU8H/aF/j5XakScQRHR+DuK9n0raQudfFQvQ=;
- b=rWa+CnmaHUPBiza0+1yyoIrHdq1WMO94ZdpS5FdLDRktT1jmdfjGX02NDPsXViXLgT
- hNOauLUayyHkogQFfREK+VLK3OT+VqJy7OVdi1GNuvm72v6GgdxIavRAmnKauLXtQUdp
- 3mdesWe9qNXewc+0ypq/zYoYbxZMr4a1HJG0VxzzU2gRS75/evj8MexgywsBjlXyGMpf
- dCUbNcnqFakpLEn/H3q6J0kbKf+7RD8SkKIRd2QCR5aZmmfGSbcP1S2FmcmroMuLSljL
- gZQOFnK/DmIb1CChE9Jpoabfenvyd6iYcJHn77GqNFtzaQKb+EyeLTkL1kQwG9sedLN9
- T62A==
-X-Gm-Message-State: ANhLgQ3fYxR+2t4OHmON867ugZgJDd2jKpx79j0t1CT5aFGjuAV8duSa
- lJ+ULzrbz4wjCGKqPZ5u3zNO2wgKv30=
-X-Google-Smtp-Source: ADFU+vtGL4RcKeSrwinOnJ7x07q0vRWrMvanv2buYQ1IULYD5GOFpeyj4HDHFvoYS2rA+pu13OoYZQ==
-X-Received: by 2002:a17:902:59dd:: with SMTP id
- d29mr26487plj.246.1584564174198; 
- Wed, 18 Mar 2020 13:42:54 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- t11sm3148629pjo.21.2020.03.18.13.42.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Mar 2020 13:42:53 -0700 (PDT)
-Subject: Re: [PULL v2 00/37] Linux user for 5.0 patches
-To: Laurent Vivier <laurent@vivier.eu>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200317155116.1227513-1-laurent@vivier.eu>
- <CAFEAcA9Pd6D6xaqN7XfOwRANxm=4uOYmdaBoeQiX4_Z-bXEi9g@mail.gmail.com>
- <610f250b-64b8-1cf4-00fe-5bf2f2eba864@linaro.org>
- <b0055b37-a381-095a-a7c9-8b1327be3cce@vivier.eu>
- <95ebdfda-de48-8a44-ec86-8dd384fc98a3@linaro.org>
- <b77a5bd0-46b6-3345-d070-a998890efff2@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0ba1e895-9f0d-49e0-d654-2663a5a858e3@linaro.org>
-Date: Wed, 18 Mar 2020 13:42:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <b77a5bd0-46b6-3345-d070-a998890efff2@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::635
+ (envelope-from <benh@kernel.crashing.org>) id 1jEfbI-0002GN-IS
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:47:41 -0400
+Received: from kernel.crashing.org ([76.164.61.194]:59938)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <benh@kernel.crashing.org>)
+ id 1jEfbI-0000yB-9e; Wed, 18 Mar 2020 16:47:40 -0400
+Received: from localhost (gate.crashing.org [63.228.1.57])
+ (authenticated bits=0)
+ by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 02IKkt6V024894
+ (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 18 Mar 2020 15:46:59 -0500
+Message-ID: <c534dd84f3e8509b7d8f1e844e48ee0dfaa3c420.camel@kernel.crashing.org>
+Subject: Re: [EXTERNAL] [PATCH 2/2] target/ppc: Fix ISA v3.0 (POWER9) slbia
+ implementation
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Nicholas Piggin
+ <npiggin@gmail.com>, qemu-ppc@nongnu.org
+Date: Thu, 19 Mar 2020 07:46:54 +1100
+In-Reply-To: <47de57fe-189f-aef1-87f4-d9e2b5d31b22@kaod.org>
+References: <20200318044135.851716-1-npiggin@gmail.com>
+ <20200318044135.851716-2-npiggin@gmail.com>
+ <47de57fe-189f-aef1-87f4-d9e2b5d31b22@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by kernel.crashing.org id
+ 02IKkt6V024894
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 76.164.61.194
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,78 +68,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/18/20 1:23 PM, Laurent Vivier wrote:
-> Le 18/03/2020 à 21:17, Richard Henderson a écrit :
->> On 3/18/20 12:58 PM, Laurent Vivier wrote:
->>>> However, from the error message above, it's clear that cpu_loop.o has not been
->>>> rebuilt properly.
->>>>
->>>
->>> In the series merged here syscall_nr.h are moved from source directory
->>> to build directory.
->>>
->>> The include path of the files is based on the dependecy files (*.d), and
->>> to force the update of this path PATCH 13 removes all the .d files that
->>> have a dependecy on the syscall_nr.h file in the source path.
->>>
->>> This is added in configure:
->>>
->>> --- a/configure
->>> +++ b/configure
->>> @@ -1887,6 +1887,17 @@ fi
->>>  # Remove old dependency files to make sure that they get properly
->>> regenerated
->>>  rm -f */config-devices.mak.d
->>>
->>> +# Remove syscall_nr.h to be sure they will be regenerated in the build
->>> +# directory, not in the source directory
->>> +for arch in ; do
->>> +    # remove the file if it has been generated in the source directory
->>> +    rm -f "${source_path}/linux-user/${arch}/syscall_nr.h"
->>> +    # remove the dependency files
->>> +    find . -name "*.d" \
->>> +           -exec grep -q
->>> "${source_path}/linux-user/${arch}/syscall_nr.h" {} \; \
->>> +           -exec rm {} \;
->>> +done
->> ...
->>> Perhaps it removes a dependency that should trigger the rebuild of
->>> cpu_loop.o?
->>
->> Ah, yes indeed. It removes *all* dependencies for cpu_loop.o, so unless we
->> touch the cpu_loop.c source file, nothing gets done.
->>
->> I think you're trying to be too fine grained here, since the *.o file has to go
->> away with the *.d file.  Why not just
->>
->>   make ${arch}-linux-user/clean
->>
->> ?
-> 
-> The idea was to be able to bisect the series as the syscall_nr.h were
-> added incrementally without rebuilding all the files.
-> 
-> If I remove the loop in the configure where to add the "make
-> ${arch}-linux-user/clean"?
+On Wed, 2020-03-18 at 18:08 +0100, C=C3=A9dric Le Goater wrote:
+> On 3/18/20 5:41 AM, Nicholas Piggin wrote:
+> > Linux using the hash MMU ("disable_radix" command line) on a POWER9
+> > machine quickly hits translation bugs due to using v3.0 slbia
+> > features that are not implemented in TCG. Add them.
+>=20
+> I checked the ISA books and this looks OK but you are also modifying
+> slbie.
 
-I don't know.  Can you get an exit status out of the find?
+For the same reason, I believe slbie needs to invalidate caches even if
+the entry isn't present.
 
-Another option might be
+The kernel will under some circumstances overwrite SLB entries without
+invalidating (because the translation itself isn't invalid, it's just
+that the SLB is full, so anything cached in the ERAT is still
+technically ok).
 
-for f in $(find ${arch}-linux-user -name '*.d' \
-           -exec grep -q ${arch_syscall} \
-           -print); do
-  rm -f $(basename $f .d).*
-done
+However, when those things get really invalidated, they need to be
+taken out, even if they no longer have a corresponding SLB entry.
 
-But frankly I don't care if all of every file gets rebuilt while bisecting, it
-just needs to work.
+Cheers,
+Ben.
 
+> Thanks,
+>=20
+> C.=20
+>=20
+>=20
+> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> > ---
+> >  target/ppc/helper.h     |  2 +-
+> >  target/ppc/mmu-hash64.c | 57 ++++++++++++++++++++++++++++++++++++-
+> > ----
+> >  target/ppc/translate.c  |  5 +++-
+> >  3 files changed, 55 insertions(+), 9 deletions(-)
+> >=20
+> > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> > index ee1498050d..2dfa1c6942 100644
+> > --- a/target/ppc/helper.h
+> > +++ b/target/ppc/helper.h
+> > @@ -615,7 +615,7 @@ DEF_HELPER_FLAGS_3(store_slb, TCG_CALL_NO_RWG,
+> > void, env, tl, tl)
+> >  DEF_HELPER_2(load_slb_esid, tl, env, tl)
+> >  DEF_HELPER_2(load_slb_vsid, tl, env, tl)
+> >  DEF_HELPER_2(find_slb_vsid, tl, env, tl)
+> > -DEF_HELPER_FLAGS_1(slbia, TCG_CALL_NO_RWG, void, env)
+> > +DEF_HELPER_FLAGS_2(slbia, TCG_CALL_NO_RWG, void, env, i32)
+> >  DEF_HELPER_FLAGS_2(slbie, TCG_CALL_NO_RWG, void, env, tl)
+> >  DEF_HELPER_FLAGS_2(slbieg, TCG_CALL_NO_RWG, void, env, tl)
+> >  #endif
+> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> > index 373d44de74..deb1c13a66 100644
+> > --- a/target/ppc/mmu-hash64.c
+> > +++ b/target/ppc/mmu-hash64.c
+> > @@ -95,9 +95,10 @@ void dump_slb(PowerPCCPU *cpu)
+> >      }
+> >  }
+> >=20
+> > -void helper_slbia(CPUPPCState *env)
+> > +void helper_slbia(CPUPPCState *env, uint32_t ih)
+> >  {
+> >      PowerPCCPU *cpu =3D env_archcpu(env);
+> > +    int starting_entry;
+> >      int n;
+> >=20
+> >      /*
+> > @@ -111,18 +112,59 @@ void helper_slbia(CPUPPCState *env)
+> >       * expected that slbmte is more common than slbia, and slbia
+> > is usually
+> >       * going to evict valid SLB entries, so that tradeoff is
+> > unlikely to be a
+> >       * good one.
+> > +     *
+> > +     * ISA v2.05 introduced IH field with values 0,1,2,6. These
+> > all invalidate
+> > +     * the same SLB entries (everything but entry 0), but differ
+> > in what
+> > +     * "lookaside information" is invalidated. TCG can ignore this
+> > and flush
+> > +     * everything.
+> > +     *
+> > +     * ISA v3.0 introduced additional values 3,4,7, which change
+> > what SLBs are
+> > +     * invalidated.
+> >       */
+> >=20
+> > -    /* XXX: Warning: slbia never invalidates the first segment */
+> > -    for (n =3D 1; n < cpu->hash64_opts->slb_size; n++) {
+> > -        ppc_slb_t *slb =3D &env->slb[n];
+> > +    env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
+> > +
+> > +    starting_entry =3D 1; /* default for IH=3D0,1,2,6 */
+> > +
+> > +    if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
+> > +        switch (ih) {
+> > +        case 0x7:
+> > +            /* invalidate no SLBs, but all lookaside information
+> > */
+> > +            return;
+> >=20
+> > -        if (slb->esid & SLB_ESID_V) {
+> > -            slb->esid &=3D ~SLB_ESID_V;
+> > +        case 0x3:
+> > +        case 0x4:
+> > +            /* also considers SLB entry 0 */
+> > +            starting_entry =3D 0;
+> > +            break;
+> > +
+> > +        case 0x5:
+> > +            /* treat undefined values as ih=3D=3D0, and warn */
+> > +            qemu_log_mask(LOG_GUEST_ERROR,
+> > +                          "slbia undefined IH field %u.\n", ih);
+> > +            break;
+> > +
+> > +        default:
+> > +            /* 0,1,2,6 */
+> > +            break;
+> >          }
+> >      }
+> >=20
+> > -    env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
+> > +    for (n =3D starting_entry; n < cpu->hash64_opts->slb_size; n++)
+> > {
+> > +        ppc_slb_t *slb =3D &env->slb[n];
+> > +
+> > +        if (!(slb->esid & SLB_ESID_V)) {
+> > +            continue;
+> > +        }
+> > +        if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
+> > +            if (ih =3D=3D 0x3 && (slb->vsid & SLB_VSID_C) =3D=3D 0) =
+{
+> > +                /* preserves entries with a class value of 0 */
+> > +                continue;
+> > +            }
+> > +        }
+> > +
+> > +        slb->esid &=3D ~SLB_ESID_V;
+> > +    }
+> >  }
+> >=20
+> >  static void __helper_slbie(CPUPPCState *env, target_ulong addr,
+> > @@ -136,6 +178,7 @@ static void __helper_slbie(CPUPPCState *env,
+> > target_ulong addr,
+> >          return;
+> >      }
+> >=20
+> > +    env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
+> >      if (slb->esid & SLB_ESID_V) {
+> >          slb->esid &=3D ~SLB_ESID_V;
+> >=20
+> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> > index eb0ddba850..e514732a09 100644
+> > --- a/target/ppc/translate.c
+> > +++ b/target/ppc/translate.c
+> > @@ -5027,12 +5027,15 @@ static void gen_tlbsync(DisasContext *ctx)
+> >  /* slbia */
+> >  static void gen_slbia(DisasContext *ctx)
+> >  {
+> > +    uint32_t ih =3D (ctx->opcode >> 21) & 0x7;
+> > +    TCGv_i32 t0 =3D tcg_const_i32(ih);
+> > +
+> >  #if defined(CONFIG_USER_ONLY)
+> >      GEN_PRIV;
+> >  #else
+> >      CHK_SV;
+> >=20
+> > -    gen_helper_slbia(cpu_env);
+> > +    gen_helper_slbia(cpu_env, t0);
+> >  #endif /* defined(CONFIG_USER_ONLY) */
+> >  }
+> >=20
 
-r~
 
