@@ -2,93 +2,80 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B54C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCB5C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 504DE20757
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:20:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27CB020757
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 15:21:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUCzXt3c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504DE20757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CD1AvMoN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27CB020757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEaUj-0002mJ-EO
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 11:20:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57329)
+	id 1jEaVg-0003jg-84
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 11:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57799)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jEaU1-0002L6-Up
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:19:50 -0400
+ (envelope-from <eblake@redhat.com>) id 1jEaUo-00035M-LZ
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jEaU0-0003cV-G1
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:19:49 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60148)
+ (envelope-from <eblake@redhat.com>) id 1jEaUn-0007L9-DF
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:20:38 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25221)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jEaU0-0003Vh-8I
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:19:48 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jEaUn-0007IX-8d
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 11:20:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584544787;
+ s=mimecast20190719; t=1584544836;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oD4ebzrcvOsCJTYeIZlelN0wKyiJ6XixffotJeNmGP0=;
- b=JUCzXt3c6LfoyN7pzNfh7VIRzhV6ZemoLTU8om0xNhsUga+0EuYGj8FNya6Pv5FB+jiWDl
- EqOkcWgUm5s8OvaQ7sP5F+4TUqY5tzfsTeMJDyOQQIBAcQbP/XmE9HzMUjjDpdFDRGi5/M
- 7BAI1uYxA5SED+caZT3XgV4xVz1Qdrs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-dPdB1YdoNuu0pgMC8D_6Ag-1; Wed, 18 Mar 2020 11:19:45 -0400
-X-MC-Unique: dPdB1YdoNuu0pgMC8D_6Ag-1
-Received: by mail-wm1-f70.google.com with SMTP id z26so1176529wmk.1
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 08:19:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=P3aEI7MWjY2Fri1Ho2EcAhF8sP9NkUSCzssC1DeA61c=;
- b=qB7w8gZ5vN9gSIuNJZVywvBzbraB+C4Oa25zCVxz1Xo8o/9VXdEoqMQmTos9ry0Y3v
- 4js1yMh3GfKMn1VX8bhs4RZRn31SzGPLGRm91yLLejtRAOcWKDc9mu63q21I9rQq9W5d
- EgkWoWNDYbjn6dQYzI3olw8ZprxLKIO3zX7CKP4DkHVybzVzY9CC0DYOml1Vm41NqC8j
- t0bu/HJec0LTlysjElf/5GQDm2CFCmx4DY27Jm/jkColgA8rfoCR1hvHKv2dbqF195/Q
- 9RkpcO6/MGIk1TAv2kM1PL21H0aDSq6Bg/xxNHT91KNdXSmZbJZxKwJjXtFrZOGBcKa2
- mwzQ==
-X-Gm-Message-State: ANhLgQ10++p6DpLwYcLy5Px2yHQLnXpY8YNdglAwzez80SGOTbFRyQ9r
- thJ+rJXs5Xllg5h+qerAagAeInRtaCRFOZcccHnuh9AyRv8LeAXlkz7pQXrHM8VLA4DH3Bia3u4
- K21pE0oZ9b2cBC0s=
-X-Received: by 2002:adf:e511:: with SMTP id j17mr6483149wrm.25.1584544784536; 
- Wed, 18 Mar 2020 08:19:44 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vucnLyuAMZuh2k1iDg47Y103rPXHMQObLQL0gozs2ZHJJMHfWFkLan7j+pa2AHImsFSUXTpFQ==
-X-Received: by 2002:adf:e511:: with SMTP id j17mr6483131wrm.25.1584544784229; 
- Wed, 18 Mar 2020 08:19:44 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-39-109.red.bezeqint.net. [109.66.39.109])
- by smtp.gmail.com with ESMTPSA id a7sm3680359wmb.0.2020.03.18.08.19.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Mar 2020 08:19:43 -0700 (PDT)
-Date: Wed, 18 Mar 2020 11:19:40 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v5 6/7] vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC
- macro
-Message-ID: <20200318111857-mutt-send-email-mst@kernel.org>
-References: <20200318091525.27044-1-yuri.benditovich@daynix.com>
- <20200318091525.27044-7-yuri.benditovich@daynix.com>
- <87d099g6j6.fsf@secure.laptop>
+ bh=RzmSfbQJXaIrVogFGnxFJK9NBa7y/YdFSCvkwfRlwnk=;
+ b=CD1AvMoNmvjFvO9SS7yR9C94IyozUS8UZbVmtjS9b0swyPsiGa8CQ+cvTQMyZ8x0sk72ey
+ 6LkdN0S61nrpqCHp+TiI2dd00LxkFFdVZkti7F12psxLDR6s/IhSI0NWEwSn8N/eqMHqbj
+ RdDTfinvpaP7P98MPdOC+cmHsSP0hCo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-LE5UAA7UNgawBwT_SHSkpg-1; Wed, 18 Mar 2020 11:20:19 -0400
+X-MC-Unique: LE5UAA7UNgawBwT_SHSkpg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C304318A8C95;
+ Wed, 18 Mar 2020 15:20:17 +0000 (UTC)
+Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19E283B0;
+ Wed, 18 Mar 2020 15:20:17 +0000 (UTC)
+Subject: Re: [PATCH v4 30/34] qapi: Implement deprecated-output=hide for QMP
+ event data
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200317115459.31821-1-armbru@redhat.com>
+ <20200317115459.31821-31-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0b746eff-9e7f-6ff7-c3f2-64b6c27f2b20@redhat.com>
+Date: Wed, 18 Mar 2020 10:20:16 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87d099g6j6.fsf@secure.laptop>
+In-Reply-To: <20200317115459.31821-31-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 216.205.24.74
@@ -103,38 +90,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com, Yuri Benditovich <yuri.benditovich@daynix.com>,
- jasowang@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 18, 2020 at 02:02:37PM +0100, Juan Quintela wrote:
-> Yuri Benditovich <yuri.benditovich@daynix.com> wrote:
-> > Similar to VMSTATE_VARRAY_UINT32_ALLOC, but the size is
-> > 16-bit field.
-> >
-> > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
->=20
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->=20
-> Same caveat about attribution to MST.
->=20
-> Once told tha, I don't understand why you are using a unit16_t.
-> You define indirections_len as:
->=20
-> +    uint16_t indirections_len;
->=20
-> But its maximum value right now is:
->=20
-> +#define VIRTIO_NET_RSS_MAX_TABLE_LEN    128
->=20
-> So, are we planning to increase that value in the next future, or we
-> just want to give enough space?
->=20
-> Later, Juan.
+On 3/17/20 6:54 AM, Markus Armbruster wrote:
+> This policy suppresses deprecated bits in output, and thus permits
+> "testing the future".  Implement it for QMP event data: suppress
+> deprecated members.
+> 
+> No QMP event data is deprecated right now.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-The max size according to spec is u16. Using that limits
-the size and makes it forward compatible.
+> +static void test_event_deprecated_data(TestEventData *data, const void *unused)
+> +{
+> +    memset(&compat_policy, 0, sizeof(compat_policy));
+> +
+> +    data->expect = qdict_from_jsonf_nofail("{ 'event': 'TEST-EVENT-FEATURES0',"
+> +                                           " 'data': { 'foo': 42 } }");
+> +    qapi_event_send_test_event_features0(42);
+> +    g_assert(data->emitted);
+> +
+> +    qobject_unref(data->expect);
+> +
+> +    compat_policy.deprecated_output = COMPAT_POLICY_OUTPUT_HIDE;
+
+Again, playing fast-and-loose with compat_policy.has_deprecated_output.
+
+
+> +++ b/scripts/qapi/events.py
+> @@ -104,7 +104,7 @@ def gen_event_send(name, arg_type, features, boxed,
+>   
+>       if have_args:
+>           ret += mcgen('''
+> -    v = qobject_output_visitor_new(&obj);
+> +    v = qobject_output_visitor_new_qmp(&obj);
+>   ''')
+>           if not arg_type.is_implicit():
+>               ret += mcgen('''
+> @@ -123,7 +123,11 @@ def gen_event_send(name, arg_type, features, boxed,
+>           ret += mcgen('''
+>   
+>       visit_complete(v, &obj);
+> -    qdict_put_obj(qmp, "data", obj);
+> +    if (qdict_size(qobject_to(QDict, obj))) {
+> +        qdict_put_obj(qmp, "data", obj);
+> +    } else {
+> +        qobject_unref(obj);
+> +    }
+
+So you'd rather omit data altogether than emit "data":{} when all 
+deprecated members disappear.  Fair enough; both approaches work.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
