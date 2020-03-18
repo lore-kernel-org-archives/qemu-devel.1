@@ -2,73 +2,76 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E257FC1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF464C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C3020663
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:21:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCAD720663
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:21:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UA6lTzTV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C3020663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QrgXtLlH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCAD720663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEMSV-0005ZN-OQ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 20:21:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45164)
+	id 1jEMSX-0005f6-Rw
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 20:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45195)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jEMR0-00042B-Lr
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:19:47 -0400
+ (envelope-from <crosa@redhat.com>) id 1jEMR1-00042D-OX
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:19:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jEMQz-0006Df-Ll
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:19:46 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:28116)
+ (envelope-from <crosa@redhat.com>) id 1jEMR0-0006Kf-Lo
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:19:47 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45074)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jEMQz-0006Ag-Hn
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:19:45 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jEMR0-0006IP-IR
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:19:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584490785;
+ s=mimecast20190719; t=1584490786;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=pVwdpjT2pmm/+g/EmwZsm20jaqg48Rh1wjbJR9p4gaU=;
- b=UA6lTzTVt7tryLg7PX7WYTsOJi5RV7sLuv9LMfuiT58eiMIlezKNQDj5MlgpjoG843MCdb
- kn1RpZvQMXY2NWgE7s54kRHm8kUrz/YDwIzoU+yi+UJfgxhAdgnZHQrONevSjFGGQ1Eu5j
- SXrcbIzYH7wrox1W6nvMf2kbZlA9QT4=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HR6pju1FpXZiyx2s7FtbvNbGXjaMb1iuZa39/jLotBU=;
+ b=QrgXtLlHvUjpW/u8nj4kT24szUOF5bBLRzlNXnMpfq3qbOayrHMw6ZG5x5la2CJyEsMVLF
+ QO+H4ikgO7Sk6+htOgwQgEHhCs+XRRTCaaQO2V65E6/iNmCSEo3AUJMKAvxVvqCv2C6RqF
+ QWh9Ek1yoCMFIkTRK9KEDsUnorLKtVA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-zzd3G_fMPsuUaFNdMxqDDw-1; Tue, 17 Mar 2020 20:19:41 -0400
-X-MC-Unique: zzd3G_fMPsuUaFNdMxqDDw-1
+ us-mta-396-eksbqT1-MamMsCkxnnD2Xg-1; Tue, 17 Mar 2020 20:19:44 -0400
+X-MC-Unique: eksbqT1-MamMsCkxnnD2Xg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C400A800D50;
- Wed, 18 Mar 2020 00:19:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66CEB8017DF;
+ Wed, 18 Mar 2020 00:19:42 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-117-2.rdu2.redhat.com
  [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BB8B91001B07;
- Wed, 18 Mar 2020 00:19:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0138D1001B07;
+ Wed, 18 Mar 2020 00:19:39 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 0/6] Python and tests (mostly acceptance) patches 2020-03-17
-Date: Tue, 17 Mar 2020 20:19:26 -0400
-Message-Id: <20200318001932.180617-1-crosa@redhat.com>
+Subject: [PULL 1/6] python/qemu/qmp.py: QMP debug with VM label
+Date: Tue, 17 Mar 2020 20:19:27 -0400
+Message-Id: <20200318001932.180617-2-crosa@redhat.com>
+In-Reply-To: <20200318001932.180617-1-crosa@redhat.com>
+References: <20200318001932.180617-1-crosa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
@@ -85,9 +88,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-ppc@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Oksana Vohchana <ovoshcha@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
+ John Snow <jsnow@redhat.com>, KONRAD Frederic <frederic.konrad@adacore.com>,
+ qemu-ppc@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
@@ -97,49 +100,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit d649689a8ecb2e276cc20d3af6d416e3c299cb17=
-:
+From: Oksana Vohchana <ovoshcha@redhat.com>
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into sta=
-ging (2020-03-17 18:33:05 +0000)
+QEMUMachine writes some messages to the default logger.
+But it sometimes hard to read the output if we have requests to
+more than one VM.
+This patch adds a label to the logger in the debug mode.
 
-are available in the Git repository at:
+Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20200316103203.10046-1-ovoshcha@redhat.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ python/qemu/machine.py | 3 ++-
+ python/qemu/qmp.py     | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-  git://github.com/clebergnu/qemu.git tags/python-next-pull-request
-
-for you to fetch changes up to a51d6a549361fd1a20dd2ac1d6a42ac0a4c708c7:
-
-  tests/docker: make "buildah bud" output similar to "docker build" (2020-0=
-3-17 19:16:16 -0400)
-
-----------------------------------------------------------------
-Python and tests (mostly acceptance) patches 2020-03-17
-
-----------------------------------------------------------------
-
-Cleber Rosa (5):
-  Acceptance tests: introduce BUILD_DIR and SOURCE_DIR
-  Acceptance test: add "boot_linux" tests
-  Acceptance tests: add make targets to download images
-  tests/docker: add CentOS 8 Dockerfile
-  tests/docker: make "buildah bud" output similar to "docker build"
-
-Oksana Vohchana (1):
-  python/qemu/qmp.py: QMP debug with VM label
-
- .travis.yml                                   |   2 +-
- python/qemu/machine.py                        |   3 +-
- python/qemu/qmp.py                            |   5 +-
- tests/Makefile.include                        |  20 +-
- tests/acceptance/avocado_qemu/__init__.py     |  25 +-
- tests/acceptance/boot_linux.py                | 222 ++++++++++++++++++
- tests/docker/dockerfiles/centos8.docker       |  32 +++
- .../dockerfiles/debian-win32-cross.docker     |   2 +-
- tests/requirements.txt                        |   1 +
- 9 files changed, 300 insertions(+), 12 deletions(-)
- create mode 100644 tests/acceptance/boot_linux.py
- create mode 100644 tests/docker/dockerfiles/centos8.docker
-
+diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+index 183d8f3d38..f53abfa492 100644
+--- a/python/qemu/machine.py
++++ b/python/qemu/machine.py
+@@ -270,7 +270,8 @@ class QEMUMachine(object):
+                 self._vm_monitor =3D os.path.join(self._sock_dir,
+                                                 self._name + "-monitor.soc=
+k")
+                 self._remove_files.append(self._vm_monitor)
+-            self._qmp =3D qmp.QEMUMonitorProtocol(self._vm_monitor, server=
+=3DTrue)
++            self._qmp =3D qmp.QEMUMonitorProtocol(self._vm_monitor, server=
+=3DTrue,
++                                                nickname=3Dself._name)
+=20
+     def _post_launch(self):
+         if self._qmp:
+diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+index f40586eedd..d6c9b2f4b1 100644
+--- a/python/qemu/qmp.py
++++ b/python/qemu/qmp.py
+@@ -46,7 +46,7 @@ class QEMUMonitorProtocol:
+     #: Logger object for debugging messages
+     logger =3D logging.getLogger('QMP')
+=20
+-    def __init__(self, address, server=3DFalse):
++    def __init__(self, address, server=3DFalse, nickname=3DNone):
+         """
+         Create a QEMUMonitorProtocol class.
+=20
+@@ -62,6 +62,9 @@ class QEMUMonitorProtocol:
+         self.__address =3D address
+         self.__sock =3D self.__get_sock()
+         self.__sockfile =3D None
++        self._nickname =3D nickname
++        if self._nickname:
++            self.logger =3D logging.getLogger('QMP').getChild(self._nickna=
+me)
+         if server:
+             self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,=
+ 1)
+             self.__sock.bind(self.__address)
 --=20
 2.25.1
 
