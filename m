@@ -6,80 +6,79 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C6DC1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 02:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 834B5C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 02:32:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C132B20724
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 02:08:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EE9A206EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 02:32:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehagMjL2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C132B20724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FhW33DG4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE9A206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEO86-0004EU-UH
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 22:08:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56812)
+	id 1jEOVe-00008j-HA
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 22:32:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jEO7Y-0003pe-8M
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:07:49 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jEOUv-0007zj-F5
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1jEO7X-0006yX-Ad
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:07:48 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45434)
+ (envelope-from <jasowang@redhat.com>) id 1jEOUu-0001fo-Ic
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:31:57 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52681)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jEO7X-0006wf-5e
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:07:47 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jEOUu-0001Ta-ER
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:31:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584497266;
+ s=mimecast20190719; t=1584498714;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tUU1HuVstjOPX/uBOLxUGP6H8lViSDP60G5UcEUhkI4=;
- b=ehagMjL2imHUeOKB9lw4jPRsTRG3XvyGX6Dm5i5RGgennQK8eMiKDDFRW/O1YgBhQWJD6K
- MBkd8fzckPl5z8O6E7iqwqFI6GpEMpQAseQ/dLuntHNjXvO++eim9+18yZcBefYL7UCYPo
- Ww3MiRFRNFv4qVOLCqLd6zFE8/ucYJ0=
+ bh=d1yz3fGlh9xc1RnOSW7axmCUv4BC6vv7Mz7Bz5QMcG4=;
+ b=FhW33DG4BVOxvwhD335CJE7165rkaUKFCL1BrAWxTx6yAFZ1pqlOHEyCMGkPQIYYzSSOHe
+ gxbnQA5C5lK6VLWXPvicrTU4CD2shMWhclblxZGiO3IhODp2SV/FRmUklDk94lnMLP7I1W
+ mLXHTaJdTOgY6pbHdWWHt8m2A5CHRuU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-uuVb6Ql7PnuqjiN2SU6kSQ-1; Tue, 17 Mar 2020 22:07:42 -0400
-X-MC-Unique: uuVb6Ql7PnuqjiN2SU6kSQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-487-DrmtmbOFNLqyLvINA1HaDA-1; Tue, 17 Mar 2020 22:31:51 -0400
+X-MC-Unique: DrmtmbOFNLqyLvINA1HaDA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6587B13F9;
- Wed, 18 Mar 2020 02:07:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03FD18017CC;
+ Wed, 18 Mar 2020 02:31:49 +0000 (UTC)
 Received: from [10.72.13.166] (ovpn-13-166.pek2.redhat.com [10.72.13.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 58E8190814;
- Wed, 18 Mar 2020 02:07:36 +0000 (UTC)
-Subject: Re: [PATCH v3 2/2] net: tulip: add .can_recieve routine
-To: P J P <ppandit@redhat.com>
-References: <20200303104724.233375-1-ppandit@redhat.com>
- <20200303104724.233375-3-ppandit@redhat.com>
- <20200306130853.GM1335569@stefanha-x1.localdomain>
- <nycvar.YSQ.7.76.2003162325500.5086@xnncv>
- <27df2e70-936f-f989-7b6b-a00772dea0cd@redhat.com>
- <nycvar.YSQ.7.76.2003171543480.5086@xnncv>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5792A1001DC2;
+ Wed, 18 Mar 2020 02:31:39 +0000 (UTC)
+Subject: Re: [PATCH 0/6] hw/net: Make Net/CanBus can_receive() handlers return
+ a boolean
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200305175651.4563-1-philmd@redhat.com>
+ <74bab3ca-fd8c-5c27-0376-2c3728cb18e4@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <976adb02-5653-2f57-555d-c41b8d392fc1@redhat.com>
-Date: Wed, 18 Mar 2020 10:07:34 +0800
+Message-ID: <5e28cb8b-6f80-cec9-6915-1806573f7583@redhat.com>
+Date: Wed, 18 Mar 2020 10:31:38 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.2003171543480.5086@xnncv>
+In-Reply-To: <74bab3ca-fd8c-5c27-0376-2c3728cb18e4@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,45 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Sven Schnelle <svens@stackframe.org>,
- Qemu Developers <qemu-devel@nongnu.org>, Ziming Zhang <ezrakiez@gmail.com>,
- Li Qiang <pangpei.lq@antfin.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/3/17 =E4=B8=8B=E5=8D=886:49, P J P wrote:
-> +-- On Tue, 17 Mar 2020, Jason Wang wrote --+
-> | > +-- On Fri, 6 Mar 2020, Stefan Hajnoczi wrote --+
-> | > | > +static int
-> | > | > +tulip_can_receive(NetClientState *nc)
-> | > | > +{
-> | > | > +    TULIPState *s =3D qemu_get_nic_opaque(nc);
-> | > | > +
-> | > | > +    if (s->rx_frame_len || tulip_rx_stopped(s)) {
-> | > | > +        return false;
-> | > | > +    }
-> |
-> | Btw, what's the point of checking rx_frame_len here?
+On 2020/3/17 =E4=B8=8B=E5=8D=886:47, Philippe Mathieu-Daud=C3=A9 wrote:
+> Ping?
 >
-> tulip_can_recive() is called from tulip_receive(). IIUC non zero(0)
-> 'rx_frame_len' hints that s->rs_frame[] buffer still has unread data byte=
-s and
-> it can not receive new bytes. The check was earlier in tulip_receive().
+> This series is fully reviewed.=20
 
 
-Right, so need to make sure qemu_flush_ququed_packets() was called when=20
-rx_frame_len is zero.
+Sorry for the delay.
+
+Applied.
 
 Thanks
 
-
-
->
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
