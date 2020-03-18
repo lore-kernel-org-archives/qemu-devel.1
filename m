@@ -2,91 +2,116 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B85CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 19:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32634C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 19:59:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A08120754
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 19:58:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hFEpeash"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A08120754
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0AF8B20753
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 19:59:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AF8B20753
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEepz-00007o-Hw
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 15:58:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47875)
+	id 1jEeqg-0001X3-87
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 15:59:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jEeot-0007bK-SR
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 15:57:40 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jEepw-0000K7-1X
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 15:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jEeop-0001v4-7I
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 15:57:39 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36657)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jEeoo-0001gy-T2
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 15:57:35 -0400
-Received: by mail-pl1-x643.google.com with SMTP id g2so9141990plo.3
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 12:57:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=SfifZN2LfHh6ueoZ6ciAcGJnVw4PMaTiQsypNeYvvyw=;
- b=hFEpeashxxC+xsNUOpbAhFGsvfegul5e6MXizzSAIuoROx754INkdwMqbXZ4FWhEYt
- zWW/LFjFmyLf7too9SbKb9jHYsIqPWKvrglpwnwsMNOG1LvzBXll1bBiV4O/KsWVw5m3
- psenE9ULMYmfIlA4YOvSDUkkTpI5XcEyKHtD16HgOHS5nVKDg5oNusEgcMP9PkjS9Mc9
- sDpxUkG1rqJLGx9qJ7F5OUlIXiPBcJ4NpnSAvgPxdnO3ifryBwQb1QVO7zfYSa2akFBm
- CvSpFfwzwsZjNb0TfL58IiR2qoaIPHTgcBzTUrRnFSELVnchFnYxEhkv9pSPkgeqMPd3
- e6FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SfifZN2LfHh6ueoZ6ciAcGJnVw4PMaTiQsypNeYvvyw=;
- b=ISkdEiL1xuqLZO+I0kGwmM750LhpNhAioT3IdvcOOalxVv1BMmd7V4foo6vrz5UUr3
- hIXddjmOQY6cukx6RX7aDnQ21YJkCVp/FHXS/83/MuVfxg47ZOKk+n6/sj6fnjNlSAxG
- dYdZ190mDn9PMv5HZVk93aSEJDDMVs/JxLyzHxJCEiRgPzzAGYq3WE+tYnvSa2Vf0VZa
- UL0t49rSY83j5lQkbM6o9U3n/I7PAfhoARKf8TsyOxccSnBGvogN15lJFHIklmIWzgbR
- 33znet//G3waa5lQ3EK1Hwy/Ifj8ykUtVThdRp/iQ/DrpeVnYPHgbueYjboe23D6FH3p
- /sqg==
-X-Gm-Message-State: ANhLgQ1iUkrA8g33xx4RdKFBvZDQYZ/zf7z5wDXe6HRJLM4FkGS01S8g
- ojmbl8sV/cGFPhjyeFnVwOMpQw==
-X-Google-Smtp-Source: ADFU+vsZ432fPyUOzVfMpuW9g2zC/zgI60WUbGjzoPhCVl3IC93pXpTbOneqSdKTzx+re6ePQfyh3w==
-X-Received: by 2002:a17:902:9b95:: with SMTP id
- y21mr5463410plp.101.1584561453815; 
- Wed, 18 Mar 2020 12:57:33 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- d1sm7249399pfc.3.2020.03.18.12.57.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Mar 2020 12:57:33 -0700 (PDT)
-Subject: Re: [PATCH v2 1/1] target/ppc: don't byte swap ELFv2 signal handler
-To: Vincent Fazio <vfazio@xes-inc.com>, qemu-devel@nongnu.org
-References: <20200318170116.1922-1-vfazio@xes-inc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8d76e1bf-2149-b995-3257-fd40eca6ccf9@linaro.org>
-Date: Wed, 18 Mar 2020 12:57:30 -0700
+ (envelope-from <laurent@vivier.eu>) id 1jEepu-0005H9-D4
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 15:58:43 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:53995)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jEepu-0004xq-2b
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 15:58:42 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MZCX1-1ik0rJ4AtN-00VCV4; Wed, 18 Mar 2020 20:58:33 +0100
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200317155116.1227513-1-laurent@vivier.eu>
+ <CAFEAcA9Pd6D6xaqN7XfOwRANxm=4uOYmdaBoeQiX4_Z-bXEi9g@mail.gmail.com>
+ <610f250b-64b8-1cf4-00fe-5bf2f2eba864@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PULL v2 00/37] Linux user for 5.0 patches
+Message-ID: <b0055b37-a381-095a-a7c9-8b1327be3cce@vivier.eu>
+Date: Wed, 18 Mar 2020 20:58:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200318170116.1922-1-vfazio@xes-inc.com>
+In-Reply-To: <610f250b-64b8-1cf4-00fe-5bf2f2eba864@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:2i/sxhJyHFPEZUObx+B6xCsAxo3+ZVRWYRbZgBLXRolIEKrJzH6
+ hym+yjgFBjr6g92eWbkMsBo94DPGta788dNj76/uzY9ZVd5eqkv0hko0J2h9sjsVWLdzAGw
+ dpyfHYAfk4PN/Li9MlNsuJ0S/naxScIfyz1F5cLdMcoJgpkc0M5c2z0ouCi8QbwMsStVNiB
+ lttuZJZs4ati5nKoC1jaw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:VWD5vVRhw4A=:zHqbf8MEo+890PsCJT6U8g
+ daUSKgMjCLocHO/fL96Nkb4//ElR1sbbkzoShNEqgmT4Zb9oc/t++23f7R4RWgr8oDzSwIPpr
+ FG5q2GZgC2tKkSm+ZDEqz43HKqOWV/5E6qHA/PctT6Nq4gWhrSfWNNHUZY3jqP2wV6RBBEcVh
+ vui2ERSxo7Zw7zRVnZAHsKcZvoJn63bNMkEG8seyP2s/RX/HQZL+SPDVh8AxCiCw/p7G6bHqP
+ /oArbjN5FC/gHq5ZhPpDHvRh4hv5Zw6zGutwBelJxFi8AtKjWDnT6cmw4B98NtzRijkFUcqJ3
+ KfU+pdwVwbbtclfAmOcB0DD7wZBxjeyIV7RmR3aqdO4LUCgc2gikXigGO+SguILnNrINxM+dL
+ 1ByzISuI5nqkcQbXPxSAjlWL/n/0iDsAF3BcTkH/hCsstra6thobWTaofdF929GQ1rQelKR+Q
+ 9ZMDzMrzwVOfy2IY4/fe6qBWxvgsA5lanlTRsX+xPw+z548WYCZcwMxZyY7hKQNxPVLvtMVfz
+ WO0Qn448bzDY28FoJnu4hX48r+bzTORnvlagb6hnN8FFdciHI1nLppoyx3ublftT58ufXsn1A
+ w0ktR0GOB1etyMVeYFaoa4gzk94H5a2upipw09CfGiY64VYhdnukGWMG9IcOd3/R6FR9F2jPw
+ AqVdQnCAq3VuqdE7Spq7ozvuwAJbIgEKf9PdRv27Isx8xuhEKDCqUokN1IvRcTNLZW2nBwoZK
+ PvWfTN+UBhkFBJRWPiD+OgXGBUAKoY2tKXsugUARfWAfR+4TCCXMswHjy10l85WZ0gzyTNXqv
+ nkGYYuduTtm/CWyimN6t2a+UgOQb653Sr9+Tpbpm3q/Rcbzk38pXmHixV+KOc5ngstJDMdJ
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,42 +123,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- Vincent Fazio <vfazio@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/18/20 10:01 AM, Vincent Fazio wrote:
-> From: Vincent Fazio <vfazio@gmail.com>
+Le 18/03/2020 à 20:46, Richard Henderson a écrit :
+> On 3/18/20 6:57 AM, Peter Maydell wrote:
+>> My set of "run ls for various architectures" linux-user tests
+>> https://people.linaro.org/~peter.maydell/linux-user-test-pmm-20200114.tgz
+>> fails with this pullreq:
+>>
+>> e104462:bionic:linux-user-test-0.3$
+>> /home/petmay01/linaro/qemu-for-merges/build/all-linux-static/x86_64-linux-user/qemu-x86_64
+>> -L ./gnemul/qemu-x86_64 x86_64/ls -l dummyfile
+>> qemu: 0x40008117e9: unhandled CPU exception 0x101 - aborting
 > 
-> Previously, the signal handler would be byte swapped if the target and
-> host CPU used different endianness. This would cause a SIGSEGV when
-> attempting to translate the opcode pointed to by the swapped address.
 > 
->  Thread 1 "qemu-ppc64" received signal SIGSEGV, Segmentation fault.
->  0x00000000600a9257 in ldl_he_p (ptr=0x4c2c061000000000) at qemu/include/qemu/bswap.h:351
->  351        __builtin_memcpy(&r, ptr, sizeof(r));
+> I replicated this on aarch64 host, with an existing build tree and merging in
+> the pull request.  It does not occur when building the same merged tree from
+> scratch.
 > 
->  #0  0x00000000600a9257 in ldl_he_p (ptr=0x4c2c061000000000) at qemu/include/qemu/bswap.h:351
->  #1  0x00000000600a92fe in ldl_be_p (ptr=0x4c2c061000000000) at qemu/include/qemu/bswap.h:449
->  #2  0x00000000600c0790 in translator_ldl_swap at qemu/include/exec/translator.h:201
->  #3  0x000000006011c1ab in ppc_tr_translate_insn at qemu/target/ppc/translate.c:7856
->  #4  0x000000006005ae70 in translator_loop at qemu/accel/tcg/translator.c:102
+> I have no idea what the reason for this is.  Laurent suggested a file in the
+> build tree that is shadowed by one in the source tree, but to me that makes no
+> sense for this case:
 > 
-> Now, no swap is performed and execution continues properly.
+> It's target/i386/cpu.h that defines EXCP_SYSCALL (renumbered in this series
+> from 0x100 to 0x101), which is not in the build tree.  It is
+> linux-user/i386/cpu_loop.c that consumes EXCP_SYSCALL, and it is also not in
+> the build tree.
 > 
-> Signed-off-by: Vincent Fazio <vfazio@gmail.com>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> ---
-> Changes since v1:
-> - Drop host/target endianness callouts
-> - Drop unnecessary pointer cast
-> - Clarify commit message
+> However, from the error message above, it's clear that cpu_loop.o has not been
+> rebuilt properly.
+> 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+In the series merged here syscall_nr.h are moved from source directory
+to build directory.
+
+The include path of the files is based on the dependecy files (*.d), and
+to force the update of this path PATCH 13 removes all the .d files that
+have a dependecy on the syscall_nr.h file in the source path.
+
+This is added in configure:
+
+--- a/configure
++++ b/configure
+@@ -1887,6 +1887,17 @@ fi
+ # Remove old dependency files to make sure that they get properly
+regenerated
+ rm -f */config-devices.mak.d
+
++# Remove syscall_nr.h to be sure they will be regenerated in the build
++# directory, not in the source directory
++for arch in ; do
++    # remove the file if it has been generated in the source directory
++    rm -f "${source_path}/linux-user/${arch}/syscall_nr.h"
++    # remove the dependency files
++    find . -name "*.d" \
++           -exec grep -q
+"${source_path}/linux-user/${arch}/syscall_nr.h" {} \; \
++           -exec rm {} \;
++done
++
+ if test -z "$python"
+ then
+     error_exit "Python not found. Use --python=/path/to/python"
+
+For the use of the dependency see for instance PATCH 14:
+
+--- a/configure
++++ b/configure
+@@ -1889,7 +1889,7 @@ rm -f */config-devices.mak.d
+
+ # Remove syscall_nr.h to be sure they will be regenerated in the build
+ # directory, not in the source directory
+-for arch in ; do
++for arch in alpha ; do
+     # remove the file if it has been generated in the source directory
+     rm -f "${source_path}/linux-user/${arch}/syscall_nr.h"
+     # remove the dependency file
++++ b/linux-user/alpha/Makefile.objs
+@@ -0,0 +1,5 @@
++generated-files-y += linux-user/alpha/syscall_nr.h
++
++syshdr := $(SRC_PATH)/linux-user/alpha/syscallhdr.sh
++%/syscall_nr.h: $(SRC_PATH)/linux-user/alpha/syscall.tbl $(syshdr)
++	$(call quiet-command, sh $(syshdr) $< $@ $(TARGET_SYSTBL_ABI),"GEN","$@")
 
 
-r~
+%/syscall_nr.h is expanded with the absolute path found in the .d file.
+
+Perhaps it removes a dependency that should trigger the rebuild of
+cpu_loop.o?
+
+Thanks,
+Laurent
 
