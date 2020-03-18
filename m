@@ -2,83 +2,87 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46559C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D0CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 106C72076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07E862076F
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:17:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eRlSPp0g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 106C72076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VeCzmd+6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07E862076F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEVlh-0001e0-61
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:17:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38779)
+	id 1jEVlq-0001xp-7a
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:17:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jEVkQ-0000FP-Fa
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:16:27 -0400
+ (envelope-from <prvs=2346c1f04e=bbhushan2@marvell.com>)
+ id 1jEVh7-0003Fw-QA
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:13:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jEVkO-0003lp-Kv
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:16:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44358)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jEVkO-0003k7-Dz
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:16:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584526583;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RRwAd6baRBfL0gFOtlnzoY0tqGGS/3afskJnH3zlAHc=;
- b=eRlSPp0geFoSF2rtjzjTfO5s+j4uNka/ZCEFwrRCAdONrptmgvAxS4AFRvlcJa/fmb9Qo5
- sLMRlXE7W7Bd92XyIorF1hRFMSroC1ItEGlom2WfRmsjFgsXxvNvM2zWs8OMfa6EAC/6Uu
- PRor4wsw7CMRzbpS8u0zB1ZFdGPrB7Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-Ao_7YqDwMg2RjqxUJT8Ncw-1; Wed, 18 Mar 2020 06:16:21 -0400
-X-MC-Unique: Ao_7YqDwMg2RjqxUJT8Ncw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DCB3108442D;
- Wed, 18 Mar 2020 10:16:20 +0000 (UTC)
-Received: from work-vm (ovpn-115-3.ams2.redhat.com [10.36.115.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CBCA92D0E;
- Wed, 18 Mar 2020 10:16:14 +0000 (UTC)
-Date: Wed, 18 Mar 2020 10:16:10 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 3/4] tests/migration: Disable autoconverge test on
- Travis-CI s390x
-Message-ID: <20200318101610.GD2850@work-vm>
-References: <20200317200541.6246-1-philmd@redhat.com>
- <20200317200541.6246-4-philmd@redhat.com>
- <20200317202620.GJ3369@work-vm>
- <a5f13b5d-03bf-5821-9539-6ba59632ad1f@redhat.com>
+ (envelope-from <prvs=2346c1f04e=bbhushan2@marvell.com>)
+ id 1jEVh6-0005Uc-Eq
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:13:01 -0400
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:26454)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=2346c1f04e=bbhushan2@marvell.com>)
+ id 1jEVh4-0005Py-0j; Wed, 18 Mar 2020 06:12:58 -0400
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+ by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02IABnOg030625; Wed, 18 Mar 2020 03:12:55 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=pfpt0818; bh=b/xFgYePXPIX12aaAGxsXGPT9CqkwDZHYIS0r7ZTW0U=;
+ b=VeCzmd+6ZI6MCKt9Hit8BdNR4+pYplmI9iihYkvkau//8osJb0goh3S0uoIcqGHVc1tp
+ hsaTgvxtfMNwT9qa37H/T1VboZFSEERC5PjKPl0sfyvFa39kYeXBiJNXh4Yb3HT6KOJA
+ 2JrngrMGmOzmIvRtW5evinqpl6dd+8f7cTrxlPjsOhYOV5nEC5zob4hzkOulo2Z5VdVw
+ iViLcJaN99oJGQEhso/56au+GMSQGvZY74P6tCKbwxGNtbxnlinnTz/LEQyZ0ILLE+Qw
+ iLxwPzK8YvclSEiXRCYyuVtyoyTOft+aa0j4dJNP6Wfk59f3qcfqzn2A6REv14z/zAiQ 2Q== 
+Received: from sc-exch03.marvell.com ([199.233.58.183])
+ by mx0b-0016f401.pphosted.com with ESMTP id 2yu9rp9tw8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Wed, 18 Mar 2020 03:12:55 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH03.marvell.com
+ (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+ Wed, 18 Mar 2020 03:12:54 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+ Wed, 18 Mar 2020 03:12:53 -0700
+Received: from bbhushan2.marvell.com (10.93.176.43) by SC-EXCH03.marvell.com
+ (10.93.176.83) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 18 Mar 2020 03:12:48 -0700
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <peter.maydell@linaro.org>, <peterx@redhat.com>,
+ <eric.auger.pro@gmail.com>, <alex.williamson@redhat.com>,
+ <kevin.tian@intel.com>, <mst@redhat.com>, <tnowicki@marvell.com>,
+ <drjones@redhat.com>, <linuc.decode@gmail.com>,
+ <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+ <bharatb.linux@gmail.com>, <jean-philippe@linaro.org>,
+ <yang.zhong@intel.com>
+Subject: [PATCH v8 8/8] virtio-iommu: add iommu notifier memory-region
+Date: Wed, 18 Mar 2020 15:41:59 +0530
+Message-ID: <20200318101159.8767-9-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200318101159.8767-1-bbhushan2@marvell.com>
+References: <20200318101159.8767-1-bbhushan2@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <a5f13b5d-03bf-5821-9539-6ba59632ad1f@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-18_04:2020-03-18,
+ 2020-03-18 signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 67.231.156.173
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,117 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Bharat Bhushan <bbhushan2@marvell.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> On 3/17/20 9:26 PM, Dr. David Alan Gilbert wrote:
-> > * Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> > > This test fails on Travis-CI s390x when configured with --disable-tcg=
-:
-> > >=20
-> > >    $ make check-qtest
-> > >      TEST    check-qtest-s390x: tests/qtest/boot-serial-test
-> > >    qemu-system-s390x: -accel tcg: invalid accelerator tcg
-> > >    qemu-system-s390x: falling back to KVM
-> > >      TEST    check-qtest-s390x: tests/qtest/pxe-test
-> > >      TEST    check-qtest-s390x: tests/qtest/test-netfilter
-> > >      TEST    check-qtest-s390x: tests/qtest/test-filter-mirror
-> > >      TEST    check-qtest-s390x: tests/qtest/test-filter-redirector
-> > >      TEST    check-qtest-s390x: tests/qtest/drive_del-test
-> > >      TEST    check-qtest-s390x: tests/qtest/device-plug-test
-> > >      TEST    check-qtest-s390x: tests/qtest/virtio-ccw-test
-> > >      TEST    check-qtest-s390x: tests/qtest/cpu-plug-test
-> > >      TEST    check-qtest-s390x: tests/qtest/migration-test
-> > >    **
-> > >    ERROR:tests/qtest/migration-test.c:1229:test_migrate_auto_converge=
-: 'got_stop' should be FALSE
-> > >    ERROR - Bail out! ERROR:tests/qtest/migration-test.c:1229:test_mig=
-rate_auto_converge: 'got_stop' should be FALSE
-> > >    make: *** [tests/Makefile.include:633: check-qtest-s390x] Error 1
-> >=20
-> > Before we take the hammer to it, could you try reducing it's initial
-> > bandwidth, the code that says:
-> >=20
-> >      /*
-> >       * Set the initial parameters so that the migration could not conv=
-erge
-> >       * without throttling.
-> >       */
-> >      migrate_set_parameter_int(from, "downtime-limit", 1);
-> >      migrate_set_parameter_int(from, "max-bandwidth", 100000000); /* ~1=
-00Mb/s */
-> >=20
-> > knock a couple of 0's off that and see if it's happy.
->=20
-> You are right! One 0 is not enough, but a couple makes the test succeed.
->=20
-> Can that change have other (bad) effects on other archs?
-> IOW can I send a generic patch updating this value, or should I add a che=
-ck
-> on the architecture?
+Finally add notify_flag_changed() to for memory-region
+access flag iommu flag change notifier
 
-I think generic is fine;  as soon as the code notices that it's
-throttling it increases the bandwidth to let it complete, so it should
-be OK to have this low.
+Finally add the memory notifier
 
-Dave
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+---
+ hw/virtio/virtio-iommu.c | 22 ++++++++++++++++++++++
+ hw/virtio/trace-events   |  2 ++
+ 2 files changed, 24 insertions(+)
 
-> Thanks!
->=20
-> >=20
-> > Dave
-> >=20
-> > > Per David Gilbert, it might be a threshold requiring tuning:
-> > > "it could just be the writing is slow on s390 and the migration
-> > > thread fast; in which case the autocomplete wouldn't be needed.
-> > > Perhaps we just need to reduce the bandwidth limit."
-> > >=20
-> > > Disable the autoconverge test for now.
-> > >=20
-> > > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > > ---
-> > >   tests/qtest/migration-test.c | 10 ++++++++++
-> > >   1 file changed, 10 insertions(+)
-> > >=20
-> > > diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-tes=
-t.c
-> > > index 3d6cc83b88..878399666e 100644
-> > > --- a/tests/qtest/migration-test.c
-> > > +++ b/tests/qtest/migration-test.c
-> > > @@ -1181,6 +1181,16 @@ static void test_migrate_auto_converge(void)
-> > >       MigrateStart *args =3D migrate_start_new();
-> > >       QTestState *from, *to;
-> > >       int64_t remaining, percentage;
-> > > +    char *travis_arch;
-> > > +
-> > > +    /*
-> > > +     * This test does not work reliably on Travis s390x.
-> > > +     */
-> > > +    travis_arch =3D getenv("TRAVIS_CPU_ARCH");
-> > > +    if (travis_arch && g_str_equal(travis_arch, "s390x")) {
-> > > +        g_test_skip("Test does not work reliably on s390x Travis con=
-tainers.");
-> > > +        return;
-> > > +    }
-> > >       /*
-> > >        * We want the test to be stable and as fast as possible.
-> > > --=20
-> > > 2.21.1
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index b68644f7c3..515c965e3c 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -814,6 +814,27 @@ unlock:
+     qemu_mutex_unlock(&s->mutex);
+ }
+ 
++static int virtio_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu_mr,
++                                             IOMMUNotifierFlag old,
++                                             IOMMUNotifierFlag new,
++                                             Error **errp)
++{
++    IOMMUDevice *sdev = container_of(iommu_mr, IOMMUDevice, iommu_mr);
++    VirtIOIOMMU *s = sdev->viommu;
++
++    if (old == IOMMU_NOTIFIER_NONE) {
++        trace_virtio_iommu_notify_flag_add(iommu_mr->parent_obj.name);
++        QLIST_INSERT_HEAD(&s->notifiers_list, sdev, next);
++        return 0;
++    }
++
++    if (new == IOMMU_NOTIFIER_NONE) {
++        trace_virtio_iommu_notify_flag_del(iommu_mr->parent_obj.name);
++        QLIST_REMOVE(sdev, next);
++    }
++    return 0;
++}
++
+ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -1033,6 +1054,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
+     imrc->translate = virtio_iommu_translate;
+     imrc->iommu_set_page_size_mask = virtio_iommu_set_page_size_mask;
+     imrc->replay = virtio_iommu_replay;
++    imrc->notify_flag_changed = virtio_iommu_notify_flag_changed;
+ }
+ 
+ static const TypeInfo virtio_iommu_info = {
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 8bae651191..a486adcf6d 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -76,3 +76,5 @@ virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uin
+ virtio_iommu_notify_map(const char *name, uint64_t iova, uint64_t paddr, uint64_t map_size) "mr=%s iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64
+ virtio_iommu_notify_unmap(const char *name, uint64_t iova, uint64_t map_size) "mr=%s iova=0x%"PRIx64" size=0x%"PRIx64
+ virtio_iommu_remap(uint64_t iova, uint64_t pa, uint64_t size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
++virtio_iommu_notify_flag_add(const char *iommu) "Add virtio-iommu notifier node for memory region %s"
++virtio_iommu_notify_flag_del(const char *iommu) "Del virtio-iommu notifier node for memory region %s"
+-- 
+2.17.1
 
 
