@@ -2,79 +2,79 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD90C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 17:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 872BFC10F29
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 17:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FF9A20767
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 17:58:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5722420714
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 17:59:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nfBGWECb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FF9A20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SOUy3dkV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5722420714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEcxW-0000Av-4z
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 13:58:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54864)
+	id 1jEcyH-0001A9-Fi
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 13:59:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55451)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jEcwj-00085w-Br
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 13:57:38 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jEcxA-00007T-Vb
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 13:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jEcwh-00032g-Vp
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 13:57:37 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:42466)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jEcwh-0002xJ-PG
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 13:57:35 -0400
-Received: by mail-oi1-x236.google.com with SMTP id 13so17804028oiy.9
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 10:57:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0l8jVPBg4yhcbRev/CvsHSb+Z8iTevGoH21sPOkchJo=;
- b=nfBGWECbSb9ih6y6rByq4r7u5rB76QxIHQZAhY3NDXYdl5fC4mt4hT5xPb3OkeyXYq
- 7dhWGYKlqaBoRCmCw7xEuBPKauvvIxYJR4WZ1MHLC1PLy/kvQGLs69faZNMXtLEwXlaD
- 7RlQ5NExDhzTrirZF7vPxInUTtGpLFsrg+nfhTS1Da07dtOP6qWkXbsRGqtoGkcz+8Ec
- kzosYXmd+i0nD/h41+NhTb/uKpAZjt1KVAnnF+sae0FjJpmOmkGvDD3ZmyyV8rucrMMq
- mrjDKxFMITSFBZXbtHW03FMcWH9Fl7B9UDf+KTaAEn+rRpgfRXOd4wu1zKdpSKL8/YmB
- +Gsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0l8jVPBg4yhcbRev/CvsHSb+Z8iTevGoH21sPOkchJo=;
- b=bORSkHvj1YhlsTf8zM2ouM6Imb2AyZuFlQlNnxU52NATMsuiCHefDDWil2Dzknscg1
- d+Xn8K239CS4DBTVnJH0G5tfMm899uPOMIplbc1r0JKowCRQ1dbuW42UwkWISL5FjkD5
- 7adwIiHz9orqPehBOmGU3NrjRfXj+Sk+UDgEYi+gDYJeuKsNHv0ce2jTrXK06nc+1WV0
- ahu9++pXdkUlv1KicWGk0OSF8ufp+fijIxK0mnAbTlukJJMfvfoYr9Fxupg/CuO9KX85
- YkupB0pvv95+zXnDuoJmGUdeocRLoKphElhI7Luhxsncs2ToeyI3NBFugoPe5krv0SBR
- 2o8g==
-X-Gm-Message-State: ANhLgQ1YcxKmLw6KGGo3BIVYxoU+bA638BngUJK2v1Oa4j5lFD8XCEiF
- Ol48xZKbxwHBoM3h3PpSKNFS+L6cQjc8h6lAre73Pw==
-X-Google-Smtp-Source: ADFU+vvcMJVvwE81Z9JoaimnzfyDZpb/BcSzOUBNCWXl6h4faovyCeFPLjo7hiEKCP+NHAc2Tq5hxWibGWxjZlbyRgU=
-X-Received: by 2002:aca:c608:: with SMTP id w8mr4213145oif.163.1584554254815; 
- Wed, 18 Mar 2020 10:57:34 -0700 (PDT)
+ (envelope-from <cohuck@redhat.com>) id 1jEcx9-0005Vp-6b
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 13:58:04 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:28520)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jEcx8-0005Nt-Sl
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 13:58:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584554282;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5ZvkZv8+DmskGvLW+6hjyuf00/9hmWoiE1K9VMDf/fk=;
+ b=SOUy3dkVeblLM888XIK1a6NM8lIDEBniG69Pt/8fWNw9aEyJjyEtJxCTUiQqVSHie8/FVR
+ pLrbvG8rju5R6VVtFt2aBabCWG24kaiLaMS+ILXBDtHWxTaxIYSmaGVSPmIpkXbUM+P6hN
+ VV/YCeAgHuwZSPOYaAOF3WodwsC49RQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-pFBnAdLnNfaNoM4DoaY7yw-1; Wed, 18 Mar 2020 13:58:00 -0400
+X-MC-Unique: pFBnAdLnNfaNoM4DoaY7yw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 127EF1005509;
+ Wed, 18 Mar 2020 17:57:59 +0000 (UTC)
+Received: from gondolin (ovpn-113-129.ams2.redhat.com [10.36.113.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 24C41627D8;
+ Wed, 18 Mar 2020 17:57:54 +0000 (UTC)
+Date: Wed, 18 Mar 2020 18:57:50 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v10 08/16] s390x: protvirt: Move STSI data over SIDAD
+Message-ID: <20200318185750.0bdf7ad4.cohuck@redhat.com>
+In-Reply-To: <20200318143047.2335-9-frankja@linux.ibm.com>
+References: <20200318143047.2335-1-frankja@linux.ibm.com>
+ <20200318143047.2335-9-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 18 Mar 2020 17:57:23 +0000
-Message-ID: <CAFEAcA8P+sy0vqYxTAnUzzmd7VoTZDb_3T1f+_orF7Mo-TBteg@mail.gmail.com>
-Subject: Re: [PULL 00/45] ppc-for-5.0 queue 20200317
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::236
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,52 +86,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
- qemu-ppc <qemu-ppc@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Mar 2020 at 10:04, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> The following changes since commit a98135f727595382e200d04c2996e868b7925a01:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20200316-pull-request' into staging (2020-03-16 14:55:59 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-5.0-20200317
->
-> for you to fetch changes up to 6961eae79f58385482775dc0a6c3d553f633662d:
->
->   pseries: Update SLOF firmware image (2020-03-17 17:00:22 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2020-03-17
->
-> Here's my final pull request for the qemu-5.0 soft freeze.  Sorry this
-> is just under the wire - I hit some last minute problems that took a
-> while to fix up and retest.
->
-> Highlights are:
->  * Numerous fixes for the FWNMI feature
->  * A handful of cleanups to the device tree construction code
->  * Numerous fixes for the spapr-vscsi device
->  * A number of fixes and cleanups for real mode (MMU off) softmmu
->    handling
->  * Fixes for handling of the PAPR RMA
->  * Better handling of hotplug/unplug events during boot
->  * Assorted other fixes
->
+On Wed, 18 Mar 2020 10:30:39 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
+> For protected guests, we need to put the STSI emulation results into
+> the SIDA, so SIE will write them into the guest at the next entry.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  target/s390x/kvm.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index cfca4c58df60eb85..462a1d70ee78104c 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -50,6 +50,7 @@
+>  #include "exec/memattrs.h"
+>  #include "hw/s390x/s390-virtio-ccw.h"
+>  #include "hw/s390x/s390-virtio-hcall.h"
+> +#include "hw/s390x/pv.h"
+>  
+>  #ifndef DEBUG_KVM
+>  #define DEBUG_KVM  0
+> @@ -1806,7 +1807,9 @@ static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
+>      SysIB_322 sysib;
+>      int del;
+>  
+> -    if (s390_cpu_virt_mem_read(cpu, addr, ar, &sysib, sizeof(sysib))) {
+> +    if (s390_is_pv()) {
+> +        s390_cpu_pv_mem_read(cpu, 0, &sysib, sizeof(sysib));
 
-Applied, thanks.
+The only minor issue I have here is that it is not obvious that this
+function either succeeds or aborts, as we only call it in the pv case.
+But it probably does not make that much sense to sprinkle comments
+everywhere, either.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+> +    } else if (s390_cpu_virt_mem_read(cpu, addr, ar, &sysib, sizeof(sysib))) {
+>          return;
+>      }
+>      /* Shift the stack of Extended Names to prepare for our own data */
+> @@ -1846,7 +1849,11 @@ static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
+>      /* Insert UUID */
+>      memcpy(sysib.vm[0].uuid, &qemu_uuid, sizeof(sysib.vm[0].uuid));
+>  
+> -    s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, sizeof(sysib));
+> +    if (s390_is_pv()) {
+> +        s390_cpu_pv_mem_write(cpu, 0, &sysib, sizeof(sysib));
+> +    } else {
+> +        s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, sizeof(sysib));
+> +    }
+>  }
+>  
+>  static int handle_stsi(S390CPU *cpu)
 
--- PMM
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
 
