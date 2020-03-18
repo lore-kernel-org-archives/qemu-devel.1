@@ -2,63 +2,74 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6D3C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AFDC10F29
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6A3220753
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:03:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A3220753
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DC09C20752
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:15:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="SRTUjqRc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC09C20752
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEeuq-0002w0-1A
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:03:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49611)
+	id 1jEf6M-00067k-Pn
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:15:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jEeu0-0002V6-2Z
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:02:58 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jEf5V-0005Ba-71
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:14:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jEetx-0006ja-Ez
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:02:56 -0400
-Received: from mga02.intel.com ([134.134.136.20]:56300)
+ (envelope-from <kwankhede@nvidia.com>) id 1jEf5S-0006uC-Qr
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:14:48 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:19236)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jEetn-0006Mu-Le; Wed, 18 Mar 2020 16:02:43 -0400
-IronPort-SDR: exGyTv/iFjS3F62hksiwFXDIE9wme7KSe7xQWVhlIvoBTBsNSX6cRQbL7FGFsDjaHyKEt9aqvK
- qElIOB1ljplw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 18 Mar 2020 13:02:40 -0700
-IronPort-SDR: domdNOPS2J8fMDV9erdPRn5XUkD9IUYDVnTMxZELwOLNuAt9sYJ7T4O2EozCkmtKyq52efo0Bs
- fw5tqLDd3ASA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,568,1574150400"; d="scan'208";a="238285870"
-Received: from unknown (HELO localhost.ch.intel.com) ([10.2.28.117])
- by fmsmga008.fm.intel.com with ESMTP; 18 Mar 2020 13:02:40 -0700
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-To: kbusch@kernel.org,
-	kwolf@redhat.com,
-	mreitz@redhat.com
-Subject: [PATCH v3] block/nvme: introduce PMR support from NVMe 1.4 spec
-Date: Wed, 18 Mar 2020 13:03:03 -0700
-Message-Id: <20200318200303.11322-1-andrzej.jakowski@linux.intel.com>
-X-Mailer: git-send-email 2.21.1
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1jEf5S-0006tZ-I1
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:14:46 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e7281270002>; Wed, 18 Mar 2020 13:14:31 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Wed, 18 Mar 2020 13:14:45 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate102.nvidia.com on Wed, 18 Mar 2020 13:14:45 -0700
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 18 Mar
+ 2020 20:14:44 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Wed, 18 Mar 2020 20:14:38 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v14 Kernel 0/7] KABIs to support migration for VFIO devices
+Date: Thu, 19 Mar 2020 01:11:07 +0530
+Message-ID: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+X-NVConfidentiality: public
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.20
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1584562472; bh=ZrueuZTFqaYO2Tyxu8ekQbb5H0RhZW6vUFkSFnd4d8k=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ X-NVConfidentiality:MIME-Version:Content-Type;
+ b=SRTUjqRc5MTOgYB8n1wT5ApTRru71ZwyssTwNhfEiTP84dTTrbJjjuiwZG5BYwVCK
+ fZz3ud54iYmALv1k5YqBFGhkcuctkoBl2Cz7WPMYaRTRE6P9Bey2cxpRtaYlKhv+Xv
+ S9BI61TNsplX58MWxGlmMIJNN1AxaaZfsAeDfHMriZqoBug9gZSIc6alNfWvKGiE/n
+ 3sahWwYoLFeMBIKoseZKezIidA9GS4UeKlxC2J91Az8UW4lpeX08ZelsVzNXTAEH9o
+ zZ0EeiMsU5Q/UHAQTNFozOztsdAlQHgnrnz4ARZ5K2TNrmPn0diCaaQOuhEaWoTaKW
+ w/RgT5UpJ3xqw==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,482 +81,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: haozhong.zhang@intel.com,
- Andrzej Jakowski <andrzej.jakowski@linux.intel.com>, qemu-block@nongnu.org,
- stefanha@gmail.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- yi.z.zhang@linux.intel.com, junyan.he@intel.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces support for PMR that has been defined as part of NVMe 1.4
-spec. User can now specify a pmrdev option that should point to HostMemoryBackend.
-pmrdev memory region will subsequently be exposed as PCI BAR 2 in emulated NVMe
-device. Guest OS can perform mmio read and writes to the PMR region that will stay
-persistent across system reboot.
+Hi,
 
-Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
----
-v2:
- - reworked PMR to use HostMemoryBackend instead of directly mapping PMR
-   backend file into qemu [1] (Stefan)
+This patch set adds:
+* New IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+  respect to IOMMU container rather than per device. All pages pinned by
+  vendor driver through vfio_pin_pages external API has to be marked as
+  dirty during  migration. When IOMMU capable device is present in the
+  container and all pages are pinned and mapped, then all pages are marked
+  dirty.
+  When there are CPU writes, CPU dirty page tracking can identify dirtied
+  pages, but any page pinned by vendor driver can also be written by
+  device. As of now there is no device which has hardware support for
+  dirty page tracking. So all pages which are pinned should be considered
+  as dirty.
+  This ioctl is also used to start/stop dirty pages tracking for pinned and
+  unpinned pages while migration is active.
 
-v1:
- - provided support for Bit 1 from PMRWBM register instead of Bit 0 to ensure
-   improved performance in virtualized environment [2] (Stefan)
+* Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
+  unmapping IO virtual address range.
+  With vIOMMU, during pre-copy phase of migration, while CPUs are still
+  running, IO virtual address unmap can happen while device still keeping
+  reference of guest pfns. Those pages should be reported as dirty before
+  unmap, so that VFIO user space application can copy content of those
+  pages from source to destination.
 
- - added check if pmr size is power of two in size [3] (David)
+* Patch 7 detect if IOMMU capable device driver is smart to report pages
+  to be marked dirty by pinning pages using vfio_pin_pages() API.
 
- - addressed cross compilation build problems reported by CI environment
 
-[1]: https://lore.kernel.org/qemu-devel/20200306223853.37958-1-andrzej.jakowski@linux.intel.com/
-[2]: https://nvmexpress.org/wp-content/uploads/NVM-Express-1_4-2019.06.10-Ratified.pdf
-[3]: https://lore.kernel.org/qemu-devel/20200218224811.30050-1-andrzej.jakowski@linux.intel.com/
----
-Persistent Memory Region (PMR) is a new optional feature provided in NVMe 1.4
-specification. This patch implements initial support for it in NVMe driver.
----
- hw/block/nvme.c       | 117 +++++++++++++++++++++++++++-
- hw/block/nvme.h       |   2 +
- hw/block/trace-events |   5 ++
- include/block/nvme.h  | 172 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 294 insertions(+), 2 deletions(-)
+Yet TODO:
+Since there is no device which has hardware support for system memmory
+dirty bitmap tracking, right now there is no other API from vendor driver
+to VFIO IOMMU module to report dirty pages. In future, when such hardware
+support will be implemented, an API will be required such that vendor
+driver could report dirty pages to VFIO module during migration phases.
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index d28335cbf3..70fd09d293 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -19,10 +19,18 @@
-  *      -drive file=<file>,if=none,id=<drive_id>
-  *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
-  *              cmb_size_mb=<cmb_size_mb[optional]>, \
-+ *              [pmrdev=<mem_backend_file_id>,] \
-  *              num_queues=<N[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-+ *
-+ * Either cmb or pmr - due to limitation in available BAR indexes.
-+ * pmr_file file needs to be power of two in size.
-+ * Enabling pmr emulation can be achieved by pointing to memory-backend-file.
-+ * For example:
-+ * -object memory-backend-file,id=<mem_id>,share=on,mem-path=<file_path>, \
-+ *  size=<size> .... -device nvme,...,pmrdev=<mem_id>
-  */
- 
- #include "qemu/osdep.h"
-@@ -35,7 +43,9 @@
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
-+#include "sysemu/hostmem.h"
- #include "sysemu/block-backend.h"
-+#include "exec/ramblock.h"
- 
- #include "qemu/log.h"
- #include "qemu/module.h"
-@@ -1141,6 +1151,26 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
-         NVME_GUEST_ERR(nvme_ub_mmiowr_cmbsz_readonly,
-                        "invalid write to read only CMBSZ, ignored");
-         return;
-+    case 0xE00: /* PMRCAP */
-+        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrcap_readonly,
-+                       "invalid write to PMRCAP register, ignored");
-+        return;
-+    case 0xE04: /* TODO PMRCTL */
-+        break;
-+    case 0xE08: /* PMRSTS */
-+        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrsts_readonly,
-+                       "invalid write to PMRSTS register, ignored");
-+        return;
-+    case 0xE0C: /* PMREBS */
-+        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrebs_readonly,
-+                       "invalid write to PMREBS register, ignored");
-+        return;
-+    case 0xE10: /* PMRSWTP */
-+        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrswtp_readonly,
-+                       "invalid write to PMRSWTP register, ignored");
-+        return;
-+    case 0xE14: /* TODO PMRMSC */
-+         break;
-     default:
-         NVME_GUEST_ERR(nvme_ub_mmiowr_invalid,
-                        "invalid MMIO write,"
-@@ -1169,6 +1199,23 @@ static uint64_t nvme_mmio_read(void *opaque, hwaddr addr, unsigned size)
-     }
- 
-     if (addr < sizeof(n->bar)) {
-+        /*
-+         * When PMRWBM bit 1 is set then read from
-+         * from PMRSTS should ensure prior writes
-+         * made it to persistent media
-+         */
-+        if (addr == 0xE08 &&
-+            (NVME_PMRCAP_PMRWBM(n->bar.pmrcap) & 0x02) >> 1) {
-+            int status;
-+
-+            status = qemu_msync((void *)n->pmrdev->mr.ram_block->host,
-+                                n->pmrdev->size,
-+                                n->pmrdev->mr.ram_block->fd);
-+            if (!status) {
-+                NVME_GUEST_ERR(nvme_ub_mmiord_pmrread_barrier,
-+                               "error while persisting data");
-+            }
-+        }
-         memcpy(&val, ptr + addr, size);
-     } else {
-         NVME_GUEST_ERR(nvme_ub_mmiord_invalid_ofs,
-@@ -1332,6 +1379,23 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         error_setg(errp, "serial property not set");
-         return;
-     }
-+
-+    if (!n->cmb_size_mb && n->pmrdev) {
-+        if (host_memory_backend_is_mapped(n->pmrdev)) {
-+            char *path = object_get_canonical_path_component(OBJECT(n->pmrdev));
-+            error_setg(errp, "can't use already busy memdev: %s", path);
-+            g_free(path);
-+            return;
-+        }
-+
-+        if (!is_power_of_2(n->pmrdev->size)) {
-+            error_setg(errp, "pmr backend size needs to be power of 2 in size");
-+            return;
-+        }
-+
-+        host_memory_backend_set_mapped(n->pmrdev, true);
-+    }
-+
-     blkconf_blocksizes(&n->conf);
-     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
-                                        false, errp)) {
-@@ -1393,7 +1457,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     n->bar.intmc = n->bar.intms = 0;
- 
-     if (n->cmb_size_mb) {
--
-         NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
-         NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
- 
-@@ -1415,6 +1478,51 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-             PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
-             PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
- 
-+    } else if (n->pmrdev) {
-+        /* Controller Capabilities register */
-+        NVME_CAP_SET_PMRS(n->bar.cap, 1);
-+
-+        /* PMR Capabities register */
-+        n->bar.pmrcap = 0;
-+        NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
-+        NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
-+        NVME_PMRCAP_SET_BIR(n->bar.pmrcap, 2);
-+        NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
-+        /* Turn on bit 1 support */
-+        NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
-+        NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
-+        NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
-+
-+        /* PMR Control register */
-+        n->bar.pmrctl = 0;
-+        NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
-+
-+        /* PMR Status register */
-+        n->bar.pmrsts = 0;
-+        NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
-+        NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
-+        NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
-+        NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
-+
-+        /* PMR Elasticity Buffer Size register */
-+        n->bar.pmrebs = 0;
-+        NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
-+        NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
-+        NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
-+
-+        /* PMR Sustained Write Throughput register */
-+        n->bar.pmrswtp = 0;
-+        NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
-+        NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
-+
-+        /* PMR Memory Space Control register */
-+        n->bar.pmrmsc = 0;
-+        NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
-+        NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
-+
-+        pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
-+            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
-+            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
-     }
- 
-     for (i = 0; i < n->num_namespaces; i++) {
-@@ -1441,15 +1549,20 @@ static void nvme_exit(PCIDevice *pci_dev)
-     g_free(n->namespaces);
-     g_free(n->cq);
-     g_free(n->sq);
--
-     if (n->cmb_size_mb) {
-         g_free(n->cmbuf);
-     }
-+
-+    if (n->pmrdev) {
-+        host_memory_backend_set_mapped(n->pmrdev, false);
-+    }
-     msix_uninit_exclusive_bar(pci_dev);
- }
- 
- static Property nvme_props[] = {
-     DEFINE_BLOCK_PROPERTIES(NvmeCtrl, conf),
-+    DEFINE_PROP_LINK("pmrdev", NvmeCtrl, pmrdev, TYPE_MEMORY_BACKEND,
-+                     HostMemoryBackend *),
-     DEFINE_PROP_STRING("serial", NvmeCtrl, serial),
-     DEFINE_PROP_UINT32("cmb_size_mb", NvmeCtrl, cmb_size_mb, 0),
-     DEFINE_PROP_UINT32("num_queues", NvmeCtrl, num_queues, 64),
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 557194ee19..6520a9f0be 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -83,6 +83,8 @@ typedef struct NvmeCtrl {
-     uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
- 
-     char            *serial;
-+    HostMemoryBackend *pmrdev;
-+
-     NvmeNamespace   *namespaces;
-     NvmeSQueue      **sq;
-     NvmeCQueue      **cq;
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index c03e80c2c9..233e094438 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -110,10 +110,15 @@ nvme_ub_mmiowr_ssreset_w1c_unsupported(void) "attempted to W1C CSTS.NSSRO but CA
- nvme_ub_mmiowr_ssreset_unsupported(void) "attempted NVM subsystem reset but CAP.NSSRS is zero (not supported)"
- nvme_ub_mmiowr_cmbloc_reserved(void) "invalid write to reserved CMBLOC when CMBSZ is zero, ignored"
- nvme_ub_mmiowr_cmbsz_readonly(void) "invalid write to read only CMBSZ, ignored"
-+nvme_ub_mmiowr_pmrcap_readonly(void) "invalid write to read only PMRCAP, ignored"
-+nvme_ub_mmiowr_pmrsts_readonly(void) "invalid write to read only PMRSTS, ignored"
-+nvme_ub_mmiowr_pmrebs_readonly(void) "invalid write to read only PMREBS, ignored"
-+nvme_ub_mmiowr_pmrswtp_readonly(void) "invalid write to read only PMRSWTP, ignored"
- nvme_ub_mmiowr_invalid(uint64_t offset, uint64_t data) "invalid MMIO write, offset=0x%"PRIx64", data=0x%"PRIx64""
- nvme_ub_mmiord_misaligned32(uint64_t offset) "MMIO read not 32-bit aligned, offset=0x%"PRIx64""
- nvme_ub_mmiord_toosmall(uint64_t offset) "MMIO read smaller than 32-bits, offset=0x%"PRIx64""
- nvme_ub_mmiord_invalid_ofs(uint64_t offset) "MMIO read beyond last register, offset=0x%"PRIx64", returning 0"
-+nvme_ub_mmiord_pmrread_barrier(void) "failed to persists data"
- nvme_ub_db_wr_misaligned(uint64_t offset) "doorbell write not 32-bit aligned, offset=0x%"PRIx64", ignoring"
- nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell write for nonexistent queue, cqid=%"PRIu32", ignoring"
- nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue doorbell write value beyond queue size, cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 8fb941c653..374262d4b7 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -15,6 +15,13 @@ typedef struct NvmeBar {
-     uint64_t    acq;
-     uint32_t    cmbloc;
-     uint32_t    cmbsz;
-+    uint8_t     padding[3520]; /* not used by QEMU */
-+    uint32_t    pmrcap;
-+    uint32_t    pmrctl;
-+    uint32_t    pmrsts;
-+    uint32_t    pmrebs;
-+    uint32_t    pmrswtp;
-+    uint32_t    pmrmsc;
- } NvmeBar;
- 
- enum NvmeCapShift {
-@@ -27,6 +34,7 @@ enum NvmeCapShift {
-     CAP_CSS_SHIFT      = 37,
-     CAP_MPSMIN_SHIFT   = 48,
-     CAP_MPSMAX_SHIFT   = 52,
-+    CAP_PMR_SHIFT      = 56,
- };
- 
- enum NvmeCapMask {
-@@ -39,6 +47,7 @@ enum NvmeCapMask {
-     CAP_CSS_MASK       = 0xff,
-     CAP_MPSMIN_MASK    = 0xf,
-     CAP_MPSMAX_MASK    = 0xf,
-+    CAP_PMR_MASK       = 0x1,
- };
- 
- #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
-@@ -69,6 +78,8 @@ enum NvmeCapMask {
-                                                            << CAP_MPSMIN_SHIFT)
- #define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
-                                                             << CAP_MPSMAX_SHIFT)
-+#define NVME_CAP_SET_PMRS(cap, val) (cap |= (uint64_t)(val & CAP_PMR_MASK)\
-+                                                            << CAP_PMR_SHIFT)
- 
- enum NvmeCcShift {
-     CC_EN_SHIFT     = 0,
-@@ -205,6 +216,167 @@ enum NvmeCmbszMask {
- #define NVME_CMBSZ_GETSIZE(cmbsz) \
-     (NVME_CMBSZ_SZ(cmbsz) * (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz))))
- 
-+enum NvmePmrcapShift {
-+    PMRCAP_RDS_SHIFT   = 3,
-+    PMRCAP_WDS_SHIFT   = 4,
-+    PMRCAP_BIR_SHIFT   = 5,
-+    PMRCAP_PMRTU_SHIFT   = 8,
-+    PMRCAP_PMRWBM_SHIFT   = 10,
-+    PMRCAP_PMRTO_SHIFT   = 16,
-+    PMRCAP_CMSS_SHIFT   = 24,
-+};
-+
-+enum NvmePmrcapMask {
-+    PMRCAP_RDS_MASK   = 0x1,
-+    PMRCAP_WDS_MASK   = 0x1,
-+    PMRCAP_BIR_MASK   = 0x7,
-+    PMRCAP_PMRTU_MASK   = 0x3,
-+    PMRCAP_PMRWBM_MASK   = 0xf,
-+    PMRCAP_PMRTO_MASK   = 0xff,
-+    PMRCAP_CMSS_MASK   = 0x1,
-+};
-+
-+#define NVME_PMRCAP_RDS(pmrcap)    \
-+    ((pmrcap >> PMRCAP_RDS_SHIFT)   & PMRCAP_RDS_MASK)
-+#define NVME_PMRCAP_WDS(pmrcap)    \
-+    ((pmrcap >> PMRCAP_WDS_SHIFT)   & PMRCAP_WDS_MASK)
-+#define NVME_PMRCAP_BIR(pmrcap)    \
-+    ((pmrcap >> PMRCAP_BIR_SHIFT)   & PMRCAP_BIR_MASK)
-+#define NVME_PMRCAP_PMRTU(pmrcap)    \
-+    ((pmrcap >> PMRCAP_PMRTU_SHIFT)   & PMRCAP_PMRTU_MASK)
-+#define NVME_PMRCAP_PMRWBM(pmrcap)    \
-+    ((pmrcap >> PMRCAP_PMRWBM_SHIFT)   & PMRCAP_PMRWBM_MASK)
-+#define NVME_PMRCAP_PMRTO(pmrcap)    \
-+    ((pmrcap >> PMRCAP_PMRTO_SHIFT)   & PMRCAP_PMRTO_MASK)
-+#define NVME_PMRCAP_CMSS(pmrcap)    \
-+    ((pmrcap >> PMRCAP_CMSS_SHIFT)   & PMRCAP_CMSS_MASK)
-+
-+#define NVME_PMRCAP_SET_RDS(pmrcap, val)   \
-+    (pmrcap |= (uint64_t)(val & PMRCAP_RDS_MASK) << PMRCAP_RDS_SHIFT)
-+#define NVME_PMRCAP_SET_WDS(pmrcap, val)   \
-+    (pmrcap |= (uint64_t)(val & PMRCAP_WDS_MASK) << PMRCAP_WDS_SHIFT)
-+#define NVME_PMRCAP_SET_BIR(pmrcap, val)   \
-+    (pmrcap |= (uint64_t)(val & PMRCAP_BIR_MASK) << PMRCAP_BIR_SHIFT)
-+#define NVME_PMRCAP_SET_PMRTU(pmrcap, val)   \
-+    (pmrcap |= (uint64_t)(val & PMRCAP_PMRTU_MASK) << PMRCAP_PMRTU_SHIFT)
-+#define NVME_PMRCAP_SET_PMRWBM(pmrcap, val)   \
-+    (pmrcap |= (uint64_t)(val & PMRCAP_PMRWBM_MASK) << PMRCAP_PMRWBM_SHIFT)
-+#define NVME_PMRCAP_SET_PMRTO(pmrcap, val)   \
-+    (pmrcap |= (uint64_t)(val & PMRCAP_PMRTO_MASK) << PMRCAP_PMRTO_SHIFT)
-+#define NVME_PMRCAP_SET_CMSS(pmrcap, val)   \
-+    (pmrcap |= (uint64_t)(val & PMRCAP_CMSS_MASK) << PMRCAP_CMSS_SHIFT)
-+
-+enum NvmePmrctlShift {
-+    PMRCTL_EN_SHIFT   = 0,
-+};
-+
-+enum NvmePmrctlMask {
-+    PMRCTL_EN_MASK   = 0x1,
-+};
-+
-+#define NVME_PMRCTL_EN(pmrctl)  ((pmrctl >> PMRCTL_EN_SHIFT)   & PMRCTL_EN_MASK)
-+
-+#define NVME_PMRCTL_SET_EN(pmrctl, val)   \
-+    (pmrctl |= (uint64_t)(val & PMRCTL_EN_MASK) << PMRCTL_EN_SHIFT)
-+
-+enum NvmePmrstsShift {
-+    PMRSTS_ERR_SHIFT   = 0,
-+    PMRSTS_NRDY_SHIFT   = 8,
-+    PMRSTS_HSTS_SHIFT   = 9,
-+    PMRSTS_CBAI_SHIFT   = 12,
-+};
-+
-+enum NvmePmrstsMask {
-+    PMRSTS_ERR_MASK   = 0xff,
-+    PMRSTS_NRDY_MASK   = 0x1,
-+    PMRSTS_HSTS_MASK   = 0x7,
-+    PMRSTS_CBAI_MASK   = 0x1,
-+};
-+
-+#define NVME_PMRSTS_ERR(pmrsts)     \
-+    ((pmrsts >> PMRSTS_ERR_SHIFT)   & PMRSTS_ERR_MASK)
-+#define NVME_PMRSTS_NRDY(pmrsts)    \
-+    ((pmrsts >> PMRSTS_NRDY_SHIFT)   & PMRSTS_NRDY_MASK)
-+#define NVME_PMRSTS_HSTS(pmrsts)    \
-+    ((pmrsts >> PMRSTS_HSTS_SHIFT)   & PMRSTS_HSTS_MASK)
-+#define NVME_PMRSTS_CBAI(pmrsts)    \
-+    ((pmrsts >> PMRSTS_CBAI_SHIFT)   & PMRSTS_CBAI_MASK)
-+
-+#define NVME_PMRSTS_SET_ERR(pmrsts, val)   \
-+    (pmrsts |= (uint64_t)(val & PMRSTS_ERR_MASK) << PMRSTS_ERR_SHIFT)
-+#define NVME_PMRSTS_SET_NRDY(pmrsts, val)   \
-+    (pmrsts |= (uint64_t)(val & PMRSTS_NRDY_MASK) << PMRSTS_NRDY_SHIFT)
-+#define NVME_PMRSTS_SET_HSTS(pmrsts, val)   \
-+    (pmrsts |= (uint64_t)(val & PMRSTS_HSTS_MASK) << PMRSTS_HSTS_SHIFT)
-+#define NVME_PMRSTS_SET_CBAI(pmrsts, val)   \
-+    (pmrsts |= (uint64_t)(val & PMRSTS_CBAI_MASK) << PMRSTS_CBAI_SHIFT)
-+
-+enum NvmePmrebsShift {
-+    PMREBS_PMRSZU_SHIFT   = 0,
-+    PMREBS_RBB_SHIFT   = 4,
-+    PMREBS_PMRWBZ_SHIFT   = 8,
-+};
-+
-+enum NvmePmrebsMask {
-+    PMREBS_PMRSZU_MASK   = 0xf,
-+    PMREBS_RBB_MASK   = 0x1,
-+    PMREBS_PMRWBZ_MASK   = 0xffffff,
-+};
-+
-+#define NVME_PMREBS_PMRSZU(pmrebs)  \
-+    ((pmrebs >> PMREBS_PMRSZU_SHIFT)   & PMREBS_PMRSZU_MASK)
-+#define NVME_PMREBS_RBB(pmrebs)     \
-+    ((pmrebs >> PMREBS_RBB_SHIFT)   & PMREBS_RBB_MASK)
-+#define NVME_PMREBS_PMRWBZ(pmrebs)  \
-+    ((pmrebs >> PMREBS_PMRWBZ_SHIFT)   & PMREBS_PMRWBZ_MASK)
-+
-+#define NVME_PMREBS_SET_PMRSZU(pmrebs, val)   \
-+    (pmrebs |= (uint64_t)(val & PMREBS_PMRSZU_MASK) << PMREBS_PMRSZU_SHIFT)
-+#define NVME_PMREBS_SET_RBB(pmrebs, val)   \
-+    (pmrebs |= (uint64_t)(val & PMREBS_RBB_MASK) << PMREBS_RBB_SHIFT)
-+#define NVME_PMREBS_SET_PMRWBZ(pmrebs, val)   \
-+    (pmrebs |= (uint64_t)(val & PMREBS_PMRWBZ_MASK) << PMREBS_PMRWBZ_SHIFT)
-+
-+enum NvmePmrswtpShift {
-+    PMRSWTP_PMRSWTU_SHIFT   = 0,
-+    PMRSWTP_PMRSWTV_SHIFT   = 8,
-+};
-+
-+enum NvmePmrswtpMask {
-+    PMRSWTP_PMRSWTU_MASK   = 0xf,
-+    PMRSWTP_PMRSWTV_MASK   = 0xffffff,
-+};
-+
-+#define NVME_PMRSWTP_PMRSWTU(pmrswtp)   \
-+    ((pmrswtp >> PMRSWTP_PMRSWTU_SHIFT)   & PMRSWTP_PMRSWTU_MASK)
-+#define NVME_PMRSWTP_PMRSWTV(pmrswtp)   \
-+    ((pmrswtp >> PMRSWTP_PMRSWTV_SHIFT)   & PMRSWTP_PMRSWTV_MASK)
-+
-+#define NVME_PMRSWTP_SET_PMRSWTU(pmrswtp, val)   \
-+    (pmrswtp |= (uint64_t)(val & PMRSWTP_PMRSWTU_MASK) << PMRSWTP_PMRSWTU_SHIFT)
-+#define NVME_PMRSWTP_SET_PMRSWTV(pmrswtp, val)   \
-+    (pmrswtp |= (uint64_t)(val & PMRSWTP_PMRSWTV_MASK) << PMRSWTP_PMRSWTV_SHIFT)
-+
-+enum NvmePmrmscShift {
-+    PMRMSC_CMSE_SHIFT   = 1,
-+    PMRMSC_CBA_SHIFT   = 12,
-+};
-+
-+enum NvmePmrmscMask {
-+    PMRMSC_CMSE_MASK   = 0x1,
-+    PMRMSC_CBA_MASK   = 0xfffffffffffff,
-+};
-+
-+#define NVME_PMRMSC_CMSE(pmrmsc)    \
-+    ((pmrmsc >> PMRMSC_CMSE_SHIFT)   & PMRMSC_CMSE_MASK)
-+#define NVME_PMRMSC_CBA(pmrmsc)     \
-+    ((pmrmsc >> PMRMSC_CBA_SHIFT)   & PMRMSC_CBA_MASK)
-+
-+#define NVME_PMRMSC_SET_CMSE(pmrmsc, val)   \
-+    (pmrmsc |= (uint64_t)(val & PMRMSC_CMSE_MASK) << PMRMSC_CMSE_SHIFT)
-+#define NVME_PMRMSC_SET_CBA(pmrmsc, val)   \
-+    (pmrmsc |= (uint64_t)(val & PMRMSC_CBA_MASK) << PMRMSC_CBA_SHIFT)
-+
- typedef struct NvmeCmd {
-     uint8_t     opcode;
-     uint8_t     fuse;
+Adding revision history from previous QEMU patch set to understand KABI
+changes done till now
+
+v13 -> v14
+- Added struct vfio_bitmap to kabi. updated structure
+  vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
+- All small changes suggested by Alex.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
+
+v12 -> v13
+- Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
+- Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
+- Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
+  field.
+
+v11 -> v12
+- Changed bitmap allocation in vfio_iommu_type1.
+- Remove atomicity of ref_count.
+- Updated comments for migration device state structure about error
+  reporting.
+- Nit picks from v11 reviews
+
+v10 -> v11
+- Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
+- Added proposal to detect if IOMMU capable device calls external pin pages
+  API to mark pages dirty.
+- Nit picks from v10 reviews
+
+v9 -> v10:
+- Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
+  during unmap while migration is active
+- Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
+  tracking.
+- If iommu_mapped, mark all pages dirty.
+- Added unpinned pages tracking while migration is active.
+- Updated comments for migration device state structure with bit
+  combination table and state transition details.
+
+v8 -> v9:
+- Split patch set in 2 sets, Kernel and QEMU.
+- Dirty pages bitmap is queried from IOMMU container rather than from
+  vendor driver for per device. Added 2 ioctls to achieve this.
+
+v7 -> v8:
+- Updated comments for KABI
+- Added BAR address validation check during PCI device's config space load
+  as suggested by Dr. David Alan Gilbert.
+- Changed vfio_migration_set_state() to set or clear device state flags.
+- Some nit fixes.
+
+v6 -> v7:
+- Fix build failures.
+
+v5 -> v6:
+- Fix build failure.
+
+v4 -> v5:
+- Added decriptive comment about the sequence of access of members of
+  structure vfio_device_migration_info to be followed based on Alex's
+  suggestion
+- Updated get dirty pages sequence.
+- As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+  get_object, save_config and load_config.
+- Fixed multiple nit picks.
+- Tested live migration with multiple vfio device assigned to a VM.
+
+v3 -> v4:
+- Added one more bit for _RESUMING flag to be set explicitly.
+- data_offset field is read-only for user space application.
+- data_size is read for every iteration before reading data from migration,
+  that is removed assumption that data will be till end of migration
+  region.
+- If vendor driver supports mappable sparsed region, map those region
+  during setup state of save/load, similarly unmap those from cleanup
+  routines.
+- Handles race condition that causes data corruption in migration region
+  during save device state by adding mutex and serialiaing save_buffer and
+  get_dirty_pages routines.
+- Skip called get_dirty_pages routine for mapped MMIO region of device.
+- Added trace events.
+- Split into multiple functional patches.
+
+v2 -> v3:
+- Removed enum of VFIO device states. Defined VFIO device state with 2
+  bits.
+- Re-structured vfio_device_migration_info to keep it minimal and defined
+  action on read and write access on its members.
+
+v1 -> v2:
+- Defined MIGRATION region type and sub-type which should be used with
+  region type capability.
+- Re-structured vfio_device_migration_info. This structure will be placed
+  at 0th offset of migration region.
+- Replaced ioctl with read/write for trapped part of migration region.
+- Added both type of access support, trapped or mmapped, for data section
+  of the region.
+- Moved PCI device functions to pci file.
+- Added iteration to get dirty page bitmap until bitmap for all requested
+  pages are copied.
+
+Thanks,
+Kirti
+
+
+Kirti Wankhede (7):
+  vfio: KABI for migration interface for device state
+  vfio iommu: Remove atomicity of ref_count of pinned pages
+  vfio iommu: Add ioctl definition for dirty pages tracking.
+  vfio iommu: Implementation of ioctl for dirty pages tracking.
+  vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
+  vfio iommu: Adds flag to indicate dirty pages tracking capability
+    support
+  vfio: Selective dirty page tracking if IOMMU backed device pins pages
+
+ drivers/vfio/vfio.c             |  13 +-
+ drivers/vfio/vfio_iommu_type1.c | 345 ++++++++++++++++++++++++++++++++++++++--
+ include/linux/vfio.h            |   4 +-
+ include/uapi/linux/vfio.h       | 298 +++++++++++++++++++++++++++++++++-
+ 4 files changed, 642 insertions(+), 18 deletions(-)
+
 -- 
-2.21.1
+2.7.0
 
 
