@@ -2,144 +2,96 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0B2C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 09:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9C0C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 09:43:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D19120674
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 09:43:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D19120674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55E2020674
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 09:43:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="huxrGjzU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55E2020674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEVEJ-0007U0-P1
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 05:43:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52624)
+	id 1jEVEf-0007wq-Ej
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 05:43:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jEVDS-0006VO-CB
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 05:42:23 -0400
+ (envelope-from <mst@redhat.com>) id 1jEVDo-0006zF-Tu
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 05:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jEVDR-0002No-G1
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 05:42:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18002)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jEVDR-0002JH-8T
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 05:42:21 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02I9dpYH046370
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 05:42:20 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yucf9r51v-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 05:42:19 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 18 Mar 2020 09:42:17 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Mar 2020 09:42:14 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02I9gDkF50331668
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Mar 2020 09:42:14 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D76BDA4062;
- Wed, 18 Mar 2020 09:42:13 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8E752A405F;
- Wed, 18 Mar 2020 09:42:13 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.78.199])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 18 Mar 2020 09:42:13 +0000 (GMT)
-Subject: Re: [PATCH v9 15/15] s390x: Add unpack facility feature to GA1
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-16-frankja@linux.ibm.com>
- <20200317190605.36c5c73b.cohuck@redhat.com>
- <64ebd363-da9d-a98a-a50d-aa3994044015@linux.ibm.com>
- <20200318102712.4bd4f254.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Wed, 18 Mar 2020 10:42:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <mst@redhat.com>) id 1jEVDn-0004Bd-Jp
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 05:42:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35951)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jEVDn-00049u-FS
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 05:42:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584524562;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4xRijCvBqp7q/mT6bHlqCr6dMFJcV+DS608GCiahVbA=;
+ b=huxrGjzUunYRpnRjGHfVTJ5JYakABa0MNy6B9Hhgp9hBstCi4VYzbn4/80p9ij4rzDHur/
+ E3woGi3mzjZb4ub4VEArEFsiAwzIeusoG9NreIcXwgApDt5t/hKJwwWfE9hySwd7YWISEW
+ 7+ZSmyPP2ZDwELV0Egn0uJzCMY6q/6o=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-19-ToX9KQA-PO-GxvvjHiyj3Q-1; Wed, 18 Mar 2020 05:42:41 -0400
+X-MC-Unique: ToX9KQA-PO-GxvvjHiyj3Q-1
+Received: by mail-wr1-f70.google.com with SMTP id c3so307868wrx.13
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 02:42:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=txD5gqI/hxUivedHX2o6onAkiDhvyWuXiB73q/XgHj8=;
+ b=JiGqCubcPaoFVSLk34e+Vyj39yLUHYHrHzQwD4LekN0aKPUj/uIs+fbTk6FfiuSH8U
+ 2nvbuodowl2PEYw2VpWYby9lQtddtF6J5Y+PJmuKApu+88xqteJy1oiMbf+XiNwNkneW
+ zTLGJOZArQHeOz3Bx199YRag7zr+x/lQ1MnmIPaaNx7X8hY4HLjOwiRwJeSD5j9Xuodm
+ y18xJBohz/yNWx5sAZo3cUe5Py6Bp8fJgR7kyn79Ntsddv0qPg8qVdAl8X0fnzN9c7f6
+ LobzamHIiEFpD51KEifH+J/wo1tugL9+3ji3kwsUbJA+Fi9Df5PrylfcACFgE8F/fir2
+ F5Jw==
+X-Gm-Message-State: ANhLgQ0zZxqzoqha6hTTkjDJW8N5NQ8gZ4FM4bWEFrz7N5oxQ/YFpTdp
+ lz8l2eqYUqNK7aOJR4FnTZyj2Wx7caW2frgQew48tPagONZUJyTskIQFeudwzrz0/cFHgpqs9Yb
+ tHrLBEE0UfVvYF38=
+X-Received: by 2002:a1c:f008:: with SMTP id a8mr4199839wmb.81.1584524560126;
+ Wed, 18 Mar 2020 02:42:40 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsflguF704xBbcUAaXnPSns5hb8z+8jjLN+hk14lc3eyJHyOYybHd0YeZtswxsJGCkKykexdQ==
+X-Received: by 2002:a1c:f008:: with SMTP id a8mr4199814wmb.81.1584524559932;
+ Wed, 18 Mar 2020 02:42:39 -0700 (PDT)
+Received: from redhat.com (bzq-79-183-62-79.red.bezeqint.net. [79.183.62.79])
+ by smtp.gmail.com with ESMTPSA id
+ m10sm3155698wmc.24.2020.03.18.02.42.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Mar 2020 02:42:39 -0700 (PDT)
+Date: Wed, 18 Mar 2020 05:42:35 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH v5 6/7] vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC
+ macro
+Message-ID: <20200318054039-mutt-send-email-mst@kernel.org>
+References: <20200318091525.27044-1-yuri.benditovich@daynix.com>
+ <20200318091525.27044-7-yuri.benditovich@daynix.com>
 MIME-Version: 1.0
-In-Reply-To: <20200318102712.4bd4f254.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="F0a27yA4ShO8rEO2CNIrEppZE1IKQwDjH"
-X-TM-AS-GCONF: 00
-x-cbid: 20031809-4275-0000-0000-000003AE53DF
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031809-4276-0000-0000-000038C37F1D
-Message-Id: <e4854eb6-b969-00a2-96c0-36c8f946152a@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-18_03:2020-03-17,
- 2020-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0
- priorityscore=1501 impostorscore=0 mlxscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 mlxlogscore=763 suspectscore=0
- phishscore=0 adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2003180048
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20200318091525.27044-7-yuri.benditovich@daynix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,56 +103,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: yan@daynix.com, jasowang@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F0a27yA4ShO8rEO2CNIrEppZE1IKQwDjH
-Content-Type: multipart/mixed; boundary="maAGw8YRjh4GPMYT71UIfcUIOy9QwY44d"
-
---maAGw8YRjh4GPMYT71UIfcUIOy9QwY44d
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 3/18/20 10:27 AM, Cornelia Huck wrote:
-> What about
+On Wed, Mar 18, 2020 at 11:15:24AM +0200, Yuri Benditovich wrote:
+> Similar to VMSTATE_VARRAY_UINT32_ALLOC, but the size is
+> 16-bit field.
 >=20
-> /*
->  * If we have support for protected virtualization, indicate
->  * the protected virtualization IPL unpack facility.
->  */
+> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+
+Hmm this is exactly my patch isn't it? If yes pls fix up attribution
+(if this is not reposted, then when applying):
+
+From: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> ---
+>  include/migration/vmstate.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >=20
-Sure
-
-
---maAGw8YRjh4GPMYT71UIfcUIOy9QwY44d--
-
---F0a27yA4ShO8rEO2CNIrEppZE1IKQwDjH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5x7PUACgkQ41TmuOI4
-ufi3pxAAhbSMf83MmYFdXtH/Fpm52ONHargQS7elpG/zTewt+GJd0q9gxl4IvkNT
-zpTKEetJBnTgxiLd20R5N9JE7zBz3+CSfKOGgblfaxA29LCBuI07uE56nss4RVYm
-U3yp4Hvnn8AhRzjDBU+hB28gwyPsTOGddsee1wndMgr8XLxF37G93CEJ87EGEIOC
-2GQ4rm7wbL5OVMvjN0/wI7aVGaa9tktfXGg2ozUsPrgiqKc6Ree4vBAceQFixNhk
-yU5v0YQEPlX1wa2qctuNp20yM8SScXrIGevE224Mm4hlp+agpwwTdH0QQ7uA87xh
-Uk+GaDlUgHj3ttyw84fTq1+7wWYCN9qpr8N0mQK7diVjP5CKljVypXdZ74ocj8qX
-0hC+SAuVTJ/qdl8uHnLwNf9eCF9gl/Ej4uLKNSPAmZMCWwDop9qTXICz3tO51Snp
-EG7AZcClKlUFl0aGv+2E4whSxm+BLymSJ/BNr4m5k7TLaIfxOm1uDiCpYhezuJ8R
-Vsn4pYzaRsIgIzm+TOpMFhnB12LaucmuWI5y0VfEZC9+RqWXQl81DV0jGT9uVsTW
-WLSVrJTAjgj8NYvch9r+F33Si2Iw+MJ+nEv8rmh9kKrDUhhwpUcCY7AY9tPH0d2l
-aHHn9SJ3BnWW7OndFC2sI8Rdy587W/va2HzrqykvJjlQfaL9Moc=
-=Vt5F
------END PGP SIGNATURE-----
-
---F0a27yA4ShO8rEO2CNIrEppZE1IKQwDjH--
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 30667631bc..baaefb6b9b 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -432,6 +432,16 @@ extern const VMStateInfo vmstate_info_qlist;
+>      .offset     =3D vmstate_offset_pointer(_state, _field, _type),     \
+>  }
+> =20
+> +#define VMSTATE_VARRAY_UINT16_ALLOC(_field, _state, _field_num, _version=
+, _info, _type) {\
+> +    .name       =3D (stringify(_field)),                               \
+> +    .version_id =3D (_version),                                        \
+> +    .num_offset =3D vmstate_offset_value(_state, _field_num, uint16_t),\
+> +    .info       =3D &(_info),                                          \
+> +    .size       =3D sizeof(_type),                                     \
+> +    .flags      =3D VMS_VARRAY_UINT16 | VMS_POINTER | VMS_ALLOC,       \
+> +    .offset     =3D vmstate_offset_pointer(_state, _field, _type),     \
+> +}
+> +
+>  #define VMSTATE_VARRAY_UINT16_UNSAFE(_field, _state, _field_num, _versio=
+n, _info, _type) {\
+>      .name       =3D (stringify(_field)),                               \
+>      .version_id =3D (_version),                                        \
+> --=20
+> 2.17.1
 
 
