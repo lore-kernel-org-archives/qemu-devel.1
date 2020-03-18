@@ -2,75 +2,86 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3CE4C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 094D0C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 02:07:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A908120663
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C50A020724
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 02:07:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i26Ea9Ef"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A908120663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fgoNNKGo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C50A020724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jENUg-0007Yu-IK
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 21:27:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34743)
+	id 1jEO74-0003N0-TX
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 22:07:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1jENLs-0004c7-Bw
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:18:33 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jEO6F-0002lL-UC
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1jENLq-000342-Ox
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:18:32 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49456)
+ (envelope-from <jasowang@redhat.com>) id 1jEO6E-0006Id-28
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:06:27 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59450)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jENLq-000315-2r
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:18:30 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jEO6D-0006Bp-S6
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 22:06:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584494309;
+ s=mimecast20190719; t=1584497185;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0Di2bKwmkhcLLcha49rb/0iGLRVyTDpUbFOqJuBsw3Q=;
- b=i26Ea9EfERCEPzBUJU7HqmBijvu5B5NOejEAMXNU/IG6dw3Yq9zJI+15zxMxDzNWa5fbW1
- pblf9F4fkRGoeij5s7Gi3/Ks59fKsVVHwnp64wy705LL/26rAnl1j3r3kNZaPClGRS9Lrp
- x6xCB28Gzgr0ILop7nXT9g2sGpxVzYY=
+ bh=mLOFuo89Uh9yZ5HRef4Gqf26z9hOxh+13iUsI2C+jb4=;
+ b=fgoNNKGo7rnLlpHGZdUesYE9PpDrCYSI3xzVkTzqbpl3ARxU7XKNcU/5gRVoJRufVeocmt
+ hHEJfFSyBnBWQXtieH9vAE4R+uz3b4VupNlZjqJrwFU0QlCW/0mxmTKMChclC6P/pzMW6h
+ yI16AsljpTyTTFUkdYOQ15HO6pwXfk8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-c5vFYE3UMxGiuItKiUPyRg-1; Tue, 17 Mar 2020 21:18:27 -0400
-X-MC-Unique: c5vFYE3UMxGiuItKiUPyRg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-312--B_xp1FOMg-x_6V4Q2COrg-1; Tue, 17 Mar 2020 22:06:21 -0400
+X-MC-Unique: -B_xp1FOMg-x_6V4Q2COrg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F8FE8017CC;
- Wed, 18 Mar 2020 01:18:26 +0000 (UTC)
-Received: from localhost (ovpn-118-148.rdu2.redhat.com [10.10.118.148])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AD6F05D9E5;
- Wed, 18 Mar 2020 01:18:23 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 12/13] hw/i386: Update structures to save the number of nodes
- per package
-Date: Tue, 17 Mar 2020 21:17:47 -0400
-Message-Id: <20200318011748.2104336-13-ehabkost@redhat.com>
-In-Reply-To: <20200318011748.2104336-1-ehabkost@redhat.com>
-References: <20200318011748.2104336-1-ehabkost@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65CCF800D50;
+ Wed, 18 Mar 2020 02:06:20 +0000 (UTC)
+Received: from [10.72.13.166] (ovpn-13-166.pek2.redhat.com [10.72.13.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B3B7919C58;
+ Wed, 18 Mar 2020 02:06:09 +0000 (UTC)
+Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
+To: Peter Xu <peterx@redhat.com>
+References: <20200226163618.31aa86ed.pasic@linux.ibm.com>
+ <20200226115009-mutt-send-email-mst@kernel.org>
+ <20200227140215.2d12149c.pasic@linux.ibm.com>
+ <20200227104233-mutt-send-email-mst@kernel.org>
+ <20200313134446.782c5f7c.pasic@linux.ibm.com>
+ <20200313112902-mutt-send-email-mst@kernel.org>
+ <20200313163122.GB95517@xz-x1>
+ <20200316131723-mutt-send-email-mst@kernel.org>
+ <20200316181405.GB184827@xz-x1>
+ <158fbd3b-1285-e18d-b535-a1e7a9802f1f@redhat.com>
+ <20200317141316.GA199571@xz-x1>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <d3958775-a67c-d6c7-e85b-7e012a2a8c5d@redhat.com>
+Date: Wed, 18 Mar 2020 10:06:08 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200317141316.GA199571@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
@@ -85,195 +96,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Babu Moger <babu.moger@amd.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, "Singh,
+ Brijesh" <brijesh.singh@amd.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Babu Moger <babu.moger@amd.com>
 
-Update structures X86CPUTopoIDs and CPUX86State to hold the number of
-nodes per package. This is required to build EPYC mode topology.
+On 2020/3/17 =E4=B8=8B=E5=8D=8810:13, Peter Xu wrote:
+> On Tue, Mar 17, 2020 at 11:04:26AM +0800, Jason Wang wrote:
+>> On 2020/3/17 =E4=B8=8A=E5=8D=882:14, Peter Xu wrote:
+>>> On Mon, Mar 16, 2020 at 01:19:54PM -0400, Michael S. Tsirkin wrote:
+>>>> On Fri, Mar 13, 2020 at 12:31:22PM -0400, Peter Xu wrote:
+>>>>> On Fri, Mar 13, 2020 at 11:29:59AM -0400, Michael S. Tsirkin wrote:
+>>>>>> On Fri, Mar 13, 2020 at 01:44:46PM +0100, Halil Pasic wrote:
+>>>>>>> [..]
+>>>>>>>>> CCing Tom. @Tom does vhost-vsock work for you with SEV and curren=
+t qemu?
+>>>>>>>>>
+>>>>>>>>> Also, one can specify iommu_platform=3Don on a device that ain't =
+a part of
+>>>>>>>>> a secure-capable VM, just for the fun of it. And that breaks
+>>>>>>>>> vhost-vsock. Or is setting iommu_platform=3Don only valid if
+>>>>>>>>> qemu-system-s390x is protected virtualization capable?
+>>>>>>>>>
+>>>>>>>>> BTW, I don't have a strong opinion on the fixes tag. We currently=
+ do not
+>>>>>>>>> recommend setting iommu_platform, and thus I don't think we care =
+too
+>>>>>>>>> much about past qemus having problems with it.
+>>>>>>>>>
+>>>>>>>>> Regards,
+>>>>>>>>> Halil
+>>>>>>>> Let's just say if we do have a Fixes: tag we want to set it correc=
+tly to
+>>>>>>>> the commit that needs this fix.
+>>>>>>>>
+>>>>>>> I finally did some digging regarding the performance degradation. F=
+or
+>>>>>>> s390x the performance degradation on vhost-net was introduced by co=
+mmit
+>>>>>>> 076a93d797 ("exec: simplify address_space_get_iotlb_entry"). Before
+>>>>>>> IOMMUTLBEntry.addr_mask used to be based on plen, which in turn was
+>>>>>>> calculated as the rest of the memory regions size (from address), a=
+nd
+>>>>>>> covered most of the guest address space. That is we didn't have a w=
+hole
+>>>>>>> lot of IOTLB API overhead.
+>>>>>>>
+>>>>>>> With commit 076a93d797 I see IOMMUTLBEntry.addr_mask =3D=3D 0xfff w=
+hich comes
+>>>>>>> as ~TARGET_PAGE_MASK from flatview_do_translate(). To have things w=
+orking
+>>>>>>> properly I applied 75e5b70e6, b021d1c044, and d542800d1e on the lev=
+el of
+>>>>>>> 076a93d797 and 076a93d797~1.
+>>>>>> Peter, what's your take on this one?
+>>>>> Commit 076a93d797 was one of the patchset where we want to provide
+>>>>> sensible IOTLB entries and also that should start to work with huge
+>>>>> pages.
+>>>> So the issue bundamentally is that it
+>>>> never produces entries larger than page size.
+>>>>
+>>>> Wasteful even just with huge pages, all the more
+>>>> so which passthrough which could have giga-byte
+>>>> entries.
+>>>>
+>>>> Want to try fixing that?
+>>> Yes we can fix that, but I'm still not sure whether changing the
+>>> interface of address_space_get_iotlb_entry() to cover adhoc regions is
+>>> a good idea, because I think it's still a memory core API and imho it
+>>> would still be good to have IOTLBs returned to be what the hardware
+>>> will be using (always page aligned IOTLBs).  Also it would still be
+>>> not ideal because vhost backend will still need to send the MISSING
+>>> messages and block for each of the continuous guest memory ranges
+>>> registered, so there will still be misterious delay.  Not to say
+>>> logically all the caches can be invalidated too so in that sense I
+>>> think it's as hacky as the vhost speedup patch mentioned below..
+>>>
+>>> Ideally I think vhost should be able to know when PT is enabled or
+>>> disabled for the device, so the vhost backend (kernel or userspace)
+>>> should be able to directly use GPA for DMA.  That might need some new
+>>> vhost interface.
+>> Yes but I think we don't need another API since we can send GPA->HVA map=
+ping
+>> via device IOTLB API when we find there's no DMA translation at all (eit=
+her
+>> PT or no vIOMMU).
+> Jason,
+>
+> Do you mean what we've worked on before?
+>
+> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg00574.html
+>
+> (I just read the previous discussion on that patch, it seems to be
+>   exactly what we've discussed again...)
+>
+> Thanks,
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <158396720035.58170.1973738805301006456.stgit@naples-babu.amd.c=
-om>
----
- hw/i386/pc.c               |  1 +
- hw/i386/x86.c              |  1 +
- include/hw/i386/topology.h |  1 +
- target/i386/cpu.c          |  1 +
- target/i386/cpu.h          |  1 +
- tests/test-x86-cpuid.c     | 40 +++++++++++++++++++-------------------
- 6 files changed, 25 insertions(+), 20 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 05e7f1090f..ee89fcd1c3 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1525,6 +1525,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_d=
-ev,
-     init_topo_info(&topo_info, x86ms);
-=20
-     env->nr_dies =3D x86ms->smp_dies;
-+    env->nr_nodes =3D topo_info.nodes_per_pkg;
-=20
-     /*
-      * If APIC ID is not set,
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 41b884605f..87b73fe33c 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -62,6 +62,7 @@ inline void init_topo_info(X86CPUTopoInfo *topo_info,
- {
-     MachineState *ms =3D MACHINE(x86ms);
-=20
-+    topo_info->nodes_per_pkg =3D ms->numa_state->num_nodes / ms->smp.socke=
-ts;
-     topo_info->dies_per_pkg =3D x86ms->smp_dies;
-     topo_info->cores_per_die =3D ms->smp.cores;
-     topo_info->threads_per_core =3D ms->smp.threads;
-diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-index ba52d49079..04f01e2a09 100644
---- a/include/hw/i386/topology.h
-+++ b/include/hw/i386/topology.h
-@@ -53,6 +53,7 @@ typedef struct X86CPUTopoIDs {
- } X86CPUTopoIDs;
-=20
- typedef struct X86CPUTopoInfo {
-+    unsigned nodes_per_pkg;
-     unsigned dies_per_pkg;
-     unsigned cores_per_die;
-     unsigned threads_per_core;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f1ac572efd..34b511f078 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6957,6 +6957,7 @@ static void x86_cpu_initfn(Object *obj)
-     FeatureWord w;
-=20
-     env->nr_dies =3D 1;
-+    env->nr_nodes =3D 1;
-     cpu_set_cpustate_pointers(cpu);
-=20
-     object_property_add(obj, "family", "int",
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 68b186d258..7e9e963d78 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1609,6 +1609,7 @@ typedef struct CPUX86State {
-     TPRAccess tpr_access_type;
-=20
-     unsigned nr_dies;
-+    unsigned nr_nodes;
- } CPUX86State;
-=20
- struct kvm_msrs;
-diff --git a/tests/test-x86-cpuid.c b/tests/test-x86-cpuid.c
-index bfabc0403a..049030a50e 100644
---- a/tests/test-x86-cpuid.c
-+++ b/tests/test-x86-cpuid.c
-@@ -31,12 +31,12 @@ static void test_topo_bits(void)
-     X86CPUTopoInfo topo_info =3D {0};
-=20
-     /* simple tests for 1 thread per core, 1 core per die, 1 die per packa=
-ge */
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 1};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 1};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 0);
-     g_assert_cmpuint(apicid_core_width(&topo_info), =3D=3D, 0);
-     g_assert_cmpuint(apicid_die_width(&topo_info), =3D=3D, 0);
-=20
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 1};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 1};
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0), =3D=3D, 0);
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1), =3D=3D, 1);
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2), =3D=3D, 2);
-@@ -45,39 +45,39 @@ static void test_topo_bits(void)
-=20
-     /* Test field width calculation for multiple values
-      */
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 2};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 1);
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 3};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 3};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 2);
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 4};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 4};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 2);
-=20
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 14};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 14};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 4);
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 15};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 15};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 4);
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 16};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 16};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 4);
--    topo_info =3D (X86CPUTopoInfo) {1, 1, 17};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 1, 17};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 5);
-=20
-=20
--    topo_info =3D (X86CPUTopoInfo) {1, 30, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 30, 2};
-     g_assert_cmpuint(apicid_core_width(&topo_info), =3D=3D, 5);
--    topo_info =3D (X86CPUTopoInfo) {1, 31, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 31, 2};
-     g_assert_cmpuint(apicid_core_width(&topo_info), =3D=3D, 5);
--    topo_info =3D (X86CPUTopoInfo) {1, 32, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 32, 2};
-     g_assert_cmpuint(apicid_core_width(&topo_info), =3D=3D, 5);
--    topo_info =3D (X86CPUTopoInfo) {1, 33, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 33, 2};
-     g_assert_cmpuint(apicid_core_width(&topo_info), =3D=3D, 6);
-=20
--    topo_info =3D (X86CPUTopoInfo) {1, 30, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 30, 2};
-     g_assert_cmpuint(apicid_die_width(&topo_info), =3D=3D, 0);
--    topo_info =3D (X86CPUTopoInfo) {2, 30, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 2, 30, 2};
-     g_assert_cmpuint(apicid_die_width(&topo_info), =3D=3D, 1);
--    topo_info =3D (X86CPUTopoInfo) {3, 30, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 3, 30, 2};
-     g_assert_cmpuint(apicid_die_width(&topo_info), =3D=3D, 2);
--    topo_info =3D (X86CPUTopoInfo) {4, 30, 2};
-+    topo_info =3D (X86CPUTopoInfo) {0, 4, 30, 2};
-     g_assert_cmpuint(apicid_die_width(&topo_info), =3D=3D, 2);
-=20
-     /* build a weird topology and see if IDs are calculated correctly
-@@ -85,18 +85,18 @@ static void test_topo_bits(void)
-=20
-     /* This will use 2 bits for thread ID and 3 bits for core ID
-      */
--    topo_info =3D (X86CPUTopoInfo) {1, 6, 3};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 6, 3};
-     g_assert_cmpuint(apicid_smt_width(&topo_info), =3D=3D, 2);
-     g_assert_cmpuint(apicid_core_offset(&topo_info), =3D=3D, 2);
-     g_assert_cmpuint(apicid_die_offset(&topo_info), =3D=3D, 5);
-     g_assert_cmpuint(apicid_pkg_offset(&topo_info), =3D=3D, 5);
-=20
--    topo_info =3D (X86CPUTopoInfo) {1, 6, 3};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 6, 3};
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0), =3D=3D, 0);
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1), =3D=3D, 1);
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2), =3D=3D, 2);
-=20
--    topo_info =3D (X86CPUTopoInfo) {1, 6, 3};
-+    topo_info =3D (X86CPUTopoInfo) {0, 1, 6, 3};
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 0), =3D=
-=3D,
-                      (1 << 2) | 0);
-     g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 1), =3D=
-=3D,
---=20
-2.24.1
+Right, something like that. But it's not urgent now consider this patch=20
+has been merged.
+
+Thanks
+
+
+>
 
 
