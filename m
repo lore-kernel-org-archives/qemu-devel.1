@@ -2,77 +2,96 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7ABC5ACD8
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42947C4332E
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:44:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 079C42076F
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:36:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A2972076F
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 20:44:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AcVdVEm7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 079C42076F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YrEwuN1x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2972076F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEfQw-0007Dh-6c
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:36:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57479)
+	id 1jEfXp-0001Wx-5Q
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 16:44:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41015)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jEfFn-00087w-Sf
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:25:29 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jEfWp-0000mR-57
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:43:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jEfFl-0004VJ-Fn
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:25:27 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55068)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jEfFl-0004S8-Af
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:25:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584563124;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7S4pvEvRq43tAOJ+VoWTNYoKkV9GHiGO1EgDeCec5QM=;
- b=AcVdVEm7JEQiqcAqQe8MvDZR7KLt+ts6dempCx3NPZNJj9DKs3zROEAYPFaKVgjN5XIjLx
- pxgKZRghjRVSTRu8K8vQ844lDTC0LpQwkvczXRtt0T/o1CXDp7cTzy9pKzN2iifv4RnJKh
- 5iDtAyjnJ+/0wEAK+t+/dmZwXV7MLHg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-D_WOhj59ON2QdrvMFgqu2w-1; Wed, 18 Mar 2020 16:25:21 -0400
-X-MC-Unique: D_WOhj59ON2QdrvMFgqu2w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49F08107ACCA;
- Wed, 18 Mar 2020 20:25:14 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0615B60BF1;
- Wed, 18 Mar 2020 20:25:11 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org, jsnow@redhat.com,
+ (envelope-from <richard.henderson@linaro.org>) id 1jEfWm-0004SB-KI
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:43:02 -0400
+Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:34668)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jEfWm-0004IJ-D1
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 16:43:00 -0400
+Received: by mail-pl1-x635.google.com with SMTP id a23so29550plm.1
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 13:42:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=QMlGyf6XU8H/aF/j5XakScQRHR+DuK9n0raQudfFQvQ=;
+ b=YrEwuN1xWidcZTBVwMlsIdNooUepEDnytUJUljON85lAHZ9xxpnOJf6J3uBmVBi2Rq
+ mT1w5Wmti2xUPj/5qNqQ4+SUOZUJkAwzX96yazz03t4VkJjSsmhJ8AnXtislDHhWcQmb
+ N3DMtsY/ziPJONTH7I4yZ154uqFlajL4ix3M4/hLBOHarU1lAXrVGp4U08kO1PufrPiB
+ j85pHfwxsgJHAK6u0a4q55zZuAdS8ebYvY+mQYyCtC59UiqbKQGwtX8FPqcNTUUPDMoc
+ 2PRDJbGOdLPwNrHJToWM9lIk7+2O0K8u2MkMi6z4rtCgk64PWhEsNDa0Q2Zh+I6mxKFv
+ 88fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QMlGyf6XU8H/aF/j5XakScQRHR+DuK9n0raQudfFQvQ=;
+ b=rWa+CnmaHUPBiza0+1yyoIrHdq1WMO94ZdpS5FdLDRktT1jmdfjGX02NDPsXViXLgT
+ hNOauLUayyHkogQFfREK+VLK3OT+VqJy7OVdi1GNuvm72v6GgdxIavRAmnKauLXtQUdp
+ 3mdesWe9qNXewc+0ypq/zYoYbxZMr4a1HJG0VxzzU2gRS75/evj8MexgywsBjlXyGMpf
+ dCUbNcnqFakpLEn/H3q6J0kbKf+7RD8SkKIRd2QCR5aZmmfGSbcP1S2FmcmroMuLSljL
+ gZQOFnK/DmIb1CChE9Jpoabfenvyd6iYcJHn77GqNFtzaQKb+EyeLTkL1kQwG9sedLN9
+ T62A==
+X-Gm-Message-State: ANhLgQ3fYxR+2t4OHmON867ugZgJDd2jKpx79j0t1CT5aFGjuAV8duSa
+ lJ+ULzrbz4wjCGKqPZ5u3zNO2wgKv30=
+X-Google-Smtp-Source: ADFU+vtGL4RcKeSrwinOnJ7x07q0vRWrMvanv2buYQ1IULYD5GOFpeyj4HDHFvoYS2rA+pu13OoYZQ==
+X-Received: by 2002:a17:902:59dd:: with SMTP id
+ d29mr26487plj.246.1584564174198; 
+ Wed, 18 Mar 2020 13:42:54 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ t11sm3148629pjo.21.2020.03.18.13.42.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Mar 2020 13:42:53 -0700 (PDT)
+Subject: Re: [PULL v2 00/37] Linux user for 5.0 patches
+To: Laurent Vivier <laurent@vivier.eu>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL v2 10/11] nbd/server: use bdrv_dirty_bitmap_next_dirty_area
-Date: Wed, 18 Mar 2020 16:23:40 -0400
-Message-Id: <20200318202341.6961-11-jsnow@redhat.com>
-In-Reply-To: <20200318202341.6961-1-jsnow@redhat.com>
-References: <20200318202341.6961-1-jsnow@redhat.com>
+References: <20200317155116.1227513-1-laurent@vivier.eu>
+ <CAFEAcA9Pd6D6xaqN7XfOwRANxm=4uOYmdaBoeQiX4_Z-bXEi9g@mail.gmail.com>
+ <610f250b-64b8-1cf4-00fe-5bf2f2eba864@linaro.org>
+ <b0055b37-a381-095a-a7c9-8b1327be3cce@vivier.eu>
+ <95ebdfda-de48-8a44-ec86-8dd384fc98a3@linaro.org>
+ <b77a5bd0-46b6-3345-d070-a998890efff2@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0ba1e895-9f0d-49e0-d654-2663a5a858e3@linaro.org>
+Date: Wed, 18 Mar 2020 13:42:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <b77a5bd0-46b6-3345-d070-a998890efff2@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::635
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,127 +103,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 3/18/20 1:23 PM, Laurent Vivier wrote:
+> Le 18/03/2020 à 21:17, Richard Henderson a écrit :
+>> On 3/18/20 12:58 PM, Laurent Vivier wrote:
+>>>> However, from the error message above, it's clear that cpu_loop.o has not been
+>>>> rebuilt properly.
+>>>>
+>>>
+>>> In the series merged here syscall_nr.h are moved from source directory
+>>> to build directory.
+>>>
+>>> The include path of the files is based on the dependecy files (*.d), and
+>>> to force the update of this path PATCH 13 removes all the .d files that
+>>> have a dependecy on the syscall_nr.h file in the source path.
+>>>
+>>> This is added in configure:
+>>>
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -1887,6 +1887,17 @@ fi
+>>>  # Remove old dependency files to make sure that they get properly
+>>> regenerated
+>>>  rm -f */config-devices.mak.d
+>>>
+>>> +# Remove syscall_nr.h to be sure they will be regenerated in the build
+>>> +# directory, not in the source directory
+>>> +for arch in ; do
+>>> +    # remove the file if it has been generated in the source directory
+>>> +    rm -f "${source_path}/linux-user/${arch}/syscall_nr.h"
+>>> +    # remove the dependency files
+>>> +    find . -name "*.d" \
+>>> +           -exec grep -q
+>>> "${source_path}/linux-user/${arch}/syscall_nr.h" {} \; \
+>>> +           -exec rm {} \;
+>>> +done
+>> ...
+>>> Perhaps it removes a dependency that should trigger the rebuild of
+>>> cpu_loop.o?
+>>
+>> Ah, yes indeed. It removes *all* dependencies for cpu_loop.o, so unless we
+>> touch the cpu_loop.c source file, nothing gets done.
+>>
+>> I think you're trying to be too fine grained here, since the *.o file has to go
+>> away with the *.d file.  Why not just
+>>
+>>   make ${arch}-linux-user/clean
+>>
+>> ?
+> 
+> The idea was to be able to bisect the series as the syscall_nr.h were
+> added incrementally without rebuilding all the files.
+> 
+> If I remove the loop in the configure where to add the "make
+> ${arch}-linux-user/clean"?
 
-Use bdrv_dirty_bitmap_next_dirty_area for bitmap_to_extents. Since
-bdrv_dirty_bitmap_next_dirty_area is very accurate in its interface,
-we'll never exceed requested region with last chunk. So, we don't need
-dont_fragment, and bitmap_to_extents() interface becomes clean enough
-to not require any comment.
+I don't know.  Can you get an exit status out of the find?
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20200205112041.6003-10-vsementsov@virtuozzo.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- nbd/server.c | 59 +++++++++++++++++-----------------------------------
- 1 file changed, 19 insertions(+), 40 deletions(-)
+Another option might be
 
-diff --git a/nbd/server.c b/nbd/server.c
-index f90bb33a75..02b1ed0801 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2068,57 +2068,36 @@ static int nbd_co_send_block_status(NBDClient *clie=
-nt, uint64_t handle,
-     return nbd_co_send_extents(client, handle, ea, last, context_id, errp)=
-;
- }
-=20
--/*
-- * Populate @ea from a dirty bitmap. Unless @dont_fragment, the
-- * final extent may exceed the original @length.
-- */
-+/* Populate @ea from a dirty bitmap. */
- static void bitmap_to_extents(BdrvDirtyBitmap *bitmap,
-                               uint64_t offset, uint64_t length,
--                              NBDExtentArray *ea, bool dont_fragment)
-+                              NBDExtentArray *es)
- {
--    uint64_t begin =3D offset, end =3D offset;
--    uint64_t overall_end =3D offset + length;
--    BdrvDirtyBitmapIter *it;
--    bool dirty;
-+    int64_t start, dirty_start, dirty_count;
-+    int64_t end =3D offset + length;
-+    bool full =3D false;
-=20
-     bdrv_dirty_bitmap_lock(bitmap);
-=20
--    it =3D bdrv_dirty_iter_new(bitmap);
--    dirty =3D bdrv_dirty_bitmap_get_locked(bitmap, offset);
--
--    while (begin < overall_end) {
--        bool next_dirty =3D !dirty;
--
--        if (dirty) {
--            end =3D bdrv_dirty_bitmap_next_zero(bitmap, begin, INT64_MAX);
--        } else {
--            bdrv_set_dirty_iter(it, begin);
--            end =3D bdrv_dirty_iter_next(it);
--        }
--        if (end =3D=3D -1 || end - begin > UINT32_MAX) {
--            /* Cap to an aligned value < 4G beyond begin. */
--            end =3D MIN(bdrv_dirty_bitmap_size(bitmap),
--                      begin + UINT32_MAX + 1 -
--                      bdrv_dirty_bitmap_granularity(bitmap));
--            next_dirty =3D dirty;
--        }
--        if (dont_fragment && end > overall_end) {
--            end =3D overall_end;
--        }
--
--        if (nbd_extent_array_add(ea, end - begin,
--                                 dirty ? NBD_STATE_DIRTY : 0) < 0) {
-+    for (start =3D offset;
-+         bdrv_dirty_bitmap_next_dirty_area(bitmap, start, end, INT32_MAX,
-+                                           &dirty_start, &dirty_count);
-+         start =3D dirty_start + dirty_count)
-+    {
-+        if ((nbd_extent_array_add(es, dirty_start - start, 0) < 0) ||
-+            (nbd_extent_array_add(es, dirty_count, NBD_STATE_DIRTY) < 0))
-+        {
-+            full =3D true;
-             break;
-         }
--        begin =3D end;
--        dirty =3D next_dirty;
-     }
-=20
--    bdrv_dirty_iter_free(it);
-+    if (!full) {
-+        /* last non dirty extent */
-+        nbd_extent_array_add(es, end - start, 0);
-+    }
-=20
-     bdrv_dirty_bitmap_unlock(bitmap);
--
--    assert(offset < end);
- }
-=20
- static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
-@@ -2129,7 +2108,7 @@ static int nbd_co_send_bitmap(NBDClient *client, uint=
-64_t handle,
-     unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BLOCK_STATUS_E=
-XTENTS;
-     g_autoptr(NBDExtentArray) ea =3D nbd_extent_array_new(nb_extents);
-=20
--    bitmap_to_extents(bitmap, offset, length, ea, dont_fragment);
-+    bitmap_to_extents(bitmap, offset, length, ea);
-=20
-     return nbd_co_send_extents(client, handle, ea, last, context_id, errp)=
-;
- }
---=20
-2.21.1
+for f in $(find ${arch}-linux-user -name '*.d' \
+           -exec grep -q ${arch_syscall} \
+           -print); do
+  rm -f $(basename $f .d).*
+done
 
+But frankly I don't care if all of every file gets rebuilt while bisecting, it
+just needs to work.
+
+
+r~
 
