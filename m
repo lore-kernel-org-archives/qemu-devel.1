@@ -2,60 +2,85 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4983EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 551A1C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 17:00:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7F2E20724
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 16:53:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7F2E20724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 217B42071C
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 17:00:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNNDbc/N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 217B42071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEbwq-0001rh-OH
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 12:53:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48822)
+	id 1jEc3i-0004Xm-9D
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 13:00:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1jEbw7-0001KH-QX
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:52:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEc2u-00040d-0L
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:59:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1jEbw6-0001aU-Fr
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:52:55 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:42076)
+ (envelope-from <armbru@redhat.com>) id 1jEc2r-0000Xg-Vj
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:59:55 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:24685)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jEbw6-0000rS-8C
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:52:54 -0400
-Received: from player728.ha.ovh.net (unknown [10.108.35.103])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1244C1CE84D
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 17:52:43 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player728.ha.ovh.net (Postfix) with ESMTPSA id D6A0B107A6B1F;
- Wed, 18 Mar 2020 16:52:37 +0000 (UTC)
-Date: Wed, 18 Mar 2020 17:52:32 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 1/2] target/ppc: Fix slbia TLB invalidation gap
-Message-ID: <20200318175232.37db1fd1@bahia.lan>
-In-Reply-To: <20200318044135.851716-1-npiggin@gmail.com>
-References: <20200318044135.851716-1-npiggin@gmail.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEc2r-0000WH-It
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 12:59:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584550793;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=owdXQjGkNmw1HYhSSNmoz0HYc13IaE+76lrSK5+LSHQ=;
+ b=LNNDbc/NEzH273IgTbJXTBah4mO4DE1nlXq2l7n+mwuVROzMqVpV2LJvaPPYjFisPX5rfa
+ RwWy/jYoN+IuvWtNWc5AaIMrlE8Jk1ju4FekQemdxPkwI/u2GCEIIbT14pvU0ODRxnubx6
+ houn1Xd9WGkIDhZCYoH79suypQHY6zI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-rBRTgbubMk-uDyTlcK2V-Q-1; Wed, 18 Mar 2020 12:59:36 -0400
+X-MC-Unique: rBRTgbubMk-uDyTlcK2V-Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DB97800D4E;
+ Wed, 18 Mar 2020 16:59:33 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
+ [10.36.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C20B6EF85;
+ Wed, 18 Mar 2020 16:59:33 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AAB991138404; Wed, 18 Mar 2020 17:59:31 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v4 29/34] qapi: Implement deprecated-output=hide for QMP
+ events
+References: <20200317115459.31821-1-armbru@redhat.com>
+ <20200317115459.31821-30-armbru@redhat.com>
+ <c8b780c9-8a82-bea2-61b5-14aab90f476d@redhat.com>
+Date: Wed, 18 Mar 2020 17:59:31 +0100
+In-Reply-To: <c8b780c9-8a82-bea2-61b5-14aab90f476d@redhat.com> (Eric Blake's
+ message of "Wed, 18 Mar 2020 07:29:03 -0500")
+Message-ID: <87v9n138gc.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 5898308139141470659
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefjedgleduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.181.248
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,84 +92,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Mar 2020 14:41:34 +1000
-Nicholas Piggin <npiggin@gmail.com> wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-> slbia must invalidate TLBs even if it does not remove a valid SLB
-> entry, because slbmte can overwrite valid entries without removing
-> their TLBs.
-> 
-> As the architecture says, slbia invalidates all lookaside information,
-> not conditionally based on if it removed valid entries.
-> 
-> It does not seem possible for POWER8 or earlier Linux kernels to hit
-> this bug because it never changes its kernel SLB translations, and it
-> should always have valid entries if any accesses are made to usespace
+> On 3/17/20 6:54 AM, Markus Armbruster wrote:
+>> This policy suppresses deprecated bits in output, and thus permits
+>> "testing the future".  Implement it for QMP events: suppress
+>> deprecated ones.
+>>
+>> No QMP event is deprecated right now.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>
+>> @@ -140,6 +141,23 @@ static void test_event_d(TestEventData *data,
+>>       qobject_unref(data->expect);
+>>   }
+>>   +static void test_event_deprecated(TestEventData *data, const void
+>> *unused)
+>> +{
+>> +    data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'TEST-EVENT-FE=
+ATURES1' }");
+>> +
+>> +    memset(&compat_policy, 0, sizeof(compat_policy));
+>> +
+>> +    qapi_event_send_test_event_features1();
+>> +    g_assert(data->emitted);
+>> +
+>> +    compat_policy.deprecated_output =3D COMPAT_POLICY_OUTPUT_HIDE;
+>
+> Umm, did you forget to set compat_policy.has_deprecated_output =3D true?
 
-s/usespace/userspace
+I did.  Works anyway, because I don't bother checking it.  I'll clean it
+up.
 
-> regions. However other operating systems which may modify SLB entry 0
-> or do more fancy things with segments might be affected.
-> 
-> When POWER9 slbia support is added in the next patch, this becomes a
-> real problem because some new slbia variants don't invalidate all
-> non-zero entries.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
+> (proof that we really want QAPI defaults to be working, to get rid of
+> pointless has_* members...)
+>
+>> +    data->emitted =3D false;
+>> +    qapi_event_send_test_event_features1();
+>> +    g_assert(!data->emitted);
+>> +
+>> +    qobject_unref(data->expect);
+>> +}
+>> +
+>
+>> +++ b/scripts/qapi/events.py
+>> @@ -61,7 +61,8 @@ def gen_param_var(typ):
+>>       return ret
+>>     -def gen_event_send(name, arg_type, boxed, event_enum_name,
+>> event_emit):
+>> +def gen_event_send(name, arg_type, features, boxed,
+>> +                   event_enum_name, event_emit):
+>>       # FIXME: Our declaration of local variables (and of 'errp' in the
+>>       # parameter list) can collide with exploded members of the event's
+>>       # data type passed in as parameters.  If this collision ever hits =
+in
+>> @@ -86,6 +87,14 @@ def gen_event_send(name, arg_type, boxed, event_enum_=
+name, event_emit):
+>>           if not boxed:
+>>               ret +=3D gen_param_var(arg_type)
+>>   +    if 'deprecated' in [f.name for f in features]:
+>> +        ret +=3D mcgen('''
+>> +
+>> +    if (compat_policy.deprecated_output =3D=3D COMPAT_POLICY_OUTPUT_HID=
+E) {
+>> +        return;
+>
+> Here, you took the shortcut that if we always 0-initialize,
+> deprecated_output will never be true except when has_deprecated_output
+> is also true.  But the test above violated that rule of thumb.
 
-LGTM
+Generated code ensures FOO is zero when !has_FOO.  Manual code should do
+the same.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+The pedantically correct check
 
->  target/ppc/mmu-hash64.c | 21 +++++++++++++++------
->  1 file changed, 15 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 34f6009b1e..373d44de74 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -100,20 +100,29 @@ void helper_slbia(CPUPPCState *env)
->      PowerPCCPU *cpu = env_archcpu(env);
->      int n;
->  
-> +    /*
-> +     * slbia must always flush all TLB (which is equivalent to ERAT in ppc
-> +     * architecture). Matching on SLB_ESID_V is not good enough, because slbmte
-> +     * can overwrite a valid SLB without flushing its lookaside information.
-> +     *
-> +     * It would be possible to keep the TLB in synch with the SLB by flushing
-> +     * when a valid entry is overwritten by slbmte, and therefore slbia would
-> +     * not have to flush unless it evicts a valid SLB entry. However it is
-> +     * expected that slbmte is more common than slbia, and slbia is usually
-> +     * going to evict valid SLB entries, so that tradeoff is unlikely to be a
-> +     * good one.
-> +     */
-> +
->      /* XXX: Warning: slbia never invalidates the first segment */
->      for (n = 1; n < cpu->hash64_opts->slb_size; n++) {
->          ppc_slb_t *slb = &env->slb[n];
->  
->          if (slb->esid & SLB_ESID_V) {
->              slb->esid &= ~SLB_ESID_V;
-> -            /*
-> -             * XXX: given the fact that segment size is 256 MB or 1TB,
-> -             *      and we still don't have a tlb_flush_mask(env, n, mask)
-> -             *      in QEMU, we just invalidate all TLBs
-> -             */
-> -            env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
->          }
->      }
-> +
-> +    env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
->  }
->  
->  static void __helper_slbie(CPUPPCState *env, target_ulong addr,
+    has_FOO && FOO =3D=3D some_non_zero_value
+
+can then safely be abbreviated to just
+
+    FOO =3D=3D some_non_zero_value
+
+which I find less turing and more more legible.
+
+> Otherwise, this patch makes sense.
+
+Thanks!
 
 
