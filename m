@@ -2,81 +2,97 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAEDC4332B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11B5C4332B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:17:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02F6D20714
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:16:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 790D220714
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:17:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PtLqoqVt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02F6D20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HNV1OCFJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 790D220714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58969 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEgzO-0007Fg-UP
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 18:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60688)
+	id 1jEh03-0007oM-MX
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 18:17:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60857)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jEgyQ-0006ff-O3
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:15:39 -0400
+ (envelope-from <philmd@redhat.com>) id 1jEgz0-0006yS-66
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:16:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jEgyP-0006xS-7o
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:15:38 -0400
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:33655)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jEgyP-0006lq-1b
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:15:37 -0400
-Received: by mail-oi1-x231.google.com with SMTP id r7so590366oij.0
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 15:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=1FJdOAfmvJnxfqY1N11F4vMcxcfKu2rQ/41hzuvZ+jM=;
- b=PtLqoqVtVlTF7Q7c/qbGJdQmtUO8chKKosP0yrBbNfcc7CGQQcaILwLHfPsHOvrLeo
- 9n6GDoDzCsdl74JYJTElk97iSNZRGDPmuvnlD70aAWutzPfDxw7mnuOwTeT81/yv1TCL
- jxNKyJ+jlNu/vBoqomEyF7lKpTJ5TL4DvSsZXxg6S+x6BwXohqzhUcjrsmSR8iyoyaJx
- uYhCBufPDQMVDP6347Hb2jh7h4yAizB/v8i1PfaXZi0OvEt3+UatNU187/qALzpnctv+
- jdz4ZK97ye4j794WG/0nOcr9CzLgBhql1yEQB7VrNiRxc2z91SCO6yO0Ir8T75WHBKWF
- 3O3w==
+ (envelope-from <philmd@redhat.com>) id 1jEgyy-0002P8-L3
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:16:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48205)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEgyy-0002M4-Ao
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:16:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584569772;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=huC2OGgYbvW84xwnIC5mxBB7O5lT6AM5qZ1RWUfo52o=;
+ b=HNV1OCFJjvvVEFegPxGRuchHk2EPF833tpMJwIID4x9KBNE3uJY3M3ScLEgMGZN7Jwtffp
+ VBxw9TwiaeAIDhnsYi/M2BtZMyOG9TN2oNdONrSTRkO0PpKI8iP9hLhh1kf4wqx5A6Go9G
+ Wpl4TLWuCILpFLXLdOPXbcUOi30QxYE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-74gBU8XQP5yoxpccECO0qA-1; Wed, 18 Mar 2020 18:16:10 -0400
+X-MC-Unique: 74gBU8XQP5yoxpccECO0qA-1
+Received: by mail-wr1-f69.google.com with SMTP id t10so6804wrp.15
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 15:16:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=1FJdOAfmvJnxfqY1N11F4vMcxcfKu2rQ/41hzuvZ+jM=;
- b=NeOF5U/G5jGtHbIVmHOPdutAGtzNQ4fpqVbYB7ZnpSf6HheFGmaoGdLh/+tkxIafz8
- qEzdrawhzSs06T7sTGHpIZlwKZGBwuGv60d1BxhzFAPsZm2SpcDXSBa+Y/IwJ96LAnea
- kBzeXQHsu2jsisYAZAM82sktVWcMoLdLjDSrD043O1sAYkRgSllXJeGr1enx60Wddm/7
- TcCTg6sVs65ZZO2BZixfBh1z1rPNO0U4zhoT2hutc2NF9j8j0uTM7cQRmqZncEDJ1wA0
- B5RlQOx7xC7I+9ktO7nVdKeBX7yA7Zz/Cmd6i3/rlsnkP4fXk/H9ljQYpIB5ZiUWmLgN
- TZiA==
-X-Gm-Message-State: ANhLgQ3NpnIWamGG4dWD7dZ6Xtbj0B3U5VT3fU8FL1AhGE/CCOrKWZLC
- 1USxt1lainwp/BxzsTq7sgTxddnLZmHnHcYpDG640A==
-X-Google-Smtp-Source: ADFU+vvK1FyIG4nJRXnEmP0GUyAIpmMpTbwMwA8Rkf6U1ZHUCUZRvT347gqvG7xyrmdUPnslJWBVEQO5PsyJHpy3YwQ=
-X-Received: by 2002:aca:c695:: with SMTP id w143mr142348oif.98.1584569735733; 
- Wed, 18 Mar 2020 15:15:35 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=RwaXQ72KSMPLcO7npdnd4uMzaGDTxoI8eHLkc3Jule0=;
+ b=C1CqHaY1+Y4qEaufCxFTsQqJ8yd9ykOIK3Y9BjXQTL/xmAD8uMvSZsMCxi2jt6u8J8
+ JPvsgGsc03ZOyei+j/YMdNuy759D9MxRurM+xljwM5t7C8oqQgKGPspO9FlvtfilUjaR
+ pLxa8KePUblPFVZ/PcANxKjgM70YPjHaDXSC/DfxJZH/yOW+xRMBs39OH+lhyBx9V5Kh
+ oiAEhimHumd9p4X6hRNNFnQzNSgGLInOZSWptB9khpjrG//7Yh17Xl+Kw6w3VZWbULHP
+ JUCVKJ5pMU2BctZ+D/CEolnnYittwICh2fmQ0xaWHSPJkwJaFzVr5IP8a/zpVFeGlVp2
+ Guew==
+X-Gm-Message-State: ANhLgQ14iBKqi869ZDM4GItQaiAfqmYK9KBShKQ+8C+bC9b9OL+QqPlx
+ orzfdderO2nlRaPLE5Gc+MvQVu8yzS/M9hJjRCE9g6IxGdsNwpHIOkmatNLQutds44jmz6ovdn1
+ KEoK6oTt2EL726GE=
+X-Received: by 2002:adf:e6ce:: with SMTP id y14mr102068wrm.152.1584569768879; 
+ Wed, 18 Mar 2020 15:16:08 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsl2x0oi4PD9D+AGQyfxhPKIVAcU4f4XQuDL0gmf+Z6vZbk7Oc+du7IwHp1jxOCpG/4+Q+sDw==
+X-Received: by 2002:adf:e6ce:: with SMTP id y14mr102045wrm.152.1584569768661; 
+ Wed, 18 Mar 2020 15:16:08 -0700 (PDT)
+Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id t193sm248214wmt.14.2020.03.18.15.16.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Mar 2020 15:16:08 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.0 1/2] hw/acpi/piix4: Add 'system-hotplug-support'
+ property
+Date: Wed, 18 Mar 2020 23:15:30 +0100
+Message-Id: <20200318221531.22910-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200318221531.22910-1-philmd@redhat.com>
+References: <20200318221531.22910-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20200317175053.5278-1-alex.bennee@linaro.org>
-In-Reply-To: <20200317175053.5278-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 18 Mar 2020 22:15:24 +0000
-Message-ID: <CAFEAcA92z9a24P3EK3wPrjHTuvL4Tz9zznbQnNns4-Qg-TsvAQ@mail.gmail.com>
-Subject: Re: [PULL 00/28 for 5.0] testing and gdbstub updates
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::231
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,50 +104,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Mar 2020 at 17:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> The following changes since commit 6fb1603aa24d9212493e4819d7b685be9c9aad=
-7a:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-202=
-00317' into staging (2020-03-17 14:44:50 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-testing-and-gdbstub-17032=
-0-1
->
-> for you to fetch changes up to 3bc2609d478779be600fd66744eb4e3730ec5e33:
->
->   gdbstub: Fix single-step issue by confirming 'vContSupported+' feature =
-to gdb (2020-03-17 17:38:52 +0000)
->
-> ----------------------------------------------------------------
-> Testing and gdbstub updates:
->
->   - docker updates for VirGL
->   - re-factor gdbstub for static GDBState
->   - re-factor gdbstub for dynamic arrays
->   - add SVE support to arm gdbstub
->   - add some guest debug tests to check-tcg
->   - add aarch64 userspace register tests
->   - remove packet size limit to gdbstub
->   - simplify gdbstub monitor code
->   - report vContSupported in gdbstub to use proper single-step
->
-> ----------------------------------------------------------------
+The I/O ranges registered by the piix4_acpi_system_hot_add_init()
+function are not documented in the PIIX4 datasheet.
+This appears to be a PC-only feature added in commit 5e3cb5347e
+("initialize hot add system / acpi gpe") which was then moved
+to the PIIX4 device model in commit 9d5e77a22f ("make
+qemu_system_device_hot_add piix independent")
+Add a property (default enabled, to not modify the current
+behavior) to allow machines wanting to model a simple PIIX4
+to disable this feature.
 
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+Should I squash this with the next patch and start with
+default=3Dfalse, which is closer to the hardware model?
+---
+ hw/acpi/piix4.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Applied, thanks.
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 964d6f5990..9c970336ac 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
+=20
+     AcpiPciHpState acpi_pci_hotplug;
+     bool use_acpi_pci_hotplug;
++    bool use_acpi_system_hotplug;
+=20
+     uint8_t disable_s3;
+     uint8_t disable_s4;
+@@ -503,8 +504,10 @@ static void piix4_pm_realize(PCIDevice *dev, Error **e=
+rrp)
+     s->machine_ready.notify =3D piix4_pm_machine_ready;
+     qemu_add_machine_init_done_notifier(&s->machine_ready);
+=20
+-    piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
+-                                   pci_get_bus(dev), s);
++    if (s->use_acpi_system_hotplug) {
++        piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
++                                       pci_get_bus(dev), s);
++    }
+     qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s), &error_abor=
+t);
+=20
+     piix4_pm_add_propeties(s);
+@@ -635,6 +638,8 @@ static Property piix4_pm_properties[] =3D {
+                      use_acpi_pci_hotplug, true),
+     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+                      acpi_memory_hotplug.is_enabled, true),
++    DEFINE_PROP_BOOL("system-hotplug-support", PIIX4PMState,
++                     use_acpi_system_hotplug, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+--=20
+2.21.1
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
