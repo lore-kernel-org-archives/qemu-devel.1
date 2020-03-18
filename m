@@ -6,72 +6,71 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4732DC10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 12:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0484DC10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 12:35:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15A0320767
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 12:31:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15A0320767
+	by mail.kernel.org (Postfix) with ESMTPS id C4E6B20767
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 12:35:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4E6B20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEXrJ-0007eN-9O
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 08:31:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42925)
+	id 1jEXuw-0000dK-Pb
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 08:35:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44040)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jEXqK-00073q-D1
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 08:30:41 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jEXu8-0008V4-Jg
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 08:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jEXqI-0006Vn-Uj
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 08:30:40 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1937)
+ (envelope-from <frankja@linux.ibm.com>) id 1jEXu7-0000dR-AC
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 08:34:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23068)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jEXqI-0006UC-Mx
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 08:30:38 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ id 1jEXu7-0000cz-2W
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 08:34:35 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02IC2VG9021124
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 08:30:37 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu719s6dv-1
+ 02ICWf7A166701
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 08:34:34 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8ad600n-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 08:30:36 -0400
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 08:34:31 -0400
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 18 Mar 2020 12:30:34 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Wed, 18 Mar 2020 12:34:16 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Mar 2020 12:30:32 -0000
+ Wed, 18 Mar 2020 12:34:15 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02ICUVg049610968
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02ICYEnG58130564
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Mar 2020 12:30:31 GMT
+ Wed, 18 Mar 2020 12:34:14 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CBF80A4065;
- Wed, 18 Mar 2020 12:30:31 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id A815BA4068;
+ Wed, 18 Mar 2020 12:34:14 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 82B95A405C;
- Wed, 18 Mar 2020 12:30:31 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 54F34A4060;
+ Wed, 18 Mar 2020 12:34:14 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.78.199])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 18 Mar 2020 12:30:31 +0000 (GMT)
-Subject: Re: [PATCH v9 04/15] s390x: protvirt: Inhibit balloon when switching
- to protected mode
+ Wed, 18 Mar 2020 12:34:14 +0000 (GMT)
+Subject: Re: [PATCH v9 14/15] docs: Add protvirt docs
 To: Cornelia Huck <cohuck@redhat.com>
 References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-5-frankja@linux.ibm.com>
- <20200318124214.15778f76.cohuck@redhat.com>
+ <20200311132151.172389-15-frankja@linux.ibm.com>
+ <20200318122546.4285aec0.cohuck@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -115,28 +114,28 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Wed, 18 Mar 2020 13:30:30 +0100
+Date: Wed, 18 Mar 2020 13:34:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200318124214.15778f76.cohuck@redhat.com>
+In-Reply-To: <20200318122546.4285aec0.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="UZu8sSxL8Zu1o0Hoy0wlBZSuf6OqgzAU1"
+ boundary="W7VuIvXy0q2j3rtMsMffTMabVta6MlS4E"
 X-TM-AS-GCONF: 00
-x-cbid: 20031812-0008-0000-0000-0000035F541A
+x-cbid: 20031812-0016-0000-0000-000002F32FDC
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031812-0009-0000-0000-00004A80AE6B
-Message-Id: <1813cdeb-d5af-5210-7e66-58fca928d625@linux.ibm.com>
+x-cbparentid: 20031812-0017-0000-0000-00003356B4C6
+Message-Id: <3de42810-965e-ad83-eed5-8407e7352a79@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
  definitions=2020-03-18_05:2020-03-18,
  2020-03-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0
- lowpriorityscore=0 malwarescore=0 impostorscore=0 mlxscore=0 phishscore=0
- priorityscore=1501 adultscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999
- suspectscore=2 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003180058
+ adultscore=0
+ lowpriorityscore=0 mlxscore=0 clxscore=1015 priorityscore=1501 spamscore=0
+ malwarescore=0 impostorscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003180059
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
@@ -157,150 +156,155 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UZu8sSxL8Zu1o0Hoy0wlBZSuf6OqgzAU1
-Content-Type: multipart/mixed; boundary="0GdBHfXHUSKpH1ZgUF9WrJ1VFfE5LTdB2"
+--W7VuIvXy0q2j3rtMsMffTMabVta6MlS4E
+Content-Type: multipart/mixed; boundary="QjByX9Jje6E7q8n207Z2ru2aG4HLelM3D"
 
---0GdBHfXHUSKpH1ZgUF9WrJ1VFfE5LTdB2
+--QjByX9Jje6E7q8n207Z2ru2aG4HLelM3D
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 3/18/20 12:42 PM, Cornelia Huck wrote:
-> On Wed, 11 Mar 2020 09:21:40 -0400
+On 3/18/20 12:25 PM, Cornelia Huck wrote:
+> On Wed, 11 Mar 2020 09:21:50 -0400
 > Janosch Frank <frankja@linux.ibm.com> wrote:
 >=20
->> Ballooning in protected VMs can only be done when the guest shares the=
-
->> pages it gives to the host. If pages are not shared, the integrity
->> checks will fail once those pages have been altered and are given back=
-
->> to the guest.
->>
->> As we currently do not yet have a solution for this we will continue
->> like this:
->>
->> 1. We block ballooning now in QEMU (with this patch)
+>> Lets add some documentation for the Protected VM functionality.
 >=20
-> add trailing '.'
->=20
->>
->> 2. Later we will provide a change to virtio that removes the blocker
->=20
-> s/Later/Later,/
->=20
->> and adds VIRTIO_F_IOMMU_PLATFORM automatically by QEMU when doing the
->> protvirt switch. This is ok as the guest balloon driver will reject to=
-
->> work with the IOMMU change
->=20
-> "This is OK, as the balloon driver in Linux (the only supported guest)
-> will refuse to work with the IOMMU_PLATFORM feature bit set."
->=20
-> ?
->=20
->>
->> 3. Later we can fix the guest balloon driver to accept the IOMMU
->=20
-> "Later, we can fix the Linux guest balloon driver..."
->=20
->> feature bit and correctly exercise sharing and unsharing of balloon
->> pages
->=20
-> again, missing trailing '.'
-
-All nits fixed
-
+> s/Lets/Let's/ :)
 >=20
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 >> ---
->>  hw/s390x/s390-virtio-ccw.c | 5 +++++
->>  1 file changed, 5 insertions(+)
+>>  docs/system/index.rst    |  1 +
+>>  docs/system/protvirt.rst | 56 +++++++++++++++++++++++++++++++++++++++=
++
+>>  2 files changed, 57 insertions(+)
+>>  create mode 100644 docs/system/protvirt.rst
 >>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index deb31e060052d279..066e01f303c35671 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -41,6 +41,7 @@
->>  #include "hw/qdev-properties.h"
->>  #include "hw/s390x/tod.h"
->>  #include "sysemu/sysemu.h"
->> +#include "sysemu/balloon.h"
->>  #include "hw/s390x/pv.h"
->>  #include "migration/blocker.h"
->> =20
->> @@ -326,6 +327,7 @@ static void s390_machine_unprotect(S390CcwMachineS=
-tate *ms)
->>      ms->pv =3D false;
->>      migrate_del_blocker(pv_mig_blocker);
->>      error_free_or_abort(&pv_mig_blocker);
->> +    qemu_balloon_inhibit(false);
->>  }
->> =20
->>  static int s390_machine_protect(S390CcwMachineState *ms)
->> @@ -333,10 +335,12 @@ static int s390_machine_protect(S390CcwMachineSt=
-ate *ms)
->>      Error *local_err =3D NULL;
->>      int rc;
->>
+> (...)
+>> diff --git a/docs/system/protvirt.rst b/docs/system/protvirt.rst
+>> new file mode 100644
+>> index 0000000000000000..6c8cf0f7910eae86
+>> --- /dev/null
+>> +++ b/docs/system/protvirt.rst
+>> @@ -0,0 +1,56 @@
+>> +Protected Virtualization on s390x
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +
+>> +The memory and most of the registers of Protected Virtual Machines
+>> +(PVMs) are encrypted or inaccessible to the hypervisor, effectively
+>> +prohibiting VM introspection when the VM is running. At rest, PVMs ar=
+e
+>> +encrypted and can only be decrypted by the firmware, represented by a=
+n
+>> +entity called Ultravisor, of specific IBM Z machines.
 >=20
-> Maybe add a comment?
+> Is that specific _generations_ or specific _machines_ (i.e. those with
+> an appropriate key)? If the latter, maybe add a note that a specific
+> image is bound to (a) specific machine(s)?
 >=20
-> /*
->  * Ballooning on protected VMs needs support in the guest for
->  * sharing and unsharing balloon pages. Block ballooning for
->  * now, until we have a solution to make at least Linux guests
->  * either support it or fail gracefully.
->  */
->  =20
->> +    qemu_balloon_inhibit(true);
->>      error_setg(&pv_mig_blocker,
->>                 "protected VMs are currently not migrateable.");
->>      rc =3D migrate_add_blocker(pv_mig_blocker, &local_err);
->>      if (local_err) {
->> +        qemu_balloon_inhibit(false);
->>          error_report_err(local_err);
->>          error_free_or_abort(&pv_mig_blocker);
->>          return rc;
->> @@ -345,6 +349,7 @@ static int s390_machine_protect(S390CcwMachineStat=
-e *ms)
->>      /* Create SE VM */
->>      rc =3D s390_pv_vm_enable();
->>      if (rc) {
->> +        qemu_balloon_inhibit(false);
->>          error_report_err(local_err);
->>          migrate_del_blocker(pv_mig_blocker);
->>          error_free_or_abort(&pv_mig_blocker);
 >=20
+>> +
+>> +
+>> +Prerequisites
+>> +-------------
+>=20
+> Also, maybe add
+>=20
+> "Running PVMs requires using the KVM hypervisor."
+>=20
+> ?
+>=20
+>> +
+>> +To run PVMs a machine with the Protected Virtualization feature
+>> +which is indicated by the Ultravisor Call facility (stfle bit
+>=20
+> maybe s/which is/as/ ?
+>=20
+>> +158) is required. The Ultravisor needs to be initialized at boot by
+>> +setting `prot_virt=3D1` on the kernel command line.
+>> +
+>> +If those requirements are met, the capability `KVM_CAP_S390_PROTECTED=
+`
+>> +will indicate that KVM can support PVMs on that LPAR.
+>> +
+>> +
+>> +QEMU Settings
+>> +-------------
+>> +
+>> +To indicate to the VM that it can transition into protected mode, the=
+
+>> +`Unpack facility` (stfle bit 161 represented by the feature
+>> +`S390_FEAT_UNPACK`) needs to be part of the cpu model of the VM.
+>> +
+>> +All I/O devices need to use the IOMMU.
+>> +Passthrough (vfio) devices are currently not supported.
+>> +
+>> +Host huge page backings are not supported. However guests can use hug=
+e
+>> +pages as indicated by its facilities.
+>> +
+>> +
+>> +Boot Process
+>> +------------
+>> +
+>> +A secure guest image can either be loaded from disk or supplied on th=
+e
+>> +QEMU command line. Booting from disk is done by the unmodified
+>> +s390-ccw BIOS. I.e., the bootmap is interpreted, multiple components
+>> +are read into memory and control is transferred to one of the
+>> +components (zipl stage3). Stag3 does some fixups and then transfers
+>=20
+> s/Stag3/Stage3/
+>=20
+>> +control to some program residing in guest memory, which is normally
+>> +the OS kernel. The secure image has another component prepended
+>> +(stage3a) that uses the new diag308 subcodes 8 and 10 to trigger the
+>> +transition into secure mode.
+>> +
+>> +Booting from the image supplied via the QEMU command line requires
+>> +that the file passed via -kernel has the same memory layout as would
+>> +result from the disk boot. This memory layout includes the encrypted
+>> +components (kernel, initrd, cmdline), the stage3a loader and
+>> +metadata. In case this boot method is used, the command line
+>> +options -initrd and -cmdline are ineffective. The preparation of a PV=
+M
+>> +image is done by genprotimg of the s390-tools package.
+>=20
+> "is done via the `genprotimg` tool from the s390-tools collection"
+>=20
+> ?
+
+Too many cooks :)
+Ack to all
 
 
 
---0GdBHfXHUSKpH1ZgUF9WrJ1VFfE5LTdB2--
+--QjByX9Jje6E7q8n207Z2ru2aG4HLelM3D--
 
---UZu8sSxL8Zu1o0Hoy0wlBZSuf6OqgzAU1
+--W7VuIvXy0q2j3rtMsMffTMabVta6MlS4E
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5yFGcACgkQ41TmuOI4
-ufjWpg//TOVyx+wgQoXMcaLkidH2QllyGWAZKgEohYN9pP0xnN8CvLYi7J9B3Dpf
-WX5RVWAU1F6icQQg6VZSnYyK1P/3nEPiH62Fd588yS+37lI6elfgg7XYjPo9NrGZ
-VhZcNan7e/mDgwrZzTHHuGow+LYVteaScUEkLfzEbkvmuRBeZ59w5nsFrLrWAuAJ
-HOBbqmfBGizB/DsX2TxASemD+OtOlTgY8VZ0ApMapaBaPvpBTokiN8l8NAbLLkqj
-yqiRQHBTOzakYaA43rZ72UP5nP2JVirjYtSWRUDp/L5wzOoPyD9oi/5YI8mxU9Hl
-uJKOs1DpazZ//fayN2ypMmY8hof5sCG/rYZQ6M9TE+l6TT05+37vGZPSeBdqwXd3
-0g3qQHOMF+EPHWWjMmCWtDKDpgaVLpjHTU11763CFU8YFkH17Sa+fxJF16ARgYj+
-FG5gCDHw4N/90D68LQPTNt4jIRNdl6ZJPORHYV27+z5Lpg0iQg+WCMREjxfTx7c2
-4VTUC5FSpEe2y992ioOyHhPqhA7cmgxcEgU6RqCxuV73puV/QTLKeab6owOem+to
-tZvh+j0WxHpEdXErJ6kWTmaql0FkH+x0vc9sEHi9vpBcs9mBmKD6dnyktoaZw5Ds
-yGx6E1qiz/YMQCvZqv9s2rSKfsLIuWJZnrq25UesI40Ag/28cwo=
-=YjpO
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5yFUUACgkQ41TmuOI4
+ufiQxRAAj/tmSJGqLuF94uPiUO+x94goWJTb87Bd8Ir+p+AuoC9D0vr0PqY+oM2k
+V6VGgDhxDiXckO8gm+SE4zYteqJaZS3BG/GkHAK9JjMkP2NMqlcH1NyeX5rz7JwG
+W2fOmjzo5/8HkCG65aQJg5snw6ezlsGjV4jI0KIVczoqy9RuxMWVtVJmxb38+hKH
+ujgkkOqnRn1udRWvFljAbKzVcaPjOzHtOyBHOtAuK7SFO1i6wuUrpU0jLyFUboKQ
+d2B4T5QItbfP/4LLSW1nMZ5huI/7MnsA5nNyYrX0T5j1qEaOw9QHYum7dP71W811
+D0hg9S6QqUEzFP8UwkNJOi/UCyI6UmkRj4eOREgwsbdOyXpfiuUkYc6S+r4xG6EP
+FNnSAd+6SRo/sRlzLulA1fMCMetcuTC+J/1GkhLJjV6YrjTBhvfi6C4t054K/SmD
+VkSNR7XHxLTAKSP4Wcyd3Hf+FtuciDx2SckxZOxFvEKe7XDIKnf1IhhBVcOALWR7
+RRDI9qXEsltLzdix0LWT210gCixSbhl39CAOkHTWvtjeyGhH+l632jqY6qlJ0QrU
+mkMNIPzj1FOLnykFDr8lvGGaeVIPs2/9Pk6VpUc4WwJxuaRHI9Y/E9fu+0UWtk8g
+2HuqJ4jNnn1tJaJwB0U+NBfqoCkg57kDmP6tRm1RiIZH0xV4SNs=
+=pohI
 -----END PGP SIGNATURE-----
 
---UZu8sSxL8Zu1o0Hoy0wlBZSuf6OqgzAU1--
+--W7VuIvXy0q2j3rtMsMffTMabVta6MlS4E--
 
 
