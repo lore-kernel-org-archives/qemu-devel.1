@@ -2,80 +2,70 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD4DC1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95570C5ACD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:27:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F3E620663
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:26:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NqT22ZW2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3E620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6B24620663
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 00:27:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B24620663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEMXN-00025a-50
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 20:26:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45532)
+	id 1jEMYD-0002yW-Le
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 20:27:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jEMRS-0004ap-59
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:15 -0400
+ (envelope-from <Colin.Xu@intel.com>) id 1jEMUS-00087C-Hp
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jEMRQ-00015t-PL
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:14 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58764)
+ (envelope-from <Colin.Xu@intel.com>) id 1jEMUQ-0006yk-P5
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:23:19 -0400
+Received: from mga05.intel.com ([192.55.52.43]:55569)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jEMRJ-0000z1-V1
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:20:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584490805;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VFn7JO0XLVD9S827UyQBaSD7Qch6L16JMLs2kqWzCw4=;
- b=NqT22ZW2XzsJw5XPwETIQVW/BSp1geJepS2VDqq4JZM1my37FEOg5Y68yBrlKuUrwooYo8
- Kz9IR0dDypGTbEsCrd1qGIlPzxrJprawkkQJwZUK5yNIO1Es37c94NRx5+P1tfnmIJRLfC
- nanP/C+ANzZYFwAUu550gcD+T3laMUs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-7cdq6aWOPH2F4FkwRrAQ6A-1; Tue, 17 Mar 2020 20:20:01 -0400
-X-MC-Unique: 7cdq6aWOPH2F4FkwRrAQ6A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9BF4100550D;
- Wed, 18 Mar 2020 00:19:59 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-2.rdu2.redhat.com
- [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 58D2610016EB;
- Wed, 18 Mar 2020 00:19:55 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 6/6] tests/docker: make "buildah bud" output similar to "docker
- build"
-Date: Tue, 17 Mar 2020 20:19:32 -0400
-Message-Id: <20200318001932.180617-7-crosa@redhat.com>
-In-Reply-To: <20200318001932.180617-1-crosa@redhat.com>
-References: <20200318001932.180617-1-crosa@redhat.com>
+ (Exim 4.71) (envelope-from <Colin.Xu@intel.com>) id 1jEMUQ-0006pC-G4
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 20:23:18 -0400
+IronPort-SDR: 9m7Z04/hM7cxD5+7e1RrAxH6ci5duohZDlGOFL2vuLC96DKRz4rYGWh1aRr7ZyWs/SvD/YMNWJ
+ mgUgkT4gEMkg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Mar 2020 17:23:14 -0700
+IronPort-SDR: AK0VJkZQXsILYkl8HHmjXK9q+vBoe2ZAWfSylQagnbvid0EsduBc99jhLDWhSphuvryInl2ke0
+ Mu9uW0d+oTGg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,565,1574150400"; d="scan'208";a="391256814"
+Received: from coxu-arch-shz.sh.intel.com (HELO [10.239.160.52])
+ ([10.239.160.52])
+ by orsmga004.jf.intel.com with ESMTP; 17 Mar 2020 17:23:13 -0700
+Subject: Re: [PULL 09/61] MAINTAINERS: Add entry for Guest X86 HAXM CPUs
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
+ <1584394048-44994-10-git-send-email-pbonzini@redhat.com>
+ <d9e9e44f-ba54-c2e7-01c8-72337d3f5993@intel.com>
+ <bc354cda-b731-183f-3860-43c3a0af434c@redhat.com>
+ <41756673-bbd4-593f-ade8-3232db8b512e@intel.com>
+ <1eead546-c06f-2ec0-e3b7-fdc5bb426620@redhat.com>
+From: Colin Xu <Colin.Xu@intel.com>
+Message-ID: <aba00b92-26a4-d80d-79ec-eb0e1df7b747@intel.com>
+Date: Wed, 18 Mar 2020 08:23:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <1eead546-c06f-2ec0-e3b7-fdc5bb426620@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,57 +77,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-ppc@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Colin.Xu@intel.com
+Cc: Wenchao Wang <wenchao.wang@intel.com>, Hang Yuan <hang.yuan@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Podman users will most often be using buildah to build containers.
-Among the differences between "buildah bud|build-using-dockerfile" and
-a traditional "docker build" is that buildah does not run a container
-during build.
 
-To the best of my knowledge and experiments, this means that runtime
-variables, such as ENV from one base image will not propagate into
-another.  The end result is that the location for the cross compiler
-binaries, defined in the base "qemu/debian9-mxe" image, are not passed
-through this image.  Consequently, the cross compilers are not on PATH
-and the build fails.
+On 2020-03-17 18:27, Paolo Bonzini wrote:
+> On 17/03/20 09:55, Colin Xu wrote:
+>> On 2020-03-17 16:26, Paolo Bonzini wrote:
+>>> On 17/03/20 08:46, Colin Xu wrote:
+>>>> Hi Paolo,
+>>>>
+>>>> For future HAX patch, once it's "Reviewed-by" haxm maintainers and other
+>>>> reviewers, do we need "SubmitAPullRequest" separately or you will do it
+>>>> together with other patches?
+>>> As you prefer.  I wouldn't mind having to send fewer pull requests. :)
+>>>
+>>> Paolo
+>> Would you mind continue help HAX send pull request? It feels like easier
+>> to track the changes when stay together with other accelerator patches.
+>> We'll regularly check the reviewed patches and do necessary tests, and
+>> send you a list of patches that can be queued for next pull.
+>>
+>> What do you think?
+> Sure, that's okay.  The number of patches is low enough.
+>
+> Paolo
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-Id: <20200312193616.438922-3-crosa@redhat.com>
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/docker/dockerfiles/debian-win32-cross.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cool. Thanks a lot for the help.
 
-diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/doc=
-ker/dockerfiles/debian-win32-cross.docker
-index 9d7053e59d..d16d6431bc 100644
---- a/tests/docker/dockerfiles/debian-win32-cross.docker
-+++ b/tests/docker/dockerfiles/debian-win32-cross.docker
-@@ -9,7 +9,7 @@ MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-=20
- ENV TARGET i686
-=20
--ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
-+ENV PATH $PATH:/usr/lib/mxe/usr/bin:/usr/lib/mxe/usr/$TARGET-w64-mingw32.s=
-hared/bin
-=20
- ENV PKG_CONFIG_PATH \
-     $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgco=
-nfig
---=20
-2.25.1
+Colin.
+
+-- 
+
+Best Regards,
+Colin Xu
 
 
