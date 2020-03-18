@@ -6,95 +6,64 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E4AC10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2350C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:13:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ABCF20767
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:07:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ABCF20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D29620767
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D29620767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEPzC-000422-GT
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 00:07:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58068)
+	id 1jEQ4u-00057f-M5
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 00:13:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34485)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mahesh@linux.ibm.com>) id 1jEPyZ-0003TS-I1
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:06:40 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jEQ4M-0004ik-0k
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mahesh@linux.ibm.com>) id 1jEPyY-0007SA-8b
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:06:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49054
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <no-reply@patchew.org>) id 1jEQ4K-0007Cr-Ev
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:12:37 -0400
+Resent-Date: Wed, 18 Mar 2020 00:12:37 -0400
+Resent-Message-Id: <E1jEQ4K-0007Cr-Ev@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21112)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mahesh@linux.ibm.com>)
- id 1jEPyY-0007P2-2U
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:06:38 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02I42VfL067514
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 00:06:37 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yu98sn6mq-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 00:06:36 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mahesh@linux.ibm.com>;
- Wed, 18 Mar 2020 04:06:35 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Mar 2020 04:06:32 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02I46Vx452559940
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Mar 2020 04:06:31 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2B3C011C04C;
- Wed, 18 Mar 2020 04:06:31 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D366E11C05B;
- Wed, 18 Mar 2020 04:06:29 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.55.186])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Wed, 18 Mar 2020 04:06:29 +0000 (GMT)
-Date: Wed, 18 Mar 2020 09:36:27 +0530
-From: Mahesh J Salgaonkar <mahesh@linux.ibm.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] ppc/spapr: Set the effective address provided flag in mc
- error log.
-References: <158444819283.31599.12155058652686614304.stgit@jupiter>
- <158446030854.25100.12364998990821380964@39012742ff91>
- <20200317171122.21c49c15@bahia.lan>
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jEQ4K-0006zt-6J
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:12:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584504741; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=mDuT3kya/Ie8BH2fhjCfB9uhJHwv+WCYxN+xannbxpDUEpmW6IBzZmC4GKaYGjZG9GmQuSesBQDwQurXtVxMsT7Q5een4MCoXlohbJhhNrMaoI/zZMww1UqkW/0E1Z1aFo+YWJZyYTIu3vZakbGUTtAxnF+PsE428zaRXvGdmLg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584504741;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=8RS22Mu0gbYBzUgQahwqPScGGP3gxAJIvUO4LbGx/5E=; 
+ b=UEgsJHIcz7m8qCMDpvTrKE3hkQQi70z2VXQrL/F+rx9RWvHoeQclGtb7fYafbXEgxeGsBHpqZtbwmp3oMqS7Gi0aqttLiWt6eD14RoXTXKIk9O30K+9TTq6ZsRm6qWffMyznB+POwpIAMLZb/VgRUAasMGyjnANjnSXSOowovOg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1584504738262135.66000947514613;
+ Tue, 17 Mar 2020 21:12:18 -0700 (PDT)
+In-Reply-To: <20200318011217.2102748-1-ehabkost@redhat.com>
+Subject: Re: [PULL 0/4] Python queue for 5.0 soft freeze
+Message-ID: <158450473711.25478.16951249008771308992@39012742ff91>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200317171122.21c49c15@bahia.lan>
-X-TM-AS-GCONF: 00
-x-cbid: 20031804-0016-0000-0000-000002F2EED7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031804-0017-0000-0000-000033567229
-Message-Id: <20200318040627.ywedm5aay3cllfzc@in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-17_10:2020-03-17,
- 2020-03-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 clxscore=1015
- adultscore=0 mlxlogscore=999 suspectscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003180018
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ehabkost@redhat.com
+Date: Tue, 17 Mar 2020 21:12:18 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,58 +75,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: mahesh@linux.ibm.com
-Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, npiggin@gmail.com,
- ganeshgr@linux.ibm.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-03-17 17:11:22 Tue, Greg Kurz wrote:
-> On Tue, 17 Mar 2020 08:51:50 -0700 (PDT)
-> no-reply@patchew.org wrote:
-> 
-> > Patchew URL: https://patchew.org/QEMU/158444819283.31599.12155058652686614304.stgit@jupiter/
-> > 
-> > 
-> > 
-> > Hi,
-> > 
-> > This series seems to have some coding style problems. See output below for
-> > more information:
-> > 
-> > Subject: [PATCH] ppc/spapr: Set the effective address provided flag in mc error log.
-> > Message-id: 158444819283.31599.12155058652686614304.stgit@jupiter
-> > Type: series
-> > 
-> > === TEST SCRIPT BEGIN ===
-> > #!/bin/bash
-> > git rev-parse base > /dev/null || exit 0
-> > git config --local diff.renamelimit 0
-> > git config --local diff.renames True
-> > git config --local diff.algorithm histogram
-> > ./scripts/checkpatch.pl --mailback base..
-> > === TEST SCRIPT END ===
-> > 
-> > Switched to a new branch 'test'
-> > 62d8ada ppc/spapr: Set the effective address provided flag in mc error log.
-> > 
-> > === OUTPUT BEGIN ===
-> > ERROR: code indent should never use tabs
-> > #57: FILE: hw/ppc/spapr_events.c:739:
-> > +^Iswitch (ext_elog->mc.error_type) {$
-> > 
-> 
-> Yeah no tabs allowed in the QEMU code (see CODING_STYLE.rst).
-> 
-> If your editor is emacs, you can consider setting these:
-> 
->   (setq indent-tabs-mode nil)
->   (setq c-basic-offset 4))
-
-My bad. Will fix it and respin v2.
-
-Thanks,
--Mahesh.
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxODAxMTIxNy4yMTAy
+NzQ4LTEtZWhhYmtvc3RAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMC80XSBQeXRob24gcXVldWUgZm9yIDUuMCBz
+b2Z0IGZyZWV6ZQpNZXNzYWdlLWlkOiAyMDIwMDMxODAxMTIxNy4yMTAyNzQ4LTEtZWhhYmtvc3RA
+cmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMWI0ZjZmMyBNQUlOVEFJTkVSUzogYWRkIHNp
+bXBsZWJlbmNoCjU3YjQyYjYgc2NyaXB0cy9zaW1wbGViZW5jaDogYWRkIGV4YW1wbGUgdXNhZ2Ug
+b2Ygc2ltcGxlYmVuY2gKOTllYTRkNyBzY3JpcHRzL3NpbXBsZWJlbmNoOiBhZGQgcWVtdS9iZW5j
+aF9ibG9ja19qb2IucHkKMTk2Zjk3ZCBzY3JpcHRzL3NpbXBsZWJlbmNoOiBhZGQgc2ltcGxlYmVu
+Y2gucHkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNCBDaGVja2luZyBjb21taXQgMTk2Zjk3ZDg1
+NjZkIChzY3JpcHRzL3NpbXBsZWJlbmNoOiBhZGQgc2ltcGxlYmVuY2gucHkpCldBUk5JTkc6IGFk
+ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
+dGluZz8KIzE2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBwbGVhc2UgdXNlIHB5dGhv
+bjMgaW50ZXJwcmV0ZXIKIzIxOiBGSUxFOiBzY3JpcHRzL3NpbXBsZWJlbmNoL3NpbXBsZWJlbmNo
+LnB5OjE6CisjIS91c3IvYmluL2VudiBweXRob24KCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5n
+cywgMTI4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKMi80IENoZWNraW5nIGNvbW1pdCA5OWVhNGQ3M2JiYTggKHNjcmlwdHMvc2ltcGxlYmVuY2g6
+IGFkZCBxZW11L2JlbmNoX2Jsb2NrX2pvYi5weSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTY6IApuZXcg
+ZmlsZSBtb2RlIDEwMDc1NQoKRVJST1I6IHBsZWFzZSB1c2UgcHl0aG9uMyBpbnRlcnByZXRlcgoj
+MjE6IEZJTEU6IHNjcmlwdHMvc2ltcGxlYmVuY2gvYmVuY2hfYmxvY2tfam9iLnB5OjE6CisjIS91
+c3IvYmluL2VudiBweXRob24KCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTE5IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDIvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy80IENoZWNr
+aW5nIGNvbW1pdCA1N2I0MmI2OTFmN2IgKHNjcmlwdHMvc2ltcGxlYmVuY2g6IGFkZCBleGFtcGxl
+IHVzYWdlIG9mIHNpbXBsZWJlbmNoKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
+aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMTogCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDgwIGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDMvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0LzQgQ2hlY2tpbmcgY29tbWl0
+IDFiNGY2ZjM4NTBmNCAoTUFJTlRBSU5FUlM6IGFkZCBzaW1wbGViZW5jaCkKPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMTgwMTEyMTcuMjEw
+Mjc0OC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
+Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
 
