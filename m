@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467ECC10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 08:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCEAC10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 08:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0943420753
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 08:42:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0943420753
+	by mail.kernel.org (Postfix) with ESMTPS id 444802076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 08:44:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444802076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEUH6-0003s5-5t
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 04:42:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49698)
+	id 1jEUJu-0005ak-FF
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 04:44:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jEUGT-0003S7-Lp
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 04:41:26 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jEUJG-00050e-OA
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 04:44:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jEUGO-00080F-Gw
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 04:41:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2954
+ (envelope-from <frankja@linux.ibm.com>) id 1jEUJF-0003JA-IC
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 04:44:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48316
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jEUGO-0007wr-A0
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 04:41:20 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ id 1jEUJF-0003FL-Ad
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 04:44:17 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02I8XV2P049474
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 04:41:19 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yu96en2h2-1
+ 02I8huWv139838
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 04:44:16 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yugd280bj-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 04:41:19 -0400
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 04:44:16 -0400
 Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 18 Mar 2020 08:41:17 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Wed, 18 Mar 2020 08:44:14 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Mar 2020 08:41:14 -0000
+ Wed, 18 Mar 2020 08:44:10 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02I8fDqE50004058
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02I8i9x654657120
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Mar 2020 08:41:13 GMT
+ Wed, 18 Mar 2020 08:44:09 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BA9F7A4060;
- Wed, 18 Mar 2020 08:41:13 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id B8FF1A4054;
+ Wed, 18 Mar 2020 08:44:09 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 676BFA405B;
- Wed, 18 Mar 2020 08:41:13 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 6F54BA405C;
+ Wed, 18 Mar 2020 08:44:09 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.78.199])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 18 Mar 2020 08:41:13 +0000 (GMT)
-Subject: Re: [PATCH v9 14/15] docs: Add protvirt docs
-To: Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+ Wed, 18 Mar 2020 08:44:09 +0000 (GMT)
+Subject: Re: [PATCH v9 15/15] s390x: Add unpack facility feature to GA1
+To: Cornelia Huck <cohuck@redhat.com>
 References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-15-frankja@linux.ibm.com>
- <CAFEAcA84eNDe82ZNCDO3apgjhoa3UEriWo1+2aW7L4ok0hMZgQ@mail.gmail.com>
- <20200317192321.3c6e3d21.cohuck@redhat.com>
+ <20200311132151.172389-16-frankja@linux.ibm.com>
+ <20200317190605.36c5c73b.cohuck@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -116,28 +115,28 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Wed, 18 Mar 2020 09:41:12 +0100
+Date: Wed, 18 Mar 2020 09:44:08 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200317192321.3c6e3d21.cohuck@redhat.com>
+In-Reply-To: <20200317190605.36c5c73b.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Hvh86PUbUJ8KVCmgux4BLC7ZqnS9z1Wkv"
+ boundary="EbACVUkDHxObgSqHvq3HERhWS4Rc4FehH"
 X-TM-AS-GCONF: 00
-x-cbid: 20031808-0016-0000-0000-000002F31159
+x-cbid: 20031808-0012-0000-0000-000003930EE9
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031808-0017-0000-0000-000033569576
-Message-Id: <5f8e9aee-2cd5-e5e2-4458-4163acc4ebd9@linux.ibm.com>
+x-cbparentid: 20031808-0013-0000-0000-000021CFF09E
+Message-Id: <64ebd363-da9d-a98a-a50d-aa3994044015@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
  definitions=2020-03-18_03:2020-03-17,
  2020-03-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 bulkscore=0
- malwarescore=0 suspectscore=0 adultscore=0 priorityscore=1501 spamscore=0
- phishscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003180040
+ spamscore=0 malwarescore=0
+ suspectscore=0 impostorscore=0 lowpriorityscore=0 clxscore=1015
+ phishscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003180043
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
@@ -151,100 +150,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- David Hildenbrand <david@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Hvh86PUbUJ8KVCmgux4BLC7ZqnS9z1Wkv
-Content-Type: multipart/mixed; boundary="iFcY1ahs9ANJXYln43CpJT81EJjuvL8Bz"
+--EbACVUkDHxObgSqHvq3HERhWS4Rc4FehH
+Content-Type: multipart/mixed; boundary="Y9FPcHewdj537aaIovPfZjPqhGdN9P0PW"
 
---iFcY1ahs9ANJXYln43CpJT81EJjuvL8Bz
+--Y9FPcHewdj537aaIovPfZjPqhGdN9P0PW
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 3/17/20 7:23 PM, Cornelia Huck wrote:
-> On Fri, 13 Mar 2020 13:28:56 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
+On 3/17/20 7:06 PM, Cornelia Huck wrote:
+> On Wed, 11 Mar 2020 09:21:51 -0400
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 >=20
->> On Wed, 11 Mar 2020 at 13:31, Janosch Frank <frankja@linux.ibm.com> wr=
-ote:
->>>
->>> Lets add some documentation for the Protected VM functionality.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>  docs/system/index.rst    |  1 +
->>>  docs/system/protvirt.rst | 56 ++++++++++++++++++++++++++++++++++++++=
-++
->>>  2 files changed, 57 insertions(+)
->>>  create mode 100644 docs/system/protvirt.rst
->>>
->>> diff --git a/docs/system/index.rst b/docs/system/index.rst
->>> index 6e5f20fa1333ce23..74afbd7cc3fc0296 100644
->>> --- a/docs/system/index.rst
->>> +++ b/docs/system/index.rst
->>> @@ -34,3 +34,4 @@ Contents:
->>>     deprecated
->>>     build-platforms
->>>     license
->>> +   protvirt =20
+>> From: Christian Borntraeger <borntraeger@de.ibm.com>
 >>
->> The order of this list in index.rst determines the order
->> of the table of contents in the manual. Could you put
->> your new document at a reasonable place in the manual,
->> not just at the bottom of the list, please?
+>> The unpack facility is an indication that diagnose 308 subcodes 8-10
+>> are available to the guest. That means, that the guest can put itself
+>> into protected mode.
 >>
->> For something that is s390 specific, the ideal would
->> be to create a new docs/system/target-s390x.rst
->> which is then the place where all s390 docs can
->> hang off of. This is how we're handling various
->> other guest architecture docs. It doesn't all
->> have to go in a single page -- eg target-arm.rst
->> is an example of putting some sub-documents into
->> docs/system/arm/ and referring to them from
->> target-arm.rst.
+>> Once it is in protected mode, the hardware stops any attempt of VM
+>> introspection by the hypervisor.
+>>
+>> Some features are currently not supported in protected mode:
+>>      * Passthrough devices
 >=20
-> That sounds like a good idea; let me see whether I can come up with
-> something that Janosch can base his change on.
+> s/Passthrough/vfio/ ?
+
+Ack
+
 >=20
-> (There's already the vfio-ap documentation that's s390x specific; I'll
-> also move it.)
+>>      * Migration
+>>      * Huge page backings
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Reviewed-by: David Hildenbrand <david@redhat.com>
+>=20
+> Btw: please add your s-o-b if you're passing on patches from others.
+
+Ack
+
+>=20
+>> ---
+>>  target/s390x/gen-features.c | 1 +
+>>  target/s390x/kvm.c          | 5 +++++
+>>  2 files changed, 6 insertions(+)
+>>
+>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c=
+
+>> index 6278845b12b8dee8..8ddeebc54419a3e2 100644
+>> --- a/target/s390x/gen-features.c
+>> +++ b/target/s390x/gen-features.c
+>> @@ -562,6 +562,7 @@ static uint16_t full_GEN15_GA1[] =3D {
+>>      S390_FEAT_GROUP_MSA_EXT_9,
+>>      S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
+>>      S390_FEAT_ETOKEN,
+>> +    S390_FEAT_UNPACK,
+>>  };
+>> =20
+>>  /* Default features (in order of release)
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index ff6027036ec2f14a..e11e895a3d9038bb 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -2403,6 +2403,11 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *=
+model, Error **errp)
+>>          clear_bit(S390_FEAT_BPB, model->features);
+>>      }
+>> =20
+>> +    /* we do have the IPL enhancements */
+>=20
+> I'm more confused by that comment than educated :) Not sure what 'IPL
+> enhancements' means in this context.
+
+/* We do have the protected virtualization ipl unpack facility */
+?
+
+>=20
+>> +    if (cap_protected) {
+>> +        set_bit(S390_FEAT_UNPACK, model->features);
+>> +    }
+>> +
+>>      /* We emulate a zPCI bus and AEN, therefore we don't need HW supp=
+ort */
+>>      set_bit(S390_FEAT_ZPCI, model->features);
+>>      set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
 >=20
 
-Oh great, I already tried moving the ap documentation but if I can
-rebase onto something usable I would be even happier as we save some
-mail round trips!
 
 
---iFcY1ahs9ANJXYln43CpJT81EJjuvL8Bz--
+--Y9FPcHewdj537aaIovPfZjPqhGdN9P0PW--
 
---Hvh86PUbUJ8KVCmgux4BLC7ZqnS9z1Wkv
+--EbACVUkDHxObgSqHvq3HERhWS4Rc4FehH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5x3qkACgkQ41TmuOI4
-ufjN6Q//VKpBBNBhLN1I5ybbO9jY58jAZ8ohru9pKFRmomipa/7tSHmvex9t9C8O
-mT9LKtrGXMoKU4QORufC8tmsyvEknhR5eJRKKUY66nlBvraUlHvXi0tCcA0LlAgZ
-GwxjtYcBMnE2BA9sqtuADdcIr9IcqsKrSPsTZ+oo8+aM8CBAJd/uauytHTOKQYXT
-c/ndxB4AnZf4tTTHFZ9+MLAfoOCMlwhhr30HkgybPw8A9x/3rMBr6hfEz1FCRQK0
-/EYyFMrGOLjekiZgSliyuAwXM02NiASfM+oxCyj60EJ/w/R5tuOpSt0Jwpn++nP1
-ZpNmftB138EaEsXsV4UEKQOrg5pcRrYBy/EuzXqyWJ+cmbkh+rGLCpnnbiU8U5mA
-4rusmz6PxIHajKBG2xWOpI/2/ARBGe/1VRdnJg7zNfRT7juWRbOoPoVqIwo4S8EJ
-CDBy67bc4o0Oaya6Rz2x8xQBaqJtL2FHT8VhcGszUhIBhlfr13Lu8pk+QVg2wEg4
-64rQk8GCKpFB2+HKF1X2Ib9C3jT1OhbTmvaQIpPvx2mIDRR7Xu6FHFR9ffM65mpR
-z1jfPz6xqgG6bHB9dkPzkHjMZRjXkxqoi10IRG2R9Gy1c6ngmErwUxucMuDV/8n5
-ZqeVzNL0XG3WFJS6nt34dfUI32mNFZP/SZlDVBoHpI2pbDPZWLg=
-=vhRR
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5x31kACgkQ41TmuOI4
+ufiVuxAA0GyuBKCx0qB0cNuJSjY5JlIrdypvbkSloaEskpPw0JFrtvJjE3ayDdLH
+aOrxmSiwYuDQL0cIpVyTaPeeNweQygupYhhAjbO6EuVqA/FN9f0O4DAGSW0+JNT3
+KranNohB9I1HjC8ksE8gbiBjvHxLCwmEXixU7eQa7cpvoMfKbI7bVaNCzPbBNXP+
+MxQDLJN7bJhyxKkMBQBn7luuJ3DwYWbtEv/UK73+7uWyAd5PQs6dHNOid04GQtrP
+eOadQLj3cs5YMa8CYSV4i8sZGARh5bHfCskavQYhZrQizrtP5IvlaayYkIQL+EhY
+/3fdzSpM8ijyEX0ZvOdDzxZOaglR1Euv5UYO5REJjpCZP0zBiZLlikQ0SzUan6US
+eOz1S2zyk1f4sAhWpo5pceEOHa2w+4QSwIEHslVSO4neDlBxfKItCYsI6u79UZbM
+mUbfJGatpf2mjUEyHHUICyDK2+SS67feJfpHQEp4EttSxk4it56GxqEFhMqofCZL
+vZKpPsmQZkdp75bX0quMQc/9jOD9z0qOIN++PY8f9aNjL/STcCwuGMe2khQSmr+r
+TniGHpLlZMKQRfV1CJIhh3gbOvS9HgcDaBPcspuLbptc2wqnANdhvt9qfqamgvTB
+tLvpAus86xa9ezmHEFrHaIQahbUuJltf30rvpeMbTaQRqX6jbqk=
+=hzVc
 -----END PGP SIGNATURE-----
 
---Hvh86PUbUJ8KVCmgux4BLC7ZqnS9z1Wkv--
+--EbACVUkDHxObgSqHvq3HERhWS4Rc4FehH--
 
 
