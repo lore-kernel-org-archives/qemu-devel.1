@@ -2,78 +2,78 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0700C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 11:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC502C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 11:13:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9741C2076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 11:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EF672076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 11:13:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K13xdzTl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9741C2076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="clPC1D3/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EF672076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEWb3-00041k-L1
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 07:10:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37366)
+	id 1jEWdC-0005Ng-Nr
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 07:13:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jEWa0-0003Dv-Nm
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 07:09:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jEWca-0004t5-Mu
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 07:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jEWZz-0004Xf-H4
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 07:09:44 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:33281)
+ (envelope-from <peter.maydell@linaro.org>) id 1jEWcZ-0005Fc-PQ
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 07:12:24 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35228)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jEWZz-0004TV-B6
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 07:09:43 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id r7so25312489oij.0
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 04:09:42 -0700 (PDT)
+ id 1jEWcZ-0005Aw-IW
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 07:12:23 -0400
+Received: by mail-ot1-x341.google.com with SMTP id k26so25112424otr.2
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 04:12:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=s24WxfQvEVkHP2kPgJUrFy0280e8Ok8/CjojyQnaqVw=;
- b=K13xdzTle0wK+SMLY5+Fekb9A14QZrZtX5SnVbx7ILkO/deXWWhgcIN6wLkdRcjZpq
- 8dWHmCBym4bqL+N76nSeIHG5v/LyyzI6M3Ybs0cKb1m+UkMxjB23VgQZf/f4DMSpzsGE
- /9VA4SijRWwBrEY1cDgtpheRJdvxbXk62CvXGLkTmaKUmYWd5+WpMzraQjmVpz6XXIHE
- LAOMNa1xcoYN0W4hGXssM0JxLwx279fXB5CkTeO05mSOF5+zzRv/Pd8wKhRXA37klsrn
- 5OlmE2cNJOYbxY+XBJsX7IkTWK9dgurq/W+RusLTfB/JDoq1I4qzgQRokNRIaLMIMk74
- B0oQ==
+ :cc; bh=5hvrnbjfCybmHx4wVyAh+W03c3dhkl1uw+Zrvs/s25o=;
+ b=clPC1D3/PZTBksxqd/8p2Liv835eM0uYYqNpQiTIuUmFgInwrduaVfOQtV2D6q0jwB
+ omwIFOL3Z9j5sUngwvw6LCWYw+PzcOXahVDQH2HX0gGIB7QLZB/gdrmrLC3SjdgyYQ3y
+ nnmu+BDNdmZxU4wl6K8J2s/LrU7rCOMY0dt+jbZhAZr+wIBaWEdrATKpY2GF1o0o41BI
+ BY4G3n7u/QE/DUhI99Uf1x2AirxehIOObJhNAB26/ew/kt4+VwCw1X7hA8inZVFTkOa5
+ 6VxlzeBv+ZF4flRYMQb+WgQc761hj1cjcLeWFEp4+guOZoglGidV27kZBqGhcVdalJ/C
+ /unA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=s24WxfQvEVkHP2kPgJUrFy0280e8Ok8/CjojyQnaqVw=;
- b=KyN3vbKTIPgL0LV7QvG9w4sfrcnT4etPQVnFscFKL6v99ZyL4Jpyq3NNF6Jry+OoTi
- tjHJWqTL+JzKZFO0CGk7OXGBnDz+iA2CWhIdFUUFv/YiMJxuGjKZsoaoeZOwifpqEYmI
- O+5ekaReOUSjPOUNa9PZAk1NZ9o+v9dWYoMRtoLYee8MmU+A5aqJuYMeZZcc066mM26I
- IEdW123dC2ghan635Ts9ZOtT9Ycy6CE9PlmAKxQTVEzn2ToJX8suw/q1pRhw4+814CXZ
- KGnqQd99ohNilhJtHOqJYx6ErT+tJq5BvMdmO5zFZlWWk13+ROFUeSFM+ZWOWpPnAfrM
- NhLg==
-X-Gm-Message-State: ANhLgQ1FrAI/RCAotWteEHXNTU4ierbfXFuMT5f7Zs1drqBLfRge8Mmc
- eIbqYSUXH0SqzOZHrSkf4cRj+G+H5VnZC9QHDELHcQ==
-X-Google-Smtp-Source: ADFU+vv7VvN0etNC4q3zmXCmruXCUAzPOXk7izuMR7rtKfDz38ymu8j78fmQQbQ0BeJl5Bz4MK4Gv72IxPJ8UW3uhDk=
-X-Received: by 2002:aca:5b07:: with SMTP id p7mr2608082oib.146.1584529782065; 
- Wed, 18 Mar 2020 04:09:42 -0700 (PDT)
+ bh=5hvrnbjfCybmHx4wVyAh+W03c3dhkl1uw+Zrvs/s25o=;
+ b=G7H+vcWyK6MsAZ5yBzz9LO3Uw1WzYgKv4ilS5VdkpgkIDr2JzastUMl7nfh7FV78Kj
+ /tOf/fxnsrNaUakmUMhF99kBOWq+cp92yjvbjcqTGtF0OCRNVOh4GTM6cDZIMK/S+Owl
+ W94Za3Bx2FGpZUOhFRzt3P/p5xCJCwAfmK1V1HiyWL09Xl0m2soU4YBS0tsmirCz4vwl
+ xYQSCHPN5YpsoIX4r4o1/kAr6ORb9uQWu+W1txMcaHkyvi+PWX3Z/+1hJ9aPs8F6FGSH
+ bSrHyPqM07HENDh1zBHDBK/2kcCLSB0/XjZBR6MXhmtFWG8MYIZEW4gZ1xYBAOUlwxLz
+ 2Mzg==
+X-Gm-Message-State: ANhLgQ23AFQSkjNH+8nHDa+DfQbL05Q94bhkG1As24QEzhVzos2vhMFS
+ /w39VXm7V6JqoQOAKJidi8etDIqsco5G06tl12E2IQ==
+X-Google-Smtp-Source: ADFU+vvieniM5Qs5+dE48WrmrhQ2E6eJx0G2bGYowRDlx1cNiqBOHcFhJAnTmYsCZP+4u32t1jBqf/4Cl3YeYPlv+VM=
+X-Received: by 2002:a9d:19ca:: with SMTP id k68mr3370445otk.232.1584529942676; 
+ Wed, 18 Mar 2020 04:12:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAPV47zcqvNekcUN=fKu1-dN=Sip3XR3+ohaG22-oNDm1dceJkQ@mail.gmail.com>
-In-Reply-To: <CAPV47zcqvNekcUN=fKu1-dN=Sip3XR3+ohaG22-oNDm1dceJkQ@mail.gmail.com>
+References: <20200318103940.1169-1-cohuck@redhat.com>
+In-Reply-To: <20200318103940.1169-1-cohuck@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 18 Mar 2020 11:09:31 +0000
-Message-ID: <CAFEAcA_CeGozr3MUA6N=cMQVXLjoLD0ca-gywm+MLU4unfgwGg@mail.gmail.com>
-Subject: Re: Qemu API documentation
-To: Priyamvad Acharya <priyamvad.agnisys@gmail.com>
+Date: Wed, 18 Mar 2020 11:12:11 +0000
+Message-ID: <CAFEAcA_6SBf61GpVVMc6m_zQHbtr9HUfiwP00wKjartH70k2tA@mail.gmail.com>
+Subject: Re: [PATCH] Documentation: create/move s390x documentation
+To: Cornelia Huck <cohuck@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,27 +85,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Janosch Frank <frankja@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Mar 2020 at 09:55, Priyamvad Acharya
-<priyamvad.agnisys@gmail.com> wrote:
+On Wed, 18 Mar 2020 at 10:39, Cornelia Huck <cohuck@redhat.com> wrote:
 >
-> Hello developer community,
+> Create a subdirectory for s390x under docs/system/ and move the
+> existing vfio-ap documentation there.
 >
-> I am working on implementing a custom device in Qemu, so to implement it I need documentation of functions which are used to emulate a hardware model in Qemu.
+> Create an initial document describing s390x system emulation.
 >
-> What are the references to get it ?
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>
+> Mostly an initial version so that Janosch can base his protected virt
+> documentation on something; there's room for more here :)
+>
+> If this looks good, I'll queue it on my s390-next branch for 5.1.
 
-QEMU has very little documentation of its internals;
-the usual practice is to figure things out by
-reading the source code. What we do have is in
-docs/devel. There are also often documentation comments
-for specific functions in the include files where
-those functions are declared, which form the API
-documentation for them.
+I would be happy to take documentation cleanups like this
+for 5.0 during the early to mid part of freeze.
 
 thanks
 -- PMM
