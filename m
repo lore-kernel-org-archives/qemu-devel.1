@@ -2,68 +2,76 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2350C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED548C5ACD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D29620767
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:13:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D29620767
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BE74B20768
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 04:21:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE74B20768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEQ4u-00057f-M5
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 00:13:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34485)
+	id 1jEQD1-0006RG-0N
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 00:21:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jEQ4M-0004ik-0k
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:12:39 -0400
+ (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jEQCC-00060w-9X
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jEQ4K-0007Cr-Ev
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:12:37 -0400
-Resent-Date: Wed, 18 Mar 2020 00:12:37 -0400
-Resent-Message-Id: <E1jEQ4K-0007Cr-Ev@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21112)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jEQ4K-0006zt-6J
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:12:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584504741; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mDuT3kya/Ie8BH2fhjCfB9uhJHwv+WCYxN+xannbxpDUEpmW6IBzZmC4GKaYGjZG9GmQuSesBQDwQurXtVxMsT7Q5een4MCoXlohbJhhNrMaoI/zZMww1UqkW/0E1Z1aFo+YWJZyYTIu3vZakbGUTtAxnF+PsE428zaRXvGdmLg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584504741;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=8RS22Mu0gbYBzUgQahwqPScGGP3gxAJIvUO4LbGx/5E=; 
- b=UEgsJHIcz7m8qCMDpvTrKE3hkQQi70z2VXQrL/F+rx9RWvHoeQclGtb7fYafbXEgxeGsBHpqZtbwmp3oMqS7Gi0aqttLiWt6eD14RoXTXKIk9O30K+9TTq6ZsRm6qWffMyznB+POwpIAMLZb/VgRUAasMGyjnANjnSXSOowovOg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584504738262135.66000947514613;
- Tue, 17 Mar 2020 21:12:18 -0700 (PDT)
-In-Reply-To: <20200318011217.2102748-1-ehabkost@redhat.com>
-Subject: Re: [PULL 0/4] Python queue for 5.0 soft freeze
-Message-ID: <158450473711.25478.16951249008771308992@39012742ff91>
+ (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jEQCA-0001nu-Ed
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 00:20:43 -0400
+Received: from mga18.intel.com ([134.134.136.126]:3104)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jEQCA-0001ar-50; Wed, 18 Mar 2020 00:20:42 -0400
+IronPort-SDR: mPMes4ZIliJ30Tcpn6pnKpifONJ8wpNeL3wsrmhUOTK3i1QEOqTjJsiV+uiCAXaz4eTx7nMtZQ
+ U+O4iL0l2wLA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Mar 2020 21:20:33 -0700
+IronPort-SDR: bQj5+7MYzyQxC7P8oUBFjvB6wJTt32sjoZfcuVNv1TXMgcFzA+fJ0/6E2EUWsJBQcnlo8UeuAV
+ wfuliYshzmyQ==
+X-IronPort-AV: E=Sophos;i="5.70,566,1574150400"; d="scan'208";a="391311957"
+Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
+ ([10.254.9.59])
+ by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Mar 2020 21:20:33 -0700
+Subject: Re: [PATCH RESEND v2] block/nvme: introduce PMR support from NVMe 1.4
+ spec
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <20200306223853.37958-1-andrzej.jakowski@linux.intel.com>
+ <20200310095147.GC140737@stefanha-x1.localdomain>
+ <15b8a77d-50de-2228-a0e6-a461b82f1873@linux.intel.com>
+ <CAJSP0QXatOWgicLo5sGt9KA2QupC2qXD2LCdHWKgHFdzgt9pEg@mail.gmail.com>
+ <12576914-0ef4-efd2-355a-cff3f4eeae69@linux.intel.com>
+ <20200312060827.gjddwgmevyptsmpl@apples.localdomain>
+ <20200316113216.GB449975@stefanha-x1.localdomain>
+ <cf3833cc-fbd1-9930-fee1-ed9b26647f1c@linux.intel.com>
+ <CAJSP0QUmO2sbCscL=f+=Ps8Wud5vcxWmL0U64Jy7XJ7VPuQGFA@mail.gmail.com>
+From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Message-ID: <eaeefd2d-fa51-8141-e53d-fa9cee2ca1f3@linux.intel.com>
+Date: Tue, 17 Mar 2020 21:20:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ehabkost@redhat.com
-Date: Tue, 17 Mar 2020 21:12:18 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+In-Reply-To: <CAJSP0QUmO2sbCscL=f+=Ps8Wud5vcxWmL0U64Jy7XJ7VPuQGFA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,58 +83,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- crosa@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>,
+ qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Dave Gilbert <dgilbert@redhat.com>, kbusch@kernel.org,
+ Zhang Yi <yi.z.zhang@linux.intel.com>, "He, Junyan" <junyan.he@intel.com>,
+ Klaus Birkelund Jensen <its@irrelevant.dk>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxODAxMTIxNy4yMTAy
-NzQ4LTEtZWhhYmtvc3RAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMC80XSBQeXRob24gcXVldWUgZm9yIDUuMCBz
-b2Z0IGZyZWV6ZQpNZXNzYWdlLWlkOiAyMDIwMDMxODAxMTIxNy4yMTAyNzQ4LTEtZWhhYmtvc3RA
-cmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMWI0ZjZmMyBNQUlOVEFJTkVSUzogYWRkIHNp
-bXBsZWJlbmNoCjU3YjQyYjYgc2NyaXB0cy9zaW1wbGViZW5jaDogYWRkIGV4YW1wbGUgdXNhZ2Ug
-b2Ygc2ltcGxlYmVuY2gKOTllYTRkNyBzY3JpcHRzL3NpbXBsZWJlbmNoOiBhZGQgcWVtdS9iZW5j
-aF9ibG9ja19qb2IucHkKMTk2Zjk3ZCBzY3JpcHRzL3NpbXBsZWJlbmNoOiBhZGQgc2ltcGxlYmVu
-Y2gucHkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNCBDaGVja2luZyBjb21taXQgMTk2Zjk3ZDg1
-NjZkIChzY3JpcHRzL3NpbXBsZWJlbmNoOiBhZGQgc2ltcGxlYmVuY2gucHkpCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzE2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBwbGVhc2UgdXNlIHB5dGhv
-bjMgaW50ZXJwcmV0ZXIKIzIxOiBGSUxFOiBzY3JpcHRzL3NpbXBsZWJlbmNoL3NpbXBsZWJlbmNo
-LnB5OjE6CisjIS91c3IvYmluL2VudiBweXRob24KCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5n
-cywgMTI4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKMi80IENoZWNraW5nIGNvbW1pdCA5OWVhNGQ3M2JiYTggKHNjcmlwdHMvc2ltcGxlYmVuY2g6
-IGFkZCBxZW11L2JlbmNoX2Jsb2NrX2pvYi5weSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTY6IApuZXcg
-ZmlsZSBtb2RlIDEwMDc1NQoKRVJST1I6IHBsZWFzZSB1c2UgcHl0aG9uMyBpbnRlcnByZXRlcgoj
-MjE6IEZJTEU6IHNjcmlwdHMvc2ltcGxlYmVuY2gvYmVuY2hfYmxvY2tfam9iLnB5OjE6CisjIS91
-c3IvYmluL2VudiBweXRob24KCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTE5IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDIvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy80IENoZWNr
-aW5nIGNvbW1pdCA1N2I0MmI2OTFmN2IgKHNjcmlwdHMvc2ltcGxlYmVuY2g6IGFkZCBleGFtcGxl
-IHVzYWdlIG9mIHNpbXBsZWJlbmNoKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMTogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDgwIGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDMvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0LzQgQ2hlY2tpbmcgY29tbWl0
-IDFiNGY2ZjM4NTBmNCAoTUFJTlRBSU5FUlM6IGFkZCBzaW1wbGViZW5jaCkKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMTgwMTEyMTcuMjEw
-Mjc0OC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+On 3/17/20 4:23 AM, Stefan Hajnoczi wrote:
+>> Code is posted here
+>> https://github.com/AndrzejJakowski/qemu/commit/3a7762a1d13ff1543d1da430748eb24e38faab6f
+>>
+>> QEMU command line:
+>>
+>> # below are just relevant pieces of configuration, other stuff omitted
+>> # tried different setting (e.g. pmem=on and pmem=off)
+>>
+>> ./x86_64-softmmu/qemu-system-x86_64 ... \
+>> -object memory-backend-file,id=mem1,share=off,pmem=on,mem-path=../nvme_pmr.bin,size=$((1*1024*1024)) \
+> share=off is MAP_PRIVATE.  If persistence is desired then share=on
+> should be used.
+> 
+> However, this shouldn't affect "system_reset" behavior since the QEMU
+> process still has the same mapped file open.
+> 
+
+Hi Stefan,
+
+Thx!! share=off setting was the problem. I confirmed with my simple test
+that persistence is achieved.
+I didn't find API to perform flush (msync). Any suggestion what function to use?
+
+Given that host memory backend is working I think my patch is almost ready for 
+resubmission -- let me know if there are any other comments.
+
+Andrzej
+
+>> -drive file=../nvme.bin,format=raw,if=none,id=nvme_emulated \
+>> -device nvme,drive=nvme_emulated,serial="test serial",pmrdev=mem1
+>>
+>> In VM:
+>> My persisent memory region is exposed PCI BAR
+>> Region 2: Memory at fe000000 (64-bit, prefetchable) [size=1M]
+>>
+>> So I perform reads/writes from/to following adress 0xfe000000 (decimal 4261412864)
+>>
+>> dd if=test.bin of=/dev/mem bs=1 count=30 seek=4261412864
+>> dd if=/dev/mem of=test1.bin bs=1 count=30 skip=4261412864
+> Did you verify that the guest kernel is really accessing the BAR?  I
+> remember that distro kernels often ship with options that make
+> /dev/mem of limited use because it's considered insecure.
+> 
+>> On VMM I didn't observe that backing file has been updated and after power cycling VM
+>> I see old junk when reading PMR region.
+> Did you check that the pmrdev mmap region contains the data the guest
+> wrote before power cycling?
+> 
+>> Also from include/qemu/pmem.h it looks like pmem_persist() will cause qemu to exit
+>> if libpmem is not installed:
+> The libpmem support only needs to be used when the pmem=on option was
+> given.  If there isn't a physical pmem device then it doesn't need to
+> be used.
+> 
+> Stefan
+
 
