@@ -2,84 +2,88 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B128C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C130C5ACD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:19:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44CDD2076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:18:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5ACB02076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="WknkTaD9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44CDD2076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpBeN90n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ACB02076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEVm5-0002S3-Dp
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:18:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37401)
+	id 1jEVn7-0003xZ-Ix
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:19:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39362)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=2346c1f04e=bbhushan2@marvell.com>)
- id 1jEVgw-0002pP-7G
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:12:51 -0400
+ (envelope-from <bharatb.linux@gmail.com>) id 1jEVlu-0002Uy-6w
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=2346c1f04e=bbhushan2@marvell.com>)
- id 1jEVgu-00055w-VP
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:12:50 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:50972)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=2346c1f04e=bbhushan2@marvell.com>)
- id 1jEVgu-00055J-QP; Wed, 18 Mar 2020 06:12:48 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
- by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02IABn5a030628; Wed, 18 Mar 2020 03:12:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0818; bh=EPTWRH4j/7+vQYg4JTRs7Id0RV8zi4mhxOYnQxamw9E=;
- b=WknkTaD9KiEVbj4ysm+kpXckxeLvVwT+/C1G9Ww3cj2J8pu0BwQpnfIO6xHIv2hiYNXq
- TVbO4nhjq6MZszgcvV+aWbL1yDWyXEir3VoESYKga3dLOGIMeu0YKipRgYN404nJVJmu
- 0vVaNm6DML6J/HtxXV4UIjRxfZ1Nt4mPVjq+/sU7dmp1u4uRbTCB6IKcHunS8x7TFMUU
- kSo7H+zB9Ld8o3/zQAXGVZtLqh2RoM5COwbLKTeMPZyPfi3kQHk3OC1XnoGekiiKRis0
- sudlzQd3QSwOZB5b64B1cGMgI2I6RurEPkfAW4LfekeMtgcIp6KjsZSpH4Yr3CB3NDAt rQ== 
-Received: from sc-exch03.marvell.com ([199.233.58.183])
- by mx0b-0016f401.pphosted.com with ESMTP id 2yu9rp9tvp-2
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Wed, 18 Mar 2020 03:12:46 -0700
-Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 18 Mar
- 2020 03:12:41 -0700
-Received: from bbhushan2.marvell.com (10.93.176.43) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 18 Mar 2020 03:12:37 -0700
-From: Bharat Bhushan <bbhushan2@marvell.com>
-To: <peter.maydell@linaro.org>, <peterx@redhat.com>,
- <eric.auger.pro@gmail.com>, <alex.williamson@redhat.com>,
- <kevin.tian@intel.com>, <mst@redhat.com>, <tnowicki@marvell.com>,
- <drjones@redhat.com>, <linuc.decode@gmail.com>,
- <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
- <bharatb.linux@gmail.com>, <jean-philippe@linaro.org>,
- <yang.zhong@intel.com>
-Subject: [PATCH v8 6/8] virtio-iommu: Call iommu notifier for attach/detach
-Date: Wed, 18 Mar 2020 15:41:57 +0530
-Message-ID: <20200318101159.8767-7-bbhushan2@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200318101159.8767-1-bbhushan2@marvell.com>
-References: <20200318101159.8767-1-bbhushan2@marvell.com>
+ (envelope-from <bharatb.linux@gmail.com>) id 1jEVls-0007gc-Ij
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:17:58 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:35685)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bharatb.linux@gmail.com>)
+ id 1jEVls-0007eV-Ea; Wed, 18 Mar 2020 06:17:56 -0400
+Received: by mail-qt1-x844.google.com with SMTP id v15so20161871qto.2;
+ Wed, 18 Mar 2020 03:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YfcHd60/dJetYFRb9sg2e77ZWneZZBfevAMmE0OYj0w=;
+ b=IpBeN90nFk4M7I5c/hBhd857zudGJpZV1V0NUgqhQSjBXoq+cgqer2+//BE6RVzBZu
+ 3t1uJ1jy2QY1xm8Yc0ygcV6wJBLDs0hNIsg31wkV9xFyR27dzMw9oQJY4kHWj+XV30EY
+ Ot7D2fwRapCqK56xkBZGbKYY7bAINM/9DPMWB2kw8z0D4HoTMtc5CD6S3UW2DpMHlHXE
+ MEIPSljdcdHuyLNJZI4/t+2jR0gMWDnOPxBR8BxbC5anRbm6RzeQcKl7/90H3hU/JInp
+ 0yQM0XlL9SVpXyiGa68wv/lE5l53odIw1xrU+B1VntnEQ0mbMvLf4H8jyJSBLhQ95t2f
+ 1keg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YfcHd60/dJetYFRb9sg2e77ZWneZZBfevAMmE0OYj0w=;
+ b=VkBQIblMiIj4YYChlmhxl06LfNgupsOyccmEX4xhXnsQNXPAeVH+comD66NW0DHtAG
+ VeS7+9Xa+fvmEtg/i2KIQuN7QIcuKZ0J5Btt8mBKZXj9QLpufIuZzt7aLzRPo49xUOLx
+ OaG7RSlbJzfVz8E4qJrupkRTWYr9KGrWdDqTYhlzCf3PH6xoCiB3TNbXTWbwXpkNENCe
+ L5ZDilWbTn1d+Eshh9aat5iin6bsvChuetoF4KrBvOqe4gcN2aO8rKkGGp6url5TsU8j
+ DFlDUxb9I64KCjVFPxNG1toGKK/sqqUwmG8Dd+MBkWQ87wiDgSsPKc2XGQ4bXNWNh6pA
+ U7Hw==
+X-Gm-Message-State: ANhLgQ2wBLfNBk4tWosnvWDDHWcp6sPTx2lO0+YrIksboIpfn62WwbO1
+ P59tsYYZ9/imOJ9h2Ul0cK0UFbzVx6iOBkINeBs=
+X-Google-Smtp-Source: ADFU+vtf5Utd7lm9clRBpfi1NLaltmUREgqpVlLZ0+fRxzH7fPiby0QtgfWZgQxVr2FBGCUigdleQB2v7VorcI1R+1w=
+X-Received: by 2002:ac8:4548:: with SMTP id z8mr3686989qtn.188.1584526675502; 
+ Wed, 18 Mar 2020 03:17:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-18_04:2020-03-18,
- 2020-03-18 signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 67.231.156.173
+References: <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
+ <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
+ <CAAeCc_ksAdoNJcFWkoB4YcySAb5Hw7D+kLyHx-Nt0hZJY17AXA@mail.gmail.com>
+ <CAAeCc_nnM-DGCyXjFJuk-6L8F+Oetq076SEjeV8kUAGxfJVQTw@mail.gmail.com>
+ <cc447790-d1c5-784b-9706-fbcd76f0c94b@redhat.com>
+ <CAAeCc_mSobL4oGcK-J3WJJq8BCS6M_oyPTrzJ9bk8yFgsUDBUw@mail.gmail.com>
+ <20200316101124.GA304669@myrica>
+ <CAAeCc_kJq_TjbZxf3Un5rpwBrNrz-8gdL_SMS-gP_0=rARf0WQ@mail.gmail.com>
+ <20200317085304.GA1057687@myrica>
+ <CAAeCc_n8_sY0EJODeo_PrOZ22zp8nUMOmGx2tBewz8jLaU30kA@mail.gmail.com>
+ <20200317155929.GB1057687@myrica>
+In-Reply-To: <20200317155929.GB1057687@myrica>
+From: Bharat Bhushan <bharatb.linux@gmail.com>
+Date: Wed, 18 Mar 2020 15:47:44 +0530
+Message-ID: <CAAeCc_k_7Ny1Kf2ZiAAJe2xms2bdK-DqB1S2ro+omxp0EWi28g@mail.gmail.com>
+Subject: Re: [PATCH v7 3/5] virtio-iommu: Call iommu notifier for attach/detach
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::844
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,121 +95,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bharat Bhushan <bbhushan2@marvell.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, drjones@redhat.com, peterx@redhat.com,
+ qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ Bharat Bhushan <bbhushan2@marvell.com>, linuc.decode@gmail.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-iommu-notifier are called when a device is attached
-or detached to as address-space.
-This is needed for VFIO.
+Hi Jean,
 
-Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
----
- hw/virtio/virtio-iommu.c | 49 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+On Tue, Mar 17, 2020 at 9:29 PM Jean-Philippe Brucker
+<jean-philippe@linaro.org> wrote:
+>
+> On Tue, Mar 17, 2020 at 02:46:55PM +0530, Bharat Bhushan wrote:
+> > Hi Jean,
+> >
+> > On Tue, Mar 17, 2020 at 2:23 PM Jean-Philippe Brucker
+> > <jean-philippe@linaro.org> wrote:
+> > >
+> > > On Tue, Mar 17, 2020 at 12:40:39PM +0530, Bharat Bhushan wrote:
+> > > > Hi Jean,
+> > > >
+> > > > On Mon, Mar 16, 2020 at 3:41 PM Jean-Philippe Brucker
+> > > > <jean-philippe@linaro.org> wrote:
+> > > > >
+> > > > > Hi Bharat,
+> > > > >
+> > > > > Could you Cc me on your next posting?  Unfortunately I don't have much
+> > > > > hardware for testing this at the moment, but I might be able to help a
+> > > > > little on the review.
+> > > > >
+> > > > > On Mon, Mar 16, 2020 at 02:40:00PM +0530, Bharat Bhushan wrote:
+> > > > > > > >>> First issue is: your guest can use 4K page and your host can use 64KB
+> > > > > > > >>> pages. In that case VFIO_DMA_MAP will fail with -EINVAL. We must devise
+> > > > > > > >>> a way to pass the host settings to the VIRTIO-IOMMU device.
+> > > > > > > >>>
+> > > > > > > >>> Even with 64KB pages, it did not work for me. I have obviously not the
+> > > > > > > >>> storm of VFIO_DMA_MAP failures but I have some, most probably due to
+> > > > > > > >>> some wrong notifications somewhere. I will try to investigate on my side.
+> > > > > > > >>>
+> > > > > > > >>> Did you test with VFIO on your side?
+> > > > > > > >>
+> > > > > > > >> I did not tried with different page sizes, only tested with 4K page size.
+> > > > > > > >>
+> > > > > > > >> Yes it works, I tested with two n/w device assigned to VM, both interfaces works
+> > > > > > > >>
+> > > > > > > >> First I will try with 64k page size.
+> > > > > > > >
+> > > > > > > > 64K page size does not work for me as well,
+> > > > > > > >
+> > > > > > > > I think we are not passing correct page_size_mask here
+> > > > > > > > (config.page_size_mask is set to TARGET_PAGE_MASK ( which is
+> > > > > > > > 0xfffffffffffff000))
+> > > > > > > I guess you mean with guest using 4K and host using 64K.
+> > > > > > > >
+> > > > > > > > We need to set this correctly as per host page size, correct?
+> > > > > > > Yes that's correct. We need to put in place a control path to retrieve
+> > > > > > > the page settings on host through VFIO to inform the virtio-iommu device.
+> > > > > > >
+> > > > > > > Besides this issue, did you try with 64kB on host and guest?
+> > > > > >
+> > > > > > I tried Followings
+> > > > > >   - 4k host and 4k guest  - it works with v7 version
+> > > > > >   - 64k host and 64k guest - it does not work with v7
+> > > > > >     hard-coded config.page_size_mask to 0xffffffffffff0000 and it works
+> > > > >
+> > > > > You might get this from the iova_pgsize bitmap returned by
+> > > > > VFIO_IOMMU_GET_INFO. The virtio config.page_size_mask is global so there
+> > > > > is the usual problem of aggregating consistent properties, but I'm
+> > > > > guessing using the host page size as a granule here is safe enough.
+> > > > >
+> > > > > If it is a problem, we can add a PROBE property for page size mask,
+> > > > > allowing to define per-endpoint page masks. I have kernel patches
+> > > > > somewhere to do just that.
+> > > >
+> > > > I do not see we need page size mask per endpoint.
+> > > >
+> > > > While I am trying to understand what "page-size-mask" guest will work with
+> > > >
+> > > > - 4K page size host and 4k page size guest
+> > > >   config.page_size_mask = 0xffffffffffff000 will work
+> > > >
+> > > > - 64K page size host and 64k page size guest
+> > > >   config.page_size_mask = 0xfffffffffff0000 will work
+> > > >
+> > > > - 64K page size host and 4k page size guest
+> > > >    1) config.page_size_mask = 0xffffffffffff000 will also not work as
+> > > > VFIO in host expect iova and size to be aligned to 64k (PAGE_SIZE in
+> > > > host)
+> > > >    2) config.page_size_mask = 0xfffffffffff0000 will not work, iova
+> > > > initialization (in guest) expect minimum page-size supported by h/w to
+> > > > be equal to 4k (PAGE_SIZE in guest)
+> > > >        Should we look to relax this in iova allocation code?
+> > >
+> > > Oh right, that's not great. Maybe the BUG_ON() can be removed, I'll ask on
+> > > the list.
+> >
+> > yes, the BUG_ON in iova_init.
+> > I tried with removing same and it worked, but not analyzed side effects.
+>
+> It might break the assumption from device drivers that mapping a page is
+> safe. For example they call alloc_page() followed by dma_map_page(). In
+> our situation dma-iommu.c will oblige and create one 64k mapping to one 4k
+> physical page. As a result the endpoint can access the neighbouring 60k of
+> memory.
+>
+> This isn't too terrible. After all, even when the page sizes match, device
+> drivers can call dma_map_single() on sub-page buffers, which will also let
+> the endpoint access a whole page. The solution, if you don't trust the
+> endpoint, is to use bounce buffers.
+>
+> But I suspect it's not as simple as removing the BUG_ON(), we'll need to
+> go over dma-iommu.c first. And it seems like assigning endpoints to guest
+> userspace won't work either in this config. In vfio_dma_do_map():
+>
+>         mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+>
+>         WARN_ON(mask & PAGE_MASK);
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 623b477b9c..4d522a636a 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -49,6 +49,7 @@ typedef struct VirtIOIOMMUEndpoint {
-     uint32_t id;
-     VirtIOIOMMUDomain *domain;
-     QLIST_ENTRY(VirtIOIOMMUEndpoint) next;
-+    VirtIOIOMMU *viommu;
- } VirtIOIOMMUEndpoint;
- 
- typedef struct VirtIOIOMMUInterval {
-@@ -155,11 +156,48 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
-     memory_region_notify_iommu(mr, 0, entry);
- }
- 
-+static gboolean virtio_iommu_mapping_unmap(gpointer key, gpointer value,
-+                                           gpointer data)
-+{
-+    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-+    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-+
-+    virtio_iommu_notify_unmap(mr, interval->low,
-+                              interval->high - interval->low + 1);
-+
-+    return false;
-+}
-+
-+static gboolean virtio_iommu_mapping_map(gpointer key, gpointer value,
-+                                         gpointer data)
-+{
-+    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
-+    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-+    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-+
-+    virtio_iommu_notify_map(mr, interval->low, mapping->phys_addr,
-+                            interval->high - interval->low + 1);
-+
-+    return false;
-+}
-+
- static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
- {
-+    VirtIOIOMMU *s = ep->viommu;
-+    VirtIOIOMMUDomain *domain = ep->domain;
-+    IOMMUDevice *sdev;
-+
-     if (!ep->domain) {
-         return;
-     }
-+
-+    QLIST_FOREACH(sdev, &s->notifiers_list, next) {
-+        if (ep->id == sdev->devfn) {
-+            g_tree_foreach(domain->mappings, virtio_iommu_mapping_unmap,
-+                           &sdev->iommu_mr);
-+        }
-+    }
-+
-     QLIST_REMOVE(ep, next);
-     ep->domain = NULL;
- }
-@@ -178,6 +216,7 @@ static VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
-     }
-     ep = g_malloc0(sizeof(*ep));
-     ep->id = ep_id;
-+    ep->viommu = s;
-     trace_virtio_iommu_get_endpoint(ep_id);
-     g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
-     return ep;
-@@ -274,6 +313,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-     uint32_t ep_id = le32_to_cpu(req->endpoint);
-     VirtIOIOMMUDomain *domain;
-     VirtIOIOMMUEndpoint *ep;
-+    IOMMUDevice *sdev;
- 
-     trace_virtio_iommu_attach(domain_id, ep_id);
- 
-@@ -299,6 +339,14 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
- 
-     ep->domain = domain;
- 
-+    /* Replay domain mappings on the associated memory region */
-+    QLIST_FOREACH(sdev, &s->notifiers_list, next) {
-+        if (ep_id == sdev->devfn) {
-+            g_tree_foreach(domain->mappings, virtio_iommu_mapping_map,
-+                           &sdev->iommu_mr);
-+        }
-+    }
-+
-     return VIRTIO_IOMMU_S_OK;
- }
- 
-@@ -873,6 +921,7 @@ static gboolean reconstruct_endpoints(gpointer key, gpointer value,
- 
-     QLIST_FOREACH(iter, &d->endpoint_list, next) {
-         iter->domain = d;
-+        iter->viommu = s;
-         g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
-     }
-     return false; /* continue the domain traversal */
--- 
-2.17.1
+Yes, Agree
 
+>
+> If I read this correctly the WARN will trigger in a 4k guest under 64k
+> host, right?  So maybe we can just say that this config isn't supported,
+> unless it's an important use-case for virtio-iommu?
+
+I sent v8 version of patch and with that guest and host with same page
+size should work.
+While i have not yet added analyzed how to mark 4k guest and 64k host
+as un-supported configuration, will analyze and send patch.
+
+Thanks
+-Bharat
+
+>
+> Thanks,
+> Jean
+>
 
