@@ -2,155 +2,99 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EEAC4332D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA34AC4332B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:32:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 033052076F
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:32:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B236F2076F
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 22:32:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4Wdaaa4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 033052076F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLgl/ITp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B236F2076F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEhEI-00022s-6Z
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 18:32:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37609)
+	id 1jEhEk-0002dy-Sd
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 18:32:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jEhAd-0005bD-RG
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:28:16 -0400
+ (envelope-from <philmd@redhat.com>) id 1jEhDr-0001mV-NR
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jEhAc-000557-Jl
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:28:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:30845)
+ (envelope-from <philmd@redhat.com>) id 1jEhDq-0005Fd-9A
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:31:35 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:46279)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jEhAc-00054K-E2
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:28:14 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEhDq-0005Dc-51
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 18:31:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584570494;
+ s=mimecast20190719; t=1584570693;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=GbGD9Kra/tNkRup/2rQPJerSKnIO/YnsUfdz0rZtPfQ=;
- b=U4Wdaaa455M07dVGKPjxgX6itc4XJaRKqQVPFqkbX9Tt0q34sxLr4qYZXqfJGWCXCgsxlf
- kezxw9z1bLtvF2P6aXXrobzUiaTIfoRQIO17B/AM7PBJpMfbhghux7FwBomdAmH7M39Pwf
- N+6XbNvEphWb382+CxTneraGRRY0r7w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-0Gd9el7xOgiiv8syikBX9Q-1; Wed, 18 Mar 2020 18:28:12 -0400
-X-MC-Unique: 0Gd9el7xOgiiv8syikBX9Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40F0A100550E;
- Wed, 18 Mar 2020 22:28:11 +0000 (UTC)
-Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 43D4960BEC;
- Wed, 18 Mar 2020 22:28:06 +0000 (UTC)
-Subject: Re: [PATCH v3] fdc/i8257: implement verify transfer mode
-To: Sven Schnelle <svens@stackframe.org>
-References: <20191101165513.14229-1-svens@stackframe.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <21ed0130-1597-d364-995d-6bfd156c9288@redhat.com>
-Date: Wed, 18 Mar 2020 18:28:05 -0400
+ in-reply-to:in-reply-to:references:references;
+ bh=tZWB/4/QHkBs1WYgfcoh+dupaQRe27/BgTbIcZHr97k=;
+ b=hLgl/ITpFgNp1awbnq2opVNx15cYy3CJeVRMBOXQKZwEUAjw4uOg5jm2nviYTH86A9qoue
+ NVWTBs4kwURlp3MP43JjCMj64J7kp+2wwlq/Cnk+3kvTV3RwzKkA19sdDPt0TyGV/IHpd2
+ CgRH8cudHDk2GlsFmYFYFGw5IhIqg10=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-CyzHcasCN5yf8uxqFL0zQw-1; Wed, 18 Mar 2020 18:31:29 -0400
+X-MC-Unique: CyzHcasCN5yf8uxqFL0zQw-1
+Received: by mail-wr1-f72.google.com with SMTP id u12so28062wrw.10
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 15:31:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kCdJq3LoL5hHTpGMpnQ3+srtEBY81UHtDEa+jCv1AX0=;
+ b=iCeahckfm964DTIpEiTrBFIvj9cLAd2XBOqUq95ELc0Kb3Izolu6dO9lgky8K/Rlyh
+ Nox5DgZH2Jveu3xJ8Ljo9flPnEpYKvnJDjy6mhnheIofinwdQhaUzvo8ONosdHt2pjoj
+ pgz1+A8VAI/yB97GkWf+GAjq5JtbkOGY9JHFqeGKEXMbJ1mtjuuWdcRUhhJTaZQm8m8t
+ kxRbNXCw9FxEXMu7RzH3iOFNYlpzNdrklOCjLftRLDMd6EleTI3+9Fy55yJkwFpfXs1J
+ 4tK9dKL1jvq9KahwsiWO7N30rSYbL9dloPLcEdG/kdknSpmcLhlFiGhkXKIk5WB6z5u+
+ 0bBg==
+X-Gm-Message-State: ANhLgQ2l3AsdIjGPKaiO2RIea17dJZ/icJoBi+n1pCfhMzr+oBtpuxPW
+ /jU1ucS15VHkA1L+qnoShos8ZddHHhXPZipvP5GfStnFCPTreEyk8FXdI6UYwcCrsKoqNH7jHyd
+ 5f7B8z6KOB/4nIfQ=
+X-Received: by 2002:a1c:2d4f:: with SMTP id t76mr7430189wmt.60.1584570688591; 
+ Wed, 18 Mar 2020 15:31:28 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtc+jFwO7VQ/xbBuJEeVD7o/n1Mf/I6It0UoOMkjCqxOvOTvRiQ1yq5pYEcVhre23OB2ayXUw==
+X-Received: by 2002:a1c:2d4f:: with SMTP id t76mr7430160wmt.60.1584570688355; 
+ Wed, 18 Mar 2020 15:31:28 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id q10sm396607wrx.12.2020.03.18.15.31.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Mar 2020 15:31:27 -0700 (PDT)
+Subject: Re: [PATCH 5/4] scripts/simplebench: fix python script ! headers
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200318011217.2102748-1-ehabkost@redhat.com>
+ <20200318170226.12186-1-vsementsov@virtuozzo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8636cd05-4817-c2c4-5741-494069ba152b@redhat.com>
+Date: Wed, 18 Mar 2020 23:31:26 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20191101165513.14229-1-svens@stackframe.org>
+In-Reply-To: <20200318170226.12186-1-vsementsov@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,52 +106,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, aleksandar.qemu.devel@gmail.com,
+ ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 11/1/19 12:55 PM, Sven Schnelle wrote:
-> While working on the Tulip driver i tried to write some Teledisk images t=
-o
-> a floppy image which didn't work. Turned out that Teledisk checks the wri=
-tten
-> data by issuing a READ command to the FDC but running the DMA controller
-> in VERIFY mode. As we ignored the DMA request in that case, the DMA trans=
-fer
-> never finished, and Teledisk reported an error.
+On 3/18/20 6:02 PM, Vladimir Sementsov-Ogievskiy wrote:
+> - simplebench.py is not for executing by itself, so drop the header
+> - in bench_block_job.py fix python to python3
 >=20
-> The i8257 spec says about verify transfers:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   scripts/simplebench/bench_block_job.py | 2 +-
+>   scripts/simplebench/simplebench.py     | 2 --
+>   2 files changed, 1 insertion(+), 3 deletions(-)
 >=20
-> 3) DMA verify, which does not actually involve the transfer of data. When=
- an
-> 8257 channel is in the DMA verify mode, it will respond the same as descr=
-ibed
-> for transfer operations, except that no memory or I/O read/write control =
-signals
-> will be generated.
+> diff --git a/scripts/simplebench/bench_block_job.py b/scripts/simplebench=
+/bench_block_job.py
+> index 9808d696cf..a0dda1dc4e 100755
+> --- a/scripts/simplebench/bench_block_job.py
+> +++ b/scripts/simplebench/bench_block_job.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/env python
+> +#!/usr/bin/env python3
+>   #
+>   # Benchmark block jobs
+>   #
+> diff --git a/scripts/simplebench/simplebench.py b/scripts/simplebench/sim=
+plebench.py
+> index 59e7314ff6..7e25f3590b 100644
+> --- a/scripts/simplebench/simplebench.py
+> +++ b/scripts/simplebench/simplebench.py
+> @@ -1,5 +1,3 @@
+> -#!/usr/bin/env python
+> -#
+>   # Simple benchmarking framework
+>   #
+>   # Copyright (c) 2019 Virtuozzo International GmbH.
 >=20
-> Herv=C3=A9 proposed to remove all the dma_mode_ok stuff from fdc to have =
-a more
-> clear boundary between DMA and FDC, so this patch also does that.
->=20
-> Suggested-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> Signed-off-by: Sven Schnelle <svens@stackframe.org>
 
-I know it's many many moons later; I was out of the country for a month
-when this patch arrived, and I lost track of it under my email backlog.
-
-It looks reviewed and good to go, so I am staging it locally and testing it=
-.
-
-Thanks,
---js
+I'd rather see this squashed in patches 1 and 2, if not:
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 
