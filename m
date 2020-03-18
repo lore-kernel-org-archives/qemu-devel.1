@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6E1C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C656C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:15:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69570206EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:14:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2425820663
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 01:15:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VAa6s4CF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69570206EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FNa5LXeU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2425820663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jENHV-0000NT-HV
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 21:14:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57433)
+	id 1jENIb-0002P1-7x
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 21:15:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1jENG7-0007Ty-Bk
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:36 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1jENG5-0004i3-SN
+ (envelope-from <ehabkost@redhat.com>) id 1jENG6-0007TW-Ud
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:35 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41668)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <ehabkost@redhat.com>) id 1jENG6-0004in-0G
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:34 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33173)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jENG1-0004fx-LC
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jENG5-0004hP-Sd
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 21:12:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584493949;
+ s=mimecast20190719; t=1584493951;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=h6CSWcVjwf/mR4GA8o7TUHijgY6z8lbK7E/cQiK0XOA=;
- b=VAa6s4CFrye3cuxw0zXCSlZ7iPwh7qElhp/DxPe8vZXvx2miNrrPUYXIQkzVNCV9LFWvpp
- 6/zqZFwu0QwylVDi+RMw/kiiKYgkg545NVS62GHR6X0797gBCKmQgCL7gNGNGWHn8GtdvB
- MC6OYFvD+HlYOPxnaTA+F22jNov6rnM=
+ bh=NvsIcJn+vDR+XVp29U5PoUNWI6fz3PjojaW3lFBTsCU=;
+ b=FNa5LXeUgaRREFt8s1sEdwTjCNrMNDkRxjpB042F2xfjPv/mLWgnKhOtHE63yZqw2IfdA1
+ obRMoqn9weO9uvv/sysR51/jNhcnMzLpf3hJ3+IXXMntsRJFjOamXO/cJz1bQdZrn5wPcs
+ WzoX9e6+Ux0yEgXLGRUA5uGcBFoUByk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-COwiw_BiM5Gjr-Rzf1XJkw-1; Tue, 17 Mar 2020 21:12:25 -0400
-X-MC-Unique: COwiw_BiM5Gjr-Rzf1XJkw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-467-Wglkl5ALPTWuiDcEsnk0Vg-1; Tue, 17 Mar 2020 21:12:29 -0400
+X-MC-Unique: Wglkl5ALPTWuiDcEsnk0Vg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAB5E13F7;
- Wed, 18 Mar 2020 01:12:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 336AC8017CC;
+ Wed, 18 Mar 2020 01:12:28 +0000 (UTC)
 Received: from localhost (ovpn-118-148.rdu2.redhat.com [10.10.118.148])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 575898AC30;
- Wed, 18 Mar 2020 01:12:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 95D945C1BB;
+ Wed, 18 Mar 2020 01:12:27 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 2/4] scripts/simplebench: add qemu/bench_block_job.py
-Date: Tue, 17 Mar 2020 21:12:15 -0400
-Message-Id: <20200318011217.2102748-3-ehabkost@redhat.com>
+Subject: [PULL 4/4] MAINTAINERS: add simplebench
+Date: Tue, 17 Mar 2020 21:12:17 -0400
+Message-Id: <20200318011217.2102748-5-ehabkost@redhat.com>
 In-Reply-To: <20200318011217.2102748-1-ehabkost@redhat.com>
 References: <20200318011217.2102748-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -94,148 +94,30 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Add block-job benchmarking helper functions.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <20200228071914.11746-3-vsementsov@virtuozzo.com>
+Message-Id: <20200228071914.11746-5-vsementsov@virtuozzo.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/simplebench/bench_block_job.py | 119 +++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
- create mode 100755 scripts/simplebench/bench_block_job.py
+ MAINTAINERS | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/scripts/simplebench/bench_block_job.py b/scripts/simplebench/b=
-ench_block_job.py
-new file mode 100755
-index 0000000000..9808d696cf
---- /dev/null
-+++ b/scripts/simplebench/bench_block_job.py
-@@ -0,0 +1,119 @@
-+#!/usr/bin/env python
-+#
-+# Benchmark block jobs
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7364af0d8b..9b462ef009 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2142,6 +2142,11 @@ F: python/qemu/*py
+ F: scripts/*.py
+ F: tests/*.py
+=20
++Benchmark util
++M: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
++S: Maintained
++F: scripts/simplebench/
 +
-+
-+import sys
-+import os
-+import socket
-+import json
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pytho=
-n'))
-+from qemu.machine import QEMUMachine
-+from qemu.qmp import QMPConnectError
-+
-+
-+def bench_block_job(cmd, cmd_args, qemu_args):
-+    """Benchmark block-job
-+
-+    cmd       -- qmp command to run block-job (like blockdev-backup)
-+    cmd_args  -- dict of qmp command arguments
-+    qemu_args -- list of Qemu command line arguments, including path to Qe=
-mu
-+                 binary
-+
-+    Returns {'seconds': int} on success and {'error': str} on failure, dic=
-t may
-+    contain addional 'vm-log' field. Return value is compatible with
-+    simplebench lib.
-+    """
-+
-+    vm =3D QEMUMachine(qemu_args[0], args=3Dqemu_args[1:])
-+
-+    try:
-+        vm.launch()
-+    except OSError as e:
-+        return {'error': 'popen failed: ' + str(e)}
-+    except (QMPConnectError, socket.timeout):
-+        return {'error': 'qemu failed: ' + str(vm.get_log())}
-+
-+    try:
-+        res =3D vm.qmp(cmd, **cmd_args)
-+        if res !=3D {'return': {}}:
-+            vm.shutdown()
-+            return {'error': '"{}" command failed: {}'.format(cmd, str(res=
-))}
-+
-+        e =3D vm.event_wait('JOB_STATUS_CHANGE')
-+        assert e['data']['status'] =3D=3D 'created'
-+        start_ms =3D e['timestamp']['seconds'] * 1000000 + \
-+            e['timestamp']['microseconds']
-+
-+        e =3D vm.events_wait((('BLOCK_JOB_READY', None),
-+                            ('BLOCK_JOB_COMPLETED', None),
-+                            ('BLOCK_JOB_FAILED', None)), timeout=3DTrue)
-+        if e['event'] not in ('BLOCK_JOB_READY', 'BLOCK_JOB_COMPLETED'):
-+            vm.shutdown()
-+            return {'error': 'block-job failed: ' + str(e),
-+                    'vm-log': vm.get_log()}
-+        end_ms =3D e['timestamp']['seconds'] * 1000000 + \
-+            e['timestamp']['microseconds']
-+    finally:
-+        vm.shutdown()
-+
-+    return {'seconds': (end_ms - start_ms) / 1000000.0}
-+
-+
-+# Bench backup or mirror
-+def bench_block_copy(qemu_binary, cmd, source, target):
-+    """Helper to run bench_block_job() for mirror or backup"""
-+    assert cmd in ('blockdev-backup', 'blockdev-mirror')
-+
-+    source['node-name'] =3D 'source'
-+    target['node-name'] =3D 'target'
-+
-+    return bench_block_job(cmd,
-+                           {'job-id': 'job0', 'device': 'source',
-+                            'target': 'target', 'sync': 'full'},
-+                           [qemu_binary,
-+                            '-blockdev', json.dumps(source),
-+                            '-blockdev', json.dumps(target)])
-+
-+
-+def drv_file(filename):
-+    return {'driver': 'file', 'filename': filename,
-+            'cache': {'direct': True}, 'aio': 'native'}
-+
-+
-+def drv_nbd(host, port):
-+    return {'driver': 'nbd',
-+            'server': {'type': 'inet', 'host': host, 'port': port}}
-+
-+
-+if __name__ =3D=3D '__main__':
-+    import sys
-+
-+    if len(sys.argv) < 4:
-+        print('USAGE: {} <qmp block-job command name> '
-+              '<json string of arguments for the command> '
-+              '<qemu binary path and arguments>'.format(sys.argv[0]))
-+        exit(1)
-+
-+    res =3D bench_block_job(sys.argv[1], json.loads(sys.argv[2]), sys.argv=
-[3:])
-+    if 'seconds' in res:
-+        print('{:.2f}'.format(res['seconds']))
-+    else:
-+        print(res)
+ QAPI
+ M: Markus Armbruster <armbru@redhat.com>
+ M: Michael Roth <mdroth@linux.vnet.ibm.com>
 --=20
 2.24.1
 
