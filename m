@@ -2,98 +2,75 @@ Return-Path: <SRS0=a3Gm=5D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35B6C5ACD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D58C1C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:41:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCCF72076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 990DA2076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Mar 2020 10:41:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FyN0Knu8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCCF72076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzMZEtvI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 990DA2076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEW0B-0005to-S9
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:32:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45653)
+	id 1jEW8Q-0007S1-3v
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 06:41:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jEVzT-0005Ui-Bd
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:32:00 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jEW79-0006jI-9s
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jEVzQ-0007BI-Jg
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:31:58 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:21196)
+ (envelope-from <cohuck@redhat.com>) id 1jEW76-0003v7-R8
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:39:54 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44202)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jEVzQ-00078l-8c
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:31:56 -0400
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jEW75-0003po-SJ
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 06:39:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584527515;
+ s=mimecast20190719; t=1584527990;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WiApycqOKt9PAZe3ZKRpGr+KSowD5eTMDh6PhXhCW7I=;
- b=FyN0Knu8fEt1JGUnJSelXqCKzdiLaeVoQ6L6P9UvPblB0Jed5vQh+OXhoMKCh/7QPHrKEI
- b4RLqWxBbM8e+TMzKcFOtSEzwJbTNJLvo8arpDKW3llWj4+Mc+JiX+wNK9EJHAFZ5VwHw8
- 2N7r4HKKT+t2YOqaIWSMfqlIr55RVgE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-OLlPNCYvPGKJMYjpFXzYig-1; Wed, 18 Mar 2020 06:31:53 -0400
-X-MC-Unique: OLlPNCYvPGKJMYjpFXzYig-1
-Received: by mail-wr1-f72.google.com with SMTP id v7so2675100wrp.0
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 03:31:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=uDvpPXXMu4Tf9uDcfCRCl3rMHI8aDrXRoEwJ1iRAPvg=;
- b=b2xS54UpaiFzSOkalwrSeD3Teyi5drXhQRF1IHpqLO0WOqpLrj/mmBz1OwOoCVAOIE
- T8qINNuNzdFS3mBnBx2j6DTXkhA8P+o14GS9pIGWPf0Szor7b4z/pQgZZfPV4p+eOyxY
- woZZlr2daFx7aQt/Qjc+9CeKxUR0om285HpJvXxyBkBH1ZY3GlFv1kzMhGyXDuUymJ24
- t7MPTsaW1811N/RmifKPU0qhsFUJBvrYE5rY7t1QmZDJDgCRPOd5CQ4FcUNLv24OxBiR
- IqEy7bHiKdT+08G28+V1ir4XED2hiQyMqHCZTKewJlTM9Tt1nkXA2k2OR5uJ8KQk8AtS
- JzMg==
-X-Gm-Message-State: ANhLgQ0KW9UwLGPEANL80J1diwYaIJl9NhlLCnGAbPLTTu5LAZ+7D/PK
- eq37J4qBkQogt977RzW/zfEsvqs3XqvA0HIovvdCR1e8HCvJc3a6k+YwzEUgJLJWGOANYbq5VFV
- i1bhEkKLuFPHeew0=
-X-Received: by 2002:adf:f285:: with SMTP id k5mr5110799wro.175.1584527512437; 
- Wed, 18 Mar 2020 03:31:52 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuQfAv8cH5BD3ftfz6LWmq1LpH+gHcW+8siWIa0Hwo68RxVXO5bBV4L81CKN/0V/z3D7u5WgA==
-X-Received: by 2002:adf:f285:: with SMTP id k5mr5110764wro.175.1584527512156; 
- Wed, 18 Mar 2020 03:31:52 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.15.43])
- by smtp.gmail.com with ESMTPSA id s7sm8580565wri.61.2020.03.18.03.31.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Mar 2020 03:31:51 -0700 (PDT)
-Subject: Re: [PATCH 09/11] target/mips: Always enable CONFIG_SEMIHOSTING
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200316120049.11225-1-philmd@redhat.com>
- <20200316120049.11225-10-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d07835cf-1021-7399-a28d-09a4a4c225ef@redhat.com>
-Date: Wed, 18 Mar 2020 11:31:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=SaTBPUdQkoCCikGcNwdhw1dsGFj1b33IkFqgMVECzWE=;
+ b=DzMZEtvIMHUKdlKgZAOHu0cqiTWJmpi1zbAvWK7W8JSs4Hnx1a3ay2ugz3YJYc78Wx/svv
+ H+1fgeAWI/deIrh4FgRxSF/jbVP1Zwvbr56TsrsmOkF2PGjmNS+hsuENgnQUV33EPpMH/v
+ WsPzxoJGg6VZIKhE23TZp7YSA0Nr2O4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-4Q8EPbIPP0mnzlBktbhYMA-1; Wed, 18 Mar 2020 06:39:47 -0400
+X-MC-Unique: 4Q8EPbIPP0mnzlBktbhYMA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E86C318FE864;
+ Wed, 18 Mar 2020 10:39:45 +0000 (UTC)
+Received: from localhost (ovpn-113-129.ams2.redhat.com [10.36.113.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CC519081B;
+ Wed, 18 Mar 2020 10:39:45 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-s390x@nongnu.org
+Subject: [PATCH] Documentation: create/move s390x documentation
+Date: Wed, 18 Mar 2020 11:39:40 +0100
+Message-Id: <20200318103940.1169-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200316120049.11225-10-philmd@redhat.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,32 +82,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/03/20 13:00, Philippe Mathieu-Daud=C3=A9 wrote:
-> diff --git a/default-configs/mips-linux-user-common.mak b/default-configs=
-/mips-linux-user-common.mak
-> new file mode 100644
-> index 0000000000..04947706e8
-> --- /dev/null
-> +++ b/default-configs/mips-linux-user-common.mak
-> @@ -0,0 +1,4 @@
-> +# Common mips*-linux-user CONFIG defines
-> +
-> +# CONFIG_SEMIHOSTING is always required on this architecture
-> +CONFIG_SEMIHOSTING=3Dy
+Create a subdirectory for s390x under docs/system/ and move the
+existing vfio-ap documentation there.
 
-If it is always required, it should be select-ed.
+Create an initial document describing s390x system emulation.
 
-Same for patch 10.
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
 
-Paolo
+Mostly an initial version so that Janosch can base his protected virt
+documentation on something; there's room for more here :)
+
+If this looks good, I'll queue it on my s390-next branch for 5.1.
+
+---
+ MAINTAINERS                         |  5 +++--
+ docs/system/index.rst               |  1 -
+ docs/system/{ =3D> s390x}/vfio-ap.rst |  0
+ docs/system/target-s390x.rst        | 26 ++++++++++++++++++++++++++
+ docs/system/targets.rst             |  1 +
+ 5 files changed, 30 insertions(+), 3 deletions(-)
+ rename docs/system/{ =3D> s390x}/vfio-ap.rst (100%)
+ create mode 100644 docs/system/target-s390x.rst
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7364af0d8b07..dfbd5b0c5de9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -101,7 +101,8 @@ F: include/hw/watchdog/wdt_diag288.h
+ F: pc-bios/s390-ccw/
+ F: pc-bios/s390-ccw.img
+ F: target/s390x/
+-F: docs/vfio-ap.txt
++F: docs/system/target-s390x.rst
++F: docs/system/s390x/
+ F: tests/migration/s390x/
+ K: ^Subject:.*(?i)s390x?
+ T: git https://github.com/cohuck/qemu.git s390-next
+@@ -1606,7 +1607,7 @@ F: hw/s390x/ap-bridge.c
+ F: include/hw/s390x/ap-device.h
+ F: include/hw/s390x/ap-bridge.h
+ F: hw/vfio/ap.c
+-F: docs/system/vfio-ap.rst
++F: docs/system/s390x/vfio-ap.rst
+ L: qemu-s390x@nongnu.org
+=20
+ vhost
+diff --git a/docs/system/index.rst b/docs/system/index.rst
+index 6e5f20fa1333..c0f685b818e5 100644
+--- a/docs/system/index.rst
++++ b/docs/system/index.rst
+@@ -30,7 +30,6 @@ Contents:
+    managed-startup
+    targets
+    security
+-   vfio-ap
+    deprecated
+    build-platforms
+    license
+diff --git a/docs/system/vfio-ap.rst b/docs/system/s390x/vfio-ap.rst
+similarity index 100%
+rename from docs/system/vfio-ap.rst
+rename to docs/system/s390x/vfio-ap.rst
+diff --git a/docs/system/target-s390x.rst b/docs/system/target-s390x.rst
+new file mode 100644
+index 000000000000..4c8b7cdd6615
+--- /dev/null
++++ b/docs/system/target-s390x.rst
+@@ -0,0 +1,26 @@
++.. _s390x-System-emulator:
++
++s390x System emulator
++---------------------
++
++QEMU can emulate z/Architecture (in particular, 64 bit) s390x systems
++via the ``qemu-system-s390x`` binary. Only one machine type,
++``s390-ccw-virtio``, is supported (with versioning for compatibility
++handling).
++
++When using KVM as accelerator, QEMU can emulate CPUs up to the generation
++of the host. When using the default cpu model with TCG as accelerator,
++QEMU will emulate a subset of z13 cpu features that should be enough to ru=
+n
++distributions built for the z13.
++
++Device support
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++QEMU will not emulate most of the traditional devices found under LPAR or
++z/VM; virtio devices (especially using virtio-ccw) make up the bulk of
++the available devices. Passthrough of host devices via vfio-pci, vfio-ccw,
++or vfio-ap is also available.
++
++.. toctree::
++   s390x/vfio-ap
++
+diff --git a/docs/system/targets.rst b/docs/system/targets.rst
+index eba3111247f6..0d8f91580aa5 100644
+--- a/docs/system/targets.rst
++++ b/docs/system/targets.rst
+@@ -17,3 +17,4 @@ Contents:
+    target-arm
+    target-m68k
+    target-xtensa
++   target-s390x
+--=20
+2.21.1
 
 
