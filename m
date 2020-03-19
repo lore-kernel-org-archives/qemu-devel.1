@@ -2,69 +2,69 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DEFC4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8A2C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:30:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1B1620663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:30:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1B1620663
+	by mail.kernel.org (Postfix) with ESMTPS id 27BAF20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:30:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27BAF20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jErVk-0004tt-00
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:30:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40915)
+	id 1jErVu-0005LK-71
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:30:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jErRx-0005Os-3i
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:50 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jErRv-0005MP-MG
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jErRv-0004Dt-Qb
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:49 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:46993)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jErRv-0004DI-HN
+ (envelope-from <laurent@vivier.eu>) id 1jErRu-0004Cx-GW
  for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:47 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:35299)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jErRu-0004Cd-7J
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:46 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M2Plu-1jHbXC338g-003s6h; Thu, 19 Mar 2020 10:26:32 +0100
+ id 1MF2YC-1j3nlt19fk-00FR61; Thu, 19 Mar 2020 10:26:37 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 01/16] target/i386: Renumber EXCP_SYSCALL
-Date: Thu, 19 Mar 2020 10:26:12 +0100
-Message-Id: <20200319092627.51487-2-laurent@vivier.eu>
+Subject: [PULL v3 09/16] linux-user: Update TASK_UNMAPPED_BASE for aarch64
+Date: Thu, 19 Mar 2020 10:26:20 +0100
+Message-Id: <20200319092627.51487-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200319092627.51487-1-laurent@vivier.eu>
 References: <20200319092627.51487-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:9HGTExg1wp02cp06LD11V11vWuFuKKYKX4/OK/2gXe1DIZUeoGB
- 20EERSaCpdqUGqmvoEI5Nh5SyjIg8L4mhrZdeCIPbKwI0Gjf19qkV3gN8tOT217QI8tqxR3
- MacyWqyWWr2GP5UJBX2xKsgRjrw38DMnopCE2YVUrzxFd00Bwslcqgs4z28yAgPgh5D6klV
- sXCa+/K/tg4hnwL+oOVug==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FxU1ZPEB50I=:lLs9ykG/SKh10TtpeQvga9
- 3xc1ZjDSd4JD+c3LflwyHlBinrIL5T6zhC5+ZGG7uLmZFmZr/YnUo5vbVFbQJk1CzTAQW5CTv
- 2Rn/d8Y0A5hACnDVozwIopGFM5gufBtkiE27zhACx2v5URIjm4KjE/OnRb1pdyVAcvC4xoWNk
- btPGaIkXL9427j8aGW5Z+MVLRhihd5cgWMkPiZONIkFgsc3QdtXIzSL9omyjJduqIdeQXFGk2
- XIizD/E4HdLXyMiNUG46VJ3yz2Av80fFz+Cs959Enrj6ULIQHYk4kZ4Cp6p82qyEK68Y5mAFh
- lXcjLd29krXI0H37ThxBSgB0bKzrl2HplqhR8P0Cn05YQdhnlLqEJQpynKPbIp/LZvKT99DbX
- 43k3b8nFui0DpGIO5NQlcbb8KrYzo43aJuFbutLTpiSK8LtWIGeKoVp4ejSqL0dS7DCGfWIsw
- i26GpZWy+uPcJhKqFydpDtgPJL0mHwYOAHWsel71O7vTmgCG41TtERbuW+371dmhZ1nLQO9px
- jXOeMxum8EUVdq5nXilxQSnRZp+9rOed0GNc3AMb7pEKRfa/wInerLKRr2YRDba0WM61/nRVV
- 4jm2nluxpbw4bv3OpYVcCYa3dKQgaPiWRxxPDZY77y1P24L2F1KxoIEMmdWY4wp7W0EySqMvR
- lZKzuUegDFnFeRDTflaGc4m1Eid3t0YQbG4FJtu4Ti5bLYSGHnr/Wd420yHpOtqHbCZmyFcbS
- v5GF98txBhFvB9kQBelwEKOil+1WMfkHUFglKDmh3wcmlIX+fjulWOrwWxKAg+/7MCNUqqlO9
- e1ih0MTZinmNs9JfnMBBalqCB1vXcGQZXbPvUSvK3lP45qGLrTJ1tG0PyK0EEptEy+N7jEv
+X-Provags-ID: V03:K1:IGmL+8UbZ90+Uaal3vT715lrRDQg8cicjsPVKzzM+5RAfBrIlwk
+ ZFA6FnWqFJr3XFs87rlYYnQkFx6lWyIKJU4sN7AO0ON/k3qYdi1tn0qnBhAbg6xHkqZwvsx
+ U5nxJVB7nioyX164RSdLY49JLCR7vqwYlhQugYo7yr0xInmk/i1MS+TT8q2QIf3NL7dVCi/
+ 56CzJJoysDgp4lTxisamQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:IyHZQ8bPvPg=:peOn06G944QaknQMFfiKd1
+ tiF3R9njNTSBXuz8TW1JHRIKR/4y0WLQLoXsnSf9Uu5lNhJICXIqslbQbID9X7ozlfRu7Ayjh
+ cmj6ihS7gkv8slj7xhkGs1BuskMA6YJo2x/rx9nWleXBpzq3DcrwKfZHGLj7dCbReSZTBKoha
+ zaQ/9YVhppNodjTiPXBvTShS1YrZEpUIAGnSU0DSccG0jOgz1O9xigByMiF1cFefAp1nRCTre
+ lZ0iTJK+Px7J7UAyF7XfawcFEOrvkLk4awkBS/x82HQcVZyLL6PkFHe85OLOBB+ud1SxsflCp
+ 6EXMzImdtAu++kUau2Y57SO6QD63Qtox6KovvtyffYk8aPXABRT4zVckzW4S0EQd8St18hwg7
+ hkzY3OTyfeIwTvB2bkGVSQhYxirDZVmkHcbraI/KOswY4QRzUDSMWvkeSMad2DDehxKr+tiBi
+ IFpcmFn+Gr4dJL+LpbxyxHQdTQlRfOQuCxOzjPywLG5iRlOD//yNmU79yrpAc6KjCet/EWBan
+ 47eh2B4mNkI223OksViW1T4HX1lPnELsf3c5KkTAfnCVvCsygePc3B5dTUmI/9yL1JAhMQpet
+ nodNWLwzVYzUqNdG2NlbojF/uDTyJDtBc22mVZSEoDhHQTG1cXv7gXFAz1NOFv7V9kY/Bryt0
+ umlToiwzt2XajxvLkEjzvq1P3DNRYSzNMC7XRQdyB1OhCnbiv0DuulLNZidsVQNdIFMvGtEP8
+ 2Sg7Thw7vykA61UVQ2DAbWBb42smcztja1jTAjgqAC22hCIRnOgruTyf0pdmo00CtkZ2vQ8Vl
+ uCLXBWEAITKYDHJaQVSxdVY+AvZHGm1Cae2ZKE1jvV1wkFBboB3OM/ghOOmtCvM0JfKWkMW
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,47 +76,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Lirong Yuan <yuanzi@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Lirong Yuan <yuanzi@google.com>
 
-We are not short of numbers for EXCP_*.  There is no need to confuse things
-by having EXCP_VMEXIT and EXCP_SYSCALL overlap, even though the former is
-only used for system mode and the latter is only used for user mode.
+This change updates TASK_UNMAPPED_BASE (the base address for guest programs) for aarch64. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
+https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200213032223.14643-2-richard.henderson@linaro.org>
+Signed-off-by: Lirong Yuan <yuanzi@google.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200313002813.3857-1-yuanzi@google.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/i386/cpu.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ linux-user/mmap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 576f309bbfc8..08b4422f36bd 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -999,9 +999,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- #define EXCP11_ALGN	17
- #define EXCP12_MCHK	18
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 8685f02e7e90..e37803379747 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -184,7 +184,11 @@ static int mmap_frag(abi_ulong real_start,
+ }
  
--#define EXCP_SYSCALL    0x100 /* only happens in user only emulation
--                                 for syscall instruction */
--#define EXCP_VMEXIT     0x100
-+#define EXCP_VMEXIT     0x100 /* only for system emulation */
-+#define EXCP_SYSCALL    0x101 /* only for user emulation */
- 
- /* i386-specific interrupt pending bits.  */
- #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
+ #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
++#ifdef TARGET_AARCH64
++# define TASK_UNMAPPED_BASE  0x5500000000
++#else
+ # define TASK_UNMAPPED_BASE  (1ul << 38)
++#endif
+ #else
+ # define TASK_UNMAPPED_BASE  0x40000000
+ #endif
 -- 
 2.25.1
 
