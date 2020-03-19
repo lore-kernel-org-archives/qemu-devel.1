@@ -2,103 +2,73 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DATE_IN_PAST_03_06,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22BAFC4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 18:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225F7C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 18:56:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E02D820724
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 18:15:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02D820724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB41F2070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 18:56:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB41F2070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEzh8-0002qL-W4
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 14:15:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43871)
+	id 1jF0LP-0002gh-5n
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 14:56:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51248)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imbrenda@linux.ibm.com>) id 1jEzgJ-0002Gt-Vs
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 14:14:12 -0400
+ (envelope-from <bounces@canonical.com>) id 1jF0Kj-0002H7-LU
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 14:55:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imbrenda@linux.ibm.com>) id 1jEzgI-0005jI-RH
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 14:14:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2732)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imbrenda@linux.ibm.com>)
- id 1jEzgI-0005ij-Ic
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 14:14:10 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02JI2rHv069070
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 14:14:09 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8aepd2n-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 14:14:08 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <imbrenda@linux.ibm.com>;
- Thu, 19 Mar 2020 18:14:06 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 19 Mar 2020 18:14:02 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02JIE1WY29491704
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 19 Mar 2020 18:14:01 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6878CAE045;
- Thu, 19 Mar 2020 18:14:01 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0C96EAE04D;
- Thu, 19 Mar 2020 18:14:01 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.97.199])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 19 Mar 2020 18:14:00 +0000 (GMT)
-Date: Thu, 19 Mar 2020 13:42:33 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v10 01/16] s390x: Move diagnose 308 subcodes and rcs
- into ipl.h
-In-Reply-To: <20200318143047.2335-2-frankja@linux.ibm.com>
-References: <20200318143047.2335-1-frankja@linux.ibm.com>
- <20200318143047.2335-2-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <bounces@canonical.com>) id 1jF0Ki-0007o1-1B
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 14:55:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:32822)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jF0Kh-0007ld-RS
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 14:55:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jF0Kf-0003PH-RN
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 18:55:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CD49A2E8041
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 18:55:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031918-0028-0000-0000-000003E7B4F9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031918-0029-0000-0000-000024AD1141
-Message-Id: <20200319134233.238a60fe@p-imbrenda>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-19_06:2020-03-19,
- 2020-03-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0
- lowpriorityscore=0 mlxscore=0 clxscore=1015 priorityscore=1501 spamscore=0
- malwarescore=0 impostorscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003190074
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Mar 2020 18:48:22 -0000
+From: Robert Henry <1866892@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mhodog
+X-Launchpad-Bug-Reporter: Robert Henry (mhodog)
+X-Launchpad-Bug-Modifier: Robert Henry (mhodog)
+References: <158386917575.11737.1131406657888792626.malonedeb@soybean.canonical.com>
+Message-Id: <158464370314.20574.11152632748805556516.malone@wampee.canonical.com>
+Subject: [Bug 1866892] Re: guest OS catches a page fault bug when running
+ dotnet
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 345526d2a761b74230a8579d47299ffb5a47f31a
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,72 +77,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- qemu-devel@nongnu.org, david@redhat.com
+Reply-To: Bug 1866892 <1866892@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Mar 2020 10:30:32 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+I have confirmed that the dotnet guest application is executing a
+"iretq" instruction when this guest kernel bug is hit. A first round of
+analysis shows nothing unreasonable at the point the iretq is executed.
+The $rsp points into the middle of a mapped in page, the returned-to
+$rip looks reasonable, etc. We continue our analysis of qemu and the
+dotnet runtime.
 
-> They are part of the IPL process, so let's put them into the ipl
-> header.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1866892
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Title:
+  guest OS catches a page  fault bug when running dotnet
 
+Status in QEMU:
+  New
 
-> ---
->  hw/s390x/ipl.h      | 11 +++++++++++
->  target/s390x/diag.c | 11 -----------
->  2 files changed, 11 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-> index 3e44abe1c651d8a0..a5665e6bfde2e8cf 100644
-> --- a/hw/s390x/ipl.h
-> +++ b/hw/s390x/ipl.h
-> @@ -159,6 +159,17 @@ struct S390IPLState {
->  typedef struct S390IPLState S390IPLState;
->  QEMU_BUILD_BUG_MSG(offsetof(S390IPLState, iplb) & 3, "alignment of
-> iplb wrong"); 
-> +#define DIAG_308_RC_OK              0x0001
-> +#define DIAG_308_RC_NO_CONF         0x0102
-> +#define DIAG_308_RC_INVALID         0x0402
-> +
-> +#define DIAG308_RESET_MOD_CLR       0
-> +#define DIAG308_RESET_LOAD_NORM     1
-> +#define DIAG308_LOAD_CLEAR          3
-> +#define DIAG308_LOAD_NORMAL_DUMP    4
-> +#define DIAG308_SET                 5
-> +#define DIAG308_STORE               6
-> +
->  #define S390_IPL_TYPE_FCP 0x00
->  #define S390_IPL_TYPE_CCW 0x02
->  #define S390_IPL_TYPE_QEMU_SCSI 0xff
-> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-> index 54e5670b3fd6d960..8aba6341f94848e1 100644
-> --- a/target/s390x/diag.c
-> +++ b/target/s390x/diag.c
-> @@ -49,17 +49,6 @@ int handle_diag_288(CPUS390XState *env, uint64_t
-> r1, uint64_t r3) return diag288_class->handle_timer(diag288, func,
-> timeout); }
->  
-> -#define DIAG_308_RC_OK              0x0001
-> -#define DIAG_308_RC_NO_CONF         0x0102
-> -#define DIAG_308_RC_INVALID         0x0402
-> -
-> -#define DIAG308_RESET_MOD_CLR       0
-> -#define DIAG308_RESET_LOAD_NORM     1
-> -#define DIAG308_LOAD_CLEAR          3
-> -#define DIAG308_LOAD_NORMAL_DUMP    4
-> -#define DIAG308_SET                 5
-> -#define DIAG308_STORE               6
-> -
->  static int diag308_parm_check(CPUS390XState *env, uint64_t r1,
-> uint64_t addr, uintptr_t ra, bool write)
->  {
+Bug description:
+  The linux guest OS catches a page fault bug when running the dotnet
+  application.
 
+  host =3D metal =3D x86_64
+  host OS =3D ubuntu 19.10
+  qemu emulation, without KVM, with "tiny code generator" tcg; no plugins; =
+built from head/master
+  guest emulation =3D x86_64
+  guest OS =3D ubuntu 19.10
+  guest app =3D dotnet, running any program
+
+  qemu sha=3D7bc4d1980f95387c4cc921d7a066217ff4e42b70 (head/master Mar 10,
+  2020)
+
+  qemu invocation is:
+
+  qemu/build/x86_64-softmmu/qemu-system-x86_64 \
+    -m size=3D4096 \
+    -smp cpus=3D1 \
+    -machine type=3Dpc-i440fx-5.0,accel=3Dtcg \
+    -cpu Skylake-Server-v1 \
+    -nographic \
+    -bios OVMF-pure-efi.fd \
+    -drive if=3Dnone,id=3Dhd0,file=3Dubuntu-19.10-server-cloudimg-amd64.img=
+ \
+    -device virtio-blk,drive=3Dhd0 \
+    -drive if=3Dnone,id=3Dcloud,file=3Dlinux_cloud_config.img \
+    -device virtio-blk,drive=3Dcloud \
+    -netdev user,id=3Duser0,hostfwd=3Dtcp::2223-:22 \
+    -device virtio-net,netdev=3Duser0
+
+  =
+
+  Here's the guest kernel console output:
+
+  =
+
+  [ 2834.005449] BUG: unable to handle page fault for address: 00007fffffff=
+c2c0
+  [ 2834.009895] #PF: supervisor read access in user mode
+  [ 2834.013872] #PF: error_code(0x0001) - permissions violation
+  [ 2834.018025] IDT: 0xfffffe0000000000 (limit=3D0xfff) GDT: 0xfffffe00000=
+01000 (limit=3D0x7f)
+  [ 2834.022242] LDTR: NULL
+  [ 2834.026306] TR: 0x40 -- base=3D0xfffffe0000003000 limit=3D0x206f
+  [ 2834.030395] PGD 80000000360d0067 P4D 80000000360d0067 PUD 36105067 PMD=
+ 36193067 PTE 8000000076d8e867
+  [ 2834.038672] Oops: 0001 [#4] SMP PTI
+  [ 2834.042707] CPU: 0 PID: 13537 Comm: dotnet Tainted: G      D          =
+ 5.3.0-29-generic #31-Ubuntu
+  [ 2834.050591] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
+S 0.0.0 02/06/2015
+  [ 2834.054785] RIP: 0033:0x1555547eaeda
+  [ 2834.059017] Code: d0 00 00 00 4c 8b a7 d8 00 00 00 4c 8b af e0 00 00 0=
+0 4c 8b b7 e8 00 00 00 4c 8b bf f0 00 00 00 48 8b bf b0 00 00 00 9d 74 02 <=
+48> cf 48 8d 64 24 30 5d c3 90 cc c3 66 90 55 4c 8b a7 d8 00 00 00
+  [ 2834.072103] RSP: 002b:00007fffffffc2c0 EFLAGS: 00000202
+  [ 2834.076507] RAX: 0000000000000000 RBX: 00001554b401af38 RCX: 000000000=
+0000001
+  [ 2834.080832] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00007ffff=
+fffcfb0
+  [ 2834.085010] RBP: 00007fffffffd730 R08: 0000000000000000 R09: 00007ffff=
+fffd1b0
+  [ 2834.089184] R10: 0000155555331dd5 R11: 00001555553ad8d0 R12: 000000000=
+0000002
+  [ 2834.093350] R13: 0000000000000001 R14: 0000000000000001 R15: 00001554b=
+401d388
+  [ 2834.097309] FS:  0000155554fa5740 GS:  0000000000000000
+  [ 2834.101131] Modules linked in: isofs nls_iso8859_1 dm_multipath scsi_d=
+h_rdac scsi_dh_emc scsi_dh_alua ppdev input_leds serio_raw parport_pc parpo=
+rt sch_fq_codel ip_tables x_tables autofs4 btrfs zstd_compress raid10 raid4=
+56 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq =
+libcrc32c raid1 raid0 multipath linear crct10dif_pclmul crc32_pclmul ghash_=
+clmulni_intel aesni_intel aes_x86_64 crypto_simd cryptd glue_helper virtio_=
+net psmouse net_failover failover virtio_blk floppy
+  [ 2834.122539] CR2: 00007fffffffc2c0
+  [ 2834.126867] ---[ end trace dfae51f1d9432708 ]---
+  [ 2834.131239] RIP: 0033:0x14d793262eda
+  [ 2834.135715] Code: Bad RIP value.
+  [ 2834.140243] RSP: 002b:00007ffddb4e2980 EFLAGS: 00000202
+  [ 2834.144615] RAX: 0000000000000000 RBX: 000014d6f402acb8 RCX: 000000000=
+0000002
+  [ 2834.148943] RDX: 0000000001cd6950 RSI: 0000000000000000 RDI: 00007ffdd=
+b4e3670
+  [ 2834.153335] RBP: 00007ffddb4e3df0 R08: 0000000000000001 R09: 00007ffdd=
+b4e3870
+  [ 2834.157774] R10: 000014d793da9dd5 R11: 000014d793e258d0 R12: 000000000=
+0000002
+  [ 2834.162132] R13: 0000000000000001 R14: 0000000000000001 R15: 000014d6f=
+402d040
+  [ 2834.166239] FS:  0000155554fa5740(0000) GS:ffff97213ba00000(0000) knlG=
+S:0000000000000000
+  [ 2834.170529] CS:  0033 DS: 0000 ES: 0000 CR0: 0000000080050033
+  [ 2834.174751] CR2: 000014d793262eb0 CR3: 0000000036130000 CR4: 000000000=
+07406f0
+  [ 2834.178892] PKRU: 55555554
+
+  I run the application from a shell with `ulimit -s unlimited`
+  (unlimited stack to size).
+
+  The application creates a number of threads, and those threads make a
+  lot of calls to sigaltstack() and mprotect(); see the relevant source
+  for dotnet here
+  https://github.com/dotnet/runtime/blob/15ec69e47b4dc56098e6058a11ccb6ae4d=
+5d4fa1/src/coreclr/src/pal/src/thread/thread.cpp#L2467
+
+  using strace -f on the app shows that no alt stacks come anywhere near
+  the failing address; all alt stacks are in the heap, as expected.
+  None of the mmap/mprotect/munmap syscalls were given arguments in the
+  high memory 0x7fffffff0000 and up.
+
+  gdb (with default signal stop/print/pass semantics) does not report
+  any signals prior to the kernel bug being tripped, so I doubt the
+  alternate signal stack is actually used.
+
+  When I run the same dotnet binary on the host (eg, on "bare metal"),
+  the host kernel seems happy and dotnet runs as expected.
+
+  I have not tried different qemu or guest or host O/S.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1866892/+subscriptions
 
