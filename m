@@ -2,63 +2,92 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46075C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 16:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D9CC4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 16:33:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B8512072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 16:32:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B8512072C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id F40C12072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 16:33:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BcrlNHtN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F40C12072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEy6B-0005l1-7G
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 12:32:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49928)
+	id 1jEy7F-0006hO-5d
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 12:33:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jEy5L-0005LF-CG
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:31:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEy6d-0006HP-DZ
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:33:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jEy5I-00083C-Ay
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:31:54 -0400
-Received: from 5.mo177.mail-out.ovh.net ([46.105.39.154]:50106)
+ (envelope-from <armbru@redhat.com>) id 1jEy6b-0002Gn-PP
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:33:15 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44162)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jEy5H-0007yv-2K
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:31:51 -0400
-Received: from player168.ha.ovh.net (unknown [10.108.57.150])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 158A81260A0
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 17:31:47 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player168.ha.ovh.net (Postfix) with ESMTPSA id 9893B109379D2;
- Thu, 19 Mar 2020 16:31:41 +0000 (UTC)
-Subject: Re: [EXTERNAL] [PATCH v2] target/ppc: Fix ISA v3.0 (POWER9) slbia
- implementation
-To: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org
-References: <20200319064439.1020571-1-npiggin@gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c960f9d5-1019-38a4-4005-e3dc058e4648@kaod.org>
-Date: Thu, 19 Mar 2020 17:31:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEy6b-0002Dr-FX
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:33:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584635592;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kB3Rc39+3+pXGiTAEtfUMGVUvvgInQgFW318aYwKUEE=;
+ b=BcrlNHtNvXslEg9s3LMAJXKaB3leqbRwlEZzQz3fg7n1pi76yzycVgos1POaVm03/vfMjD
+ UUjkjZLMSPU9ATFTf/zdv78mvBV38nIy+GXaWvPpGMzPjJtYyqvOJ/H72DbMeND7ECbPbg
+ 1cw9gsLRLS4wD0gInWhZ/FbaT3l+0Es=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-giZTViWtOQu42Nl197wzBg-1; Thu, 19 Mar 2020 12:33:08 -0400
+X-MC-Unique: giZTViWtOQu42Nl197wzBg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B2FB1088382;
+ Thu, 19 Mar 2020 16:33:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
+ [10.36.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 713C262673;
+ Thu, 19 Mar 2020 16:33:03 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A99461138404; Thu, 19 Mar 2020 17:33:01 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+References: <20200312193616.438922-1-crosa@redhat.com>
+ <CAFEAcA_PiX7LffcT9+1Bdn764fsqsSzUZib-yp=Og0Vpa3oOrw@mail.gmail.com>
+ <20200312221619.GA483011@dhcp-17-173.bos.redhat.com>
+ <CAFEAcA8=3zcffu8FYEenyNR5O=kHh8OJmMCJj6Uwh5HJw_b-WA@mail.gmail.com>
+ <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-jiZ=Pv7Co6gdkqKans=m6-9RwKAQuB9mri-baM5Gssw@mail.gmail.com>
+ <849930679.1334346.1584361606961.JavaMail.zimbra@redhat.com>
+ <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
+ <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
+ <20200317141257.GA5724@localhost.localdomain>
+ <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
+Date: Thu, 19 Mar 2020 17:33:01 +0100
+In-Reply-To: <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
+ (Peter Maydell's message of "Tue, 17 Mar 2020 14:24:35 +0000")
+Message-ID: <87sgi49uf6.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200319064439.1020571-1-npiggin@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 11417469480740555673
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefledgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucffohhmrghinheplhhishhtrdhtrghrghgvthenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhduieekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.39.154
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,158 +99,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Wainer Moschetta <wmoschet@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/19/20 7:44 AM, Nicholas Piggin wrote:
-> The new ISA v3.0 slbia variants have not been implemented for TCG,
-> which can lead to crashing when a POWER9 machine boots Linux using
-> the hash MMU, for example ("disable_radix" kernel command line).
->=20
-> Add them.
->=20
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> On Tue, 17 Mar 2020 at 14:13, Cleber Rosa <crosa@redhat.com> wrote:
+>>
+>> On Tue, Mar 17, 2020 at 09:29:32AM +0000, Peter Maydell wrote:
+>> > Ah, I see. My assumption was that this was all stuff that you were
+>> > working on, so that I would then be able to test that it worked correc=
+tly,
+>> > not that I would need to do configuration of the gitlab.com setup.
+>
+>> So, I had to use temporary hardware resources to set this up (and set
+>> it up countless times TBH).  I had the understanding based on the list
+>> of machines you documented[1] that at least some of them would be used
+>> for the permanent setup.
+>
+> Well, some of them will be (eg the s390 box), but some of them
+> are my personal ones that can't be reused easily. I'd assumed
+> in any case that gitlab would have at least support for x86 hosts:
+> we are definitely not going to continue to use my desktop machine
+> for running CI builds! Also IIRC RedHat said they'd be able to
+> provide some machines for runners.
 
-> ---
-> Changes in v2:
-> - Rewrite changelog.
-> - Remove stray slbie hunk that crept in
->=20
-> I don't think the slbie invalidation is necessary, as explained on the
-> list.
->=20
->  target/ppc/helper.h     |  2 +-
->  target/ppc/mmu-hash64.c | 56 +++++++++++++++++++++++++++++++++++------
->  target/ppc/translate.c  |  5 +++-
->  3 files changed, 54 insertions(+), 9 deletions(-)
->=20
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index ee1498050d..2dfa1c6942 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -615,7 +615,7 @@ DEF_HELPER_FLAGS_3(store_slb, TCG_CALL_NO_RWG, void=
-, env, tl, tl)
->  DEF_HELPER_2(load_slb_esid, tl, env, tl)
->  DEF_HELPER_2(load_slb_vsid, tl, env, tl)
->  DEF_HELPER_2(find_slb_vsid, tl, env, tl)
-> -DEF_HELPER_FLAGS_1(slbia, TCG_CALL_NO_RWG, void, env)
-> +DEF_HELPER_FLAGS_2(slbia, TCG_CALL_NO_RWG, void, env, i32)
->  DEF_HELPER_FLAGS_2(slbie, TCG_CALL_NO_RWG, void, env, tl)
->  DEF_HELPER_FLAGS_2(slbieg, TCG_CALL_NO_RWG, void, env, tl)
->  #endif
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 373d44de74..e5baabf0e1 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -95,9 +95,10 @@ void dump_slb(PowerPCCPU *cpu)
->      }
->  }
->=20
-> -void helper_slbia(CPUPPCState *env)
-> +void helper_slbia(CPUPPCState *env, uint32_t ih)
->  {
->      PowerPCCPU *cpu =3D env_archcpu(env);
-> +    int starting_entry;
->      int n;
->=20
->      /*
-> @@ -111,18 +112,59 @@ void helper_slbia(CPUPPCState *env)
->       * expected that slbmte is more common than slbia, and slbia is us=
-ually
->       * going to evict valid SLB entries, so that tradeoff is unlikely =
-to be a
->       * good one.
-> +     *
-> +     * ISA v2.05 introduced IH field with values 0,1,2,6. These all in=
-validate
-> +     * the same SLB entries (everything but entry 0), but differ in wh=
-at
-> +     * "lookaside information" is invalidated. TCG can ignore this and=
- flush
-> +     * everything.
-> +     *
-> +     * ISA v3.0 introduced additional values 3,4,7, which change what =
-SLBs are
-> +     * invalidated.
->       */
->=20
-> -    /* XXX: Warning: slbia never invalidates the first segment */
-> -    for (n =3D 1; n < cpu->hash64_opts->slb_size; n++) {
-> -        ppc_slb_t *slb =3D &env->slb[n];
-> +    env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
-> +
-> +    starting_entry =3D 1; /* default for IH=3D0,1,2,6 */
-> +
-> +    if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
-> +        switch (ih) {
-> +        case 0x7:
-> +            /* invalidate no SLBs, but all lookaside information */
-> +            return;
->=20
-> -        if (slb->esid & SLB_ESID_V) {
-> -            slb->esid &=3D ~SLB_ESID_V;
-> +        case 0x3:
-> +        case 0x4:
-> +            /* also considers SLB entry 0 */
-> +            starting_entry =3D 0;
-> +            break;
-> +
-> +        case 0x5:
-> +            /* treat undefined values as ih=3D=3D0, and warn */
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          "slbia undefined IH field %u.\n", ih);
-> +            break;
-> +
-> +        default:
-> +            /* 0,1,2,6 */
-> +            break;
->          }
->      }
->=20
-> -    env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
-> +    for (n =3D starting_entry; n < cpu->hash64_opts->slb_size; n++) {
-> +        ppc_slb_t *slb =3D &env->slb[n];
-> +
-> +        if (!(slb->esid & SLB_ESID_V)) {
-> +            continue;
-> +        }
-> +        if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
-> +            if (ih =3D=3D 0x3 && (slb->vsid & SLB_VSID_C) =3D=3D 0) {
-> +                /* preserves entries with a class value of 0 */
-> +                continue;
-> +            }
-> +        }
-> +
-> +        slb->esid &=3D ~SLB_ESID_V;
-> +    }
->  }
->=20
->  static void __helper_slbie(CPUPPCState *env, target_ulong addr,
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index eb0ddba850..e514732a09 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -5027,12 +5027,15 @@ static void gen_tlbsync(DisasContext *ctx)
->  /* slbia */
->  static void gen_slbia(DisasContext *ctx)
->  {
-> +    uint32_t ih =3D (ctx->opcode >> 21) & 0x7;
-> +    TCGv_i32 t0 =3D tcg_const_i32(ih);
-> +
->  #if defined(CONFIG_USER_ONLY)
->      GEN_PRIV;
->  #else
->      CHK_SV;
->=20
-> -    gen_helper_slbia(cpu_env);
-> +    gen_helper_slbia(cpu_env, t0);
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
->=20
+Correct!  As discussed at the QEMU summit, we'll gladly chip in runners
+to test the stuff we care about, but to match the coverage of your
+private zoo of machines, others will have to chip in, too.
+
+>> OK, I see it, now it makes more sense.  So we're "only" missing the
+>> setup for the machines we'll use for the more permanent setup.  Would
+>> you like to do a staged setup/migration using one or some of the
+>> machines you documented?  I'm 100% onboard to help with this, meaning
+>> that I can assist you with instructions, or do "pair setup" of the
+>> machines if needed.  I think a good part of the evaluation here comes
+>> down to how manageable/reproducible the setup is, so it'd make sense
+>> for one to be part of the setup itself.
+>
+> I think we should start by getting the gitlab setup working
+> for the basic "x86 configs" first. Then we can try adding
+> a runner for s390 (that one's logistically easiest because
+> it is a project machine, not one owned by me personally or
+> by Linaro) once the basic framework is working, and expand
+> from there.
+
+Makes sense to me.
+
+Next steps to get this off the ground:
+
+* Red Hat provides runner(s) for x86 stuff we care about.
+
+* If that doesn't cover 'basic "x86 configs" in your judgement, we
+  fill the gaps as described below under "Expand from there".
+
+* Add an s390 runner using the project machine you mentioned.
+
+* Expand from there: identify the remaining gaps, map them to people /
+  organizations interested in them, and solicit contributions from these
+  guys.
+
+A note on contributions: we need both hardware and people.  By people I
+mean maintainers for the infrastructure, the tools and all the runners.
+Cleber & team are willing to serve for the infrastructure, the tools and
+the Red Hat runners.
+
+Does this sound workable?
+
+> But to a large degree I really don't want to have to get
+> into the details of how gitlab works or setting up runners
+> myself if I can avoid it. We're going through this migration
+> because I want to be able to hand off the CI stuff to other
+> people, not to retain control of it.
+
+Understand.  We need contributions to gating CI, but the whole point of
+this exercise is to make people other than *you* contribute to our
+gating CI :)
+
+Let me use this opportunity to say thank you for all your integration
+work!
 
 
