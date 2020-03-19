@@ -2,81 +2,100 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE96C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F36C43333
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:03:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4916B2070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:01:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92CF820753
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:03:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ScAELSDh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4916B2070A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0Ca34ct"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92CF820753
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jErzI-00082C-Fl
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 06:01:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50408)
+	id 1jEs1Q-0001Kp-PR
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 06:03:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51236)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jEry3-0006nO-Dq
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:00:00 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jEs0e-0000n4-6B
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:02:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jEry2-0007RH-BZ
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:59:59 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44795)
+ (envelope-from <pbonzini@redhat.com>) id 1jEs0Z-0004oU-5d
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:02:40 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40044)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jEry2-0007R5-8f
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:59:58 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jEs0Y-0004oB-Uj
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:02:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584611998;
+ s=mimecast20190719; t=1584612154;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1LDz5qktvaihEBgJ1F8iIql4C0wEg8cO879LooSKwn0=;
- b=ScAELSDhAZ4DxkZhnPzwmB/9PvYCAchGDL6RSaObqKTie9gHLDIm63WXgMT2vgYkrWED47
- 7lQD9j0NyPw4mHeAIEpdrIBfN6VEuo5K0dINjWYSmVjBWzBV2EDiO3DaLKhsB+rWQnzpcP
- I6kJWjMjO/LCedM9cV5YKYqsa5tpO8A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-G_eOJcmKN3ad4LNkg-criw-1; Thu, 19 Mar 2020 05:59:51 -0400
-X-MC-Unique: G_eOJcmKN3ad4LNkg-criw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ACAD18FE860;
- Thu, 19 Mar 2020 09:59:50 +0000 (UTC)
-Received: from gondolin (ovpn-113-188.ams2.redhat.com [10.36.113.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F15373865;
- Thu, 19 Mar 2020 09:59:43 +0000 (UTC)
-Date: Thu, 19 Mar 2020 10:59:19 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v10 15/16] docs: system: Add protvirt docs
-Message-ID: <20200319105919.34829695.cohuck@redhat.com>
-In-Reply-To: <158d3b95-dca6-4dd7-0171-eb208664510e@linux.ibm.com>
-References: <20200318143047.2335-1-frankja@linux.ibm.com>
- <20200318143047.2335-16-frankja@linux.ibm.com>
- <20200318155318.0c80acd2.cohuck@redhat.com>
- <158d3b95-dca6-4dd7-0171-eb208664510e@linux.ibm.com>
-Organization: Red Hat GmbH
+ bh=5q11skmYIcnBYVdiHpdLtG5yjOzJR+w1Z0fZwpgwlI0=;
+ b=a0Ca34ctl4VXGYrSWPYVOOhBOnivWUyE4VXT4Y6LZEzd8ifGDpfuo1PrR6IBx8zazYscaF
+ BZXU1G5PAXVT5kx/L18sbJso2HbGYpTWHgpt9FhfaWNCqDxoIYk4rXFg+OghUWBjNzm1AP
+ OrnDVISpyGBzG9oe0e8HwLpsDzxKTaU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-398-hP6lggJ1OzeuCaNoGY6nZA-1; Thu, 19 Mar 2020 06:02:30 -0400
+X-MC-Unique: hP6lggJ1OzeuCaNoGY6nZA-1
+Received: by mail-wm1-f72.google.com with SMTP id n188so498182wmf.0
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 03:02:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cMMWTazjnMHIB+B2IdY+dBDzgBwCwE53d+kdif1fHXA=;
+ b=sZeaVkQI560JpEkNOk8A0MXyZixHwaKvQZtb7ZXQH03wLxFNtO0z2RmA9hFPlsVG3x
+ Ud5jla/GdQ2o7UvJhwtKvQSttpfFDjhq4r0mqUTrexVKzPbL1Aug6gUMjare76bxVzax
+ FU8YGu1LMo8cQCkoAoY+WPESaRTeyzsPbZW4o5UNseXqYqRradrkgKKLCUc/1jLtTuFD
+ ozgXNLu2AqhYOBkATfpkPdkSUz7t0kJDjedGOvGDxU7dVN2P+0D3KsaCCUEjf9Sr4Mgb
+ rd4WATDU346SFM1qWxQsvgIldEL+92K9RlDeeOF5FnRYlJDelfyWmxAC0uk+HZNQ4iQR
+ E4cQ==
+X-Gm-Message-State: ANhLgQ2LP16bDVLdrmswaD1ZOEDqDu79BwOgIyB0lsJWya/k7gsmSSVA
+ DgUBdlhfA8Ykx32YvkpCzH1OKATvPiDQOnM3mOqwHCfmYBaFo6VdoaF67AVqUhrGyzvaD6n7adH
+ 8eFGKQQS1OanjSzc=
+X-Received: by 2002:adf:f30b:: with SMTP id i11mr3153003wro.224.1584612149353; 
+ Thu, 19 Mar 2020 03:02:29 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvKHn+enou47LWOVtxAl2vIJoEKpFa9Tda1ASis5QLNZd/zbR2LoXC4BVwNuVqc/lbEwXJVEg==
+X-Received: by 2002:adf:f30b:: with SMTP id i11mr3152974wro.224.1584612149129; 
+ Thu, 19 Mar 2020 03:02:29 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+ by smtp.gmail.com with ESMTPSA id v7sm2560832wml.18.2020.03.19.03.02.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Mar 2020 03:02:28 -0700 (PDT)
+Subject: Re: [PATCH-for-5.0 1/2] hw/acpi/piix4: Add 'system-hotplug-support'
+ property
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200318221531.22910-1-philmd@redhat.com>
+ <20200318221531.22910-2-philmd@redhat.com>
+ <3ac0d8f1-15d8-51d3-b40e-8975ec1353ad@redhat.com>
+ <1b61a51a-0419-1bd3-2728-e5c11606f99e@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c0ea77ce-bd5f-aa3b-2dd0-e4793800208a@redhat.com>
+Date: Thu, 19 Mar 2020 11:02:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <1b61a51a-0419-1bd3-2728-e5c11606f99e@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/rX6q51jAf9aTFU1Taq2ISvD";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,111 +107,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/rX6q51jAf9aTFU1Taq2ISvD
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 19 Mar 2020 10:04:38 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 3/18/20 3:53 PM, Cornelia Huck wrote:
-> > On Wed, 18 Mar 2020 10:30:46 -0400
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >  =20
-> >> Let's add some documentation for the Protected VM functionality.
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> Acked-by: David Hildenbrand <david@redhat.com>
-> >> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> >> ---
-> >>  docs/system/s390x/protvirt.rst | 59 +++++++++++++++++++++++++++++++++=
-+
-> >>  docs/system/target-s390x.rst   |  5 +++
-> >>  2 files changed, 64 insertions(+)
-> >>  create mode 100644 docs/system/s390x/protvirt.rst =20
-> >=20
-> > (...)
-> >  =20
-> >> +Booting from the image supplied on the QEMU command line requires tha=
-t
-> >> +the file passed via -kernel has the same memory layout as would resul=
-t
-> >> +from the disk boot. This memory layout includes the encrypted
-> >> +components (kernel, initrd, cmdline), the stage3a loader and
-> >> +metadata. In case this boot method is used, the command line
-> >> +options -initrd and -cmdline are ineffective. The preparation of a PV=
-M
-> >> +image is done via the `genprotimg` tool from the s390-tools package. =
-=20
-> >=20
-> > I still think 'package' is not a good name (yes, I realize that
-> > s390-tools' README uses that term as well :) I'd prefer 'collection' or
-> > something like that, so it doesn't get confused with distro packages,
-> > which may use a different name. But no strong opinion. =20
+On 19/03/20 10:42, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 3/19/20 10:36 AM, Paolo Bonzini wrote:
+>> On 18/03/20 23:15, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> The I/O ranges registered by the piix4_acpi_system_hot_add_init()
+>>> function are not documented in the PIIX4 datasheet.
+>>> This appears to be a PC-only feature added in commit 5e3cb5347e
+>>> ("initialize hot add system / acpi gpe") which was then moved
+>>> to the PIIX4 device model in commit 9d5e77a22f ("make
+>>> qemu_system_device_hot_add piix independent")
+>>> Add a property (default enabled, to not modify the current
+>>> behavior) to allow machines wanting to model a simple PIIX4
+>>> to disable this feature.
+>>
+>> Yes, all hotplug stuff (PCI/memory/CPU) are custom additions by QEMU.
+>>
+>>> +=C2=A0=C2=A0=C2=A0 DEFINE_PROP_BOOL("system-hotplug-support", PIIX4PMS=
+tate,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 use_acpi_system_hotplug=
+, true),
+>>
+>> Why not cpu-hotplug-support?
 >=20
-> collection it is
->=20
-> >  =20
-> >> diff --git a/docs/system/target-s390x.rst b/docs/system/target-s390x.r=
-st
-> >> index 4c8b7cdd66154d26..8d97158dc804af1c 100644
-> >> --- a/docs/system/target-s390x.rst
-> >> +++ b/docs/system/target-s390x.rst
-> >> @@ -24,3 +24,8 @@ or vfio-ap is also available.
-> >>  .. toctree::
-> >>     s390x/vfio-ap
-> >> =20
-> >> +Architectural features
-> >> +~~~~~~~~ =20
-> >=20
-> > Architecture features
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > ? =20
->=20
-> Ack
->=20
-> >  =20
-> >> +
-> >> +.. toctree::
-> >> +   s390x/protvirt =20
-> >=20
-> > Otherwise, looks good to me.
-> >=20
-> >  =20
->=20
->=20
+> Because I have no idea what this code is about, and it seems more than
+> cpu (pci, memory):
 
-With those changes,
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Right, I should have been more verbose.  You mentioned I/O port 0xaf00
+which is CPU hotplug.  Perhaps unless you can also crash with PCI
+hotplug (0xae00-0xae0f) it's worth removing only CPU hotplug from MIPS
+machines, and keep PCI hotplug.
 
---Sig_/rX6q51jAf9aTFU1Taq2ISvD
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Paolo
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl5zQncACgkQ3s9rk8bw
-L6+DXg//X8SYhaXkYr9m7YgOCRcp2H+eYSEdelCHL/vXrGdNTOTlhU+OrD1rxf6W
-jQXBxVezwNIW05MJnUPyoZJ3wS/BlPmima+q5Kb65GVoy/AgULI190mVzpsvB7Km
-BbEXgoF8HZUILSzz6XnV52dooPDnIA1515bfrbFsYoNHNSvtsPAeHWe6HgLBsNRG
-yS5ykPVDgVm32uTCzTx43RTqdektBwOYU4mjeNUTY62M7UtTzVbuOg+yeSX4RKKW
-7ct1qbYLFt46nzILl3l7mt3B8q4ypInwXP1c+UcW4NstDpo6KsLx7gSMicSrc9ju
-TIu8E7qq3Fwicwt3X/GXF+8w4H3gEwee2iIZnF0M/g1z86N/PLZdpNj5PE/j4ATT
-7fZovI5p/9t5+h4kkK7yIw791+/6K+0cDweHxiX1SoXiYE0M5asC2C0gmmFlvW06
-uR2MQdClj+GFzSla/QUe1X5lMUNPixZv+6DH25EsyBeuiK8TgT5fd3tEeMH5wpjJ
-Q8vw/6GEc485WG158S0oIK9sk/MALyKHFX8xWueEvAhLoPD6YtGymPanvkUKRHeE
-+UBzZo5y8auJqunQALx6c68Ei8dOhHrlf8+IUhIbHkVohjsMS2muBo3tPzKKPJDz
-EtlUVHDHqQXRUG2GdtqKyQtkFQ79/yCyNOI786siSEoiIsWQxI0=
-=s6TV
------END PGP SIGNATURE-----
-
---Sig_/rX6q51jAf9aTFU1Taq2ISvD--
+> static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PCIBus *bus, PIIX4PMState *s)
+> {
+> =C2=A0=C2=A0=C2=A0 memory_region_init_io(&s->io_gpe, OBJECT(s), &piix4_gp=
+e_ops, s,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 "acpi-gpe0", GPE_LEN);
+> =C2=A0=C2=A0=C2=A0 memory_region_add_subregion(parent, GPE_BASE, &s->io_g=
+pe);
+>=20
+> =C2=A0=C2=A0=C2=A0 acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, =
+parent,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->use_acpi_pci_hotplug);
+>=20
+> =C2=A0=C2=A0=C2=A0 s->cpu_hotplug_legacy =3D true;
+> =C2=A0=C2=A0=C2=A0 object_property_add_bool(OBJECT(s), "cpu-hotplug-legac=
+y",
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 piix4_get_cpu_hotplug_legacy,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 piix4_set_cpu_hotplug_legacy,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 NULL);
+> =C2=A0=C2=A0=C2=A0 legacy_acpi_cpu_hotplug_init(parent, OBJECT(s), &s->gp=
+e_cpu,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PIIX4_CPU_HOTPLUG_IO_BASE);
+>=20
+> =C2=A0=C2=A0=C2=A0 if (s->acpi_memory_hotplug.is_enabled) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 acpi_memory_hotplug_init(paren=
+t, OBJECT(s),
+> &s->acpi_memory_hotplug,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ACPI_MEMORY_HOTPLUG_BASE);
+> =C2=A0=C2=A0=C2=A0 }
+> }
+>=20
 
 
