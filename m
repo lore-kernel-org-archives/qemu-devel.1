@@ -2,77 +2,77 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC6DC4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2682C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:32:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76D1120663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:31:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E2CC20782
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:32:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TQHVm3jE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76D1120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts+mJJV8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E2CC20782
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEwCi-00071X-LX
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 10:31:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48728)
+	id 1jEwDt-0008Aj-OA
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 10:32:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jEwBw-0006TF-7y
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:30:37 -0400
+ (envelope-from <mansourweb@gmail.com>) id 1jEwD3-0007Q9-Ej
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:31:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jEwBu-0003Wg-CR
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:30:35 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:54766)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jEwBu-0003WN-43
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:30:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584628233;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vCCYJiZZ6I0+GAvWI4VBrcE9+KX3/b2FHAQomUHLaT4=;
- b=TQHVm3jEA5IjpQdmH0HNB1m/+VVay+fWP9iS2CJ7qEtwctNPV7uom4qdSO4IeryhrQCe9R
- Egft8P1WHhTKqQsd6yvUWjoDojXCXz6M5lkKK14CeiIKpAX1ZgWnp2O+8unXtywniNCpM1
- UcUbsRAZiWAA+tZ5YPjCvYd3fiZ6RdQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-f-KbRQIDPe-K6i-Jqe7W_g-1; Thu, 19 Mar 2020 10:30:31 -0400
-X-MC-Unique: f-KbRQIDPe-K6i-Jqe7W_g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 940F81857BF5;
- Thu, 19 Mar 2020 14:30:30 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.100])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4737660BF1;
- Thu, 19 Mar 2020 14:30:17 +0000 (UTC)
-Date: Thu, 19 Mar 2020 15:30:15 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH 05/13] microvm: add acpi_dsdt_add_virtio() for x86
-Message-ID: <20200319153015.43f29fe0@redhat.com>
-In-Reply-To: <20200319080117.7725-6-kraxel@redhat.com>
-References: <20200319080117.7725-1-kraxel@redhat.com>
- <20200319080117.7725-6-kraxel@redhat.com>
+ (envelope-from <mansourweb@gmail.com>) id 1jEwD2-00052N-71
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:31:45 -0400
+Received: from mail-lf1-x133.google.com ([2a00:1450:4864:20::133]:38840)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mansourweb@gmail.com>)
+ id 1jEwD0-00051a-W4
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:31:43 -0400
+Received: by mail-lf1-x133.google.com with SMTP id n13so1810186lfh.5
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 07:31:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=/ayF9jYzWyGPL6mGDUl2C1/kywBa1U0xypOD6/4ahXA=;
+ b=Ts+mJJV8+o0PHVgM3W9fZ0zkHeKo6bJLe4o8mi4NCgZV9ciWj7XfBW9zAAAVEWjMMt
+ DbcWHo7KTQKre0r47vXWNJwqPh5X3aNfa1MWvWCKfmyAQsmLtxsMxloQRIUYWF5rvU+r
+ x7H4LF1fjWhwlKSuxj4Tyj3N6bOnMJnslfsN1svOzyWOLkzOWyElzUgTEDUv6u+AHDwq
+ 5mFNUcg5KGK+3wEnH378FBMOEe8qSR2NfzQMEvXJ6bt0SYUQUxmnbu2867vHPJqAYfHE
+ WPB0xG3xikqEN4IFmHPHX50RF5QckieZsiDyez7Tt6Eh9ymzvsdNK2ojjGLbrR07gYdh
+ 54qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=/ayF9jYzWyGPL6mGDUl2C1/kywBa1U0xypOD6/4ahXA=;
+ b=MVmZo17MUN8Bz/6Vx0gTsZlOerho8GJ/pFqgzQzsJZEmaArUGRPkEFFQxHnqMmhSeM
+ lXgxD0aTfisMlVMFLzOyVRPz5zDJfFTY5G9901rldoLNue9KXLSDRsjKB++rfoOjqkD2
+ i63nwV7oUHmpwbeQf3ydNgZQ9pR3mUn3iKZlRgRbWTeje95qOJz/d4X8KZIueyoLRz7y
+ 57dvbtkKjwhkZdBlP3wGX6t72PUdDqN6tfG2Sbg+LjsSTuWHcDpu7hIsFyb28pTydsc8
+ YwZpOLEzmhzxXka9kSbhRmj902L6vTklcsfv/HYD36harItVKlSt4HzXWO02pA0AVYGP
+ O5cA==
+X-Gm-Message-State: ANhLgQ1+juUxRnl4Xtu7S244Uvi08rWQ2uBII8G9wHPWQQhwfjwQ1dM1
+ v6rV+ASpZqdS98QeYcjDnT95XhL6KIo6cuTqbsOAK5RKPRY=
+X-Google-Smtp-Source: ADFU+vtfPQk5MBD1+PEyxfr9cnzn5i6vDwusMZ+A2VUoMnh9dfqULmjwNBQ2unSFW6gYzay30wj73WSiWBZrLL5Agwg=
+X-Received: by 2002:a19:6445:: with SMTP id b5mr2233635lfj.187.1584628301149; 
+ Thu, 19 Mar 2020 07:31:41 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+From: Mansour Ahmadi <ManSoSec@gmail.com>
+Date: Thu, 19 Mar 2020 10:31:30 -0400
+Message-ID: <CAGT9xrAiELsA0jt9tsn+jQ+mmeNK+Ya+5mBKBnLOEYVYKwKYoQ@mail.gmail.com>
+Subject: Missing Frame initialization
+To: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Content-Type: multipart/alternative; boundary="000000000000fdb9d305a136064e"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,110 +84,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Mar 2020 09:01:09 +0100
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+--000000000000fdb9d305a136064e
+Content-Type: text/plain; charset="UTF-8"
 
-> Makes x86 linux kernel find virtio-mmio devices automatically.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/i386/acpi-build.c | 51 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 0e45a646af56..80844db24d6b 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -21,6 +21,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/cutils.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qnum.h"
->  #include "acpi-build.h"
-> @@ -60,6 +61,7 @@
->  #include "hw/pci-host/q35.h"
->  #include "hw/i386/x86-iommu.h"
->  #include "hw/i386/microvm.h"
-> +#include "hw/virtio/virtio-mmio.h"
->  
->  #include "hw/acpi/aml-build.h"
->  #include "hw/acpi/utils.h"
-> @@ -2750,6 +2752,54 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
->      return true;
->  }
->  
-> +static void acpi_dsdt_add_virtio(Aml *scope)
-> +{
-> +    gchar *separator;
-> +    long int index;
-> +    BusState *bus;
-> +    BusChild *kid;
-> +
-> +    bus = sysbus_get_default();
-> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-> +        DeviceState *dev = kid->child;
-> +        ObjectClass *class = object_get_class(OBJECT(dev));
-> +
-> +        if (class == object_class_by_name(TYPE_VIRTIO_MMIO)) {
-using object_dynamic_cast() would be cleaner
+I originally reported this:
 
-> +            VirtIOMMIOProxy *mmio = VIRTIO_MMIO(OBJECT(dev));
-> +            VirtioBusState *mmio_virtio_bus = &mmio->bus;
-> +            BusState *mmio_bus = &mmio_virtio_bus->parent_obj;
-> +
-> +            if (QTAILQ_EMPTY(&mmio_bus->children)) {
-> +                continue;
-> +            }
-> +            separator = g_strrstr(mmio_bus->name, ".");
-> +            if (!separator) {
-> +                continue;
-> +            }
-> +            if (qemu_strtol(separator + 1, NULL, 10, &index) != 0) {
-> +                continue;
-> +            }
-> +
-> +            uint32_t irq = VIRTIO_IRQ_BASE + index;
-> +            hwaddr base = VIRTIO_MMIO_BASE + index * 512;
-> +            hwaddr size = 512;
-is it possible to fish these values out from device without poking in its guts
-like using sysbus_get_connected_irq() and make up something to do get mmio parameters from sysbus device
+In the case of badframe, user struct is not unlocked here and may lead to
+deadlock:
 
-> +
-> +            Aml *dev = aml_device("VR%02u", (unsigned)index);
-> +            aml_append(dev, aml_name_decl("_HID", aml_string("LNRO0005")));
-> +            aml_append(dev, aml_name_decl("_UID", aml_int(index)));
-> +            aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-> +
-> +            Aml *crs = aml_resource_template();
-> +            aml_append(crs, aml_memory32_fixed(base, size, AML_READ_WRITE));
-> +            aml_append(crs,
-> +                       aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
-> +                                     AML_EXCLUSIVE, &irq, 1));
-> +            aml_append(dev, aml_name_decl("_CRS", crs));
-> +            aml_append(scope, dev);
-> +        }
-> +    }
-> +}
-> +
->  static void
->  build_dsdt_microvm(GArray *table_data, BIOSLinker *linker,
->                     MicrovmMachineState *mms)
-> @@ -2766,6 +2816,7 @@ build_dsdt_microvm(GArray *table_data, BIOSLinker *linker,
->  
->      sb_scope = aml_scope("_SB");
->      acpi_dsdt_add_fw_cfg(sb_scope, OBJECT(x86ms->fw_cfg));
-> +    acpi_dsdt_add_virtio(sb_scope);
->      aml_append(dsdt, sb_scope);
->  
->      scope = aml_scope("\\");
+https://github.com/qemu/qemu
+/blob/d4f7d56759f7c75270c13d5f3f5f736a9558929c/linux-user/m68k/signal.c#L380
 
+In similar case, it in unlocked correctly:
+https://github.com/qemu/qemu
+/blob/d4f7d56759f7c75270c13d5f3f5f736a9558929c/linux-user/sh4/signal.c#L303
+
+Laurant replied that frame needs to be initialized with NULL in the second
+case indeed:
+
+In fact, this case is a little bit different and wrong but to fix that
+the solution is to set frame to NULL when it is declared:
+
+linux-user/qemu.h:
+* Unlock an area of guest memory.  The first LEN bytes must be
+   flushed back to guest memory. host_ptr = NULL is explicitly
+   allowed and does nothing. */
+static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
+                               long len)
+like for linux-user/aarch64/signal.c:
+long do_rt_sigreturn(CPUARMState *env)
+{
+    struct target_rt_sigframe *frame = NULL;
+...
+We have several targets with the same problem.
+
+Thanks,
+Mansour
+
+--000000000000fdb9d305a136064e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div class=3D"gmail_default" style=3D"font-family:garamond=
+,serif;font-size:large">I originally reported this:</div><div class=3D"gmai=
+l_default" style=3D"font-family:garamond,serif;font-size:large"><br></div><=
+div class=3D"gmail_default" style=3D"font-family:garamond,serif;font-size:l=
+arge"><div class=3D"gmail_default">In the case of badframe, user struct is =
+not unlocked here and may lead to deadlock:</div><div class=3D"gmail_defaul=
+t"><br></div><div class=3D"gmail_default"><a href=3D"https://github.com/qem=
+u/qemu/blob/d4f7d56759f7c75270c13d5f3f5f736a9558929c/linux-user/m68k/signal=
+.c#L380" target=3D"_blank">https://github.com/<span class=3D"gmail-il">qemu=
+</span>/<span class=3D"gmail-il">qemu</span>/blob/d4f7d56759f7c75270c13d5f3=
+f5f736a9558929c/linux-user/m68k/signal.c#L380</a><br></div><div class=3D"gm=
+ail_default"><br></div><div class=3D"gmail_default">In similar case, it in =
+unlocked correctly:</div><div class=3D"gmail_default"><a href=3D"https://gi=
+thub.com/qemu/qemu/blob/d4f7d56759f7c75270c13d5f3f5f736a9558929c/linux-user=
+/sh4/signal.c#L303" target=3D"_blank">https://github.com/<span class=3D"gma=
+il-il">qemu</span>/<span class=3D"gmail-il">qemu</span>/blob/d4f7d56759f7c7=
+5270c13d5f3f5f736a9558929c/linux-user/sh4/signal.c#L303</a><br></div><div c=
+lass=3D"gmail_default"><br></div><div class=3D"gmail_default">Laurant repli=
+ed that frame needs to be initialized with NULL in the second case indeed:<=
+/div><div class=3D"gmail_default"><br></div><div class=3D"gmail_default"><s=
+pan style=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">In fac=
+t, this case is a little bit different and wrong but to fix that</span><br =
+style=3D"font-family:Arial,Helvetica,sans-serif;font-size:small"><span styl=
+e=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">the solution i=
+s to set frame to NULL when it is declared:</span><br style=3D"font-family:=
+Arial,Helvetica,sans-serif;font-size:small"><br style=3D"font-family:Arial,=
+Helvetica,sans-serif;font-size:small"><span style=3D"font-family:Arial,Helv=
+etica,sans-serif;font-size:small">linux-user/</span><span class=3D"gmail-il=
+" style=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">qemu</sp=
+an><span style=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">.=
+h:</span><br style=3D"font-family:Arial,Helvetica,sans-serif;font-size:smal=
+l"><span style=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">*=
+ Unlock an area of guest memory.=C2=A0 The first LEN bytes must be</span><b=
+r style=3D"font-family:Arial,Helvetica,sans-serif;font-size:small"><span st=
+yle=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">=C2=A0 =C2=
+=A0flushed back to guest memory. host_ptr =3D NULL is explicitly</span><br =
+style=3D"font-family:Arial,Helvetica,sans-serif;font-size:small"><span styl=
+e=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">=C2=A0 =C2=A0a=
+llowed and does nothing. */</span><br style=3D"font-family:Arial,Helvetica,=
+sans-serif;font-size:small"><span style=3D"font-family:Arial,Helvetica,sans=
+-serif;font-size:small">static inline void unlock_user(void *host_ptr, abi_=
+ulong guest_addr,</span><br style=3D"font-family:Arial,Helvetica,sans-serif=
+;font-size:small"><span style=3D"font-family:Arial,Helvetica,sans-serif;fon=
+t-size:small">=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0long len)</span><br sty=
+le=3D"font-family:Arial,Helvetica,sans-serif;font-size:small"><span style=
+=3D"font-family:Arial,Helvetica,sans-serif;font-size:small">like for linux-=
+user/aarch64/signal.c:</span><br style=3D"font-family:Arial,Helvetica,sans-=
+serif;font-size:small"><span style=3D"font-family:Arial,Helvetica,sans-seri=
+f;font-size:small">long do_rt_sigreturn(CPUARMState *env)</span><br style=
+=3D"font-family:Arial,Helvetica,sans-serif;font-size:small"><span style=3D"=
+font-family:Arial,Helvetica,sans-serif;font-size:small">{</span><br style=
+=3D"font-family:Arial,Helvetica,sans-serif;font-size:small"><span style=3D"=
+font-family:Arial,Helvetica,sans-serif;font-size:small">=C2=A0 =C2=A0 struc=
+t target_rt_sigframe *frame =3D NULL;</span><br style=3D"font-family:Arial,=
+Helvetica,sans-serif;font-size:small"><span style=3D"font-family:Arial,Helv=
+etica,sans-serif;font-size:small">...</span><br style=3D"font-family:Arial,=
+Helvetica,sans-serif;font-size:small"><span style=3D"font-family:Arial,Helv=
+etica,sans-serif;font-size:small">We have several targets with the same pro=
+blem.</span></div></div><div class=3D"gmail_default" style=3D"font-family:g=
+aramond,serif;font-size:large"><br></div><div class=3D"gmail_default" style=
+=3D"font-family:garamond,serif;font-size:large">Thanks,</div><div class=3D"=
+gmail_default" style=3D"font-family:garamond,serif;font-size:large">Mansour=
+</div><div><div dir=3D"ltr" class=3D"gmail_signature" data-smartmail=3D"gma=
+il_signature"><div dir=3D"ltr"><div><div dir=3D"ltr"><div><div dir=3D"ltr">=
+<div dir=3D"ltr"><span style=3D"border-collapse:collapse;white-space:pre-wr=
+ap"><span style=3D"border-collapse:separate;white-space:normal"><font color=
+=3D"#000000" size=3D"2"><div style=3D"font-family:Calibri"><div style=3D"fo=
+nt-family:arial,sans-serif"></div></div></font></span></span></div></div></=
+div></div></div></div></div></div></div>
+
+--000000000000fdb9d305a136064e--
 
