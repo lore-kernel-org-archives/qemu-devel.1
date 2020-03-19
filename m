@@ -2,79 +2,95 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE10C4332E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 13:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F3AFC4332E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 13:20:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CA5820722
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 13:11:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6QPU5qA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CA5820722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DCB2521655
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 13:20:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCB2521655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEux9-0000X5-OH
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 09:11:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32887)
+	id 1jEv6D-0003K5-R5
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 09:20:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jtomko@redhat.com>) id 1jEuwZ-0008QO-GW
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 09:10:40 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jEv5G-0001nb-CY
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 09:19:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jtomko@redhat.com>) id 1jEuwY-000368-19
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 09:10:39 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41059)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1jEuwX-00033s-Ru
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 09:10:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584623437;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=VtABQyJeGiivpX5K18NZUbOOvDYw74JrX+Vaderrm4I=;
- b=a6QPU5qAgKWegjjH9EPim/Nh/xYmxulzZFXKnip/C1rIP+Hu0fhGTcclJ19PMAoZhztXJi
- Ns8718Akd95jrxqXkArDiwDn+A4Z6fnEWiq5axUmqz6KCimR37uOCWApBOjTvpM5pUgo3e
- r19DguUs2rGINL8GZWbjZ7tCy06NFZk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-JfUmyJTSOTmrfEIvcj11iA-1; Thu, 19 Mar 2020 09:10:34 -0400
-X-MC-Unique: JfUmyJTSOTmrfEIvcj11iA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9E51801E78;
- Thu, 19 Mar 2020 13:10:33 +0000 (UTC)
-Received: from lpt (unknown [10.40.208.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BA3B9CA3;
- Thu, 19 Mar 2020 13:10:29 +0000 (UTC)
-Date: Thu, 19 Mar 2020 14:10:26 +0100
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH 1/1] conf: qemu 9pfs: add 'multidevs' option
-Message-ID: <20200319131026.GA2150275@lpt>
-References: <E1jEFpH-00028X-1c@lizzy.crudebyte.com>
- <E1jEFpL-00028n-Qj@lizzy.crudebyte.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1jEv5F-0001Gz-2M
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 09:19:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61160)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1jEv5E-0001EB-RT
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 09:19:37 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02JD3tLe064083
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 09:19:36 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8hwtq8r-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 09:19:35 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 19 Mar 2020 13:19:33 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 19 Mar 2020 13:19:31 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02JDJU3q54001778
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 19 Mar 2020 13:19:30 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 05F22A4060;
+ Thu, 19 Mar 2020 13:19:30 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A4A14A4054;
+ Thu, 19 Mar 2020 13:19:28 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.146.136])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 19 Mar 2020 13:19:28 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v11 01/16] s390x: Move diagnose 308 subcodes and rcs into ipl.h
+Date: Thu, 19 Mar 2020 09:19:06 -0400
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200319131921.2367-1-frankja@linux.ibm.com>
+References: <20200319131921.2367-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <E1jEFpL-00028n-Qj@lizzy.crudebyte.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8t9RHnE3ZwKMSgU+"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031913-0008-0000-0000-0000036002CD
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031913-0009-0000-0000-00004A8160AE
+Message-Id: <20200319131921.2367-2-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-19_04:2020-03-19,
+ 2020-03-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 spamscore=0
+ suspectscore=1 mlxlogscore=999 priorityscore=1501 impostorscore=0
+ phishscore=0 clxscore=1015 adultscore=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003190057
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,166 +102,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---8t9RHnE3ZwKMSgU+
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+They are part of the IPL process, so let's put them into the ipl
+header.
 
-On a Tuesday in 2020, Christian Schoenebeck wrote:
->Introduce new 'multidevs' option for filesystem.
->
->  <filesystem type='mount' accessmode='mapped' multidevs='remap'>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ hw/s390x/ipl.h      | 11 +++++++++++
+ target/s390x/diag.c | 11 -----------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-I don't like the 'multidevs' name, but cannot think of anything
-beter.
-
-'collisions' maybe?
-
->    <source dir='/path'/>
->    <target dir='mount_tag'>
->  </filesystem>
->
->This option prevents misbheaviours on guest if a 9pfs export
->contains multiple devices, due to the potential file ID collisions
->this otherwise may cause.
->
->Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
->---
-> docs/formatdomain.html.in     | 47 ++++++++++++++++++++++++++++++++++-
-> docs/schemas/domaincommon.rng | 10 ++++++++
-> src/conf/domain_conf.c        | 30 ++++++++++++++++++++++
-> src/conf/domain_conf.h        | 13 ++++++++++
-> src/qemu/qemu_command.c       |  7 ++++++
-> 5 files changed, 106 insertions(+), 1 deletion(-)
-
-Please split the XML changes from the qemu driver changes.
-
-Also missing:
-* qemu_capabilities addition
-* qemuDomainDeviceDefValidateFS in qemu_domain.c - check for the capability,
-   reject this setting for virtiofs
-* qemuxml2xmltest addition
-* qemuxml2argvtest addition
-
-(no changes required for virschematest - it checks all the XML files in
-the directories used by the above tests against the schema)
-
->
->diff --git a/docs/formatdomain.html.in b/docs/formatdomain.html.in
->index 594146009d..13c506988b 100644
->--- a/docs/formatdomain.html.in
->+++ b/docs/formatdomain.html.in
->@@ -3967,7 +3967,7 @@
->     &lt;source name='my-vm-template'/&gt;
->     &lt;target dir='/'/&gt;
->   &lt;/filesystem&gt;
->-  &lt;filesystem type='mount' accessmode='passthrough'&gt;
->+  &lt;filesystem type='mount' accessmode='passthrough' multidevs='remap'&gt;
->     &lt;driver type='path' wrpolicy='immediate'/&gt;
->     &lt;source dir='/export/to/guest'/&gt;
->     &lt;target dir='/import/from/host'/&gt;
->@@ -4084,13 +4084,58 @@
->         </dd>
->         </dl>
->
->+      <p>
->       <span class="since">Since 5.2.0</span>, the filesystem element
->       has an optional attribute <code>model</code> with supported values
->       "virtio-transitional", "virtio-non-transitional", or "virtio".
->       See <a href="#elementsVirtioTransitional">Virtio transitional devices</a>
->       for more details.
->+      </p>
->+
-
-Unrelated change that can be split out.
-
->+      <p>
->+      The filesystem element has an optional attribute <code>multidevs</code>
->+      which specifies how to deal with a filesystem export containing more than
->+      one device, in order to avoid file ID collisions on guest when using 9pfs
->+      (<span class="since">since 6.2.0, requires QEMU 4.2</span>).
->+      This attribute is not available for virtiofs. The possible values are:
->+      </p>
->+
->+        <dl>
->+        <dt><code>default</code></dt>
->+        <dd>
->+        Use QEMU's default setting (which currently is <code>warn</code>).
->+        </dd>
->+        <dt><code>remap</code></dt>
->+        <dd>
->+        This setting allows guest to access multiple devices per export without
->+        encountering misbehaviours. Inode numbers from host are automatically
->+        remapped on guest to actively prevent file ID collisions if guest
->+        accesses one export containing multiple devices.
->+        </dd>
->+        <dt><code>forbid</code></dt>
->+        <dd>
->+        Only allow to access one device per export by guest. Attempts to access
->+        additional devices on the same export will cause the individual
->+        filesystem access by guest to fail with an error and being logged (once)
->+        as error on host side.
->+        </dd>
->+        <dt><code>warn</code></dt>
->+        <dd>
->+        This setting resembles the behaviour of 9pfs prior to QEMU 4.2, that is
->+        no action is performed to prevent any potential file ID collisions if an
->+        export contains multiple devices, with the only exception: a warning is
->+        logged (once) on host side now. This setting may lead to misbehaviours
->+        on guest side if more than one device is exported per export, due to the
->+        potential file ID collisions this may cause on guest side in that case.
->+        </dd>
->+        </dl>
->+
->       </dd>
-
->
->+      <p>
->+      The <code>filesystem</code> element may contain the following subelements:
->+      </p>
->+
-
-And so can this one.
-
->       <dt><code>driver</code></dt>
->       <dd>
->         The optional driver element allows specifying further details
->@@ -25422,6 +25449,9 @@ virDomainFSDefFormat(virBufferPtr buf,
->         virBufferAsprintf(buf, " model='%s'",
->                           virDomainFSModelTypeToString(def->model));
->     }
->+    if (def->multidevs) {
->+        virBufferAsprintf(buf, " multidevs='%s'", multidevs);
->+    }
-
-make syntax-check complains here:
-Curly brackets around single-line body:
-../src/conf/domain_conf.c:25452-25454:
-     if (def->multidevs) {
-         virBufferAsprintf(buf, " multidevs='%s'", multidevs);
-     }
-
-Jano
-
---8t9RHnE3ZwKMSgU+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl5zbz4ACgkQ+YPwO/Ma
-t52KAAgAsIQTS0LKY2zT5gwKFsHeFPfT4wqqrKJRTRcVnEi7l8wyGs/exFfhqSjW
-EYD9EJ/YeBpqD0rwXXTS7+fDRhUoh+3L1HnTMr0/RBZI1iacMNQIKbjutFn7zy3M
-fXnEjYbcLiJm1WDY6n9JeNoTYEzDGTBoaHjHETSNfceLPGc8UBDsg1TtLHbKWUcr
-KmhwZhfn95RnL0LzjlIZze7Tzp049Xr7dtzfcRoQTPtLIEyD7c4d/FhI2ViU0nME
-RAgLkpB6IGcI0Uogyar9B+bXGVgm49aVUiU/Ijx1m2yMduQXWGVfTm0F1u97sv6X
-z7o+AEpEzS5wmstTgGwcyrRaeXe5ow==
-=b175
------END PGP SIGNATURE-----
-
---8t9RHnE3ZwKMSgU+--
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 3e44abe1c651d8a0..a5665e6bfde2e8cf 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -159,6 +159,17 @@ struct S390IPLState {
+ typedef struct S390IPLState S390IPLState;
+ QEMU_BUILD_BUG_MSG(offsetof(S390IPLState, iplb) & 3, "alignment of iplb wrong");
+ 
++#define DIAG_308_RC_OK              0x0001
++#define DIAG_308_RC_NO_CONF         0x0102
++#define DIAG_308_RC_INVALID         0x0402
++
++#define DIAG308_RESET_MOD_CLR       0
++#define DIAG308_RESET_LOAD_NORM     1
++#define DIAG308_LOAD_CLEAR          3
++#define DIAG308_LOAD_NORMAL_DUMP    4
++#define DIAG308_SET                 5
++#define DIAG308_STORE               6
++
+ #define S390_IPL_TYPE_FCP 0x00
+ #define S390_IPL_TYPE_CCW 0x02
+ #define S390_IPL_TYPE_QEMU_SCSI 0xff
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index 54e5670b3fd6d960..8aba6341f94848e1 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -49,17 +49,6 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+     return diag288_class->handle_timer(diag288, func, timeout);
+ }
+ 
+-#define DIAG_308_RC_OK              0x0001
+-#define DIAG_308_RC_NO_CONF         0x0102
+-#define DIAG_308_RC_INVALID         0x0402
+-
+-#define DIAG308_RESET_MOD_CLR       0
+-#define DIAG308_RESET_LOAD_NORM     1
+-#define DIAG308_LOAD_CLEAR          3
+-#define DIAG308_LOAD_NORMAL_DUMP    4
+-#define DIAG308_SET                 5
+-#define DIAG308_STORE               6
+-
+ static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
+                               uintptr_t ra, bool write)
+ {
+-- 
+2.25.1
 
 
