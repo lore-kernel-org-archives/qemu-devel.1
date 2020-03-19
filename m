@@ -2,73 +2,82 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A542C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF30C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:46:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29C662072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:42:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C662072C
+	by mail.kernel.org (Postfix) with ESMTPS id 8C32B20774
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:46:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UYUVEMJX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C32B20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jF1zO-0001fM-Cb
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:42:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40577)
+	id 1jF248-0005d1-Gp
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:46:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jF1yk-0001EK-Mw
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:41:24 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jF230-0004MR-Ty
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jF1yi-0005tu-3l
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:41:22 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53948)
+ (envelope-from <peter.maydell@linaro.org>) id 1jF22z-0003s6-M1
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:45:46 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:36601)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jF1yh-0005rs-Tp
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:41:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jF1yg-0007r6-1p
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 20:41:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0B2762E80C0
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 20:41:18 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jF22z-0003rp-G7
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:45:45 -0400
+Received: by mail-oi1-x231.google.com with SMTP id k18so4247549oib.3
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 13:45:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=u8i+STaYIVMKJpdw0yrvzes4GxekyH6+mEdvx45gyUE=;
+ b=UYUVEMJXZboEpZAUnNLpweVgdpo4v6tQCjjtN/bRj0hdS1zmGi1+RYYPpO8XEi4nTN
+ SbKQFVwT8WNRQVh1Q4KmgstPP09MVGcBSTXIsGncSEJH8VqEiz2mB5geIQGgkPGHPElT
+ mhYK6n/OJ88oo4MHOrbRi9tmiTgdjEzJYS6A6KB25248UNLmBeejr3keWAl0hlJ+GEtY
+ jmtyYDvhp4QrCaFfpH9Cb6wkQcHAT6TZKvP1nZR8HY8DnO7AnzxPBF6Zp250IDkilqaX
+ ZnYQLLnvzUStzI5QAIm4ekntNj/z52wUiHnmNANkmpG8nJXDW8o9lxLtjMFmgeiXyMKl
+ UbMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=u8i+STaYIVMKJpdw0yrvzes4GxekyH6+mEdvx45gyUE=;
+ b=HGqsH4GvPIRfr+LlBtK+LP+qFnk8w/Y4rDDNALQ6gO0VQkq9Hyw06q1pKOhKGd7va0
+ vMkLgM+uUenXVZNi0hVYUfokbX/rPhL1MZHm9v/HJhQlgg0ubW/SPBmqu4zt21fP+SLz
+ Qo9sXWbTL94SU7ux0LPAl1xgXE9y7ImBVQ+LxNRG8U7GvJihDvMKJyMadIDIVQuxengq
+ virn5IjJil3J0jfQ8iqhS4TkRqW5AjQzvqthQvmuaAAMPOXpI2zEOuyjI1IZzaR90LML
+ pdFCZ41/rIeDIQCLlyWoOiI1LoEllCoPH8elEQrSzynzPU2JvlaiNByxV9R4QcJzVXhH
+ eUcg==
+X-Gm-Message-State: ANhLgQ3q5l5UuJFUS2YAwRrepU0D3Zyn/BsnVD9fxPs66vsfesikn8WZ
+ d+DUDJxvRJmuJAAHaxtI3uSeHXGKa6njHaSt8f9GRQ==
+X-Google-Smtp-Source: ADFU+vtxT4gsdf4BmMJYz2x7lBvHIeiXx2Y7YzWjC89o6urJ5vQBdvBBDO9r9BHBjP26FVMlyvyQDsnqBJmRstzvGEs=
+X-Received: by 2002:aca:190f:: with SMTP id l15mr3721504oii.48.1584650744411; 
+ Thu, 19 Mar 2020 13:45:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Mar 2020 20:35:38 -0000
+References: <20200319092627.51487-1-laurent@vivier.eu>
+In-Reply-To: <20200319092627.51487-1-laurent@vivier.eu>
 From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mhodog pmaydell
-X-Launchpad-Bug-Reporter: Robert Henry (mhodog)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <158386917575.11737.1131406657888792626.malonedeb@soybean.canonical.com>
-Message-Id: <158465013901.10809.11650771508592729707.malone@soybean.canonical.com>
-Subject: [Bug 1866892] Re: guest OS catches a page fault bug when running
- dotnet
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0aaf4bcf41ee99d576683efd10dfd77b4a8424da
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Date: Thu, 19 Mar 2020 20:45:33 +0000
+Message-ID: <CAFEAcA_rHYVD35BGjHLv9vbevj9dX8FM+H-ctiYVvwiwrkabyg@mail.gmail.com>
+Subject: Re: [PULL v3 00/16] Linux user for 5.0 patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::231
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,148 +86,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1866892 <1866892@bugs.launchpad.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks, that's pretty clear. I expect you'll find the bug is just that
-QEMU doesn't get the semantics of an iret from userspace correct. The
-helper_iret_protected() function is probably a good place to look.
+On Thu, 19 Mar 2020 at 09:29, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 373c7068dd610e97f0b551b5a6d0a27cd6da4506:
+>
+>   qemu.nsi: Install Sphinx documentation (2020-03-09 16:45:00 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/linux-user-for-5.0-pull-request
+>
+> for you to fetch changes up to c91518bb0649f09e2c636790603907ef93ea95d4:
+>
+>   linux-user, openrisc: sync syscall numbers with kernel v5.5 (2020-03-19 09:22:21 +0100)
+>
+> ----------------------------------------------------------------
+> update syscall numbers to linux 5.5 (with scripts)
+> add futex_time64/clock_gettime64/clock_settime64
+> add AT_EXECFN
+> Emulate x86_64 vsyscalls
+>
+> v3: remove syscall.tbl series
+> v2: guard copy_to_user_timezone() with TARGET_NR_gettimeofday
+>     remove "Support futex_time64" patch
+>     guard sys_futex with TARGET_NR_exit
+>
+> ----------------------------------------------------------------
 
--- =
+Still fails:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1866892
+/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/x86_64-linux-user/qemu-x86_64
+-L ./gnemul/qemu-x86_64 x86_64/ls -l dummyfile
+qemu: 0x40008117e9: unhandled CPU exception 0x101 - aborting
+RAX=000000000000003f RBX=000000006ffffe34 RCX=0000004000800b18
+RDX=0000004000813180
+RSI=0000000000000064 RDI=0000004000800670 RBP=000000006fffff40
+RSP=0000004000800668
+R8 =0000000000000000 R9 =0000004000800b45 R10=0000004000801a18
+R11=0000004000801260
+R12=00000040008008c0 R13=0000000000000008 R14=0000000000400040
+R15=00000040008032d0
+RIP=00000040008117e9 RFL=00000246 [---Z-P-] CPL=3 II=0 A20=1 SMM=0 HLT=0
+ES =0000 0000000000000000 00000000 00000000
+CS =0033 0000000000000000 ffffffff 00effb00 DPL=3 CS64 [-RA]
+SS =002b 0000000000000000 ffffffff 00cff300 DPL=3 DS   [-WA]
+DS =0000 0000000000000000 00000000 00000000
+FS =0000 0000000000000000 00000000 00000000
+GS =0000 0000000000000000 00000000 00000000
+LDT=0000 0000000000000000 0000ffff 00008200 DPL=0 LDT
+TR =0000 0000000000000000 0000ffff 00008b00 DPL=0 TSS64-busy
+GDT=     000000400091a000 0000007f
+IDT=     0000004000919000 000001ff
+CR0=80010001 CR2=0000000000000000 CR3=0000000000000000 CR4=00000220
+DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000
+DR3=0000000000000000
+DR6=00000000ffff0ff0 DR7=0000000000000400
+EFER=0000000000000500
+Makefile:6: recipe for target 'test' failed
+make: *** [test] Error 127
 
-Title:
-  guest OS catches a page  fault bug when running dotnet
-
-Status in QEMU:
-  New
-
-Bug description:
-  The linux guest OS catches a page fault bug when running the dotnet
-  application.
-
-  host =3D metal =3D x86_64
-  host OS =3D ubuntu 19.10
-  qemu emulation, without KVM, with "tiny code generator" tcg; no plugins; =
-built from head/master
-  guest emulation =3D x86_64
-  guest OS =3D ubuntu 19.10
-  guest app =3D dotnet, running any program
-
-  qemu sha=3D7bc4d1980f95387c4cc921d7a066217ff4e42b70 (head/master Mar 10,
-  2020)
-
-  qemu invocation is:
-
-  qemu/build/x86_64-softmmu/qemu-system-x86_64 \
-    -m size=3D4096 \
-    -smp cpus=3D1 \
-    -machine type=3Dpc-i440fx-5.0,accel=3Dtcg \
-    -cpu Skylake-Server-v1 \
-    -nographic \
-    -bios OVMF-pure-efi.fd \
-    -drive if=3Dnone,id=3Dhd0,file=3Dubuntu-19.10-server-cloudimg-amd64.img=
- \
-    -device virtio-blk,drive=3Dhd0 \
-    -drive if=3Dnone,id=3Dcloud,file=3Dlinux_cloud_config.img \
-    -device virtio-blk,drive=3Dcloud \
-    -netdev user,id=3Duser0,hostfwd=3Dtcp::2223-:22 \
-    -device virtio-net,netdev=3Duser0
-
-  =
-
-  Here's the guest kernel console output:
-
-  =
-
-  [ 2834.005449] BUG: unable to handle page fault for address: 00007fffffff=
-c2c0
-  [ 2834.009895] #PF: supervisor read access in user mode
-  [ 2834.013872] #PF: error_code(0x0001) - permissions violation
-  [ 2834.018025] IDT: 0xfffffe0000000000 (limit=3D0xfff) GDT: 0xfffffe00000=
-01000 (limit=3D0x7f)
-  [ 2834.022242] LDTR: NULL
-  [ 2834.026306] TR: 0x40 -- base=3D0xfffffe0000003000 limit=3D0x206f
-  [ 2834.030395] PGD 80000000360d0067 P4D 80000000360d0067 PUD 36105067 PMD=
- 36193067 PTE 8000000076d8e867
-  [ 2834.038672] Oops: 0001 [#4] SMP PTI
-  [ 2834.042707] CPU: 0 PID: 13537 Comm: dotnet Tainted: G      D          =
- 5.3.0-29-generic #31-Ubuntu
-  [ 2834.050591] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S 0.0.0 02/06/2015
-  [ 2834.054785] RIP: 0033:0x1555547eaeda
-  [ 2834.059017] Code: d0 00 00 00 4c 8b a7 d8 00 00 00 4c 8b af e0 00 00 0=
-0 4c 8b b7 e8 00 00 00 4c 8b bf f0 00 00 00 48 8b bf b0 00 00 00 9d 74 02 <=
-48> cf 48 8d 64 24 30 5d c3 90 cc c3 66 90 55 4c 8b a7 d8 00 00 00
-  [ 2834.072103] RSP: 002b:00007fffffffc2c0 EFLAGS: 00000202
-  [ 2834.076507] RAX: 0000000000000000 RBX: 00001554b401af38 RCX: 000000000=
-0000001
-  [ 2834.080832] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00007ffff=
-fffcfb0
-  [ 2834.085010] RBP: 00007fffffffd730 R08: 0000000000000000 R09: 00007ffff=
-fffd1b0
-  [ 2834.089184] R10: 0000155555331dd5 R11: 00001555553ad8d0 R12: 000000000=
-0000002
-  [ 2834.093350] R13: 0000000000000001 R14: 0000000000000001 R15: 00001554b=
-401d388
-  [ 2834.097309] FS:  0000155554fa5740 GS:  0000000000000000
-  [ 2834.101131] Modules linked in: isofs nls_iso8859_1 dm_multipath scsi_d=
-h_rdac scsi_dh_emc scsi_dh_alua ppdev input_leds serio_raw parport_pc parpo=
-rt sch_fq_codel ip_tables x_tables autofs4 btrfs zstd_compress raid10 raid4=
-56 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq =
-libcrc32c raid1 raid0 multipath linear crct10dif_pclmul crc32_pclmul ghash_=
-clmulni_intel aesni_intel aes_x86_64 crypto_simd cryptd glue_helper virtio_=
-net psmouse net_failover failover virtio_blk floppy
-  [ 2834.122539] CR2: 00007fffffffc2c0
-  [ 2834.126867] ---[ end trace dfae51f1d9432708 ]---
-  [ 2834.131239] RIP: 0033:0x14d793262eda
-  [ 2834.135715] Code: Bad RIP value.
-  [ 2834.140243] RSP: 002b:00007ffddb4e2980 EFLAGS: 00000202
-  [ 2834.144615] RAX: 0000000000000000 RBX: 000014d6f402acb8 RCX: 000000000=
-0000002
-  [ 2834.148943] RDX: 0000000001cd6950 RSI: 0000000000000000 RDI: 00007ffdd=
-b4e3670
-  [ 2834.153335] RBP: 00007ffddb4e3df0 R08: 0000000000000001 R09: 00007ffdd=
-b4e3870
-  [ 2834.157774] R10: 000014d793da9dd5 R11: 000014d793e258d0 R12: 000000000=
-0000002
-  [ 2834.162132] R13: 0000000000000001 R14: 0000000000000001 R15: 000014d6f=
-402d040
-  [ 2834.166239] FS:  0000155554fa5740(0000) GS:ffff97213ba00000(0000) knlG=
-S:0000000000000000
-  [ 2834.170529] CS:  0033 DS: 0000 ES: 0000 CR0: 0000000080050033
-  [ 2834.174751] CR2: 000014d793262eb0 CR3: 0000000036130000 CR4: 000000000=
-07406f0
-  [ 2834.178892] PKRU: 55555554
-
-  I run the application from a shell with `ulimit -s unlimited`
-  (unlimited stack to size).
-
-  The application creates a number of threads, and those threads make a
-  lot of calls to sigaltstack() and mprotect(); see the relevant source
-  for dotnet here
-  https://github.com/dotnet/runtime/blob/15ec69e47b4dc56098e6058a11ccb6ae4d=
-5d4fa1/src/coreclr/src/pal/src/thread/thread.cpp#L2467
-
-  using strace -f on the app shows that no alt stacks come anywhere near
-  the failing address; all alt stacks are in the heap, as expected.
-  None of the mmap/mprotect/munmap syscalls were given arguments in the
-  high memory 0x7fffffff0000 and up.
-
-  gdb (with default signal stop/print/pass semantics) does not report
-  any signals prior to the kernel bug being tripped, so I doubt the
-  alternate signal stack is actually used.
-
-  When I run the same dotnet binary on the host (eg, on "bare metal"),
-  the host kernel seems happy and dotnet runs as expected.
-
-  I have not tried different qemu or guest or host O/S.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1866892/+subscriptions
+thanks
+-- PMM
 
