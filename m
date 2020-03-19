@@ -2,81 +2,80 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1E6C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B91C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:14:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9FFD2072D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DBDF2072D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:14:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqSKa+f5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9FFD2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IObK/vTb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DBDF2072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEwmw-0003sw-QU
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 11:08:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58945)
+	id 1jEwrz-0006Eq-5v
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 11:14:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jEwmN-0003Qy-8M
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:08:16 -0400
+ (envelope-from <linus.walleij@linaro.org>) id 1jEwrN-0005ot-LY
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jEwmL-00010b-Gb
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:08:14 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47487)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jEwmL-000101-Cx
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:08:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584630492;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/mtgzCdv9sKXyH05tbd38LH95LLZVXgjX5yGisTonng=;
- b=cqSKa+f5he9znPhsfOBTZj7Upe1Wl2pY3Ch+O2NVzZVyv3Fkvz+OElaevSqZ0jM9REdMy8
- ovy+WiucIbISh43+WzTYBrMntnL4NbOyUD6Op+tW0cPIxSS9jPqguhJ6VEkWMGKG4Fmldl
- PDzhLDOVpeMyTIQo872WBLJBVZA2RTU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-CgnmQsQ6M--FMSGClc5o4w-1; Thu, 19 Mar 2020 11:08:09 -0400
-X-MC-Unique: CgnmQsQ6M--FMSGClc5o4w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B088F801E6C;
- Thu, 19 Mar 2020 15:08:07 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.100])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DD1E7BBBD7;
- Thu, 19 Mar 2020 15:08:01 +0000 (UTC)
-Date: Thu, 19 Mar 2020 16:08:00 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.0 1/2] hw/acpi/piix4: Add 'system-hotplug-support'
- property
-Message-ID: <20200319160800.614de5fb@redhat.com>
-In-Reply-To: <4d42697e-ba84-e5af-3a17-a2cc52cf0dbc@redhat.com>
-References: <20200318221531.22910-1-philmd@redhat.com>
- <20200318221531.22910-2-philmd@redhat.com>
- <20200319114424.5723e777@office.mammed.net>
- <4d42697e-ba84-e5af-3a17-a2cc52cf0dbc@redhat.com>
+ (envelope-from <linus.walleij@linaro.org>) id 1jEwrL-0006Wq-4k
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:13:25 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:45933)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
+ id 1jEwrK-0006Tq-S1
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:13:23 -0400
+Received: by mail-lf1-x144.google.com with SMTP id x143so1913096lff.12
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:13:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/uotPJyrFZ0V5dJBIBxpoXcAAW/RZupCPGuZpTwdN+s=;
+ b=IObK/vTbu2r1EwtJUxcOkt/weNgwAIs+CHTDvFgznXHZYVnCuvygzfOBa4JLbHT97b
+ W9XtSA7rUSeyqs4nYmn9mTKNKjGB079S+l2sxY3DvKZFnHs93Sb1SYARR39KY1nD5L26
+ /tKgb1jIfCLitehDbmJwfWQipefcZm7L02maSR1IKYDj3oB3T83NhKnIgOSh9+KEIgNl
+ TKDSLoErLO8Nl1dNdDkofdlbfXby0LIXIuFEbQ7kA4LH+4gbAwq0FBa7ki43wI29SXcr
+ z5XGe0X6erHAQQGBtOyfxylFoG3kI/gx/XwBTVRsH+cX4Pz5xNURnZMmaTjSAEji452K
+ LLvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/uotPJyrFZ0V5dJBIBxpoXcAAW/RZupCPGuZpTwdN+s=;
+ b=NXstnMlTewEnV/CBPFDdyNF71/BhtP0q96/7oh0NMa0qaK+ICNc7J954eh7TqHZQQH
+ 7PMPZDiHalOrPfx1MMYXA0OYjGyCgS8c4Fh7EFr8CjIHcbpqQGFMjLuvmMXzknivAWgS
+ mWJwRuhgrQ3UxgHE9TCbZ124n0rd317Lnls54r4YFplCgnzjztFvG9z76ZUdfAn7hrQz
+ nCUyVUuPwQwlD42kw2EEKyYEngAwWIwdERJTm3F/tKSimLkodeLqK2KteKMzQkhQzvsQ
+ CL9gKmVNpEqOc/XWWIcbOtUFNkUmM7pCV4sHURVnZI82khnU3sE/M3b8pupByMxcxl/S
+ UvyA==
+X-Gm-Message-State: ANhLgQ3KCMAQYPauuZTCDAymlPDXSEuW1Pj3SHT9EDPT9AdLm2QML3AO
+ lve1jYw7yE9XB2eeXHwFbAu8uDgbttTPNZ7BqE/fHw==
+X-Google-Smtp-Source: ADFU+vu1xSj2mSTjDUg4SXO/2v8/tid2EhIWeZkU86OKVTq9D1e8crqiiKiOF6X8KpVKbvzB2tB2QO5h9YFRavOMQH4=
+X-Received: by 2002:ac2:4552:: with SMTP id j18mr2475295lfm.89.1584630800987; 
+ Thu, 19 Mar 2020 08:13:20 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200317113153.7945-1-linus.walleij@linaro.org>
+ <CAFEAcA9mXE+gPnvM6HZ-w0+BhbpeuH=osFH-9NUzCLv=w-c7HQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9mXE+gPnvM6HZ-w0+BhbpeuH=osFH-9NUzCLv=w-c7HQ@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 19 Mar 2020 16:13:09 +0100
+Message-ID: <CACRpkdZtLNUwiZEMiJEoB0ojOBckyGcZeyFkR6MC69qv-ry9EA@mail.gmail.com>
+Subject: Re: [PATCH] ext4: Give 32bit personalities 32bit hashes
+To: Peter Maydell <peter.maydell@linaro.org>,
+ "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,121 +87,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: Theodore Ts'o <tytso@mit.edu>, Linux API <linux-api@vger.kernel.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, stable <stable@vger.kernel.org>,
+ Florian Weimer <fw@deneb.enyo.de>, Andreas Dilger <adilger.kernel@dilger.ca>,
+ Andy Lutomirski <luto@kernel.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Ext4 Developers List <linux-ext4@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Mar 2020 12:04:11 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Tue, Mar 17, 2020 at 12:58 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> On Tue, 17 Mar 2020 at 11:31, Linus Walleij <linus.walleij@linaro.org> wrote:
+> >
+> > It was brought to my attention that this bug from 2018 was
+> > still unresolved: 32 bit emulators like QEMU were given
+> > 64 bit hashes when running 32 bit emulation on 64 bit systems.
+> >
+> > The personality(2) system call supports to let processes
+> > indicate that they are 32 bit Linux to the kernel. This
+> > was suggested by Teo in the original thread, so I just wired
+> > it up and it solves the problem.
+>
+> Thanks for having a look at this. I'm not sure this is what
+> QEMU needs, though. When QEMU runs, it is not a 32-bit
+> process, it's a 64-bit process. Some of the syscalls
+> it makes are on behalf of the guest and would need 32-bit
+> semantics (including this one of wanting 32-bit hash sizes
+> in directory reads). But some syscalls it makes for itself
+> (either directly, or via libraries it's linked against
+> including glibc and glib) -- those would still want the
+> usual 64-bit semantics, I would have thought.
 
-> On 3/19/20 11:44 AM, Igor Mammedov wrote:
-> > On Wed, 18 Mar 2020 23:15:30 +0100
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> >  =20
-> >> The I/O ranges registered by the piix4_acpi_system_hot_add_init()
-> >> function are not documented in the PIIX4 datasheet.
-> >> This appears to be a PC-only feature added in commit 5e3cb5347e
-> >> ("initialize hot add system / acpi gpe") which was then moved
-> >> to the PIIX4 device model in commit 9d5e77a22f ("make
-> >> qemu_system_device_hot_add piix independent")
-> >> Add a property (default enabled, to not modify the current
-> >> behavior) to allow machines wanting to model a simple PIIX4
-> >> to disable this feature.
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =20
-> >=20
-> > it's already pretty twisted code and adding one more knob
-> > to workaround other compat knobs makes it worse.
-> >=20
-> > Even though it's not really welcomed approach,
-> > we can ifdef all hotplug parts and compile them out for mips
-> > dropping along the way linking with not needed dependencies =20
->=20
-> We can't use use target-specific poisoned definitions to ifdef out in=20
-> generic hw/ code.
->=20
-> > or
-> > more often used, make stubs from hotplug parts for mips
-> > and link with them. =20
->=20
-> So the problem is this device doesn't match the hardware datasheet, has=
-=20
-> extra features helping virtualization, and now we can not simplify it=20
-> due to backward compat.
->=20
-> Once Michael said he doesn't care about the PIIX4, only the PIIX3=20
-> southbridge [1] [2], but then the i440fx pc machine uses a PIIX3 with a=
-=20
-> pci PM function from PIIX4, and made that PII4_PM Frankenstein.
->=20
-> You are asking me to choose between worse versus ugly?
-That 'ugly' is typically used within QEMU to deal with such things
-probably due to its low complexity.
+The "personality" thing is a largely unused facility that
+a process can use to say it has this generic behaviour.
+In this case we say we have the PER_LINUX32 personality
+so it will make the process evoke 32bit behaviours inside
+the kernel when dealing with this process.
 
-> The saner outcome I see is make the current PIIX4_PM x86-specific, not=20
-> modifying the code, and start a fresh new copy respecting the datasheet.
-properly implementing spec would be quite a task
-(although if motivation is just for fun, then why not)
+Which I (loosely) appreciate that we want to achieve.
 
->=20
-> Note I'm not particularly interested in MIPS here, but having model=20
-> respecting the hardware.
->=20
-> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg504270.html
-> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg601512.html
->=20
-> >  =20
-> >> ---
-> >> Should I squash this with the next patch and start with
-> >> default=3Dfalse, which is closer to the hardware model?
-> >> ---
-> >>   hw/acpi/piix4.c | 9 +++++++--
-> >>   1 file changed, 7 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> >> index 964d6f5990..9c970336ac 100644
-> >> --- a/hw/acpi/piix4.c
-> >> +++ b/hw/acpi/piix4.c
-> >> @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
-> >>  =20
-> >>       AcpiPciHpState acpi_pci_hotplug;
-> >>       bool use_acpi_pci_hotplug;
-> >> +    bool use_acpi_system_hotplug;
-> >>  =20
-> >>       uint8_t disable_s3;
-> >>       uint8_t disable_s4;
-> >> @@ -503,8 +504,10 @@ static void piix4_pm_realize(PCIDevice *dev, Erro=
-r **errp)
-> >>       s->machine_ready.notify =3D piix4_pm_machine_ready;
-> >>       qemu_add_machine_init_done_notifier(&s->machine_ready);
-> >>  =20
-> >> -    piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
-> >> -                                   pci_get_bus(dev), s);
-> >> +    if (s->use_acpi_system_hotplug) {
-> >> +        piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
-> >> +                                       pci_get_bus(dev), s);
-> >> +    }
-> >>       qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s), &erro=
-r_abort);
-> >>  =20
-> >>       piix4_pm_add_propeties(s);
-> >> @@ -635,6 +638,8 @@ static Property piix4_pm_properties[] =3D {
-> >>                        use_acpi_pci_hotplug, true),
-> >>       DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-> >>                        acpi_memory_hotplug.is_enabled, true),
-> >> +    DEFINE_PROP_BOOL("system-hotplug-support", PIIX4PMState,
-> >> +                     use_acpi_system_hotplug, true),
-> >>       DEFINE_PROP_END_OF_LIST(),
-> >>   };
-> >>    =20
-> >  =20
->=20
->=20
+> > Programs that need the 32 bit hash only need to issue the
+> > personality(PER_LINUX32) call and things start working.
+>
+> What in particular does this personality setting affect?
+> My copy of the personality(2) manpage just says:
+>
+>        PER_LINUX32 (since Linux 2.2)
+>               [To be documented.]
+>
+> which isn't very informative.
 
+It's not a POSIX thing (not part of the Single Unix Specification)
+so as with most Linux things it has some fuzzy semantics
+defined by the community...
+
+I usually just go to the source.
+
+If you grep the kernel what turns up is a bunch of
+architecture-specific behaviors on arm64, ia64, mips, parisc,
+powerpc, s390, sparc. They are very minor.
+
+On x86_64 the semantic effect is
+none so this would work for any kind of 32bit userspace
+on x86_64. It would be the first time this flag has any
+effect at all on x86_64, but arguably a useful one.
+
+I would not be surprised if running say i586 on x86_64
+has the same problem, just that noone has reported
+it yet. But what do I know. If they have the same problem
+they can use the same solution. Hm QEMU supports
+emulating i586 or even i386 ... maybe you could test?
+Or tell me how to test? We might be solving a bigger
+issue here.
+
+Yours,
+Linus Walleij
 
