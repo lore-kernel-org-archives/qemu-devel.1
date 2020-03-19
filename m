@@ -2,86 +2,89 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6327CC4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB193C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:29:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 244BB20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:27:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A86F520768
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:29:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZH9Be3x1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 244BB20724
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qbbAZzOK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A86F520768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEktw-0002QG-9H
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 22:27:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47755)
+	id 1jEkwS-0003QK-Su
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 22:29:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48983)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1jEktI-0001nn-OA
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:26:37 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jEkvr-0002uY-Eh
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:29:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1jEktH-0006PX-PC
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:26:36 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40305)
+ (envelope-from <npiggin@gmail.com>) id 1jEkvq-0005lm-06
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:29:15 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33597)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1jEktF-0006Hv-5G; Wed, 18 Mar 2020 22:26:33 -0400
-Received: by mail-pf1-x444.google.com with SMTP id l184so540230pfl.7;
- Wed, 18 Mar 2020 19:26:32 -0700 (PDT)
+ id 1jEkvp-0005hK-Qe; Wed, 18 Mar 2020 22:29:13 -0400
+Received: by mail-pf1-x443.google.com with SMTP id n7so565299pfn.0;
+ Wed, 18 Mar 2020 19:29:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:subject:to:cc:references:in-reply-to:mime-version
  :user-agent:message-id:content-transfer-encoding;
- bh=Sj0K9+9Fvh+zhCdmDXlRxzujyTsNq9yW97D/j4g6Hi4=;
- b=ZH9Be3x1cR1krdwMTvWuqQNKWyqi46JKVn1ZRsmCKob8+rCMIueSakzobQv9aHG+uW
- YHOQiSiNJEKORYAgbQoSTfl8mermVX9mazBF41cIieKr/Q4em3G1+cBAraJSt9HNtveH
- t3/8qz3rBY8qMDORJ5iVSGjPHsSVA8W9jXV9YIwxfAboGIBSnc7sNPpGV9Y8c4bEKNh7
- guojEQEWi4yboBrc8Ndj49BIiet+7/dlfjXYW/mwXtqT3PukMioZ5KCLkN4bXesHwIg3
- AHIivjhgeYZqktDndgT6DXMgcWC4EnusgRlRslQ42SkFO4h7VoG2Asjw7Sop9r8gXAWl
- GsNw==
+ bh=69JCyOFRTHiCDcQ0HWPnIX1pUDtFwQ8tQgJ9HDRCQOE=;
+ b=qbbAZzOKwukl55ZB6szfmedKABbeJ1Ads450fCkz2LikvmzoaMbt08ageXHqBi0fBf
+ +O0PoLJ8dIwWclNjXg+dpTkX1V8TbcA69e0JCtv43CTziTQ7I0EtfSBKltSqJ31IxKXt
+ asKr16OVqNF2ME8sgJ3yg0/fhGbx1WQemw4qkjSrEj3wyE/UHqN6LArnBR/z7mFl67DM
+ MDSON+r91U4uqsiqpya38aFEmsr0nyRy5pFE7uy/0DoJ5+APWAJmfs/3G2uqyefLQ9Ev
+ 8vlZk+9APx68t500c1GTdzJtbjFv050xOkBRoxX6jph8GfZ1c7YHGPjz1tpxQvQrOwaX
+ cJ4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
  :mime-version:user-agent:message-id:content-transfer-encoding;
- bh=Sj0K9+9Fvh+zhCdmDXlRxzujyTsNq9yW97D/j4g6Hi4=;
- b=GacgxPbOqa4NOkMukeHDBpzQW5V0DQEG9362OK9gLlop80zmRVKI0fELWLj09hMggd
- E3t8HGFjQf6b6FN0wyVLJ+5w5b01/zc/pe1eJlcD2lbZ8L3nj8YzBM9Iz0v/fnPOe+5f
- axSQgWj00KVycxJ04ECIsAAFiFh/cOCt+avQrPMH2oD8ZA9+rdRzR6bU/8p7b1Mscb/r
- FRhtmg2X9gHm9BPaTIvU2j3hUz6GEMUKNCRG7wWnys3AyY6ZVrE6JbfGfDvx0Wqjg5RE
- 620QvSdrKyO5TNolW8ODm81sbtMx/Un4/kGPw87RR0XFe6IB1qzuuedBUQ5i/yf2tNiz
- 2IhA==
-X-Gm-Message-State: ANhLgQ13gI7I92d92JsK2z4dSoZsihTHv09U20+gyEuHGmp6yUZBRhhq
- KAfnRfPlOlLj2PYR6DTw0NU=
-X-Google-Smtp-Source: ADFU+vvB4VWMBRkDkUzZIXfOOvwrWNhH4zsGdBvpQT0sauUVRQMce/pmR8g6z6BXDVMFhiwUJfYv1A==
-X-Received: by 2002:a65:494f:: with SMTP id q15mr836085pgs.383.1584584791715; 
- Wed, 18 Mar 2020 19:26:31 -0700 (PDT)
+ bh=69JCyOFRTHiCDcQ0HWPnIX1pUDtFwQ8tQgJ9HDRCQOE=;
+ b=CqgIX2ODwDZF1Pg7EyMPoRhJzOU88hbf7fJg1ZI3jJtWU8Tq1lfloNd1FTvnMMb6KO
+ B2DGMCWuagC4uogwigu2xiqe6PyxMSLht/epUY1M2QwOhlnJvxgNaDcDRCn36B+oqfIY
+ E4idka0U3t0z6WsvcYdBOzwoDX5JQTOAtJ13IdBBWY+HKi4o2MYZ3Kf578ZlnEMx7tpS
+ rtA8yxe9uC2tEDIQCUOajqqTi9UOazCSnMKQPh9MXSaTsreBnnKqQAS5BofQVtsN31vH
+ IK6EC+nP6QF5WS/uY/Ul6AOfPaLp+DHPOEEDD4A93bcwQTcq7uMxxAckFzWhrGcQCWd4
+ /mEg==
+X-Gm-Message-State: ANhLgQ2rL8LcIc8kO7eqdZD/ZUPgDb3YBEFjfCZvf9IFGvOq0GSfMquV
+ jfT9Zr5cktR5R36NPuNfcwQ=
+X-Google-Smtp-Source: ADFU+vvOGoTY2wHOeG//jtIL8mn1RX+HKGyXRSCqK7xvEzlgDrecJ8oNaHZqZ3ClglNO6DHDoQgJOw==
+X-Received: by 2002:a63:309:: with SMTP id 9mr853688pgd.193.1584584952773;
+ Wed, 18 Mar 2020 19:29:12 -0700 (PDT)
 Received: from localhost (14-202-190-183.tpgi.com.au. [14.202.190.183])
- by smtp.gmail.com with ESMTPSA id q71sm273916pjb.5.2020.03.18.19.26.29
+ by smtp.gmail.com with ESMTPSA id u24sm333799pgo.83.2020.03.18.19.29.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Mar 2020 19:26:30 -0700 (PDT)
-Date: Thu, 19 Mar 2020 12:24:41 +1000
+ Wed, 18 Mar 2020 19:29:11 -0700 (PDT)
+Date: Thu, 19 Mar 2020 12:27:22 +1000
 From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [EXTERNAL] [PATCH 1/2] target/ppc: Fix slbia TLB invalidation gap
-To: =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org
-References: <20200318044135.851716-1-npiggin@gmail.com>
- <b4a5674c-12b0-68c5-fc2b-94b8d5675ee3@kaod.org>
-In-Reply-To: <b4a5674c-12b0-68c5-fc2b-94b8d5675ee3@kaod.org>
+Subject: Re: [PATCH 1/5] ppc/spapr: KVM FWNMI should not be enabled until
+ guest requests it
+To: Greg Kurz <groug@kaod.org>
+References: <20200317050215.159334-1-npiggin@gmail.com>
+ <20200317050215.159334-2-npiggin@gmail.com>
+ <20200317120214.58195d0e@bahia.lan>
+In-Reply-To: <20200317120214.58195d0e@bahia.lan>
 MIME-Version: 1.0
 User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1584584632.f0iyej012p.astroid@bobo.none>
+Message-Id: <1584584746.exy0ui5cdw.astroid@bobo.none>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,43 +96,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ =?iso-8859-1?q?C=E9dric_Le=0A?= Goater <clg@fr.ibm.com>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org,
+ =?iso-8859-1?q?David=0A?= Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-C=C3=A9dric Le Goater's on March 19, 2020 2:45 am:
-> On 3/18/20 5:41 AM, Nicholas Piggin wrote:
->> slbia must invalidate TLBs even if it does not remove a valid SLB
->> entry, because slbmte can overwrite valid entries without removing
->> their TLBs.
->>=20
->> As the architecture says, slbia invalidates all lookaside information,
->> not conditionally based on if it removed valid entries.
->>=20
->> It does not seem possible for POWER8 or earlier Linux kernels to hit
->> this bug because it never changes its kernel SLB translations, and it
->> should always have valid entries if any accesses are made to usespace
->> regions. However other operating systems which may modify SLB entry 0
->> or do more fancy things with segments might be affected.
+Greg Kurz's on March 17, 2020 9:02 pm:
+> On Tue, 17 Mar 2020 15:02:11 +1000
+> Nicholas Piggin <npiggin@gmail.com> wrote:
 >=20
-> Did you hit the bug on the other OS ?=20
-
-No, hit it when fixing POWER9 hash.
-
-> =20
->> When POWER9 slbia support is added in the next patch, this becomes a
->> real problem because some new slbia variants don't invalidate all
->> non-zero entries.
+>> The KVM FWNMI capability should be enabled with the "ibm,nmi-register"
+>> rtas call. Although MCEs from KVM will be delivered as architected
+>> interrupts to the guest before "ibm,nmi-register" is called, KVM has
+>> different behaviour depending on whether the guest has enabled FWNMI
+>> (it attempts to do more recovery on behalf of a non-FWNMI guest).
 >>=20
 >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>  hw/ppc/spapr_caps.c  | 5 +++--
+>>  hw/ppc/spapr_rtas.c  | 7 +++++++
+>>  target/ppc/kvm.c     | 7 +++++++
+>>  target/ppc/kvm_ppc.h | 6 ++++++
+>>  4 files changed, 23 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+>> index 679ae7959f..eb5521d0c2 100644
+>> --- a/hw/ppc/spapr_caps.c
+>> +++ b/hw/ppc/spapr_caps.c
+>> @@ -517,9 +517,10 @@ static void cap_fwnmi_apply(SpaprMachineState *spap=
+r, uint8_t val,
+>>      }
+>> =20
+>>      if (kvm_enabled()) {
+>> -        if (kvmppc_set_fwnmi() < 0) {
+>> +        if (!kvmppc_get_fwnmi()) {
+>>              error_setg(errp, "Firmware Assisted Non-Maskable Interrupts=
+(FWNMI) "
+>> -                             "not supported by KVM");
+>> +                             "not supported by KVM, "
+>> +                             "try appending -machine cap-fwnmi=3Doff");
 >=20
-> Looks correct.
+> It is usually preferred to keep error message strings on one
+> line for easier grepping. Also hints should be specified with
+> error_append_hint() because they are treated differently by
+> QMP (ie. not printed).
 >=20
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Something like:
+>=20
+>         if (!kvmppc_get_fwnmi()) {
+>             error_setg(errp,
+>        "Firmware Assisted Non-Maskable Interrupts(FWNMI) not supported by=
+ KVM");
+>             error_append_hint(errp, "Try appending -machine cap-fwnmi=3Do=
+ff\n");
+>         }
 
-Thanks,
+Hmm, okay.
+
+>=20
+> Note that the current error handling code has an issue that
+> prevents hints to be printed when errp =3D=3D &error_fatal, which
+> is exactly what spapr_caps_apply() does. Since this affects
+> a lot of locations in the code base, there's an on-going
+> effort to fix that globally:
+>=20
+> https://patchwork.ozlabs.org/project/qemu-devel/list/?series=3D163907
+>=20
+> I don't know if this will make it for 5.0, but in any case I
+> think you should call error_append_hint() in this patch anyway
+> and the code will just work at some later point.
+>=20
+> Rest looks good.
+
+Thanks will do,
 Nick
+
 =
 
