@@ -2,53 +2,74 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E45EDC4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:49:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD03FC4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:55:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0FDD20732
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:49:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0FDD20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 9874920722
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:55:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DB+UHcOt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9874920722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEroD-0000mr-SK
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:49:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46531)
+	id 1jErtU-0002je-KV
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:55:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jErnS-0000KL-QK
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:49:05 -0400
+ (envelope-from <ppandit@redhat.com>) id 1jErsn-0001rD-1i
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jErnQ-0006Oj-2o
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:49:02 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:54378)
+ (envelope-from <ppandit@redhat.com>) id 1jErsl-0004qr-LU
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:32 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35977)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jErnK-0005yY-8k; Thu, 19 Mar 2020 05:48:54 -0400
-Received: from apples.localdomain (80-62-117-52-mobile.dk.customer.tdc.net
- [80.62.117.52])
- by charlie.dont.surf (Postfix) with ESMTPSA id 1BD82BF5A6;
- Thu, 19 Mar 2020 09:48:51 +0000 (UTC)
-Date: Thu, 19 Mar 2020 10:48:47 +0100
-From: Klaus Birkelund Jensen <its@irrelevant.dk>
-To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Subject: Re: [PATCH v3] block/nvme: introduce PMR support from NVMe 1.4 spec
-Message-ID: <20200319094847.fb24tqay6t34m7hp@apples.localdomain>
-References: <20200318200303.11322-1-andrzej.jakowski@linux.intel.com>
+ (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1jErsl-0004qP-I7
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584611670;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=TQEf021rsn2O+uJbv2MfnoWfJZ1YBI7MF/3VxixkJtQ=;
+ b=DB+UHcOtr/gd2gBWqAYDD89ZQxeMMTScDPhSVsef6arr+8WUEEhf1ZSP1PKwropYY7mEaP
+ ESWYGP5gbi/OFMaNG4JzcTWBQo0yXkzHj4YzIIQOMOvfHYLWqlmC1rhGyQpz4KusjMIycy
+ Nae9b5uqrI+ZkFe3TmlL4TGElV84gfA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-288-0E0u7c4LMg-reZ3CdgGLxQ-1; Thu, 19 Mar 2020 05:54:25 -0400
+X-MC-Unique: 0E0u7c4LMg-reZ3CdgGLxQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8403A8018CE;
+ Thu, 19 Mar 2020 09:54:23 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.192.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 67D5491296;
+ Thu, 19 Mar 2020 09:54:17 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: [PATCH v4 0/3] net: tulip: add checks to avoid OOB access
+Date: Thu, 19 Mar 2020 15:22:08 +0530
+Message-Id: <20200319095211.741445-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200318200303.11322-1-andrzej.jakowski@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 128.199.63.193
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,506 +81,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, haozhong.zhang@intel.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, yi.z.zhang@linux.intel.com,
- junyan.he@intel.com, kbusch@kernel.org, dgilbert@redhat.com
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Li Qiang <pangpei.lq@antfin.com>, Sven Schnelle <svens@stackframe.org>,
+ Ziming Zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mar 18 13:03, Andrzej Jakowski wrote:
-> This patch introduces support for PMR that has been defined as part of NVMe 1.4
-> spec. User can now specify a pmrdev option that should point to HostMemoryBackend.
-> pmrdev memory region will subsequently be exposed as PCI BAR 2 in emulated NVMe
-> device. Guest OS can perform mmio read and writes to the PMR region that will stay
-> persistent across system reboot.
-> 
-> Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-> ---
-> v2:
->  - reworked PMR to use HostMemoryBackend instead of directly mapping PMR
->    backend file into qemu [1] (Stefan)
-> 
-> v1:
->  - provided support for Bit 1 from PMRWBM register instead of Bit 0 to ensure
->    improved performance in virtualized environment [2] (Stefan)
-> 
->  - added check if pmr size is power of two in size [3] (David)
-> 
->  - addressed cross compilation build problems reported by CI environment
-> 
-> [1]: https://lore.kernel.org/qemu-devel/20200306223853.37958-1-andrzej.jakowski@linux.intel.com/
-> [2]: https://nvmexpress.org/wp-content/uploads/NVM-Express-1_4-2019.06.10-Ratified.pdf
-> [3]: https://lore.kernel.org/qemu-devel/20200218224811.30050-1-andrzej.jakowski@linux.intel.com/
-> ---
-> Persistent Memory Region (PMR) is a new optional feature provided in NVMe 1.4
-> specification. This patch implements initial support for it in NVMe driver.
-> ---
->  hw/block/nvme.c       | 117 +++++++++++++++++++++++++++-
->  hw/block/nvme.h       |   2 +
->  hw/block/trace-events |   5 ++
->  include/block/nvme.h  | 172 ++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 294 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index d28335cbf3..70fd09d293 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -19,10 +19,18 @@
->   *      -drive file=<file>,if=none,id=<drive_id>
->   *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
->   *              cmb_size_mb=<cmb_size_mb[optional]>, \
-> + *              [pmrdev=<mem_backend_file_id>,] \
->   *              num_queues=<N[optional]>
->   *
->   * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
->   * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-> + *
-> + * Either cmb or pmr - due to limitation in available BAR indexes.
-> + * pmr_file file needs to be power of two in size.
-> + * Enabling pmr emulation can be achieved by pointing to memory-backend-file.
-> + * For example:
-> + * -object memory-backend-file,id=<mem_id>,share=on,mem-path=<file_path>, \
-> + *  size=<size> .... -device nvme,...,pmrdev=<mem_id>
->   */
->  
->  #include "qemu/osdep.h"
-> @@ -35,7 +43,9 @@
->  #include "sysemu/sysemu.h"
->  #include "qapi/error.h"
->  #include "qapi/visitor.h"
-> +#include "sysemu/hostmem.h"
->  #include "sysemu/block-backend.h"
-> +#include "exec/ramblock.h"
->  
->  #include "qemu/log.h"
->  #include "qemu/module.h"
-> @@ -1141,6 +1151,26 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
->          NVME_GUEST_ERR(nvme_ub_mmiowr_cmbsz_readonly,
->                         "invalid write to read only CMBSZ, ignored");
->          return;
-> +    case 0xE00: /* PMRCAP */
-> +        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrcap_readonly,
-> +                       "invalid write to PMRCAP register, ignored");
-> +        return;
-> +    case 0xE04: /* TODO PMRCTL */
-> +        break;
-> +    case 0xE08: /* PMRSTS */
-> +        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrsts_readonly,
-> +                       "invalid write to PMRSTS register, ignored");
-> +        return;
-> +    case 0xE0C: /* PMREBS */
-> +        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrebs_readonly,
-> +                       "invalid write to PMREBS register, ignored");
-> +        return;
-> +    case 0xE10: /* PMRSWTP */
-> +        NVME_GUEST_ERR(nvme_ub_mmiowr_pmrswtp_readonly,
-> +                       "invalid write to PMRSWTP register, ignored");
-> +        return;
-> +    case 0xE14: /* TODO PMRMSC */
-> +         break;
->      default:
->          NVME_GUEST_ERR(nvme_ub_mmiowr_invalid,
->                         "invalid MMIO write,"
-> @@ -1169,6 +1199,23 @@ static uint64_t nvme_mmio_read(void *opaque, hwaddr addr, unsigned size)
->      }
->  
->      if (addr < sizeof(n->bar)) {
-> +        /*
-> +         * When PMRWBM bit 1 is set then read from
-> +         * from PMRSTS should ensure prior writes
-> +         * made it to persistent media
-> +         */
-> +        if (addr == 0xE08 &&
-> +            (NVME_PMRCAP_PMRWBM(n->bar.pmrcap) & 0x02) >> 1) {
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Don't think that shift is needed.
+Hello,
 
-> +            int status;
-> +
-> +            status = qemu_msync((void *)n->pmrdev->mr.ram_block->host,
-> +                                n->pmrdev->size,
-> +                                n->pmrdev->mr.ram_block->fd);
-> +            if (!status) {
-> +                NVME_GUEST_ERR(nvme_ub_mmiord_pmrread_barrier,
-> +                               "error while persisting data");
-> +            }
-> +        }
->          memcpy(&val, ptr + addr, size);
->      } else {
->          NVME_GUEST_ERR(nvme_ub_mmiord_invalid_ofs,
-> @@ -1332,6 +1379,23 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->          error_setg(errp, "serial property not set");
->          return;
->      }
-> +
-> +    if (!n->cmb_size_mb && n->pmrdev) {
-> +        if (host_memory_backend_is_mapped(n->pmrdev)) {
-> +            char *path = object_get_canonical_path_component(OBJECT(n->pmrdev));
-> +            error_setg(errp, "can't use already busy memdev: %s", path);
-> +            g_free(path);
-> +            return;
-> +        }
-> +
-> +        if (!is_power_of_2(n->pmrdev->size)) {
-> +            error_setg(errp, "pmr backend size needs to be power of 2 in size");
-> +            return;
-> +        }
-> +
-> +        host_memory_backend_set_mapped(n->pmrdev, true);
-> +    }
-> +
->      blkconf_blocksizes(&n->conf);
->      if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
->                                         false, errp)) {
-> @@ -1393,7 +1457,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->      n->bar.intmc = n->bar.intms = 0;
->  
->      if (n->cmb_size_mb) {
-> -
->          NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
->          NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
->  
-> @@ -1415,6 +1478,51 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->              PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
->              PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
->  
-> +    } else if (n->pmrdev) {
-> +        /* Controller Capabilities register */
-> +        NVME_CAP_SET_PMRS(n->bar.cap, 1);
-> +
-> +        /* PMR Capabities register */
-> +        n->bar.pmrcap = 0;
-> +        NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
-> +        NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
-> +        NVME_PMRCAP_SET_BIR(n->bar.pmrcap, 2);
-> +        NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
-> +        /* Turn on bit 1 support */
-> +        NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
-> +        NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
-> +        NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
-> +
-> +        /* PMR Control register */
-> +        n->bar.pmrctl = 0;
-> +        NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
-> +
-> +        /* PMR Status register */
-> +        n->bar.pmrsts = 0;
-> +        NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
-> +        NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
-> +        NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
-> +        NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
-> +
-> +        /* PMR Elasticity Buffer Size register */
-> +        n->bar.pmrebs = 0;
-> +        NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
-> +        NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
-> +        NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
-> +
-> +        /* PMR Sustained Write Throughput register */
-> +        n->bar.pmrswtp = 0;
-> +        NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
-> +        NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
-> +
-> +        /* PMR Memory Space Control register */
-> +        n->bar.pmrmsc = 0;
-> +        NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
-> +        NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
-> +
-> +        pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
-> +            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
-> +            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
->      }
->  
->      for (i = 0; i < n->num_namespaces; i++) {
-> @@ -1441,15 +1549,20 @@ static void nvme_exit(PCIDevice *pci_dev)
->      g_free(n->namespaces);
->      g_free(n->cq);
->      g_free(n->sq);
-> -
->      if (n->cmb_size_mb) {
->          g_free(n->cmbuf);
->      }
-> +
-> +    if (n->pmrdev) {
-> +        host_memory_backend_set_mapped(n->pmrdev, false);
-> +    }
->      msix_uninit_exclusive_bar(pci_dev);
->  }
->  
->  static Property nvme_props[] = {
->      DEFINE_BLOCK_PROPERTIES(NvmeCtrl, conf),
-> +    DEFINE_PROP_LINK("pmrdev", NvmeCtrl, pmrdev, TYPE_MEMORY_BACKEND,
-> +                     HostMemoryBackend *),
->      DEFINE_PROP_STRING("serial", NvmeCtrl, serial),
->      DEFINE_PROP_UINT32("cmb_size_mb", NvmeCtrl, cmb_size_mb, 0),
->      DEFINE_PROP_UINT32("num_queues", NvmeCtrl, num_queues, 64),
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 557194ee19..6520a9f0be 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -83,6 +83,8 @@ typedef struct NvmeCtrl {
->      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
->  
->      char            *serial;
-> +    HostMemoryBackend *pmrdev;
-> +
->      NvmeNamespace   *namespaces;
->      NvmeSQueue      **sq;
->      NvmeCQueue      **cq;
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index c03e80c2c9..233e094438 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -110,10 +110,15 @@ nvme_ub_mmiowr_ssreset_w1c_unsupported(void) "attempted to W1C CSTS.NSSRO but CA
->  nvme_ub_mmiowr_ssreset_unsupported(void) "attempted NVM subsystem reset but CAP.NSSRS is zero (not supported)"
->  nvme_ub_mmiowr_cmbloc_reserved(void) "invalid write to reserved CMBLOC when CMBSZ is zero, ignored"
->  nvme_ub_mmiowr_cmbsz_readonly(void) "invalid write to read only CMBSZ, ignored"
-> +nvme_ub_mmiowr_pmrcap_readonly(void) "invalid write to read only PMRCAP, ignored"
-> +nvme_ub_mmiowr_pmrsts_readonly(void) "invalid write to read only PMRSTS, ignored"
-> +nvme_ub_mmiowr_pmrebs_readonly(void) "invalid write to read only PMREBS, ignored"
-> +nvme_ub_mmiowr_pmrswtp_readonly(void) "invalid write to read only PMRSWTP, ignored"
->  nvme_ub_mmiowr_invalid(uint64_t offset, uint64_t data) "invalid MMIO write, offset=0x%"PRIx64", data=0x%"PRIx64""
->  nvme_ub_mmiord_misaligned32(uint64_t offset) "MMIO read not 32-bit aligned, offset=0x%"PRIx64""
->  nvme_ub_mmiord_toosmall(uint64_t offset) "MMIO read smaller than 32-bits, offset=0x%"PRIx64""
->  nvme_ub_mmiord_invalid_ofs(uint64_t offset) "MMIO read beyond last register, offset=0x%"PRIx64", returning 0"
-> +nvme_ub_mmiord_pmrread_barrier(void) "failed to persists data"
->  nvme_ub_db_wr_misaligned(uint64_t offset) "doorbell write not 32-bit aligned, offset=0x%"PRIx64", ignoring"
->  nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell write for nonexistent queue, cqid=%"PRIu32", ignoring"
->  nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue doorbell write value beyond queue size, cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index 8fb941c653..374262d4b7 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -15,6 +15,13 @@ typedef struct NvmeBar {
->      uint64_t    acq;
->      uint32_t    cmbloc;
->      uint32_t    cmbsz;
-> +    uint8_t     padding[3520]; /* not used by QEMU */
-> +    uint32_t    pmrcap;
-> +    uint32_t    pmrctl;
-> +    uint32_t    pmrsts;
-> +    uint32_t    pmrebs;
-> +    uint32_t    pmrswtp;
-> +    uint32_t    pmrmsc;
->  } NvmeBar;
->  
->  enum NvmeCapShift {
-> @@ -27,6 +34,7 @@ enum NvmeCapShift {
->      CAP_CSS_SHIFT      = 37,
->      CAP_MPSMIN_SHIFT   = 48,
->      CAP_MPSMAX_SHIFT   = 52,
-> +    CAP_PMR_SHIFT      = 56,
->  };
->  
->  enum NvmeCapMask {
-> @@ -39,6 +47,7 @@ enum NvmeCapMask {
->      CAP_CSS_MASK       = 0xff,
->      CAP_MPSMIN_MASK    = 0xf,
->      CAP_MPSMAX_MASK    = 0xf,
-> +    CAP_PMR_MASK       = 0x1,
->  };
->  
->  #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
-> @@ -69,6 +78,8 @@ enum NvmeCapMask {
->                                                             << CAP_MPSMIN_SHIFT)
->  #define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
->                                                              << CAP_MPSMAX_SHIFT)
-> +#define NVME_CAP_SET_PMRS(cap, val) (cap |= (uint64_t)(val & CAP_PMR_MASK)\
-> +                                                            << CAP_PMR_SHIFT)
->  
->  enum NvmeCcShift {
->      CC_EN_SHIFT     = 0,
-> @@ -205,6 +216,167 @@ enum NvmeCmbszMask {
->  #define NVME_CMBSZ_GETSIZE(cmbsz) \
->      (NVME_CMBSZ_SZ(cmbsz) * (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz))))
->  
-> +enum NvmePmrcapShift {
-> +    PMRCAP_RDS_SHIFT   = 3,
-> +    PMRCAP_WDS_SHIFT   = 4,
-> +    PMRCAP_BIR_SHIFT   = 5,
-> +    PMRCAP_PMRTU_SHIFT   = 8,
-> +    PMRCAP_PMRWBM_SHIFT   = 10,
-> +    PMRCAP_PMRTO_SHIFT   = 16,
-> +    PMRCAP_CMSS_SHIFT   = 24,
-> +};
+* This series adds checks to avoid potential OOB access and infinite loop
+  issues while processing rx/tx data.
 
-Can these be aligned?
+* Tulip tx descriptors are capped at 128 to avoid infinite loop in
+  tulip_xmit_list_update(), wrt Tulip kernel driver
+  -> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
+e/drivers/net/ethernet/dec/tulip/tulip.h#n319
 
-> +
-> +enum NvmePmrcapMask {
-> +    PMRCAP_RDS_MASK   = 0x1,
-> +    PMRCAP_WDS_MASK   = 0x1,
-> +    PMRCAP_BIR_MASK   = 0x7,
-> +    PMRCAP_PMRTU_MASK   = 0x3,
-> +    PMRCAP_PMRWBM_MASK   = 0xf,
-> +    PMRCAP_PMRTO_MASK   = 0xff,
-> +    PMRCAP_CMSS_MASK   = 0x1,
-> +};
+* Update v3: add .can_receive routine
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg06275.html
 
-Can these be aligned?
+* Update v4: flush queued packets once they are received
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg05868.html
 
-> +
-> +#define NVME_PMRCAP_RDS(pmrcap)    \
-> +    ((pmrcap >> PMRCAP_RDS_SHIFT)   & PMRCAP_RDS_MASK)
-> +#define NVME_PMRCAP_WDS(pmrcap)    \
-> +    ((pmrcap >> PMRCAP_WDS_SHIFT)   & PMRCAP_WDS_MASK)
-> +#define NVME_PMRCAP_BIR(pmrcap)    \
-> +    ((pmrcap >> PMRCAP_BIR_SHIFT)   & PMRCAP_BIR_MASK)
-> +#define NVME_PMRCAP_PMRTU(pmrcap)    \
-> +    ((pmrcap >> PMRCAP_PMRTU_SHIFT)   & PMRCAP_PMRTU_MASK)
-> +#define NVME_PMRCAP_PMRWBM(pmrcap)    \
-> +    ((pmrcap >> PMRCAP_PMRWBM_SHIFT)   & PMRCAP_PMRWBM_MASK)
-> +#define NVME_PMRCAP_PMRTO(pmrcap)    \
-> +    ((pmrcap >> PMRCAP_PMRTO_SHIFT)   & PMRCAP_PMRTO_MASK)
-> +#define NVME_PMRCAP_CMSS(pmrcap)    \
-> +    ((pmrcap >> PMRCAP_CMSS_SHIFT)   & PMRCAP_CMSS_MASK)
-> +
-> +#define NVME_PMRCAP_SET_RDS(pmrcap, val)   \
-> +    (pmrcap |= (uint64_t)(val & PMRCAP_RDS_MASK) << PMRCAP_RDS_SHIFT)
-> +#define NVME_PMRCAP_SET_WDS(pmrcap, val)   \
-> +    (pmrcap |= (uint64_t)(val & PMRCAP_WDS_MASK) << PMRCAP_WDS_SHIFT)
-> +#define NVME_PMRCAP_SET_BIR(pmrcap, val)   \
-> +    (pmrcap |= (uint64_t)(val & PMRCAP_BIR_MASK) << PMRCAP_BIR_SHIFT)
-> +#define NVME_PMRCAP_SET_PMRTU(pmrcap, val)   \
-> +    (pmrcap |= (uint64_t)(val & PMRCAP_PMRTU_MASK) << PMRCAP_PMRTU_SHIFT)
-> +#define NVME_PMRCAP_SET_PMRWBM(pmrcap, val)   \
-> +    (pmrcap |= (uint64_t)(val & PMRCAP_PMRWBM_MASK) << PMRCAP_PMRWBM_SHIFT)
-> +#define NVME_PMRCAP_SET_PMRTO(pmrcap, val)   \
-> +    (pmrcap |= (uint64_t)(val & PMRCAP_PMRTO_MASK) << PMRCAP_PMRTO_SHIFT)
-> +#define NVME_PMRCAP_SET_CMSS(pmrcap, val)   \
-> +    (pmrcap |= (uint64_t)(val & PMRCAP_CMSS_MASK) << PMRCAP_CMSS_SHIFT)
-> +
-> +enum NvmePmrctlShift {
-> +    PMRCTL_EN_SHIFT   = 0,
-> +};
-> +
-> +enum NvmePmrctlMask {
-> +    PMRCTL_EN_MASK   = 0x1,
-> +};
-> +
-> +#define NVME_PMRCTL_EN(pmrctl)  ((pmrctl >> PMRCTL_EN_SHIFT)   & PMRCTL_EN_MASK)
-> +
-> +#define NVME_PMRCTL_SET_EN(pmrctl, val)   \
-> +    (pmrctl |= (uint64_t)(val & PMRCTL_EN_MASK) << PMRCTL_EN_SHIFT)
-> +
-> +enum NvmePmrstsShift {
-> +    PMRSTS_ERR_SHIFT   = 0,
-> +    PMRSTS_NRDY_SHIFT   = 8,
-> +    PMRSTS_HSTS_SHIFT   = 9,
-> +    PMRSTS_CBAI_SHIFT   = 12,
-> +};
-> +
-> +enum NvmePmrstsMask {
-> +    PMRSTS_ERR_MASK   = 0xff,
-> +    PMRSTS_NRDY_MASK   = 0x1,
-> +    PMRSTS_HSTS_MASK   = 0x7,
-> +    PMRSTS_CBAI_MASK   = 0x1,
-> +};
-> +
-> +#define NVME_PMRSTS_ERR(pmrsts)     \
-> +    ((pmrsts >> PMRSTS_ERR_SHIFT)   & PMRSTS_ERR_MASK)
-> +#define NVME_PMRSTS_NRDY(pmrsts)    \
-> +    ((pmrsts >> PMRSTS_NRDY_SHIFT)   & PMRSTS_NRDY_MASK)
-> +#define NVME_PMRSTS_HSTS(pmrsts)    \
-> +    ((pmrsts >> PMRSTS_HSTS_SHIFT)   & PMRSTS_HSTS_MASK)
-> +#define NVME_PMRSTS_CBAI(pmrsts)    \
-> +    ((pmrsts >> PMRSTS_CBAI_SHIFT)   & PMRSTS_CBAI_MASK)
-> +
-> +#define NVME_PMRSTS_SET_ERR(pmrsts, val)   \
-> +    (pmrsts |= (uint64_t)(val & PMRSTS_ERR_MASK) << PMRSTS_ERR_SHIFT)
-> +#define NVME_PMRSTS_SET_NRDY(pmrsts, val)   \
-> +    (pmrsts |= (uint64_t)(val & PMRSTS_NRDY_MASK) << PMRSTS_NRDY_SHIFT)
-> +#define NVME_PMRSTS_SET_HSTS(pmrsts, val)   \
-> +    (pmrsts |= (uint64_t)(val & PMRSTS_HSTS_MASK) << PMRSTS_HSTS_SHIFT)
-> +#define NVME_PMRSTS_SET_CBAI(pmrsts, val)   \
-> +    (pmrsts |= (uint64_t)(val & PMRSTS_CBAI_MASK) << PMRSTS_CBAI_SHIFT)
-> +
-> +enum NvmePmrebsShift {
-> +    PMREBS_PMRSZU_SHIFT   = 0,
-> +    PMREBS_RBB_SHIFT   = 4,
-> +    PMREBS_PMRWBZ_SHIFT   = 8,
-> +};
-> +
-> +enum NvmePmrebsMask {
-> +    PMREBS_PMRSZU_MASK   = 0xf,
-> +    PMREBS_RBB_MASK   = 0x1,
-> +    PMREBS_PMRWBZ_MASK   = 0xffffff,
-> +};
+Thank you.
+--
+Prasad J Pandit (3):
+  net: tulip: check frame size and r/w data length
+  net: tulip: add .can_recieve routine
+  net: tulip: flush queued packets post receive
 
-Alignment.
+ hw/net/tulip.c | 51 +++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 42 insertions(+), 9 deletions(-)
 
-> +
-> +#define NVME_PMREBS_PMRSZU(pmrebs)  \
-> +    ((pmrebs >> PMREBS_PMRSZU_SHIFT)   & PMREBS_PMRSZU_MASK)
-> +#define NVME_PMREBS_RBB(pmrebs)     \
-> +    ((pmrebs >> PMREBS_RBB_SHIFT)   & PMREBS_RBB_MASK)
-> +#define NVME_PMREBS_PMRWBZ(pmrebs)  \
-> +    ((pmrebs >> PMREBS_PMRWBZ_SHIFT)   & PMREBS_PMRWBZ_MASK)
-> +
-> +#define NVME_PMREBS_SET_PMRSZU(pmrebs, val)   \
-> +    (pmrebs |= (uint64_t)(val & PMREBS_PMRSZU_MASK) << PMREBS_PMRSZU_SHIFT)
-> +#define NVME_PMREBS_SET_RBB(pmrebs, val)   \
-> +    (pmrebs |= (uint64_t)(val & PMREBS_RBB_MASK) << PMREBS_RBB_SHIFT)
-> +#define NVME_PMREBS_SET_PMRWBZ(pmrebs, val)   \
-> +    (pmrebs |= (uint64_t)(val & PMREBS_PMRWBZ_MASK) << PMREBS_PMRWBZ_SHIFT)
-> +
-> +enum NvmePmrswtpShift {
-> +    PMRSWTP_PMRSWTU_SHIFT   = 0,
-> +    PMRSWTP_PMRSWTV_SHIFT   = 8,
-> +};
-> +
-> +enum NvmePmrswtpMask {
-> +    PMRSWTP_PMRSWTU_MASK   = 0xf,
-> +    PMRSWTP_PMRSWTV_MASK   = 0xffffff,
-> +};
-> +
-> +#define NVME_PMRSWTP_PMRSWTU(pmrswtp)   \
-> +    ((pmrswtp >> PMRSWTP_PMRSWTU_SHIFT)   & PMRSWTP_PMRSWTU_MASK)
-> +#define NVME_PMRSWTP_PMRSWTV(pmrswtp)   \
-> +    ((pmrswtp >> PMRSWTP_PMRSWTV_SHIFT)   & PMRSWTP_PMRSWTV_MASK)
-> +
-> +#define NVME_PMRSWTP_SET_PMRSWTU(pmrswtp, val)   \
-> +    (pmrswtp |= (uint64_t)(val & PMRSWTP_PMRSWTU_MASK) << PMRSWTP_PMRSWTU_SHIFT)
-> +#define NVME_PMRSWTP_SET_PMRSWTV(pmrswtp, val)   \
-> +    (pmrswtp |= (uint64_t)(val & PMRSWTP_PMRSWTV_MASK) << PMRSWTP_PMRSWTV_SHIFT)
-> +
-> +enum NvmePmrmscShift {
-> +    PMRMSC_CMSE_SHIFT   = 1,
-> +    PMRMSC_CBA_SHIFT   = 12,
-> +};
-> +
-> +enum NvmePmrmscMask {
-> +    PMRMSC_CMSE_MASK   = 0x1,
-> +    PMRMSC_CBA_MASK   = 0xfffffffffffff,
-> +};
+--
+2.25.1
 
-Alignment.
-
-> +
-> +#define NVME_PMRMSC_CMSE(pmrmsc)    \
-> +    ((pmrmsc >> PMRMSC_CMSE_SHIFT)   & PMRMSC_CMSE_MASK)
-> +#define NVME_PMRMSC_CBA(pmrmsc)     \
-> +    ((pmrmsc >> PMRMSC_CBA_SHIFT)   & PMRMSC_CBA_MASK)
-> +
-> +#define NVME_PMRMSC_SET_CMSE(pmrmsc, val)   \
-> +    (pmrmsc |= (uint64_t)(val & PMRMSC_CMSE_MASK) << PMRMSC_CMSE_SHIFT)
-> +#define NVME_PMRMSC_SET_CBA(pmrmsc, val)   \
-> +    (pmrmsc |= (uint64_t)(val & PMRMSC_CBA_MASK) << PMRMSC_CBA_SHIFT)
-> +
->  typedef struct NvmeCmd {
->      uint8_t     opcode;
->      uint8_t     fuse;
-> -- 
-> 2.21.1
-> 
-> 
-
-Tested and LGTM, just a couple of style fixes that I'd like to see.
-
-I would like a small comment at the top of nvme.c that noted that any
-configured CMB would take preference or have the device complain if both
-are configured.
-
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
 
