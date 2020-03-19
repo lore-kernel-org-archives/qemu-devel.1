@@ -2,67 +2,66 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20349C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 01:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58677C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 01:27:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D59F720767
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 01:14:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D59F720767
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1933020752
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 01:27:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1933020752
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEjlE-00046f-TJ
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 21:14:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49075)
+	id 1jEjyO-0007Ac-67
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 21:27:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jEjkV-0003en-La
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 21:13:29 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jEjxZ-0006CD-UO
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 21:27:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jEjkT-0005ew-FF
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 21:13:27 -0400
-Resent-Date: Wed, 18 Mar 2020 21:13:27 -0400
-Resent-Message-Id: <E1jEjkT-0005ew-FF@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21127)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jEjkT-0005OD-74; Wed, 18 Mar 2020 21:13:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584580398; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=dKEGs1FUzTaLQm270zxi8HAhuRVVMpIC/vUDIjN9F1AG1AXpITd/Z3LxyAwXwVj1FVUsf8QYF8ufDmGXagTr4tNrxDluc5BGlmaYu+aVGeWWe9FRLTBcGr7bpfAGr+pIpLB9QNN+uuAFvs28b4LFWh/DVQYlzu2VS780Fk3p94g=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584580398;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=vBe//cCQ7QMIrRvK6eaivOAhTV5qxp/qjkkAu6/Kci8=; 
- b=i48SFDsLM/LIpB/uqkzJcVJ83iyK4oYSOuM6XNlzY6d+4eGautCgVIerdL3xa6yUMhZl0C3nCRnDX0lvG7j8aNY97L9xO19j3plTmYY3UG194N+UU3coIet9lxAGeanSWvkWq5BjPB/k1SXwIxW278h1aPtdHn66pHVHZHvx/pQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584580395835228.2532722158419;
- Wed, 18 Mar 2020 18:13:15 -0700 (PDT)
-In-Reply-To: <cover.1584571250.git.alistair.francis@wdc.com>
-Subject: Re: [PATCH v9 0/4]  linux-user: generate syscall_nr.sh for RISC-V
-Message-ID: <158458039459.25478.10856694513466934921@39012742ff91>
+ (envelope-from <yan.y.zhao@intel.com>) id 1jEjxW-0001cI-Lo
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 21:26:56 -0400
+Received: from mga01.intel.com ([192.55.52.88]:28450)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jEjxW-0007z5-6S
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 21:26:54 -0400
+IronPort-SDR: kV5UMZZJLadXGcGFXSJh7Hlii8llg0AzOCcqD9WdPaMx9YcrzF19uJN1VgAfU47hgDQBy0IiX9
+ S/pWYYydOcyQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 18 Mar 2020 18:26:38 -0700
+IronPort-SDR: myUd6AGo14ImczSNYOjQ3J9JIp0T505rjFM+l8WRkb0P7jGVg85hWWQ8Vzf3c25p7PgMMUSsgO
+ sHYki/SW80Bg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,569,1574150400"; d="scan'208";a="391641101"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga004.jf.intel.com with ESMTP; 18 Mar 2020 18:26:32 -0700
+Date: Wed, 18 Mar 2020 21:17:03 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v14 Kernel 1/7] vfio: KABI for migration interface for
+ device state
+Message-ID: <20200319011703.GC4641@joy-OptiPlex-7040>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-2-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alistair.francis@wdc.com
-Date: Wed, 18 Mar 2020 18:13:15 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1584560474-19946-2-git-send-email-kwankhede@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,177 +73,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, laurent@vivier.eu,
- alistair.francis@wdc.com, alistair23@gmail.com, palmer@dabbelt.com
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTg0NTcxMjUwLmdp
-dC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2OSAwLzRdICBsaW51eC11c2VyOiBnZW5l
-cmF0ZSBzeXNjYWxsX25yLnNoIGZvciBSSVNDLVYKTWVzc2FnZS1pZDogY292ZXIuMTU4NDU3MTI1
-MC5naXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
-fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-Y2QyMGEzMyBsaW51eC11c2VyL3Jpc2N2OiBVcGRhdGUgdGhlIHN5c2NhbGxfbnIncyB0byB0aGUg
-NS41IGtlcm5lbAplMDY3NjdkIGxpbnV4LXVzZXI6IFN1cHBvcnQgZnV0ZXhfdGltZTY0Cjk2NWQ0
-MDYgbGludXgtdXNlci9zeXNjYWxsOiBBZGQgc3VwcG9ydCBmb3IgY2xvY2tfZ2V0dGltZTY0L2Ns
-b2NrX3NldHRpbWU2NAoyMWU0YjA3IGxpbnV4LXVzZXI6IFByb3RlY3QgbW9yZSBzeXNjYWxscwoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KMS80IENoZWNraW5nIGNvbW1pdCAyMWU0YjA3Zjc4YjggKGxp
-bnV4LXVzZXI6IFByb3RlY3QgbW9yZSBzeXNjYWxscykKMi80IENoZWNraW5nIGNvbW1pdCA5NjVk
-NDA2OTAxNDggKGxpbnV4LXVzZXIvc3lzY2FsbDogQWRkIHN1cHBvcnQgZm9yIGNsb2NrX2dldHRp
-bWU2NC9jbG9ja19zZXR0aW1lNjQpCjMvNCBDaGVja2luZyBjb21taXQgZTA2NzY3ZDU0YzljIChs
-aW51eC11c2VyOiBTdXBwb3J0IGZ1dGV4X3RpbWU2NCkKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNw
-ZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzIzOiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGwuYzoyNDg6CisjaWYgZGVmaW5lZChfX05SX2Z1dGV4KQoKV0FSTklORzogYXJjaGl0ZWN0
-dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzI2OiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGwuYzoyNTE6CisjaWYgZGVmaW5lZChfX05SX2Z1dGV4X3RpbWU2NCkKCldBUk5J
-Tkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMzNzog
-RklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzAzOgorI2lmIChkZWZpbmVkKFRBUkdFVF9OUl9m
-dXRleCkgJiYgZGVmaW5lZChfX05SX2Z1dGV4KSkgfHwgXAoKV0FSTklORzogYXJjaGl0ZWN0dXJl
-IHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzQzOiBGSUxFOiBsaW51eC11c2Vy
-L3N5c2NhbGwuYzozMDk6CisjaWYgZGVmaW5lZChfX05SX2Z1dGV4X3RpbWU2NCkKCkVSUk9SOiBz
-cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzQ0OiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGwuYzozMTA6Citfc3lzY2FsbDYoaW50LHN5c19mdXRleF90aW1lNjQsaW50ICos
-dWFkZHIsaW50LG9wLGludCx2YWwsCiAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVp
-cmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNDQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2Fs
-bC5jOjMxMDoKK19zeXNjYWxsNihpbnQsc3lzX2Z1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQs
-b3AsaW50LHZhbCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
-ZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4Ok94VikKIzQ0OiBGSUxFOiBsaW51eC11c2Vy
-L3N5c2NhbGwuYzozMTA6Citfc3lzY2FsbDYoaW50LHN5c19mdXRleF90aW1lNjQsaW50ICosdWFk
-ZHIsaW50LG9wLGludCx2YWwsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NDogRklM
-RTogbGludXgtdXNlci9zeXNjYWxsLmM6MzEwOgorX3N5c2NhbGw2KGludCxzeXNfZnV0ZXhfdGlt
-ZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLAogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywn
-IChjdHg6VnhWKQojNDQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjMxMDoKK19zeXNjYWxs
-NihpbnQsc3lzX2Z1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQsb3AsaW50LHZhbCwKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Ug
-cmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NDogRklMRTogbGludXgtdXNlci9z
-eXNjYWxsLmM6MzEwOgorX3N5c2NhbGw2KGludCxzeXNfZnV0ZXhfdGltZTY0LGludCAqLHVhZGRy
-LGludCxvcCxpbnQsdmFsLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4
-VikKIzQ0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzozMTA6Citfc3lzY2FsbDYoaW50LHN5
-c19mdXRleF90aW1lNjQsaW50ICosdWFkZHIsaW50LG9wLGludCx2YWwsCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBy
-ZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4Ok94VikKIzQ1OiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGwuYzozMTE6CisgICAgICAgICAgY29uc3Qgc3RydWN0IHRpbWVzcGVjICosdGltZW91dCxp
-bnQgKix1YWRkcjIsaW50LHZhbDMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NTogRklM
-RTogbGludXgtdXNlci9zeXNjYWxsLmM6MzExOgorICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1l
-c3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhh
-dCAnLCcgKGN0eDpPeFYpCiM0NTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzExOgorICAg
-ICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2
-YWwzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NTogRklMRTog
-bGludXgtdXNlci9zeXNjYWxsLmM6MzExOgorICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3Bl
-YyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVk
-IGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNDU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5j
-OjMxMToKKyAgICAgICAgICBjb25zdCBzdHJ1Y3QgdGltZXNwZWMgKix0aW1lb3V0LGludCAqLHVh
-ZGRyMixpbnQsdmFsMykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
-cyBzaG91bGQgYmUgYXZvaWRlZAojNTU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc3NjoK
-KyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXgpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMg
-ZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5j
-Ojc4MDoKKyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXhfdGltZTY0KQoKRVJST1I6IHNwYWNlIHJlcXVp
-cmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNjA6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2Fs
-bC5jOjc4MToKK3NhZmVfc3lzY2FsbDYoaW50LGZ1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQs
-b3AsaW50LHZhbCwgXAogICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQg
-YWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM2MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6
-NzgxOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxp
-bnQsdmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Ug
-cmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpPeFYpCiM2MDogRklMRTogbGludXgtdXNlci9z
-eXNjYWxsLmM6NzgxOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRy
-LGludCxvcCxpbnQsdmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM2MDogRklM
-RTogbGludXgtdXNlci9zeXNjYWxsLmM6NzgxOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGlt
-ZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAn
-LCcgKGN0eDpWeFYpCiM2MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NzgxOgorc2FmZV9z
-eXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLCBcCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
-YWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNjA6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbC5jOjc4MToKK3NhZmVfc3lzY2FsbDYoaW50LGZ1dGV4X3RpbWU2NCxpbnQgKix1
-YWRkcixpbnQsb3AsaW50LHZhbCwgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
-Y3R4OlZ4VikKIzYwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3ODE6CitzYWZlX3N5c2Nh
-bGw2KGludCxmdXRleF90aW1lNjQsaW50ICosdWFkZHIsaW50LG9wLGludCx2YWwsIFwKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
-IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6T3hWKQojNjE6IEZJTEU6IGxpbnV4
-LXVzZXIvc3lzY2FsbC5jOjc4MjoKKyAgICAgICAgICAgICAgY29uc3Qgc3RydWN0IHRpbWVzcGVj
-ICosdGltZW91dCxpbnQgKix1YWRkcjIsaW50LHZhbDMpCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChj
-dHg6VnhWKQojNjE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc4MjoKKyAgICAgICAgICAg
-ICAgY29uc3Qgc3RydWN0IHRpbWVzcGVjICosdGltZW91dCxpbnQgKix1YWRkcjIsaW50LHZhbDMp
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
-c3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpPeFYpCiM2MTogRklMRTogbGludXgt
-dXNlci9zeXNjYWxsLmM6NzgyOgorICAgICAgICAgICAgICBjb25zdCBzdHJ1Y3QgdGltZXNwZWMg
-Kix0aW1lb3V0LGludCAqLHVhZGRyMixpbnQsdmFsMykKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRl
-ciB0aGF0ICcsJyAoY3R4OlZ4VikKIzYxOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3ODI6
-CisgICAgICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFk
-ZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
-Y3R4OlZ4VikKIzYxOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3ODI6CisgICAgICAgICAg
-ICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwz
-KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQg
-YmUgYXZvaWRlZAojODQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY5MTM6CisjaWYgZGVm
-aW5lZChfX05SX2Z1dGV4KQoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMg
-c2hvdWxkIGJlIGF2b2lkZWQKIzkwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo2OTE5Ogor
-I2lmIGRlZmluZWQoX19OUl9mdXRleF90aW1lNjQpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3Bl
-Y2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojOTY6IEZJTEU6IGxpbnV4LXVzZXIvc3lz
-Y2FsbC5jOjY5MjU6CisjaWYgZGVmaW5lZChfX05SX2Z1dGV4KQoKV0FSTklORzogYXJjaGl0ZWN0
-dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzEwOTogRklMRTogbGludXgt
-dXNlci9zeXNjYWxsLmM6NjkzODoKKyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXgpCgpXQVJOSU5HOiBh
-cmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMTE0OiBGSUxF
-OiBsaW51eC11c2VyL3N5c2NhbGwuYzo2OTQzOgorI2lmIGRlZmluZWQoX19OUl9mdXRleF90aW1l
-NjQpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZv
-aWRlZAojMTIxOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo2OTUwOgorI2lmIGRlZmluZWQo
-X19OUl9mdXRleCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjg6IEZJTEU6
-IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjcwMTM6CitzdGF0aWMgaW50IGRvX2Z1dGV4X3RpbWU2NCh0
-YXJnZXRfdWxvbmcgdWFkZHIsIGludCBvcCwgaW50IHZhbCwgdGFyZ2V0X3Vsb25nIHRpbWVvdXQs
-CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUg
-bGluZQojMTc0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3MDE5OgorICAgIC8qID8/PyBX
-ZSBhc3N1bWUgRlVURVhfKiBjb25zdGFudHMgYXJlIHRoZSBzYW1lIG9uIGJvdGggaG9zdAoKV0FS
-TklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2VxdWVudCBsaW5lcwojMTc1OiBGSUxF
-OiBsaW51eC11c2VyL3N5c2NhbGwuYzo3MDIwOgorICAgIC8qID8/PyBXZSBhc3N1bWUgRlVURVhf
-KiBjb25zdGFudHMgYXJlIHRoZSBzYW1lIG9uIGJvdGggaG9zdAorICAgICAgIGFuZCB0YXJnZXQu
-ICAqLwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBh
-cmF0ZSBsaW5lCiMxNzU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjcwMjA6CisgICAgICAg
-YW5kIHRhcmdldC4gICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8q
-IG9uIGEgc2VwYXJhdGUgbGluZQojMTk5OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3MDQ0
-OgorICAgICAgICAvKiBGb3IgRlVURVhfUkVRVUVVRSwgRlVURVhfQ01QX1JFUVVFVUUsIGFuZCBG
-VVRFWF9XQUtFX09QLCB0aGUKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSAqIG9uIHN1YnNl
-cXVlbnQgbGluZXMKIzIwMDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NzA0NToKKyAgICAg
-ICAgLyogRm9yIEZVVEVYX1JFUVVFVUUsIEZVVEVYX0NNUF9SRVFVRVVFLCBhbmQgRlVURVhfV0FL
-RV9PUCwgdGhlCisgICAgICAgICAgIFRJTUVPVVQgcGFyYW1ldGVyIGlzIGludGVycHJldGVkIGFz
-IGEgdWludDMyX3QgYnkgdGhlIGtlcm5lbC4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBh
-IHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMjAzOiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGwuYzo3MDQ4OgorICAgICAgICAgICBzaW5jZSBpdCdzIG5vdCBjb21wYXJlZCB0byBndWVz
-dCBtZW1vcnkuICAqLwoKdG90YWw6IDI0IGVycm9ycywgMTkgd2FybmluZ3MsIDIxMiBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAzLzQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvNCBDaGVja2lu
-ZyBjb21taXQgY2QyMGEzM2MzM2UzIChsaW51eC11c2VyL3Jpc2N2OiBVcGRhdGUgdGhlIHN5c2Nh
-bGxfbnIncyB0byB0aGUgNS41IGtlcm5lbCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
-ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTI6IApuZXcgZmls
-ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4OTggbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggNC80IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
-YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1ODQ1NzEyNTAuZ2l0
-LmFsaXN0YWlyLmZyYW5jaXNAd2RjLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
-ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+On Thu, Mar 19, 2020 at 03:41:08AM +0800, Kirti Wankhede wrote:
+> - Defined MIGRATION region type and sub-type.
+> 
+> - Defined vfio_device_migration_info structure which will be placed at the
+>   0th offset of migration region to get/set VFIO device related
+>   information. Defined members of structure and usage on read/write access.
+> 
+> - Defined device states and state transition details.
+> 
+> - Defined sequence to be followed while saving and resuming VFIO device.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  include/uapi/linux/vfio.h | 227 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 227 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 9e843a147ead..d0021467af53 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
+>  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+>  #define VFIO_REGION_TYPE_GFX                    (1)
+>  #define VFIO_REGION_TYPE_CCW			(2)
+> +#define VFIO_REGION_TYPE_MIGRATION              (3)
+>  
+>  /* sub-types for VFIO_REGION_TYPE_PCI_* */
+>  
+> @@ -379,6 +380,232 @@ struct vfio_region_gfx_edid {
+>  /* sub-types for VFIO_REGION_TYPE_CCW */
+>  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+>  
+> +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
+> +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
+> +
+> +/*
+> + * The structure vfio_device_migration_info is placed at the 0th offset of
+> + * the VFIO_REGION_SUBTYPE_MIGRATION region to get and set VFIO device related
+> + * migration information. Field accesses from this structure are only supported
+> + * at their native width and alignment. Otherwise, the result is undefined and
+> + * vendor drivers should return an error.
+> + *
+> + * device_state: (read/write)
+> + *      - The user application writes to this field to inform the vendor driver
+> + *        about the device state to be transitioned to.
+> + *      - The vendor driver should take the necessary actions to change the
+> + *        device state. After successful transition to a given state, the
+> + *        vendor driver should return success on write(device_state, state)
+> + *        system call. If the device state transition fails, the vendor driver
+> + *        should return an appropriate -errno for the fault condition.
+> + *      - On the user application side, if the device state transition fails,
+> + *	  that is, if write(device_state, state) returns an error, read
+> + *	  device_state again to determine the current state of the device from
+> + *	  the vendor driver.
+> + *      - The vendor driver should return previous state of the device unless
+> + *        the vendor driver has encountered an internal error, in which case
+> + *        the vendor driver may report the device_state VFIO_DEVICE_STATE_ERROR.
+> + *      - The user application must use the device reset ioctl to recover the
+> + *        device from VFIO_DEVICE_STATE_ERROR state. If the device is
+> + *        indicated to be in a valid device state by reading device_state, the
+> + *        user application may attempt to transition the device to any valid
+> + *        state reachable from the current state or terminate itself.
+> + *
+> + *      device_state consists of 3 bits:
+> + *      - If bit 0 is set, it indicates the _RUNNING state. If bit 0 is clear,
+> + *        it indicates the _STOP state. When the device state is changed to
+> + *        _STOP, driver should stop the device before write() returns.
+> + *      - If bit 1 is set, it indicates the _SAVING state, which means that the
+> + *        driver should start gathering device state information that will be
+> + *        provided to the VFIO user application to save the device's state.
+> + *      - If bit 2 is set, it indicates the _RESUMING state, which means that
+> + *        the driver should prepare to resume the device. Data provided through
+> + *        the migration region should be used to resume the device.
+> + *      Bits 3 - 31 are reserved for future use. To preserve them, the user
+> + *      application should perform a read-modify-write operation on this
+> + *      field when modifying the specified bits.
+> + *
+> + *  +------- _RESUMING
+> + *  |+------ _SAVING
+> + *  ||+----- _RUNNING
+> + *  |||
+> + *  000b => Device Stopped, not saving or resuming
+> + *  001b => Device running, which is the default state
+> + *  010b => Stop the device & save the device state, stop-and-copy state
+> + *  011b => Device running and save the device state, pre-copy state
+> + *  100b => Device stopped and the device state is resuming
+> + *  101b => Invalid state
+> + *  110b => Error state
+> + *  111b => Invalid state
+> + *
+> + * State transitions:
+> + *
+> + *              _RESUMING  _RUNNING    Pre-copy    Stop-and-copy   _STOP
+> + *                (100b)     (001b)     (011b)        (010b)       (000b)
+> + * 0. Running or default state
+> + *                             |
+> + *
+> + * 1. Normal Shutdown (optional)
+> + *                             |------------------------------------->|
+> + *
+> + * 2. Save the state or suspend
+> + *                             |------------------------->|---------->|
+> + *
+> + * 3. Save the state during live migration
+> + *                             |----------->|------------>|---------->|
+> + *
+> + * 4. Resuming
+> + *                  |<---------|
+> + *
+> + * 5. Resumed
+> + *                  |--------->|
+> + *
+> + * 0. Default state of VFIO device is _RUNNNG when the user application starts.
+> + * 1. During normal shutdown of the user application, the user application may
+> + *    optionally change the VFIO device state from _RUNNING to _STOP. This
+> + *    transition is optional. The vendor driver must support this transition but
+> + *    must not require it.
+> + * 2. When the user application saves state or suspends the application, the
+> + *    device state transitions from _RUNNING to stop-and-copy and then to _STOP.
+> + *    On state transition from _RUNNING to stop-and-copy, driver must stop the
+> + *    device, save the device state and send it to the application through the
+> + *    migration region. The sequence to be followed for such transition is given
+> + *    below.
+> + * 3. In live migration of user application, the state transitions from _RUNNING
+> + *    to pre-copy, to stop-and-copy, and to _STOP.
+> + *    On state transition from _RUNNING to pre-copy, the driver should start
+> + *    gathering the device state while the application is still running and send
+> + *    the device state data to application through the migration region.
+> + *    On state transition from pre-copy to stop-and-copy, the driver must stop
+> + *    the device, save the device state and send it to the user application
+> + *    through the migration region.
+> + *    Vendor drivers must support the pre-copy state even for implementations
+> + *    where no data is provided to the user before the stop-and-copy state. The
+> + *    user must not be required to consume all migration data before the device
+> + *    transitions to a new state, including the stop-and-copy state.
+> + *    The sequence to be followed for above two transitions is given below.
+> + * 4. To start the resuming phase, the device state should be transitioned from
+> + *    the _RUNNING to the _RESUMING state.
+> + *    In the _RESUMING state, the driver should use the device state data
+> + *    received through the migration region to resume the device.
+> + * 5. After providing saved device data to the driver, the application should
+> + *    change the state from _RESUMING to _RUNNING.
+> + *
+> + * reserved:
+> + *      Reads on this field return zero and writes are ignored.
+> + *
+> + * pending_bytes: (read only)
+> + *      The number of pending bytes still to be migrated from the vendor driver.
+> + *
+> + * data_offset: (read only)
+> + *      The user application should read data_offset in the migration region
+> + *      from where the user application should read the device data during the
+> + *      _SAVING state or write the device data during the _RESUMING state. See
+> + *      below for details of sequence to be followed.
+> + *
+> + * data_size: (read/write)
+> + *      The user application should read data_size to get the size in bytes of
+> + *      the data copied in the migration region during the _SAVING state and
+> + *      write the size in bytes of the data copied in the migration region
+> + *      during the _RESUMING state.
+> + *
+> + * The format of the migration region is as follows:
+> + *  ------------------------------------------------------------------
+> + * |vfio_device_migration_info|    data section                      |
+> + * |                          |     ///////////////////////////////  |
+> + * ------------------------------------------------------------------
+> + *   ^                              ^
+> + *  offset 0-trapped part        data_offset
+> + *
+> + * The structure vfio_device_migration_info is always followed by the data
+> + * section in the region, so data_offset will always be nonzero. The offset
+> + * from where the data is copied is decided by the kernel driver. The data
+> + * section can be trapped, mapped, or partitioned, depending on how the kernel
+> + * driver defines the data section. The data section partition can be defined
+> + * as mapped by the sparse mmap capability. If mmapped, data_offset should be
+> + * page aligned, whereas initial section which contains the
+> + * vfio_device_migration_info structure, might not end at the offset, which is
+> + * page aligned. The user is not required to access through mmap regardless
+> + * of the capabilities of the region mmap.
+> + * The vendor driver should determine whether and how to partition the data
+> + * section. The vendor driver should return data_offset accordingly.
+> + *
+> + * The sequence to be followed for the _SAVING|_RUNNING device state or
+> + * pre-copy phase and for the _SAVING device state or stop-and-copy phase is as
+> + * follows:
+> + * a. Read pending_bytes, indicating the start of a new iteration to get device
+> + *    data. Repeated read on pending_bytes at this stage should have no side
+> + *    effects.
+> + *    If pending_bytes == 0, the user application should not iterate to get data
+> + *    for that device.
+> + *    If pending_bytes > 0, perform the following steps.
+> + * b. Read data_offset, indicating that the vendor driver should make data
+> + *    available through the data section. The vendor driver should return this
+> + *    read operation only after data is available from (region + data_offset)
+> + *    to (region + data_offset + data_size).
+> + * c. Read data_size, which is the amount of data in bytes available through
+> + *    the migration region.
+> + *    Read on data_offset and data_size should return the offset and size of
+> + *    the current buffer if the user application reads data_offset and
+> + *    data_size more than once here.
+If data region is mmaped, merely reading data_offset and data_size
+cannot let kernel know what are correct values to return.
+Consider to add a read operation which is trapped into kernel to let
+kernel exactly know it needs to move to the next offset and update data_size
+?
+
+> + * d. Read data_size bytes of data from (region + data_offset) from the
+> + *    migration region.
+> + * e. Process the data.
+> + * f. Read pending_bytes, which indicates that the data from the previous
+> + *    iteration has been read. If pending_bytes > 0, go to step b.
+> + *
+> + * If an error occurs during the above sequence, the vendor driver can return
+> + * an error code for next read() or write() operation, which will terminate the
+> + * loop. The user application should then take the next necessary action, for
+> + * example, failing migration or terminating the user application.
+> + *
+> + * The user application can transition from the _SAVING|_RUNNING
+> + * (pre-copy state) to the _SAVING (stop-and-copy) state regardless of the
+> + * number of pending bytes. The user application should iterate in _SAVING
+> + * (stop-and-copy) until pending_bytes is 0.
+> + *
+> + * The sequence to be followed while _RESUMING device state is as follows:
+> + * While data for this device is available, repeat the following steps:
+> + * a. Read data_offset from where the user application should write data.
+> + * b. Write migration data starting at the migration region + data_offset for
+> + *    the length determined by data_size from the migration source.
+> + * c. Write data_size, which indicates to the vendor driver that data is
+> + *    written in the migration region. Vendor driver should apply the
+> + *    user-provided migration region data to the device resume state.
+> + *
+> + * For the user application, data is opaque. The user application should write
+> + * data in the same order as the data is received and the data should be of
+> + * same transaction size at the source.
+> + */
+> +
+> +struct vfio_device_migration_info {
+> +	__u32 device_state;         /* VFIO device state */
+> +#define VFIO_DEVICE_STATE_STOP      (0)
+> +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
+> +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
+> +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
+> +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
+> +				     VFIO_DEVICE_STATE_SAVING |  \
+> +				     VFIO_DEVICE_STATE_RESUMING)
+> +
+> +#define VFIO_DEVICE_STATE_VALID(state) \
+> +	(state & VFIO_DEVICE_STATE_RESUMING ? \
+> +	(state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
+> +
+> +#define VFIO_DEVICE_STATE_IS_ERROR(state) \
+> +	((state & VFIO_DEVICE_STATE_MASK) == (VFIO_DEVICE_STATE_SAVING | \
+> +					      VFIO_DEVICE_STATE_RESUMING))
+> +
+> +#define VFIO_DEVICE_STATE_SET_ERROR(state) \
+> +	((state & ~VFIO_DEVICE_STATE_MASK) | VFIO_DEVICE_SATE_SAVING | \
+> +					     VFIO_DEVICE_STATE_RESUMING)
+> +
+> +	__u32 reserved;
+> +	__u64 pending_bytes;
+> +	__u64 data_offset;
+> +	__u64 data_size;
+> +} __attribute__((packed));
+> +
+>  /*
+>   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+>   * which allows direct access to non-MSIX registers which happened to be within
+> -- 
+> 2.7.0
+> 
 
