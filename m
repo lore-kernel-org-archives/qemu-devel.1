@@ -2,80 +2,79 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3344C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BFFCC4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:34:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD7AE20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:24:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB5C12071C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:34:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hn0JKXs2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD7AE20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b9RmwiJA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5C12071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEuDW-0005Ve-TW
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 08:24:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50736)
+	id 1jEuNd-0007oH-45
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 08:34:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jEuCm-0004q2-KN
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:23:21 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jEuMl-0007E0-Ja
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:33:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jEuCl-0007jv-LC
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:23:20 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:23265)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jEuCl-0007jf-Hc
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:23:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584620599;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AHSBeAZBOsICeUJZYPgCKpbxwrGW8xtAKij48lMTN6s=;
- b=Hn0JKXs2V8MScgnBvyptxA9HZBhJY24PfOtRJ4S8Q76srUPpuhdsvaVEHX7QrQ64Rjuzo7
- FFrZ7IPkwIWQ3tR3FXsA5gUjcVkO9LjlUs6xzUgwSkQ/dQ0WR47L3/eEjAz0jyqfE7N3ej
- cxwb6oQBC6nVkCxoPbkphg02YYdURSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-e_DX7sRDNE-3qovVit7wYA-1; Thu, 19 Mar 2020 08:23:17 -0400
-X-MC-Unique: e_DX7sRDNE-3qovVit7wYA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 637CADBAE;
- Thu, 19 Mar 2020 12:23:16 +0000 (UTC)
-Received: from gondolin (ovpn-113-188.ams2.redhat.com [10.36.113.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7CD9810027AA;
- Thu, 19 Mar 2020 12:23:12 +0000 (UTC)
-Date: Thu, 19 Mar 2020 13:23:10 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v10 13/16] s390x: protvirt: Move IO control structures
- over SIDA
-Message-ID: <20200319132310.0f994bd5.cohuck@redhat.com>
-In-Reply-To: <20200318143047.2335-14-frankja@linux.ibm.com>
-References: <20200318143047.2335-1-frankja@linux.ibm.com>
- <20200318143047.2335-14-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1jEuMk-0001Yj-ED
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:33:39 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:36326)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jEuMk-0001YH-7n
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:33:38 -0400
+Received: by mail-ot1-x334.google.com with SMTP id 39so2167855otu.3
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 05:33:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=K5tEMVBP5CTSTwVX8RCh3vxJKBlUzd6wujHFCvzurXg=;
+ b=b9RmwiJALnr1txRvFWo4D5bx2yCFFaAqmF8fOOt+FM7DSkU/iz0VUn29l+jBJB/pHN
+ qiVaT19Y7yVrr7QtENoxEPVb2riaYKuvG/KJqCaAcoZb4MtoBqr0waSvZ200ku8iM14U
+ Aj+4qvHYX4OTtOjI3EgQGFeWIrQoWGTnb0Ehskc3/VV9dzlbFUf3X/vfe6+IpCTOvD5a
+ /0zJHSGWTXVfZgFtdJfH8eAOdvHLaXSDFU4JhTFmpVHZvec1ry+P7IcqbV9WxwTEY6mu
+ aXmC6SGG75wvcYu6fm5QXQh2ltOf6NxZAXvkrm27z4hmKpHI76HO8kFYN0VK0JrBgpD2
+ Retg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=K5tEMVBP5CTSTwVX8RCh3vxJKBlUzd6wujHFCvzurXg=;
+ b=JCK1KeDMBkiGT2pJAJOlj3p0XJTzIdbVTi8YooCtFd9/vgJ3i9+1Xo6E4sI3cTX0jN
+ fV0A9bQG7FkgssvqJ7YOYufdp+9vtrYR4owWyw1XRuIbrnJRZ8on1NYbmhbxr21T6N8h
+ tn9nivoftzYn5us5HPzaTpJ75lgUmcRHJsdgcryTLb6jSXx9cK9872U5k7tqWLDd7g0Q
+ uaxkt+tIQU3guSHUWRGRbBh0xGfn5uvghAelA6IxU+6javRWlD6zhWjHss9OhPYO8pwK
+ y0tKUptGsMvDsrMGr4Uo7YCZjlz12LYfk45dNSbYEbXNiTXKHGo2nzYtTEV9GVSvCvIS
+ BdZA==
+X-Gm-Message-State: ANhLgQ2metzfRguqP0EMLtfn0es9R9MdRB5QC2xF9J1c6fOLn+D+DB9x
+ ROVS8AuVPHvA3nl7trp9fN4KnZ3Dn6xzvlBi/oA/BA==
+X-Google-Smtp-Source: ADFU+vsc7NsUZk5EVIgxTbX+TF4vpPS+uar8RA9py8nThtOWteiQ5j079NScD4BJO1vGPICe9qV2Y616mQlXxN4efKg=
+X-Received: by 2002:a9d:1d43:: with SMTP id m61mr2098980otm.91.1584621216858; 
+ Thu, 19 Mar 2020 05:33:36 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200317232329.22362-1-jsnow@redhat.com>
+In-Reply-To: <20200317232329.22362-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Mar 2020 12:33:25 +0000
+Message-ID: <CAFEAcA_7p_B8U3W4gV2rT5JE3djE=gy_vs5vUcWVjqYiVan3dw@mail.gmail.com>
+Subject: Re: [PULL 00/20] Ide patches
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,47 +86,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Helge Deller <deller@gmx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Mar 2020 10:30:44 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Tue, 17 Mar 2020 at 23:23, John Snow <jsnow@redhat.com> wrote:
+>
+> The following changes since commit 373c7068dd610e97f0b551b5a6d0a27cd6da4506:
+>
+>   qemu.nsi: Install Sphinx documentation (2020-03-09 16:45:00 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
+>
+> for you to fetch changes up to 7d0776ca7f853d466b6174d96daa5c8afc43d1a4:
+>
+>   hw/ide: Remove unneeded inclusion of hw/ide.h (2020-03-17 12:22:36 -0400)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
+>
 
-> For protected guests, we need to put the IO emulation results into the
-> SIDA, so SIE will write them into the guest at the next entry.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/ioinst.c | 61 +++++++++++++++++++++++++++++++------------
->  1 file changed, 45 insertions(+), 16 deletions(-)
-> 
 
-> @@ -260,6 +269,13 @@ void ioinst_handle_stsch(S390CPU *cpu, uint64_t reg1, uint32_t ipb,
->      }
->  
->      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
-> +        /*
-> +         * The Ultravisor checks schid bit 16 to be one and bits 0-12
-> +         * to be 0 and injects a operand exception itself.
+Applied, thanks.
 
-As a side remark, that also implies that the ultravisor doesn't support
-MCSS-E, which is highly unsurprising :)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-Do we want to fence off enabling MCSS-E in the sda chsc for pv guests?
-Probably not really needed, as Linux does not support it anyway.
-
-> +         *
-> +         * Hence we should never end up here.
-> +         */
-> +        g_assert(!s390_is_pv());
->          /*
->           * As operand exceptions have a lower priority than access exceptions,
->           * we check whether the memory area is writeable (injecting the
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
+-- PMM
 
