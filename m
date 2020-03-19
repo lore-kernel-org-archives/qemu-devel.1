@@ -2,66 +2,69 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD03FC4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C104AC4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:55:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9874920722
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:55:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F43020722
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:55:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DB+UHcOt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9874920722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxbWYOnS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F43020722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jErtU-0002je-KV
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:55:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48479)
+	id 1jErth-0003BE-Lw
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:55:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ppandit@redhat.com>) id 1jErsn-0001rD-1i
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:34 -0400
+ (envelope-from <ppandit@redhat.com>) id 1jErst-0001wG-Cn
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ppandit@redhat.com>) id 1jErsl-0004qr-LU
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:32 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35977)
+ (envelope-from <ppandit@redhat.com>) id 1jErsr-0004v3-Uk
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:39 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:40670)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1jErsl-0004qP-I7
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:31 -0400
+ (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1jErsr-0004uk-RY
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:54:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584611670;
+ s=mimecast20190719; t=1584611677;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=TQEf021rsn2O+uJbv2MfnoWfJZ1YBI7MF/3VxixkJtQ=;
- b=DB+UHcOtr/gd2gBWqAYDD89ZQxeMMTScDPhSVsef6arr+8WUEEhf1ZSP1PKwropYY7mEaP
- ESWYGP5gbi/OFMaNG4JzcTWBQo0yXkzHj4YzIIQOMOvfHYLWqlmC1rhGyQpz4KusjMIycy
- Nae9b5uqrI+ZkFe3TmlL4TGElV84gfA=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AwME8ofdMlNyZiZXbkS1lNMvS2VzRBwAxzDX3MKKtIA=;
+ b=DxbWYOnSHf0jgLJviuo1e6YbTbKrFPcK50htkksAfQzA25GQEpc7Y4QYWdQwe6qGEb9qEu
+ bzBip5sZ+Gi7DHw/ZgwI8hoLCqjCOk773Z53l+yYquSXH0Py0Ift9tg+GWSFqRhdxhEF8c
+ 88btC0KJQAh9mheie0opnxDLu7hLSf4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-0E0u7c4LMg-reZ3CdgGLxQ-1; Thu, 19 Mar 2020 05:54:25 -0400
-X-MC-Unique: 0E0u7c4LMg-reZ3CdgGLxQ-1
+ us-mta-245-5fEC_ERRMAubEns-HNFJWg-1; Thu, 19 Mar 2020 05:54:33 -0400
+X-MC-Unique: 5fEC_ERRMAubEns-HNFJWg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8403A8018CE;
- Thu, 19 Mar 2020 09:54:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EB7A108443A;
+ Thu, 19 Mar 2020 09:54:31 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 67D5491296;
- Thu, 19 Mar 2020 09:54:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20439912AC;
+ Thu, 19 Mar 2020 09:54:24 +0000 (UTC)
 From: P J P <ppandit@redhat.com>
 To: Jason Wang <jasowang@redhat.com>
-Subject: [PATCH v4 0/3] net: tulip: add checks to avoid OOB access
-Date: Thu, 19 Mar 2020 15:22:08 +0530
-Message-Id: <20200319095211.741445-1-ppandit@redhat.com>
+Subject: [PATCH v4 1/3] net: tulip: check frame size and r/w data length
+Date: Thu, 19 Mar 2020 15:22:09 +0530
+Message-Id: <20200319095211.741445-2-ppandit@redhat.com>
+In-Reply-To: <20200319095211.741445-1-ppandit@redhat.com>
+References: <20200319095211.741445-1-ppandit@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
@@ -69,7 +72,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,33 +95,154 @@ Sender: "Qemu-devel"
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
+Tulip network driver while copying tx/rx buffers does not check
+frame size against r/w data length. This may lead to OOB buffer
+access. Add check to avoid it.
 
-* This series adds checks to avoid potential OOB access and infinite loop
-  issues while processing rx/tx data.
+Limit iterations over descriptors to avoid potential infinite
+loop issue in tulip_xmit_list_update.
 
-* Tulip tx descriptors are capped at 128 to avoid infinite loop in
-  tulip_xmit_list_update(), wrt Tulip kernel driver
-  -> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
-e/drivers/net/ethernet/dec/tulip/tulip.h#n319
+Reported-by: Li Qiang <pangpei.lq@antfin.com>
+Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+Reported-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/net/tulip.c | 36 +++++++++++++++++++++++++++---------
+ 1 file changed, 27 insertions(+), 9 deletions(-)
 
-* Update v3: add .can_receive routine
+Update v3: return a value from tulip_copy_tx_buffers() and avoid infinite l=
+oop
   -> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg06275.html
 
-* Update v4: flush queued packets once they are received
-  -> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg05868.html
-
-Thank you.
---
-Prasad J Pandit (3):
-  net: tulip: check frame size and r/w data length
-  net: tulip: add .can_recieve routine
-  net: tulip: flush queued packets post receive
-
- hw/net/tulip.c | 51 +++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 42 insertions(+), 9 deletions(-)
-
---
+diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+index cfac2719d3..fbe40095da 100644
+--- a/hw/net/tulip.c
++++ b/hw/net/tulip.c
+@@ -170,6 +170,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct =
+tulip_descriptor *desc)
+         } else {
+             len =3D s->rx_frame_len;
+         }
++
++        if (s->rx_frame_len + len >=3D sizeof(s->rx_frame)) {
++            return;
++        }
+         pci_dma_write(&s->dev, desc->buf_addr1, s->rx_frame +
+             (s->rx_frame_size - s->rx_frame_len), len);
+         s->rx_frame_len -=3D len;
+@@ -181,6 +185,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct =
+tulip_descriptor *desc)
+         } else {
+             len =3D s->rx_frame_len;
+         }
++
++        if (s->rx_frame_len + len >=3D sizeof(s->rx_frame)) {
++            return;
++        }
+         pci_dma_write(&s->dev, desc->buf_addr2, s->rx_frame +
+             (s->rx_frame_size - s->rx_frame_len), len);
+         s->rx_frame_len -=3D len;
+@@ -227,7 +235,8 @@ static ssize_t tulip_receive(TULIPState *s, const uint8=
+_t *buf, size_t size)
+=20
+     trace_tulip_receive(buf, size);
+=20
+-    if (size < 14 || size > 2048 || s->rx_frame_len || tulip_rx_stopped(s)=
+) {
++    if (size < 14 || size > sizeof(s->rx_frame) - 4
++        || s->rx_frame_len || tulip_rx_stopped(s)) {
+         return 0;
+     }
+=20
+@@ -275,7 +284,6 @@ static ssize_t tulip_receive_nc(NetClientState *nc,
+     return tulip_receive(qemu_get_nic_opaque(nc), buf, size);
+ }
+=20
+-
+ static NetClientInfo net_tulip_info =3D {
+     .type =3D NET_CLIENT_DRIVER_NIC,
+     .size =3D sizeof(NICState),
+@@ -558,7 +566,7 @@ static void tulip_tx(TULIPState *s, struct tulip_descri=
+ptor *desc)
+         if ((s->csr[6] >> CSR6_OM_SHIFT) & CSR6_OM_MASK) {
+             /* Internal or external Loopback */
+             tulip_receive(s, s->tx_frame, s->tx_frame_len);
+-        } else {
++        } else if (s->tx_frame_len <=3D sizeof(s->tx_frame)) {
+             qemu_send_packet(qemu_get_queue(s->nic),
+                 s->tx_frame, s->tx_frame_len);
+         }
+@@ -570,23 +578,31 @@ static void tulip_tx(TULIPState *s, struct tulip_desc=
+riptor *desc)
+     }
+ }
+=20
+-static void tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor *=
+desc)
++static int tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor *d=
+esc)
+ {
+     int len1 =3D (desc->control >> TDES1_BUF1_SIZE_SHIFT) & TDES1_BUF1_SIZ=
+E_MASK;
+     int len2 =3D (desc->control >> TDES1_BUF2_SIZE_SHIFT) & TDES1_BUF2_SIZ=
+E_MASK;
+=20
++    if (s->tx_frame_len + len1 >=3D sizeof(s->tx_frame)) {
++        return -1;
++    }
+     if (len1) {
+         pci_dma_read(&s->dev, desc->buf_addr1,
+             s->tx_frame + s->tx_frame_len, len1);
+         s->tx_frame_len +=3D len1;
+     }
+=20
++    if (s->tx_frame_len + len2 >=3D sizeof(s->tx_frame)) {
++        return -1;
++    }
+     if (len2) {
+         pci_dma_read(&s->dev, desc->buf_addr2,
+             s->tx_frame + s->tx_frame_len, len2);
+         s->tx_frame_len +=3D len2;
+     }
+     desc->status =3D (len1 + len2) ? 0 : 0x7fffffff;
++
++    return 0;
+ }
+=20
+ static void tulip_setup_filter_addr(TULIPState *s, uint8_t *buf, int n)
+@@ -651,13 +667,15 @@ static uint32_t tulip_ts(TULIPState *s)
+=20
+ static void tulip_xmit_list_update(TULIPState *s)
+ {
++#define TULIP_DESC_MAX 128
++    uint8_t i =3D 0;
+     struct tulip_descriptor desc;
+=20
+     if (tulip_ts(s) !=3D CSR5_TS_SUSPENDED) {
+         return;
+     }
+=20
+-    for (;;) {
++    for (i =3D 0; i < TULIP_DESC_MAX; i++) {
+         tulip_desc_read(s, s->current_tx_desc, &desc);
+         tulip_dump_tx_descriptor(s, &desc);
+=20
+@@ -675,10 +693,10 @@ static void tulip_xmit_list_update(TULIPState *s)
+                 s->tx_frame_len =3D 0;
+             }
+=20
+-            tulip_copy_tx_buffers(s, &desc);
+-
+-            if (desc.control & TDES1_LS) {
+-                tulip_tx(s, &desc);
++            if (!tulip_copy_tx_buffers(s, &desc)) {
++                if (desc.control & TDES1_LS) {
++                    tulip_tx(s, &desc);
++                }
+             }
+         }
+         tulip_desc_write(s, s->current_tx_desc, &desc);
+--=20
 2.25.1
 
 
