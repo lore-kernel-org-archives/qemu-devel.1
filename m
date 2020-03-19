@@ -6,67 +6,69 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE07CC4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:24:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8238C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90F5420714
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:24:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F5420714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C44B20714
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:26:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C44B20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEqU5-0005VU-Oj
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 04:24:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45263)
+	id 1jEqVc-0006rm-LJ
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 04:26:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45539)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jEqTV-00054v-Hw
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:24:23 -0400
+ (envelope-from <bounces@canonical.com>) id 1jEqUw-00066F-AP
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jEqTT-0003Pj-Rh
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:24:21 -0400
-Resent-Date: Thu, 19 Mar 2020 04:24:21 -0400
-Resent-Message-Id: <E1jEqTT-0003Pj-Rh@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21161)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jEqTT-0003Pb-J5
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:24:19 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584606252; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=dUJYM/8SyqOETyHr+M0YuyKFdktkt0Ol+F80oBefiHX1OrjGsky9mRJOxezvsTgujwywRlPt4Y166dLDE51M0ZYkPHG7eouQjM9+Czxyf0gNduGrg+JsJ6PsgCeSP0R5ox/KfiymuCHU8I/Wlb+bWk+SmEAvAr7zM4vWmvnXCmY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584606252;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=5s2Yco7ss78XI+PvvgCE2y7V/svZFj5Cr2FokMI64mY=; 
- b=FfOfmO8QGXuwjZ0CX6eWgDeTo7nhK5mP7TZ3+wfc4vNbop3WbAn7PmzyXKdtaLVuO6YZI3EIJURlMUaMXVl3Ni/JML156iH4vwmwVV/l5wgG5APXJ5Tg4eG5rbK1EhKNvqBetRdWlmraSwy9iDtSvu1Y29QOZxretMAsXFSAsZY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584606250823210.66017544154056;
- Thu, 19 Mar 2020 01:24:10 -0700 (PDT)
-In-Reply-To: <20200319080117.7725-1-kraxel@redhat.com>
-Subject: Re: [PATCH 00/13] microvm: add acpi support
-Message-ID: <158460624917.25478.16521103978895670111@39012742ff91>
+ (envelope-from <bounces@canonical.com>) id 1jEqUv-0004Os-2d
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:25:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37890)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jEqUu-0004NT-TG
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:25:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jEqUt-0007VX-Hb
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:25:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 833BB2E80C7
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:25:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kraxel@redhat.com
-Date: Thu, 19 Mar 2020 01:24:10 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Mar 2020 08:11:51 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: eastson83 laurent-vivier pmaydell
+X-Launchpad-Bug-Reporter: Dongwhan Kim (eastson83)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <158460432256.11238.315491712700748145.malonedeb@soybean.canonical.com>
+Message-Id: <158460551123.20574.1864641418440613891.malone@wampee.canonical.com>
+Subject: [Bug 1868055] Re: cannot run golang app with docker,
+ version 17.09.1-ce, disabling core 0 and qemu-arm, version 2.7.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 14ef182a43904546b0e5369b73d69c372a9d89e8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,156 +77,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, slp@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- kraxel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Reply-To: Bug 1868055 <1868055@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxOTA4MDExNy43NzI1
-LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1h
-Z2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9y
-YSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIGh3L2Rp
-c3BsYXkvYmxpenphcmQubwogIENDICAgICAgaHcvZGlzcGxheS9leHlub3M0MjEwX2ZpbWQubwov
-dG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9pc2EtYWNwaS5jOiBJbiBmdW5jdGlvbiAnaXNhX2Fj
-cGlfYWRkX3Byb3BldGllcyc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2lzYS1hY3BpLmM6
-NTI6NDI6IGVycm9yOiBpbmNvbXBhdGlibGUgdHlwZSBmb3IgYXJndW1lbnQgNCBvZiAnb2JqZWN0
-X3Byb3BlcnR5X2FkZF91aW50OF9wdHInCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgJnplcm8sIE5VTEwpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBefn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9l
-eGVjL21lbW9yeS5oOjI4LAotLS0KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVj
-dC5oOjE2ODg6NzQ6IG5vdGU6IGV4cGVjdGVkICdPYmplY3RQcm9wZXJ0eUZsYWdzJyB7YWthICdl
-bnVtIDxhbm9ueW1vdXM+J30gYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ3ZvaWQgKicKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgdWludDhfdCAqdiwgT2JqZWN0UHJv
-cGVydHlGbGFncyBmbGFncywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5efn5+fgovdG1wL3FlbXUtdGVzdC9z
-cmMvaHcvYWNwaS9pc2EtYWNwaS5jOjUxOjU6IGVycm9yOiB0b28gZmV3IGFyZ3VtZW50cyB0byBm
-dW5jdGlvbiAnb2JqZWN0X3Byb3BlcnR5X2FkZF91aW50OF9wdHInCiAgICAgb2JqZWN0X3Byb3Bl
-cnR5X2FkZF91aW50OF9wdHIoT0JKRUNUKHMpLCBBQ1BJX1BNX1BST1BfQUNQSV9FTkFCTEVfQ01E
-LAogICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJv
-bSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9leGVjL21lbW9yeS5oOjI4LAotLS0KL3RtcC9x
-ZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVjdC5oOjE2ODc6Njogbm90ZTogZGVjbGFyZWQg
-aGVyZQogdm9pZCBvYmplY3RfcHJvcGVydHlfYWRkX3VpbnQ4X3B0cihPYmplY3QgKm9iaiwgY29u
-c3QgY2hhciAqbmFtZSwKICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9x
-ZW11LXRlc3Qvc3JjL2h3L2FjcGkvaXNhLWFjcGkuYzo1NDo0MjogZXJyb3I6IGluY29tcGF0aWJs
-ZSB0eXBlIGZvciBhcmd1bWVudCA0IG9mICdvYmplY3RfcHJvcGVydHlfYWRkX3VpbnQ4X3B0cicK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmemVybywgTlVMTCk7CiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn4KSW4gZmlsZSBpbmNsdWRlZCBm
-cm9tIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2V4ZWMvbWVtb3J5Lmg6MjgsCi0tLQovdG1w
-L3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xb20vb2JqZWN0Lmg6MTY4ODo3NDogbm90ZTogZXhwZWN0
-ZWQgJ09iamVjdFByb3BlcnR5RmxhZ3MnIHtha2EgJ2VudW0gPGFub255bW91cz4nfSBidXQgYXJn
-dW1lbnQgaXMgb2YgdHlwZSAndm9pZCAqJwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBjb25zdCB1aW50OF90ICp2LCBPYmplY3RQcm9wZXJ0eUZsYWdzIGZsYWdzLAogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB+fn5+fn5+fn5+
-fn5+fn5+fn5+fl5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2lzYS1hY3BpLmM6NTM6
-NTogZXJyb3I6IHRvbyBmZXcgYXJndW1lbnRzIHRvIGZ1bmN0aW9uICdvYmplY3RfcHJvcGVydHlf
-YWRkX3VpbnQ4X3B0cicKICAgICBvYmplY3RfcHJvcGVydHlfYWRkX3VpbnQ4X3B0cihPQkpFQ1Qo
-cyksIEFDUElfUE1fUFJPUF9BQ1BJX0RJU0FCTEVfQ01ELAogICAgIF5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5j
-bHVkZS9leGVjL21lbW9yeS5oOjI4LAotLS0KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9t
-L29iamVjdC5oOjE2ODc6Njogbm90ZTogZGVjbGFyZWQgaGVyZQogdm9pZCBvYmplY3RfcHJvcGVy
-dHlfYWRkX3VpbnQ4X3B0cihPYmplY3QgKm9iaiwgY29uc3QgY2hhciAqbmFtZSwKICAgICAgXn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvaXNh
-LWFjcGkuYzo1Njo1MDogZXJyb3I6IGluY29tcGF0aWJsZSB0eXBlIGZvciBhcmd1bWVudCA0IG9m
-ICdvYmplY3RfcHJvcGVydHlfYWRkX3VpbnQzMl9wdHInCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICZzLT5ncGVfYmFzZSwgTlVMTCk7CiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Rt
-cC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvZXhlYy9tZW1vcnkuaDoyOCwKLS0tCi90bXAvcWVtdS10
-ZXN0L3NyYy9pbmNsdWRlL3FvbS9vYmplY3QuaDoxNzMyOjU3OiBub3RlOiBleHBlY3RlZCAnT2Jq
-ZWN0UHJvcGVydHlGbGFncycge2FrYSAnZW51bSA8YW5vbnltb3VzPid9IGJ1dCBhcmd1bWVudCBp
-cyBvZiB0eXBlICd2b2lkIConCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBP
-YmplY3RQcm9wZXJ0eUZsYWdzIGZsYWdzLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5efn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNw
-aS9pc2EtYWNwaS5jOjU1OjU6IGVycm9yOiB0b28gZmV3IGFyZ3VtZW50cyB0byBmdW5jdGlvbiAn
-b2JqZWN0X3Byb3BlcnR5X2FkZF91aW50MzJfcHRyJwogICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRf
-dWludDMyX3B0cihPQkpFQ1QocyksIEFDUElfUE1fUFJPUF9HUEUwX0JMSywKICAgICBefn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10
-ZXN0L3NyYy9pbmNsdWRlL2V4ZWMvbWVtb3J5Lmg6MjgsCi0tLQovdG1wL3FlbXUtdGVzdC9zcmMv
-aW5jbHVkZS9xb20vb2JqZWN0Lmg6MTczMDo2OiBub3RlOiBkZWNsYXJlZCBoZXJlCiB2b2lkIG9i
-amVjdF9wcm9wZXJ0eV9hZGRfdWludDMyX3B0cihPYmplY3QgKm9iaiwgY29uc3QgY2hhciAqbmFt
-ZSwKICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3Ny
-Yy9ody9hY3BpL2lzYS1hY3BpLmM6NTg6NDk6IGVycm9yOiBpbmNvbXBhdGlibGUgdHlwZSBmb3Ig
-YXJndW1lbnQgNCBvZiAnb2JqZWN0X3Byb3BlcnR5X2FkZF91aW50MzJfcHRyJwogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAmcy0+Z3BlX2xlbiwgTlVMTCk7CiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+CkluIGZpbGUgaW5jbHVk
-ZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9leGVjL21lbW9yeS5oOjI4LAotLS0K
-L3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVjdC5oOjE3MzI6NTc6IG5vdGU6IGV4
-cGVjdGVkICdPYmplY3RQcm9wZXJ0eUZsYWdzJyB7YWthICdlbnVtIDxhbm9ueW1vdXM+J30gYnV0
-IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ3ZvaWQgKicKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIE9iamVjdFByb3BlcnR5RmxhZ3MgZmxhZ3MsCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICB+fn5+fn5+fn5+fn5+fn5+fn5+fl5+fn5+Ci90bXAvcWVtdS10ZXN0
-L3NyYy9ody9hY3BpL2lzYS1hY3BpLmM6NTc6NTogZXJyb3I6IHRvbyBmZXcgYXJndW1lbnRzIHRv
-IGZ1bmN0aW9uICdvYmplY3RfcHJvcGVydHlfYWRkX3VpbnQzMl9wdHInCiAgICAgb2JqZWN0X3By
-b3BlcnR5X2FkZF91aW50MzJfcHRyKE9CSkVDVChzKSwgQUNQSV9QTV9QUk9QX0dQRTBfQkxLX0xF
-TiwKICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBm
-cm9tIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2V4ZWMvbWVtb3J5Lmg6MjgsCi0tLQovdG1w
-L3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xb20vb2JqZWN0Lmg6MTczMDo2OiBub3RlOiBkZWNsYXJl
-ZCBoZXJlCiB2b2lkIG9iamVjdF9wcm9wZXJ0eV9hZGRfdWludDMyX3B0cihPYmplY3QgKm9iaiwg
-Y29uc3QgY2hhciAqbmFtZSwKICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90
-bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2lzYS1hY3BpLmM6NjA6NDk6IGVycm9yOiBpbmNvbXBh
-dGlibGUgdHlwZSBmb3IgYXJndW1lbnQgNCBvZiAnb2JqZWN0X3Byb3BlcnR5X2FkZF91aW50MTZf
-cHRyJwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcy0+c2NpX2lycSwgTlVM
-TCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+
-CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9leGVjL21l
-bW9yeS5oOjI4LAotLS0KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVjdC5oOjE3
-MTA6NTc6IG5vdGU6IGV4cGVjdGVkICdPYmplY3RQcm9wZXJ0eUZsYWdzJyB7YWthICdlbnVtIDxh
-bm9ueW1vdXM+J30gYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ3ZvaWQgKicKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIE9iamVjdFByb3BlcnR5RmxhZ3MgZmxhZ3MsCiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB+fn5+fn5+fn5+fn5+fn5+fn5+fl5+fn5+
-Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2lzYS1hY3BpLmM6NTk6NTogZXJyb3I6IHRvbyBm
-ZXcgYXJndW1lbnRzIHRvIGZ1bmN0aW9uICdvYmplY3RfcHJvcGVydHlfYWRkX3VpbnQxNl9wdHIn
-CiAgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF91aW50MTZfcHRyKE9CSkVDVChzKSwgQUNQSV9QTV9Q
-Uk9QX1NDSV9JTlQsCiAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CkluIGZpbGUg
-aW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9leGVjL21lbW9yeS5oOjI4
-LAotLS0KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVjdC5oOjE3MDg6Njogbm90
-ZTogZGVjbGFyZWQgaGVyZQogdm9pZCBvYmplY3RfcHJvcGVydHlfYWRkX3VpbnQxNl9wdHIoT2Jq
-ZWN0ICpvYmosIGNvbnN0IGNoYXIgKm5hbWUsCiAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9pc2EtYWNwaS5jOjYyOjQ5OiBlcnJv
-cjogaW5jb21wYXRpYmxlIHR5cGUgZm9yIGFyZ3VtZW50IDQgb2YgJ29iamVjdF9wcm9wZXJ0eV9h
-ZGRfdWludDMyX3B0cicKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJnMtPmlv
-X2Jhc2UsIE5VTEwpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgXn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1
-ZGUvZXhlYy9tZW1vcnkuaDoyOCwKLS0tCi90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FvbS9v
-YmplY3QuaDoxNzMyOjU3OiBub3RlOiBleHBlY3RlZCAnT2JqZWN0UHJvcGVydHlGbGFncycge2Fr
-YSAnZW51bSA8YW5vbnltb3VzPid9IGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlICd2b2lkIConCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBPYmplY3RQcm9wZXJ0eUZsYWdzIGZs
-YWdzLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+fn5+
-fn5+fn5efn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9pc2EtYWNwaS5jOjYxOjU6IGVy
-cm9yOiB0b28gZmV3IGFyZ3VtZW50cyB0byBmdW5jdGlvbiAnb2JqZWN0X3Byb3BlcnR5X2FkZF91
-aW50MzJfcHRyJwogICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRfdWludDMyX3B0cihPQkpFQ1Qocyks
-IEFDUElfUE1fUFJPUF9QTV9JT19CQVNFLAogICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvZXhl
-Yy9tZW1vcnkuaDoyOCwKLS0tCi90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FvbS9vYmplY3Qu
-aDoxNzMwOjY6IG5vdGU6IGRlY2xhcmVkIGhlcmUKIHZvaWQgb2JqZWN0X3Byb3BlcnR5X2FkZF91
-aW50MzJfcHRyKE9iamVjdCAqb2JqLCBjb25zdCBjaGFyICpuYW1lLAogICAgICBefn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn4KbWFrZTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMu
-bWFrOjY5OiBody9hY3BpL2lzYS1hY3BpLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9y
-IHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgog
-IEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgot
-LS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3Mu
-Q2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1
-bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YWE2M2Q3MmFmNDQ0NGJkZGFh
-ODdmM2NjN2VlM2QyNjAnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21w
-PXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFf
-Q09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9
-JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScs
-ICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAv
-Y2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWpiN2w0cmdyL3Ny
-Yy9kb2NrZXItc3JjLjIwMjAtMDMtMTktMDQuMjIuMDcuMjQzOTg6L3Zhci90bXAvcWVtdTp6LHJv
-JywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0
-dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5x
-ZW11Lmluc3RhbmNlLnV1aWQ9YWE2M2Q3MmFmNDQ0NGJkZGFhODdmM2NjN2VlM2QyNjAKbWFrZVsx
-XTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAv
-dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtamI3bDRyZ3Ivc3JjJwptYWtlOiAqKiogW2RvY2tl
-ci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMm0yLjUwN3MKdXNlciAg
-ICAwbTguNTcwcwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAyMDAzMTkwODAxMTcuNzcyNS0xLWtyYXhlbEByZWRoYXQuY29tL3Rlc3Rpbmcu
-ZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This is a known and fixed bug in QEMU. Please try a more recent version
+than 2.7 (eg 4.2, which is the most recent release).
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1868055
+
+Title:
+  cannot run golang app with docker, version 17.09.1-ce, disabling core
+  0 and qemu-arm, version 2.7.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello!
+  I figure out that sometimes simple go application is not working.
+  I am using docker + qemu-arm + go( for armv7l).
+
+  These are version info below.
+
+  root@VDBS1535:~# docker -v
+  Docker version 17.09.1-ce, build 19e2cf6
+
+  bash-3.2# qemu-arm --version
+  qemu-arm version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and the Q=
+EMU Project developers
+
+  $ go version
+  go version go1.12.6 linux/arm
+  $ go env
+  GOARCH=3D"arm"
+  GOBIN=3D""
+  GOCACHE=3D"/home/quickbuild/.cache/go-build"
+  GOEXE=3D""
+  GOFLAGS=3D""
+  GOHOSTARCH=3D"arm"
+  GOHOSTOS=3D"linux"
+  GOOS=3D"linux"
+  GOPATH=3D"/home/quickbuild/go"
+  GOPROXY=3D""
+  GORACE=3D""
+  GOROOT=3D"/usr/lib/golang"
+  GOTMPDIR=3D""
+  GOTOOLDIR=3D"/usr/lib/golang/pkg/tool/linux_arm"
+  GCCGO=3D"gccgo"
+  GOARM=3D"7"
+  CC=3D"gcc"
+  CXX=3D"g++"
+  CGO_ENABLED=3D"1"
+  GOMOD=3D""
+  CGO_CFLAGS=3D"-g -O2"
+  CGO_CPPFLAGS=3D""
+  CGO_CXXFLAGS=3D"-g -O2"
+  CGO_FFLAGS=3D"-g -O2"
+  CGO_LDFLAGS=3D"-g -O2"
+  PKG_CONFIG=3D"pkg-config"
+  GOGCCFLAGS=3D"-fPIC -marm -pthread -fmessage-length=3D0 -fdebug-prefix-ma=
+p=3D/tmp/go-build242285369=3D/tmp/go-build -gno-record-gcc-switches"
+
+  This issue is come only when I disable core 0 using a command below.
+  please check "--cpuset-cpus=3D1-55" option.
+
+  sudo docker run --privileged -d -i -t --cpuset-cpus=3D1-55 --mount
+  type=3Dbind,source=3D"/home/dw83kim/mnt",destination=3D"/mnt" --network h=
+ost
+  --name=3D"ubuntu_core1" ubuntu:xenial-20200212
+
+  =
+
+  This is what I have tested in the environment above.
+
+  package main
+  func main(){
+      for i:=3D0; i<1000; i++ {
+          println("Hello world")
+      }
+  }
+
+  This is one of the error logs have faced sometimes not always.
+
+  bash-3.2# go run test.go
+  fatal error: schedule: holding locks
+  panic during panic
+  SIGILL: illegal instruction
+  PC=3D0xc9ec4c m=3D3 sigcode=3D2
+
+  goroutine 122 [runnable]:
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault (core dumped)
+  bash-3.2#
+
+  Please check it.
+  Thanks in advance.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1868055/+subscriptions
 
