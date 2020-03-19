@@ -2,142 +2,85 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADBA6C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B138C43332
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:53:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41AE720782
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:52:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41AE720782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 193C620B1F
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:53:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="FwQCSC3L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 193C620B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEwWk-0006o4-Ch
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 10:52:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55267)
+	id 1jEwYE-0007n0-9Z
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 10:53:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jEwWA-0006OC-KV
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:51:31 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jEwXb-0007HC-AR
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jEwW9-0002JU-0T
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:51:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63042)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jEwW8-0002JK-PN
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:51:28 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02JEp9xB067463
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:51:27 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8aegm8m-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:51:26 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Thu, 19 Mar 2020 14:50:44 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 19 Mar 2020 14:50:41 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02JEoe7P63897746
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 19 Mar 2020 14:50:40 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BF705A405B;
- Thu, 19 Mar 2020 14:50:40 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 68261A406B;
- Thu, 19 Mar 2020 14:50:40 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.52.26])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 19 Mar 2020 14:50:40 +0000 (GMT)
-Subject: Re: [PATCH v11 09/16] s390x: protvirt: SCLP interpretation
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200319131921.2367-1-frankja@linux.ibm.com>
- <20200319131921.2367-10-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Thu, 19 Mar 2020 15:50:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <kwankhede@nvidia.com>) id 1jEwXY-0002uX-PU
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:52:58 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:19821)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1jEwXY-0002uF-Hq
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:52:56 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e7386e40000>; Thu, 19 Mar 2020 07:51:16 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Thu, 19 Mar 2020 07:52:54 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Thu, 19 Mar 2020 07:52:54 -0700
+Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
+ 2020 14:52:46 +0000
+Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
+ <20200318214500.1a0cb985@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <e0070cf4-af58-2906-b427-0888ecb89538@nvidia.com>
+Date: Thu, 19 Mar 2020 20:22:41 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200319131921.2367-10-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200318214500.1a0cb985@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031914-0028-0000-0000-000003E79D2B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031914-0029-0000-0000-000024ACF8B4
-Message-Id: <67a26568-1435-f74a-bb0f-90ac0f994d08@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-19_05:2020-03-19,
- 2020-03-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0
- lowpriorityscore=0 mlxscore=0 clxscore=1015 priorityscore=1501 spamscore=0
- malwarescore=0 impostorscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003190065
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1584629477; bh=dDxfFpVv1wOTY5SS5GpKXoCSC88h6bMeE0jAKqP6744=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=FwQCSC3LwtegYFbM74WAqZrsJJzAcLXeQT8/fsmF4Rloy9Vh+1hHAnxXeKhk8kNuR
+ RXYfc8VLzp00pKobi0m17fJrtLlVuaaafHsf+cKLbhrOknj11t2yudWd1SXtXMrxfr
+ avbx2zj/NsHIqRdki0DZpKVplf8qRbz2XQ+L0Buz/Onalkh9KpQm0H+pqQ6JGvKJzq
+ 4Pvl0jopuRlzU476O5dT5gwVTwedCt3Y+eeZ3pLyo7QdpRciQYTONnZA+AQHAodQXu
+ 7O+RTsdQhIaya2nzF4eieWKFMjO32iCFx3ez2NR5BsO1PezWFldG5G52oOjXoVibdY
+ Wkd4qSWr0zAzw==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,168 +92,371 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 19.03.20 14:19, Janosch Frank wrote:
-> SCLP for a protected guest is done over the SIDAD, so we need to use
-> the s390_cpu_pv_mem_* functions to access the SIDAD instead of guest
-> memory when reading/writing SCBs.
+On 3/19/2020 9:15 AM, Alex Williamson wrote:
+> On Thu, 19 Mar 2020 01:11:11 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> To not confuse the sclp emulation, we set 0x4000 as the SCCB address,
-> since the function that injects the sclp external interrupt would
-> reject a zero sccb address.
+>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+>> - Start dirty pages tracking while migration is active
+>> - Stop dirty pages tracking.
+>> - Get dirty pages bitmap. Its user space application's responsibility to
+>>    copy content of dirty pages from source to destination during migration.
+>>
+>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+>> structure. Bitmap size is calculated considering smallest supported page
+>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
+>>
+>> Bitmap is populated for already pinned pages when bitmap is allocated for
+>> a vfio_dma with the smallest supported page size. Update bitmap from
+>> pinning functions when tracking is enabled. When user application queries
+>> bitmap, check if requested page size is same as page size used to
+>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
+>> error.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>   drivers/vfio/vfio_iommu_type1.c | 205 +++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 203 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 70aeab921d0f..d6417fb02174 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -71,6 +71,7 @@ struct vfio_iommu {
+>>   	unsigned int		dma_avail;
+>>   	bool			v2;
+>>   	bool			nesting;
+>> +	bool			dirty_page_tracking;
+>>   };
+>>   
+>>   struct vfio_domain {
+>> @@ -91,6 +92,7 @@ struct vfio_dma {
+>>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+>>   	struct task_struct	*task;
+>>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+>> +	unsigned long		*bitmap;
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-series looks good to me.
-
-
-> ---
->  hw/s390x/sclp.c         | 56 +++++++++++++++++++++++++++++++++--------
->  include/hw/s390x/sclp.h |  2 ++
->  target/s390x/kvm.c      | 25 ++++++++++++++----
->  3 files changed, 67 insertions(+), 16 deletions(-)
+> We've made the bitmap a width invariant u64 else, should be here as
+> well.
 > 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index af0bfbc2eca74767..d8ae207731f1060a 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -33,6 +33,22 @@ static inline SCLPDevice *get_sclp_device(void)
->      return sclp;
->  }
->  
-> +static inline bool sclp_command_code_valid(uint32_t code)
-> +{
-> +    switch (code & SCLP_CMD_CODE_MASK) {
-> +    case SCLP_CMDW_READ_SCP_INFO:
-> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
-> +    case SCLP_CMDW_READ_CPU_INFO:
-> +    case SCLP_CMDW_CONFIGURE_IOA:
-> +    case SCLP_CMDW_DECONFIGURE_IOA:
-> +    case SCLP_CMD_READ_EVENT_DATA:
-> +    case SCLP_CMD_WRITE_EVENT_DATA:
-> +    case SCLP_CMD_WRITE_EVENT_MASK:
-> +        return true;
-> +    }
-> +    return false;
-> +}
-> +
->  static void prepare_cpu_entries(SCLPDevice *sclp, CPUEntry *entry, int *count)
->  {
->      MachineState *ms = MACHINE(qdev_get_machine());
-> @@ -193,6 +209,34 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
->      }
->  }
->  
-> +/*
-> + * We only need the address to have something valid for the
-> + * service_interrupt call.
-> + */
-> +#define SCLP_PV_DUMMY_ADDR 0x4000
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code)
-> +{
-> +    SCLPDevice *sclp = get_sclp_device();
-> +    SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
-> +    SCCB work_sccb;
-> +    hwaddr sccb_len = sizeof(SCCB);
-> +
-> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
-> +
-> +    if (!sclp_command_code_valid(code)) {
-> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-> +        goto out_write;
-> +    }
-> +
-> +    sclp_c->execute(sclp, &work_sccb, code);
-> +out_write:
-> +    s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
-> +                          be16_to_cpu(work_sccb.h.length));
-> +    sclp_c->service_interrupt(sclp, SCLP_PV_DUMMY_ADDR);
-> +    return 0;
-> +}
-> +
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->  {
->      SCLPDevice *sclp = get_sclp_device();
-> @@ -225,17 +269,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->          return -PGM_SPECIFICATION;
->      }
->  
-> -    switch (code & SCLP_CMD_CODE_MASK) {
-> -    case SCLP_CMDW_READ_SCP_INFO:
-> -    case SCLP_CMDW_READ_SCP_INFO_FORCED:
-> -    case SCLP_CMDW_READ_CPU_INFO:
-> -    case SCLP_CMDW_CONFIGURE_IOA:
-> -    case SCLP_CMDW_DECONFIGURE_IOA:
-> -    case SCLP_CMD_READ_EVENT_DATA:
-> -    case SCLP_CMD_WRITE_EVENT_DATA:
-> -    case SCLP_CMD_WRITE_EVENT_MASK:
-> -        break;
-> -    default:
-> +    if (!sclp_command_code_valid(code)) {
->          work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
->          goto out_write;
->      }
-> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> index cd7b24359f28deb4..822eff4396ff5dde 100644
-> --- a/include/hw/s390x/sclp.h
-> +++ b/include/hw/s390x/sclp.h
-> @@ -217,5 +217,7 @@ void s390_sclp_init(void);
->  void sclp_service_interrupt(uint32_t sccb);
->  void raise_irq_cpu_hotplug(void);
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code);
->  
->  #endif
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 462a1d70ee78104c..6b7819d2c51a111c 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1233,12 +1233,27 @@ static void kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
->      sccb = env->regs[ipbh0 & 0xf];
->      code = env->regs[(ipbh0 & 0xf0) >> 4];
->  
-> -    r = sclp_service_call(env, sccb, code);
-> -    if (r < 0) {
-> -        kvm_s390_program_interrupt(cpu, -r);
-> -        return;
-> +    switch (run->s390_sieic.icptcode) {
-> +    case ICPT_PV_INSTR_NOTIFICATION:
-> +        g_assert(s390_is_pv());
-> +        /* The notification intercepts are currently handled by KVM */
-> +        error_report("unexpected SCLP PV notification");
-> +        exit(1);
-> +        break;
-> +    case ICPT_PV_INSTR:
-> +        g_assert(s390_is_pv());
-> +        sclp_service_call_protected(env, sccb, code);
-> +        /* Setting the CC is done by the Ultravisor. */
-> +        break;
-> +    case ICPT_INSTRUCTION:
-> +        g_assert(!s390_is_pv());
-> +        r = sclp_service_call(env, sccb, code);
-> +        if (r < 0) {
-> +            kvm_s390_program_interrupt(cpu, -r);
-> +            return;
-> +        }
-> +        setcc(cpu, r);
->      }
-> -    setcc(cpu, r);
->  }
->  
->  static int handle_b2(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+>>   };
+>>   
+>>   struct vfio_group {
+>> @@ -125,7 +127,10 @@ struct vfio_regions {
+>>   #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>>   					(!list_empty(&iommu->domain_list))
+>>   
+>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+>> +
+>>   static int put_pfn(unsigned long pfn, int prot);
+>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+>>   
+>>   /*
+>>    * This code handles mapping and unmapping of user data buffers
+>> @@ -175,6 +180,55 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+>>   	rb_erase(&old->node, &iommu->dma_list);
+>>   }
+>>   
+>> +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu, uint64_t pgsize)
+>> +{
+>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+>> +
+>> +	for (; n; n = rb_next(n)) {
+>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+>> +		struct rb_node *p;
+>> +		unsigned long npages = dma->size / pgsize;
+>> +
+>> +		dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+>> +		if (!dma->bitmap) {
+>> +			struct rb_node *p = rb_prev(n);
+>> +
+>> +			for (; p; p = rb_prev(p)) {
+>> +				struct vfio_dma *dma = rb_entry(n,
+>> +							struct vfio_dma, node);
+>> +
+>> +				kfree(dma->bitmap);
+>> +				dma->bitmap = NULL;
+>> +			}
+>> +			return -ENOMEM;
+>> +		}
+>> +
+>> +		if (RB_EMPTY_ROOT(&dma->pfn_list))
+>> +			continue;
+>> +
+>> +		for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
+>> +			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
+>> +							 node);
+>> +
+>> +			bitmap_set(dma->bitmap,
+>> +					(vpfn->iova - dma->iova) / pgsize, 1);
+>> +		}
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>> +static void vfio_dma_bitmap_free(struct vfio_iommu *iommu)
+>> +{
+>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+>> +
+>> +	for (; n; n = rb_next(n)) {
+>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+>> +
+>> +		kfree(dma->bitmap);
+>> +		dma->bitmap = NULL;
+>> +	}
+>> +}
+>> +
+>>   /*
+>>    * Helper Functions for host iova-pfn list
+>>    */
+>> @@ -567,6 +621,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>   			vfio_unpin_page_external(dma, iova, do_accounting);
+>>   			goto pin_unwind;
+>>   		}
+>> +
+>> +		if (iommu->dirty_page_tracking) {
+>> +			unsigned long pgshift =
+>> +					 __ffs(vfio_pgsize_bitmap(iommu));
+>> +
+>> +			bitmap_set(dma->bitmap,
+>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
+>> +		}
+>>   	}
+>>   
+>>   	ret = i;
+>> @@ -801,6 +863,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>>   	vfio_unmap_unpin(iommu, dma, true);
+>>   	vfio_unlink_dma(iommu, dma);
+>>   	put_task_struct(dma->task);
+>> +	kfree(dma->bitmap);
+>>   	kfree(dma);
+>>   	iommu->dma_avail++;
+>>   }
+>> @@ -831,6 +894,50 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+>>   	return bitmap;
+>>   }
+>>   
+>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+>> +				  size_t size, uint64_t pgsize,
+>> +				  unsigned char __user *bitmap)
+> 
+> And here, why do callers cast to an unsigned char pointer when we're
+> going to cast to a void pointer anyway?  Should be a u64 __user pointer.
+> 
+>> +{
+>> +	struct vfio_dma *dma;
+>> +	unsigned long pgshift = __ffs(pgsize);
+>> +	unsigned int npages, bitmap_size;
+>> +
+>> +	dma = vfio_find_dma(iommu, iova, 1);
+>> +
+>> +	if (!dma)
+>> +		return -EINVAL;
+>> +
+>> +	if (dma->iova != iova || dma->size != size)
+>> +		return -EINVAL;
+>> +
+>> +	npages = dma->size >> pgshift;
+>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+>> +
+>> +	/* mark all pages dirty if all pages are pinned and mapped. */
+>> +	if (dma->iommu_mapped)
+>> +		bitmap_set(dma->bitmap, 0, npages);
+>> +
+>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+>> +		return -EFAULT;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+>> +{
+>> +	uint64_t bsize;
+>> +
+>> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
+> 
+> As commented previously, how do we derive this UINT_MAX limitation?
 > 
 
+Sorry, I missed that earlier
+
+ > UINT_MAX seems arbitrary, is this specified in our API?  The size of a
+ > vfio_dma is limited to what the user is able to pin, and therefore
+ > their locked memory limit, but do we have an explicit limit elsewhere
+ > that results in this limit here.  I think a 4GB bitmap would track
+ > something like 2^47 bytes of memory, that's pretty excessive, but still
+ > an arbitrary limit.
+
+There has to be some upper limit check. In core KVM, in
+virt/kvm/kvm_main.c there is max number of pages check:
+
+if (new.npages > KVM_MEM_MAX_NR_PAGES)
+
+Where
+/*
+  * Some of the bitops functions do not support too long bitmaps.
+  * This number must be determined not to exceed such limits.
+  */
+#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+
+Though I don't know which bitops functions do not support long bitmaps.
+
+Something similar as above can be done or same as you also mentioned of 
+4GB bitmap limit? that is U32_MAX instead of UINT_MAX?
+
+>> +		return -EINVAL;
+>> +
+>> +	bsize = DIRTY_BITMAP_BYTES(npages);
+>> +
+>> +	if (bitmap_size < bsize)
+>> +		return -EINVAL;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   			     struct vfio_iommu_type1_dma_unmap *unmap)
+>>   {
+> 
+> We didn't address that vfio_dma_do_map() needs to kvzalloc a bitmap for
+> any new vfio_dma created while iommu->dirty_page_tracking = true.
+> 
+
+Good point. Adding it.
+
+Thanks,
+Kirti
+
+>> @@ -2278,6 +2385,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>   
+>>   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>>   			-EFAULT : 0;
+>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+>> +		struct vfio_iommu_type1_dirty_bitmap dirty;
+>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+>> +		int ret = 0;
+>> +
+>> +		if (!iommu->v2)
+>> +			return -EACCES;
+>> +
+>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+>> +				    flags);
+>> +
+>> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
+>> +			return -EFAULT;
+>> +
+>> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
+>> +			return -EINVAL;
+>> +
+>> +		/* only one flag should be set at a time */
+>> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
+>> +			return -EINVAL;
+>> +
+>> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+>> +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
+>> +
+>> +			mutex_lock(&iommu->lock);
+>> +			if (!iommu->dirty_page_tracking) {
+>> +				ret = vfio_dma_bitmap_alloc(iommu, pgsize);
+>> +				if (!ret)
+>> +					iommu->dirty_page_tracking = true;
+>> +			}
+>> +			mutex_unlock(&iommu->lock);
+>> +			return ret;
+>> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+>> +			mutex_lock(&iommu->lock);
+>> +			if (iommu->dirty_page_tracking) {
+>> +				iommu->dirty_page_tracking = false;
+>> +				vfio_dma_bitmap_free(iommu);
+>> +			}
+>> +			mutex_unlock(&iommu->lock);
+>> +			return 0;
+>> +		} else if (dirty.flags &
+>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+>> +			struct vfio_iommu_type1_dirty_bitmap_get range;
+>> +			unsigned long pgshift;
+>> +			size_t data_size = dirty.argsz - minsz;
+>> +			uint64_t iommu_pgsize =
+>> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
+>> +
+>> +			if (!data_size || data_size < sizeof(range))
+>> +				return -EINVAL;
+>> +
+>> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
+>> +					   sizeof(range)))
+>> +				return -EFAULT;
+>> +
+>> +			/* allow only min supported pgsize */
+>> +			if (range.bitmap.pgsize != iommu_pgsize)
+>> +				return -EINVAL;
+>> +			if (range.iova & (iommu_pgsize - 1))
+>> +				return -EINVAL;
+>> +			if (!range.size || range.size & (iommu_pgsize - 1))
+>> +				return -EINVAL;
+>> +			if (range.iova + range.size < range.iova)
+>> +				return -EINVAL;
+>> +			if (!access_ok((void __user *)range.bitmap.data,
+>> +				       range.bitmap.size))
+>> +				return -EINVAL;
+>> +
+>> +			pgshift = __ffs(range.bitmap.pgsize);
+>> +			ret = verify_bitmap_size(range.size >> pgshift,
+>> +						 range.bitmap.size);
+>> +			if (ret)
+>> +				return ret;
+>> +
+>> +			mutex_lock(&iommu->lock);
+>> +			if (iommu->dirty_page_tracking)
+>> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
+>> +					 range.size, range.bitmap.pgsize,
+>> +				    (unsigned char __user *)range.bitmap.data);
+>> +			else
+>> +				ret = -EINVAL;
+>> +			mutex_unlock(&iommu->lock);
+>> +
+>> +			return ret;
+>> +		}
+>>   	}
+>>   
+>>   	return -ENOTTY;
+>> @@ -2345,10 +2539,17 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+>>   
+>>   	vaddr = dma->vaddr + offset;
+>>   
+>> -	if (write)
+>> +	if (write) {
+>>   		*copied = __copy_to_user((void __user *)vaddr, data,
+>>   					 count) ? 0 : count;
+>> -	else
+>> +		if (*copied && iommu->dirty_page_tracking) {
+>> +			unsigned long pgshift =
+>> +				__ffs(vfio_pgsize_bitmap(iommu));
+>> +
+>> +			bitmap_set(dma->bitmap, offset >> pgshift,
+>> +				   *copied >> pgshift);
+>> +		}
+>> +	} else
+> 
+> Great, thanks for adding this!
+> 
+>>   		*copied = __copy_from_user(data, (void __user *)vaddr,
+>>   					   count) ? 0 : count;
+>>   	if (kthread)
+> 
 
