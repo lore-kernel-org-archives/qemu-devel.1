@@ -2,85 +2,81 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B138C43332
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1E6C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:08:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 193C620B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 14:53:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9FFD2072D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="FwQCSC3L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 193C620B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqSKa+f5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9FFD2072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEwYE-0007n0-9Z
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 10:53:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55460)
+	id 1jEwmw-0003sw-QU
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 11:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jEwXb-0007HC-AR
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:53:01 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jEwmN-0003Qy-8M
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:08:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jEwXY-0002uX-PU
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:52:58 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:19821)
+ (envelope-from <imammedo@redhat.com>) id 1jEwmL-00010b-Gb
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:08:14 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47487)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jEwXY-0002uF-Hq
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 10:52:56 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e7386e40000>; Thu, 19 Mar 2020 07:51:16 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 19 Mar 2020 07:52:54 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 19 Mar 2020 07:52:54 -0700
-Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
- 2020 14:52:46 +0000
-Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
- <20200318214500.1a0cb985@w520.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <e0070cf4-af58-2906-b427-0888ecb89538@nvidia.com>
-Date: Thu, 19 Mar 2020 20:22:41 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jEwmL-000101-Cx
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:08:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584630492;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/mtgzCdv9sKXyH05tbd38LH95LLZVXgjX5yGisTonng=;
+ b=cqSKa+f5he9znPhsfOBTZj7Upe1Wl2pY3Ch+O2NVzZVyv3Fkvz+OElaevSqZ0jM9REdMy8
+ ovy+WiucIbISh43+WzTYBrMntnL4NbOyUD6Op+tW0cPIxSS9jPqguhJ6VEkWMGKG4Fmldl
+ PDzhLDOVpeMyTIQo872WBLJBVZA2RTU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-CgnmQsQ6M--FMSGClc5o4w-1; Thu, 19 Mar 2020 11:08:09 -0400
+X-MC-Unique: CgnmQsQ6M--FMSGClc5o4w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B088F801E6C;
+ Thu, 19 Mar 2020 15:08:07 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.100])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DD1E7BBBD7;
+ Thu, 19 Mar 2020 15:08:01 +0000 (UTC)
+Date: Thu, 19 Mar 2020 16:08:00 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0 1/2] hw/acpi/piix4: Add 'system-hotplug-support'
+ property
+Message-ID: <20200319160800.614de5fb@redhat.com>
+In-Reply-To: <4d42697e-ba84-e5af-3a17-a2cc52cf0dbc@redhat.com>
+References: <20200318221531.22910-1-philmd@redhat.com>
+ <20200318221531.22910-2-philmd@redhat.com>
+ <20200319114424.5723e777@office.mammed.net>
+ <4d42697e-ba84-e5af-3a17-a2cc52cf0dbc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200318214500.1a0cb985@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1584629477; bh=dDxfFpVv1wOTY5SS5GpKXoCSC88h6bMeE0jAKqP6744=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=FwQCSC3LwtegYFbM74WAqZrsJJzAcLXeQT8/fsmF4Rloy9Vh+1hHAnxXeKhk8kNuR
- RXYfc8VLzp00pKobi0m17fJrtLlVuaaafHsf+cKLbhrOknj11t2yudWd1SXtXMrxfr
- avbx2zj/NsHIqRdki0DZpKVplf8qRbz2XQ+L0Buz/Onalkh9KpQm0H+pqQ6JGvKJzq
- 4Pvl0jopuRlzU476O5dT5gwVTwedCt3Y+eeZ3pLyo7QdpRciQYTONnZA+AQHAodQXu
- 7O+RTsdQhIaya2nzF4eieWKFMjO32iCFx3ez2NR5BsO1PezWFldG5G52oOjXoVibdY
- Wkd4qSWr0zAzw==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,371 +88,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 19 Mar 2020 12:04:11 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
+> On 3/19/20 11:44 AM, Igor Mammedov wrote:
+> > On Wed, 18 Mar 2020 23:15:30 +0100
+> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+> >  =20
+> >> The I/O ranges registered by the piix4_acpi_system_hot_add_init()
+> >> function are not documented in the PIIX4 datasheet.
+> >> This appears to be a PC-only feature added in commit 5e3cb5347e
+> >> ("initialize hot add system / acpi gpe") which was then moved
+> >> to the PIIX4 device model in commit 9d5e77a22f ("make
+> >> qemu_system_device_hot_add piix independent")
+> >> Add a property (default enabled, to not modify the current
+> >> behavior) to allow machines wanting to model a simple PIIX4
+> >> to disable this feature.
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =20
+> >=20
+> > it's already pretty twisted code and adding one more knob
+> > to workaround other compat knobs makes it worse.
+> >=20
+> > Even though it's not really welcomed approach,
+> > we can ifdef all hotplug parts and compile them out for mips
+> > dropping along the way linking with not needed dependencies =20
+>=20
+> We can't use use target-specific poisoned definitions to ifdef out in=20
+> generic hw/ code.
+>=20
+> > or
+> > more often used, make stubs from hotplug parts for mips
+> > and link with them. =20
+>=20
+> So the problem is this device doesn't match the hardware datasheet, has=
+=20
+> extra features helping virtualization, and now we can not simplify it=20
+> due to backward compat.
+>=20
+> Once Michael said he doesn't care about the PIIX4, only the PIIX3=20
+> southbridge [1] [2], but then the i440fx pc machine uses a PIIX3 with a=
+=20
+> pci PM function from PIIX4, and made that PII4_PM Frankenstein.
+>=20
+> You are asking me to choose between worse versus ugly?
+That 'ugly' is typically used within QEMU to deal with such things
+probably due to its low complexity.
 
-On 3/19/2020 9:15 AM, Alex Williamson wrote:
-> On Thu, 19 Mar 2020 01:11:11 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
->> - Start dirty pages tracking while migration is active
->> - Stop dirty pages tracking.
->> - Get dirty pages bitmap. Its user space application's responsibility to
->>    copy content of dirty pages from source to destination during migration.
->>
->> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
->> structure. Bitmap size is calculated considering smallest supported page
->> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
->>
->> Bitmap is populated for already pinned pages when bitmap is allocated for
->> a vfio_dma with the smallest supported page size. Update bitmap from
->> pinning functions when tracking is enabled. When user application queries
->> bitmap, check if requested page size is same as page size used to
->> populated bitmap. If it is equal, copy bitmap, but if not equal, return
->> error.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 205 +++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 203 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 70aeab921d0f..d6417fb02174 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -71,6 +71,7 @@ struct vfio_iommu {
->>   	unsigned int		dma_avail;
->>   	bool			v2;
->>   	bool			nesting;
->> +	bool			dirty_page_tracking;
->>   };
->>   
->>   struct vfio_domain {
->> @@ -91,6 +92,7 @@ struct vfio_dma {
->>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->>   	struct task_struct	*task;
->>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->> +	unsigned long		*bitmap;
-> 
-> We've made the bitmap a width invariant u64 else, should be here as
-> well.
-> 
->>   };
->>   
->>   struct vfio_group {
->> @@ -125,7 +127,10 @@ struct vfio_regions {
->>   #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->>   					(!list_empty(&iommu->domain_list))
->>   
->> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
->> +
->>   static int put_pfn(unsigned long pfn, int prot);
->> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->>   
->>   /*
->>    * This code handles mapping and unmapping of user data buffers
->> @@ -175,6 +180,55 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->>   	rb_erase(&old->node, &iommu->dma_list);
->>   }
->>   
->> +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu, uint64_t pgsize)
->> +{
->> +	struct rb_node *n = rb_first(&iommu->dma_list);
->> +
->> +	for (; n; n = rb_next(n)) {
->> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->> +		struct rb_node *p;
->> +		unsigned long npages = dma->size / pgsize;
->> +
->> +		dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
->> +		if (!dma->bitmap) {
->> +			struct rb_node *p = rb_prev(n);
->> +
->> +			for (; p; p = rb_prev(p)) {
->> +				struct vfio_dma *dma = rb_entry(n,
->> +							struct vfio_dma, node);
->> +
->> +				kfree(dma->bitmap);
->> +				dma->bitmap = NULL;
->> +			}
->> +			return -ENOMEM;
->> +		}
->> +
->> +		if (RB_EMPTY_ROOT(&dma->pfn_list))
->> +			continue;
->> +
->> +		for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
->> +			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
->> +							 node);
->> +
->> +			bitmap_set(dma->bitmap,
->> +					(vpfn->iova - dma->iova) / pgsize, 1);
->> +		}
->> +	}
->> +	return 0;
->> +}
->> +
->> +static void vfio_dma_bitmap_free(struct vfio_iommu *iommu)
->> +{
->> +	struct rb_node *n = rb_first(&iommu->dma_list);
->> +
->> +	for (; n; n = rb_next(n)) {
->> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->> +
->> +		kfree(dma->bitmap);
->> +		dma->bitmap = NULL;
->> +	}
->> +}
->> +
->>   /*
->>    * Helper Functions for host iova-pfn list
->>    */
->> @@ -567,6 +621,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>   			vfio_unpin_page_external(dma, iova, do_accounting);
->>   			goto pin_unwind;
->>   		}
->> +
->> +		if (iommu->dirty_page_tracking) {
->> +			unsigned long pgshift =
->> +					 __ffs(vfio_pgsize_bitmap(iommu));
->> +
->> +			bitmap_set(dma->bitmap,
->> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
->> +		}
->>   	}
->>   
->>   	ret = i;
->> @@ -801,6 +863,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->>   	vfio_unmap_unpin(iommu, dma, true);
->>   	vfio_unlink_dma(iommu, dma);
->>   	put_task_struct(dma->task);
->> +	kfree(dma->bitmap);
->>   	kfree(dma);
->>   	iommu->dma_avail++;
->>   }
->> @@ -831,6 +894,50 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->>   	return bitmap;
->>   }
->>   
->> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
->> +				  size_t size, uint64_t pgsize,
->> +				  unsigned char __user *bitmap)
-> 
-> And here, why do callers cast to an unsigned char pointer when we're
-> going to cast to a void pointer anyway?  Should be a u64 __user pointer.
-> 
->> +{
->> +	struct vfio_dma *dma;
->> +	unsigned long pgshift = __ffs(pgsize);
->> +	unsigned int npages, bitmap_size;
->> +
->> +	dma = vfio_find_dma(iommu, iova, 1);
->> +
->> +	if (!dma)
->> +		return -EINVAL;
->> +
->> +	if (dma->iova != iova || dma->size != size)
->> +		return -EINVAL;
->> +
->> +	npages = dma->size >> pgshift;
->> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
->> +
->> +	/* mark all pages dirty if all pages are pinned and mapped. */
->> +	if (dma->iommu_mapped)
->> +		bitmap_set(dma->bitmap, 0, npages);
->> +
->> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
->> +		return -EFAULT;
->> +
->> +	return 0;
->> +}
->> +
->> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
->> +{
->> +	uint64_t bsize;
->> +
->> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
-> 
-> As commented previously, how do we derive this UINT_MAX limitation?
-> 
+> The saner outcome I see is make the current PIIX4_PM x86-specific, not=20
+> modifying the code, and start a fresh new copy respecting the datasheet.
+properly implementing spec would be quite a task
+(although if motivation is just for fun, then why not)
 
-Sorry, I missed that earlier
+>=20
+> Note I'm not particularly interested in MIPS here, but having model=20
+> respecting the hardware.
+>=20
+> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg504270.html
+> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg601512.html
+>=20
+> >  =20
+> >> ---
+> >> Should I squash this with the next patch and start with
+> >> default=3Dfalse, which is closer to the hardware model?
+> >> ---
+> >>   hw/acpi/piix4.c | 9 +++++++--
+> >>   1 file changed, 7 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> >> index 964d6f5990..9c970336ac 100644
+> >> --- a/hw/acpi/piix4.c
+> >> +++ b/hw/acpi/piix4.c
+> >> @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
+> >>  =20
+> >>       AcpiPciHpState acpi_pci_hotplug;
+> >>       bool use_acpi_pci_hotplug;
+> >> +    bool use_acpi_system_hotplug;
+> >>  =20
+> >>       uint8_t disable_s3;
+> >>       uint8_t disable_s4;
+> >> @@ -503,8 +504,10 @@ static void piix4_pm_realize(PCIDevice *dev, Erro=
+r **errp)
+> >>       s->machine_ready.notify =3D piix4_pm_machine_ready;
+> >>       qemu_add_machine_init_done_notifier(&s->machine_ready);
+> >>  =20
+> >> -    piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
+> >> -                                   pci_get_bus(dev), s);
+> >> +    if (s->use_acpi_system_hotplug) {
+> >> +        piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
+> >> +                                       pci_get_bus(dev), s);
+> >> +    }
+> >>       qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s), &erro=
+r_abort);
+> >>  =20
+> >>       piix4_pm_add_propeties(s);
+> >> @@ -635,6 +638,8 @@ static Property piix4_pm_properties[] =3D {
+> >>                        use_acpi_pci_hotplug, true),
+> >>       DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+> >>                        acpi_memory_hotplug.is_enabled, true),
+> >> +    DEFINE_PROP_BOOL("system-hotplug-support", PIIX4PMState,
+> >> +                     use_acpi_system_hotplug, true),
+> >>       DEFINE_PROP_END_OF_LIST(),
+> >>   };
+> >>    =20
+> >  =20
+>=20
+>=20
 
- > UINT_MAX seems arbitrary, is this specified in our API?  The size of a
- > vfio_dma is limited to what the user is able to pin, and therefore
- > their locked memory limit, but do we have an explicit limit elsewhere
- > that results in this limit here.  I think a 4GB bitmap would track
- > something like 2^47 bytes of memory, that's pretty excessive, but still
- > an arbitrary limit.
-
-There has to be some upper limit check. In core KVM, in
-virt/kvm/kvm_main.c there is max number of pages check:
-
-if (new.npages > KVM_MEM_MAX_NR_PAGES)
-
-Where
-/*
-  * Some of the bitops functions do not support too long bitmaps.
-  * This number must be determined not to exceed such limits.
-  */
-#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
-
-Though I don't know which bitops functions do not support long bitmaps.
-
-Something similar as above can be done or same as you also mentioned of 
-4GB bitmap limit? that is U32_MAX instead of UINT_MAX?
-
->> +		return -EINVAL;
->> +
->> +	bsize = DIRTY_BITMAP_BYTES(npages);
->> +
->> +	if (bitmap_size < bsize)
->> +		return -EINVAL;
->> +
->> +	return 0;
->> +}
->> +
->>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   			     struct vfio_iommu_type1_dma_unmap *unmap)
->>   {
-> 
-> We didn't address that vfio_dma_do_map() needs to kvzalloc a bitmap for
-> any new vfio_dma created while iommu->dirty_page_tracking = true.
-> 
-
-Good point. Adding it.
-
-Thanks,
-Kirti
-
->> @@ -2278,6 +2385,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->>   
->>   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->>   			-EFAULT : 0;
->> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
->> +		struct vfio_iommu_type1_dirty_bitmap dirty;
->> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
->> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
->> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
->> +		int ret = 0;
->> +
->> +		if (!iommu->v2)
->> +			return -EACCES;
->> +
->> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
->> +				    flags);
->> +
->> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
->> +			return -EFAULT;
->> +
->> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
->> +			return -EINVAL;
->> +
->> +		/* only one flag should be set at a time */
->> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
->> +			return -EINVAL;
->> +
->> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
->> +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
->> +
->> +			mutex_lock(&iommu->lock);
->> +			if (!iommu->dirty_page_tracking) {
->> +				ret = vfio_dma_bitmap_alloc(iommu, pgsize);
->> +				if (!ret)
->> +					iommu->dirty_page_tracking = true;
->> +			}
->> +			mutex_unlock(&iommu->lock);
->> +			return ret;
->> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
->> +			mutex_lock(&iommu->lock);
->> +			if (iommu->dirty_page_tracking) {
->> +				iommu->dirty_page_tracking = false;
->> +				vfio_dma_bitmap_free(iommu);
->> +			}
->> +			mutex_unlock(&iommu->lock);
->> +			return 0;
->> +		} else if (dirty.flags &
->> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
->> +			struct vfio_iommu_type1_dirty_bitmap_get range;
->> +			unsigned long pgshift;
->> +			size_t data_size = dirty.argsz - minsz;
->> +			uint64_t iommu_pgsize =
->> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
->> +
->> +			if (!data_size || data_size < sizeof(range))
->> +				return -EINVAL;
->> +
->> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
->> +					   sizeof(range)))
->> +				return -EFAULT;
->> +
->> +			/* allow only min supported pgsize */
->> +			if (range.bitmap.pgsize != iommu_pgsize)
->> +				return -EINVAL;
->> +			if (range.iova & (iommu_pgsize - 1))
->> +				return -EINVAL;
->> +			if (!range.size || range.size & (iommu_pgsize - 1))
->> +				return -EINVAL;
->> +			if (range.iova + range.size < range.iova)
->> +				return -EINVAL;
->> +			if (!access_ok((void __user *)range.bitmap.data,
->> +				       range.bitmap.size))
->> +				return -EINVAL;
->> +
->> +			pgshift = __ffs(range.bitmap.pgsize);
->> +			ret = verify_bitmap_size(range.size >> pgshift,
->> +						 range.bitmap.size);
->> +			if (ret)
->> +				return ret;
->> +
->> +			mutex_lock(&iommu->lock);
->> +			if (iommu->dirty_page_tracking)
->> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
->> +					 range.size, range.bitmap.pgsize,
->> +				    (unsigned char __user *)range.bitmap.data);
->> +			else
->> +				ret = -EINVAL;
->> +			mutex_unlock(&iommu->lock);
->> +
->> +			return ret;
->> +		}
->>   	}
->>   
->>   	return -ENOTTY;
->> @@ -2345,10 +2539,17 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->>   
->>   	vaddr = dma->vaddr + offset;
->>   
->> -	if (write)
->> +	if (write) {
->>   		*copied = __copy_to_user((void __user *)vaddr, data,
->>   					 count) ? 0 : count;
->> -	else
->> +		if (*copied && iommu->dirty_page_tracking) {
->> +			unsigned long pgshift =
->> +				__ffs(vfio_pgsize_bitmap(iommu));
->> +
->> +			bitmap_set(dma->bitmap, offset >> pgshift,
->> +				   *copied >> pgshift);
->> +		}
->> +	} else
-> 
-> Great, thanks for adding this!
-> 
->>   		*copied = __copy_from_user(data, (void __user *)vaddr,
->>   					   count) ? 0 : count;
->>   	if (kthread)
-> 
 
