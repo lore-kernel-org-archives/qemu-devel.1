@@ -2,78 +2,75 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE96C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A02B2C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:26:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82AA920739
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:18:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g5gQKruL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82AA920739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 757252070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:26:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 757252070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEtCR-0006z5-N3
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 07:18:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37470)
+	id 1jEtJl-0001AW-Fk
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 07:26:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38482)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jEtBo-0006YW-Fj
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:18:17 -0400
+ (envelope-from <bounces@canonical.com>) id 1jEtJ6-0000kc-K1
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:25:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1jEtBn-0003xt-15
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:18:16 -0400
-Received: from mail-qk1-x72a.google.com ([2607:f8b0:4864:20::72a]:32827)
+ (envelope-from <bounces@canonical.com>) id 1jEtJ5-0008Nq-2h
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:25:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47132)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jEtBm-0003xQ-TT
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:18:14 -0400
-Received: by mail-qk1-x72a.google.com with SMTP id p6so2603545qkm.0
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 04:18:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=3ayIiV45+D13+klB3U+OZugCICnaVF9i6WaY9DphZ5g=;
- b=g5gQKruLuaQygbqb8cGs/lmVzAfJvqFpYyGYUp6FirpW31ZqEG4wswuU7eoMzvVrCH
- VhXxQkL0nrzl/yVqYb9shPbsqYJbWSu9N1DWQg8ozXdJ8fdJSZwy2LM47ayTjBT1BV/n
- 2ajCVxxlUrJFvQDQIw85X67ILOKf6jk24ElaVO9IXpUSsjvheoCf063/wD2+vAWERbD4
- sHkdLM+c0EMwmswNagdaO98LKeM9uio4TmJMB5hi1YMZSWSt4w3Ru2YyFgvqnXPYN2Ek
- lI+24oxJNjA1psBkMyF7CkFDMbqVb94AmfOa+PL2jQ+Q/mQWSotkaLTX0H2+7D/dFbqH
- H3HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=3ayIiV45+D13+klB3U+OZugCICnaVF9i6WaY9DphZ5g=;
- b=dKO3PKwMNqGzOFZEJE3hwzn8KlUlXC8DgV1R+hCyjSlAxaEca8T7Jrj6TCMcb72/3o
- nF/81+FshW0XeFjY+DUTbz/h7uYzYpjTtbKN3K+wOR/u40fqlgHZzpsJdBzg/zv7a2E8
- HyAlcaZDRx64ZoT20kIbqY9NDxRJVFgTHVesfMk9xwL4mcfiCBFB2ex7r3YOdQoDw7jw
- fvQ35WP6qAXoEuEhTn0tyqvKGir4njv1wS8jfE+LILIllwMQaoQRU9S32RI2vfsIoPJg
- MLjlqojnH+vmCMb0WBSOl5WhhZE3pcZKFEFEKgqX2PRRoSaJ5QkYLebpOd9nDkdgnwoN
- hI3A==
-X-Gm-Message-State: ANhLgQ2S493VLcyT+CmLO0E2b+/mkOcQkgozvAwPs1a3zOjLUhI+e4yQ
- cpOkRbK47PyMSmYg+g+x0aZlKoh7haMBjh1s1fTzrud4heg=
-X-Google-Smtp-Source: ADFU+vsjQFvURNLrR22OtvLwiUImhSDVKqfOmsxk3RcOhKjqgHFjUIArWb5hrZslK30uOmhbVOYbYZn1qr1nR05FEKw=
-X-Received: by 2002:a37:7a46:: with SMTP id v67mr2295136qkc.87.1584616693219; 
- Thu, 19 Mar 2020 04:18:13 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jEtJ4-0007sm-Su
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:25:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jEtJ2-00042b-Rx
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 11:25:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CE2042E80CC
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 11:25:44 +0000 (UTC)
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 19 Mar 2020 11:18:02 +0000
-Message-ID: <CAJSP0QU0dMtqVkPspCbjAqpUs+AJAiqZUnhzUYRFZ3t=7URzmQ@mail.gmail.com>
-Subject: Use the new lock guard macros for safe locking
-To: qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::72a
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Mar 2020 11:18:15 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1866870@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h paelzer tstrike34
+X-Launchpad-Bug-Reporter: tstrike (tstrike34)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
+References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
+Message-Id: <158461669535.28890.6799674105255888769.malone@gac.canonical.com>
+Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c6a1d1701fe32367ff2e82e11cbff88f0e2158aa
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,142 +79,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Below is a wiki page I just created explaining the lock guard macros
-that make locking code simpler and safer.
+Starting from the Disco build env that I had I changed the packages
 
-I wanted to make everyone aware of these new macros.  Please consider
-using them!
+Step #1 binutils:
+Unpacking binutils-x86-64-linux-gnu (2.33-2ubuntu1.2) over (2.32-7ubuntu4) =
+...
+Unpacking libbinutils:amd64 (2.33-2ubuntu1.2) over (2.32-7ubuntu4) ...
+Unpacking binutils (2.33-2ubuntu1.2) over (2.32-7ubuntu4) ...
+Unpacking binutils-common:amd64 (2.33-2ubuntu1.2) over (2.32-7ubuntu4) ...
 
-Thanks,
-Stefan
----
-From https://wiki.qemu.org/ToDo/LockGuards:
+=3D> Still working
 
-Lock guards are a safe alternative to manual lock()/unlock() calls.
-They take a lock and automatically unlock it at the end of the scope
-or when the function returns.  This prevents common bugs when locks
-are not released in error code paths.
+Step #2 gcc:
+Unpacking libubsan1:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libtsan0:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking gcc-9-base:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libstdc++6:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libquadmath0:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) .=
+..
+Unpacking liblsan0:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libitm1:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libgomp1:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libcc1-0:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libatomic1:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libasan5:amd64 (9.2.1-9ubuntu2) over (9.1.0-2ubuntu2~19.04) ...
+Unpacking libgcc1:amd64 (1:9.2.1-9ubuntu2) over (1:9.1.0-2ubuntu2~19.04) ...
+Unpacking libisl21:amd64 (0.21-2) ...
+Unpacking cpp-9 (9.2.1-9ubuntu2) ...
+Unpacking libgcc-9-dev:amd64 (9.2.1-9ubuntu2) ...
+Unpacking gcc-9 (9.2.1-9ubuntu2) ...
+Unpacking libstdc++-9-dev:amd64 (9.2.1-9ubuntu2) ...
+Unpacking g++-9 (9.2.1-9ubuntu2) ...
+Unpacking g++ (4:9.2.1-3.1ubuntu1) over (4:8.3.0-1ubuntu3) ...
+Unpacking gcc (4:9.2.1-3.1ubuntu1) over (4:8.3.0-1ubuntu3) ...
+Unpacking cpp (4:9.2.1-3.1ubuntu1) over (4:8.3.0-1ubuntu3) ...
 
-Lock guards were added to QEMU in March 2020.  Much of the codebase
-does not take advantage of them yet.  This page explains how to use
-them and when to convert existing code.
+=3D> now it is breaking
 
-==Lock guard macros==
-Two lock guard macros are defined in "qemu/lockable.h":
+One thing that we have seen to cause breakage in other cases was the new de=
+fault to enable:
+  -fcf-protection
 
-  /**
-   * WITH_QEMU_LOCK_GUARD - Lock a lock object for scope
-   *
-   * @x: a lock object (currently one of QemuMutex, CoMutex, QemuSpin).
-   *
-   * This macro defines a lock scope such that entering the scope takes the lock
-   * and leaving the scope releases the lock.  Return statements are allowed
-   * within the scope and release the lock.  Break and continue statements leave
-   * the scope early and release the lock.
-   *
-   *   WITH_QEMU_LOCK_GUARD(&mutex) {
-   *       ...
-   *       if (error) {
-   *           return; <-- mutex is automatically unlocked
-   *       }
-   *
-   *       if (early_exit) {
-   *           break;  <-- leave this scope early
-   *       }
-   *       ...
-   *   }
-   */
-  #define WITH_QEMU_LOCK_GUARD(x)
+The code already carries quite a bunch of similar "no" rules:
+COMMONCFLAGS +=3D $(call cc-option,$(CC),-nopie,)
+COMMONCFLAGS +=3D $(call cc-option,$(CC),-fno-pie,)
+COMMONCFLAGS +=3D $(call cc-option,$(CC),-fno-stack-protector,)
+COMMONCFLAGS +=3D $(call cc-option,$(CC),-fno-stack-protector-all,)
+COMMONCFLAGS +=3D $(call cc-option,$(CC),-fstack-check=3Dno,)
+COMMONCFLAGS +=3D $(call cc-option,$(CC),-Wno-address-of-packed-member,)
 
-and
+Lets add to that:
+COMMONCFLAGS +=3D $(call cc-option,$(CC),-fcf-protection=3Dnone,)
 
-  /**
-   * QEMU_LOCK_GUARD - Lock an object until the end of the scope
-   *
-   * @x: a lock object (currently one of QemuMutex, CoMutex, QemuSpin).
-   *
-   * This macro takes a lock until the end of the scope.  Return statements
-   * release the lock.
-   *
-   *   ... <-- mutex not locked
-   *   QEMU_LOCK_GUARD(&mutex); <-- mutex locked from here onwards
-   *   ...
-   *   if (error) {
-   *       return; <-- mutex is automatically unlocked
-   *   }
-   */
-  #define QEMU_LOCK_GUARD(x)
+=3D> That made it work \o/ !
 
-==How to use lock guards==
-Use WITH_QEMU_LOCK_GUARD() when the lock must be released before the
-end of the function.  Use QEMU_LOCK_GUARD() when the lock must be held
-until the end of the function.
+-- =
 
-Here is an example conversion from manual lock()/unlock() calls to
-WITH_QEMU_LOCK_GUARD().  Before:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1866870
 
-  qemu_mutex_lock(&mutex);
-  if (data == NULL) {
-      qemu_mutex_unlock(&mutex);
-      return false;
-  }
-  ...use data...
-  qemu_mutex_unlock(&mutex);
-  return true;
+Title:
+  KVM Guest pauses after upgrade to Ubuntu 20.04
 
-After:
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
 
-  WITH_QEMU_LOCK_GUARD(&mutex) {
-      if (data == NULL) {
-          return false;
-      }
-      ...use data...
-  }
+Bug description:
+  Symptom:
+  Error unpausing domain: internal error: unable to execute QEMU command 'c=
+ont': Resetting the Virtual Machine is required
 
-Notice that it is no longer necessary to manually call qemu_mutex_unlock().
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
+wrapper
+      callback(asyncjob, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
+pcb
+      callback(*args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
+e 66, in newfn
+      ret =3D fn(self, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
+ in resume
+      self._backend.resume()
+    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
+      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
+=3Dself)
+  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
+t': Resetting the Virtual Machine is required
 
-==Which types of locks are supported==
-QemuMutex, QemuRecMutex, CoMutex, and QemuSpin are supported by
-WITH_QEMU_LOCK_GUARD() and QEMU_LOCK_GUARD().
+  =
 
-The RCU read lock has its own WITH_RCU_READ_LOCK_GUARD() and
-RCU_READ_LOCK_GUARD() macros in "qemu/rcu.h" that can replace manual
-rcu_read_lock()/rcu_read_unlock() calls.
+  ---
 
-==When to convert existing code to lock guards==
-Lock guards usually make code easier to read by eliminating unlock()
-calls and gotos.  However, there are some exceptions where it is
-either not worth it or when lock guards cannot handle complex cases.
+  As outlined here:
+  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
 
-They do not provide a significant advantage for straight-line code
-without conditional statements:
+  After upgrade, all KVM guests are in a default pause state. Even after
+  forcing them off via virsh, and restarting them the guests are paused.
 
-  qemu_mutex_lock(&mutex);
-  data++;
-  qemu_mutex_unlock(&mutex);
+  These Guests are not nested.
 
-Leave simple code alone because it is not worth developing and
-reviewing patches that have no benefit.
+  A lot of diganostic information are outlined in the previous bug
+  report link provided. The solution mentioned in previous report had
+  been allegedly integrated into the downstream updates.
 
-They also do not handle complex control flow such as loops that
-temporarily drop a lock:
-
-  qemu_mutex_lock(&mutex);
-  while (running) {
-      ...
-      qemu_mutex_unlock(&mutex);
-      wait();
-      qemu_mutex_lock(&mutex);
-      ...
-  }
-  qemu_mutex_unlock(&mutex);
-
-Although lock guard macros could be mixed with manual lock()/unlock()
-calls to handle some complex control flow cases, this can be subtle
-and may lead to bugs.  Do not try to convert these cases to use lock
-guards.
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
 
