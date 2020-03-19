@@ -2,71 +2,73 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9A1C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 19:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250B0C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 19:51:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6400E20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 19:43:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6400E20724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id ED416206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 19:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED416206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jF14L-00046e-Gi
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 15:43:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59374)
+	id 1jF1CQ-0005nn-1d
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 15:51:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60738)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jF13a-0003Sm-1Z
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 15:42:21 -0400
+ (envelope-from <bounces@canonical.com>) id 1jF1Br-0005NC-J3
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 15:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jF13Y-0003mf-OW
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 15:42:17 -0400
-Resent-Date: Thu, 19 Mar 2020 15:42:17 -0400
-Resent-Message-Id: <E1jF13Y-0003mf-OW@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21198)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jF13W-0003jn-0S; Thu, 19 Mar 2020 15:42:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584646915; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=MOLZC6Ni1KuEhxroVamVmXPq4gzuRNJ6nMy0xNIk94PT5bNt0cVBRqFMKsXshj1tU1k/p92je3WyWIufuFw+afkUqFvuw3wucl20UX702olDHHyd2G5x5cUtmTHpfVGbN+DNUuQ+Zwq/rxP/qx9uionYv690dStTIP8g1PkeNcY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584646915;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ksfxhT8dVK1mu2oN8YSLnqT8uazrNOi2DYSlrItSUUI=; 
- b=l4BJHsuy7Gw3q2OinP+kSZfUD9076GRLTbvnGSiXGzpuK2DieqR8dOdiGhA3nCHe/QAZDj7jjxomb0pL2Be+6VBejMAxJGci/Z7zbJ0HcF01PfV05PyqwLG34wUtxluERdwmwKpMSu7XBXXenGMm8rdRzSn034OgxXOvssvHSeQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584646912647273.2919263517657;
- Thu, 19 Mar 2020 12:41:52 -0700 (PDT)
-In-Reply-To: <20200319161925.1818377-2-dnbrdsky@gmail.com>
-Subject: Re: [PATCH] lockable: replaced locks with lock guard macros where
- appropriate
-Message-ID: <158464691088.9037.5280412894035369099@39012742ff91>
+ (envelope-from <bounces@canonical.com>) id 1jF1Bq-00066X-3S
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 15:50:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41720)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jF1Bp-00066N-U7
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 15:50:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jF1Bn-0000TJ-Oi
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 19:50:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B9E352E80C8
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 19:50:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dnbrdsky@gmail.com
-Date: Thu, 19 Mar 2020 12:41:52 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Mar 2020 19:38:29 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mhodog pmaydell
+X-Launchpad-Bug-Reporter: Robert Henry (mhodog)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <158386917575.11737.1131406657888792626.malonedeb@soybean.canonical.com>
+Message-Id: <158464671008.11669.8976163055427912134.malone@soybean.canonical.com>
+Subject: [Bug 1866892] Re: guest OS catches a page fault bug when running
+ dotnet
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 19797e66b416f7ea1773d196e7937999242d1ee1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,57 +77,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com,
- stefanha@gmail.com, pl@kamp.de, armbru@redhat.com, qemu-devel@nongnu.org,
- dnbrdsky@gmail.com, alex.williamson@redhat.com, kraxel@redhat.com,
- ronniesahlberg@gmail.com, pbonzini@redhat.com, mreitz@redhat.com,
- dgilbert@redhat.com
+Reply-To: Bug 1866892 <1866892@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxOTE2MTkyNS4xODE4
-Mzc3LTItZG5icmRza3lAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
-ZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
-b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
-bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2Vy
-LWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0Bm
-ZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICB0
-cmFjZS1yb290Lm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy91dGls
-L3JjdS5jOjM0OgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9yY3UuYzogSW4gZnVuY3Rpb24gJ3N5
-bmNocm9uaXplX3JjdSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FlbXUvbG9ja2FibGUu
-aDoxNzM6Mjk6IGVycm9yOiByZWRlZmluaXRpb24gb2YgJ3FlbXVfbG9ja2FibGVfYXV0b19fQ09V
-TlRFUl9fJwogICAgIGdfYXV0b3B0cihRZW11TG9ja2FibGUpIHFlbXVfbG9ja2FibGVfYXV0byMj
-X19DT1VOVEVSX18gPSBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
-fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy91dGlsL3JjdS5jOjE1Mjo1OiBub3RlOiBpbiBleHBh
-bnNpb24gb2YgbWFjcm8gJ1FFTVVfTE9DS19HVUFSRCcKLS0tCi90bXAvcWVtdS10ZXN0L3NyYy91
-dGlsL3JjdS5jOjE0NTo1OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8gJ1FFTVVfTE9DS19H
-VUFSRCcKICAgICBRRU1VX0xPQ0tfR1VBUkQoJnJjdV9zeW5jX2xvY2spOwogICAgIF5+fn5+fn5+
-fn5+fn5+fgptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHV0aWwv
-cmN1Lm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
-VHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2Vy
-L2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFBy
-b2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBD
-b21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5x
-ZW11Lmluc3RhbmNlLnV1aWQ9NGI2M2ZmZDJhYjVmNDk4N2EwYTU1ZDJhNTJhMDY0YzcnLCAnLXUn
-LCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScs
-ICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
-JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScs
-ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
-Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTVlbmEyaWRrL3NyYy9kb2NrZXItc3JjLjIwMjAtMDMt
-MTktMTUuMzkuMzkuMjM1ODY6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92
-YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBz
-dGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NGI2
-M2ZmZDJhYjVmNDk4N2EwYTU1ZDJhNTJhMDY0YzcKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBF
-cnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAtNWVuYTJpZGsvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRv
-cmFdIEVycm9yIDIKCnJlYWwgICAgMW00Ni43NTJzCnVzZXIgICAgMG04LjYyOHMKCgpUaGUgZnVs
-bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzE5MTYx
-OTI1LjE4MTgzNzctMi1kbmJyZHNreUBnbWFpbC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVk
-b3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Is dotnet intentionally doing an iret? It seems like an odd thing for a
+userspace program to do, given it's basically "return from interrupt".
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1866892
+
+Title:
+  guest OS catches a page  fault bug when running dotnet
+
+Status in QEMU:
+  New
+
+Bug description:
+  The linux guest OS catches a page fault bug when running the dotnet
+  application.
+
+  host =3D metal =3D x86_64
+  host OS =3D ubuntu 19.10
+  qemu emulation, without KVM, with "tiny code generator" tcg; no plugins; =
+built from head/master
+  guest emulation =3D x86_64
+  guest OS =3D ubuntu 19.10
+  guest app =3D dotnet, running any program
+
+  qemu sha=3D7bc4d1980f95387c4cc921d7a066217ff4e42b70 (head/master Mar 10,
+  2020)
+
+  qemu invocation is:
+
+  qemu/build/x86_64-softmmu/qemu-system-x86_64 \
+    -m size=3D4096 \
+    -smp cpus=3D1 \
+    -machine type=3Dpc-i440fx-5.0,accel=3Dtcg \
+    -cpu Skylake-Server-v1 \
+    -nographic \
+    -bios OVMF-pure-efi.fd \
+    -drive if=3Dnone,id=3Dhd0,file=3Dubuntu-19.10-server-cloudimg-amd64.img=
+ \
+    -device virtio-blk,drive=3Dhd0 \
+    -drive if=3Dnone,id=3Dcloud,file=3Dlinux_cloud_config.img \
+    -device virtio-blk,drive=3Dcloud \
+    -netdev user,id=3Duser0,hostfwd=3Dtcp::2223-:22 \
+    -device virtio-net,netdev=3Duser0
+
+  =
+
+  Here's the guest kernel console output:
+
+  =
+
+  [ 2834.005449] BUG: unable to handle page fault for address: 00007fffffff=
+c2c0
+  [ 2834.009895] #PF: supervisor read access in user mode
+  [ 2834.013872] #PF: error_code(0x0001) - permissions violation
+  [ 2834.018025] IDT: 0xfffffe0000000000 (limit=3D0xfff) GDT: 0xfffffe00000=
+01000 (limit=3D0x7f)
+  [ 2834.022242] LDTR: NULL
+  [ 2834.026306] TR: 0x40 -- base=3D0xfffffe0000003000 limit=3D0x206f
+  [ 2834.030395] PGD 80000000360d0067 P4D 80000000360d0067 PUD 36105067 PMD=
+ 36193067 PTE 8000000076d8e867
+  [ 2834.038672] Oops: 0001 [#4] SMP PTI
+  [ 2834.042707] CPU: 0 PID: 13537 Comm: dotnet Tainted: G      D          =
+ 5.3.0-29-generic #31-Ubuntu
+  [ 2834.050591] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
+S 0.0.0 02/06/2015
+  [ 2834.054785] RIP: 0033:0x1555547eaeda
+  [ 2834.059017] Code: d0 00 00 00 4c 8b a7 d8 00 00 00 4c 8b af e0 00 00 0=
+0 4c 8b b7 e8 00 00 00 4c 8b bf f0 00 00 00 48 8b bf b0 00 00 00 9d 74 02 <=
+48> cf 48 8d 64 24 30 5d c3 90 cc c3 66 90 55 4c 8b a7 d8 00 00 00
+  [ 2834.072103] RSP: 002b:00007fffffffc2c0 EFLAGS: 00000202
+  [ 2834.076507] RAX: 0000000000000000 RBX: 00001554b401af38 RCX: 000000000=
+0000001
+  [ 2834.080832] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00007ffff=
+fffcfb0
+  [ 2834.085010] RBP: 00007fffffffd730 R08: 0000000000000000 R09: 00007ffff=
+fffd1b0
+  [ 2834.089184] R10: 0000155555331dd5 R11: 00001555553ad8d0 R12: 000000000=
+0000002
+  [ 2834.093350] R13: 0000000000000001 R14: 0000000000000001 R15: 00001554b=
+401d388
+  [ 2834.097309] FS:  0000155554fa5740 GS:  0000000000000000
+  [ 2834.101131] Modules linked in: isofs nls_iso8859_1 dm_multipath scsi_d=
+h_rdac scsi_dh_emc scsi_dh_alua ppdev input_leds serio_raw parport_pc parpo=
+rt sch_fq_codel ip_tables x_tables autofs4 btrfs zstd_compress raid10 raid4=
+56 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq =
+libcrc32c raid1 raid0 multipath linear crct10dif_pclmul crc32_pclmul ghash_=
+clmulni_intel aesni_intel aes_x86_64 crypto_simd cryptd glue_helper virtio_=
+net psmouse net_failover failover virtio_blk floppy
+  [ 2834.122539] CR2: 00007fffffffc2c0
+  [ 2834.126867] ---[ end trace dfae51f1d9432708 ]---
+  [ 2834.131239] RIP: 0033:0x14d793262eda
+  [ 2834.135715] Code: Bad RIP value.
+  [ 2834.140243] RSP: 002b:00007ffddb4e2980 EFLAGS: 00000202
+  [ 2834.144615] RAX: 0000000000000000 RBX: 000014d6f402acb8 RCX: 000000000=
+0000002
+  [ 2834.148943] RDX: 0000000001cd6950 RSI: 0000000000000000 RDI: 00007ffdd=
+b4e3670
+  [ 2834.153335] RBP: 00007ffddb4e3df0 R08: 0000000000000001 R09: 00007ffdd=
+b4e3870
+  [ 2834.157774] R10: 000014d793da9dd5 R11: 000014d793e258d0 R12: 000000000=
+0000002
+  [ 2834.162132] R13: 0000000000000001 R14: 0000000000000001 R15: 000014d6f=
+402d040
+  [ 2834.166239] FS:  0000155554fa5740(0000) GS:ffff97213ba00000(0000) knlG=
+S:0000000000000000
+  [ 2834.170529] CS:  0033 DS: 0000 ES: 0000 CR0: 0000000080050033
+  [ 2834.174751] CR2: 000014d793262eb0 CR3: 0000000036130000 CR4: 000000000=
+07406f0
+  [ 2834.178892] PKRU: 55555554
+
+  I run the application from a shell with `ulimit -s unlimited`
+  (unlimited stack to size).
+
+  The application creates a number of threads, and those threads make a
+  lot of calls to sigaltstack() and mprotect(); see the relevant source
+  for dotnet here
+  https://github.com/dotnet/runtime/blob/15ec69e47b4dc56098e6058a11ccb6ae4d=
+5d4fa1/src/coreclr/src/pal/src/thread/thread.cpp#L2467
+
+  using strace -f on the app shows that no alt stacks come anywhere near
+  the failing address; all alt stacks are in the heap, as expected.
+  None of the mmap/mprotect/munmap syscalls were given arguments in the
+  high memory 0x7fffffff0000 and up.
+
+  gdb (with default signal stop/print/pass semantics) does not report
+  any signals prior to the kernel bug being tripped, so I doubt the
+  alternate signal stack is actually used.
+
+  When I run the same dotnet binary on the host (eg, on "bare metal"),
+  the host kernel seems happy and dotnet runs as expected.
+
+  I have not tried different qemu or guest or host O/S.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1866892/+subscriptions
 
