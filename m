@@ -2,77 +2,62 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AE4C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A15EC4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:48:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A1A920722
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:47:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZ4RMwQ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1A920722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4E4E420732
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:48:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E4E420732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEmA1-0003gg-Hf
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 23:47:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55778)
+	id 1jEmAQ-0004IU-Gh
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 23:48:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56552)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1jEm7M-0000kM-Sj
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:45:14 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEm9I-0002pm-BZ
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:47:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1jEm7K-0007A0-Vu
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:45:12 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58831)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEm9F-0002Qv-Mi
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:47:11 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:49098)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1jEm7K-00076R-Mu
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:45:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584589509;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=P5JpO8HSA4DOLAbbeuAZRqMoH3/gVv4FN1Ksuqh3kYM=;
- b=IZ4RMwQ2SNyZ17wYQ+cR/5+O7voTer12HJE3mpaQIWIppVjDNA6z0xuE/atof1YNSNoFnf
- 1Vy4HWJH3lVHKEb32dbspZnxwBwmJGBRfY26Snd41WIxrslOkAg1xt0+oC13gfNjs9djwK
- 6ktCJqioIdkGVsTg+Hb3KtRGJ16LYLc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-utBeOXQqM4-byx_ZVHmL4Q-1; Wed, 18 Mar 2020 23:45:05 -0400
-X-MC-Unique: utBeOXQqM4-byx_ZVHmL4Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC4E48017CE;
- Thu, 19 Mar 2020 03:45:02 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 32058BBBC5;
- Thu, 19 Mar 2020 03:45:01 +0000 (UTC)
-Date: Wed, 18 Mar 2020 21:45:00 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200318214500.1a0cb985@w520.home>
-In-Reply-To: <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEm9D-00025u-MX; Wed, 18 Mar 2020 23:47:09 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436849|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_regular_dialog|0.120115-0.00154986-0.878335;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03278; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.H1nPPHp_1584589615; 
+Received: from 172.16.31.150(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H1nPPHp_1584589615)
+ by smtp.aliyun-inc.com(10.147.42.22); Thu, 19 Mar 2020 11:46:55 +0800
+Subject: Re: [PATCH v6 25/61] target/riscv: vector single-width averaging add
+ and subtract
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-26-zhiwei_liu@c-sky.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <0cdf21fd-b1f1-36bf-f156-5a673199fa1f@c-sky.com>
+Date: Thu, 19 Mar 2020 11:46:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <20200317150653.9008-26-zhiwei_liu@c-sky.com>
+Content-Type: multipart/alternative;
+ boundary="------------AA80C2260A9958F4DBBA9BAA"
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,335 +69,444 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Mar 2020 01:11:11 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+This is a multi-part message in MIME format.
+--------------AA80C2260A9958F4DBBA9BAA
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start dirty pages tracking while migration is active
-> - Stop dirty pages tracking.
-> - Get dirty pages bitmap. Its user space application's responsibility to
->   copy content of dirty pages from source to destination during migration.
-> 
-> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> structure. Bitmap size is calculated considering smallest supported page
-> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> 
-> Bitmap is populated for already pinned pages when bitmap is allocated for
-> a vfio_dma with the smallest supported page size. Update bitmap from
-> pinning functions when tracking is enabled. When user application queries
-> bitmap, check if requested page size is same as page size used to
-> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> error.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 205 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 203 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 70aeab921d0f..d6417fb02174 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -71,6 +71,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -91,6 +92,7 @@ struct vfio_dma {
->  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->  	struct task_struct	*task;
->  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> +	unsigned long		*bitmap;
 
-We've made the bitmap a width invariant u64 else, should be here as
-well.
 
->  };
->  
->  struct vfio_group {
-> @@ -125,7 +127,10 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> +
->  static int put_pfn(unsigned long pfn, int prot);
-> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->  
->  /*
->   * This code handles mapping and unmapping of user data buffers
-> @@ -175,6 +180,55 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->  	rb_erase(&old->node, &iommu->dma_list);
->  }
->  
-> +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu, uint64_t pgsize)
+On 2020/3/17 23:06, LIU Zhiwei wrote:
+
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+  target/riscv/helper.h                   |  17 ++++
+  target/riscv/insn32.decode              |   5 ++
+  target/riscv/insn_trans/trans_rvv.inc.c |   7 ++
+  target/riscv/vector_helper.c            | 100 ++++++++++++++++++++++++
+  4 files changed, 129 insertions(+)
+
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index fd1c184852..311ce1322c 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -715,3 +715,20 @@ DEF_HELPER_6(vssub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+  DEF_HELPER_6(vssub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+  DEF_HELPER_6(vssub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+  DEF_HELPER_6(vssub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vaadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index c9a4050adc..e617d7bd60 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -417,6 +417,11 @@ vssubu_vv       100010 . ..... ..... 000 ..... 1010111 @r_vm
+  vssubu_vx       100010 . ..... ..... 100 ..... 1010111 @r_vm
+  vssub_vv        100011 . ..... ..... 000 ..... 1010111 @r_vm
+  vssub_vx        100011 . ..... ..... 100 ..... 1010111 @r_vm
++vaadd_vv        100100 . ..... ..... 000 ..... 1010111 @r_vm
++vaadd_vx        100100 . ..... ..... 100 ..... 1010111 @r_vm
++vaadd_vi        100100 . ..... ..... 011 ..... 1010111 @r_vm
++vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
++vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
+  
+  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index dd1a508a51..ba2e7d56f4 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1636,3 +1636,10 @@ GEN_OPIVX_TRANS(vssubu_vx,  opivx_check)
+  GEN_OPIVX_TRANS(vssub_vx,  opivx_check)
+  GEN_OPIVI_TRANS(vsaddu_vi, 1, vsaddu_vx, opivx_check)
+  GEN_OPIVI_TRANS(vsadd_vi, 0, vsadd_vx, opivx_check)
++
++/* Vector Single-Width Averaging Add and Subtract */
++GEN_OPIVV_TRANS(vaadd_vv, opivv_check)
++GEN_OPIVV_TRANS(vasub_vv, opivv_check)
++GEN_OPIVX_TRANS(vaadd_vx,  opivx_check)
++GEN_OPIVX_TRANS(vasub_vx,  opivx_check)
++GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index b17cac7fd4..984a8e260f 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -2488,3 +2488,103 @@ GEN_VEXT_VX_RM(vssub_vx_b, 1, 1, clearb)
+  GEN_VEXT_VX_RM(vssub_vx_h, 2, 2, clearh)
+  GEN_VEXT_VX_RM(vssub_vx_w, 4, 4, clearl)
+  GEN_VEXT_VX_RM(vssub_vx_d, 8, 8, clearq)
++
++/* Vector Single-Width Averaging Add and Subtract */
++static inline uint8_t get_round(int vxrm, uint64_t v, uint8_t shift)
++{
++    uint8_t d = extract64(v, shift, 1);
++    uint8_t d1;
++    uint64_t D1, D2;
++
++    if (shift == 0 || shift > 64) {
++        return 0;
++    }
++
++    d1 = extract64(v, shift - 1, 1);
++    D1 = extract64(v, 0, shift);
++    if (vxrm == 0) { /* round-to-nearest-up (add +0.5 LSB) */
++        return d1;
++    } else if (vxrm == 1) { /* round-to-nearest-even */
++        if (shift > 1) {
++            D2 = extract64(v, 0, shift - 1);
++            return d1 & ((D2 != 0) | d);
++        } else {
++            return d1 & d;
++        }
++    } else if (vxrm == 3) { /* round-to-odd (OR bits into LSB, aka "jam") */
++        return !d & (D1 != 0);
++    }
++    return 0; /* round-down (truncate) */
++}
++
++static inline int32_t aadd32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    int64_t res = (int64_t)a + b;
++    uint8_t round = get_round(vxrm, res, 1);
++
++    return (res >> 1) + round;
++}
++
++static inline int64_t aadd64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
++{
++    int64_t res = a + b;
++    uint8_t round = get_round(vxrm, res, 1);
++    int64_t over = (res ^ a) & (res ^ b) & INT64_MIN;
++
++    /* With signed overflow, bit 64 is inverse of bit 63. */
++    return ((res >> 1) ^ over) + round;
++}
++
++RVVCALL(OPIVV2_RM, vaadd_vv_b, OP_SSS_B, H1, H1, H1, aadd32)
++RVVCALL(OPIVV2_RM, vaadd_vv_h, OP_SSS_H, H2, H2, H2, aadd32)
++RVVCALL(OPIVV2_RM, vaadd_vv_w, OP_SSS_W, H4, H4, H4, aadd32)
++RVVCALL(OPIVV2_RM, vaadd_vv_d, OP_SSS_D, H8, H8, H8, aadd64)
++GEN_VEXT_VV_RM(vaadd_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vaadd_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vaadd_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vaadd_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vaadd_vx_b, OP_SSS_B, H1, H1, aadd32)
++RVVCALL(OPIVX2_RM, vaadd_vx_h, OP_SSS_H, H2, H2, aadd32)
++RVVCALL(OPIVX2_RM, vaadd_vx_w, OP_SSS_W, H4, H4, aadd32)
++RVVCALL(OPIVX2_RM, vaadd_vx_d, OP_SSS_D, H8, H8, aadd64)
++GEN_VEXT_VX_RM(vaadd_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vaadd_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vaadd_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vaadd_vx_d, 8, 8, clearq)
++
++static inline int32_t asub32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    int64_t res = (int64_t)a - b;
++    uint8_t round = get_round(vxrm, res, 1);
++
++    return (res >> 1) + round;
++}
++
+
+I find a corner case here.  As the spec said in Section 13.2
+
+   "There can be no overflow in the result".
+
+If the a is 0x7fffffff,  b is 0x80000000, and the round mode is round to 
+up(rnu),
+then the result is (0x7fffffff - 0x80000000 + 1) >> 1, equals 
+0x80000000, according the v0.7.1
+
+    # Averaging subtract
+
+    # result = (src1 - src2 + round) >> 1;
+
+The result is also overflow, according to v0.8. It will be calculated 
+that like here,
+
+    roundoff_signed(vs2[i] - vs1[i], 1)
+
+    roundoff_signed(v, d) = (signed(v) >> d) + r
+
+Should I check do a saturation here?
+
+Zhiwei
+
+
+
+> +static inline int64_t asub64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
 > +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> +    int64_t res = (int64_t)a - b;
+> +    uint8_t round = get_round(vxrm, res, 1);
+> +    int64_t over = (res ^ a) & (a ^ b) & INT64_MIN;
 > +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +		struct rb_node *p;
-> +		unsigned long npages = dma->size / pgsize;
-> +
-> +		dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-> +		if (!dma->bitmap) {
-> +			struct rb_node *p = rb_prev(n);
-> +
-> +			for (; p; p = rb_prev(p)) {
-> +				struct vfio_dma *dma = rb_entry(n,
-> +							struct vfio_dma, node);
-> +
-> +				kfree(dma->bitmap);
-> +				dma->bitmap = NULL;
-> +			}
-> +			return -ENOMEM;
-> +		}
-> +
-> +		if (RB_EMPTY_ROOT(&dma->pfn_list))
-> +			continue;
-> +
-> +		for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> +			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
-> +							 node);
-> +
-> +			bitmap_set(dma->bitmap,
-> +					(vpfn->iova - dma->iova) / pgsize, 1);
-> +		}
-> +	}
-> +	return 0;
+> +    /* With signed overflow, bit 64 is inverse of bit 63. */
+> +    return ((res >> 1) ^ over) + round;
 > +}
 > +
-> +static void vfio_dma_bitmap_free(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> +RVVCALL(OPIVV2_RM, vasub_vv_b, OP_SSS_B, H1, H1, H1, asub32)
+> +RVVCALL(OPIVV2_RM, vasub_vv_h, OP_SSS_H, H2, H2, H2, asub32)
+> +RVVCALL(OPIVV2_RM, vasub_vv_w, OP_SSS_W, H4, H4, H4, asub32)
+> +RVVCALL(OPIVV2_RM, vasub_vv_d, OP_SSS_D, H8, H8, H8, asub64)
+> +GEN_VEXT_VV_RM(vasub_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV_RM(vasub_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_RM(vasub_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_RM(vasub_vv_d, 8, 8, clearq)
 > +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		kfree(dma->bitmap);
-> +		dma->bitmap = NULL;
-> +	}
-> +}
-> +
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> @@ -567,6 +621,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  			vfio_unpin_page_external(dma, iova, do_accounting);
->  			goto pin_unwind;
->  		}
-> +
-> +		if (iommu->dirty_page_tracking) {
-> +			unsigned long pgshift =
-> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			bitmap_set(dma->bitmap,
-> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
-> +		}
->  	}
->  
->  	ret = i;
-> @@ -801,6 +863,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->  	vfio_unmap_unpin(iommu, dma, true);
->  	vfio_unlink_dma(iommu, dma);
->  	put_task_struct(dma->task);
-> +	kfree(dma->bitmap);
->  	kfree(dma);
->  	iommu->dma_avail++;
->  }
-> @@ -831,6 +894,50 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	return bitmap;
->  }
->  
-> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> +				  size_t size, uint64_t pgsize,
-> +				  unsigned char __user *bitmap)
+> +RVVCALL(OPIVX2_RM, vasub_vx_b, OP_SSS_B, H1, H1, asub32)
+> +RVVCALL(OPIVX2_RM, vasub_vx_h, OP_SSS_H, H2, H2, asub32)
+> +RVVCALL(OPIVX2_RM, vasub_vx_w, OP_SSS_W, H4, H4, asub32)
+> +RVVCALL(OPIVX2_RM, vasub_vx_d, OP_SSS_D, H8, H8, asub64)
+> +GEN_VEXT_VX_RM(vasub_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX_RM(vasub_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX_RM(vasub_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX_RM(vasub_vx_d, 8, 8, clearq)
 
-And here, why do callers cast to an unsigned char pointer when we're
-going to cast to a void pointer anyway?  Should be a u64 __user pointer.
 
-> +{
-> +	struct vfio_dma *dma;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	unsigned int npages, bitmap_size;
-> +
-> +	dma = vfio_find_dma(iommu, iova, 1);
-> +
-> +	if (!dma)
-> +		return -EINVAL;
-> +
-> +	if (dma->iova != iova || dma->size != size)
-> +		return -EINVAL;
-> +
-> +	npages = dma->size >> pgshift;
-> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> +
-> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> +	if (dma->iommu_mapped)
-> +		bitmap_set(dma->bitmap, 0, npages);
-> +
-> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> +{
-> +	uint64_t bsize;
-> +
-> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
+--------------AA80C2260A9958F4DBBA9BAA
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-As commented previously, how do we derive this UINT_MAX limitation?
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <br>
+    <br>
+    <div class="moz-cite-prefix">On 2020/3/17 23:06, LIU Zhiwei wrote:<br>
+    </div>
+    <pre class="moz-quote-pre" wrap="">Signed-off-by: LIU Zhiwei <a class="moz-txt-link-rfc2396E" href="mailto:zhiwei_liu@c-sky.com">&lt;zhiwei_liu@c-sky.com&gt;</a>
+---
+ target/riscv/helper.h                   |  17 ++++
+ target/riscv/insn32.decode              |   5 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |   7 ++
+ target/riscv/vector_helper.c            | 100 ++++++++++++++++++++++++
+ 4 files changed, 129 insertions(+)
 
-> +		return -EINVAL;
-> +
-> +	bsize = DIRTY_BITMAP_BYTES(npages);
-> +
-> +	if (bitmap_size < bsize)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index fd1c184852..311ce1322c 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -715,3 +715,20 @@ DEF_HELPER_6(vssub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vssub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vssub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vssub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vaadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vasub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vaadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vasub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index c9a4050adc..e617d7bd60 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -417,6 +417,11 @@ vssubu_vv       100010 . ..... ..... 000 ..... 1010111 @r_vm
+ vssubu_vx       100010 . ..... ..... 100 ..... 1010111 @r_vm
+ vssub_vv        100011 . ..... ..... 000 ..... 1010111 @r_vm
+ vssub_vx        100011 . ..... ..... 100 ..... 1010111 @r_vm
++vaadd_vv        100100 . ..... ..... 000 ..... 1010111 @r_vm
++vaadd_vx        100100 . ..... ..... 100 ..... 1010111 @r_vm
++vaadd_vi        100100 . ..... ..... 011 ..... 1010111 @r_vm
++vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
++vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index dd1a508a51..ba2e7d56f4 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1636,3 +1636,10 @@ GEN_OPIVX_TRANS(vssubu_vx,  opivx_check)
+ GEN_OPIVX_TRANS(vssub_vx,  opivx_check)
+ GEN_OPIVI_TRANS(vsaddu_vi, 1, vsaddu_vx, opivx_check)
+ GEN_OPIVI_TRANS(vsadd_vi, 0, vsadd_vx, opivx_check)
++
++/* Vector Single-Width Averaging Add and Subtract */
++GEN_OPIVV_TRANS(vaadd_vv, opivv_check)
++GEN_OPIVV_TRANS(vasub_vv, opivv_check)
++GEN_OPIVX_TRANS(vaadd_vx,  opivx_check)
++GEN_OPIVX_TRANS(vasub_vx,  opivx_check)
++GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index b17cac7fd4..984a8e260f 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -2488,3 +2488,103 @@ GEN_VEXT_VX_RM(vssub_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX_RM(vssub_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX_RM(vssub_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX_RM(vssub_vx_d, 8, 8, clearq)
++
++/* Vector Single-Width Averaging Add and Subtract */
++static inline uint8_t get_round(int vxrm, uint64_t v, uint8_t shift)
++{
++    uint8_t d = extract64(v, shift, 1);
++    uint8_t d1;
++    uint64_t D1, D2;
++
++    if (shift == 0 || shift &gt; 64) {
++        return 0;
++    }
++
++    d1 = extract64(v, shift - 1, 1);
++    D1 = extract64(v, 0, shift);
++    if (vxrm == 0) { /* round-to-nearest-up (add +0.5 LSB) */
++        return d1;
++    } else if (vxrm == 1) { /* round-to-nearest-even */
++        if (shift &gt; 1) {
++            D2 = extract64(v, 0, shift - 1);
++            return d1 &amp; ((D2 != 0) | d);
++        } else {
++            return d1 &amp; d;
++        }
++    } else if (vxrm == 3) { /* round-to-odd (OR bits into LSB, aka "jam") */
++        return !d &amp; (D1 != 0);
++    }
++    return 0; /* round-down (truncate) */
++}
++
++static inline int32_t aadd32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    int64_t res = (int64_t)a + b;
++    uint8_t round = get_round(vxrm, res, 1);
++
++    return (res &gt;&gt; 1) + round;
++}
++
++static inline int64_t aadd64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
++{
++    int64_t res = a + b;
++    uint8_t round = get_round(vxrm, res, 1);
++    int64_t over = (res ^ a) &amp; (res ^ b) &amp; INT64_MIN;
++
++    /* With signed overflow, bit 64 is inverse of bit 63. */
++    return ((res &gt;&gt; 1) ^ over) + round;
++}
++
++RVVCALL(OPIVV2_RM, vaadd_vv_b, OP_SSS_B, H1, H1, H1, aadd32)
++RVVCALL(OPIVV2_RM, vaadd_vv_h, OP_SSS_H, H2, H2, H2, aadd32)
++RVVCALL(OPIVV2_RM, vaadd_vv_w, OP_SSS_W, H4, H4, H4, aadd32)
++RVVCALL(OPIVV2_RM, vaadd_vv_d, OP_SSS_D, H8, H8, H8, aadd64)
++GEN_VEXT_VV_RM(vaadd_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vaadd_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vaadd_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vaadd_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vaadd_vx_b, OP_SSS_B, H1, H1, aadd32)
++RVVCALL(OPIVX2_RM, vaadd_vx_h, OP_SSS_H, H2, H2, aadd32)
++RVVCALL(OPIVX2_RM, vaadd_vx_w, OP_SSS_W, H4, H4, aadd32)
++RVVCALL(OPIVX2_RM, vaadd_vx_d, OP_SSS_D, H8, H8, aadd64)
++GEN_VEXT_VX_RM(vaadd_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vaadd_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vaadd_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vaadd_vx_d, 8, 8, clearq)
++
++static inline int32_t asub32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    int64_t res = (int64_t)a - b;
++    uint8_t round = get_round(vxrm, res, 1);
++
++    return (res &gt;&gt; 1) + round;
++}
++</pre>
+    I find a corner case here.  As the spec said in Section 13.2<br>
+    <pre>  "There can be no overflow in the result".</pre>
+    If the a is 0x7fffffff,  b is 0x80000000, and the round mode is
+    round to up(rnu),<br>
+    then the result is (0x7fffffff - 0x80000000 + 1) &gt;&gt; 1, equals
+    0x80000000, according the v0.7.1<br>
+    <blockquote>
+      <pre># Averaging subtract</pre>
+      <pre># result = (src1 - src2 + round) &gt;&gt; 1;
 
-We didn't address that vfio_dma_do_map() needs to kvzalloc a bitmap for
-any new vfio_dma created while iommu->dirty_page_tracking = true.
+</pre>
+    </blockquote>
+    The result is also overflow, according to v0.8. It will be
+    calculated that like here,<br>
+    <blockquote>
+      <pre>roundoff_signed(vs2[i] - vs1[i], 1)
 
-> @@ -2278,6 +2385,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap dirty;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret = 0;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    flags);
-> +
-> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		/* only one flag should be set at a time */
-> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
-> +			return -EINVAL;
-> +
-> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			mutex_lock(&iommu->lock);
-> +			if (!iommu->dirty_page_tracking) {
-> +				ret = vfio_dma_bitmap_alloc(iommu, pgsize);
-> +				if (!ret)
-> +					iommu->dirty_page_tracking = true;
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return ret;
-> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking) {
-> +				iommu->dirty_page_tracking = false;
-> +				vfio_dma_bitmap_free(iommu);
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +		} else if (dirty.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			struct vfio_iommu_type1_dirty_bitmap_get range;
-> +			unsigned long pgshift;
-> +			size_t data_size = dirty.argsz - minsz;
-> +			uint64_t iommu_pgsize =
-> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			if (!data_size || data_size < sizeof(range))
-> +				return -EINVAL;
-> +
-> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
-> +					   sizeof(range)))
-> +				return -EFAULT;
-> +
-> +			/* allow only min supported pgsize */
-> +			if (range.bitmap.pgsize != iommu_pgsize)
-> +				return -EINVAL;
-> +			if (range.iova & (iommu_pgsize - 1))
-> +				return -EINVAL;
-> +			if (!range.size || range.size & (iommu_pgsize - 1))
-> +				return -EINVAL;
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)range.bitmap.data,
-> +				       range.bitmap.size))
-> +				return -EINVAL;
-> +
-> +			pgshift = __ffs(range.bitmap.pgsize);
-> +			ret = verify_bitmap_size(range.size >> pgshift,
-> +						 range.bitmap.size);
-> +			if (ret)
-> +				return ret;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking)
-> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
-> +					 range.size, range.bitmap.pgsize,
-> +				    (unsigned char __user *)range.bitmap.data);
-> +			else
-> +				ret = -EINVAL;
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> @@ -2345,10 +2539,17 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->  
->  	vaddr = dma->vaddr + offset;
->  
-> -	if (write)
-> +	if (write) {
->  		*copied = __copy_to_user((void __user *)vaddr, data,
->  					 count) ? 0 : count;
-> -	else
-> +		if (*copied && iommu->dirty_page_tracking) {
-> +			unsigned long pgshift =
-> +				__ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			bitmap_set(dma->bitmap, offset >> pgshift,
-> +				   *copied >> pgshift);
-> +		}
-> +	} else
+roundoff_signed(v, d) = (signed(v) &gt;&gt; d) + r
 
-Great, thanks for adding this!
+</pre>
+    </blockquote>
+    Should I check do a saturation here?<br>
+    <br>
+    Zhiwei<br>
+    <br>
+    <br>
+    <br>
+    <pre>
+</pre>
+    <blockquote type="cite"
+      cite="mid:20200317150653.9008-26-zhiwei_liu@c-sky.com">
+      <pre class="moz-quote-pre" wrap="">
++static inline int64_t asub64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
++{
++    int64_t res = (int64_t)a - b;
++    uint8_t round = get_round(vxrm, res, 1);
++    int64_t over = (res ^ a) &amp; (a ^ b) &amp; INT64_MIN;
++
++    /* With signed overflow, bit 64 is inverse of bit 63. */
++    return ((res &gt;&gt; 1) ^ over) + round;
++}
++
++RVVCALL(OPIVV2_RM, vasub_vv_b, OP_SSS_B, H1, H1, H1, asub32)
++RVVCALL(OPIVV2_RM, vasub_vv_h, OP_SSS_H, H2, H2, H2, asub32)
++RVVCALL(OPIVV2_RM, vasub_vv_w, OP_SSS_W, H4, H4, H4, asub32)
++RVVCALL(OPIVV2_RM, vasub_vv_d, OP_SSS_D, H8, H8, H8, asub64)
++GEN_VEXT_VV_RM(vasub_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vasub_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vasub_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vasub_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vasub_vx_b, OP_SSS_B, H1, H1, asub32)
++RVVCALL(OPIVX2_RM, vasub_vx_h, OP_SSS_H, H2, H2, asub32)
++RVVCALL(OPIVX2_RM, vasub_vx_w, OP_SSS_W, H4, H4, asub32)
++RVVCALL(OPIVX2_RM, vasub_vx_d, OP_SSS_D, H8, H8, asub64)
++GEN_VEXT_VX_RM(vasub_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vasub_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vasub_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vasub_vx_d, 8, 8, clearq)
+</pre>
+    </blockquote>
+    <br>
+  </body>
+</html>
 
->  		*copied = __copy_from_user(data, (void __user *)vaddr,
->  					   count) ? 0 : count;
->  	if (kthread)
-
+--------------AA80C2260A9958F4DBBA9BAA--
 
