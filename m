@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FE7C4332E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483A4C4332B
 	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:17:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2384C20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:17:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2384C20724
+	by mail.kernel.org (Postfix) with ESMTPS id 1D74D20722
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:17:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D74D20722
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jErIa-0003M3-6v
+	id 1jErIa-0003Mn-1R
 	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:17:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37864)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37845)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jErHR-0002Bu-RH
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:15:59 -0400
+ (envelope-from <bounces@canonical.com>) id 1jErHR-0002Bo-8l
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:15:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jErHQ-00033i-9d
+ (envelope-from <bounces@canonical.com>) id 1jErHP-00033L-H0
  for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:15:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49086)
+Received: from indium.canonical.com ([91.189.90.7]:49038)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jErHQ-00033A-2w
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:15:56 -0400
+ id 1jErHP-000305-AI
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:15:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jErHO-0005OQ-PQ
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 09:15:54 +0000
+ id 1jErHM-0005Cy-V4
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 09:15:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B31652E80D7
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 09:15:54 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E64AF2E8048
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 09:15:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Mar 2020 09:08:14 -0000
-From: Launchpad Bug Tracker <1867519@bugs.launchpad.net>
+Date: Thu, 19 Mar 2020 09:01:47 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1867519@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
@@ -57,9 +57,10 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: berrange mohamadh paelzer
 X-Launchpad-Bug-Reporter: Mohammad Heib (mohamadh)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
 References: <158428174672.11238.3583143675239092561.malonedeb@soybean.canonical.com>
-Message-Id: <158460889603.22814.14939901222344516617.launchpad@ackee.canonical.com>
+Message-Id: <158460850723.19727.16998058232947361986.malone@chaenomeles.canonical.com>
 Subject: [Bug 1867519] Re: qemu 4.2 segfaults on VF detach
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -67,7 +68,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: cf665d9c0de2030b430750e29a482f7d581b1c63
+X-Launchpad-Hash: b0d6c91b2777d5534b263a68f5bb32850469c4cc
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,9 +86,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Merge proposal linked:
-   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
-/380874
+I regularly before a release pull in fixes that were posted for qemu-stable.
+This is one of them, I'll again do such a build and retest this issue with =
+it.
+
+I identified and backported (only one needed modification) 33 patches.
+But as usual there might be some context needed on top - I have build that =
+over night in [1]
+
+Testing that on my reproducer
+
+Attach-host:
+[84652.671123] vfio-pci 0000:08:00.2: enabling device (0000 -> 0002)
+
+Attach-guest:
+[   45.199920] pci 0000:00:08.0: [15b3:1016] type 00 class 0x020000
+[   45.200374] pci 0000:00:08.0: reg 0x10: [mem 0x00000000-0x000fffff 64bit=
+ pref]
+[   45.201358] pci 0000:00:08.0: enabling Extended Tags
+[   45.202726] pci 0000:00:08.0: 0.000 Gb/s available PCIe bandwidth, limit=
+ed by Unknown speed x0 link at 0000:00:08.0 (capable of 63.008 Gb/s with 8 =
+GT/s x8 link)
+[   45.208316] pci 0000:00:08.0: BAR 0: assigned [mem 0x100000000-0x1000fff=
+ff 64bit pref]
+[   45.256566] mlx5_core 0000:00:08.0: enabling device (0000 -> 0002)
+[   45.262103] mlx5_core 0000:00:08.0: firmware version: 14.27.1016
+[   45.544010] mlx5_core 0000:00:08.0: MLX5E: StrdRq(0) RqSz(1024) StrdSz(2=
+56) RxCqeCmprss(0)
+[   45.710123] mlx5_core 0000:00:08.0 ens8: renamed from eth0
+[   60.992547] random: crng init done
+[   60.992552] random: 3 urandom warning(s) missed due to ratelimiting
+
+Detach-host:
+[84926.767411] mlx5_core 0000:08:00.2: enabling device (0000 -> 0002)
+[84926.767514] mlx5_core 0000:08:00.2: firmware version: 14.27.1016
+[84927.036146] mlx5_core 0000:08:00.2: MLX5E: StrdRq(0) RqSz(1024) StrdSz(2=
+56) RxCqeCmprss(0)
+[84927.208523] mlx5_core 0000:08:00.2 ens1v1: renamed from eth0
+
+Detach-guest:
+<nothing>
+
+
+So yes, these changes fix the issue here (and a bunch of others).
+I'll open up an MP to get these changes into Ubuntu 20.04.
+
+[1]: https://launchpad.net/~ci-train-ppa-service/+archive/ubuntu/3981
 
 -- =
 
