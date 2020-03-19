@@ -2,82 +2,82 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,HTML_MESSAGE,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60134C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 281B3C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 22:12:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 291F42072D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:59:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D43932076E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 22:12:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bxRQax2K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 291F42072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JE+JXKPP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D43932076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jF2GN-0003vd-An
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:59:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43161)
+	id 1jF3PJ-0005qb-R0
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 18:12:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1jF2BU-0006iS-8L
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:54:33 -0400
+ (envelope-from <dnbrdsky@gmail.com>) id 1jF3OS-0005Ly-M1
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 18:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1jF2BS-0005I6-Vx
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:54:32 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:57554)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1jF2BS-0005Hw-S4
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:54:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584651270;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hjYV+wyQpR7B3d18pGkcaBgDOBTqUbQeqCdfhG5P9bo=;
- b=bxRQax2KOIvVQ8vCVGS2SgaQuwAMYHMkknuSolDAvevK95u+NMjCd71TmUS1CZ0VhdSu35
- pV0APy0kNcEmVqVdCGErKwq8qGi6Xfr+LIUiGaHeOwCbDTgB+COeVzGB6Y4y+A3hjk36C0
- O1MwnUiS9czP95Sgz7CCNe8sGTY1NJE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-p0LYqKLYNvCQK8jTVjAaFQ-1; Thu, 19 Mar 2020 16:54:26 -0400
-X-MC-Unique: p0LYqKLYNvCQK8jTVjAaFQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCD30800D4E;
- Thu, 19 Mar 2020 20:54:23 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 09B57BBBFD;
- Thu, 19 Mar 2020 20:54:21 +0000 (UTC)
-Date: Thu, 19 Mar 2020 14:54:21 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200319145421.4b8bd4eb@w520.home>
-In-Reply-To: <8e537411-b60e-cc45-498c-5e516382206e@nvidia.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
- <20200318214500.1a0cb985@w520.home>
- <e0070cf4-af58-2906-b427-0888ecb89538@nvidia.com>
- <20200319102238.77686a08@w520.home>
- <8e537411-b60e-cc45-498c-5e516382206e@nvidia.com>
+ (envelope-from <dnbrdsky@gmail.com>) id 1jF3OR-0001z3-72
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 18:12:00 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:35154)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dnbrdsky@gmail.com>)
+ id 1jF3ON-0001uo-KQ; Thu, 19 Mar 2020 18:11:55 -0400
+Received: by mail-io1-xd42.google.com with SMTP id h8so4052855iob.2;
+ Thu, 19 Mar 2020 15:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/tfjzR/CaG2cZcoGhB+I2RN3BpOoglQ/9/LJ3SWYEm4=;
+ b=JE+JXKPPZqJ4fB5EUlJYeCY5UV4i9eiBSxzelCcaPHkkBODG/WCBzOV0ckpNNXRJci
+ L8HKDVc0k3VB3tcSG510S+EB8ILVLieMfyEk8JgRa20GwZSFrXdbKtmGdS0AEj/7JPJi
+ 6NTLxt/wuUn8r4/TmuT1YHqKFfr3Z6sHSnR8xJXZCLTJY/Yx+5JGi1mYZ03C+LXSKq9Z
+ M8TEB0ledchtE2sda8y7SWArvQxSEp89Slf4xmLdeXKhg+ucgQ/zhwxR5foa8oomvQWP
+ FJEHxI39e6yujWXSKaAN4t7tpICvODNZIN0gKDjVUJFK85YZh9Emr+s9D1aACAWREZL3
+ oEAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/tfjzR/CaG2cZcoGhB+I2RN3BpOoglQ/9/LJ3SWYEm4=;
+ b=MC5HN6wMgKMfBgmegry9QHdDiID2A6bp5q8fYmqayMq//gwFSAyVeSnsWQLigVwiqk
+ ZchfliVooo6T2nP4J/0PZHFCV/V9/IEz60VzN3DvGLvifEEbcvYxcZD8kfLUhq8N+/AX
+ nP5461FLzgd+RiVRRf6edoK/lPgOcRSz3mzP67PaXQFOYBiSe1P8XCIETJbC9I/vuJpF
+ TF9VSxWEqXxcyT3FQJmg0UxsLTMW0fsn615kldPfMLz0QmIp7Ov65Vaap22/L2knY8Cm
+ IBFGvV1G9uhGnD+1CJcGnoGasxzSaIkS40aCVVd/oPMPXpkXb8GJl98kRwldO52DJ7dN
+ 57DQ==
+X-Gm-Message-State: ANhLgQ22DEkeBGCnsSj8ezubJV71cYXZ1mdGbA/DicVTAdAZUrsglsm0
+ fOkvkuEPlnOgTA8e3mJ13ph5KmCr0P8lqJhGbCo=
+X-Google-Smtp-Source: ADFU+vu8B3Lwxs990EVJ53LMBmhJ5bLypNSRZr39hIr7rnFR3w1uTAWGuKCtwbuQXJcQnE3V6NEh0ukURMlSRCPVnP4=
+X-Received: by 2002:a6b:3a87:: with SMTP id h129mr4656585ioa.135.1584655914726; 
+ Thu, 19 Mar 2020 15:11:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200319161925.1818377-1-dnbrdsky@gmail.com>
+ <20200319161925.1818377-2-dnbrdsky@gmail.com>
+ <8a44d121-81fe-fb52-29db-edb0ad4d48be@redhat.com>
+In-Reply-To: <8a44d121-81fe-fb52-29db-edb0ad4d48be@redhat.com>
+From: Daniel Brodsky <dnbrdsky@gmail.com>
+Date: Thu, 19 Mar 2020 15:11:44 -0700
+Message-ID: <CA+ZmoZXoTD91mzMqOJf6W0ocPOFSNL=AK1yYybfPxiHC9gWuAA@mail.gmail.com>
+Subject: Re: [PATCH] lockable: replaced locks with lock guard macros where
+ appropriate
+To: Eric Blake <eblake@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000e37a8805a13c7433"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,108 +89,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:iSCSI" <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, stefanha@gmail.com,
+ Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Mar 2020 01:55:10 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+--000000000000e37a8805a13c7433
+Content-Type: text/plain; charset="UTF-8"
 
-> On 3/19/2020 9:52 PM, Alex Williamson wrote:
-> > On Thu, 19 Mar 2020 20:22:41 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> On 3/19/2020 9:15 AM, Alex Williamson wrote:  
-> >>> On Thu, 19 Mar 2020 01:11:11 +0530
-> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >>>      
-> 
-> <snip>
-> 
-> >>>> +
-> >>>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> >>>> +{
-> >>>> +	uint64_t bsize;
-> >>>> +
-> >>>> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)  
-> >>>
-> >>> As commented previously, how do we derive this UINT_MAX limitation?
-> >>>      
-> >>
-> >> Sorry, I missed that earlier
-> >>  
-> >>   > UINT_MAX seems arbitrary, is this specified in our API?  The size of a
-> >>   > vfio_dma is limited to what the user is able to pin, and therefore
-> >>   > their locked memory limit, but do we have an explicit limit elsewhere
-> >>   > that results in this limit here.  I think a 4GB bitmap would track
-> >>   > something like 2^47 bytes of memory, that's pretty excessive, but still
-> >>   > an arbitrary limit.  
-> >>
-> >> There has to be some upper limit check. In core KVM, in
-> >> virt/kvm/kvm_main.c there is max number of pages check:
-> >>
-> >> if (new.npages > KVM_MEM_MAX_NR_PAGES)
-> >>
-> >> Where
-> >> /*
-> >>    * Some of the bitops functions do not support too long bitmaps.
-> >>    * This number must be determined not to exceed such limits.
-> >>    */
-> >> #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
-> >>
-> >> Though I don't know which bitops functions do not support long bitmaps.
-> >>
-> >> Something similar as above can be done or same as you also mentioned of
-> >> 4GB bitmap limit? that is U32_MAX instead of UINT_MAX?  
-> > 
-> > Let's see, we use bitmap_set():
-> > 
-> > void bitmap_set(unsigned long *map, unsigned int start, unsigned int nbits)
-> > 
-> > So we're limited to an unsigned int number of bits, but for an
-> > unaligned, multi-bit operation this will call __bitmap_set():
-> > 
-> > void __bitmap_set(unsigned long *map, unsigned int start, int len)
-> > 
-> > So we're down to a signed int number of bits (seems like an API bug in
-> > bitops there), so it makes sense that KVM is testing against MAX_INT
-> > number of pages, ie. number of bits.  But that still suggests a bitmap
-> > size of MAX_UINT is off by a factor of 16.  So we can have 2^31 bits
-> > divided by 2^3 bits/byte yields a maximum bitmap size of 2^28 (ie.
-> > 256MB), which maps 2^31 * 2^12 = 2^43 (8TB) on a 4K system.
-> > 
-> > Let's fix the limit check and put a nice comment explaining it.  Thanks,
-> >   
-> 
-> Agreed. Adding DIRTY_BITMAP_SIZE_MAX macro and comment as below.
-> 
-> /*
->   * Input argument of number of bits to bitmap_set() is unsigned 
-> integer, which
->   * further casts to signed integer for unaligned multi-bit operation,
->   * __bitmap_set().
->   * Then maximum bitmap size supported is 2^31 bits divided by 2^3 
-> bits/byte,
->   * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
->   * system.
->   */
-> #define DIRTY_BITMAP_PAGES_MAX  ((1UL << 31) - 1)
+On Thu, Mar 19, 2020 at 1:48 PM Eric Blake <eblake@redhat.com> wrote:
+>
+> On 3/19/20 11:19 AM, dnbrdsky@gmail.com wrote:
+> > From: danbrodsky <dnbrdsky@gmail.com>
+> >
+> > - ran regexp "qemu_mutex_lock\(.*\).*\n.*if" to find targets
+> > - replaced result with QEMU_LOCK_GUARD if all unlocks at function end
+> > - replaced result with WITH_QEMU_LOCK_GUARD if unlock not at end
+> >
+> > Signed-off-by: danbrodsky <dnbrdsky@gmail.com>
+> > ---
+> >   block/iscsi.c         | 23 +++++++------------
+> >   block/nfs.c           | 53 ++++++++++++++++++++-----------------------
+> >   cpus-common.c         | 13 ++++-------
+> >   hw/display/qxl.c      | 44 +++++++++++++++++------------------
+> >   hw/vfio/platform.c    |  4 +---
+> >   migration/migration.c |  3 +--
+> >   migration/multifd.c   |  8 +++----
+> >   migration/ram.c       |  3 +--
+> >   monitor/misc.c        |  4 +---
+> >   ui/spice-display.c    | 14 ++++++------
+> >   util/log.c            |  4 ++--
+> >   util/qemu-timer.c     | 17 +++++++-------
+> >   util/rcu.c            |  8 +++----
+> >   util/thread-pool.c    |  3 +--
+> >   util/vfio-helpers.c   |  4 ++--
+> >   15 files changed, 90 insertions(+), 115 deletions(-)
+>
+> That's a rather big patch touching multiple areas of code at once; I'm
+> not sure if it would be easier to review if you were to break it up into
+> a series of smaller patches each touching a smaller group of related
+> files.  For example, I don't mind reviwing block/, but tend to shy away
+> from migration/ code.
 
-nit, can we just use INT_MAX here?
+Is this necessary for a series of fairly basic changes? Most files are only
+modified on 1 or 2 lines.
+>
+> >
+> > diff --git a/block/iscsi.c b/block/iscsi.c
+> > index 682abd8e09..df73bde114 100644
+> > --- a/block/iscsi.c
+> > +++ b/block/iscsi.c
+> > @@ -1086,23 +1086,21 @@ static BlockAIOCB
+*iscsi_aio_ioctl(BlockDriverState *bs,
+> >       acb->task->expxferlen = acb->ioh->dxfer_len;
+> >
+> >       data.size = 0;
+> > -    qemu_mutex_lock(&iscsilun->mutex);
+> > +    QEMU_LOCK_GUARD(&iscsilun->mutex);
+> >       if (acb->task->xfer_dir == SCSI_XFER_WRITE) {
+> >           if (acb->ioh->iovec_count == 0) {
+> >               data.data = acb->ioh->dxferp;
+> >               data.size = acb->ioh->dxfer_len;
+> >           } else {
+> >               scsi_task_set_iov_out(acb->task,
+> > -                                 (struct scsi_iovec *)
+acb->ioh->dxferp,
+> > -                                 acb->ioh->iovec_count);
+> > +                                  (struct scsi_iovec
+*)acb->ioh->dxferp,
+> > +                                  acb->ioh->iovec_count);
+>
+> This looks like a spurious whitespace change.  Why is it part of the
+patch?
+>
 
-> #define DIRTY_BITMAP_SIZE_MAX 	\
-> 			DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> 
-> 
-> Thanks,
-> Kirti
-> 
+Sorry, it looks like my editor was autoformatting some areas of the text.
+I'll remove
+those changes in the next version.
 
+> >           }
+> >       }
+> >
+> >       if (iscsi_scsi_command_async(iscsi, iscsilun->lun, acb->task,
+> >                                    iscsi_aio_ioctl_cb,
+> > -                                 (data.size > 0) ? &data : NULL,
+> > -                                 acb) != 0) {
+> > -        qemu_mutex_unlock(&iscsilun->mutex);
+> > +                                 (data.size > 0) ? &data : NULL, acb)
+!= 0) {
+> >           scsi_free_scsi_task(acb->task);
+>
+> Unwrapping the line fit in 80 columns, but again, why are you mixing
+> whitespace changes in rather than focusing on the cleanup of mutex
+> actions?  Did you create this patch mechanically with a tool like
+> Coccinelle, as the source of your reflowing of lines?  If so, what was
+> the input to Coccinelle; if it was some other automated tool, can you
+> include the formula so that someone else could reproduce your changes
+> (whitespace and all)?  If it was not automated, that's also okay, but
+> then I would not expect as much whitespace churn.
+>
+
+Should I not be including changes that fix warnings in code check? I'll
+correct
+the mistakes and submit a new version without all the whitespace churn.
+
+--000000000000e37a8805a13c7433
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>On Thu, Mar 19, 2020 at 1:48 PM Eric Blake &lt;<a hre=
+f=3D"mailto:eblake@redhat.com">eblake@redhat.com</a>&gt; wrote:<br>&gt;<br>=
+&gt; On 3/19/20 11:19 AM, <a href=3D"mailto:dnbrdsky@gmail.com">dnbrdsky@gm=
+ail.com</a> wrote:<br>&gt; &gt; From: danbrodsky &lt;<a href=3D"mailto:dnbr=
+dsky@gmail.com">dnbrdsky@gmail.com</a>&gt;<br>&gt; &gt;<br>&gt; &gt; - ran =
+regexp &quot;qemu_mutex_lock\(.*\).*\n.*if&quot; to find targets<br>&gt; &g=
+t; - replaced result with QEMU_LOCK_GUARD if all unlocks at function end<br=
+>&gt; &gt; - replaced result with WITH_QEMU_LOCK_GUARD if unlock not at end=
+<br>&gt; &gt;<br>&gt; &gt; Signed-off-by: danbrodsky &lt;<a href=3D"mailto:=
+dnbrdsky@gmail.com">dnbrdsky@gmail.com</a>&gt;<br>&gt; &gt; ---<br>&gt; &gt=
+; =C2=A0 block/iscsi.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 23 +++++++------------=
+<br>&gt; &gt; =C2=A0 block/nfs.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 53 ++=
+++++++++++++++++++-----------------------<br>&gt; &gt; =C2=A0 cpus-common.c=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 13 ++++-------<br>&gt; &gt; =C2=A0 hw/displa=
+y/qxl.c =C2=A0 =C2=A0 =C2=A0| 44 +++++++++++++++++------------------<br>&gt=
+; &gt; =C2=A0 hw/vfio/platform.c =C2=A0 =C2=A0| =C2=A04 +---<br>&gt; &gt; =
+=C2=A0 migration/migration.c | =C2=A03 +--<br>&gt; &gt; =C2=A0 migration/mu=
+ltifd.c =C2=A0 | =C2=A08 +++----<br>&gt; &gt; =C2=A0 migration/ram.c =C2=A0=
+ =C2=A0 =C2=A0 | =C2=A03 +--<br>&gt; &gt; =C2=A0 monitor/misc.c =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0| =C2=A04 +---<br>&gt; &gt; =C2=A0 ui/spice-display.c =C2=
+=A0 =C2=A0| 14 ++++++------<br>&gt; &gt; =C2=A0 util/log.c =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A04 ++--<br>&gt; &gt; =C2=A0 util/qemu-tim=
+er.c =C2=A0 =C2=A0 | 17 +++++++-------<br>&gt; &gt; =C2=A0 util/rcu.c =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A08 +++----<br>&gt; &gt; =C2=A0=
+ util/thread-pool.c =C2=A0 =C2=A0| =C2=A03 +--<br>&gt; &gt; =C2=A0 util/vfi=
+o-helpers.c =C2=A0 | =C2=A04 ++--<br>&gt; &gt; =C2=A0 15 files changed, 90 =
+insertions(+), 115 deletions(-)<br>&gt;<br>&gt; That&#39;s a rather big pat=
+ch touching multiple areas of code at once; I&#39;m<br>&gt; not sure if it =
+would be easier to review if you were to break it up into<br>&gt; a series =
+of smaller patches each touching a smaller group of related<br>&gt; files.=
+=C2=A0 For example, I don&#39;t mind reviwing block/, but tend to shy away<=
+br>&gt; from migration/ code.<br><br>Is this necessary for a series of fair=
+ly basic changes? Most files are only<br>modified on 1 or 2 lines.<br>&gt;<=
+br>&gt; &gt;<br>&gt; &gt; diff --git a/block/iscsi.c b/block/iscsi.c<br>&gt=
+; &gt; index 682abd8e09..df73bde114 100644<br>&gt; &gt; --- a/block/iscsi.c=
+<br>&gt; &gt; +++ b/block/iscsi.c<br>&gt; &gt; @@ -1086,23 +1086,21 @@ stat=
+ic BlockAIOCB *iscsi_aio_ioctl(BlockDriverState *bs,<br>&gt; &gt; =C2=A0 =
+=C2=A0 =C2=A0 acb-&gt;task-&gt;expxferlen =3D acb-&gt;ioh-&gt;dxfer_len;<br=
+>&gt; &gt; =C2=A0<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 data.size =3D 0;<br>&gt=
+; &gt; - =C2=A0 =C2=A0qemu_mutex_lock(&amp;iscsilun-&gt;mutex);<br>&gt; &gt=
+; + =C2=A0 =C2=A0QEMU_LOCK_GUARD(&amp;iscsilun-&gt;mutex);<br>&gt; &gt; =C2=
+=A0 =C2=A0 =C2=A0 if (acb-&gt;task-&gt;xfer_dir =3D=3D SCSI_XFER_WRITE) {<b=
+r>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (acb-&gt;ioh-&gt;iovec_co=
+unt =3D=3D 0) {<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 data.data =3D acb-&gt;ioh-&gt;dxferp;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 data.size =3D acb-&gt;ioh-&gt;dxfer_len;<br>&g=
+t; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>&gt; &gt; =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 scsi_task_set_iov_out(acb-&gt;task,<=
+br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (struct scsi_iovec *) =
+acb-&gt;ioh-&gt;dxferp,<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 acb-&gt;ioh-&gt;iovec_count);<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0(struct scsi_iovec *)acb-&gt;ioh-&gt;dxferp,<br>&gt; &g=
+t; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0acb-&gt;ioh-&gt;iovec_count=
+);<br>&gt;<br><div>&gt; This looks like a spurious whitespace change.=C2=A0=
+ Why is it part of the patch?</div><div>&gt;</div><div><br></div><div>Sorry=
+, it looks like my editor was autoformatting some areas of the text. I&#39;=
+ll remove<br></div><div>those changes in the next version.<br><br></div>&gt=
+; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
+=A0 }<br>&gt; &gt; =C2=A0<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 if (iscsi_scsi_=
+command_async(iscsi, iscsilun-&gt;lun, acb-&gt;task,<br>&gt; &gt; =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0iscsi_aio_ioctl_cb,<br>&gt; &g=
+t; - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (data.size &gt; 0) ? &amp;data : =
+NULL,<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 acb) !=3D 0) {<=
+br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_mutex_unlock(&amp;iscsilun-&=
+gt;mutex);<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (data.size &=
+gt; 0) ? &amp;data : NULL, acb) !=3D 0) {<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 scsi_free_scsi_task(acb-&gt;task);<br>&gt;<br>&gt; Unwrappin=
+g the line fit in 80 columns, but again, why are you mixing<br>&gt; whitesp=
+ace changes in rather than focusing on the cleanup of mutex<br>&gt; actions=
+?=C2=A0 Did you create this patch mechanically with a tool like<br>&gt; Coc=
+cinelle, as the source of your reflowing of lines?=C2=A0 If so, what was<br=
+>&gt; the input to Coccinelle; if it was some other automated tool, can you=
+<br>&gt; include the formula so that someone else could reproduce your chan=
+ges<br>&gt; (whitespace and all)?=C2=A0 If it was not automated, that&#39;s=
+ also okay, but<br>&gt; then I would not expect as much whitespace churn.<b=
+r>&gt;<br><br></div>Should I not be including changes that fix warnings in =
+code check? I&#39;ll correct<br>the mistakes and submit a new version witho=
+ut all the whitespace churn.<br></div>
+
+--000000000000e37a8805a13c7433--
 
