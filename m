@@ -2,74 +2,72 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 614E9C4332E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58999C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:11:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F6E02072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:09:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 224E32072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:11:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0ji4ZJM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F6E02072C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvOgjVId"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 224E32072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEqFP-00055G-Cs
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 04:09:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39771)
+	id 1jEqGZ-00064z-Aa
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 04:10:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jEq7e-0001mX-F5
+ (envelope-from <kraxel@redhat.com>) id 1jEq7e-0001kU-BK
  for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jEq7b-0005gv-9E
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:46 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:20801)
+ (envelope-from <kraxel@redhat.com>) id 1jEq7Y-0005XZ-Qx
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:43 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:42583)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jEq7a-0005bU-0C
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:42 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jEq7Y-0005V3-M0
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584604901;
+ s=mimecast20190719; t=1584604900;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=E9hfy3vdBCnyEY97AeX6cPqCQtaybV53wcmgVyMvvIk=;
- b=U0ji4ZJMexqYUkaDZKltf+D3EFD5AqPstBDBZxQS93RRh3vssNNkfDpLyLPRukLCNYhA9g
- UsiJrVLwTw3qdmAVBkLXqHJMuJSEGZZrE+9o8Abwh4Pgl/fDDWKUpVA+d7DA79ua4CebPq
- EridEjULU1KJPTutoPWgVcDTy0YGBsg=
+ bh=1hIQzOVownPUgeOfpivxGQH7GbNiuNjbqeCCe9FxpM4=;
+ b=gvOgjVIdxgXdS4r6F9DdHY36nt/isWbuYL6/RYWWObw1MYy3EFPLg26ld7O6HzRCUDqS9d
+ aoatdc39+GS/ATPzzY+Pn+XVeN6+K2099C9C9AVmJCp4w5GkkVsoPQ7NsJgmNSUTFswz1k
+ qx5VP4PxCmkeVoWa8GtgJ4vAmWhWFO8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-XiL95cPsNp6bCCFWkWNjEg-1; Thu, 19 Mar 2020 04:01:36 -0400
-X-MC-Unique: XiL95cPsNp6bCCFWkWNjEg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-336-wxmEcOsFPcuNQnXPC_y32w-1; Thu, 19 Mar 2020 04:01:38 -0400
+X-MC-Unique: wxmEcOsFPcuNQnXPC_y32w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96C658010C4;
- Thu, 19 Mar 2020 08:01:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10C19107B76A;
+ Thu, 19 Mar 2020 08:01:37 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-49.ams2.redhat.com
  [10.36.112.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8375119756;
- Thu, 19 Mar 2020 08:01:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7843D90812;
+ Thu, 19 Mar 2020 08:01:28 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E00D931FAA; Thu, 19 Mar 2020 09:01:17 +0100 (CET)
+ id CEC9431F48; Thu, 19 Mar 2020 09:01:17 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 07/13] [testing] seabios: update submodule to experimental
- microvm branch
-Date: Thu, 19 Mar 2020 09:01:11 +0100
-Message-Id: <20200319080117.7725-8-kraxel@redhat.com>
+Subject: [PATCH 05/13] microvm: add acpi_dsdt_add_virtio() for x86
+Date: Thu, 19 Mar 2020 09:01:09 +0100
+Message-Id: <20200319080117.7725-6-kraxel@redhat.com>
 In-Reply-To: <20200319080117.7725-1-kraxel@redhat.com>
 References: <20200319080117.7725-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -95,20 +93,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://git.kraxel.org/cgit/seabios/log/?h=3Dmicrovm
+Makes x86 linux kernel find virtio-mmio devices automatically.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- roms/seabios | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/i386/acpi-build.c | 51 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/roms/seabios b/roms/seabios
-index f21b5a4aeb02..81a6f4b87318 160000
---- a/roms/seabios
-+++ b/roms/seabios
-@@ -1 +1 @@
--Subproject commit f21b5a4aeb020f2a5e2c6503f906a9349dd2f069
-+Subproject commit 81a6f4b87318a945e3a4cd014c2efa89482a0cd0
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 0e45a646af56..80844db24d6b 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -21,6 +21,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qnum.h"
+ #include "acpi-build.h"
+@@ -60,6 +61,7 @@
+ #include "hw/pci-host/q35.h"
+ #include "hw/i386/x86-iommu.h"
+ #include "hw/i386/microvm.h"
++#include "hw/virtio/virtio-mmio.h"
+=20
+ #include "hw/acpi/aml-build.h"
+ #include "hw/acpi/utils.h"
+@@ -2750,6 +2752,54 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+     return true;
+ }
+=20
++static void acpi_dsdt_add_virtio(Aml *scope)
++{
++    gchar *separator;
++    long int index;
++    BusState *bus;
++    BusChild *kid;
++
++    bus =3D sysbus_get_default();
++    QTAILQ_FOREACH(kid, &bus->children, sibling) {
++        DeviceState *dev =3D kid->child;
++        ObjectClass *class =3D object_get_class(OBJECT(dev));
++
++        if (class =3D=3D object_class_by_name(TYPE_VIRTIO_MMIO)) {
++            VirtIOMMIOProxy *mmio =3D VIRTIO_MMIO(OBJECT(dev));
++            VirtioBusState *mmio_virtio_bus =3D &mmio->bus;
++            BusState *mmio_bus =3D &mmio_virtio_bus->parent_obj;
++
++            if (QTAILQ_EMPTY(&mmio_bus->children)) {
++                continue;
++            }
++            separator =3D g_strrstr(mmio_bus->name, ".");
++            if (!separator) {
++                continue;
++            }
++            if (qemu_strtol(separator + 1, NULL, 10, &index) !=3D 0) {
++                continue;
++            }
++
++            uint32_t irq =3D VIRTIO_IRQ_BASE + index;
++            hwaddr base =3D VIRTIO_MMIO_BASE + index * 512;
++            hwaddr size =3D 512;
++
++            Aml *dev =3D aml_device("VR%02u", (unsigned)index);
++            aml_append(dev, aml_name_decl("_HID", aml_string("LNRO0005")))=
+;
++            aml_append(dev, aml_name_decl("_UID", aml_int(index)));
++            aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
++
++            Aml *crs =3D aml_resource_template();
++            aml_append(crs, aml_memory32_fixed(base, size, AML_READ_WRITE)=
+);
++            aml_append(crs,
++                       aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_H=
+IGH,
++                                     AML_EXCLUSIVE, &irq, 1));
++            aml_append(dev, aml_name_decl("_CRS", crs));
++            aml_append(scope, dev);
++        }
++    }
++}
++
+ static void
+ build_dsdt_microvm(GArray *table_data, BIOSLinker *linker,
+                    MicrovmMachineState *mms)
+@@ -2766,6 +2816,7 @@ build_dsdt_microvm(GArray *table_data, BIOSLinker *li=
+nker,
+=20
+     sb_scope =3D aml_scope("_SB");
+     acpi_dsdt_add_fw_cfg(sb_scope, OBJECT(x86ms->fw_cfg));
++    acpi_dsdt_add_virtio(sb_scope);
+     aml_append(dsdt, sb_scope);
+=20
+     scope =3D aml_scope("\\");
 --=20
 2.18.2
 
