@@ -4,86 +4,97 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83313C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 16:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A23C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 17:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C87C2071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 16:58:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C12D52072D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 17:06:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="PBk9/vHp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C87C2071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGY6gY8i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C12D52072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEyV7-0005tC-DI
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 12:58:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55982)
+	id 1jEydG-00086S-Sg
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 13:06:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57767)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jEyUP-0005Td-Aq
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:57:51 -0400
+ (envelope-from <philmd@redhat.com>) id 1jEych-0007gJ-Sv
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:06:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jEyUM-0007sv-Fl
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:57:48 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:13029)
+ (envelope-from <philmd@redhat.com>) id 1jEycg-00065H-16
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:06:23 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40469)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jEyUM-0007qN-55
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 12:57:46 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e73a47a0000>; Thu, 19 Mar 2020 09:57:30 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 19 Mar 2020 09:57:43 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 19 Mar 2020 09:57:43 -0700
-Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
- 2020 16:57:34 +0000
-Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-To: Alex Williamson <alex.williamson@redhat.com>, Yan Zhao
- <yan.y.zhao@intel.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
- <20200319030639.GD4641@joy-OptiPlex-7040> <20200318220100.1aac12fa@w520.home>
- <20200319041533.GE4641@joy-OptiPlex-7040> <20200318224053.3651c818@w520.home>
- <20200319061534.GG4641@joy-OptiPlex-7040> <20200319070635.2ff5db56@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com>
-Date: Thu, 19 Mar 2020 22:27:30 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEycf-00064s-T9
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:06:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584637581;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BYUgtx9vBxFQRdBV/0S41Vz4vYBuP9QA3WwfgOFi8vI=;
+ b=dGY6gY8iyx0aaMRj5BvBC0xx627K7vWCWd/r0qxaNMIIF6YOmz9XwyVQC9+hmJM+v/AgcV
+ 5wrQ5zt5/tH3k722wgWfNweuMvG55WqAvKRDeaCSx9k8AcaK6BSWkdPprqh3uYMeaP47+h
+ DGZ5983Cy0vsx1sCIuCXGVnlnSzUhIQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-iNRasbpAM2KDicMyc7rONw-1; Thu, 19 Mar 2020 13:06:20 -0400
+X-MC-Unique: iNRasbpAM2KDicMyc7rONw-1
+Received: by mail-ed1-f70.google.com with SMTP id i10so2542820edk.13
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:06:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=BYUgtx9vBxFQRdBV/0S41Vz4vYBuP9QA3WwfgOFi8vI=;
+ b=e55Hflk36pCWwnwr8/T+1Tvuy211ugWsxR7iNOX0e4u4YsIX0puxnm64nl2GAumaYW
+ rbbypRX9RRonQEa3gg0n7UxY0CCTfJ2nqFGnV7FwZiXnvfY1fTd6zFprvtvcCNWGH+k1
+ Sk/NhnVu9U1WCeRtiPLJwE0Xsvb20j3qW1SOU+g2tq3dOFXyDGU/7VWOQEPrPZCQeVKr
+ 8FnANi4gzE9jvxBOuV3ReCCZIsfvEWsP7Gu5CWBCTN5L/UbJwTylwEcwDhE0AsUKi3+4
+ EaPq7x9D/ijkIUq5qas6Rla+/tclsfMv1r9Nf50yLyqytMozgIbqa0xWw5DFFtnbcw7E
+ LAVg==
+X-Gm-Message-State: ANhLgQ3NXAQlZF2wNT2d2eBpOjbdf23XYoSrlZKqchIEziZU9u/QOQ/G
+ uyE539IRf1ujksTsLG2OsQWx7JS4S7GW+W/5xA+KmIL3xoGwvsWZ6KPTKhjp0cmZAAvEA4LO408
+ +4dSjdWdrofreBN8=
+X-Received: by 2002:a17:906:4ac5:: with SMTP id
+ u5mr4322572ejt.306.1584637578511; 
+ Thu, 19 Mar 2020 10:06:18 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvL7HyArudd79bcx8PsNksp6aBN0TRCGXTcUmR7tSo+qhBAV2TdHM+4T7dLFOIFFZKXCsGoWA==
+X-Received: by 2002:a17:906:4ac5:: with SMTP id
+ u5mr4322524ejt.306.1584637578198; 
+ Thu, 19 Mar 2020 10:06:18 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id g19sm171193ejr.65.2020.03.19.10.06.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Mar 2020 10:06:17 -0700 (PDT)
+Subject: Re: [PATCH v3] MAINTAINERS: Add an entry for the HVF accelerator
+To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+References: <20200319135520.80901-1-r.bolshakov@yadro.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <70dac67d-8cb1-466f-fe1f-6be4af7c8aca@redhat.com>
+Date: Thu, 19 Mar 2020 18:06:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200319070635.2ff5db56@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200319135520.80901-1-r.bolshakov@yadro.com>
 Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1584637051; bh=62CL+wODth/gDOK49qpDu8R0PAcg4lyTPHNwJ/3/nAw=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=PBk9/vHpjeM4lwhXil64m1csKiKT89xHx4ghm2jwU8/IeDP6bHI57dDsDEPNZdPLp
- 5/hJC+0NKl0Wa+2D9TYNxhwxsg7DjblwkuYY9X15yTRyEZd+vvSWWUXZyWrnRtlDA+
- JXOHEGJt4bhLoea76sYEvhSyZWECmSF2WBcT1J+gl1/o0z42HRDdylAKKivMkrIQlx
- Z3wzQXsN1ZwU9k9MgtO/REOUQ3kglw2x7biPK0IqU7wjOE9Tg9vFc+uFfMvg87yyRg
- sK4VDGjLtS4UrU5uPNwU3poFiXcR2/iwwlwl4HcsujEmGQneVdF237US5dy66PPOlU
- yr5AwTZER4MKw==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.65
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,403 +106,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Cameron Esfahani <dirty@apple.com>,
+ Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>,
+ Patrick Colp <patrick.colp@oracle.com>, Liran Alon <liran.alon@oracle.com>,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Heiher <r@hev.cc>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 3/19/2020 6:36 PM, Alex Williamson wrote:
-> On Thu, 19 Mar 2020 02:15:34 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
+On 3/19/20 2:55 PM, Roman Bolshakov wrote:
+> Cameron signed up for taking HVF ownership.
 > 
->> On Thu, Mar 19, 2020 at 12:40:53PM +0800, Alex Williamson wrote:
->>> On Thu, 19 Mar 2020 00:15:33 -0400
->>> Yan Zhao <yan.y.zhao@intel.com> wrote:
->>>    
->>>> On Thu, Mar 19, 2020 at 12:01:00PM +0800, Alex Williamson wrote:
->>>>> On Wed, 18 Mar 2020 23:06:39 -0400
->>>>> Yan Zhao <yan.y.zhao@intel.com> wrote:
->>>>>      
->>>>>> On Thu, Mar 19, 2020 at 03:41:11AM +0800, Kirti Wankhede wrote:
->>>>>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
->>>>>>> - Start dirty pages tracking while migration is active
->>>>>>> - Stop dirty pages tracking.
->>>>>>> - Get dirty pages bitmap. Its user space application's responsibility to
->>>>>>>    copy content of dirty pages from source to destination during migration.
->>>>>>>
->>>>>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
->>>>>>> structure. Bitmap size is calculated considering smallest supported page
->>>>>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
->>>>>>>
->>>>>>> Bitmap is populated for already pinned pages when bitmap is allocated for
->>>>>>> a vfio_dma with the smallest supported page size. Update bitmap from
->>>>>>> pinning functions when tracking is enabled. When user application queries
->>>>>>> bitmap, check if requested page size is same as page size used to
->>>>>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
->>>>>>> error.
->>>>>>>
->>>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->>>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
->>>>>>> ---
->>>>>>>   drivers/vfio/vfio_iommu_type1.c | 205 +++++++++++++++++++++++++++++++++++++++-
->>>>>>>   1 file changed, 203 insertions(+), 2 deletions(-)
->>>>>>>
->>>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->>>>>>> index 70aeab921d0f..d6417fb02174 100644
->>>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
->>>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>>>>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
->>>>>>>   	unsigned int		dma_avail;
->>>>>>>   	bool			v2;
->>>>>>>   	bool			nesting;
->>>>>>> +	bool			dirty_page_tracking;
->>>>>>>   };
->>>>>>>   
->>>>>>>   struct vfio_domain {
->>>>>>> @@ -91,6 +92,7 @@ struct vfio_dma {
->>>>>>>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->>>>>>>   	struct task_struct	*task;
->>>>>>>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->>>>>>> +	unsigned long		*bitmap;
->>>>>>>   };
->>>>>>>   
->>>>>>>   struct vfio_group {
->>>>>>> @@ -125,7 +127,10 @@ struct vfio_regions {
->>>>>>>   #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->>>>>>>   					(!list_empty(&iommu->domain_list))
->>>>>>>   
->>>>>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
->>>>>>> +
->>>>>>>   static int put_pfn(unsigned long pfn, int prot);
->>>>>>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->>>>>>>   
->>>>>>>   /*
->>>>>>>    * This code handles mapping and unmapping of user data buffers
->>>>>>> @@ -175,6 +180,55 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->>>>>>>   	rb_erase(&old->node, &iommu->dma_list);
->>>>>>>   }
->>>>>>>   
->>>>>>> +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu, uint64_t pgsize)
->>>>>>> +{
->>>>>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
->>>>>>> +
->>>>>>> +	for (; n; n = rb_next(n)) {
->>>>>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->>>>>>> +		struct rb_node *p;
->>>>>>> +		unsigned long npages = dma->size / pgsize;
->>>>>>> +
->>>>>>> +		dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
->>>>>>> +		if (!dma->bitmap) {
->>>>>>> +			struct rb_node *p = rb_prev(n);
->>>>>>> +
->>>>>>> +			for (; p; p = rb_prev(p)) {
->>>>>>> +				struct vfio_dma *dma = rb_entry(n,
->>>>>>> +							struct vfio_dma, node);
->>>>>>> +
->>>>>>> +				kfree(dma->bitmap);
->>>>>>> +				dma->bitmap = NULL;
->>>>>>> +			}
->>>>>>> +			return -ENOMEM;
->>>>>>> +		}
->>>>>>> +
->>>>>>> +		if (RB_EMPTY_ROOT(&dma->pfn_list))
->>>>>>> +			continue;
->>>>>>> +
->>>>>>> +		for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
->>>>>>> +			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
->>>>>>> +							 node);
->>>>>>> +
->>>>>>> +			bitmap_set(dma->bitmap,
->>>>>>> +					(vpfn->iova - dma->iova) / pgsize, 1);
->>>>>>> +		}
->>>>>>> +	}
->>>>>>> +	return 0;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static void vfio_dma_bitmap_free(struct vfio_iommu *iommu)
->>>>>>> +{
->>>>>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
->>>>>>> +
->>>>>>> +	for (; n; n = rb_next(n)) {
->>>>>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->>>>>>> +
->>>>>>> +		kfree(dma->bitmap);
->>>>>>> +		dma->bitmap = NULL;
->>>>>>> +	}
->>>>>>> +}
->>>>>>> +
->>>>>>>   /*
->>>>>>>    * Helper Functions for host iova-pfn list
->>>>>>>    */
->>>>>>> @@ -567,6 +621,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>>>>>>   			vfio_unpin_page_external(dma, iova, do_accounting);
->>>>>>>   			goto pin_unwind;
->>>>>>>   		}
->>>>>>> +
->>>>>>> +		if (iommu->dirty_page_tracking) {
->>>>>>> +			unsigned long pgshift =
->>>>>>> +					 __ffs(vfio_pgsize_bitmap(iommu));
->>>>>>> +
->>>>>>> +			bitmap_set(dma->bitmap,
->>>>>>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
->>>>>>> +		}
->>>>>>>   	}
->>>>>>>   
->>>>>>>   	ret = i;
->>>>>>> @@ -801,6 +863,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->>>>>>>   	vfio_unmap_unpin(iommu, dma, true);
->>>>>>>   	vfio_unlink_dma(iommu, dma);
->>>>>>>   	put_task_struct(dma->task);
->>>>>>> +	kfree(dma->bitmap);
->>>>>>>   	kfree(dma);
->>>>>>>   	iommu->dma_avail++;
->>>>>>>   }
->>>>>>> @@ -831,6 +894,50 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->>>>>>>   	return bitmap;
->>>>>>>   }
->>>>>>>   
->>>>>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
->>>>>>> +				  size_t size, uint64_t pgsize,
->>>>>>> +				  unsigned char __user *bitmap)
->>>>>>> +{
->>>>>>> +	struct vfio_dma *dma;
->>>>>>> +	unsigned long pgshift = __ffs(pgsize);
->>>>>>> +	unsigned int npages, bitmap_size;
->>>>>>> +
->>>>>>> +	dma = vfio_find_dma(iommu, iova, 1);
->>>>>>> +
->>>>>>> +	if (!dma)
->>>>>>> +		return -EINVAL;
->>>>>>> +
->>>>>>> +	if (dma->iova != iova || dma->size != size)
->>>>>>> +		return -EINVAL;
->>>>>>> +
->>>>>> looks this size is passed from user. how can it ensure size always
->>>>>> equals to dma->size ?
->>>>>>
->>>>>> shouldn't we iterate dma tree to look for dirty for whole range if a
->>>>>> single dma cannot meet them all?
->>>>>
->>>>> Please see the discussion on v12[1], the problem is with the alignment
->>>>> of DMA mapped regions versus the bitmap.  A DMA mapping only requires
->>>>> page alignment, so for example imagine a user requests the bitmap from
->>>>> page zero to 4GB, but we have a DMA mapping starting at 4KB.  We can't
->>>>> efficiently copy the bitmap tracked by the vfio_dma structure to the
->>>>> user buffer when it's shifted by 1 bit.  Adjacent mappings can also
->>>>> make for a very complicated implementation.  In the discussion linked
->>>>> we decided to compromise on a more simple implementation that requires
->>>>> the user to ask for a bitmap which exactly matches a single DMA
->>>>> mapping, which Kirti indicates is what we require to support QEMU.
->>>>> Later in the series, the unmap operation also makes this requirement
->>>>> when used with the flags to retrieve the dirty bitmap.  Thanks,
->>>>>     
->>>>
->>>> so, what about for vIOMMU enabling case?
->>>> if IOVAs are mapped per page, then there's a log_sync in qemu,
->>>> it's supposed for range from 0-U64MAX, qemu has to find out which
->>>> ones are mapped and cut them into pages before calling this IOCTL?
->>>> And what if those IOVAs are mapped for len more than one page?
->>>
->>> Good question.  Kirti?
->>>
-
-In log_sync with vIOMMU, loop for range such that:
-
-- find iotlb entry for iova, get iova_xlat
-- size = iotlb.addr_mask + 1; This is same caculation as when mapping 
-are created from vfio_iommu_map_notify()
-- use the <iova_xlat, size> for VFIO_IOMMU_DIRTY_PAGES ioctl
-- increment iova: iova += size
-- iterate above steps till end of range.
-
->>>>> [1] https://lore.kernel.org/kvm/20200218215330.5bc8fc6a@w520.home/
->>>>>       
->>>>>>> +	npages = dma->size >> pgshift;
->>>>>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
->>>>>>> +
->>>>>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
->>>>>>> +	if (dma->iommu_mapped)
->>>>>>> +		bitmap_set(dma->bitmap, 0, npages);
->>>>>>> +
->>>>>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
->>>>>>> +		return -EFAULT;
->>>>>>> +
->> Here, dma->bitmap needs to be cleared. right?
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Cc: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+> Cc: Patrick Colp <patrick.colp@oracle.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Cc: Heiher <r@hev.cc>
 > 
-> Ah, I missed re-checking this in my review.  v13 did clear it, but I
-> noted that we need to re-populate any currently pinned pages.  This
-> neither clears nor repopulates.  That's wrong.  Thanks,
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+> Changes since v2:
+>    Removed myself from the list of maintainers, added Cameron from Apple.
+>    Status is changed to Supported again.
+> Changes since v1:
+>    Status is changed to Maintained instead of Supported.
 > 
-
-Why re-populate when there will be no change since 
-vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any 
-pin request while vfio_iova_dirty_bitmap() is still working, it will 
-wait till iommu->lock is released. Bitmap will be populated when page is 
-pinned.
-
-Thanks,
-Kirti
-
-> Alex
+>   MAINTAINERS | 7 +++++++
+>   1 file changed, 7 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7364af0d8b..ab4dc2816c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -406,6 +406,13 @@ S: Supported
+>   F: target/i386/kvm.c
+>   F: scripts/kvm/vmxcap
 >   
->>>>>>> +	return 0;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
->>>>>>> +{
->>>>>>> +	uint64_t bsize;
->>>>>>> +
->>>>>>> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
->>>>>>> +		return -EINVAL;
->>>>>>> +
->>>>>>> +	bsize = DIRTY_BITMAP_BYTES(npages);
->>>>>>> +
->>>>>>> +	if (bitmap_size < bsize)
->>>>>>> +		return -EINVAL;
->>>>>>> +
->>>>>>> +	return 0;
->>>>>>> +}
->>>>>>> +
->>>>>>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>>>>>>   			     struct vfio_iommu_type1_dma_unmap *unmap)
->>>>>>>   {
->>>>>>> @@ -2278,6 +2385,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->>>>>>>   
->>>>>>>   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->>>>>>>   			-EFAULT : 0;
->>>>>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
->>>>>>> +		struct vfio_iommu_type1_dirty_bitmap dirty;
->>>>>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
->>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
->>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
->>>>>>> +		int ret = 0;
->>>>>>> +
->>>>>>> +		if (!iommu->v2)
->>>>>>> +			return -EACCES;
->>>>>>> +
->>>>>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
->>>>>>> +				    flags);
->>>>>>> +
->>>>>>> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
->>>>>>> +			return -EFAULT;
->>>>>>> +
->>>>>>> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
->>>>>>> +			return -EINVAL;
->>>>>>> +
->>>>>>> +		/* only one flag should be set at a time */
->>>>>>> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
->>>>>>> +			return -EINVAL;
->>>>>>> +
->>>>>>> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
->>>>>>> +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
->>>>>>> +
->>>>>>> +			mutex_lock(&iommu->lock);
->>>>>>> +			if (!iommu->dirty_page_tracking) {
->>>>>>> +				ret = vfio_dma_bitmap_alloc(iommu, pgsize);
->>>>>>> +				if (!ret)
->>>>>>> +					iommu->dirty_page_tracking = true;
->>>>>>> +			}
->>>>>>> +			mutex_unlock(&iommu->lock);
->>>>>>> +			return ret;
->>>>>>> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
->>>>>>> +			mutex_lock(&iommu->lock);
->>>>>>> +			if (iommu->dirty_page_tracking) {
->>>>>>> +				iommu->dirty_page_tracking = false;
->>>>>>> +				vfio_dma_bitmap_free(iommu);
->>>>>>> +			}
->>>>>>> +			mutex_unlock(&iommu->lock);
->>>>>>> +			return 0;
->>>>>>> +		} else if (dirty.flags &
->>>>>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
->>>>>>> +			struct vfio_iommu_type1_dirty_bitmap_get range;
->>>>>>> +			unsigned long pgshift;
->>>>>>> +			size_t data_size = dirty.argsz - minsz;
->>>>>>> +			uint64_t iommu_pgsize =
->>>>>>> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
->>>>>>> +
->>>>>>> +			if (!data_size || data_size < sizeof(range))
->>>>>>> +				return -EINVAL;
->>>>>>> +
->>>>>>> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
->>>>>>> +					   sizeof(range)))
->>>>>>> +				return -EFAULT;
->>>>>>> +
->>>>>>> +			/* allow only min supported pgsize */
->>>>>>> +			if (range.bitmap.pgsize != iommu_pgsize)
->>>>>>> +				return -EINVAL;
->>>>>>> +			if (range.iova & (iommu_pgsize - 1))
->>>>>>> +				return -EINVAL;
->>>>>>> +			if (!range.size || range.size & (iommu_pgsize - 1))
->>>>>>> +				return -EINVAL;
->>>>>>> +			if (range.iova + range.size < range.iova)
->>>>>>> +				return -EINVAL;
->>>>>>> +			if (!access_ok((void __user *)range.bitmap.data,
->>>>>>> +				       range.bitmap.size))
->>>>>>> +				return -EINVAL;
->>>>>>> +
->>>>>>> +			pgshift = __ffs(range.bitmap.pgsize);
->>>>>>> +			ret = verify_bitmap_size(range.size >> pgshift,
->>>>>>> +						 range.bitmap.size);
->>>>>>> +			if (ret)
->>>>>>> +				return ret;
->>>>>>> +
->>>>>>> +			mutex_lock(&iommu->lock);
->>>>>>> +			if (iommu->dirty_page_tracking)
->>>>>>> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
->>>>>>> +					 range.size, range.bitmap.pgsize,
->>>>>>> +				    (unsigned char __user *)range.bitmap.data);
->>>>>>> +			else
->>>>>>> +				ret = -EINVAL;
->>>>>>> +			mutex_unlock(&iommu->lock);
->>>>>>> +
->>>>>>> +			return ret;
->>>>>>> +		}
->>>>>>>   	}
->>>>>>>   
->>>>>>>   	return -ENOTTY;
->>>>>>> @@ -2345,10 +2539,17 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->>>>>>>   
->>>>>>>   	vaddr = dma->vaddr + offset;
->>>>>>>   
->>>>>>> -	if (write)
->>>>>>> +	if (write) {
->>>>>>>   		*copied = __copy_to_user((void __user *)vaddr, data,
->>>>>>>   					 count) ? 0 : count;
->>>>>>> -	else
->>>>>>> +		if (*copied && iommu->dirty_page_tracking) {
->>>>>>> +			unsigned long pgshift =
->>>>>>> +				__ffs(vfio_pgsize_bitmap(iommu));
->>>>>>> +
->>>>>>> +			bitmap_set(dma->bitmap, offset >> pgshift,
->>>>>>> +				   *copied >> pgshift);
->>>>>>> +		}
->>>>>>> +	} else
->>>>>>>   		*copied = __copy_from_user(data, (void __user *)vaddr,
->>>>>>>   					   count) ? 0 : count;
->>>>>>>   	if (kthread)
->>>>>>> -- 
->>>>>>> 2.7.0
->>>>>>>        
->>>>>>      
->>>>>      
->>>>    
->>>    
->>
+> +X86 HVF CPUs
+> +M: Cameron Esfahani <dirty@apple.com>
+
+ From the other thread discussions, I'd keep you at least listed as 
+designated reviewer:
+
+R: Roman Bolshakov <r.bolshakov@yadro.com>
+
+> +S: Supported
+> +F: accel/stubs/hvf-stub.c
+> +F: target/i386/hvf/
+> +F: include/sysemu/hvf.h
+> +
+>   WHPX CPUs
+>   M: Sunil Muthuswamy <sunilmut@microsoft.com>
+>   S: Supported
 > 
+
 
