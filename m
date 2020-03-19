@@ -2,75 +2,76 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B167C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 941A0C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F79020722
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:47:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F79020722
+	by mail.kernel.org (Postfix) with ESMTPS id 6699920722
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 12:51:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6699920722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEuaX-0001Vo-J4
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 08:47:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55087)
+	id 1jEudX-0002hr-Iq
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 08:50:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55790)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jEuZd-0000my-E4
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:46:58 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jEucw-0002A9-9P
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jEuZc-00006l-6F
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:46:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22286)
+ (envelope-from <frankja@linux.ibm.com>) id 1jEucv-0004qV-6n
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:50:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30544)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jEuZb-0008W9-Sx
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:46:56 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ id 1jEucu-0004pO-Uh
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 08:50:21 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02JCXsaF013855
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:46:53 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yua3w6s8g-1
+ 02JCo52K061589
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:50:20 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8bstgmt-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:46:53 -0400
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:50:18 -0400
 Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 19 Mar 2020 12:46:51 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Thu, 19 Mar 2020 12:50:15 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 19 Mar 2020 12:46:48 -0000
+ Thu, 19 Mar 2020 12:50:13 -0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
  [9.149.105.59])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02JCklVZ63045632
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 02JCoCiN47186298
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 19 Mar 2020 12:46:47 GMT
+ Thu, 19 Mar 2020 12:50:12 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 664D0A405B;
- Thu, 19 Mar 2020 12:46:47 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 03B2DA4055;
+ Thu, 19 Mar 2020 12:50:12 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 10A6EA4051;
- Thu, 19 Mar 2020 12:46:47 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id B53DCA4040;
+ Thu, 19 Mar 2020 12:50:11 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.146.136])
  by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 19 Mar 2020 12:46:46 +0000 (GMT)
-Subject: Re: [PATCH v10 09/16] s390x: protvirt: SCLP interpretation
+ Thu, 19 Mar 2020 12:50:11 +0000 (GMT)
+Subject: Re: [PATCH v10 13/16] s390x: protvirt: Move IO control structures
+ over SIDA
 To: Cornelia Huck <cohuck@redhat.com>
 References: <20200318143047.2335-1-frankja@linux.ibm.com>
- <20200318143047.2335-10-frankja@linux.ibm.com>
- <20200319130945.4134ed82.cohuck@redhat.com>
+ <20200318143047.2335-14-frankja@linux.ibm.com>
+ <20200319132310.0f994bd5.cohuck@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -114,28 +115,28 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 19 Mar 2020 13:46:46 +0100
+Date: Thu, 19 Mar 2020 13:50:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200319130945.4134ed82.cohuck@redhat.com>
+In-Reply-To: <20200319132310.0f994bd5.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="FRmWJ6IrCdsmxoK9HZNtttvEa0qVpinVg"
+ boundary="ioy98b6vMwmYyzUzcWt4bbQTm9BXRmTCz"
 X-TM-AS-GCONF: 00
-x-cbid: 20031912-0012-0000-0000-00000393D6EE
+x-cbid: 20031912-0020-0000-0000-000003B7243E
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031912-0013-0000-0000-000021D0BC93
-Message-Id: <091466c6-95e7-b635-2d89-cc311b4b146d@linux.ibm.com>
+x-cbparentid: 20031912-0021-0000-0000-0000220F9232
+Message-Id: <c3cd4647-c2f3-eddd-1d8b-a4fd58f796a1@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-19_04:2020-03-19,
+ definitions=2020-03-19_03:2020-03-19,
  2020-03-19 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0
- phishscore=0 priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0
- malwarescore=0 bulkscore=0 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003190057
+ clxscore=1015 mlxscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 bulkscore=0
+ suspectscore=0 malwarescore=0 mlxlogscore=999 spamscore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003190056
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
@@ -156,145 +157,95 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FRmWJ6IrCdsmxoK9HZNtttvEa0qVpinVg
-Content-Type: multipart/mixed; boundary="iYPdueyBB8cGD20JLe8FfzxGPYBN5JNSL"
+--ioy98b6vMwmYyzUzcWt4bbQTm9BXRmTCz
+Content-Type: multipart/mixed; boundary="7m7FfHkkb3McgLIqrWVLyPgJQ3vZgVJh1"
 
---iYPdueyBB8cGD20JLe8FfzxGPYBN5JNSL
+--7m7FfHkkb3McgLIqrWVLyPgJQ3vZgVJh1
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 3/19/20 1:09 PM, Cornelia Huck wrote:
-> On Wed, 18 Mar 2020 10:30:40 -0400
+On 3/19/20 1:23 PM, Cornelia Huck wrote:
+> On Wed, 18 Mar 2020 10:30:44 -0400
 > Janosch Frank <frankja@linux.ibm.com> wrote:
 >=20
->> SCLP for a protected guest is done over the SIDAD, so we need to use
->> the s390_cpu_pv_mem_* functions to access the SIDAD instead of guest
->> memory when reading/writing SCBs.
->>
->> To not confuse the sclp emulation, we set 0x4000 as the SCCB address,
->> since the function that injects the sclp external interrupt would
->> reject a zero sccb address.
+>> For protected guests, we need to put the IO emulation results into the=
+
+>> SIDA, so SIE will write them into the guest at the next entry.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> Reviewed-by: David Hildenbrand <david@redhat.com>
->> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 >> ---
->>  hw/s390x/sclp.c         | 65 ++++++++++++++++++++++++++++++++++------=
+>>  target/s390x/ioinst.c | 61 +++++++++++++++++++++++++++++++-----------=
 -
->>  include/hw/s390x/sclp.h |  2 ++
->>  target/s390x/kvm.c      | 25 ++++++++++++----
->>  3 files changed, 76 insertions(+), 16 deletions(-)
+>>  1 file changed, 45 insertions(+), 16 deletions(-)
 >>
->> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
->> index af0bfbc2eca74767..6486890fecea4b3c 100644
->> --- a/hw/s390x/sclp.c
->> +++ b/hw/s390x/sclp.c
->> @@ -33,6 +33,22 @@ static inline SCLPDevice *get_sclp_device(void)
->>      return sclp;
->>  }
->> =20
->> +static inline bool sclp_command_code_valid(uint32_t code)
->> +{
->> +    switch (code & SCLP_CMD_CODE_MASK) {
->> +    case SCLP_CMDW_READ_SCP_INFO:
->> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
->> +    case SCLP_CMDW_READ_CPU_INFO:
->> +    case SCLP_CMDW_CONFIGURE_IOA:
->> +    case SCLP_CMDW_DECONFIGURE_IOA:
->> +    case SCLP_CMD_READ_EVENT_DATA:
->> +    case SCLP_CMD_WRITE_EVENT_DATA:
->> +    case SCLP_CMD_WRITE_EVENT_MASK:
->> +        return true;
->> +    }
->> +    return false;
->> +}
->> +
->>  static void prepare_cpu_entries(SCLPDevice *sclp, CPUEntry *entry, in=
-t *count)
->>  {
->>      MachineState *ms =3D MACHINE(qdev_get_machine());
->> @@ -193,6 +209,43 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *=
-sccb, uint32_t code)
+>=20
+>> @@ -260,6 +269,13 @@ void ioinst_handle_stsch(S390CPU *cpu, uint64_t r=
+eg1, uint32_t ipb,
 >>      }
->>  }
 >> =20
->> +/*
->> + * We only need the address to have something valid for the
->> + * service_interrupt call.
->> + */
->> +#define SCLP_PV_DUMMY_ADDR 0x4000
->> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
->> +                                uint32_t code)
->> +{
->> +    SCLPDevice *sclp =3D get_sclp_device();
->> +    SCLPDeviceClass *sclp_c =3D SCLP_GET_CLASS(sclp);
->> +    SCCB work_sccb;
->> +    hwaddr sccb_len =3D sizeof(SCCB);
->> +
->> +    /*
->> +     * Only a very limited number of calls is permitted by the
->> +     * Ultravisor and we support all of them, so we don't check for
->=20
-> This is no longer true, no?
+>>      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)=
+) {
+>> +        /*
+>> +         * The Ultravisor checks schid bit 16 to be one and bits 0-12=
 
-Right, I just removed the comment.
+>> +         * to be 0 and injects a operand exception itself.
+>=20
+> As a side remark, that also implies that the ultravisor doesn't support=
+
+> MCSS-E, which is highly unsurprising :)
+
+Yup
 
 >=20
->> +     * them. All other specification exceptions are also interpreted
->> +     * by the Ultravisor and hence never cause an exit we need to
->> +     * handle.
->> +     *
->> +     * Setting the CC is also done by the Ultravisor.
->> +     */
->> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
->> +
->> +    if (!sclp_command_code_valid(code)) {
->> +        work_sccb.h.response_code =3D cpu_to_be16(SCLP_RC_INVALID_SCL=
-P_COMMAND);
->> +        goto out_write;
->> +    }
->> +
->> +    sclp_c->execute(sclp, &work_sccb, code);
->> +out_write:
->> +    s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
->> +                          be16_to_cpu(work_sccb.h.length));
->> +    sclp_c->service_interrupt(sclp, SCLP_PV_DUMMY_ADDR);
->> +    return 0;
->> +}
->> +
->>  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t cod=
-e)
->>  {
->>      SCLPDevice *sclp =3D get_sclp_device();
+> Do we want to fence off enabling MCSS-E in the sda chsc for pv guests?
+> Probably not really needed, as Linux does not support it anyway.
+
+If possible I'd leave that to Halil or you.
+IO is currently not my stronghold.
+
 >=20
+>> +         *
+>> +         * Hence we should never end up here.
+>> +         */
+>> +        g_assert(!s390_is_pv());
+>>          /*
+>>           * As operand exceptions have a lower priority than access ex=
+ceptions,
+>>           * we check whether the memory area is writeable (injecting t=
+he
+>=20
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>=20
+Thanks!
 
 
 
---iYPdueyBB8cGD20JLe8FfzxGPYBN5JNSL--
+--7m7FfHkkb3McgLIqrWVLyPgJQ3vZgVJh1--
 
---FRmWJ6IrCdsmxoK9HZNtttvEa0qVpinVg
+--ioy98b6vMwmYyzUzcWt4bbQTm9BXRmTCz
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5zabYACgkQ41TmuOI4
-ufhktA/9GydAKuppDkC2eYpT+75J3lTTs2xzaHe7iXuHTj+vMkhXYmrm/i3PqunH
-IEK0s0Z+a0GGd+4p7ewsSm6nSChgDu7nczqd+mtyU8epo3KAGDm220Rwdc5IXMeg
-nO1xlFTIe5mRRj2+/JsoXdr0zUAV9VdGwANlNloxt0QIREqIVZMCyjUxzY+N91Rm
-msXiPqdFhFquXmKxP/5gLgl3bbkIELIyS3BZ5CKWjq0kVgY2S1j+vTbg0BgsPHn4
-prQWIoUWj8rNmqnzQef8/h6HPU8cu7N1s/SaszUET3h2dK2rDQN/m2TQCksGgDy3
-BteXpm7qrHSV5hESXMvVMJhi7zhJkUrMkvqIvsmmg3l3I63f4+NcLMS1KkQLfj4f
-zemX+v/8JwUGndiX6/OCXfVH5PLWpiqtHkVsWNdmn0HMJ/ctzo3FU6WriujvJcu7
-zHSvHeJ80GRDi3sKpHnsK7qIvP2GZlecaXCAMAKgOldqrPM86ICoXGmbB9jjJvbs
-aaivdPVOW8ryO+lk3V/QUdP8XEYwtn9c9OUSu8MnBRrB95lY2LaUJjV/oUV3Gfnm
-pLi+AwvFPfmfV63GRyilieBbBj3QnKU5Rwflmsa5o/7cnxhjJesv/YPDEaZLqiHo
-hXM5OcaodF/JngIOPajBcVrlCB8ZLzO86zpI9WxkGIG8YB2Rds8=
-=yaCz
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5zaoMACgkQ41TmuOI4
+ufh0bQ/9FXAv4AT8Lh2nFQvhzyZKUrxQwy9BRM+3GaZUJ3Uq+LM2+gF4G8WOU2a7
+2laDxv5l14Oz0jHCS7xim45x/Z9RyWHnAi8JyCiVfQWnkiBQpJCGF8r68+j3xc/Y
+HZhsuMAvmPqRR2eXLxN6qZ02V0WmI/YDEb8jSE+p/WyfllByFv9MKDVIYQPqoTJZ
+NWMHaoqaiyLvUZ73p61k1fvU6PKtfgE1+HPOL11QhbcigSthc9Bl/Jtqqv0H475M
+xyDPMkxANmu22DTNvuEJCjmYl88f1aKYcsacJGOChBXajbVqyy10a5nzF5Ho2shx
+rRWn9ADFvlXr1EC5iUij8BxxMcXFEr7nIIxGjXLTw3V1jF0JgepjBMzMNl/zsQEi
+ifC4snKnO99rQofhQlzhQizD+R1LUVYqhmlqCs0NaaBqhV4QTWG8kr8t0XuhwPjG
+tMzvt0McVQce97LAvGJ3wVhy+GQi1N59j/oLclgOXrLNBFezxp1q1etfuaMq+sQM
+uCNOWB8JmJ9kr4DycinQDlcRMzcpgio3F/VSHgO76/uvyhenLt0PEhxUjk6P7qyS
+G8Nv4V9OEyvMCEZlcPpjSJsqf+CSiNhj85hP5rleTHGJm0e0E9JXd2PUK17u5u/P
+8TE7YOTuSLLzs0luYIQxuG4Lw07pf4XtU/EHmS915nvafs9LdjM=
+=GvhO
 -----END PGP SIGNATURE-----
 
---FRmWJ6IrCdsmxoK9HZNtttvEa0qVpinVg--
+--ioy98b6vMwmYyzUzcWt4bbQTm9BXRmTCz--
 
 
