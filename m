@@ -2,89 +2,77 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FEF9C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5F0C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2E0020724
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:33:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2E0020724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 24CCB20722
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:46:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hni2Wwby"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CCB20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jElvh-0007tt-1K
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 23:33:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48031)
+	id 1jEm8W-0001MG-5D
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 23:46:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <leonardo@linux.ibm.com>) id 1jElv6-0007Tc-Ay
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:32:33 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jEm7C-0000ex-W9
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <leonardo@linux.ibm.com>) id 1jElv5-0007aC-BA
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:32:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32934)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <leonardo@linux.ibm.com>)
- id 1jElv5-0007SZ-3F
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:32:31 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02J33V5D088924; Wed, 18 Mar 2020 23:32:24 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yua3vptv6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 18 Mar 2020 23:32:24 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02J3MIGo009141;
- Thu, 19 Mar 2020 03:32:23 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma02wdc.us.ibm.com with ESMTP id 2yrpw75j6d-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 19 Mar 2020 03:32:23 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02J3WMwI58458458
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 19 Mar 2020 03:32:22 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5694078069;
- Thu, 19 Mar 2020 03:32:22 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AF65D78064;
- Thu, 19 Mar 2020 03:32:19 +0000 (GMT)
-Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.85.205.198])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 19 Mar 2020 03:32:18 +0000 (GMT)
-From: Leonardo Bras <leonardo@linux.ibm.com>
-To: Alistair Francis <alistair.francis@wdc.com>,
- David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH 1/1] device_tree: Add info message when dumping dtb to file
-Date: Thu, 19 Mar 2020 00:32:00 -0300
-Message-Id: <20200319033200.390008-1-leonardo@linux.ibm.com>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <alex.williamson@redhat.com>) id 1jEm7B-0006qW-A3
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:45:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50352)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jEm7B-0006ly-1r
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:45:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584589500;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=V3IrYsm1nDYmYCrl6yeOdU+LoL6XC7ZlPWuzmgcSbtk=;
+ b=hni2Wwby6IeMed1xVcMP97rgJOee1yvTSyGyBmkroB4dJvQetl3VUc+ML02/Nxoxj2DXnv
+ oU2786DAGvsP/deHWXsfiX86HlWJBy5k/7FnYU8khs5iy71G7bArIZ9Qc6h6ha/Bs/Zbhj
+ rCVudX87R6BpBaTYoA4YL2z/TALG3O8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-qH_aF-JePOmZbJ3uP1bOBg-1; Wed, 18 Mar 2020 23:44:56 -0400
+X-MC-Unique: qH_aF-JePOmZbJ3uP1bOBg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05FE31857BE0;
+ Thu, 19 Mar 2020 03:44:53 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB33F6EF97;
+ Thu, 19 Mar 2020 03:44:50 +0000 (UTC)
+Date: Wed, 18 Mar 2020 21:44:50 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v14 Kernel 3/7] vfio iommu: Add ioctl definition for
+ dirty pages tracking.
+Message-ID: <20200318214450.358ca543@w520.home>
+In-Reply-To: <1584560474-19946-4-git-send-email-kwankhede@nvidia.com>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-4-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-18_10:2020-03-18,
- 2020-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0
- phishscore=0 priorityscore=1501 clxscore=1011 impostorscore=0 adultscore=0
- malwarescore=0 bulkscore=0 mlxscore=0 mlxlogscore=961 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003190013
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,40 +84,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Leonardo Bras <leonardo@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When dumping dtb to a file, qemu exits silently before starting the VM.
+On Thu, 19 Mar 2020 01:11:10 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Add info message so user can easily track why the proccess exits.
-Add error message if dtb dump failed.
+> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
+> All pages pinned by vendor driver through this API should be considered as
+> dirty during migration. When container consists of IOMMU capable device and
+> all pages are pinned and mapped, then all pages are marked dirty.
+> Added support to start/stop pinned and unpinned pages tracking and to get
+> bitmap of all dirtied pages for requested IO virtual address range.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index d0021467af53..043e9eafb255 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -995,6 +995,12 @@ struct vfio_iommu_type1_dma_map {
+>  
+>  #define VFIO_IOMMU_MAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 13)
+>  
+> +struct vfio_bitmap {
+> +	__u64        pgsize;	/* page size for bitmap */
+> +	__u64        size;	/* in bytes */
+> +	__u64 __user *data;	/* one bit per page */
+> +};
+> +
+>  /**
+>   * VFIO_IOMMU_UNMAP_DMA - _IOWR(VFIO_TYPE, VFIO_BASE + 14,
+>   *							struct vfio_dma_unmap)
+> @@ -1021,6 +1027,55 @@ struct vfio_iommu_type1_dma_unmap {
+>  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+>  
+> +/**
+> + * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
+> + *                                     struct vfio_iommu_type1_dirty_bitmap)
+> + * IOCTL is used for dirty pages tracking. Caller sets argsz, which is size of
+> + * struct vfio_iommu_type1_dirty_bitmap. Caller set flag depend on which
+> + * operation to perform, details as below:
+> + *
+> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_START set, indicates
+> + * migration is active and IOMMU module should track pages which are pinned and
+> + * could be dirtied by device.
 
-Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
----
- device_tree.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+"...should track" pages dirtied or potentially dirtied by devices.
 
-diff --git a/device_tree.c b/device_tree.c
-index f8b46b3c73..2e45c18c79 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -530,7 +530,12 @@ void qemu_fdt_dumpdtb(void *fdt, int size)
- 
-     if (dumpdtb) {
-         /* Dump the dtb to a file and quit */
--        exit(g_file_set_contents(dumpdtb, fdt, size, NULL) ? 0 : 1);
-+        if (g_file_set_contents(dumpdtb, fdt, size, NULL)) {
-+            info_report("dtb dumped to %s. Exiting.", dumpdtb);
-+            exit(0);
-+        }
-+        error_report("%s: Failed dumping dtb to %s", __func__, dumpdtb)
-+        exit(1);
-     }
- }
- 
--- 
-2.24.1
+As soon as we add support for Yan's DMA r/w the pinning requirement is
+gone, besides pinning is an in-kernel implementation detail, the user
+of this interface doesn't know or care which pages are pinned.
+
+> + * Dirty pages are tracked until tracking is stopped by user application by
+> + * setting VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
+> + *
+> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP set, indicates
+> + * IOMMU should stop tracking pinned pages.
+
+s/pinned/dirtied/
+
+> + *
+> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
+> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
+> + * given IOVA range. User must provide data[] as the structure
+> + * vfio_iommu_type1_dirty_bitmap_get through which user provides IOVA range and
+> + * pgsize. This interface supports to get bitmap of smallest supported pgsize
+> + * only and can be modified in future to get bitmap of specified pgsize.
+> + * User must allocate memory for bitmap, zero the bitmap memory and set size
+> + * of allocated memory in bitmap_size field. One bit is used to represent one
+> + * page consecutively starting from iova offset. User should provide page size
+> + * in 'pgsize'. Bit set in bitmap indicates page at that offset from iova is
+> + * dirty. Caller must set argsz including size of structure
+> + * vfio_iommu_type1_dirty_bitmap_get.
+> + *
+> + * Only one flag should be set at a time.
+
+"Only one of the flags _START, _STOP, and _GET maybe be specified at a
+time."  IOW, let's not presume what yet undefined flags may do.
+Hopefully this addresses Dave's concern.
+
+> + *
+> + */
+> +struct vfio_iommu_type1_dirty_bitmap {
+> +	__u32        argsz;
+> +	__u32        flags;
+> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
+> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
+> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
+> +	__u8         data[];
+> +};
+> +
+> +struct vfio_iommu_type1_dirty_bitmap_get {
+> +	__u64              iova;	/* IO virtual address */
+> +	__u64              size;	/* Size of iova range */
+> +	struct vfio_bitmap bitmap;
+> +};
+> +
+> +#define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>  
+>  /*
 
 
