@@ -2,83 +2,100 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6844CC4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 06:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9A3C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 07:02:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EBD02072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 06:47:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A3D720714
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 07:02:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OvqLZp0c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBD02072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5ystxaY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3D720714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEoxy-0007Lz-9u
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 02:47:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36151)
+	id 1jEpCF-0001GG-8V
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 03:02:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41100)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1jEox9-0006pY-IA
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 02:46:52 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEpBL-0000q3-4X
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 03:01:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1jEox8-0002iE-4v
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 02:46:51 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39137)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1jEox4-0002Xq-QR; Thu, 19 Mar 2020 02:46:46 -0400
-Received: by mail-pf1-x443.google.com with SMTP id d25so896152pfn.6;
- Wed, 18 Mar 2020 23:46:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8filGja/D7ZIQr1WPGOj7qYDnkJMWa9pZJoeTe/6C6M=;
- b=OvqLZp0cWmemAdS/kBxpoRqrGDPoOaCPIsMR01WggqQymc4+87ueAkOddMJOWPZB43
- askFTsoESDA0YQDqm9u4ijC3Gx0rhW73UTtcWPtOIIknyQhH0swv7Y151Ia6LgIswXgz
- 8FUu8p5XRDYpkOYfa/TUFKL/npkLP2padWXi61n6tKHk/wSep32+wwdnRp3zJ3GJnJ85
- vOWN5NrB5Mf6iPsDaGs9oXl65/GAmXupYg7yfjexqxbALeL/dH3jGTSS9pouDqrd2IUd
- C2+fH/vjL+thC84YwokfEzuFER7BdwZQdsAVBYuvoSld6aGdt9i3lojeihCOE99cQ7Q8
- 6uEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8filGja/D7ZIQr1WPGOj7qYDnkJMWa9pZJoeTe/6C6M=;
- b=kGDjmvBz4079zkWEDkGsZGPE8ArzfNXVst2M4LiGyIaUmbsesqOtl54qsuraFMPl1j
- Rf4ooopLIHcoxgnwrVnKj0j3agW/SwVkJsOXUuYxhYuXaIMihhU1mWOYk9fC5RKEeBcf
- slTDNpSnOFu1EobSm/0ZkoZTjXQA5JkYrHoAmbKzMsWGkJzePETIjAS3lPQTx5aXZFlK
- Lfmt+yDM5IYFFd/c7PBAjVGmxh73n3zZ7ZkVv3PV4eRAYj2vI3/QzbXX1heqHQze/TkD
- WI3biN5eLnB6TF85f+YZVrpz/5wnbkgtZL9dlhFZY8b8y3PZ6+rU3wVspdFlWWLEGakQ
- CAIg==
-X-Gm-Message-State: ANhLgQ3wFRoV7mrK7USlhJtmIbs+fxoOrgF9w0lpHVNssOG018zoXajT
- QNgAN8VuJuWlaaShPuMmHu9cMHIG
-X-Google-Smtp-Source: ADFU+vuYFpdk0ouGFeRwMww4aaCqURWB9mhOgk3rUDMtY8JC8hY+OdBDJcWOegZrApNfnNEfHzWfpA==
-X-Received: by 2002:a62:7c15:: with SMTP id x21mr2525859pfc.132.1584600404666; 
- Wed, 18 Mar 2020 23:46:44 -0700 (PDT)
-Received: from bobo.ibm.com (14-202-190-183.tpgi.com.au. [14.202.190.183])
- by smtp.gmail.com with ESMTPSA id z17sm1088360pff.12.2020.03.18.23.46.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Mar 2020 23:46:44 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: qemu-ppc@nongnu.org
-Subject: [PATCH v2] target/ppc: Fix ISA v3.0 (POWER9) slbia implementation
-Date: Thu, 19 Mar 2020 16:44:39 +1000
-Message-Id: <20200319064439.1020571-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <armbru@redhat.com>) id 1jEpBJ-0003a0-E2
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 03:01:30 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54040)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEpBJ-0003Y6-99
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 03:01:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584601288;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HQGnhuPWkiyxBaYlw7XMm3vhxrUCyibzC+CGqCTjaRE=;
+ b=J5ystxaYkc9GI1Lg2QLry9GPGeAR9WcoClpFRrbdW9dFv4DMrTc6o/+rwZciQ0MYiIpUQS
+ hEV0YK8ozuq8+MqHxIIabeeSKbuN9kAYih82laOB0Mrs4jogertQXQ7s/WvqRXqrRUwGgs
+ 6T6F974iLwIeBxFthYSMWlkxTwAATno=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-5fVzutVBNUyyZmE9VvWFKQ-1; Thu, 19 Mar 2020 03:01:24 -0400
+X-MC-Unique: 5fVzutVBNUyyZmE9VvWFKQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A0F9107ACCA;
+ Thu, 19 Mar 2020 07:01:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
+ [10.36.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 478E862673;
+ Thu, 19 Mar 2020 07:01:21 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9EF041138404; Thu, 19 Mar 2020 08:01:19 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
+ in mac_via
+References: <20200305065422.12707-1-pannengyuan@huawei.com>
+ <20200305065422.12707-3-pannengyuan@huawei.com>
+ <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
+ <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+ <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
+ <0c3ae5aa-36c3-a809-4a42-159348f44780@huawei.com>
+ <CAFEAcA8_RkECOT=YJ3ML0wxBrKiqVw=CssORU=jyryfcNueB0w@mail.gmail.com>
+ <871rq08tn9.fsf@dusky.pond.sub.org>
+ <eca27715-554d-2c2e-5e58-ffd01abb654c@ilande.co.uk>
+ <e1ae65dd-f9cd-b0ee-0ea6-f3c2b010fdab@redhat.com>
+ <87tv2p8y5j.fsf@dusky.pond.sub.org>
+ <3f512e33-5875-eee4-bbe8-61e7b313743d@redhat.com>
+ <87mu8g3kgj.fsf@dusky.pond.sub.org>
+ <bd83fe53-6541-b04d-04d9-76ddd29e2b99@redhat.com>
+ <875zf1ak9e.fsf@dusky.pond.sub.org>
+ <d94927af-eb46-f704-6658-e3f321c4d8ed@redhat.com>
+ <87d0997lei.fsf@dusky.pond.sub.org>
+ <37da8765-267e-948b-a96f-24c43be7573f@redhat.com>
+Date: Thu, 19 Mar 2020 08:01:19 +0100
+In-Reply-To: <37da8765-267e-948b-a96f-24c43be7573f@redhat.com> (Paolo
+ Bonzini's message of "Wed, 18 Mar 2020 17:44:36 +0100")
+Message-ID: <87v9n025hc.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,150 +107,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>, Nicholas Piggin <npiggin@gmail.com>,
- qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@fr.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang?= =?utf-8?Q?=C3=A9?=" <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>,
+ Euler Robot <euler.robot@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The new ISA v3.0 slbia variants have not been implemented for TCG,
-which can lead to crashing when a POWER9 machine boots Linux using
-the hash MMU, for example ("disable_radix" kernel command line).
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Add them.
+> On 18/03/20 16:06, Markus Armbruster wrote:
+>>> - object initialization should cause no side effects outside the subtre=
+e
+>>> of the object
+>>=20
+>> object_initialize_child() and its users like sysbus_init_child_obj()
+>> violate this rule: they add a child property to the subtree's parent.
+>> Correct?
+>
+> At least object_initialize_child() adds the property to the object
+> itself, so it's fine.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
-Changes in v2:
-- Rewrite changelog.
-- Remove stray slbie hunk that crept in
+It seems to
 
-I don't think the slbie invalidation is necessary, as explained on the
-list.
+1. Initialize @childobj
+2. Set a bunch of properties
+3. Add the child property to @parentobj
+4. Call .complete() if it's a TYPE_USER_CREATABLE
+5. Adjust reference count
 
- target/ppc/helper.h     |  2 +-
- target/ppc/mmu-hash64.c | 56 +++++++++++++++++++++++++++++++++++------
- target/ppc/translate.c  |  5 +++-
- 3 files changed, 54 insertions(+), 9 deletions(-)
+Step 3. modifies outside the sub-tree rooted at @childobj.  What am I
+missing?
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index ee1498050d..2dfa1c6942 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -615,7 +615,7 @@ DEF_HELPER_FLAGS_3(store_slb, TCG_CALL_NO_RWG, void, env, tl, tl)
- DEF_HELPER_2(load_slb_esid, tl, env, tl)
- DEF_HELPER_2(load_slb_vsid, tl, env, tl)
- DEF_HELPER_2(find_slb_vsid, tl, env, tl)
--DEF_HELPER_FLAGS_1(slbia, TCG_CALL_NO_RWG, void, env)
-+DEF_HELPER_FLAGS_2(slbia, TCG_CALL_NO_RWG, void, env, i32)
- DEF_HELPER_FLAGS_2(slbie, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_2(slbieg, TCG_CALL_NO_RWG, void, env, tl)
- #endif
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 373d44de74..e5baabf0e1 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -95,9 +95,10 @@ void dump_slb(PowerPCCPU *cpu)
-     }
- }
- 
--void helper_slbia(CPUPPCState *env)
-+void helper_slbia(CPUPPCState *env, uint32_t ih)
- {
-     PowerPCCPU *cpu = env_archcpu(env);
-+    int starting_entry;
-     int n;
- 
-     /*
-@@ -111,18 +112,59 @@ void helper_slbia(CPUPPCState *env)
-      * expected that slbmte is more common than slbia, and slbia is usually
-      * going to evict valid SLB entries, so that tradeoff is unlikely to be a
-      * good one.
-+     *
-+     * ISA v2.05 introduced IH field with values 0,1,2,6. These all invalidate
-+     * the same SLB entries (everything but entry 0), but differ in what
-+     * "lookaside information" is invalidated. TCG can ignore this and flush
-+     * everything.
-+     *
-+     * ISA v3.0 introduced additional values 3,4,7, which change what SLBs are
-+     * invalidated.
-      */
- 
--    /* XXX: Warning: slbia never invalidates the first segment */
--    for (n = 1; n < cpu->hash64_opts->slb_size; n++) {
--        ppc_slb_t *slb = &env->slb[n];
-+    env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
-+
-+    starting_entry = 1; /* default for IH=0,1,2,6 */
-+
-+    if (env->mmu_model == POWERPC_MMU_3_00) {
-+        switch (ih) {
-+        case 0x7:
-+            /* invalidate no SLBs, but all lookaside information */
-+            return;
- 
--        if (slb->esid & SLB_ESID_V) {
--            slb->esid &= ~SLB_ESID_V;
-+        case 0x3:
-+        case 0x4:
-+            /* also considers SLB entry 0 */
-+            starting_entry = 0;
-+            break;
-+
-+        case 0x5:
-+            /* treat undefined values as ih==0, and warn */
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "slbia undefined IH field %u.\n", ih);
-+            break;
-+
-+        default:
-+            /* 0,1,2,6 */
-+            break;
-         }
-     }
- 
--    env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
-+    for (n = starting_entry; n < cpu->hash64_opts->slb_size; n++) {
-+        ppc_slb_t *slb = &env->slb[n];
-+
-+        if (!(slb->esid & SLB_ESID_V)) {
-+            continue;
-+        }
-+        if (env->mmu_model == POWERPC_MMU_3_00) {
-+            if (ih == 0x3 && (slb->vsid & SLB_VSID_C) == 0) {
-+                /* preserves entries with a class value of 0 */
-+                continue;
-+            }
-+        }
-+
-+        slb->esid &= ~SLB_ESID_V;
-+    }
- }
- 
- static void __helper_slbie(CPUPPCState *env, target_ulong addr,
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index eb0ddba850..e514732a09 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -5027,12 +5027,15 @@ static void gen_tlbsync(DisasContext *ctx)
- /* slbia */
- static void gen_slbia(DisasContext *ctx)
- {
-+    uint32_t ih = (ctx->opcode >> 21) & 0x7;
-+    TCGv_i32 t0 = tcg_const_i32(ih);
-+
- #if defined(CONFIG_USER_ONLY)
-     GEN_PRIV;
- #else
-     CHK_SV;
- 
--    gen_helper_slbia(cpu_env);
-+    gen_helper_slbia(cpu_env, t0);
- #endif /* defined(CONFIG_USER_ONLY) */
- }
- 
--- 
-2.23.0
+Hmm, maybe this: using object_initialize_child() when initializing
+@parentobj is fine; while object_initialize_child() leaves the sub-tree
+rooted at @childobj, it still stays within the sub-tree rooted at
+@parentobj.
+
+If this is how the function must be used, its contract should spell it
+out!
+
+A review of existing uses for misuses may be in order.
+
+> sysbus_init_child_obj() adds a link to the object to the sysbus object
+> (via qdev_set_parent_bus/bus_add_child).  This does violate the rule.
+> However, currently we have:
+>
+> - create link on qdev_set_parent_bus, before realizing
+>
+> - remove link on device_unparent, after unrealizing
+
+By "create link", do you mean bus_add_child() in qdev_set_parent_bus()?
+
+By "remove link", do you mean bus_remove_child() in device_unparent()?
+
+> which makes the device setup even more complicated than necessary.  In
+> other words I don't think the bug is in the function, instead it
+> probably makes sense to do something else:
+>
+> - create link in device_set_realized, before calling ->pre_plug (undo on
+> failure)
+>
+> - remove link in device_set_realized, after calling ->unrealize (if it
+> succeeds)
+>
+> and leave sysbus_init_child_obj() as is.
+
+I'm barely following you.  Me reviewing an actual patch could help.
+
+>>> - setting properties can cause side effects outside the subtree of the
+>>> object (e.g. marking an object as "in use"), but they must be undone by
+>>> finalization.
+>>=20
+>> Textbook example is the 1:1 connection between device frontend and
+>> backend: block frontend's property "drive", char frontend's property
+>> "chardev", NIC frontend property "netdev", ...
+>>=20
+>> Can we come up with some guardrails for what property setting may do?
+>> Affecting guest-visible state is off limits.  What else is?
+>
+> Yes, guest-visible state is off limits until realization.
+>
+>>> - realization can also cause side effects outside the subtree of the
+>>> object, but if unrealization is possible, they must be undone by
+>>> unrealization. if an object is realized and unrealization is not
+>>> possible, finalization will never run (and in that case, side effects o=
+f
+>>> realization need not be undone at all).
+>>=20
+>> One possible answer the question what should be done in realize() is
+>> whatever must not be done earlier.  Is that the best we can do?
+>
+> That's the lower bound of descriptivity.  The upper bound is anything
+> that is visible from the guest.  The truth could be in the middle.
+
+Can we set aside a bit of time to write docs/devel/qom.rst together?  I
+know object.h is lovingly commented, but unless you already know how QOM
+works, you're drowning in detail there.  You'd have to provide most of
+the contents, I'm afraid, because you know so much more about it.  Could
+save you time in the long run, though: fewer questions to answer, fewer
+mistakes to correct.
 
 
