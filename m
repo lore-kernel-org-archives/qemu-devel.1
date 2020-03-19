@@ -2,79 +2,99 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6317BC4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76AB3C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:14:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BCD1206D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:10:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 417CB20739
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 11:14:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SxfM6K6/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BCD1206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJpNSXJl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 417CB20739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36257 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEt45-0002kP-AU
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 07:10:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35922)
+	id 1jEt8V-0004s3-Ci
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 07:14:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jEt3Q-0002ED-VS
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:09:37 -0400
+ (envelope-from <philmd@redhat.com>) id 1jEt7i-0004S7-Ur
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jEt3P-0003NB-Qx
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:09:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:32341)
+ (envelope-from <philmd@redhat.com>) id 1jEt7h-0004C6-ST
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:14:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59970)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jEt3P-0003M9-Nk
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:09:35 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEt7h-0004AG-OG
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 07:14:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584616175;
+ s=mimecast20190719; t=1584616441;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uj+CP1nXamEl9v2lG/SpkgkH3Bl2qCU1naDrfqZ4tqM=;
- b=SxfM6K6/dV4aAA5KDLEgQVFqnluxVHTrQstDOMWyT6kjUE8HtKyr+9yuyWn58PkM1/OGet
- NZJM4XWtrAns33t88PvRIv4HdOpUmlBNzkBPr/rUiETn0JgW4QK6EfBEEj/q7Pm7LCwg+m
- vYa2Q0rhU7EWbXYs8AbwwJoF8MZNPxk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-7f06vW3FMj68ozrGyZiw9Q-1; Thu, 19 Mar 2020 07:09:32 -0400
-X-MC-Unique: 7f06vW3FMj68ozrGyZiw9Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C096C1005510;
- Thu, 19 Mar 2020 11:09:30 +0000 (UTC)
-Received: from gondolin (ovpn-113-188.ams2.redhat.com [10.36.113.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9765196AE;
- Thu, 19 Mar 2020 11:09:26 +0000 (UTC)
-Date: Thu, 19 Mar 2020 12:08:48 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v10 03/16] s390x: protvirt: Support unpack facility
-Message-ID: <20200319120848.19b34cb8.cohuck@redhat.com>
-In-Reply-To: <20200318143047.2335-4-frankja@linux.ibm.com>
-References: <20200318143047.2335-1-frankja@linux.ibm.com>
- <20200318143047.2335-4-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ bh=x+pVrduBfUztH4rdiP6RlMz6oo9fviverviCp4jzWg0=;
+ b=GJpNSXJleLObd0PC3pcumGtH8cnAlMwfansme8ZcPbtBtCxEaYo+mST2u1VLFbOYGGRWJp
+ cEiX4qpDOKTM7WVlhLBXSDjk+3zh2Mvh2VKTZACYZoRl+nDmNQ9kmaI7tThnj9iJg6yHcb
+ /QVXAT6GwXpBzpMa/cLosD/ptbojmcE=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-yq30_iisOTCu7qXNnIcwMw-1; Thu, 19 Mar 2020 07:13:59 -0400
+X-MC-Unique: yq30_iisOTCu7qXNnIcwMw-1
+Received: by mail-ed1-f71.google.com with SMTP id ce13so1615999edb.11
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 04:13:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eKrewbTGgjekSuIxFeb8QQMEus3Oh+1ryPF5uEHmE7g=;
+ b=gz1T6/fow0OoeWwMUUE5BMC7lGCNRuWdh54Uh0LGlvWU7GS9YZvKioU8vmEQSF7Pwm
+ UWe7Swj0k4dfIKDGiyfVte+RIkkIdBWL2p3aEYSmbQfPlIOsJ4PbTTctoHf8IXaNphlT
+ 35wuqWWSS632gjxpaMW6gknwogvPRCjh0RAmudav2nSX/vbDXJz5FVTmWXj5umZTj//U
+ 1L1F1sAqucNHlBUwohl+0D8/MJoGktCMJWCD7ve/s7lRbHCFSxVx3wqNHpWehXg8FbOh
+ 2Hec0Aj9qb+AeYESz+mpvhtHkBjGxUmpbjypNGKli+oFDi1o/1IH+5zJHCWacruoZ3RW
+ k7HA==
+X-Gm-Message-State: ANhLgQ1ds1mD5tu1k3iXUXy5NWfaFOW87wh3ybtZcqHyHgm2qxfHN8gE
+ eYMUF3Oc9mq1ofdqKwU4mE2nOelFDCOtBB1/nsNRRLMbtMSOhHlEMab3W2SmT39s7dXsUR0Dt/x
+ Df9Ho258EYjL7El4=
+X-Received: by 2002:a50:cfc6:: with SMTP id i6mr2199244edk.314.1584616438113; 
+ Thu, 19 Mar 2020 04:13:58 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvtlo+9VAWsBKr0wjU4B+3iasXYQJxnma/7jW4/umikEb+D/4m4TUjDcrN4/xfmwl/GUpSfSA==
+X-Received: by 2002:a50:cfc6:: with SMTP id i6mr2199224edk.314.1584616437873; 
+ Thu, 19 Mar 2020 04:13:57 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id d20sm108675edn.12.2020.03.19.04.13.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Mar 2020 04:13:57 -0700 (PDT)
+Subject: Re: [PATCH v2 01/12] Makefile: Only build virtiofsd if system-mode is
+ enabled
+To: qemu-devel@nongnu.org
+References: <20200315235716.28448-1-philmd@redhat.com>
+ <20200315235716.28448-2-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3c0eae94-1d01-b8a4-26cb-ddf6d2f4cb28@redhat.com>
+Date: Thu, 19 Mar 2020 12:13:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200315235716.28448-2-philmd@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,76 +106,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-s390x@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Mar 2020 10:30:34 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+This patch is reviewed, can it get in 5.0 as build fix?
 
-> The unpack facility provides the means to setup a protected guest. A
-> protected guest cannot be introspected by the hypervisor or any
-> user/administrator of the machine it is running on.
-> 
-> Protected guests are encrypted at rest and need a special boot
-> mechanism via diag308 subcode 8 and 10.
-> 
-> Code 8 sets the PV specific IPLB which is retained separately from
-> those set via code 5.
-> 
-> Code 10 is used to unpack the VM into protected memory, verify its
-> integrity and start it.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Co-developed-by: Christian Borntraeger <borntraeger@de.ibm.com> [Changes
-> to machine]
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+On 3/16/20 12:57 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Do not build the virtiofsd helper when configured with
+> --disable-system.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/s390x/Makefile.objs              |   1 +
->  hw/s390x/ipl.c                      |  59 +++++++++++++-
->  hw/s390x/ipl.h                      |  91 ++++++++++++++++++++-
->  hw/s390x/pv.c                       |  98 +++++++++++++++++++++++
-
-More of an aside: In MAINTAINERS, this new file will be covered by the
-general s390x section, the tcg section, and the s390-ccw-virtio machine
-section, but not by the kvm section. Do we want to tweak that?
-
->  hw/s390x/s390-virtio-ccw.c          | 119 +++++++++++++++++++++++++++-
->  include/hw/s390x/pv.h               |  55 +++++++++++++
->  include/hw/s390x/s390-virtio-ccw.h  |   1 +
->  target/s390x/cpu.c                  |   2 +
->  target/s390x/cpu_features_def.inc.h |   1 +
->  target/s390x/diag.c                 |  39 ++++++++-
->  target/s390x/kvm-stub.c             |   5 ++
->  target/s390x/kvm.c                  |   5 ++
->  target/s390x/kvm_s390x.h            |   1 +
->  13 files changed, 467 insertions(+), 10 deletions(-)
->  create mode 100644 hw/s390x/pv.c
->  create mode 100644 include/hw/s390x/pv.h
-
-(...)
-
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 3dd396e870357944..84029f14814b4980 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -37,6 +37,8 @@
->  #include "sysemu/hw_accel.h"
->  #include "hw/qdev-properties.h"
->  #ifndef CONFIG_USER_ONLY
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/pv.h"
-
-These are probably needed because of some inline stuff dragging
-definitions in?
-
->  #include "hw/boards.h"
->  #include "sysemu/arch_init.h"
->  #include "sysemu/sysemu.h"
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> v2: Use single line with ifeq=3D'yyyy' (lvivier, rth)
+> ---
+>   Makefile | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index 7df22fcc5d..7d27941803 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -345,7 +345,7 @@ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
+>   vhost-user-json-y +=3D contrib/vhost-user-gpu/50-qemu-gpu.json
+>   endif
+>  =20
+> -ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
+> +ifeq ($(CONFIG_SOFTMMU)$(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_N=
+G),yyyy)
+>   HELPERS-y +=3D virtiofsd$(EXESUF)
+>   vhost-user-json-y +=3D tools/virtiofsd/50-qemu-virtiofsd.json
+>   endif
+>=20
 
 
