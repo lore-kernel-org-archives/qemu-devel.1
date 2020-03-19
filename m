@@ -2,64 +2,70 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2148C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 06:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FDAC4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 06:25:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B8D22072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 06:24:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="N3jkhgQa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B8D22072C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 1D28A20724
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 06:25:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D28A20724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEobV-0002Jn-JT
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 02:24:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55513)
+	id 1jEoct-0003kZ-6v
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 02:25:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jEoaM-0001LU-V9
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 02:23:21 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jEocF-0003JG-VN
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 02:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jEoaK-0002Cy-K8
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 02:23:18 -0400
-Received: from ozlabs.org ([203.11.71.1]:47437)
+ (envelope-from <yan.y.zhao@intel.com>) id 1jEocC-0003uW-VB
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 02:25:15 -0400
+Received: from mga12.intel.com ([192.55.52.136]:24860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jEoaJ-0002CU-VG; Thu, 19 Mar 2020 02:23:16 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48jcKY2YCRz9sPk; Thu, 19 Mar 2020 17:23:12 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584598993;
- bh=+4XBs/upme9Y0X3CX/zYbW9PkTL+5D/M8QfMDyPlb2g=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=N3jkhgQar8v6vggBynyIaMJXBrhOjpc266MgMqAkAblD+WzOwL1+GMX0smqJ3JTfH
- iros2uYd8CJ+Z0ahfau+onW1j8RbHQ/3tObahLnxw0AsfihYpB+szwp3jKx1ZXGZZL
- 64ZbdbWX8jS8HfG/MifjMh56HNKp9UVaW+NhmZbQ=
-Date: Thu, 19 Mar 2020 17:22:34 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v3 2/2] target/ppc: Add support for scv and rfscv
- instructions
-Message-ID: <20200319062234.GK628315@umbus.fritz.box>
-References: <20200317054918.199161-1-npiggin@gmail.com>
- <20200317054918.199161-2-npiggin@gmail.com>
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jEocC-0003jV-9W
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 02:25:12 -0400
+IronPort-SDR: krD3/meR5w8tesMHoTI2HARc3Y3WMdZe9DgOrIJvIguYeN6510+6cqPe/cX9EsQB6MN97Cfuv9
+ Sq5DA9r+jjUA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 18 Mar 2020 23:25:08 -0700
+IronPort-SDR: CrZSm3d6V4c6ikoZn5JxlUIsQmixrctWXVim5vheZiA3pzbuvbxNCCyvdbFT1RDrnR0x1IzlwN
+ w8ejzN0lQ/Ew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,570,1574150400"; d="scan'208";a="444452018"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by fmsmga005.fm.intel.com with ESMTP; 18 Mar 2020 23:25:03 -0700
+Date: Thu, 19 Mar 2020 02:15:34 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+Message-ID: <20200319061534.GG4641@joy-OptiPlex-7040>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
+ <20200319030639.GD4641@joy-OptiPlex-7040>
+ <20200318220100.1aac12fa@w520.home>
+ <20200319041533.GE4641@joy-OptiPlex-7040>
+ <20200318224053.3651c818@w520.home>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Ucgz5Oc/kKURWzXs"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200317054918.199161-2-npiggin@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <20200318224053.3651c818@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,452 +77,370 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Mar 19, 2020 at 12:40:53PM +0800, Alex Williamson wrote:
+> On Thu, 19 Mar 2020 00:15:33 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > On Thu, Mar 19, 2020 at 12:01:00PM +0800, Alex Williamson wrote:
+> > > On Wed, 18 Mar 2020 23:06:39 -0400
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >   
+> > > > On Thu, Mar 19, 2020 at 03:41:11AM +0800, Kirti Wankhede wrote:  
+> > > > > VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+> > > > > - Start dirty pages tracking while migration is active
+> > > > > - Stop dirty pages tracking.
+> > > > > - Get dirty pages bitmap. Its user space application's responsibility to
+> > > > >   copy content of dirty pages from source to destination during migration.
+> > > > > 
+> > > > > To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+> > > > > structure. Bitmap size is calculated considering smallest supported page
+> > > > > size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
+> > > > > 
+> > > > > Bitmap is populated for already pinned pages when bitmap is allocated for
+> > > > > a vfio_dma with the smallest supported page size. Update bitmap from
+> > > > > pinning functions when tracking is enabled. When user application queries
+> > > > > bitmap, check if requested page size is same as page size used to
+> > > > > populated bitmap. If it is equal, copy bitmap, but if not equal, return
+> > > > > error.
+> > > > > 
+> > > > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > > > > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > > > > ---
+> > > > >  drivers/vfio/vfio_iommu_type1.c | 205 +++++++++++++++++++++++++++++++++++++++-
+> > > > >  1 file changed, 203 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > > > > index 70aeab921d0f..d6417fb02174 100644
+> > > > > --- a/drivers/vfio/vfio_iommu_type1.c
+> > > > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > > > @@ -71,6 +71,7 @@ struct vfio_iommu {
+> > > > >  	unsigned int		dma_avail;
+> > > > >  	bool			v2;
+> > > > >  	bool			nesting;
+> > > > > +	bool			dirty_page_tracking;
+> > > > >  };
+> > > > >  
+> > > > >  struct vfio_domain {
+> > > > > @@ -91,6 +92,7 @@ struct vfio_dma {
+> > > > >  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+> > > > >  	struct task_struct	*task;
+> > > > >  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+> > > > > +	unsigned long		*bitmap;
+> > > > >  };
+> > > > >  
+> > > > >  struct vfio_group {
+> > > > > @@ -125,7 +127,10 @@ struct vfio_regions {
+> > > > >  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+> > > > >  					(!list_empty(&iommu->domain_list))
+> > > > >  
+> > > > > +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+> > > > > +
+> > > > >  static int put_pfn(unsigned long pfn, int prot);
+> > > > > +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+> > > > >  
+> > > > >  /*
+> > > > >   * This code handles mapping and unmapping of user data buffers
+> > > > > @@ -175,6 +180,55 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+> > > > >  	rb_erase(&old->node, &iommu->dma_list);
+> > > > >  }
+> > > > >  
+> > > > > +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu, uint64_t pgsize)
+> > > > > +{
+> > > > > +	struct rb_node *n = rb_first(&iommu->dma_list);
+> > > > > +
+> > > > > +	for (; n; n = rb_next(n)) {
+> > > > > +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> > > > > +		struct rb_node *p;
+> > > > > +		unsigned long npages = dma->size / pgsize;
+> > > > > +
+> > > > > +		dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+> > > > > +		if (!dma->bitmap) {
+> > > > > +			struct rb_node *p = rb_prev(n);
+> > > > > +
+> > > > > +			for (; p; p = rb_prev(p)) {
+> > > > > +				struct vfio_dma *dma = rb_entry(n,
+> > > > > +							struct vfio_dma, node);
+> > > > > +
+> > > > > +				kfree(dma->bitmap);
+> > > > > +				dma->bitmap = NULL;
+> > > > > +			}
+> > > > > +			return -ENOMEM;
+> > > > > +		}
+> > > > > +
+> > > > > +		if (RB_EMPTY_ROOT(&dma->pfn_list))
+> > > > > +			continue;
+> > > > > +
+> > > > > +		for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
+> > > > > +			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
+> > > > > +							 node);
+> > > > > +
+> > > > > +			bitmap_set(dma->bitmap,
+> > > > > +					(vpfn->iova - dma->iova) / pgsize, 1);
+> > > > > +		}
+> > > > > +	}
+> > > > > +	return 0;
+> > > > > +}
+> > > > > +
+> > > > > +static void vfio_dma_bitmap_free(struct vfio_iommu *iommu)
+> > > > > +{
+> > > > > +	struct rb_node *n = rb_first(&iommu->dma_list);
+> > > > > +
+> > > > > +	for (; n; n = rb_next(n)) {
+> > > > > +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> > > > > +
+> > > > > +		kfree(dma->bitmap);
+> > > > > +		dma->bitmap = NULL;
+> > > > > +	}
+> > > > > +}
+> > > > > +
+> > > > >  /*
+> > > > >   * Helper Functions for host iova-pfn list
+> > > > >   */
+> > > > > @@ -567,6 +621,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> > > > >  			vfio_unpin_page_external(dma, iova, do_accounting);
+> > > > >  			goto pin_unwind;
+> > > > >  		}
+> > > > > +
+> > > > > +		if (iommu->dirty_page_tracking) {
+> > > > > +			unsigned long pgshift =
+> > > > > +					 __ffs(vfio_pgsize_bitmap(iommu));
+> > > > > +
+> > > > > +			bitmap_set(dma->bitmap,
+> > > > > +				   (vpfn->iova - dma->iova) >> pgshift, 1);
+> > > > > +		}
+> > > > >  	}
+> > > > >  
+> > > > >  	ret = i;
+> > > > > @@ -801,6 +863,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+> > > > >  	vfio_unmap_unpin(iommu, dma, true);
+> > > > >  	vfio_unlink_dma(iommu, dma);
+> > > > >  	put_task_struct(dma->task);
+> > > > > +	kfree(dma->bitmap);
+> > > > >  	kfree(dma);
+> > > > >  	iommu->dma_avail++;
+> > > > >  }
+> > > > > @@ -831,6 +894,50 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+> > > > >  	return bitmap;
+> > > > >  }
+> > > > >  
+> > > > > +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> > > > > +				  size_t size, uint64_t pgsize,
+> > > > > +				  unsigned char __user *bitmap)
+> > > > > +{
+> > > > > +	struct vfio_dma *dma;
+> > > > > +	unsigned long pgshift = __ffs(pgsize);
+> > > > > +	unsigned int npages, bitmap_size;
+> > > > > +
+> > > > > +	dma = vfio_find_dma(iommu, iova, 1);
+> > > > > +
+> > > > > +	if (!dma)
+> > > > > +		return -EINVAL;
+> > > > > +
+> > > > > +	if (dma->iova != iova || dma->size != size)
+> > > > > +		return -EINVAL;
+> > > > > +    
+> > > > looks this size is passed from user. how can it ensure size always
+> > > > equals to dma->size ?
+> > > > 
+> > > > shouldn't we iterate dma tree to look for dirty for whole range if a
+> > > > single dma cannot meet them all?  
+> > > 
+> > > Please see the discussion on v12[1], the problem is with the alignment
+> > > of DMA mapped regions versus the bitmap.  A DMA mapping only requires
+> > > page alignment, so for example imagine a user requests the bitmap from
+> > > page zero to 4GB, but we have a DMA mapping starting at 4KB.  We can't
+> > > efficiently copy the bitmap tracked by the vfio_dma structure to the
+> > > user buffer when it's shifted by 1 bit.  Adjacent mappings can also
+> > > make for a very complicated implementation.  In the discussion linked
+> > > we decided to compromise on a more simple implementation that requires
+> > > the user to ask for a bitmap which exactly matches a single DMA
+> > > mapping, which Kirti indicates is what we require to support QEMU.
+> > > Later in the series, the unmap operation also makes this requirement
+> > > when used with the flags to retrieve the dirty bitmap.  Thanks,
+> > >  
+> > 
+> > so, what about for vIOMMU enabling case?
+> > if IOVAs are mapped per page, then there's a log_sync in qemu,
+> > it's supposed for range from 0-U64MAX, qemu has to find out which
+> > ones are mapped and cut them into pages before calling this IOCTL?
+> > And what if those IOVAs are mapped for len more than one page?
+> 
+> Good question.  Kirti?
+> 
+> > > [1] https://lore.kernel.org/kvm/20200218215330.5bc8fc6a@w520.home/
+> > >    
+> > > > > +	npages = dma->size >> pgshift;
+> > > > > +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+> > > > > +
+> > > > > +	/* mark all pages dirty if all pages are pinned and mapped. */
+> > > > > +	if (dma->iommu_mapped)
+> > > > > +		bitmap_set(dma->bitmap, 0, npages);
+> > > > > +
+> > > > > +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+> > > > > +		return -EFAULT;
+> > > > > +
+Here, dma->bitmap needs to be cleared. right?
 
---Ucgz5Oc/kKURWzXs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Mar 17, 2020 at 03:49:18PM +1000, Nicholas Piggin wrote:
-> POWER9 adds scv and rfscv instructions and the system call vectored
-> interrupt. Linux does not support this instruction yet but it has
-> been tested with a modified kernel that runs on real hardware.
->=20
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-Applied to ppc-for-5.1.
-
-> ---
-> Since v2:
-> - Rebased on top of FWNMI series
->=20
->  linux-user/ppc/cpu_loop.c       |  1 +
->  target/ppc/cpu.h                |  7 ++-
->  target/ppc/excp_helper.c        | 98 ++++++++++++++++++++++++---------
->  target/ppc/helper.h             |  1 +
->  target/ppc/translate.c          | 46 +++++++++++++++-
->  target/ppc/translate_init.inc.c |  3 +-
->  6 files changed, 126 insertions(+), 30 deletions(-)
->=20
-> diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
-> index 5b27f8603e..df71e15a25 100644
-> --- a/linux-user/ppc/cpu_loop.c
-> +++ b/linux-user/ppc/cpu_loop.c
-> @@ -267,6 +267,7 @@ void cpu_loop(CPUPPCState *env)
->              queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
->              break;
->          case POWERPC_EXCP_SYSCALL:  /* System call exception            =
-     */
-> +        case POWERPC_EXCP_SYSCALL_VECTORED:
->              cpu_abort(cs, "Syscall exception while in user mode. "
->                        "Aborting\n");
->              break;
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index ed8d2015bd..992f0a49e8 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -127,8 +127,9 @@ enum {
->      POWERPC_EXCP_SDOOR_HV =3D 100,
->      /* ISA 3.00 additions */
->      POWERPC_EXCP_HVIRT    =3D 101,
-> +    POWERPC_EXCP_SYSCALL_VECTORED =3D 102, /* scv exception             =
-        */
->      /* EOL                                                              =
-     */
-> -    POWERPC_EXCP_NB       =3D 102,
-> +    POWERPC_EXCP_NB       =3D 103,
->      /* QEMU exceptions: used internally during code translation         =
-     */
->      POWERPC_EXCP_STOP         =3D 0x200, /* stop translation            =
-       */
->      POWERPC_EXCP_BRANCH       =3D 0x201, /* branch instruction          =
-       */
-> @@ -475,6 +476,7 @@ typedef struct ppc_v3_pate_t {
->  /* Facility Status and Control (FSCR) bits */
->  #define FSCR_EBB        (63 - 56) /* Event-Based Branch Facility */
->  #define FSCR_TAR        (63 - 55) /* Target Address Register */
-> +#define FSCR_SCV        (63 - 51) /* System call vectored */
->  /* Interrupt cause mask and position in FSCR. HFSCR has the same format =
-*/
->  #define FSCR_IC_MASK    (0xFFULL)
->  #define FSCR_IC_POS     (63 - 7)
-> @@ -484,6 +486,7 @@ typedef struct ppc_v3_pate_t {
->  #define FSCR_IC_TM          5
->  #define FSCR_IC_EBB         7
->  #define FSCR_IC_TAR         8
-> +#define FSCR_IC_SCV        12
-> =20
->  /* Exception state register bits definition                             =
-     */
->  #define ESR_PIL   PPC_BIT(36) /* Illegal Instruction                    =
-*/
-> @@ -551,6 +554,8 @@ enum {
->      POWERPC_FLAG_VSX      =3D 0x00080000,
->      /* Has Transaction Memory (ISA 2.07)                                =
-     */
->      POWERPC_FLAG_TM       =3D 0x00100000,
-> +    /* Has SCV (ISA 3.00)                                               =
-     */
-> +    POWERPC_FLAG_SCV      =3D 0x00200000,
->  };
-> =20
->  /***********************************************************************=
-******/
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 81ee19ebae..73b5c28d03 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -67,6 +67,18 @@ static inline void dump_syscall(CPUPPCState *env)
->                    ppc_dump_gpr(env, 8), env->nip);
->  }
-> =20
-> +static inline void dump_syscall_vectored(CPUPPCState *env)
-> +{
-> +    qemu_log_mask(CPU_LOG_INT, "syscall r0=3D%016" PRIx64
-> +                  " r3=3D%016" PRIx64 " r4=3D%016" PRIx64 " r5=3D%016" P=
-RIx64
-> +                  " r6=3D%016" PRIx64 " r7=3D%016" PRIx64 " r8=3D%016" P=
-RIx64
-> +                  " nip=3D" TARGET_FMT_lx "\n",
-> +                  ppc_dump_gpr(env, 0), ppc_dump_gpr(env, 3),
-> +                  ppc_dump_gpr(env, 4), ppc_dump_gpr(env, 5),
-> +                  ppc_dump_gpr(env, 6), ppc_dump_gpr(env, 7),
-> +                  ppc_dump_gpr(env, 8), env->nip);
-> +}
-> +
->  static inline void dump_hcall(CPUPPCState *env)
->  {
->      qemu_log_mask(CPU_LOG_INT, "hypercall r3=3D%016" PRIx64
-> @@ -185,7 +197,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
->      CPUState *cs =3D CPU(cpu);
->      CPUPPCState *env =3D &cpu->env;
->      target_ulong msr, new_msr, vector;
-> -    int srr0, srr1, asrr0, asrr1, lev, ail;
-> +    int srr0, srr1, asrr0, asrr1, lev =3D -1, ail;
->      bool lpes0;
-> =20
->      qemu_log_mask(CPU_LOG_INT, "Raise exception at " TARGET_FMT_lx
-> @@ -421,6 +433,13 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
->              new_msr |=3D (target_ulong)MSR_HVB;
->          }
->          break;
-> +    case POWERPC_EXCP_SYSCALL_VECTORED: /* scv exception                =
-     */
-> +        lev =3D env->error_code;
-> +        dump_syscall_vectored(env);
-> +        env->nip +=3D 4;
-> +        new_msr |=3D env->msr & ((target_ulong)1 << MSR_EE);
-> +        new_msr |=3D env->msr & ((target_ulong)1 << MSR_RI);
-> +        break;
->      case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception=
-     */
->      case POWERPC_EXCP_APU:       /* Auxiliary processor unavailable     =
-     */
->      case POWERPC_EXCP_DECR:      /* Decrementer exception               =
-     */
-> @@ -723,12 +742,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
->          break;
->      }
-> =20
-> -    /* Save PC */
-> -    env->spr[srr0] =3D env->nip;
-> -
-> -    /* Save MSR */
-> -    env->spr[srr1] =3D msr;
-> -
->      /* Sanity check */
->      if (!(env->msr_mask & MSR_HVB)) {
->          if (new_msr & MSR_HVB) {
-> @@ -741,14 +754,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
->          }
->      }
-> =20
-> -    /* If any alternate SRR register are defined, duplicate saved values=
- */
-> -    if (asrr0 !=3D -1) {
-> -        env->spr[asrr0] =3D env->spr[srr0];
-> -    }
-> -    if (asrr1 !=3D -1) {
-> -        env->spr[asrr1] =3D env->spr[srr1];
-> -    }
-> -
->      /*
->       * Sort out endianness of interrupt, this differs depending on the
->       * CPU, the HV mode, etc...
-> @@ -783,14 +788,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
->      }
->  #endif
-> =20
-> -    /* Jump to handler */
-> -    vector =3D env->excp_vectors[excp];
-> -    if (vector =3D=3D (target_ulong)-1ULL) {
-> -        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-> -                  excp);
-> -    }
-> -    vector |=3D env->excp_prefix;
-> -
->      /*
->       * AIL only works if there is no HV transition and we are running
->       * with translations enabled
-> @@ -799,10 +796,21 @@ static inline void powerpc_excp(PowerPCCPU *cpu, in=
-t excp_model, int excp)
->          ((new_msr & MSR_HVB) && !(msr & MSR_HVB))) {
->          ail =3D 0;
->      }
-> -    /* Handle AIL */
-> -    if (ail) {
-> -        new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
-> -        vector |=3D ppc_excp_vector_offset(cs, ail);
-> +
-> +    vector =3D env->excp_vectors[excp];
-> +    if (vector =3D=3D (target_ulong)-1ULL) {
-> +        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-> +                  excp);
-> +    }
-> +
-> +    vector |=3D env->excp_prefix;
-> +
-> +    /* If any alternate SRR register are defined, duplicate saved values=
- */
-> +    if (asrr0 !=3D -1) {
-> +        env->spr[asrr0] =3D env->nip;
-> +    }
-> +    if (asrr1 !=3D -1) {
-> +        env->spr[asrr1] =3D msr;
->      }
-> =20
->  #if defined(TARGET_PPC64)
-> @@ -822,6 +830,37 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
->      }
->  #endif
-> =20
-> +    if (excp !=3D POWERPC_EXCP_SYSCALL_VECTORED) {
-> +        /* Save PC */
-> +        env->spr[srr0] =3D env->nip;
-> +
-> +        /* Save MSR */
-> +        env->spr[srr1] =3D msr;
-> +
-> +        /* Handle AIL */
-> +        if (ail) {
-> +            new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
-> +            vector |=3D ppc_excp_vector_offset(cs, ail);
-> +        }
-> +
-> +#if defined(TARGET_PPC64)
-> +    } else {
-> +        /* scv AIL is a little different */
-> +        if (ail) {
-> +            new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
-> +        }
-> +        if (ail =3D=3D AIL_C000_0000_0000_4000) {
-> +            vector |=3D 0xc000000000003000ull;
-> +        } else {
-> +            vector |=3D 0x0000000000017000ull;
-> +        }
-> +        vector +=3D lev * 0x20;
-> +
-> +        env->lr =3D env->nip;
-> +        env->ctr =3D msr;
-> +#endif
-> +    }
-> +
->      powerpc_set_excp_state(cpu, vector, new_msr);
->  }
-> =20
-> @@ -1162,6 +1201,11 @@ void helper_rfid(CPUPPCState *env)
->      do_rfi(env, env->spr[SPR_SRR0], env->spr[SPR_SRR1]);
->  }
-> =20
-> +void helper_rfscv(CPUPPCState *env)
-> +{
-> +    do_rfi(env, env->lr, env->ctr);
-> +}
-> +
->  void helper_hrfid(CPUPPCState *env)
->  {
->      do_rfi(env, env->spr[SPR_HSRR0], env->spr[SPR_HSRR1]);
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index cfb4c07085..ee1498050d 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -15,6 +15,7 @@ DEF_HELPER_1(rfmci, void, env)
->  #if defined(TARGET_PPC64)
->  DEF_HELPER_2(pminsn, void, env, i32)
->  DEF_HELPER_1(rfid, void, env)
-> +DEF_HELPER_1(rfscv, void, env)
->  DEF_HELPER_1(hrfid, void, env)
->  DEF_HELPER_2(store_lpcr, void, env, tl)
->  DEF_HELPER_2(store_pcr, void, env, tl)
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 127c82a24e..eb0ddba850 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -173,6 +173,7 @@ struct DisasContext {
->      bool vsx_enabled;
->      bool spe_enabled;
->      bool tm_enabled;
-> +    bool scv_enabled;
->      bool gtse;
->      ppc_spr_t *spr_cb; /* Needed to check rights for mfspr/mtspr */
->      int singlestep_enabled;
-> @@ -4012,6 +4013,22 @@ static void gen_rfid(DisasContext *ctx)
->  #endif
->  }
-> =20
-> +static void gen_rfscv(DisasContext *ctx)
-> +{
-> +#if defined(CONFIG_USER_ONLY)
-> +    GEN_PRIV;
-> +#else
-> +    /* Restore CPU state */
-> +    CHK_SV;
-> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> +        gen_io_start();
-> +    }
-> +    gen_update_cfar(ctx, ctx->base.pc_next - 4);
-> +    gen_helper_rfscv(cpu_env);
-> +    gen_sync_exception(ctx);
-> +#endif
-> +}
-> +
->  static void gen_hrfid(DisasContext *ctx)
->  {
->  #if defined(CONFIG_USER_ONLY)
-> @@ -4030,6 +4047,7 @@ static void gen_hrfid(DisasContext *ctx)
->  #define POWERPC_SYSCALL POWERPC_EXCP_SYSCALL_USER
->  #else
->  #define POWERPC_SYSCALL POWERPC_EXCP_SYSCALL
-> +#define POWERPC_SYSCALL_VECTORED POWERPC_EXCP_SYSCALL_VECTORED
->  #endif
->  static void gen_sc(DisasContext *ctx)
->  {
-> @@ -4039,6 +4057,21 @@ static void gen_sc(DisasContext *ctx)
->      gen_exception_err(ctx, POWERPC_SYSCALL, lev);
->  }
-> =20
-> +#if defined(TARGET_PPC64)
-> +static void gen_scv(DisasContext *ctx)
-> +{
-> +    uint32_t lev;
-> +
-> +    if (unlikely(!ctx->scv_enabled)) {
-> +        gen_exception_err(ctx, POWERPC_EXCP_FU, FSCR_IC_SCV);
-> +        return;
-> +    }
-> +
-> +    lev =3D (ctx->opcode >> 5) & 0x7F;
-> +    gen_exception_err(ctx, POWERPC_SYSCALL_VECTORED, lev);
-> +}
-> +#endif
-> +
->  /***                                Trap                                =
-   ***/
-> =20
->  /* Check for unconditional traps (always or never) */
-> @@ -7019,6 +7052,10 @@ GEN_HANDLER(mcrf, 0x13, 0x00, 0xFF, 0x00000001, PP=
-C_INTEGER),
->  GEN_HANDLER(rfi, 0x13, 0x12, 0x01, 0x03FF8001, PPC_FLOW),
->  #if defined(TARGET_PPC64)
->  GEN_HANDLER(rfid, 0x13, 0x12, 0x00, 0x03FF8001, PPC_64B),
-> +/* Top bit of opc2 corresponds with low bit of LEV, so use two handlers =
-*/
-> +GEN_HANDLER_E(scv, 0x11, 0x10, 0xFF, 0x03FFF01E, PPC_NONE, PPC2_ISA300),
-> +GEN_HANDLER_E(scv, 0x11, 0x00, 0xFF, 0x03FFF01E, PPC_NONE, PPC2_ISA300),
-> +GEN_HANDLER_E(rfscv, 0x13, 0x12, 0x02, 0x03FF8001, PPC_NONE, PPC2_ISA300=
-),
->  GEN_HANDLER_E(stop, 0x13, 0x12, 0x0b, 0x03FFF801, PPC_NONE, PPC2_ISA300),
->  GEN_HANDLER_E(doze, 0x13, 0x12, 0x0c, 0x03FFF801, PPC_NONE, PPC2_PM_ISA2=
-06),
->  GEN_HANDLER_E(nap, 0x13, 0x12, 0x0d, 0x03FFF801, PPC_NONE, PPC2_PM_ISA20=
-6),
-> @@ -7026,7 +7063,9 @@ GEN_HANDLER_E(sleep, 0x13, 0x12, 0x0e, 0x03FFF801, =
-PPC_NONE, PPC2_PM_ISA206),
->  GEN_HANDLER_E(rvwinkle, 0x13, 0x12, 0x0f, 0x03FFF801, PPC_NONE, PPC2_PM_=
-ISA206),
->  GEN_HANDLER(hrfid, 0x13, 0x12, 0x08, 0x03FF8001, PPC_64H),
->  #endif
-> -GEN_HANDLER(sc, 0x11, 0xFF, 0xFF, 0x03FFF01D, PPC_FLOW),
-> +/* Top bit of opc2 corresponds with low bit of LEV, so use two handlers =
-*/
-> +GEN_HANDLER(sc, 0x11, 0x11, 0xFF, 0x03FFF01D, PPC_FLOW),
-> +GEN_HANDLER(sc, 0x11, 0x01, 0xFF, 0x03FFF01D, PPC_FLOW),
->  GEN_HANDLER(tw, 0x1F, 0x04, 0x00, 0x00000001, PPC_FLOW),
->  GEN_HANDLER(twi, 0x03, 0xFF, 0xFF, 0x00000000, PPC_FLOW),
->  #if defined(TARGET_PPC64)
-> @@ -7805,6 +7844,11 @@ static void ppc_tr_init_disas_context(DisasContext=
-Base *dcbase, CPUState *cs)
->      } else {
->          ctx->vsx_enabled =3D false;
->      }
-> +    if ((env->flags & POWERPC_FLAG_SCV) && (env->spr[SPR_FSCR] & (1ull <=
-< FSCR_SCV))) {
-> +        ctx->scv_enabled =3D true;
-> +    } else {
-> +        ctx->scv_enabled =3D false;
-> +    }
->  #if defined(TARGET_PPC64)
->      if ((env->flags & POWERPC_FLAG_TM) && msr_tm) {
->          ctx->tm_enabled =3D !!msr_tm;
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index 0ae145e18d..15025cd5ea 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -3382,6 +3382,7 @@ static void init_excp_POWER9(CPUPPCState *env)
-> =20
->  #if !defined(CONFIG_USER_ONLY)
->      env->excp_vectors[POWERPC_EXCP_HVIRT]    =3D 0x00000EA0;
-> +    env->excp_vectors[POWERPC_EXCP_SYSCALL_VECTORED] =3D 0x00000000;
->  #endif
->  }
-> =20
-> @@ -9030,7 +9031,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->      pcc->flags =3D POWERPC_FLAG_VRE | POWERPC_FLAG_SE |
->                   POWERPC_FLAG_BE | POWERPC_FLAG_PMM |
->                   POWERPC_FLAG_BUS_CLK | POWERPC_FLAG_CFAR |
-> -                 POWERPC_FLAG_VSX | POWERPC_FLAG_TM;
-> +                 POWERPC_FLAG_VSX | POWERPC_FLAG_TM | POWERPC_FLAG_SCV;
->      pcc->l1_dcache_size =3D 0x8000;
->      pcc->l1_icache_size =3D 0x8000;
->      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Ucgz5Oc/kKURWzXs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5zD6oACgkQbDjKyiDZ
-s5K81w//ecS2+owNu7drMx2d1RAEb6tSfiMnfHOpXQspROhD0qr53rEFZup47v32
-224WslgwHxQ7L+kMph7WxTUxX+qX3ArurqSmJbXNXagHHpmuZtaoVYpVaBeaIrll
-h+O5HKe2IIUjjc8iOYnDWDLQafJtRR78VQuzr2oBIV8rdlZL/lt0X1bLpYdihNMt
-t/eiQkcKUn55FggvscKvIlxfooypCvvyrjzxWCPqI7CoUWzf+Uw1E5oEeXkgVjbX
-gU3myp2qz5pJM5y5tBhs1ZcCvn1B50iE6cstfDTktd9/Nmr6YifkbeGZksIc6bEO
-BSYm7oJIXp4+2SjgIADqwgciRBfpYmsEIsbSn+EfFUNJSHzPLiHEaiJw4qRNFet1
-j7OoWhcdZjc93aBDzkn+odcY+4GR3LIX+S8tRe211enmXJL5h7z1k/xUM72ua2LG
-6ddvVbTb9ykC2O9DmTX2N0IJE4Uqj9Ul95jhSF5bv8+EmmTy62GFOTd2QgjpmhXw
-ZJpv0bzuXRHdQjDbizXYyHSvfv/YOyIbWQor1g6rSgEtE40fskQdt+OYjahrmq1/
-P3b5V45yIbDOsRKAekt1BgJ2cIo4mhnHnrwIbxqpwuo5nLysif/fSMZZVjK9YntR
-R3dx1RKdl6DCBqVIcmLztxxYDS8kBnZXS4wSanzvAzqNMpDUurY=
-=2WER
------END PGP SIGNATURE-----
-
---Ucgz5Oc/kKURWzXs--
+> > > > > +	return 0;
+> > > > > +}
+> > > > > +
+> > > > > +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> > > > > +{
+> > > > > +	uint64_t bsize;
+> > > > > +
+> > > > > +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
+> > > > > +		return -EINVAL;
+> > > > > +
+> > > > > +	bsize = DIRTY_BITMAP_BYTES(npages);
+> > > > > +
+> > > > > +	if (bitmap_size < bsize)
+> > > > > +		return -EINVAL;
+> > > > > +
+> > > > > +	return 0;
+> > > > > +}
+> > > > > +
+> > > > >  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> > > > >  			     struct vfio_iommu_type1_dma_unmap *unmap)
+> > > > >  {
+> > > > > @@ -2278,6 +2385,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> > > > >  
+> > > > >  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> > > > >  			-EFAULT : 0;
+> > > > > +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> > > > > +		struct vfio_iommu_type1_dirty_bitmap dirty;
+> > > > > +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> > > > > +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> > > > > +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> > > > > +		int ret = 0;
+> > > > > +
+> > > > > +		if (!iommu->v2)
+> > > > > +			return -EACCES;
+> > > > > +
+> > > > > +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> > > > > +				    flags);
+> > > > > +
+> > > > > +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
+> > > > > +			return -EFAULT;
+> > > > > +
+> > > > > +		if (dirty.argsz < minsz || dirty.flags & ~mask)
+> > > > > +			return -EINVAL;
+> > > > > +
+> > > > > +		/* only one flag should be set at a time */
+> > > > > +		if (__ffs(dirty.flags) != __fls(dirty.flags))
+> > > > > +			return -EINVAL;
+> > > > > +
+> > > > > +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> > > > > +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
+> > > > > +
+> > > > > +			mutex_lock(&iommu->lock);
+> > > > > +			if (!iommu->dirty_page_tracking) {
+> > > > > +				ret = vfio_dma_bitmap_alloc(iommu, pgsize);
+> > > > > +				if (!ret)
+> > > > > +					iommu->dirty_page_tracking = true;
+> > > > > +			}
+> > > > > +			mutex_unlock(&iommu->lock);
+> > > > > +			return ret;
+> > > > > +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> > > > > +			mutex_lock(&iommu->lock);
+> > > > > +			if (iommu->dirty_page_tracking) {
+> > > > > +				iommu->dirty_page_tracking = false;
+> > > > > +				vfio_dma_bitmap_free(iommu);
+> > > > > +			}
+> > > > > +			mutex_unlock(&iommu->lock);
+> > > > > +			return 0;
+> > > > > +		} else if (dirty.flags &
+> > > > > +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> > > > > +			struct vfio_iommu_type1_dirty_bitmap_get range;
+> > > > > +			unsigned long pgshift;
+> > > > > +			size_t data_size = dirty.argsz - minsz;
+> > > > > +			uint64_t iommu_pgsize =
+> > > > > +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
+> > > > > +
+> > > > > +			if (!data_size || data_size < sizeof(range))
+> > > > > +				return -EINVAL;
+> > > > > +
+> > > > > +			if (copy_from_user(&range, (void __user *)(arg + minsz),
+> > > > > +					   sizeof(range)))
+> > > > > +				return -EFAULT;
+> > > > > +
+> > > > > +			/* allow only min supported pgsize */
+> > > > > +			if (range.bitmap.pgsize != iommu_pgsize)
+> > > > > +				return -EINVAL;
+> > > > > +			if (range.iova & (iommu_pgsize - 1))
+> > > > > +				return -EINVAL;
+> > > > > +			if (!range.size || range.size & (iommu_pgsize - 1))
+> > > > > +				return -EINVAL;
+> > > > > +			if (range.iova + range.size < range.iova)
+> > > > > +				return -EINVAL;
+> > > > > +			if (!access_ok((void __user *)range.bitmap.data,
+> > > > > +				       range.bitmap.size))
+> > > > > +				return -EINVAL;
+> > > > > +
+> > > > > +			pgshift = __ffs(range.bitmap.pgsize);
+> > > > > +			ret = verify_bitmap_size(range.size >> pgshift,
+> > > > > +						 range.bitmap.size);
+> > > > > +			if (ret)
+> > > > > +				return ret;
+> > > > > +
+> > > > > +			mutex_lock(&iommu->lock);
+> > > > > +			if (iommu->dirty_page_tracking)
+> > > > > +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
+> > > > > +					 range.size, range.bitmap.pgsize,
+> > > > > +				    (unsigned char __user *)range.bitmap.data);
+> > > > > +			else
+> > > > > +				ret = -EINVAL;
+> > > > > +			mutex_unlock(&iommu->lock);
+> > > > > +
+> > > > > +			return ret;
+> > > > > +		}
+> > > > >  	}
+> > > > >  
+> > > > >  	return -ENOTTY;
+> > > > > @@ -2345,10 +2539,17 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+> > > > >  
+> > > > >  	vaddr = dma->vaddr + offset;
+> > > > >  
+> > > > > -	if (write)
+> > > > > +	if (write) {
+> > > > >  		*copied = __copy_to_user((void __user *)vaddr, data,
+> > > > >  					 count) ? 0 : count;
+> > > > > -	else
+> > > > > +		if (*copied && iommu->dirty_page_tracking) {
+> > > > > +			unsigned long pgshift =
+> > > > > +				__ffs(vfio_pgsize_bitmap(iommu));
+> > > > > +
+> > > > > +			bitmap_set(dma->bitmap, offset >> pgshift,
+> > > > > +				   *copied >> pgshift);
+> > > > > +		}
+> > > > > +	} else
+> > > > >  		*copied = __copy_from_user(data, (void __user *)vaddr,
+> > > > >  					   count) ? 0 : count;
+> > > > >  	if (kthread)
+> > > > > -- 
+> > > > > 2.7.0
+> > > > >     
+> > > >   
+> > >   
+> > 
+> 
 
