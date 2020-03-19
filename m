@@ -2,65 +2,69 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F226C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 17:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166BBC4332E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 17:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C58A20836
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 17:43:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D940320870
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 17:44:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cUKIXN7q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C58A20836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rby+RffM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D940320870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEzD0-0003tT-CX
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 13:43:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37400)
+	id 1jEzDg-0004mW-WD
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 13:44:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ppandit@redhat.com>) id 1jEzCM-0003LT-Hx
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:43:15 -0400
+ (envelope-from <ppandit@redhat.com>) id 1jEzCv-0003xX-JJ
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:43:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ppandit@redhat.com>) id 1jEzCK-0005m5-K4
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:43:13 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35430)
+ (envelope-from <ppandit@redhat.com>) id 1jEzCu-0006UZ-CE
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:43:49 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:34942)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1jEzCK-0005k0-Cv
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:43:12 -0400
+ (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1jEzCu-0006UD-8D
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 13:43:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584639791;
+ s=mimecast20190719; t=1584639827;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=9z4Pi/w0eP4VUVYwSxXmrnzcdpv450A0YeLSN8DY6As=;
- b=cUKIXN7qE3mH3jiE42FMua4SHLEwWjrq8lrbj8n2NkCICR7wVrD3P+n7LyX8Ii8BS3dYIR
- U+x0EBguR4dRHR+IbnsvRBMrnu1VuTEWxxQ8Bez253d61CXev+vXvtFc4N21r2rGz8vn9/
- PImkmig1T7sw9q/XunlOimVjQyt4E2g=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4HbV0cQ9P9Xo7EHZ8Az+BhnhBarlR3zlQZ8FTdALk2k=;
+ b=Rby+RffMmZuKVRh3iWQfZpFTvx0VLPBhCIbP8XIbb/dxjyL+Brx5EglpwbZOqGy6w5XJAE
+ o4YAhC6da9NBBIELmF2n+m5MYqtnXKMPveFX6e63u9nzgrzoOsfdmFk0K/+3YIQWtMPHex
+ nXoapNPe2RCXWkYYyGPu7pXUMmKnyXU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-2gASiEsEOkyVke0ezUU-mQ-1; Thu, 19 Mar 2020 13:43:07 -0400
-X-MC-Unique: 2gASiEsEOkyVke0ezUU-mQ-1
+ us-mta-306-HasEiZ25PT2_iWJlodoXig-1; Thu, 19 Mar 2020 13:43:43 -0400
+X-MC-Unique: HasEiZ25PT2_iWJlodoXig-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4DD4800D53;
- Thu, 19 Mar 2020 17:43:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA789800D5B;
+ Thu, 19 Mar 2020 17:43:42 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 181BD19C58;
- Thu, 19 Mar 2020 17:42:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A029B21ECB;
+ Thu, 19 Mar 2020 17:43:27 +0000 (UTC)
 From: P J P <ppandit@redhat.com>
 To: Jason Wang <jasowang@redhat.com>
-Subject: [PATCH v5 0/3] net: tulip: add checks to avoid OOB access
-Date: Thu, 19 Mar 2020 23:10:47 +0530
-Message-Id: <20200319174050.759794-1-ppandit@redhat.com>
+Subject: [PATCH v5 2/3] net: tulip: add .can_receive routine
+Date: Thu, 19 Mar 2020 23:10:49 +0530
+Message-Id: <20200319174050.759794-3-ppandit@redhat.com>
+In-Reply-To: <20200319174050.759794-1-ppandit@redhat.com>
+References: <20200319174050.759794-1-ppandit@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
@@ -91,36 +95,64 @@ Sender: "Qemu-devel"
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
+Define .can_receive routine to do sanity checks before receiving
+packet data.
 
-* This series adds checks to avoid potential OOB access and infinite loop
-  issues while processing rx/tx data.
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/net/tulip.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-* Tulip tx descriptors are capped at 128 to avoid infinite loop in
-  tulip_xmit_list_update(), wrt Tulip kernel driver
-  -> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
-e/drivers/net/ethernet/dec/tulip/tulip.h#n319
-
-* Update v3: add .can_receive routine
+Update v3: define .can_receive routine
   -> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg06275.html
 
-* Update v4: flush queued packets once they are received
-  -> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg05868.html
-
-* Update v5: fixed a typo in patch commit message
+Update v5: fix a typo in commit log message
   -> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg06209.html
 
-Thank you.
---
-Prasad J Pandit (3):
-  net: tulip: check frame size and r/w data length
-  net: tulip: add .can_receive routine
-  net: tulip: flush queued packets post receive
-
- hw/net/tulip.c | 51 +++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 42 insertions(+), 9 deletions(-)
-
---
+diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+index fbe40095da..757f12c710 100644
+--- a/hw/net/tulip.c
++++ b/hw/net/tulip.c
+@@ -229,6 +229,18 @@ static bool tulip_filter_address(TULIPState *s, const =
+uint8_t *addr)
+     return ret;
+ }
+=20
++static int
++tulip_can_receive(NetClientState *nc)
++{
++    TULIPState *s =3D qemu_get_nic_opaque(nc);
++
++    if (s->rx_frame_len || tulip_rx_stopped(s)) {
++        return false;
++    }
++
++    return true;
++}
++
+ static ssize_t tulip_receive(TULIPState *s, const uint8_t *buf, size_t siz=
+e)
+ {
+     struct tulip_descriptor desc;
+@@ -236,7 +248,7 @@ static ssize_t tulip_receive(TULIPState *s, const uint8=
+_t *buf, size_t size)
+     trace_tulip_receive(buf, size);
+=20
+     if (size < 14 || size > sizeof(s->rx_frame) - 4
+-        || s->rx_frame_len || tulip_rx_stopped(s)) {
++        || !tulip_can_receive(s->nic->ncs)) {
+         return 0;
+     }
+=20
+@@ -288,6 +300,7 @@ static NetClientInfo net_tulip_info =3D {
+     .type =3D NET_CLIENT_DRIVER_NIC,
+     .size =3D sizeof(NICState),
+     .receive =3D tulip_receive_nc,
++    .can_receive =3D tulip_can_receive,
+ };
+=20
+ static const char *tulip_reg_name(const hwaddr addr)
+--=20
 2.25.1
 
 
