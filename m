@@ -2,86 +2,79 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B0BC4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41F6C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:32:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C9EF20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:26:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFD8B20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:32:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ceHPQzEf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C9EF20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xIAO7K8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFD8B20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42631 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jF1kJ-0003tw-5V
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:26:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37719)
+	id 1jF1pm-0005KO-TB
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:32:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38655)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jF1jN-0003Cv-Tw
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:25:31 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jF1p1-0004sW-Uj
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jF1jK-0000Td-U6
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:25:29 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:9024)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jF1jJ-0000GG-50
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:25:26 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e73d5260000>; Thu, 19 Mar 2020 13:25:10 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 19 Mar 2020 13:25:23 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 19 Mar 2020 13:25:23 -0700
-Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
- 2020 20:25:14 +0000
-Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
- <20200318214500.1a0cb985@w520.home>
- <e0070cf4-af58-2906-b427-0888ecb89538@nvidia.com>
- <20200319102238.77686a08@w520.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <8e537411-b60e-cc45-498c-5e516382206e@nvidia.com>
-Date: Fri, 20 Mar 2020 01:55:10 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <peter.maydell@linaro.org>) id 1jF1oz-0000mq-Op
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:31:19 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33567)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jF1oz-0000m0-J2
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:31:17 -0400
+Received: by mail-ot1-x342.google.com with SMTP id x26so3871162otk.0
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 13:31:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=o8Sdb2pg3BbCtB8ahXdMacI1iJETA+ZgJ5S9p4eJANU=;
+ b=xIAO7K8rmHoCQKiNcLE9iD08HyOBu9a1jQD1lHKG+pU+Yc1yRaXjZ9VKsd8ejaqRc1
+ Hb+VCe6/RPsbqjzHkNRRZPJMo98T5xBM5RfbNVwGa99LiTAqrWV5KSMxyjoZTsXuJLks
+ 4d1oaY1+lUCk125latSpzk851azdtMx+eKSFMnZL9IDPxAPL6FdhRGJKLl7l4niZk9Du
+ wMMt8Ja2sEjIAMZK/QeiuIFd/A4Yz2PO6WcJzLNNRc3OpBm3bz79xLFMvXWS6kqzeZ1Y
+ CxMcevj5H3OC7v9PFg3qocQDoeBApH9az4Fpf1aANTh/8m7Z9Mon6JeIw0+wrngvyUp1
+ kKUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=o8Sdb2pg3BbCtB8ahXdMacI1iJETA+ZgJ5S9p4eJANU=;
+ b=hEkrWnBvh0Wp8NtrmF1xOHjvE4S2XVFu6z/YPOJ7cz6Ra4pe4+ovtZulthHViPLk6i
+ +8paG83DmtW/wgHf5roqpcvkFEukY3FpuFi28xmYkyDtmmamWFxJnj1vYFeK021iTUEW
+ 7Ir/xP0O/gef0QxSES0394EPfNxZQl6I/FI3jIyJsTOwwMMgUaIIrpodGg4C2yaHYeJo
+ 3SfezkjP00YlJU8nHITffj9zdGpSYW6Ny8nc8W5gXRtAXOT0eK3ayiPDBDHvFOv0wvL2
+ cxme5Im+UZ4AL0ic5jZkjnynSM9iKhCp4bwo3Q8mdm5v43xntF1m7mfheLe1/1xwnXrx
+ B9mw==
+X-Gm-Message-State: ANhLgQ29N9luoENuPky9vsBzpvIbBA/ANHTbBhlmRBcZnLDxAOSAsxIe
+ BIM/Zom82xLldcasVprTtSDXNXUU+gnR4sSluuE1IQ==
+X-Google-Smtp-Source: ADFU+vuFLnyuZjoqy/8S5ol6Wz5jeL3AZbBoycyG7euk0Pm2bg1G1ev58Bwbaf3LgG0P8vQ98P5hE48zakCJGowP4PA=
+X-Received: by 2002:a9d:19ca:: with SMTP id k68mr3965384otk.232.1584649876390; 
+ Thu, 19 Mar 2020 13:31:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200319102238.77686a08@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1584649510; bh=x7i8QtLfAseF52v4fyGyBaaNiiKUfP8Yw3d6ILWuXNA=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=ceHPQzEf0GB16z5/jaC/mJzemnbL0F6IBcSzY2P/hXjR7AhKY3HAJ/Vju57U7NIqR
- +F0DLxcSASh5BHLKrbj/tr9N5WunMK9/7Ey3SfW7WeAF0RmEz09eLEZPXdkhQIrRkP
- iOZ+pjJvn0WPjWSt+SC1J4thsZNFSA5iPXWe+/DiSU9d32zBJ0iB3EdTXraFObvibN
- bSGqMMHxGtSlTniJaQG8ce6/L0BSPJ6v2U3wyxI953gC2Dr/ixaqGwdPKpLiheY0d3
- n6jYRDRwxwI66ED4vj7jeS0EhzJdTqXl0slf9wS5Gd/If1XkrH/arjaQEpj/nGVJfB
- qv+X9SPuunQ8A==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.65
+References: <20200310150947.3510824-1-borntraeger@de.ibm.com>
+ <20200310150947.3510824-4-borntraeger@de.ibm.com>
+In-Reply-To: <20200310150947.3510824-4-borntraeger@de.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Mar 2020 20:31:05 +0000
+Message-ID: <CAFEAcA93+BC_N28fCRwPc8YNGW_UhSOE+=A+0Qo3bB9x8zO9qQ@mail.gmail.com>
+Subject: Re: [PULL 3/4] s390/ipl: sync back loadparm
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,102 +86,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Marc Hartmayer <mhartmay@linux.ibm.com>,
+ Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 10 Mar 2020 at 15:09, Christian Borntraeger
+<borntraeger@de.ibm.com> wrote:
+>
+> From: Halil Pasic <pasic@linux.ibm.com>
+>
+> We expose loadparm as a r/w machine property, but if loadparm is set by
+> the guest via DIAG 308, we don't update the property. Having a
+> disconnect between the guest view and the QEMU property is not nice in
+> itself, but things get even worse for SCSI, where under certain
+> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
+> expected" for details) we call s390_gen_initial_iplb() on resets
+> effectively overwriting the guest/user supplied loadparm with the stale
+> value.
 
+Hi; Coverity points out (CID 1421966) that you have a buffer overrun here:
 
-On 3/19/2020 9:52 PM, Alex Williamson wrote:
-> On Thu, 19 Mar 2020 20:22:41 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> On 3/19/2020 9:15 AM, Alex Williamson wrote:
->>> On Thu, 19 Mar 2020 01:11:11 +0530
->>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>    
+> +static void update_machine_ipl_properties(IplParameterBlock *iplb)
+> +{
+> +    Object *machine = qdev_get_machine();
+> +    Error *err = NULL;
+> +
+> +    /* Sync loadparm */
+> +    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
+> +        uint8_t *ebcdic_loadparm = iplb->loadparm;
+> +        char ascii_loadparm[8];
 
-<snip>
+This array is 8 bytes...
 
->>>> +
->>>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
->>>> +{
->>>> +	uint64_t bsize;
->>>> +
->>>> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
->>>
->>> As commented previously, how do we derive this UINT_MAX limitation?
->>>    
->>
->> Sorry, I missed that earlier
->>
->>   > UINT_MAX seems arbitrary, is this specified in our API?  The size of a
->>   > vfio_dma is limited to what the user is able to pin, and therefore
->>   > their locked memory limit, but do we have an explicit limit elsewhere
->>   > that results in this limit here.  I think a 4GB bitmap would track
->>   > something like 2^47 bytes of memory, that's pretty excessive, but still
->>   > an arbitrary limit.
->>
->> There has to be some upper limit check. In core KVM, in
->> virt/kvm/kvm_main.c there is max number of pages check:
->>
->> if (new.npages > KVM_MEM_MAX_NR_PAGES)
->>
->> Where
->> /*
->>    * Some of the bitops functions do not support too long bitmaps.
->>    * This number must be determined not to exceed such limits.
->>    */
->> #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
->>
->> Though I don't know which bitops functions do not support long bitmaps.
->>
->> Something similar as above can be done or same as you also mentioned of
->> 4GB bitmap limit? that is U32_MAX instead of UINT_MAX?
-> 
-> Let's see, we use bitmap_set():
-> 
-> void bitmap_set(unsigned long *map, unsigned int start, unsigned int nbits)
-> 
-> So we're limited to an unsigned int number of bits, but for an
-> unaligned, multi-bit operation this will call __bitmap_set():
-> 
-> void __bitmap_set(unsigned long *map, unsigned int start, int len)
-> 
-> So we're down to a signed int number of bits (seems like an API bug in
-> bitops there), so it makes sense that KVM is testing against MAX_INT
-> number of pages, ie. number of bits.  But that still suggests a bitmap
-> size of MAX_UINT is off by a factor of 16.  So we can have 2^31 bits
-> divided by 2^3 bits/byte yields a maximum bitmap size of 2^28 (ie.
-> 256MB), which maps 2^31 * 2^12 = 2^43 (8TB) on a 4K system.
-> 
-> Let's fix the limit check and put a nice comment explaining it.  Thanks,
-> 
+> +        int i;
+> +
+> +        for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
+> +            ascii_loadparm[i] = ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
+> +        }
+> +        ascii_loadparm[i] = 0;
 
-Agreed. Adding DIRTY_BITMAP_SIZE_MAX macro and comment as below.
+...but you can write 9 bytes into it (8 from the guest-controlled
+iplb_loadparm buffer plus one for the trailing NUL).
 
-/*
-  * Input argument of number of bits to bitmap_set() is unsigned 
-integer, which
-  * further casts to signed integer for unaligned multi-bit operation,
-  * __bitmap_set().
-  * Then maximum bitmap size supported is 2^31 bits divided by 2^3 
-bits/byte,
-  * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-  * system.
-  */
-#define DIRTY_BITMAP_PAGES_MAX  ((1UL << 31) - 1)
-#define DIRTY_BITMAP_SIZE_MAX 	\
-			DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+> +        object_property_set_str(machine, ascii_loadparm, "loadparm", &err);
+> +    } else {
+> +        object_property_set_str(machine, "", "loadparm", &err);
+> +    }
+> +    if (err) {
+> +        warn_report_err(err);
+> +    }
+> +}
 
-
-Thanks,
-Kirti
+thanks
+-- PMM
 
