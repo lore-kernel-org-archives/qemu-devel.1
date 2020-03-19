@@ -2,82 +2,72 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 023F8C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1749C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:06:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD2432072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:06:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c50jPleC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD2432072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 870152072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 08:06:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870152072C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEqCJ-0001FQ-Ua
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 04:06:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39710)
+	id 1jEqCd-0001u6-Mi
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 04:06:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40947)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jEq7Y-0001gv-Ip
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:41 -0400
+ (envelope-from <bounces@canonical.com>) id 1jEqBd-0000Oq-7t
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jEq7X-0005QB-Ei
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:40 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:51337)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jEq7X-0005Nl-AE
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:01:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584604899;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hSzTUuBVSD20JGOao/BrW7RhITmYyNs/OHVV6V5t7OQ=;
- b=c50jPleCtEDhXN1/dqtFHcy7L7yISMY2XLJvtKDqDUffyCDZg11qZx2QvNFYLD0rrHodmc
- zsw6VWR/HZuSz5n8n8/v7UWeuSeMHf8ZIM5P2gL3gbWHaWPj+eW+Sd6D729i/D9N2tarCD
- vs2ZIXjWmQAWKGQXWmnBOpaUVhbjUJ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-urE79ladNLuwxfbR1uXmUw-1; Thu, 19 Mar 2020 04:01:36 -0400
-X-MC-Unique: urE79ladNLuwxfbR1uXmUw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83E6713EA;
- Thu, 19 Mar 2020 08:01:35 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-49.ams2.redhat.com
- [10.36.112.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8B2AB196AE;
- Thu, 19 Mar 2020 08:01:28 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 1167B3EC02; Thu, 19 Mar 2020 09:01:18 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 10/13] microvm/acpi: add rtc
-Date: Thu, 19 Mar 2020 09:01:14 +0100
-Message-Id: <20200319080117.7725-11-kraxel@redhat.com>
-In-Reply-To: <20200319080117.7725-1-kraxel@redhat.com>
-References: <20200319080117.7725-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <bounces@canonical.com>) id 1jEqBb-0004if-QP
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:05:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34506)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jEqBa-0004gb-T9
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 04:05:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jEqBZ-0005Ek-Ch
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:05:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5DF132E80C3
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 08:05:49 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Mar 2020 07:52:02 -0000
+From: Dongwhan Kim <1868055@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: eastson83
+X-Launchpad-Bug-Reporter: Dongwhan Kim (eastson83)
+X-Launchpad-Bug-Modifier: Dongwhan Kim (eastson83)
+Message-Id: <158460432256.11238.315491712700748145.malonedeb@soybean.canonical.com>
+Subject: [Bug 1868055] [NEW] cannot run golang app with docker,
+ version 17.09.1-ce, disabling core 0 and qemu-arm, version 2.7.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 6ce65e275262c616683a65c8cc56dc78a36ef6db
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,76 +76,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1868055 <1868055@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/hw/i386/microvm.h | 3 +++
- hw/i386/acpi-build.c      | 3 +++
- hw/i386/microvm.c         | 5 ++---
- 3 files changed, 8 insertions(+), 3 deletions(-)
+Public bug reported:
 
-diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
-index da2852a70195..53b2457db752 100644
---- a/include/hw/i386/microvm.h
-+++ b/include/hw/i386/microvm.h
-@@ -57,6 +57,9 @@ typedef struct {
-     bool option_roms;
-     bool auto_kernel_cmdline;
-=20
-+    /* built-in devices */
-+    ISADevice *rtc_state;
-+
-     /* Machine state */
-     bool kernel_cmdline_fixed;
-     Notifier machine_done;
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 80844db24d6b..928e0ee2deeb 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2815,6 +2815,9 @@ build_dsdt_microvm(GArray *table_data, BIOSLinker *li=
-nker,
-     build_dbg_aml(dsdt);
-=20
-     sb_scope =3D aml_scope("_SB");
-+    if (mms->rtc_state) {
-+        aml_append(sb_scope, build_rtc_device_aml());
-+    }
-     acpi_dsdt_add_fw_cfg(sb_scope, OBJECT(x86ms->fw_cfg));
-     acpi_dsdt_add_virtio(sb_scope);
-     aml_append(dsdt, sb_scope);
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index fd753764fc10..748f9826fb0e 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -101,7 +101,6 @@ static void microvm_devices_init(MicrovmMachineState *m=
-ms)
- {
-     X86MachineState *x86ms =3D X86_MACHINE(mms);
-     ISABus *isa_bus;
--    ISADevice *rtc_state;
-     GSIState *gsi_state;
-     int i;
-=20
-@@ -155,8 +154,8 @@ static void microvm_devices_init(MicrovmMachineState *m=
-ms)
-=20
-     if (mms->rtc =3D=3D ON_OFF_AUTO_ON ||
-         (mms->rtc =3D=3D ON_OFF_AUTO_AUTO && !kvm_enabled())) {
--        rtc_state =3D mc146818_rtc_init(isa_bus, 2000, NULL);
--        microvm_set_rtc(mms, rtc_state);
-+        mms->rtc_state =3D mc146818_rtc_init(isa_bus, 2000, NULL);
-+        microvm_set_rtc(mms, mms->rtc_state);
-     }
-=20
-     if (mms->isa_serial) {
---=20
-2.18.2
+Hello!
+I figure out that sometimes simple go application is not working.
+I am using docker + qemu-arm + go( for armv7l).
 
+These are version info below.
+
+root@VDBS1535:~# docker -v
+Docker version 17.09.1-ce, build 19e2cf6
+
+bash-3.2# qemu-arm --version
+qemu-arm version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and the QEM=
+U Project developers
+
+$ go version
+go version go1.12.6 linux/arm
+$ go env
+GOARCH=3D"arm"
+GOBIN=3D""
+GOCACHE=3D"/home/quickbuild/.cache/go-build"
+GOEXE=3D""
+GOFLAGS=3D""
+GOHOSTARCH=3D"arm"
+GOHOSTOS=3D"linux"
+GOOS=3D"linux"
+GOPATH=3D"/home/quickbuild/go"
+GOPROXY=3D""
+GORACE=3D""
+GOROOT=3D"/usr/lib/golang"
+GOTMPDIR=3D""
+GOTOOLDIR=3D"/usr/lib/golang/pkg/tool/linux_arm"
+GCCGO=3D"gccgo"
+GOARM=3D"7"
+CC=3D"gcc"
+CXX=3D"g++"
+CGO_ENABLED=3D"1"
+GOMOD=3D""
+CGO_CFLAGS=3D"-g -O2"
+CGO_CPPFLAGS=3D""
+CGO_CXXFLAGS=3D"-g -O2"
+CGO_FFLAGS=3D"-g -O2"
+CGO_LDFLAGS=3D"-g -O2"
+PKG_CONFIG=3D"pkg-config"
+GOGCCFLAGS=3D"-fPIC -marm -pthread -fmessage-length=3D0 -fdebug-prefix-map=
+=3D/tmp/go-build242285369=3D/tmp/go-build -gno-record-gcc-switches"
+
+This issue is come only when I disable core 0 using a command below.
+please check "--cpuset-cpus=3D1-55" option.
+
+sudo docker run --privileged -d -i -t --cpuset-cpus=3D1-55 --mount
+type=3Dbind,source=3D"/home/dw83kim/mnt",destination=3D"/mnt" --network host
+--name=3D"ubuntu_core1" ubuntu:xenial-20200212
+
+
+This is what I have tested in the environment above.
+
+package main
+func main(){
+    for i:=3D0; i<1000; i++ {
+        println("Hello world")
+    }
+}
+
+This is one of the error logs have faced sometimes not always.
+
+bash-3.2# go run test.go
+fatal error: schedule: holding locks
+panic during panic
+SIGILL: illegal instruction
+PC=3D0xc9ec4c m=3D3 sigcode=3D2
+
+goroutine 122 [runnable]:
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Segmentation fault (core dumped)
+bash-3.2#
+
+Please check it.
+Thanks in advance.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1868055
+
+Title:
+  cannot run golang app with docker, version 17.09.1-ce, disabling core
+  0 and qemu-arm, version 2.7.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello!
+  I figure out that sometimes simple go application is not working.
+  I am using docker + qemu-arm + go( for armv7l).
+
+  These are version info below.
+
+  root@VDBS1535:~# docker -v
+  Docker version 17.09.1-ce, build 19e2cf6
+
+  bash-3.2# qemu-arm --version
+  qemu-arm version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and the Q=
+EMU Project developers
+
+  $ go version
+  go version go1.12.6 linux/arm
+  $ go env
+  GOARCH=3D"arm"
+  GOBIN=3D""
+  GOCACHE=3D"/home/quickbuild/.cache/go-build"
+  GOEXE=3D""
+  GOFLAGS=3D""
+  GOHOSTARCH=3D"arm"
+  GOHOSTOS=3D"linux"
+  GOOS=3D"linux"
+  GOPATH=3D"/home/quickbuild/go"
+  GOPROXY=3D""
+  GORACE=3D""
+  GOROOT=3D"/usr/lib/golang"
+  GOTMPDIR=3D""
+  GOTOOLDIR=3D"/usr/lib/golang/pkg/tool/linux_arm"
+  GCCGO=3D"gccgo"
+  GOARM=3D"7"
+  CC=3D"gcc"
+  CXX=3D"g++"
+  CGO_ENABLED=3D"1"
+  GOMOD=3D""
+  CGO_CFLAGS=3D"-g -O2"
+  CGO_CPPFLAGS=3D""
+  CGO_CXXFLAGS=3D"-g -O2"
+  CGO_FFLAGS=3D"-g -O2"
+  CGO_LDFLAGS=3D"-g -O2"
+  PKG_CONFIG=3D"pkg-config"
+  GOGCCFLAGS=3D"-fPIC -marm -pthread -fmessage-length=3D0 -fdebug-prefix-ma=
+p=3D/tmp/go-build242285369=3D/tmp/go-build -gno-record-gcc-switches"
+
+  This issue is come only when I disable core 0 using a command below.
+  please check "--cpuset-cpus=3D1-55" option.
+
+  sudo docker run --privileged -d -i -t --cpuset-cpus=3D1-55 --mount
+  type=3Dbind,source=3D"/home/dw83kim/mnt",destination=3D"/mnt" --network h=
+ost
+  --name=3D"ubuntu_core1" ubuntu:xenial-20200212
+
+  =
+
+  This is what I have tested in the environment above.
+
+  package main
+  func main(){
+      for i:=3D0; i<1000; i++ {
+          println("Hello world")
+      }
+  }
+
+  This is one of the error logs have faced sometimes not always.
+
+  bash-3.2# go run test.go
+  fatal error: schedule: holding locks
+  panic during panic
+  SIGILL: illegal instruction
+  PC=3D0xc9ec4c m=3D3 sigcode=3D2
+
+  goroutine 122 [runnable]:
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault (core dumped)
+  bash-3.2#
+
+  Please check it.
+  Thanks in advance.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1868055/+subscriptions
 
