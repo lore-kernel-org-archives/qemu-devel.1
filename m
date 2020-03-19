@@ -2,103 +2,69 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17996C4332E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CF7C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:58:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D021E20775
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:42:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D021E20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A05192072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 15:58:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="nWwvIwEt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A05192072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jExJv-0005Up-V4
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 11:42:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39899)
+	id 1jExZ7-0000eq-Ni
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 11:58:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1jExJ6-0004yT-Nb
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:42:06 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jExYJ-0000FL-Ks
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1jExJ4-0001a0-PT
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:42:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13962
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jExYI-0005kV-4H
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:57:47 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:36005)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1jExJ4-0001ZP-I3
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:42:02 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02JFWPX5153873
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 11:42:01 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yu7adgs7r-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 11:42:01 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Thu, 19 Mar 2020 15:41:59 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 19 Mar 2020 15:41:55 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02JFfsMP27787664
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 19 Mar 2020 15:41:54 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 36559A405C;
- Thu, 19 Mar 2020 15:41:54 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C18A8A4054;
- Thu, 19 Mar 2020 15:41:53 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.104.230])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 19 Mar 2020 15:41:53 +0000 (GMT)
-Date: Thu, 19 Mar 2020 16:40:50 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v5 07/18] s390x: protvirt: Inhibit balloon when
- switching to protected mode
-In-Reply-To: <8622efeb-1a4a-338f-d363-53818b00d195@redhat.com>
-References: <20200226122038.61481-1-frankja@linux.ibm.com>
- <20200226122038.61481-8-frankja@linux.ibm.com>
- <ed51d194-1b63-1c54-953a-d2031336a90e@redhat.com>
- <58a51f40-21c7-5737-4f4c-568fdd2477fa@linux.ibm.com>
- <20200227132402.67a38047.pasic@linux.ibm.com>
- <8622efeb-1a4a-338f-d363-53818b00d195@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jExYH-0005j0-MJ
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 11:57:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=xJPuztGTgIFCjNionGVdOI7CEZZp9fGKo4OQrm1FXWM=; b=nWwvIwEtaYD4HhUHGvXGvKRCXK
+ aVEt11N5hy4ZHZn73edgmrcNSv+GkknAtoMHKq1vYe3dYyrRY+qqMwotDVunLrLV3SBCzPd68ZfvE
+ KSDVyNCNwo5UGxkbIf4QRvcrkimLNw2a5kkdoE8mf6Hufvn46OWYhhUokLW/u6A0NamGJ3dcmrwKf
+ uEZ/5vBfppqPg6mAdmkDML53y8CpyHF5yd+HuIFCUPVCBmlu17UdxuD7/s83OQLijK2AB+/LIq7YV
+ DWknml2j1hx4sPiOGVqgEjXB70385yZBR/hXfUFUTrJWQ8zZSnBLSo7qfr7Z+yGqRMXIWNe/9gU6Q
+ 1PlRPEVBTpk2F7sOh4Jc4OchBxqk4YPZHXg4dlPt1T12SOAB5HBndi7BP30RJG29CZevKOf7iuePe
+ OCWPo6nX4NiB9bFQO+DbRS/bdkawjdgPk012vYSkC3c3dNMUyyCNMA1vtG5bSqK9n6/sl2e/GK6PW
+ 2eV7/1i+zZHvQGfrSEF4cXa41Y141Dh4dqFPYCvjgjETjMXZSXWK2/Xo5RLg8jLJwAgqOifDENwvT
+ xpDFrwbnZo6LuhDBLI9ViaZx59zpTuhxKf+/dEgwU8fGcrTv8DrDMeG54mJTBiFgxJXiK/CCsd+sK
+ x5pXDlXWoMJbBSp5PrNvJR3r5QcSqkOyInFwrlbQk=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: =?ISO-8859-1?Q?J=E1n?= Tomko <jtomko@redhat.com>, libvir-list@redhat.com,
+ Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 1/1] conf: qemu 9pfs: add 'multidevs' option
+Date: Thu, 19 Mar 2020 16:57:41 +0100
+Message-ID: <1876644.SqPMx7qSmg@silver>
+In-Reply-To: <20200319131026.GA2150275@lpt>
+References: <E1jEFpH-00028X-1c@lizzy.crudebyte.com>
+ <E1jEFpL-00028n-Qj@lizzy.crudebyte.com> <20200319131026.GA2150275@lpt>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031915-4275-0000-0000-000003AF2C14
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031915-4276-0000-0000-000038C45AF2
-Message-Id: <20200319164050.78a01702.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-19_05:2020-03-19,
- 2020-03-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0
- priorityscore=1501 mlxscore=0 lowpriorityscore=0 bulkscore=0
- suspectscore=0 clxscore=1015 adultscore=0 spamscore=0 impostorscore=0
- malwarescore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2003190067
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,228 +76,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, "Michael
- S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com, qemu-devel@nongnu.org,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Mar 2020 14:54:11 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Donnerstag, 19. M=E4rz 2020 14:10:26 CET J=E1n Tomko wrote:
+> On a Tuesday in 2020, Christian Schoenebeck wrote:
+> >Introduce new 'multidevs' option for filesystem.
+> >
+> >  <filesystem type=3D'mount' accessmode=3D'mapped' multidevs=3D'remap'>
+>=20
+> I don't like the 'multidevs' name, but cannot think of anything
+> beter.
+>=20
+> 'collisions' maybe?
 
-> On 27.02.20 13:24, Halil Pasic wrote:
-> > On Wed, 26 Feb 2020 16:11:03 +0100
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> > 
-> >> On 2/26/20 3:59 PM, David Hildenbrand wrote:
-> >>> On 26.02.20 13:20, Janosch Frank wrote:
-> >>>> Ballooning in protected VMs can only be done when the guest shares the
-> >>>> pages it gives to the host. Hence, until we have a solution for this
-> >>>> in the guest kernel, we inhibit ballooning when switching into
-> >>>> protected mode and reverse that once we move out of it.
-> >>>
-> >>> I don't understand what you mean here, sorry. zapping a page will mean
-> >>> that a fresh one will be faulted in when accessed. And AFAIK, that means
-> >>> it will be encrypted again when needed.
-> >>
-> >> Yes, as soon as the host alters non-shared memory we'll run into
-> >> integrity issues.
-> >>
-> >>
-> >> I've been talking to Halil after I sent this out and it looks like we'll
-> >> rather try to automatically enable the IOMMU for all devices when
-> >> switching into protected mode. He said that if the IOMMU is set the
-> >> balloon code will do an early exit on feature negotiation.
-> >>
-> > 
-> > I have a discussion starter RFC for you.
-> > 
-> > --------------------------8<----------------------------------------------
-> > From: Halil Pasic <pasic@linux.ibm.com>
-> > Date: Wed, 26 Feb 2020 16:48:21 +0100
-> > Subject: [RFC PATCH 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
-> > 
-> > The virtio specification tells that the device is to present
-> > VIRTIO_F_ACCESS_PLATFORM (a.k.a. VIRTIO_F_IOMMU_PLATFORM) when the
-> > device "can only access certain memory addresses with said access
-> > specified and/or granted by the platform". This is the case for a
-> > protected VM, as the device can access only memory addresses that are in
-> > pages that are currently shared (only the guest can share/unsare its
-> > page).
-> > 
-> > No VM however starts out as a protected VM, but some VMs may be
-> > converted to protected VMs if the guest decides so.
-> > 
-> > Making the end user explicitly manage the VIRTIO_F_ACCESS_PLATFORM via
-> > the property iommu_on is a minor disaster. If the correctness of the
-> > paravirtualized virtio devices depends (and thus in a sense the
-> > correctness of the hypervisor), then the hypervisor should have the last
-> > word about whether VIRTIO_F_ACCESS_PLATFORM is to be presented or not.
-> > 
-> > Let's manage the VIRTIO_F_ACCESS_PLATFORM virtio feature automatically
-> > for virtio-ccw devices, so that we set it before we start the protected
-> > configuration, and unset it when our VM is not protected.
-> > 
-> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> > ---
-> > NOTES:
-> > * I wanted to have a discussion starter fast, there are multiple open
-> > questions.
-> > 
-> > * Doing more than one system_resets() is hackish.  We
-> > should look into this.
-> > 
-> > * The user interface implications of this patch are also an ugly can of
-> > worms. Needs to be discussed.
-> > 
-> > * We should consider keeping the original value if !pv and restoring it
-> > on pv --> !pv, instead of forcing to unset when leaving pv, and actually
-> > not forcing unset when !pv.
-> > 
-> > * It might make sense to do something like this in virtio core, but I
-> >   decided start the discussion with a ccw-only change.
-> > 
-> > * Maybe we need a machine option that enables this sort of behavior,
-> > especially if we decide not to do the conserving/restoring.
-> > 
-> > * Lightly tested.
-> > ---
-> >  hw/s390x/s390-virtio-ccw.c |  4 ++--
-> >  hw/s390x/virtio-ccw.c      | 13 +++++++++++++
-> >  2 files changed, 15 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index 0f4455d1df..996124f152 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -337,7 +337,7 @@ static void s390_machine_unprotect(S390CcwMachineState *ms)
-> >          ms->pv = false;
-> >      }
-> >      migrate_del_blocker(pv_mig_blocker);
-> > -    qemu_balloon_inhibit(false);
-> > +    subsystem_reset();
-> >  }
-> >  
-> >  static int s390_machine_protect(S390CcwMachineState *ms)
-> > @@ -346,7 +346,6 @@ static int s390_machine_protect(S390CcwMachineState *ms)
-> >      CPUState *t;
-> >      int rc;
-> >  
-> > -    qemu_balloon_inhibit(true);
-> >      if (!pv_mig_blocker) {
-> >          error_setg(&pv_mig_blocker,
-> >                     "protected VMs are currently not migrateable.");
-> > @@ -384,6 +383,7 @@ static int s390_machine_protect(S390CcwMachineState *ms)
-> >      if (rc) {
-> >          goto out_err;
-> >      }
-> > +    subsystem_reset();
-> >      return rc;
-> >  
-> >  out_err:
-> > diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> > index 13f57e7b67..48bb54f68e 100644
-> > --- a/hw/s390x/virtio-ccw.c
-> > +++ b/hw/s390x/virtio-ccw.c
-> > @@ -869,12 +869,24 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-> >      }
-> >  }
-> >  
-> > +static inline void virtio_ccw_pv_enforce_features(VirtIODevice *vdev)
-> > +{
-> > +    S390CcwMachineState *ms = S390_CCW_MACHINE(qdev_get_machine());
-> > +
-> > +    if (ms->pv) {
-> > +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
-> > +    } else {
-> > +        virtio_clear_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
-> > +    }
-> > +}
-> > +
-> >  static void virtio_ccw_reset(DeviceState *d)
-> >  {
-> >      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
-> >      VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
-> >      VirtIOCCWDeviceClass *vdc = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
-> >  
-> > +    virtio_ccw_pv_enforce_features(vdev);
-> >      virtio_ccw_reset_virtio(dev, vdev);
-> >      if (vdc->parent_reset) {
-> >          vdc->parent_reset(d);
-> > @@ -1103,6 +1115,7 @@ static void virtio_ccw_pre_plugged(DeviceState *d, Error **errp)
-> >      if (dev->max_rev >= 1) {
-> >          virtio_add_feature(&vdev->host_features, VIRTIO_F_VERSION_1);
-> >      }
-> > +    virtio_ccw_pv_enforce_features(vdev);
-> >  }
-> >  
-> >  /* This is called by virtio-bus just after the device is plugged. */
-> > 
-> > base-commit: 8665f2475f5999d4c9f33598f1360f0b0797c489
-> > 
-> 
-> I asked this question already to Michael (cc) via a different channel,
-> but hare is it again:
-> 
-> Why does the balloon driver not support VIRTIO_F_IOMMU_PLATFORM? It is
-> absolutely not clear to me. The introducing commit mentioned that it
-> "bypasses DMA". I fail to see that.
-> 
-> At least the communication via the SG mechanism should work perfectly
-> fine with an IOMMU enabled. So I assume it boils down to the pages that
-> we inflate/deflate not being referenced via IOVA?
+Not sure if 'collisions' is better, e.g. collisions=3D'remap' sounds scary.=
+ :)
+And which collision would that be? At least IMO 'multidevs' is less ambigio=
+us.
+I have no problem though to change it to whatever name you might come up wi=
+th.=20
+Just keep the resulting key-value pair set in mind:
 
-AFAIU the IOVA/GPA stuff is not the problem here. You have said it
-yourself, the SG mechanism would work for balloon out of the box, as it
-does for the other virtio devices. 
+multidevs=3D'default'
+multidevs=3D'remap'
+multidevs=3D'forbid'
+multidevs=3D'warn'
 
-But VIRTIO_F_ACCESS_PLATFORM (aka VIRTIO_F_IOMMU_PLATFORM)  not presented
-means according to Michael that the device has full access to the entire
-guest RAM. If VIRTIO_F_ACCESS_PLATFORM is negotiated this may or may not
-be the case.
+vs.
 
-The actual problem is that the pages denoted by the buffer transmitted
-via the virtqueue are normally not shared pages. I.e. the hypervisor
-can not reuse them (what is the point of balloon inflate). To make this
-work, the guest would need to share the pages before saying 'host these
-are in my balloon, so you can use them'. This is a piece of logic we
-need only if the host/the device does not have full access to the
-guest RAM. That is in my opinion why the balloon driver fences
-VIRTIO_F_ACCESS_PLATFORM.
+collisions=3D'default'
+collisions=3D'remap' <- probably misleading what 'remap' means in this case
+collisions=3D'forbid'
+collisions=3D'warn' <- wrong, it warns about multiple devices, not about fi=
+le ID=20
+collisions.
 
-Does that make sense?
+So different key-name might also require different value-names.
 
-> 
-> I don't think they have to be IOVA addresses. We're neither reading nor
-> writing these pages. We really speak about "physical memory in the
-> system" when ballooning. Everything else doesn't really make sense.
-> There is no need to map/unmap pages we inflate/deflate AFAIKs.
-> 
-> IMHO, we should not try to piggy-back on VIRTIO_F_IOMMU_PLATFORM here,
-> but instead explicitly disable it either in the hypervisor or the guest.
-> 
+Another option would be the long form 'multi-devices=3D...'
 
-We need a feature bit here. We can say fencing VIRTIO_F_ACCESS_PLATFORM
-was a bug, fix that bug, and then invent another 'the guest RAM is
-somehow different' feature bit specific to the balloon, and then create
-arch hooks in the driver that get active if this feature is negotiated.
+> >    <source dir=3D'/path'/>
+> >    <target dir=3D'mount_tag'>
+> > =20
+> >  </filesystem>
+> >
+> >This option prevents misbheaviours on guest if a 9pfs export
+> >contains multiple devices, due to the potential file ID collisions
+> >this otherwise may cause.
+> >
+> >Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> >---
+> >
+> > docs/formatdomain.html.in     | 47 ++++++++++++++++++++++++++++++++++-
+> > docs/schemas/domaincommon.rng | 10 ++++++++
+> > src/conf/domain_conf.c        | 30 ++++++++++++++++++++++
+> > src/conf/domain_conf.h        | 13 ++++++++++
+> > src/qemu/qemu_command.c       |  7 ++++++
+> > 5 files changed, 106 insertions(+), 1 deletion(-)
+>=20
+> Please split the XML changes from the qemu driver changes.
 
-I assumed the fact that the balloon driver fences
-VIRTIO_F_ACCESS_PLATFORM is not a bug.
+Ok
 
-> I hope someone can clarify what the real issue with an IOMMU and
-> ballooning is, because I'll be having the same "issue" with
-virtio-mem.
-> 
+> Also missing:
+> * qemu_capabilities addition
 
-The issue is not with the IOMMU, the issue is with restricted access
-to guest RAM. The definition of VIRTIO_F_ACCESS_PLATFORM is such that we
-pretty much know what's up when VIRTIO_F_ACCESS_PLATFORM is not
-presented, but VIRTIO_F_ACCESS_PLATFORM presented can mean a couple of
-things.
+AFAICS the common procedure is to add new capabilities always to the end of=
+=20
+the enum list. So I guess I will do that as well.
 
-Regards,
-Halil
+> * qemuDomainDeviceDefValidateFS in qemu_domain.c - check for the capabili=
+ty,
+> reject this setting for virtiofs
+
+Good to know where that check is supposed to go to, thanks!
+
+> * qemuxml2xmltest addition
+> * qemuxml2argvtest addition
+
+Ok, I have to read up how those tests work. AFAICS I need to add xml files =
+to=20
+their data subdirs.
+
+Separate patches required for those 2 tests?
+
+> (no changes required for virschematest - it checks all the XML files in
+> the directories used by the above tests against the schema)
+>=20
+> >diff --git a/docs/formatdomain.html.in b/docs/formatdomain.html.in
+> >index 594146009d..13c506988b 100644
+> >--- a/docs/formatdomain.html.in
+> >+++ b/docs/formatdomain.html.in
+> >@@ -3967,7 +3967,7 @@
+> >
+> >     &lt;source name=3D'my-vm-template'/&gt;
+> >     &lt;target dir=3D'/'/&gt;
+> >  =20
+> >   &lt;/filesystem&gt;
+> >
+> >-  &lt;filesystem type=3D'mount' accessmode=3D'passthrough'&gt;
+> >+  &lt;filesystem type=3D'mount' accessmode=3D'passthrough'
+> >multidevs=3D'remap'&gt;>
+> >     &lt;driver type=3D'path' wrpolicy=3D'immediate'/&gt;
+> >     &lt;source dir=3D'/export/to/guest'/&gt;
+> >     &lt;target dir=3D'/import/from/host'/&gt;
+> >
+> >@@ -4084,13 +4084,58 @@
+> >
+> >         </dd>
+> >         </dl>
+> >
+> >+      <p>
+> >
+> >       <span class=3D"since">Since 5.2.0</span>, the filesystem element
+> >       has an optional attribute <code>model</code> with supported values
+> >       "virtio-transitional", "virtio-non-transitional", or "virtio".
+> >       See <a href=3D"#elementsVirtioTransitional">Virtio transitional
+> >       devices</a>
+> >       for more details.
+> >
+> >+      </p>
+> >+
+>=20
+> Unrelated change that can be split out.
+
+Ok, I'll make that the 1st preparatory patch then including ...
+
+> >+      <p>
+> >+      The filesystem element has an optional attribute
+> ><code>multidevs</code> +      which specifies how to deal with a
+> >filesystem export containing more than +      one device, in order to
+> >avoid file ID collisions on guest when using 9pfs +      (<span
+> >class=3D"since">since 6.2.0, requires QEMU 4.2</span>). +      This
+> >attribute is not available for virtiofs. The possible values are: +    =
+=20
+> ></p>
+> >+
+> >+        <dl>
+> >+        <dt><code>default</code></dt>
+> >+        <dd>
+> >+        Use QEMU's default setting (which currently is <code>warn</code=
+>).
+> >+        </dd>
+> >+        <dt><code>remap</code></dt>
+> >+        <dd>
+> >+        This setting allows guest to access multiple devices per export
+> >without +        encountering misbehaviours. Inode numbers from host are
+> >automatically +        remapped on guest to actively prevent file ID
+> >collisions if guest +        accesses one export containing multiple
+> >devices.
+> >+        </dd>
+> >+        <dt><code>forbid</code></dt>
+> >+        <dd>
+> >+        Only allow to access one device per export by guest. Attempts to
+> >access +        additional devices on the same export will cause the
+> >individual +        filesystem access by guest to fail with an error and
+> >being logged (once) +        as error on host side.
+> >+        </dd>
+> >+        <dt><code>warn</code></dt>
+> >+        <dd>
+> >+        This setting resembles the behaviour of 9pfs prior to QEMU 4.2,
+> >that is +        no action is performed to prevent any potential file ID
+> >collisions if an +        export contains multiple devices, with the only
+> >exception: a warning is +        logged (once) on host side now. This
+> >setting may lead to misbehaviours +        on guest side if more than one
+> >device is exported per export, due to the +        potential file ID
+> >collisions this may cause on guest side in that case. +        </dd>
+> >+        </dl>
+> >+
+> >
+> >       </dd>
+> >
+> >+      <p>
+> >+      The <code>filesystem</code> element may contain the following
+> >subelements: +      </p>
+> >+
+>=20
+> And so can this one.
+
+=2E.. this one.
+
+> >       <dt><code>driver</code></dt>
+> >       <dd>
+> >      =20
+> >         The optional driver element allows specifying further details
+> >
+> >@@ -25422,6 +25449,9 @@ virDomainFSDefFormat(virBufferPtr buf,
+> >
+> >         virBufferAsprintf(buf, " model=3D'%s'",
+> >        =20
+> >                           virDomainFSModelTypeToString(def->model));
+> >    =20
+> >     }
+> >
+> >+    if (def->multidevs) {
+> >+        virBufferAsprintf(buf, " multidevs=3D'%s'", multidevs);
+> >+    }
+>=20
+> make syntax-check complains here:
+> Curly brackets around single-line body:
+> ../src/conf/domain_conf.c:25452-25454:
+>      if (def->multidevs) {
+>          virBufferAsprintf(buf, " multidevs=3D'%s'", multidevs);
+>      }
+>=20
+> Jano
+
+Sorry for that, I assumed same code style as qemu. I'll do the automated=20
+syntax checks from now on.
+
+Best regards,
+Christian Schoenebeck
+
 
 
