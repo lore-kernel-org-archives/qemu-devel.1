@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB68FC4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97971C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:06:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A45BE2071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:06:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A45BE2071C
+	by mail.kernel.org (Postfix) with ESMTPS id 6774D2071C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:06:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6774D2071C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEs4H-0002gi-Ra
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 06:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51560)
+	id 1jEs4L-0002mj-Is
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 06:06:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jEs3d-0001wK-7I
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:46 -0400
+ (envelope-from <bounces@canonical.com>) id 1jEs3f-0001we-DR
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jEs3b-0005xq-R4
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34288)
+ (envelope-from <bounces@canonical.com>) id 1jEs3d-0005yw-R4
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34408)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jEs3b-0005xX-Ln
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:43 -0400
+ id 1jEs3d-0005yK-Kn
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jEs3Z-0004Qu-Tc
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:05:41 +0000
+ id 1jEs3c-0004Qu-Kt
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:05:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D7BE92E80AB
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:05:41 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 995772E80C0
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:05:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Mar 2020 09:58:06 -0000
+Date: Thu, 19 Mar 2020 09:58:24 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1866870@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -58,7 +58,7 @@ X-Launchpad-Bug-Reporter: tstrike (tstrike34)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
-Message-Id: <158461188651.19604.59223429660324585.malone@wampee.canonical.com>
+Message-Id: <158461190476.19072.9894986932203561030.malone@chaenomeles.canonical.com>
 Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -66,7 +66,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 16816e272475896373002be9ce0e20cca096b31e
+X-Launchpad-Hash: 4b3d3a371665e6cd6ca3cf81ccfa888c6aa3ae96
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,19 +84,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I wanted to make sure why different qemu configs make it trigger or not,
-and after finding seabios to be related the candidates were obvious.
+With that confirmed I checked if I can just point to a bios to break it, an=
+d indeed adding =
 
-Default config gets us:
-BIOS directory    /usr/local/share/qemu
+  -bios /root/seabios_1.12.0-1/usr/share/seabios/bios.bin
+  -bios /root/seabios_1.13.0-1/usr/share/seabios/bios.bin
+respectively is a make or break change.
 
-The long conf had:
---firmwarepath=3D/usr/share/qemu:/usr/share/seabios:/usr/lib/ipxe/qemu
 
-Adding that to the short config which had most things disabled made it brea=
-k as well.
-Since it has much less moving parts having most other features disabled I'l=
-l continue to use that.
+As a next step I reproduced the error with seabios rel-1.13.0 from https://=
+review.coreboot.org/seabios.git.
+It crashes as well.
+
+But to make this puzzle even more interesting rel-1.12.0 from the same git =
+crashes as well.
+I wonder where this trip might end, from qemu to seabios to ... compiler?
 
 -- =
 
