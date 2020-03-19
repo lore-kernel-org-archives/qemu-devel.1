@@ -2,83 +2,86 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38ED6C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6327CC4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 032C720724
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:19:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 244BB20724
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:27:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aAYKaD5h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 032C720724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZH9Be3x1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 244BB20724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEkmY-00007w-6Z
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 22:19:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44131)
+	id 1jEktw-0002QG-9H
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 22:27:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@chromium.org>) id 1jEkli-0007By-SL
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:48 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jEktI-0001nn-OA
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@chromium.org>) id 1jEklh-0000m0-Jh
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:46 -0400
-Received: from mail-pj1-x102c.google.com ([2607:f8b0:4864:20::102c]:37539)
+ (envelope-from <npiggin@gmail.com>) id 1jEktH-0006PX-PC
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:26:36 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40305)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stevensd@chromium.org>)
- id 1jEklh-0000fN-Bm
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:45 -0400
-Received: by mail-pj1-x102c.google.com with SMTP id ca13so287897pjb.2
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 19:18:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=N1Zou9g3kOpovEPiLX1RjUrhPNeCP8eY2KNWCUQTCG4=;
- b=aAYKaD5hXQz4nJWmWdoEb5Skgi/qTb9l9vp+6LzCAZRNfaJe8kilk2IdLVZHFqQvsX
- xEMJNJezpcGfyHocz8a64j12ZNDFBnZRXEv41Hg4aXctgy4Jdk0vZ+46q+ygPv/g+AI7
- qcwpL4XBMW33MXM12kYQuh/1TgiT3ewv/29d0=
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1jEktF-0006Hv-5G; Wed, 18 Mar 2020 22:26:33 -0400
+Received: by mail-pf1-x444.google.com with SMTP id l184so540230pfl.7;
+ Wed, 18 Mar 2020 19:26:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:cc:references:in-reply-to:mime-version
+ :user-agent:message-id:content-transfer-encoding;
+ bh=Sj0K9+9Fvh+zhCdmDXlRxzujyTsNq9yW97D/j4g6Hi4=;
+ b=ZH9Be3x1cR1krdwMTvWuqQNKWyqi46JKVn1ZRsmCKob8+rCMIueSakzobQv9aHG+uW
+ YHOQiSiNJEKORYAgbQoSTfl8mermVX9mazBF41cIieKr/Q4em3G1+cBAraJSt9HNtveH
+ t3/8qz3rBY8qMDORJ5iVSGjPHsSVA8W9jXV9YIwxfAboGIBSnc7sNPpGV9Y8c4bEKNh7
+ guojEQEWi4yboBrc8Ndj49BIiet+7/dlfjXYW/mwXtqT3PukMioZ5KCLkN4bXesHwIg3
+ AHIivjhgeYZqktDndgT6DXMgcWC4EnusgRlRslQ42SkFO4h7VoG2Asjw7Sop9r8gXAWl
+ GsNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=N1Zou9g3kOpovEPiLX1RjUrhPNeCP8eY2KNWCUQTCG4=;
- b=TqKG1YGxAwkb0qy0pWu+nmqPLB9qdXjdnuA4K3pynFnRuY/WLImdgctcPs/GH0s/zR
- TQmOqKxqNsrThFnzcYBuWJw+62BrEz0W3JXquSg9INHe4hRzHZAtCvX3x/6a76PSusia
- Rl/q/i6AGDw22dGkwhrSqJ+o2HCHBzUyUSGSf2IsFsMTWB9Fyk+gXtlrlVWuopTB5gbP
- zl54PAP1vZtaQ7yohCVrD5dhNPK/nUev2Kk8ZdUkC6GlYn0IfDzI47N0XnKoLGG48rx9
- PVfLDZr7duk6yA6bL4ONUZpcZKqUpgCzXOUkWGAx6VJSCCOXqYnDtMuCa2d+bppGP7aR
- DF6A==
-X-Gm-Message-State: ANhLgQ2TA92a+PloTwyZbao0qOasn4GFBdu1mR7Z6ocuZxrB9m0iquPw
- 9z1NoYaDkyYLLIdgW43NlB7Fng==
-X-Google-Smtp-Source: ADFU+vtE7S8SgklW7D0s/jGCM8v62Wug2+KP+L5Qt3hs5eR8MSAtHC0RMzYyuHEp+K2oo2rbMWIgNQ==
-X-Received: by 2002:a17:90a:7105:: with SMTP id
- h5mr1329758pjk.54.1584584324391; 
- Wed, 18 Mar 2020 19:18:44 -0700 (PDT)
-Received: from localhost ([2401:fa00:8f:203:30f2:7a9c:387e:6c7])
- by smtp.gmail.com with ESMTPSA id q9sm325194pgs.89.2020.03.18.19.18.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Mar 2020 19:18:44 -0700 (PDT)
-From: David Stevens <stevensd@chromium.org>
-To: virtio-comment@lists.oasis-open.org
-Subject: [PATCH v4 2/2] virtio-gpu: add the ability to export resources
-Date: Thu, 19 Mar 2020 11:18:23 +0900
-Message-Id: <20200319021823.57219-3-stevensd@chromium.org>
-X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-In-Reply-To: <20200319021823.57219-1-stevensd@chromium.org>
-References: <20200319021823.57219-1-stevensd@chromium.org>
+ h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+ :mime-version:user-agent:message-id:content-transfer-encoding;
+ bh=Sj0K9+9Fvh+zhCdmDXlRxzujyTsNq9yW97D/j4g6Hi4=;
+ b=GacgxPbOqa4NOkMukeHDBpzQW5V0DQEG9362OK9gLlop80zmRVKI0fELWLj09hMggd
+ E3t8HGFjQf6b6FN0wyVLJ+5w5b01/zc/pe1eJlcD2lbZ8L3nj8YzBM9Iz0v/fnPOe+5f
+ axSQgWj00KVycxJ04ECIsAAFiFh/cOCt+avQrPMH2oD8ZA9+rdRzR6bU/8p7b1Mscb/r
+ FRhtmg2X9gHm9BPaTIvU2j3hUz6GEMUKNCRG7wWnys3AyY6ZVrE6JbfGfDvx0Wqjg5RE
+ 620QvSdrKyO5TNolW8ODm81sbtMx/Un4/kGPw87RR0XFe6IB1qzuuedBUQ5i/yf2tNiz
+ 2IhA==
+X-Gm-Message-State: ANhLgQ13gI7I92d92JsK2z4dSoZsihTHv09U20+gyEuHGmp6yUZBRhhq
+ KAfnRfPlOlLj2PYR6DTw0NU=
+X-Google-Smtp-Source: ADFU+vvB4VWMBRkDkUzZIXfOOvwrWNhH4zsGdBvpQT0sauUVRQMce/pmR8g6z6BXDVMFhiwUJfYv1A==
+X-Received: by 2002:a65:494f:: with SMTP id q15mr836085pgs.383.1584584791715; 
+ Wed, 18 Mar 2020 19:26:31 -0700 (PDT)
+Received: from localhost (14-202-190-183.tpgi.com.au. [14.202.190.183])
+ by smtp.gmail.com with ESMTPSA id q71sm273916pjb.5.2020.03.18.19.26.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Mar 2020 19:26:30 -0700 (PDT)
+Date: Thu, 19 Mar 2020 12:24:41 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [EXTERNAL] [PATCH 1/2] target/ppc: Fix slbia TLB invalidation gap
+To: =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org
+References: <20200318044135.851716-1-npiggin@gmail.com>
+ <b4a5674c-12b0-68c5-fc2b-94b8d5675ee3@kaod.org>
+In-Reply-To: <b4a5674c-12b0-68c5-fc2b-94b8d5675ee3@kaod.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1584584632.f0iyej012p.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::102c
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,88 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zach Reizner <zachr@chromium.org>,
- Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- David Stevens <stevensd@chromium.org>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?St=C3=A9phane=20Marchesin?= <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: David Stevens <stevensd@chromium.org>
----
- virtio-gpu.tex | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+C=C3=A9dric Le Goater's on March 19, 2020 2:45 am:
+> On 3/18/20 5:41 AM, Nicholas Piggin wrote:
+>> slbia must invalidate TLBs even if it does not remove a valid SLB
+>> entry, because slbmte can overwrite valid entries without removing
+>> their TLBs.
+>>=20
+>> As the architecture says, slbia invalidates all lookaside information,
+>> not conditionally based on if it removed valid entries.
+>>=20
+>> It does not seem possible for POWER8 or earlier Linux kernels to hit
+>> this bug because it never changes its kernel SLB translations, and it
+>> should always have valid entries if any accesses are made to usespace
+>> regions. However other operating systems which may modify SLB entry 0
+>> or do more fancy things with segments might be affected.
+>=20
+> Did you hit the bug on the other OS ?=20
 
-diff --git a/virtio-gpu.tex b/virtio-gpu.tex
-index af4ca61..e75aafa 100644
---- a/virtio-gpu.tex
-+++ b/virtio-gpu.tex
-@@ -35,6 +35,8 @@ \subsection{Feature bits}\label{sec:Device Types / GPU Device / Feature bits}
- \begin{description}
- \item[VIRTIO_GPU_F_VIRGL (0)] virgl 3D mode is supported.
- \item[VIRTIO_GPU_F_EDID  (1)] EDID is supported.
-+\item[VIRTIO_GPU_F_RESOURCE_UUID (2)] assigning resources UUIDs for export
-+  to other virtio devices is supported.
- \end{description}
- 
- \subsection{Device configuration layout}\label{sec:Device Types / GPU Device / Device configuration layout}
-@@ -181,6 +183,7 @@ \subsubsection{Device Operation: Request header}\label{sec:Device Types / GPU De
-         VIRTIO_GPU_CMD_GET_CAPSET_INFO,
-         VIRTIO_GPU_CMD_GET_CAPSET,
-         VIRTIO_GPU_CMD_GET_EDID,
-+        VIRTIO_GPU_CMD_RESOURCE_ASSIGN_UUID,
- 
-         /* cursor commands */
-         VIRTIO_GPU_CMD_UPDATE_CURSOR = 0x0300,
-@@ -192,6 +195,7 @@ \subsubsection{Device Operation: Request header}\label{sec:Device Types / GPU De
-         VIRTIO_GPU_RESP_OK_CAPSET_INFO,
-         VIRTIO_GPU_RESP_OK_CAPSET,
-         VIRTIO_GPU_RESP_OK_EDID,
-+        VIRTIO_GPU_RESP_OK_RESOURCE_UUID,
- 
-         /* error responses */
-         VIRTIO_GPU_RESP_ERR_UNSPEC = 0x1200,
-@@ -454,6 +458,32 @@ \subsubsection{Device Operation: controlq}\label{sec:Device Types / GPU Device /
- This detaches any backing pages from a resource, to be used in case of
- guest swapping or object destruction.
- 
-+\item[VIRTIO_GPU_CMD_RESOURCE_ASSIGN_UUID] Creates an exported object from
-+  a resource. Request data is \field{struct
-+    virtio_gpu_resource_assign_uuid}.  Response type is
-+  VIRTIO_GPU_RESP_OK_RESOURCE_UUID, response data is \field{struct
-+    virtio_gpu_resp_resource_uuid}. Support is optional and negotiated
-+    using the VIRTIO_GPU_F_RESOURCE_UUID feature flag.
-+
-+\begin{lstlisting}
-+struct virtio_gpu_resource_assign_uuid {
-+        struct virtio_gpu_ctrl_hdr hdr;
-+        le32 resource_id;
-+        le32 padding;
-+};
-+
-+struct virtio_gpu_resp_resource_uuid {
-+        struct virtio_gpu_ctrl_hdr hdr;
-+        u8 uuid[16];
-+};
-+\end{lstlisting}
-+
-+The response contains a UUID which identifies the exported object created from
-+the host private resource. Note that if the resource has an attached backing,
-+modifications made to the host private resource through the exported object by
-+other devices are not visible in the attached backing until they are transferred
-+into the backing.
-+
- \end{description}
- 
- \subsubsection{Device Operation: cursorq}\label{sec:Device Types / GPU Device / Device Operation / Device Operation: cursorq}
--- 
-2.25.1.481.gfbce0eb801-goog
+No, hit it when fixing POWER9 hash.
 
+> =20
+>> When POWER9 slbia support is added in the next patch, this becomes a
+>> real problem because some new slbia variants don't invalidate all
+>> non-zero entries.
+>>=20
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>=20
+> Looks correct.
+>=20
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+Nick
+=
 
