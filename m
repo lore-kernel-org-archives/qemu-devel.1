@@ -2,79 +2,82 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE07C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E80C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E632420774
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7468D20774
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="C+VejKkl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E632420774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2PnfwHO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7468D20774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jF2BD-000611-Ud
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:54:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42650)
+	id 1jF2BP-0006Iw-Kw
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:54:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jF27u-0000Qd-NJ
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:50:52 -0400
+ (envelope-from <eblake@redhat.com>) id 1jF2AP-00051l-Lv
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:53:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jF27t-0003c2-74
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:50:50 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:16467)
+ (envelope-from <eblake@redhat.com>) id 1jF2AO-0004NT-8z
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:53:25 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34912)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jF27t-0003bh-0f
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:50:49 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e73db1a0000>; Thu, 19 Mar 2020 13:50:34 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 19 Mar 2020 13:50:47 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 19 Mar 2020 13:50:47 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
- 2020 20:50:47 +0000
-Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Thu, 19 Mar 2020 20:50:41 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v15 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-Date: Fri, 20 Mar 2020 01:46:42 +0530
-Message-ID: <1584649004-8285-6-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jF2AO-0004NP-5V
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:53:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584651203;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MewPVfiDuxFNqh/JVlM7h5mKRw1l12myAOHcbLDqwNM=;
+ b=B2PnfwHOnmRIVf0CKLdAVRqzn75VUdxKgpvNAAfyeMyPh1eBvp7+kdHhYdxSBE1cON0Ad3
+ PxkwraxQDeIiTyGAeN8pd64DohrNJghdDK2rtIU34qyeST6oWvRKMUmWZ65UbL+CFx+CY1
+ zs3O7DsCRdzFf+Z56tMU//puKIuYbx4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-S2gzw_yKNkWT4UsVaWbHOQ-1; Thu, 19 Mar 2020 16:53:20 -0400
+X-MC-Unique: S2gzw_yKNkWT4UsVaWbHOQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D6BE18C35A0;
+ Thu, 19 Mar 2020 20:53:19 +0000 (UTC)
+Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CBFC6269F;
+ Thu, 19 Mar 2020 20:53:10 +0000 (UTC)
+Subject: Re: [PATCH] lockable: replaced locks with lock guard macros where
+ appropriate
+To: qemu-devel@nongnu.org, dnbrdsky@gmail.com
+References: <158464628614.8795.7072935999807888220@39012742ff91>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d734a44f-b2d6-150f-ca82-160e334d99c8@redhat.com>
+Date: Thu, 19 Mar 2020 15:53:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1584651035; bh=MOsbTOYhqV35rmjXEgH3UV2bzrMBXZJ/IwUsOwjoOIM=;
- h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- In-Reply-To:References:X-NVConfidentiality:MIME-Version:
- Content-Type;
- b=C+VejKklxiIYCGPxcTyBC76I1hx7tk46loxtS35knpuig+ZUYG3u3ixJqXj0mBZU6
- 4VZhBV7Un9T2CYbATK1iR+Uz0eDg5nemBMwPt7dxohTWFh7b6judRRIyxNbzoD5oiZ
- CrSsWQQP2I4A72JbpFx1w3ZWj4cbnFbCu0vq9283aNcMaqnAL//saekdMMByR3R3gU
- cwbP1HtJAG20N4V5yc5Xf1aXARgNMeuV+/7splrnjAGGcqzc9NHGtquptpmKOuNKFS
- 8B1o4fJyHcexJ0tHpy1fR/XTqF+R1a3L76CBb8caCON58ePIV54ubzY4+UpiIuXtgR
- 3WfN7DKN+v6ZA==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.65
+In-Reply-To: <158464628614.8795.7072935999807888220@39012742ff91>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,164 +89,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
- ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, pl@kamp.de,
+ armbru@redhat.com, mreitz@redhat.com, alex.williamson@redhat.com,
+ kraxel@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DMA mapped pages, including those pinned by mdev vendor drivers, might
-get unpinned and unmapped while migration is active and device is still
-running. For example, in pre-copy phase while guest driver could access
-those pages, host device or vendor driver can dirty these mapped pages.
-Such pages should be marked dirty so as to maintain memory consistency
-for a user making use of dirty page tracking.
+On 3/19/20 2:31 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200319161925.1818377-2-dnbrdsky@gmail.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series failed the asan build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> export ARCH=x86_64
+> make docker-image-fedora V=1 NETWORK=1
+> time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
+> === TEST SCRIPT END ===
+> 
+>    CC      trace-root.o
+>    CC      accel/kvm/trace.o
+>    CC      accel/tcg/trace.o
+> /tmp/qemu-test/src/util/thread-pool.c:213:5: error: unused variable 'qemu_lockable_auto__COUNTER__' [-Werror,-Wunused-variable]
+>      QEMU_LOCK_GUARD(&pool->lock);
+>      ^
+> /tmp/qemu-test/src/include/qemu/lockable.h:173:29: note: expanded from macro 'QEMU_LOCK_GUARD'
 
-To get bitmap during unmap, user should allocate memory for bitmap, set
-size of allocated memory, set page size to be considered for bitmap and
-set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+Hmm. This one is a different failure than the other patchew warnings 
+about variable redefinition; but is still evidence that it is missing 
+your "[PATCH] misc: fix __COUNTER__ macro to be referenced properly". 
+At any rate, the fact that we have a compiler warning about an unused 
+variable (when in reality it IS used by the auto-cleanup attribute) is 
+annoying; we may have to further tweak QEMU_LOCK_GUARD to add an 
+__attribute__((unused)) to shut up this particular compiler false positive.
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
----
- drivers/vfio/vfio_iommu_type1.c | 54 ++++++++++++++++++++++++++++++++++++++---
- include/uapi/linux/vfio.h       | 10 ++++++++
- 2 files changed, 60 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 239f61764d03..e79c1ff6fb41 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -962,7 +962,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
- }
- 
- static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
--			     struct vfio_iommu_type1_dma_unmap *unmap)
-+			     struct vfio_iommu_type1_dma_unmap *unmap,
-+			     struct vfio_bitmap *bitmap)
- {
- 	uint64_t mask;
- 	struct vfio_dma *dma, *dma_last = NULL;
-@@ -1013,6 +1014,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 	 * will be returned if these conditions are not met.  The v2 interface
- 	 * will only return success and a size of zero if there were no
- 	 * mappings within the range.
-+	 *
-+	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
-+	 * must be for single mapping. Multiple mappings with this flag set is
-+	 * not supported.
- 	 */
- 	if (iommu->v2) {
- 		dma = vfio_find_dma(iommu, unmap->iova, 1);
-@@ -1020,6 +1025,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 			ret = -EINVAL;
- 			goto unlock;
- 		}
-+
-+		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-+		    (dma->iova != unmap->iova || dma->size != unmap->size)) {
-+			ret = -EINVAL;
-+			goto unlock;
-+		}
-+
- 		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
- 		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
- 			ret = -EINVAL;
-@@ -1037,6 +1049,11 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 		if (dma->task->mm != current->mm)
- 			break;
- 
-+		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-+		     iommu->dirty_page_tracking)
-+			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
-+						bitmap->pgsize, bitmap->data);
-+
- 		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
- 			struct vfio_iommu_type1_dma_unmap nb_unmap;
- 
-@@ -2398,17 +2415,46 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
- 		struct vfio_iommu_type1_dma_unmap unmap;
--		long ret;
-+		struct vfio_bitmap bitmap = { 0 };
-+		int ret;
- 
- 		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
- 
- 		if (copy_from_user(&unmap, (void __user *)arg, minsz))
- 			return -EFAULT;
- 
--		if (unmap.argsz < minsz || unmap.flags)
-+		if (unmap.argsz < minsz ||
-+		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
- 			return -EINVAL;
- 
--		ret = vfio_dma_do_unmap(iommu, &unmap);
-+		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-+			unsigned long pgshift;
-+			uint64_t iommu_pgsize =
-+					 1 << __ffs(vfio_pgsize_bitmap(iommu));
-+
-+			if (unmap.argsz < (minsz + sizeof(bitmap)))
-+				return -EINVAL;
-+
-+			if (copy_from_user(&bitmap,
-+					   (void __user *)(arg + minsz),
-+					   sizeof(bitmap)))
-+				return -EFAULT;
-+
-+			/* allow only min supported pgsize */
-+			if (bitmap.pgsize != iommu_pgsize)
-+				return -EINVAL;
-+			if (!access_ok((void __user *)bitmap.data, bitmap.size))
-+				return -EINVAL;
-+
-+			pgshift = __ffs(bitmap.pgsize);
-+			ret = verify_bitmap_size(unmap.size >> pgshift,
-+						 bitmap.size);
-+			if (ret)
-+				return ret;
-+
-+		}
-+
-+		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
- 		if (ret)
- 			return ret;
- 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 8138f94cac15..2780a5742c04 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -1010,12 +1010,22 @@ struct vfio_bitmap {
-  * field.  No guarantee is made to the user that arbitrary unmaps of iova
-  * or size different from those used in the original mapping call will
-  * succeed.
-+ * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
-+ * before unmapping IO virtual addresses. When this flag is set, user must
-+ * provide data[] as structure vfio_bitmap. User must allocate memory to get
-+ * bitmap and must set size of allocated memory in vfio_bitmap.size field.
-+ * A bit in bitmap represents one page of user provided page size in 'pgsize',
-+ * consecutively starting from iova offset. Bit set indicates page at that
-+ * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
-+ * returned in vfio_bitmap.data
-  */
- struct vfio_iommu_type1_dma_unmap {
- 	__u32	argsz;
- 	__u32	flags;
-+#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
- 	__u64	iova;				/* IO virtual address */
- 	__u64	size;				/* Size of mapping (bytes) */
-+	__u8    data[];
- };
- 
- #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
 -- 
-2.7.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
