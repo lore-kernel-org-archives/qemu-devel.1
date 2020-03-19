@@ -2,79 +2,81 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F41F6C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BD9C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFD8B20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:32:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E56CF2072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 20:36:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xIAO7K8r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFD8B20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ix9j369C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E56CF2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jF1pm-0005KO-TB
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:32:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38655)
+	id 1jF1uF-0007eI-2H
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 16:36:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jF1p1-0004sW-Uj
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:31:21 -0400
+ (envelope-from <eblake@redhat.com>) id 1jF1tU-00079B-4M
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jF1oz-0000mq-Op
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:31:19 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33567)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jF1oz-0000m0-J2
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:31:17 -0400
-Received: by mail-ot1-x342.google.com with SMTP id x26so3871162otk.0
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 13:31:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=o8Sdb2pg3BbCtB8ahXdMacI1iJETA+ZgJ5S9p4eJANU=;
- b=xIAO7K8rmHoCQKiNcLE9iD08HyOBu9a1jQD1lHKG+pU+Yc1yRaXjZ9VKsd8ejaqRc1
- Hb+VCe6/RPsbqjzHkNRRZPJMo98T5xBM5RfbNVwGa99LiTAqrWV5KSMxyjoZTsXuJLks
- 4d1oaY1+lUCk125latSpzk851azdtMx+eKSFMnZL9IDPxAPL6FdhRGJKLl7l4niZk9Du
- wMMt8Ja2sEjIAMZK/QeiuIFd/A4Yz2PO6WcJzLNNRc3OpBm3bz79xLFMvXWS6kqzeZ1Y
- CxMcevj5H3OC7v9PFg3qocQDoeBApH9az4Fpf1aANTh/8m7Z9Mon6JeIw0+wrngvyUp1
- kKUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=o8Sdb2pg3BbCtB8ahXdMacI1iJETA+ZgJ5S9p4eJANU=;
- b=hEkrWnBvh0Wp8NtrmF1xOHjvE4S2XVFu6z/YPOJ7cz6Ra4pe4+ovtZulthHViPLk6i
- +8paG83DmtW/wgHf5roqpcvkFEukY3FpuFi28xmYkyDtmmamWFxJnj1vYFeK021iTUEW
- 7Ir/xP0O/gef0QxSES0394EPfNxZQl6I/FI3jIyJsTOwwMMgUaIIrpodGg4C2yaHYeJo
- 3SfezkjP00YlJU8nHITffj9zdGpSYW6Ny8nc8W5gXRtAXOT0eK3ayiPDBDHvFOv0wvL2
- cxme5Im+UZ4AL0ic5jZkjnynSM9iKhCp4bwo3Q8mdm5v43xntF1m7mfheLe1/1xwnXrx
- B9mw==
-X-Gm-Message-State: ANhLgQ29N9luoENuPky9vsBzpvIbBA/ANHTbBhlmRBcZnLDxAOSAsxIe
- BIM/Zom82xLldcasVprTtSDXNXUU+gnR4sSluuE1IQ==
-X-Google-Smtp-Source: ADFU+vuFLnyuZjoqy/8S5ol6Wz5jeL3AZbBoycyG7euk0Pm2bg1G1ev58Bwbaf3LgG0P8vQ98P5hE48zakCJGowP4PA=
-X-Received: by 2002:a9d:19ca:: with SMTP id k68mr3965384otk.232.1584649876390; 
- Thu, 19 Mar 2020 13:31:16 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1jF1tS-0007Gt-3h
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:35:55 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:38463)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jF1tR-00077P-98
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 16:35:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584650152;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0uPhlXn+ve+3FM5jp2ChiVgqmYZE4AlzB5UVncc/Kco=;
+ b=ix9j369C8xxeZaWCCmbcvX3tPVfMgEkdQQJsh3yZmgRrsf0nBf8VrOLDbUUAWSAwwzE7i6
+ KGAIg5EQI2hbcqj9jXxC0VJATO1w7Hu8QlOTOzG1wU2y2xxHIWGEQs+6RFi2xbL61LKXC2
+ WH5Px9IERYOnEeOgxxqq/a2g15U0Vvc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-XX6rTzV9MvWNXjyX1taL5Q-1; Thu, 19 Mar 2020 16:35:44 -0400
+X-MC-Unique: XX6rTzV9MvWNXjyX1taL5Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75039800D53;
+ Thu, 19 Mar 2020 20:35:43 +0000 (UTC)
+Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19BBA1001B07;
+ Thu, 19 Mar 2020 20:35:43 +0000 (UTC)
+Subject: Re: [PATCH] misc: fix __COUNTER__ macro to be referenced properly
+To: dnbrdsky@gmail.com, stefanha@gmail.com
+References: <20200319161925.1818377-1-dnbrdsky@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <43c25451-f7f9-41ee-749f-1e73d5b46f9c@redhat.com>
+Date: Thu, 19 Mar 2020 15:35:42 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200310150947.3510824-1-borntraeger@de.ibm.com>
- <20200310150947.3510824-4-borntraeger@de.ibm.com>
-In-Reply-To: <20200310150947.3510824-4-borntraeger@de.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Mar 2020 20:31:05 +0000
-Message-ID: <CAFEAcA93+BC_N28fCRwPc8YNGW_UhSOE+=A+0Qo3bB9x8zO9qQ@mail.gmail.com>
-Subject: Re: [PULL 3/4] s390/ipl: sync back loadparm
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <20200319161925.1818377-1-dnbrdsky@gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,63 +88,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Marc Hartmayer <mhartmay@linux.ibm.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Mar 2020 at 15:09, Christian Borntraeger
-<borntraeger@de.ibm.com> wrote:
->
-> From: Halil Pasic <pasic@linux.ibm.com>
->
-> We expose loadparm as a r/w machine property, but if loadparm is set by
-> the guest via DIAG 308, we don't update the property. Having a
-> disconnect between the guest view and the QEMU property is not nice in
-> itself, but things get even worse for SCSI, where under certain
-> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
-> expected" for details) we call s390_gen_initial_iplb() on resets
-> effectively overwriting the guest/user supplied loadparm with the stale
-> value.
+On 3/19/20 11:19 AM, dnbrdsky@gmail.com wrote:
+> From: danbrodsky <dnbrdsky@gmail.com>
+> 
+> - __COUNTER__ doesn't work with ## concat
+> - replaced ## with glue() macro so __COUNTER__ is evaluated
+> 
+> Signed-off-by: danbrodsky <dnbrdsky@gmail.com>
 
-Hi; Coverity points out (CID 1421966) that you have a buffer overrun here:
+Thanks - this appears to be your first contribution to qemu.
 
-> +static void update_machine_ipl_properties(IplParameterBlock *iplb)
-> +{
-> +    Object *machine = qdev_get_machine();
-> +    Error *err = NULL;
-> +
-> +    /* Sync loadparm */
-> +    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
-> +        uint8_t *ebcdic_loadparm = iplb->loadparm;
-> +        char ascii_loadparm[8];
+Typically, the S-o-b should match how you would spell your legal name, 
+rather than being a single-word computer user name.
 
-This array is 8 bytes...
+It looks like you threaded another message to this one:
+Message-Id: <20200319161925.1818377-2-dnbrdsky@gmail.com>
+Subject: [PATCH] lockable: replaced locks with lock guard macros where
+  appropriate
+but without a 0/2 cover letter, or even a 1/2 or 2/2 indicator on the 
+individual patches.  This makes it more likely that the second patch may 
+be overlooked by our CI tools.
 
-> +        int i;
-> +
-> +        for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
-> +            ascii_loadparm[i] = ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
-> +        }
-> +        ascii_loadparm[i] = 0;
+Since this patch is fixing an issue that just went into the tree 
+recently, it would be useful to add mention of that in the commit message:
+Fixes: 3284c3ddc4
 
-...but you can write 9 bytes into it (8 from the guest-controlled
-iplb_loadparm buffer plus one for the trailing NUL).
+In fact, using 'lockable:' rather than 'misc:' as your subject prefix 
+makes it more obvious that you are fixing an issue in the same area as 
+where it was introduced.
 
-> +        object_property_set_str(machine, ascii_loadparm, "loadparm", &err);
-> +    } else {
-> +        object_property_set_str(machine, "", "loadparm", &err);
-> +    }
-> +    if (err) {
-> +        warn_report_err(err);
-> +    }
-> +}
+More patch submission hints at https://wiki.qemu.org/Contribute/SubmitAPatch
 
-thanks
--- PMM
+> ---
+>   include/qemu/lockable.h | 2 +-
+>   include/qemu/rcu.h      | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/qemu/lockable.h b/include/qemu/lockable.h
+> index 1aeb2cb1a6..a9258f2c2c 100644
+> --- a/include/qemu/lockable.h
+> +++ b/include/qemu/lockable.h
+> @@ -170,7 +170,7 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(QemuLockable, qemu_lockable_auto_unlock)
+>    *   }
+>    */
+>   #define QEMU_LOCK_GUARD(x) \
+> -    g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ = \
+> +    g_autoptr(QemuLockable) glue(qemu_lockable_auto, __COUNTER__) = \
+
+That said, the patch itself is correct.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+I'll leave it up to the maintainer for this file whether they can 
+improve your commit message (although the hardest part of that would be 
+knowing a full proper name to use in place of your username), or if you 
+will need to send a v2.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
