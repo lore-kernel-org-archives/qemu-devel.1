@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D9EC4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EF7C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:34:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3777A20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:32:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3777A20663
+	by mail.kernel.org (Postfix) with ESMTPS id 2BB1220663
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:34:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BB1220663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jErXq-0000GC-B3
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:32:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40944)
+	id 1jErZN-0002OK-7s
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:34:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jErRy-0005QJ-26
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:51 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jErRx-0005Om-2T
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jErRw-0004EV-Du
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:49 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:51571)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jErRw-0004DR-4x
+ (envelope-from <laurent@vivier.eu>) id 1jErRs-0004CV-Ud
  for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:48 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:42001)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jErRs-0004By-Gr
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:44 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mth79-1jZ8Q21ls7-00v9Ha; Thu, 19 Mar 2020 10:26:33 +0100
+ id 1M4KFF-1jEaSs0lwv-000Ing; Thu, 19 Mar 2020 10:26:39 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 02/16] linux-user/i386: Split out gen_signal
-Date: Thu, 19 Mar 2020 10:26:13 +0100
-Message-Id: <20200319092627.51487-3-laurent@vivier.eu>
+Subject: [PULL v3 12/16] linux-user/riscv: Update the syscall_nr's to the 5.5
+ kernel
+Date: Thu, 19 Mar 2020 10:26:23 +0100
+Message-Id: <20200319092627.51487-13-laurent@vivier.eu>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200319092627.51487-1-laurent@vivier.eu>
 References: <20200319092627.51487-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Jo0Z5G9FVg3jJZgoxBWz3muaUTKrn2C79oThQC79xGBX9ZzU5vD
- sl7a07mQeF+whjDliZZ3OGM0oB2LWTxvhJ0YJ95IiTuG9X8SxRS3PZjqVedRXwleF2HIr4T
- 01PXr/dLGELE4NyVuaHZahbL7u4djtmA2eWpcR8RejTe+SxfVJiQlr4KoiLzj7kevZG5rWK
- cGXHWrPUzTHX8365X0/pA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JfugAy3XM0Y=:G69lrxU3U3YcdUVFgjFWDC
- sN70aZ1ihMyPfrhBlMrz9O1n2/oXm9nTcYgAbalD5emeVcEkvXtXLAMZpDGCmJPRquUUWBr55
- dWVsJ1AQ7+PxiiypqJAH67s+2kKM2CabtJv3RiueyJWuKwxkkV5qkmoD+U5J4pNiGbov5ehUO
- Ehv3tBC/w6Sx1PcoMwa/8MIPckLLQJMqogBycdgLaVmyrSn0s3Onb2UFnLw6Ujs3XGzwwxHFy
- Cgw6V734nf5J2N32jNSi23LPnC7gzVZh2LDnG+r29ktpI4DspnOzkKRMS3AV60BMsvYNbLTMM
- OK2utjcpfkPmpQc+Nh1Ibg1U+IOZoMXfWEShl7aZACIh2yWWzSYzil6OGcE+Wf4HXRxllTsZO
- E3GDeiC0e1fAsvNIt6RwX+UUyjIY+qQRGnQ/q7YuX3akAjnew+54kpviTIhfZMCHkuCafLHZ3
- xItJjnxAubGSjRL6RxBaquHFcdLOtq7PGe/6O4dHoPt2ydVIxj7PrXxtq6k0I6ksMxspF1o9m
- ANl86/s42cNz37IWGkjJrT+GPPLOCYv3mTPxhGPpLY+tFi7ei5X+7udunQs8C/Sp2ydyd+EhX
- sNpxattLo11b90jRKjw+VEXyokRbX69wb/eqI1NluLHnmthQNfy0hoRd8bIMgcTB2hIEB+2Lb
- KSvVUUOi83s4O7EUhxija9uWq9sI6FuZvqG5RxTf6s2fa1P/IFLhFsrGi8NiQiMc8xl9mxu2y
- t8oSBwEw/nmWswZMatbWQBfPVKS1jaQONehET9j6AcZ26XwG3+tt+g91khOJg4AcBV0NBM79A
- VjQ5wJelN3rWvtxQW1PJgeCkVJocvUAeqOWZLsMRUVMZwLV1BZFqLs7jMgvjd+jkeAMaZbZ
+X-Provags-ID: V03:K1:prFaPj4GibEzCqTvGN0Onu/j0EzjXcb1r3CWbVFM+LmOwVkNgDB
+ Z8VzySuqnzIdgmcYAeIZDGDH0Tk3ffwKqWthOfGsoJhcS2UyiQTqlOFSca0FN5F7DENYtsA
+ aenNE3HGJL9LfFZD/Eldkv8jEBtgsvuQvrbAXOHFAWvAw+agOHd+vxioEoz9sJ/e5VaEg7v
+ b4r6trcl4OG0WhUhnBAEw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:RHqPFoITFyI=:ttlThVhvjxiUCcmcM3AVH2
+ 0jKnpGwqXgwQ46qgIsjIl95Huz5AMIYp7eyHvB7zNzGY0IT31E0jnJLOK2fG3l8M4H0hAuXVc
+ YSO93RzfpApHxjstciGo4y58CU1tntC478IABGgW50Fjh9WMAujl9+ePH+YkPV1ZGNEdKCLqY
+ VYUpHMFCseLGSDxyASlt99aAwyVduFBQpTvOlTN17Px2T8aiiRiOOTv53HdAkneX6KOPQoWn5
+ 13K32nL0a6aPpJOUn634+xapvNd5Bf7fygqtYCDzuXVqArE+D/MX6VvyS/LDixh9QzrQTf051
+ Ys0RtwjS7+wiVXnfh9Zcxr6VoS/tjt9+mTv13FpDO18lLlBaNic184O1r2CuXByAd7zJcA0yW
+ ndHfpiRpriRDzXcie7HiRk9bbMxHEy8si3d/zrfFUIna8QwizCUZhgZN6jLtGekIp+gU1+Rbp
+ /+ObihOfAdNB853JKfzTYEF6h6aYcuKPXtd1PKCiuWlmiwV49pha+MRcOQFzK/Wrlc7tLnAod
+ zxoqQKJeDbSvpZwTDtyk+RtWfTKXCza2ZsbRTQ+n5IY4EIQW2Y0AwmNc3iPsMMVZP3pmdu+3f
+ 5GcojZMM35gUw3ZkL6rU00rNq8ltvT0wXl0UfVhTJ6+hjYyHYoYuLqxDtPkZKHYH1ndJZy0J0
+ lK6261OtpY7lC6OBhh4krsrjduUWVXnKjCI1CJP24EOoIBEgz3vCwZcbDNmFyyFuxMz8jF6zF
+ DKRWdibjv1wQi7B0S7LGJ+OfjoLTEcw7tg7lTLMl89PMTummWvhtu2OO6EOGVXxUg3PLqgE8C
+ 4Uu5atUsEWn4fJG/j7Ks9ExkYv2h/Yx/BPtFXEK6Gbu/dV11nyFop1dyAdaJ/Ut3kRef6VR
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,186 +76,957 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-This is a bit tidier than open-coding the 5 lines necessary
-to initialize the target_siginfo_t.  In addition, this zeros
-the remaining bytes of the target_siginfo_t, rather than
-passing in garbage.
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200213032223.14643-3-richard.henderson@linaro.org>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <8e512fa2dc885aafc4d9c4013ee033442827a4a0.1584051142.git.alistair.francis@wdc.com>
+[lv: guard sys_futex with TARGET_NR_exit]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/i386/cpu_loop.c | 93 ++++++++++++++------------------------
- 1 file changed, 33 insertions(+), 60 deletions(-)
+ linux-user/riscv/syscall32_nr.h | 295 +++++++++++++++++++++++++++++++
+ linux-user/riscv/syscall64_nr.h | 301 ++++++++++++++++++++++++++++++++
+ linux-user/riscv/syscall_nr.h   | 294 +------------------------------
+ linux-user/syscall.c            |   2 +-
+ 4 files changed, 599 insertions(+), 293 deletions(-)
+ create mode 100644 linux-user/riscv/syscall32_nr.h
+ create mode 100644 linux-user/riscv/syscall64_nr.h
 
-diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
-index 024b6f4d588c..e217cca5ee1e 100644
---- a/linux-user/i386/cpu_loop.c
-+++ b/linux-user/i386/cpu_loop.c
-@@ -81,13 +81,23 @@ static void set_idt(int n, unsigned int dpl)
- }
- #endif
- 
-+static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
-+{
-+    target_siginfo_t info = {
-+        .si_signo = sig,
-+        .si_code = code,
-+        ._sifields._sigfault._addr = addr
-+    };
+diff --git a/linux-user/riscv/syscall32_nr.h b/linux-user/riscv/syscall32_nr.h
+new file mode 100644
+index 000000000000..4fef73e954da
+--- /dev/null
++++ b/linux-user/riscv/syscall32_nr.h
+@@ -0,0 +1,295 @@
++/*
++ * This file contains the system call numbers.
++ */
++#ifndef LINUX_USER_RISCV_SYSCALL32_NR_H
++#define LINUX_USER_RISCV_SYSCALL32_NR_H
 +
-+    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+}
++#define TARGET_NR_io_setup 0
++#define TARGET_NR_io_destroy 1
++#define TARGET_NR_io_submit 2
++#define TARGET_NR_io_cancel 3
++#define TARGET_NR_setxattr 5
++#define TARGET_NR_lsetxattr 6
++#define TARGET_NR_fsetxattr 7
++#define TARGET_NR_getxattr 8
++#define TARGET_NR_lgetxattr 9
++#define TARGET_NR_fgetxattr 10
++#define TARGET_NR_listxattr 11
++#define TARGET_NR_llistxattr 12
++#define TARGET_NR_flistxattr 13
++#define TARGET_NR_removexattr 14
++#define TARGET_NR_lremovexattr 15
++#define TARGET_NR_fremovexattr 16
++#define TARGET_NR_getcwd 17
++#define TARGET_NR_lookup_dcookie 18
++#define TARGET_NR_eventfd2 19
++#define TARGET_NR_epoll_create1 20
++#define TARGET_NR_epoll_ctl 21
++#define TARGET_NR_epoll_pwait 22
++#define TARGET_NR_dup 23
++#define TARGET_NR_dup3 24
++#define TARGET_NR_fcntl64 25
++#define TARGET_NR_inotify_init1 26
++#define TARGET_NR_inotify_add_watch 27
++#define TARGET_NR_inotify_rm_watch 28
++#define TARGET_NR_ioctl 29
++#define TARGET_NR_ioprio_set 30
++#define TARGET_NR_ioprio_get 31
++#define TARGET_NR_flock 32
++#define TARGET_NR_mknodat 33
++#define TARGET_NR_mkdirat 34
++#define TARGET_NR_unlinkat 35
++#define TARGET_NR_symlinkat 36
++#define TARGET_NR_linkat 37
++#define TARGET_NR_umount2 39
++#define TARGET_NR_mount 40
++#define TARGET_NR_pivot_root 41
++#define TARGET_NR_nfsservctl 42
++#define TARGET_NR_statfs64 43
++#define TARGET_NR_fstatfs64 44
++#define TARGET_NR_truncate64 45
++#define TARGET_NR_ftruncate64 46
++#define TARGET_NR_fallocate 47
++#define TARGET_NR_faccessat 48
++#define TARGET_NR_chdir 49
++#define TARGET_NR_fchdir 50
++#define TARGET_NR_chroot 51
++#define TARGET_NR_fchmod 52
++#define TARGET_NR_fchmodat 53
++#define TARGET_NR_fchownat 54
++#define TARGET_NR_fchown 55
++#define TARGET_NR_openat 56
++#define TARGET_NR_close 57
++#define TARGET_NR_vhangup 58
++#define TARGET_NR_pipe2 59
++#define TARGET_NR_quotactl 60
++#define TARGET_NR_getdents64 61
++#define TARGET_NR_llseek 62
++#define TARGET_NR_read 63
++#define TARGET_NR_write 64
++#define TARGET_NR_readv 65
++#define TARGET_NR_writev 66
++#define TARGET_NR_pread64 67
++#define TARGET_NR_pwrite64 68
++#define TARGET_NR_preadv 69
++#define TARGET_NR_pwritev 70
++#define TARGET_NR_sendfile64 71
++#define TARGET_NR_signalfd4 74
++#define TARGET_NR_vmsplice 75
++#define TARGET_NR_splice 76
++#define TARGET_NR_tee 77
++#define TARGET_NR_readlinkat 78
++#define TARGET_NR_fstatat64 79
++#define TARGET_NR_fstat64 80
++#define TARGET_NR_sync 81
++#define TARGET_NR_fsync 82
++#define TARGET_NR_fdatasync 83
++#define TARGET_NR_sync_file_range 84
++#define TARGET_NR_timerfd_create 85
++#define TARGET_NR_acct 89
++#define TARGET_NR_capget 90
++#define TARGET_NR_capset 91
++#define TARGET_NR_personality 92
++#define TARGET_NR_exit 93
++#define TARGET_NR_exit_group 94
++#define TARGET_NR_waitid 95
++#define TARGET_NR_set_tid_address 96
++#define TARGET_NR_unshare 97
++#define TARGET_NR_set_robust_list 99
++#define TARGET_NR_get_robust_list 100
++#define TARGET_NR_getitimer 102
++#define TARGET_NR_setitimer 103
++#define TARGET_NR_kexec_load 104
++#define TARGET_NR_init_module 105
++#define TARGET_NR_delete_module 106
++#define TARGET_NR_timer_create 107
++#define TARGET_NR_timer_getoverrun 109
++#define TARGET_NR_timer_delete 111
++#define TARGET_NR_syslog 116
++#define TARGET_NR_ptrace 117
++#define TARGET_NR_sched_setparam 118
++#define TARGET_NR_sched_setscheduler 119
++#define TARGET_NR_sched_getscheduler 120
++#define TARGET_NR_sched_getparam 121
++#define TARGET_NR_sched_setaffinity 122
++#define TARGET_NR_sched_getaffinity 123
++#define TARGET_NR_sched_yield 124
++#define TARGET_NR_sched_get_priority_max 125
++#define TARGET_NR_sched_get_priority_min 126
++#define TARGET_NR_restart_syscall 128
++#define TARGET_NR_kill 129
++#define TARGET_NR_tkill 130
++#define TARGET_NR_tgkill 131
++#define TARGET_NR_sigaltstack 132
++#define TARGET_NR_rt_sigsuspend 133
++#define TARGET_NR_rt_sigaction 134
++#define TARGET_NR_rt_sigprocmask 135
++#define TARGET_NR_rt_sigpending 136
++#define TARGET_NR_rt_sigqueueinfo 138
++#define TARGET_NR_rt_sigreturn 139
++#define TARGET_NR_setpriority 140
++#define TARGET_NR_getpriority 141
++#define TARGET_NR_reboot 142
++#define TARGET_NR_setregid 143
++#define TARGET_NR_setgid 144
++#define TARGET_NR_setreuid 145
++#define TARGET_NR_setuid 146
++#define TARGET_NR_setresuid 147
++#define TARGET_NR_getresuid 148
++#define TARGET_NR_setresgid 149
++#define TARGET_NR_getresgid 150
++#define TARGET_NR_setfsuid 151
++#define TARGET_NR_setfsgid 152
++#define TARGET_NR_times 153
++#define TARGET_NR_setpgid 154
++#define TARGET_NR_getpgid 155
++#define TARGET_NR_getsid 156
++#define TARGET_NR_setsid 157
++#define TARGET_NR_getgroups 158
++#define TARGET_NR_setgroups 159
++#define TARGET_NR_uname 160
++#define TARGET_NR_sethostname 161
++#define TARGET_NR_setdomainname 162
++#define TARGET_NR_getrlimit 163
++#define TARGET_NR_setrlimit 164
++#define TARGET_NR_getrusage 165
++#define TARGET_NR_umask 166
++#define TARGET_NR_prctl 167
++#define TARGET_NR_getcpu 168
++#define TARGET_NR_getpid 172
++#define TARGET_NR_getppid 173
++#define TARGET_NR_getuid 174
++#define TARGET_NR_geteuid 175
++#define TARGET_NR_getgid 176
++#define TARGET_NR_getegid 177
++#define TARGET_NR_gettid 178
++#define TARGET_NR_sysinfo 179
++#define TARGET_NR_mq_open 180
++#define TARGET_NR_mq_unlink 181
++#define TARGET_NR_mq_notify 184
++#define TARGET_NR_mq_getsetattr 185
++#define TARGET_NR_msgget 186
++#define TARGET_NR_msgctl 187
++#define TARGET_NR_msgrcv 188
++#define TARGET_NR_msgsnd 189
++#define TARGET_NR_semget 190
++#define TARGET_NR_semctl 191
++#define TARGET_NR_semop 193
++#define TARGET_NR_shmget 194
++#define TARGET_NR_shmctl 195
++#define TARGET_NR_shmat 196
++#define TARGET_NR_shmdt 197
++#define TARGET_NR_socket 198
++#define TARGET_NR_socketpair 199
++#define TARGET_NR_bind 200
++#define TARGET_NR_listen 201
++#define TARGET_NR_accept 202
++#define TARGET_NR_connect 203
++#define TARGET_NR_getsockname 204
++#define TARGET_NR_getpeername 205
++#define TARGET_NR_sendto 206
++#define TARGET_NR_recvfrom 207
++#define TARGET_NR_setsockopt 208
++#define TARGET_NR_getsockopt 209
++#define TARGET_NR_shutdown 210
++#define TARGET_NR_sendmsg 211
++#define TARGET_NR_recvmsg 212
++#define TARGET_NR_readahead 213
++#define TARGET_NR_brk 214
++#define TARGET_NR_munmap 215
++#define TARGET_NR_mremap 216
++#define TARGET_NR_add_key 217
++#define TARGET_NR_request_key 218
++#define TARGET_NR_keyctl 219
++#define TARGET_NR_clone 220
++#define TARGET_NR_execve 221
++#define TARGET_NR_mmap2 222
++#define TARGET_NR_fadvise64_64 223
++#define TARGET_NR_swapon 224
++#define TARGET_NR_swapoff 225
++#define TARGET_NR_mprotect 226
++#define TARGET_NR_msync 227
++#define TARGET_NR_mlock 228
++#define TARGET_NR_munlock 229
++#define TARGET_NR_mlockall 230
++#define TARGET_NR_munlockall 231
++#define TARGET_NR_mincore 232
++#define TARGET_NR_madvise 233
++#define TARGET_NR_remap_file_pages 234
++#define TARGET_NR_mbind 235
++#define TARGET_NR_get_mempolicy 236
++#define TARGET_NR_set_mempolicy 237
++#define TARGET_NR_migrate_pages 238
++#define TARGET_NR_move_pages 239
++#define TARGET_NR_rt_tgsigqueueinfo 240
++#define TARGET_NR_perf_event_open 241
++#define TARGET_NR_accept4 242
++#define TARGET_NR_arch_specific_syscall 244
++#define TARGET_NR_riscv_flush_icache (TARGET_NR_arch_specific_syscall + 15)
++#define TARGET_NR_prlimit64 261
++#define TARGET_NR_fanotify_init 262
++#define TARGET_NR_fanotify_mark 263
++#define TARGET_NR_name_to_handle_at 264
++#define TARGET_NR_open_by_handle_at 265
++#define TARGET_NR_syncfs 267
++#define TARGET_NR_setns 268
++#define TARGET_NR_sendmmsg 269
++#define TARGET_NR_process_vm_readv 270
++#define TARGET_NR_process_vm_writev 271
++#define TARGET_NR_kcmp 272
++#define TARGET_NR_finit_module 273
++#define TARGET_NR_sched_setattr 274
++#define TARGET_NR_sched_getattr 275
++#define TARGET_NR_renameat2 276
++#define TARGET_NR_seccomp 277
++#define TARGET_NR_getrandom 278
++#define TARGET_NR_memfd_create 279
++#define TARGET_NR_bpf 280
++#define TARGET_NR_execveat 281
++#define TARGET_NR_userfaultfd 282
++#define TARGET_NR_membarrier 283
++#define TARGET_NR_mlock2 284
++#define TARGET_NR_copy_file_range 285
++#define TARGET_NR_preadv2 286
++#define TARGET_NR_pwritev2 287
++#define TARGET_NR_pkey_mprotect 288
++#define TARGET_NR_pkey_alloc 289
++#define TARGET_NR_pkey_free 290
++#define TARGET_NR_statx 291
++#define TARGET_NR_rseq 293
++#define TARGET_NR_kexec_file_load 294
++#define TARGET_NR_clock_gettime64 403
++#define TARGET_NR_clock_settime64 404
++#define TARGET_NR_clock_adjtime64 405
++#define TARGET_NR_clock_getres_time64 406
++#define TARGET_NR_clock_nanosleep_time64 407
++#define TARGET_NR_timer_gettime64 408
++#define TARGET_NR_timer_settime64 409
++#define TARGET_NR_timerfd_gettime64 410
++#define TARGET_NR_timerfd_settime64 411
++#define TARGET_NR_utimensat_time64 412
++#define TARGET_NR_pselect6_time64 413
++#define TARGET_NR_ppoll_time64 414
++#define TARGET_NR_io_pgetevents_time64 416
++#define TARGET_NR_recvmmsg_time64 417
++#define TARGET_NR_mq_timedsend_time64 418
++#define TARGET_NR_mq_timedreceive_time64 419
++#define TARGET_NR_semtimedop_time64 420
++#define TARGET_NR_rt_sigtimedwait_time64 421
++#define TARGET_NR_futex_time64 422
++#define TARGET_NR_sched_rr_get_interval_time64 423
++#define TARGET_NR_pidfd_send_signal 424
++#define TARGET_NR_io_uring_setup 425
++#define TARGET_NR_io_uring_enter 426
++#define TARGET_NR_io_uring_register 427
++#define TARGET_NR_open_tree 428
++#define TARGET_NR_move_mount 429
++#define TARGET_NR_fsopen 430
++#define TARGET_NR_fsconfig 431
++#define TARGET_NR_fsmount 432
++#define TARGET_NR_fspick 433
++#define TARGET_NR_pidfd_open 434
++#define TARGET_NR_clone3 435
++#define TARGET_NR_syscalls 436
 +
- void cpu_loop(CPUX86State *env)
- {
-     CPUState *cs = env_cpu(env);
-     int trapnr;
-     abi_ulong pc;
-     abi_ulong ret;
--    target_siginfo_t info;
++#endif /* LINUX_USER_RISCV_SYSCALL32_NR_H */
+diff --git a/linux-user/riscv/syscall64_nr.h b/linux-user/riscv/syscall64_nr.h
+new file mode 100644
+index 000000000000..cc82f3244f55
+--- /dev/null
++++ b/linux-user/riscv/syscall64_nr.h
+@@ -0,0 +1,301 @@
++/*
++ * This file contains the system call numbers.
++ */
++#ifndef LINUX_USER_RISCV_SYSCALL64_NR_H
++#define LINUX_USER_RISCV_SYSCALL64_NR_H
++
++#define TARGET_NR_io_setup 0
++#define TARGET_NR_io_destroy 1
++#define TARGET_NR_io_submit 2
++#define TARGET_NR_io_cancel 3
++#define TARGET_NR_io_getevents 4
++#define TARGET_NR_setxattr 5
++#define TARGET_NR_lsetxattr 6
++#define TARGET_NR_fsetxattr 7
++#define TARGET_NR_getxattr 8
++#define TARGET_NR_lgetxattr 9
++#define TARGET_NR_fgetxattr 10
++#define TARGET_NR_listxattr 11
++#define TARGET_NR_llistxattr 12
++#define TARGET_NR_flistxattr 13
++#define TARGET_NR_removexattr 14
++#define TARGET_NR_lremovexattr 15
++#define TARGET_NR_fremovexattr 16
++#define TARGET_NR_getcwd 17
++#define TARGET_NR_lookup_dcookie 18
++#define TARGET_NR_eventfd2 19
++#define TARGET_NR_epoll_create1 20
++#define TARGET_NR_epoll_ctl 21
++#define TARGET_NR_epoll_pwait 22
++#define TARGET_NR_dup 23
++#define TARGET_NR_dup3 24
++#define TARGET_NR_fcntl 25
++#define TARGET_NR_inotify_init1 26
++#define TARGET_NR_inotify_add_watch 27
++#define TARGET_NR_inotify_rm_watch 28
++#define TARGET_NR_ioctl 29
++#define TARGET_NR_ioprio_set 30
++#define TARGET_NR_ioprio_get 31
++#define TARGET_NR_flock 32
++#define TARGET_NR_mknodat 33
++#define TARGET_NR_mkdirat 34
++#define TARGET_NR_unlinkat 35
++#define TARGET_NR_symlinkat 36
++#define TARGET_NR_linkat 37
++#define TARGET_NR_umount2 39
++#define TARGET_NR_mount 40
++#define TARGET_NR_pivot_root 41
++#define TARGET_NR_nfsservctl 42
++#define TARGET_NR_statfs 43
++#define TARGET_NR_fstatfs 44
++#define TARGET_NR_truncate 45
++#define TARGET_NR_ftruncate 46
++#define TARGET_NR_fallocate 47
++#define TARGET_NR_faccessat 48
++#define TARGET_NR_chdir 49
++#define TARGET_NR_fchdir 50
++#define TARGET_NR_chroot 51
++#define TARGET_NR_fchmod 52
++#define TARGET_NR_fchmodat 53
++#define TARGET_NR_fchownat 54
++#define TARGET_NR_fchown 55
++#define TARGET_NR_openat 56
++#define TARGET_NR_close 57
++#define TARGET_NR_vhangup 58
++#define TARGET_NR_pipe2 59
++#define TARGET_NR_quotactl 60
++#define TARGET_NR_getdents64 61
++#define TARGET_NR_lseek 62
++#define TARGET_NR_read 63
++#define TARGET_NR_write 64
++#define TARGET_NR_readv 65
++#define TARGET_NR_writev 66
++#define TARGET_NR_pread64 67
++#define TARGET_NR_pwrite64 68
++#define TARGET_NR_preadv 69
++#define TARGET_NR_pwritev 70
++#define TARGET_NR_sendfile 71
++#define TARGET_NR_pselect6 72
++#define TARGET_NR_ppoll 73
++#define TARGET_NR_signalfd4 74
++#define TARGET_NR_vmsplice 75
++#define TARGET_NR_splice 76
++#define TARGET_NR_tee 77
++#define TARGET_NR_readlinkat 78
++#define TARGET_NR_newfstatat 79
++#define TARGET_NR_fstat 80
++#define TARGET_NR_sync 81
++#define TARGET_NR_fsync 82
++#define TARGET_NR_fdatasync 83
++#define TARGET_NR_sync_file_range 84
++#define TARGET_NR_timerfd_create 85
++#define TARGET_NR_timerfd_settime 86
++#define TARGET_NR_timerfd_gettime 87
++#define TARGET_NR_utimensat 88
++#define TARGET_NR_acct 89
++#define TARGET_NR_capget 90
++#define TARGET_NR_capset 91
++#define TARGET_NR_personality 92
++#define TARGET_NR_exit 93
++#define TARGET_NR_exit_group 94
++#define TARGET_NR_waitid 95
++#define TARGET_NR_set_tid_address 96
++#define TARGET_NR_unshare 97
++#define TARGET_NR_futex 98
++#define TARGET_NR_set_robust_list 99
++#define TARGET_NR_get_robust_list 100
++#define TARGET_NR_nanosleep 101
++#define TARGET_NR_getitimer 102
++#define TARGET_NR_setitimer 103
++#define TARGET_NR_kexec_load 104
++#define TARGET_NR_init_module 105
++#define TARGET_NR_delete_module 106
++#define TARGET_NR_timer_create 107
++#define TARGET_NR_timer_gettime 108
++#define TARGET_NR_timer_getoverrun 109
++#define TARGET_NR_timer_settime 110
++#define TARGET_NR_timer_delete 111
++#define TARGET_NR_clock_settime 112
++#define TARGET_NR_clock_gettime 113
++#define TARGET_NR_clock_getres 114
++#define TARGET_NR_clock_nanosleep 115
++#define TARGET_NR_syslog 116
++#define TARGET_NR_ptrace 117
++#define TARGET_NR_sched_setparam 118
++#define TARGET_NR_sched_setscheduler 119
++#define TARGET_NR_sched_getscheduler 120
++#define TARGET_NR_sched_getparam 121
++#define TARGET_NR_sched_setaffinity 122
++#define TARGET_NR_sched_getaffinity 123
++#define TARGET_NR_sched_yield 124
++#define TARGET_NR_sched_get_priority_max 125
++#define TARGET_NR_sched_get_priority_min 126
++#define TARGET_NR_sched_rr_get_interval 127
++#define TARGET_NR_restart_syscall 128
++#define TARGET_NR_kill 129
++#define TARGET_NR_tkill 130
++#define TARGET_NR_tgkill 131
++#define TARGET_NR_sigaltstack 132
++#define TARGET_NR_rt_sigsuspend 133
++#define TARGET_NR_rt_sigaction 134
++#define TARGET_NR_rt_sigprocmask 135
++#define TARGET_NR_rt_sigpending 136
++#define TARGET_NR_rt_sigtimedwait 137
++#define TARGET_NR_rt_sigqueueinfo 138
++#define TARGET_NR_rt_sigreturn 139
++#define TARGET_NR_setpriority 140
++#define TARGET_NR_getpriority 141
++#define TARGET_NR_reboot 142
++#define TARGET_NR_setregid 143
++#define TARGET_NR_setgid 144
++#define TARGET_NR_setreuid 145
++#define TARGET_NR_setuid 146
++#define TARGET_NR_setresuid 147
++#define TARGET_NR_getresuid 148
++#define TARGET_NR_setresgid 149
++#define TARGET_NR_getresgid 150
++#define TARGET_NR_setfsuid 151
++#define TARGET_NR_setfsgid 152
++#define TARGET_NR_times 153
++#define TARGET_NR_setpgid 154
++#define TARGET_NR_getpgid 155
++#define TARGET_NR_getsid 156
++#define TARGET_NR_setsid 157
++#define TARGET_NR_getgroups 158
++#define TARGET_NR_setgroups 159
++#define TARGET_NR_uname 160
++#define TARGET_NR_sethostname 161
++#define TARGET_NR_setdomainname 162
++#define TARGET_NR_getrlimit 163
++#define TARGET_NR_setrlimit 164
++#define TARGET_NR_getrusage 165
++#define TARGET_NR_umask 166
++#define TARGET_NR_prctl 167
++#define TARGET_NR_getcpu 168
++#define TARGET_NR_gettimeofday 169
++#define TARGET_NR_settimeofday 170
++#define TARGET_NR_adjtimex 171
++#define TARGET_NR_getpid 172
++#define TARGET_NR_getppid 173
++#define TARGET_NR_getuid 174
++#define TARGET_NR_geteuid 175
++#define TARGET_NR_getgid 176
++#define TARGET_NR_getegid 177
++#define TARGET_NR_gettid 178
++#define TARGET_NR_sysinfo 179
++#define TARGET_NR_mq_open 180
++#define TARGET_NR_mq_unlink 181
++#define TARGET_NR_mq_timedsend 182
++#define TARGET_NR_mq_timedreceive 183
++#define TARGET_NR_mq_notify 184
++#define TARGET_NR_mq_getsetattr 185
++#define TARGET_NR_msgget 186
++#define TARGET_NR_msgctl 187
++#define TARGET_NR_msgrcv 188
++#define TARGET_NR_msgsnd 189
++#define TARGET_NR_semget 190
++#define TARGET_NR_semctl 191
++#define TARGET_NR_semtimedop 192
++#define TARGET_NR_semop 193
++#define TARGET_NR_shmget 194
++#define TARGET_NR_shmctl 195
++#define TARGET_NR_shmat 196
++#define TARGET_NR_shmdt 197
++#define TARGET_NR_socket 198
++#define TARGET_NR_socketpair 199
++#define TARGET_NR_bind 200
++#define TARGET_NR_listen 201
++#define TARGET_NR_accept 202
++#define TARGET_NR_connect 203
++#define TARGET_NR_getsockname 204
++#define TARGET_NR_getpeername 205
++#define TARGET_NR_sendto 206
++#define TARGET_NR_recvfrom 207
++#define TARGET_NR_setsockopt 208
++#define TARGET_NR_getsockopt 209
++#define TARGET_NR_shutdown 210
++#define TARGET_NR_sendmsg 211
++#define TARGET_NR_recvmsg 212
++#define TARGET_NR_readahead 213
++#define TARGET_NR_brk 214
++#define TARGET_NR_munmap 215
++#define TARGET_NR_mremap 216
++#define TARGET_NR_add_key 217
++#define TARGET_NR_request_key 218
++#define TARGET_NR_keyctl 219
++#define TARGET_NR_clone 220
++#define TARGET_NR_execve 221
++#define TARGET_NR_mmap 222
++#define TARGET_NR_fadvise64 223
++#define TARGET_NR_swapon 224
++#define TARGET_NR_swapoff 225
++#define TARGET_NR_mprotect 226
++#define TARGET_NR_msync 227
++#define TARGET_NR_mlock 228
++#define TARGET_NR_munlock 229
++#define TARGET_NR_mlockall 230
++#define TARGET_NR_munlockall 231
++#define TARGET_NR_mincore 232
++#define TARGET_NR_madvise 233
++#define TARGET_NR_remap_file_pages 234
++#define TARGET_NR_mbind 235
++#define TARGET_NR_get_mempolicy 236
++#define TARGET_NR_set_mempolicy 237
++#define TARGET_NR_migrate_pages 238
++#define TARGET_NR_move_pages 239
++#define TARGET_NR_rt_tgsigqueueinfo 240
++#define TARGET_NR_perf_event_open 241
++#define TARGET_NR_accept4 242
++#define TARGET_NR_recvmmsg 243
++#define TARGET_NR_arch_specific_syscall 244
++#define TARGET_NR_riscv_flush_icache (TARGET_NR_arch_specific_syscall + 15)
++#define TARGET_NR_wait4 260
++#define TARGET_NR_prlimit64 261
++#define TARGET_NR_fanotify_init 262
++#define TARGET_NR_fanotify_mark 263
++#define TARGET_NR_name_to_handle_at 264
++#define TARGET_NR_open_by_handle_at 265
++#define TARGET_NR_clock_adjtime 266
++#define TARGET_NR_syncfs 267
++#define TARGET_NR_setns 268
++#define TARGET_NR_sendmmsg 269
++#define TARGET_NR_process_vm_readv 270
++#define TARGET_NR_process_vm_writev 271
++#define TARGET_NR_kcmp 272
++#define TARGET_NR_finit_module 273
++#define TARGET_NR_sched_setattr 274
++#define TARGET_NR_sched_getattr 275
++#define TARGET_NR_renameat2 276
++#define TARGET_NR_seccomp 277
++#define TARGET_NR_getrandom 278
++#define TARGET_NR_memfd_create 279
++#define TARGET_NR_bpf 280
++#define TARGET_NR_execveat 281
++#define TARGET_NR_userfaultfd 282
++#define TARGET_NR_membarrier 283
++#define TARGET_NR_mlock2 284
++#define TARGET_NR_copy_file_range 285
++#define TARGET_NR_preadv2 286
++#define TARGET_NR_pwritev2 287
++#define TARGET_NR_pkey_mprotect 288
++#define TARGET_NR_pkey_alloc 289
++#define TARGET_NR_pkey_free 290
++#define TARGET_NR_statx 291
++#define TARGET_NR_io_pgetevents 292
++#define TARGET_NR_rseq 293
++#define TARGET_NR_kexec_file_load 294
++#define TARGET_NR_pidfd_send_signal 424
++#define TARGET_NR_io_uring_setup 425
++#define TARGET_NR_io_uring_enter 426
++#define TARGET_NR_io_uring_register 427
++#define TARGET_NR_open_tree 428
++#define TARGET_NR_move_mount 429
++#define TARGET_NR_fsopen 430
++#define TARGET_NR_fsconfig 431
++#define TARGET_NR_fsmount 432
++#define TARGET_NR_fspick 433
++#define TARGET_NR_pidfd_open 434
++#define TARGET_NR_clone3 435
++#define TARGET_NR_syscalls 436
++
++#endif /* LINUX_USER_RISCV_SYSCALL64_NR_H */
+diff --git a/linux-user/riscv/syscall_nr.h b/linux-user/riscv/syscall_nr.h
+index 5c8728220994..0a5a2f2fb161 100644
+--- a/linux-user/riscv/syscall_nr.h
++++ b/linux-user/riscv/syscall_nr.h
+@@ -6,300 +6,10 @@
+ #ifndef LINUX_USER_RISCV_SYSCALL_NR_H
+ #define LINUX_USER_RISCV_SYSCALL_NR_H
  
-     for(;;) {
-         cpu_exec_start(cs);
-@@ -134,70 +144,45 @@ void cpu_loop(CPUX86State *env)
+-#define TARGET_NR_io_setup 0
+-#define TARGET_NR_io_destroy 1
+-#define TARGET_NR_io_submit 2
+-#define TARGET_NR_io_cancel 3
+-#define TARGET_NR_io_getevents 4
+-#define TARGET_NR_setxattr 5
+-#define TARGET_NR_lsetxattr 6
+-#define TARGET_NR_fsetxattr 7
+-#define TARGET_NR_getxattr 8
+-#define TARGET_NR_lgetxattr 9
+-#define TARGET_NR_fgetxattr 10
+-#define TARGET_NR_listxattr 11
+-#define TARGET_NR_llistxattr 12
+-#define TARGET_NR_flistxattr 13
+-#define TARGET_NR_removexattr 14
+-#define TARGET_NR_lremovexattr 15
+-#define TARGET_NR_fremovexattr 16
+-#define TARGET_NR_getcwd 17
+-#define TARGET_NR_lookup_dcookie 18
+-#define TARGET_NR_eventfd2 19
+-#define TARGET_NR_epoll_create1 20
+-#define TARGET_NR_epoll_ctl 21
+-#define TARGET_NR_epoll_pwait 22
+-#define TARGET_NR_dup 23
+-#define TARGET_NR_dup3 24
+ #ifdef TARGET_RISCV32
+-#define TARGET_NR_fcntl64 25
++# include "syscall32_nr.h"
+ #else
+-#define TARGET_NR_fcntl 25
++# include "syscall64_nr.h"
  #endif
-         case EXCP0B_NOSEG:
-         case EXCP0C_STACK:
--            info.si_signo = TARGET_SIGBUS;
--            info.si_errno = 0;
--            info.si_code = TARGET_SI_KERNEL;
--            info._sifields._sigfault._addr = 0;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGBUS, TARGET_SI_KERNEL, 0);
-             break;
-         case EXCP0D_GPF:
-             /* XXX: potential problem if ABI32 */
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_fault(env);
--            } else
+-#define TARGET_NR_inotify_init1 26
+-#define TARGET_NR_inotify_add_watch 27
+-#define TARGET_NR_inotify_rm_watch 28
+-#define TARGET_NR_ioctl 29
+-#define TARGET_NR_ioprio_set 30
+-#define TARGET_NR_ioprio_get 31
+-#define TARGET_NR_flock 32
+-#define TARGET_NR_mknodat 33
+-#define TARGET_NR_mkdirat 34
+-#define TARGET_NR_unlinkat 35
+-#define TARGET_NR_symlinkat 36
+-#define TARGET_NR_linkat 37
+-#define TARGET_NR_renameat 38
+-#define TARGET_NR_umount2 39
+-#define TARGET_NR_mount 40
+-#define TARGET_NR_pivot_root 41
+-#define TARGET_NR_nfsservctl 42
+-#define TARGET_NR_statfs 43
+-#define TARGET_NR_fstatfs 44
+-#define TARGET_NR_truncate 45
+-#define TARGET_NR_ftruncate 46
+-#define TARGET_NR_fallocate 47
+-#define TARGET_NR_faccessat 48
+-#define TARGET_NR_chdir 49
+-#define TARGET_NR_fchdir 50
+-#define TARGET_NR_chroot 51
+-#define TARGET_NR_fchmod 52
+-#define TARGET_NR_fchmodat 53
+-#define TARGET_NR_fchownat 54
+-#define TARGET_NR_fchown 55
+-#define TARGET_NR_openat 56
+-#define TARGET_NR_close 57
+-#define TARGET_NR_vhangup 58
+-#define TARGET_NR_pipe2 59
+-#define TARGET_NR_quotactl 60
+-#define TARGET_NR_getdents64 61
+-#ifdef TARGET_RISCV32
+-#define TARGET_NR__llseek 62
+-#else
+-#define TARGET_NR_lseek 62
 -#endif
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                info.si_code = TARGET_SI_KERNEL;
--                info._sifields._sigfault._addr = 0;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-             }
-+#endif
-+            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
-             break;
-         case EXCP0E_PAGE:
--            info.si_signo = TARGET_SIGSEGV;
--            info.si_errno = 0;
--            if (!(env->error_code & 1))
--                info.si_code = TARGET_SEGV_MAPERR;
--            else
--                info.si_code = TARGET_SEGV_ACCERR;
--            info._sifields._sigfault._addr = env->cr[2];
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGSEGV,
-+                       (env->error_code & 1 ?
-+                        TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR),
-+                       env->cr[2]);
-             break;
-         case EXCP00_DIVZ:
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_trap(env, trapnr);
--            } else
+-#define TARGET_NR_read 63
+-#define TARGET_NR_write 64
+-#define TARGET_NR_readv 65
+-#define TARGET_NR_writev 66
+-#define TARGET_NR_pread64 67
+-#define TARGET_NR_pwrite64 68
+-#define TARGET_NR_preadv 69
+-#define TARGET_NR_pwritev 70
+-#define TARGET_NR_sendfile 71
+-#define TARGET_NR_pselect6 72
+-#define TARGET_NR_ppoll 73
+-#define TARGET_NR_signalfd4 74
+-#define TARGET_NR_vmsplice 75
+-#define TARGET_NR_splice 76
+-#define TARGET_NR_tee 77
+-#define TARGET_NR_readlinkat 78
+-#define TARGET_NR_newfstatat 79
+-#define TARGET_NR_fstat 80
+-#define TARGET_NR_sync 81
+-#define TARGET_NR_fsync 82
+-#define TARGET_NR_fdatasync 83
+-#define TARGET_NR_sync_file_range 84
+-#define TARGET_NR_timerfd_create 85
+-#define TARGET_NR_timerfd_settime 86
+-#define TARGET_NR_timerfd_gettime 87
+-#define TARGET_NR_utimensat 88
+-#define TARGET_NR_acct 89
+-#define TARGET_NR_capget 90
+-#define TARGET_NR_capset 91
+-#define TARGET_NR_personality 92
+-#define TARGET_NR_exit 93
+-#define TARGET_NR_exit_group 94
+-#define TARGET_NR_waitid 95
+-#define TARGET_NR_set_tid_address 96
+-#define TARGET_NR_unshare 97
+-#define TARGET_NR_futex 98
+-#define TARGET_NR_set_robust_list 99
+-#define TARGET_NR_get_robust_list 100
+-#define TARGET_NR_nanosleep 101
+-#define TARGET_NR_getitimer 102
+-#define TARGET_NR_setitimer 103
+-#define TARGET_NR_kexec_load 104
+-#define TARGET_NR_init_module 105
+-#define TARGET_NR_delete_module 106
+-#define TARGET_NR_timer_create 107
+-#define TARGET_NR_timer_gettime 108
+-#define TARGET_NR_timer_getoverrun 109
+-#define TARGET_NR_timer_settime 110
+-#define TARGET_NR_timer_delete 111
+-#define TARGET_NR_clock_settime 112
+-#define TARGET_NR_clock_gettime 113
+-#define TARGET_NR_clock_getres 114
+-#define TARGET_NR_clock_nanosleep 115
+-#define TARGET_NR_syslog 116
+-#define TARGET_NR_ptrace 117
+-#define TARGET_NR_sched_setparam 118
+-#define TARGET_NR_sched_setscheduler 119
+-#define TARGET_NR_sched_getscheduler 120
+-#define TARGET_NR_sched_getparam 121
+-#define TARGET_NR_sched_setaffinity 122
+-#define TARGET_NR_sched_getaffinity 123
+-#define TARGET_NR_sched_yield 124
+-#define TARGET_NR_sched_get_priority_max 125
+-#define TARGET_NR_sched_get_priority_min 126
+-#define TARGET_NR_sched_rr_get_interval 127
+-#define TARGET_NR_restart_syscall 128
+-#define TARGET_NR_kill 129
+-#define TARGET_NR_tkill 130
+-#define TARGET_NR_tgkill 131
+-#define TARGET_NR_sigaltstack 132
+-#define TARGET_NR_rt_sigsuspend 133
+-#define TARGET_NR_rt_sigaction 134
+-#define TARGET_NR_rt_sigprocmask 135
+-#define TARGET_NR_rt_sigpending 136
+-#define TARGET_NR_rt_sigtimedwait 137
+-#define TARGET_NR_rt_sigqueueinfo 138
+-#define TARGET_NR_rt_sigreturn 139
+-#define TARGET_NR_setpriority 140
+-#define TARGET_NR_getpriority 141
+-#define TARGET_NR_reboot 142
+-#define TARGET_NR_setregid 143
+-#define TARGET_NR_setgid 144
+-#define TARGET_NR_setreuid 145
+-#define TARGET_NR_setuid 146
+-#define TARGET_NR_setresuid 147
+-#define TARGET_NR_getresuid 148
+-#define TARGET_NR_setresgid 149
+-#define TARGET_NR_getresgid 150
+-#define TARGET_NR_setfsuid 151
+-#define TARGET_NR_setfsgid 152
+-#define TARGET_NR_times 153
+-#define TARGET_NR_setpgid 154
+-#define TARGET_NR_getpgid 155
+-#define TARGET_NR_getsid 156
+-#define TARGET_NR_setsid 157
+-#define TARGET_NR_getgroups 158
+-#define TARGET_NR_setgroups 159
+-#define TARGET_NR_uname 160
+-#define TARGET_NR_sethostname 161
+-#define TARGET_NR_setdomainname 162
+-#define TARGET_NR_getrlimit 163
+-#define TARGET_NR_setrlimit 164
+-#define TARGET_NR_getrusage 165
+-#define TARGET_NR_umask 166
+-#define TARGET_NR_prctl 167
+-#define TARGET_NR_getcpu 168
+-#define TARGET_NR_gettimeofday 169
+-#define TARGET_NR_settimeofday 170
+-#define TARGET_NR_adjtimex 171
+-#define TARGET_NR_getpid 172
+-#define TARGET_NR_getppid 173
+-#define TARGET_NR_getuid 174
+-#define TARGET_NR_geteuid 175
+-#define TARGET_NR_getgid 176
+-#define TARGET_NR_getegid 177
+-#define TARGET_NR_gettid 178
+-#define TARGET_NR_sysinfo 179
+-#define TARGET_NR_mq_open 180
+-#define TARGET_NR_mq_unlink 181
+-#define TARGET_NR_mq_timedsend 182
+-#define TARGET_NR_mq_timedreceive 183
+-#define TARGET_NR_mq_notify 184
+-#define TARGET_NR_mq_getsetattr 185
+-#define TARGET_NR_msgget 186
+-#define TARGET_NR_msgctl 187
+-#define TARGET_NR_msgrcv 188
+-#define TARGET_NR_msgsnd 189
+-#define TARGET_NR_semget 190
+-#define TARGET_NR_semctl 191
+-#define TARGET_NR_semtimedop 192
+-#define TARGET_NR_semop 193
+-#define TARGET_NR_shmget 194
+-#define TARGET_NR_shmctl 195
+-#define TARGET_NR_shmat 196
+-#define TARGET_NR_shmdt 197
+-#define TARGET_NR_socket 198
+-#define TARGET_NR_socketpair 199
+-#define TARGET_NR_bind 200
+-#define TARGET_NR_listen 201
+-#define TARGET_NR_accept 202
+-#define TARGET_NR_connect 203
+-#define TARGET_NR_getsockname 204
+-#define TARGET_NR_getpeername 205
+-#define TARGET_NR_sendto 206
+-#define TARGET_NR_recvfrom 207
+-#define TARGET_NR_setsockopt 208
+-#define TARGET_NR_getsockopt 209
+-#define TARGET_NR_shutdown 210
+-#define TARGET_NR_sendmsg 211
+-#define TARGET_NR_recvmsg 212
+-#define TARGET_NR_readahead 213
+-#define TARGET_NR_brk 214
+-#define TARGET_NR_munmap 215
+-#define TARGET_NR_mremap 216
+-#define TARGET_NR_add_key 217
+-#define TARGET_NR_request_key 218
+-#define TARGET_NR_keyctl 219
+-#define TARGET_NR_clone 220
+-#define TARGET_NR_execve 221
+-#ifdef TARGET_RISCV32
+-#define TARGET_NR_mmap2 222
+-#define TARGET_NR_fadvise64_64 223
+-#else
+-#define TARGET_NR_mmap 222
+-#define TARGET_NR_fadvise64 223
 -#endif
--            {
--                /* division by zero */
--                info.si_signo = TARGET_SIGFPE;
--                info.si_errno = 0;
--                info.si_code = TARGET_FPE_INTDIV;
--                info._sifields._sigfault._addr = env->eip;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-             }
-+#endif
-+            gen_signal(env, TARGET_SIGFPE, TARGET_FPE_INTDIV, env->eip);
-             break;
-         case EXCP01_DB:
-         case EXCP03_INT3:
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_trap(env, trapnr);
--            } else
-+                break;
-+            }
+-#define TARGET_NR_swapon 224
+-#define TARGET_NR_swapoff 225
+-#define TARGET_NR_mprotect 226
+-#define TARGET_NR_msync 227
+-#define TARGET_NR_mlock 228
+-#define TARGET_NR_munlock 229
+-#define TARGET_NR_mlockall 230
+-#define TARGET_NR_munlockall 231
+-#define TARGET_NR_mincore 232
+-#define TARGET_NR_madvise 233
+-#define TARGET_NR_remap_file_pages 234
+-#define TARGET_NR_mbind 235
+-#define TARGET_NR_get_mempolicy 236
+-#define TARGET_NR_set_mempolicy 237
+-#define TARGET_NR_migrate_pages 238
+-#define TARGET_NR_move_pages 239
+-#define TARGET_NR_rt_tgsigqueueinfo 240
+-#define TARGET_NR_perf_event_open 241
+-#define TARGET_NR_accept4 242
+-#define TARGET_NR_recvmmsg 243
+-#define TARGET_NR_arch_specific_syscall 244
+-#define TARGET_NR_wait4 260
+-#define TARGET_NR_prlimit64 261
+-#define TARGET_NR_fanotify_init 262
+-#define TARGET_NR_fanotify_mark 263
+-#define TARGET_NR_name_to_handle_at 264
+-#define TARGET_NR_open_by_handle_at 265
+-#define TARGET_NR_clock_adjtime 266
+-#define TARGET_NR_syncfs 267
+-#define TARGET_NR_setns 268
+-#define TARGET_NR_sendmmsg 269
+-#define TARGET_NR_process_vm_readv 270
+-#define TARGET_NR_process_vm_writev 271
+-#define TARGET_NR_kcmp 272
+-#define TARGET_NR_finit_module 273
+-#define TARGET_NR_sched_setattr 274
+-#define TARGET_NR_sched_getattr 275
+-#define TARGET_NR_renameat2 276
+-#define TARGET_NR_seccomp 277
+-#define TARGET_NR_getrandom 278
+-#define TARGET_NR_memfd_create 279
+-#define TARGET_NR_bpf 280
+-#define TARGET_NR_execveat 281
+-#define TARGET_NR_userfaultfd 282
+-#define TARGET_NR_membarrier 283
+-#define TARGET_NR_mlock2 284
+-#define TARGET_NR_copy_file_range 285
+-#define TARGET_NR_preadv2 286
+-#define TARGET_NR_pwritev2 287
+-#define TARGET_NR_pkey_mprotect 288
+-#define TARGET_NR_pkey_alloc 289
+-#define TARGET_NR_pkey_free 290
+-#define TARGET_NR_statx 291
+-#define TARGET_NR_io_pgetevents 292
+-#define TARGET_NR_rseq 293
+-#define TARGET_NR_kexec_file_load 294
+-
+-#define TARGET_NR_syscalls (TARGET_NR_kexec_file_load + 1)
+ 
  #endif
--            {
--                info.si_signo = TARGET_SIGTRAP;
--                info.si_errno = 0;
--                if (trapnr == EXCP01_DB) {
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    info._sifields._sigfault._addr = env->eip;
--                } else {
--                    info.si_code = TARGET_SI_KERNEL;
--                    info._sifields._sigfault._addr = 0;
--                }
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            if (trapnr == EXCP01_DB) {
-+                gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, env->eip);
-+            } else {
-+                gen_signal(env, TARGET_SIGTRAP, TARGET_SI_KERNEL, 0);
-             }
-             break;
-         case EXCP04_INTO:
-@@ -205,31 +190,19 @@ void cpu_loop(CPUX86State *env)
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_trap(env, trapnr);
--            } else
--#endif
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                info.si_code = TARGET_SI_KERNEL;
--                info._sifields._sigfault._addr = 0;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-             }
-+#endif
-+            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
-             break;
-         case EXCP06_ILLOP:
--            info.si_signo = TARGET_SIGILL;
--            info.si_errno = 0;
--            info.si_code = TARGET_ILL_ILLOPN;
--            info._sifields._sigfault._addr = env->eip;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGILL, TARGET_ILL_ILLOPN, env->eip);
-             break;
-         case EXCP_INTERRUPT:
-             /* just indicate that signals should be handled asap */
-             break;
-         case EXCP_DEBUG:
--            info.si_signo = TARGET_SIGTRAP;
--            info.si_errno = 0;
--            info.si_code = TARGET_TRAP_BRKPT;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, 0);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 661404687080..03ecfd1298c2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -295,7 +295,7 @@ _syscall1(int,exit_group,int,error_code)
+ #if defined(TARGET_NR_set_tid_address) && defined(__NR_set_tid_address)
+ _syscall1(int,set_tid_address,int *,tidptr)
+ #endif
+-#if defined(TARGET_NR_futex) && defined(__NR_futex)
++#if (defined(TARGET_NR_futex) || defined(TARGET_NR_exit)) && defined(__NR_futex)
+ _syscall6(int,sys_futex,int *,uaddr,int,op,int,val,
+           const struct timespec *,timeout,int *,uaddr2,int,val3)
+ #endif
 -- 
 2.25.1
 
