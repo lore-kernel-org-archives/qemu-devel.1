@@ -2,67 +2,67 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8A2C4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FDDBC4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:31:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27BAF20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:30:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27BAF20663
+	by mail.kernel.org (Postfix) with ESMTPS id 316AD20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 09:31:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 316AD20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jErVu-0005LK-71
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:30:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40873)
+	id 1jErW1-0005bE-7q
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 05:31:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jErRv-0005MP-MG
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:48 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jErRy-0005Qu-D5
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jErRu-0004Cx-GW
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:47 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:35299)
+ (envelope-from <laurent@vivier.eu>) id 1jErRx-0004F3-29
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:50 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:33917)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jErRu-0004Cd-7J
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:46 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jErRw-0004E8-P7
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 05:26:48 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MF2YC-1j3nlt19fk-00FR61; Thu, 19 Mar 2020 10:26:37 +0100
+ id 1Mc1hn-1jqfIn2n7f-00dTuI; Thu, 19 Mar 2020 10:26:38 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 09/16] linux-user: Update TASK_UNMAPPED_BASE for aarch64
-Date: Thu, 19 Mar 2020 10:26:20 +0100
-Message-Id: <20200319092627.51487-10-laurent@vivier.eu>
+Subject: [PULL v3 11/16] linux-user/syscall: Add support for
+ clock_gettime64/clock_settime64
+Date: Thu, 19 Mar 2020 10:26:22 +0100
+Message-Id: <20200319092627.51487-12-laurent@vivier.eu>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200319092627.51487-1-laurent@vivier.eu>
 References: <20200319092627.51487-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:IGmL+8UbZ90+Uaal3vT715lrRDQg8cicjsPVKzzM+5RAfBrIlwk
- ZFA6FnWqFJr3XFs87rlYYnQkFx6lWyIKJU4sN7AO0ON/k3qYdi1tn0qnBhAbg6xHkqZwvsx
- U5nxJVB7nioyX164RSdLY49JLCR7vqwYlhQugYo7yr0xInmk/i1MS+TT8q2QIf3NL7dVCi/
- 56CzJJoysDgp4lTxisamQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IyHZQ8bPvPg=:peOn06G944QaknQMFfiKd1
- tiF3R9njNTSBXuz8TW1JHRIKR/4y0WLQLoXsnSf9Uu5lNhJICXIqslbQbID9X7ozlfRu7Ayjh
- cmj6ihS7gkv8slj7xhkGs1BuskMA6YJo2x/rx9nWleXBpzq3DcrwKfZHGLj7dCbReSZTBKoha
- zaQ/9YVhppNodjTiPXBvTShS1YrZEpUIAGnSU0DSccG0jOgz1O9xigByMiF1cFefAp1nRCTre
- lZ0iTJK+Px7J7UAyF7XfawcFEOrvkLk4awkBS/x82HQcVZyLL6PkFHe85OLOBB+ud1SxsflCp
- 6EXMzImdtAu++kUau2Y57SO6QD63Qtox6KovvtyffYk8aPXABRT4zVckzW4S0EQd8St18hwg7
- hkzY3OTyfeIwTvB2bkGVSQhYxirDZVmkHcbraI/KOswY4QRzUDSMWvkeSMad2DDehxKr+tiBi
- IFpcmFn+Gr4dJL+LpbxyxHQdTQlRfOQuCxOzjPywLG5iRlOD//yNmU79yrpAc6KjCet/EWBan
- 47eh2B4mNkI223OksViW1T4HX1lPnELsf3c5KkTAfnCVvCsygePc3B5dTUmI/9yL1JAhMQpet
- nodNWLwzVYzUqNdG2NlbojF/uDTyJDtBc22mVZSEoDhHQTG1cXv7gXFAz1NOFv7V9kY/Bryt0
- umlToiwzt2XajxvLkEjzvq1P3DNRYSzNMC7XRQdyB1OhCnbiv0DuulLNZidsVQNdIFMvGtEP8
- 2Sg7Thw7vykA61UVQ2DAbWBb42smcztja1jTAjgqAC22hCIRnOgruTyf0pdmo00CtkZ2vQ8Vl
- uCLXBWEAITKYDHJaQVSxdVY+AvZHGm1Cae2ZKE1jvV1wkFBboB3OM/ghOOmtCvM0JfKWkMW
+X-Provags-ID: V03:K1:L9uGFhJuOpdqZ11JjA5qmhOkxad9EpMTdmTYCQSsFM3t3oRux9s
+ k+BgrnC5/eJteZAE9/PDuRyaqem/D1lL6qPWSFXmPDBAu5llwvv0sq4IzY4Dq7YSO3EA9o9
+ oT3PHJr3rHsb7Z0yGknnN3Mu6leuCRKLCUkTWqUHShJeFAxVY41nx0P0iGY0D4BrdMhddKJ
+ HC0jVu6OrwIa+SziKXy2g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hdwfzrX7RyI=:tEUyfOLVlQEw+D9J8JjgEQ
+ ROJL9gJcpmjkuU1LkdJsQN80MJWfEWKfUMLksAwvUoWUPDBDToTDfMTOEAYYB0vhypynlBavk
+ /FRVCQWsn7ILmSBl3MkyZ9uv6aCJwVIOXCxZRj5fNirNbETJmJytb6LMt+WOaVGYMyqT0lMjB
+ cuLWKC9Fl0TlfKBRnLbT+ggOY5XJGDvqhaD0KOSkmQ7r9o/qRIWv+ZwuxKswlbSBmTXpF6BqS
+ CqeUqJDax8M7kM7ieYop32weMJYxNuZ8QXF8yP67DQt1WHmGIDX5XC1gHKDQ2C1zOuc0FQC1Z
+ JbWDxJ8b2rnOXSfvu5ttEh7H2hziA/sBMmela003kY38Mhvx15BeT9aBB0m2SWM12NYhTmDJ9
+ hC6cdYF0TelsdAlQev0L2UAV4jRHA35lhgflQToVE7QiKOeu49RsP13Bqql9GopjtOzPQQmzL
+ xob2bAqQ3ew//DYdioNDFiaynQ26t/14RtPqpSxsy4ouVjy23ZqU1mrhhYhXHt1NSD9BlZwqw
+ Lbw7WCxzJyNTBpBgQTIuzp4YzA5G7Cf9iisvpysgb+ZAA3kT1oNoDsPkad272LW5SpsjrmSkD
+ 05cmHoYs9FkUOJ5Wb5zRAs3MLXSpiAfJbcULLJg+oFCtIWWIlLBE9hkkDSI+4A2K88K+UBAfW
+ +uqlRu5EAizIal94cWkdjR/UFdpnm3a1OwIpjp+0QWN+Ea/XpFnDXSNpW4eBo6JN+vWl7LbB9
+ mkEa/T5gIeOundFokfmYEwBcy2Wx1BdVPLbn0dJiAtNoPtHmoUlOFljChYz74hRc/+XI1SIaF
+ 2Au8ADBgXexxtlZuCHQRZjmYRdhShWOaBV8UXSV6sKhVdIrfr5UfTW+33d1U8zIXYrVrPwk
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,41 +76,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Lirong Yuan <yuanzi@google.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lirong Yuan <yuanzi@google.com>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-This change updates TASK_UNMAPPED_BASE (the base address for guest programs) for aarch64. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
-https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
+Add support for the clock_gettime64/clock_settime64 syscalls.
 
-Signed-off-by: Lirong Yuan <yuanzi@google.com>
+If your host is 64-bit or is 32-bit with the *_time64 syscall then the
+timespec will correctly be a 64-bit time_t. Otherwise the host will
+return a 32-bit time_t which will be rounded to 64-bits. This will be
+incorrect after y2038.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200313002813.3857-1-yuanzi@google.com>
+Message-Id: <4a7fd05532400d10aa0f684c9043e2ac7b34d91c.1584051142.git.alistair.francis@wdc.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/mmap.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ linux-user/syscall.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 8685f02e7e90..e37803379747 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -184,7 +184,11 @@ static int mmap_frag(abi_ulong real_start,
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index ea1c84dc5de5..661404687080 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1229,6 +1229,22 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
  }
- 
- #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
-+#ifdef TARGET_AARCH64
-+# define TASK_UNMAPPED_BASE  0x5500000000
-+#else
- # define TASK_UNMAPPED_BASE  (1ul << 38)
-+#endif
- #else
- # define TASK_UNMAPPED_BASE  0x40000000
  #endif
+ 
++#if defined(TARGET_NR_clock_settime64)
++static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
++                                                 abi_ulong target_addr)
++{
++    struct target__kernel_timespec *target_ts;
++
++    if (!lock_user_struct(VERIFY_READ, target_ts, target_addr, 1)) {
++        return -TARGET_EFAULT;
++    }
++    __get_user(host_ts->tv_sec, &target_ts->tv_sec);
++    __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
++    unlock_user_struct(target_ts, target_addr, 0);
++    return 0;
++}
++#endif
++
+ static inline abi_long host_to_target_timespec(abi_ulong target_addr,
+                                                struct timespec *host_ts)
+ {
+@@ -11493,6 +11509,18 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         return ret;
+     }
+ #endif
++#ifdef TARGET_NR_clock_settime64
++    case TARGET_NR_clock_settime64:
++    {
++        struct timespec ts;
++
++        ret = target_to_host_timespec64(&ts, arg2);
++        if (!is_error(ret)) {
++            ret = get_errno(clock_settime(arg1, &ts));
++        }
++        return ret;
++    }
++#endif
+ #ifdef TARGET_NR_clock_gettime
+     case TARGET_NR_clock_gettime:
+     {
+@@ -11504,6 +11532,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         return ret;
+     }
+ #endif
++#ifdef TARGET_NR_clock_gettime64
++    case TARGET_NR_clock_gettime64:
++    {
++        struct timespec ts;
++        ret = get_errno(clock_gettime(arg1, &ts));
++        if (!is_error(ret)) {
++            ret = host_to_target_timespec64(arg2, &ts);
++        }
++        return ret;
++    }
++#endif
+ #ifdef TARGET_NR_clock_getres
+     case TARGET_NR_clock_getres:
+     {
 -- 
 2.25.1
 
