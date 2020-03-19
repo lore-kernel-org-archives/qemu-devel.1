@@ -2,66 +2,86 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85189C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B776C4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:27:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5935920768
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:17:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5935920768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 060C620768
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 03:27:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZcAQLcA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 060C620768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jElg3-0004pO-GR
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 23:16:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40987)
+	id 1jElpp-0006hj-4d
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 23:27:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44923)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jElfQ-0004P0-TA
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:16:22 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jElpD-00065n-5S
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:26:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1jElfO-00038A-9J
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:16:19 -0400
-Received: from mga12.intel.com ([192.55.52.136]:10700)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1jElfO-00034n-0i
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:16:18 -0400
-IronPort-SDR: mRwGNqjOjkId5opCvxms4p/OGV8IVlJ6vzWMUMhv5q3BJasXmiWPMi8Dd3pMk4MmDEQg6DLmP+
- faMI6LHCorsw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 18 Mar 2020 20:16:13 -0700
-IronPort-SDR: swnNbXQO1iGicif0Vn5gsbafAmsX5kVTQAdL1kveGqX7dQJO+ccxbgIMwyRFrDeRRSEfz+RRWO
- Q2rlzeDXSuxA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,570,1574150400"; d="scan'208";a="444411818"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga005.fm.intel.com with ESMTP; 18 Mar 2020 20:16:09 -0700
-Date: Wed, 18 Mar 2020 23:06:39 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200319030639.GD4641@joy-OptiPlex-7040>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
+ (envelope-from <npiggin@gmail.com>) id 1jElpB-0006If-TU
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 23:26:27 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44292)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1jElp9-00064v-4o; Wed, 18 Mar 2020 23:26:23 -0400
+Received: by mail-pg1-x544.google.com with SMTP id 37so422730pgm.11;
+ Wed, 18 Mar 2020 20:26:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:cc:references:in-reply-to:mime-version
+ :user-agent:message-id:content-transfer-encoding;
+ bh=/mdqrLfDhinE7Tvec+d6LMLp8+n4KeR/lPsYQ4GyYqI=;
+ b=TZcAQLcAu2UMQMyZSrbATwBQygBKo+Hg9vAZnEwJUKC0vv0/1u7w8EsCaVqYWrZein
+ MOoQARy0M8+OzgWYfdXGDJfwVvhUNe6RskHCwUYRbVDsrB8DI0cOZT4CaVWlrOox+D+U
+ Tdia3xEvuvHWQQn+SkxjRys7ArRuIk1hAWCQLqfadyyo4i0970FLZ2/ixtM0cIbEATxT
+ 2Y7QJLQQ+g3dtmxkm8dSdcRpYVXgwA6uxSfeylvvZGvwwAvV7ZK0/0nP5jlTBZkkt7ep
+ C9yWqsNsgTReiK7AZqdJQtA9tj5/FkcKYhjk2+9ydBPzbuzgUQaPqmzknAfNYcPU2BNU
+ EAEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+ :mime-version:user-agent:message-id:content-transfer-encoding;
+ bh=/mdqrLfDhinE7Tvec+d6LMLp8+n4KeR/lPsYQ4GyYqI=;
+ b=Fbw+VAWgsGWeQpYS+x+HRWkONt3GXOwK9JoHWgSre4ZlYKk31Whf6rQy9qiM54JZF7
+ nwpzllkF/1OAcChXqFwMsxbrIUCdhlbbY8gmUq3bVzc//DfvHP+vU7/J6spsesfhR2jY
+ GmkI5lf6zAEV+B+FxH5oYcDf4U9Q2RlTzfDrjGaZwQ3ZonDspk4r92JuBptDYqrVYrxy
+ ZjSqviqDdXmX2qPafwhjkJNuVG3C34D6XmBZfFLF7q4DplENl4/agVhu5+e8tOtr4z7/
+ 4TLjjZZ789fp17O5Q3dCjdpnf1Hz4p/noJR9yprZZbbtzDKsjOHldnfZcKnKeij2VMFI
+ y1Wg==
+X-Gm-Message-State: ANhLgQ1ahoaX3ubjSbHG4XUpCDigRQ3x1WJ0Qny6VfS/II3cgPM1n6my
+ fqJ9aT+dxdMKuf5y+6IUMgw=
+X-Google-Smtp-Source: ADFU+vuFlwnH1T+JvOl0AcGVIDjFmaLNltFaGlMJD77otxuO/kcCaq7A7I0iNsWImYErUtVZYtadkw==
+X-Received: by 2002:a63:f010:: with SMTP id k16mr1088147pgh.328.1584588381677; 
+ Wed, 18 Mar 2020 20:26:21 -0700 (PDT)
+Received: from localhost (14-202-190-183.tpgi.com.au. [14.202.190.183])
+ by smtp.gmail.com with ESMTPSA id d71sm405043pfd.46.2020.03.18.20.26.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Mar 2020 20:26:20 -0700 (PDT)
+Date: Thu, 19 Mar 2020 13:24:29 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2] ppc/spapr: Set the effective address provided flag in
+ mc error log.
+To: Mahesh Salgaonkar <mahesh@linux.ibm.com>, Qemu-ppc <qemu-ppc@nongnu.org>
+References: <158451653844.22972.17999316676230071087.stgit@jupiter>
+In-Reply-To: <158451653844.22972.17999316676230071087.stgit@jupiter>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.136
+User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1584588180.mfardhks8k.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,333 +93,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Qemu-devel <qemu-devel@nongnu.org>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 19, 2020 at 03:41:11AM +0800, Kirti Wankhede wrote:
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start dirty pages tracking while migration is active
-> - Stop dirty pages tracking.
-> - Get dirty pages bitmap. Its user space application's responsibility to
->   copy content of dirty pages from source to destination during migration.
-> 
-> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> structure. Bitmap size is calculated considering smallest supported page
-> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> 
-> Bitmap is populated for already pinned pages when bitmap is allocated for
-> a vfio_dma with the smallest supported page size. Update bitmap from
-> pinning functions when tracking is enabled. When user application queries
-> bitmap, check if requested page size is same as page size used to
-> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> error.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
+Mahesh Salgaonkar's on March 18, 2020 5:34 pm:
+> Per PAPR, it is expected to set effective address provided flag in
+> sub_err_type member of mc extended error log (i.e
+> rtas_event_log_v6_mc.sub_err_type). This somehow got missed in original
+> fwnmi-mce patch series. The current code just updates the effective addre=
+ss
+> but does not set the flag to indicate that it is available. Hence guest
+> fails to extract effective address from mce rtas log. This patch fixes
+> that.
+>=20
+> Without this patch guest MCE logs fails print DAR value:
+>=20
+> [   11.933608] Disabling lock debugging due to kernel taint
+> [   11.933773] MCE: CPU0: machine check (Severe) Host TLB Multihit [Recov=
+ered]
+> [   11.933979] MCE: CPU0: NIP: [c000000000090b34] radix__flush_tlb_range_=
+psize+0x194/0xf00
+> [   11.934223] MCE: CPU0: Initiator CPU
+> [   11.934341] MCE: CPU0: Unknown
+>=20
+> After the change:
+>=20
+> [   22.454149] Disabling lock debugging due to kernel taint
+> [   22.454316] MCE: CPU0: machine check (Severe) Host TLB Multihit DAR: d=
+eadbeefdeadbeef [Recovered]
+> [   22.454605] MCE: CPU0: NIP: [c0000000003e5804] kmem_cache_alloc+0x84/0=
+x330
+> [   22.454820] MCE: CPU0: Initiator CPU
+> [   22.454944] MCE: CPU0: Unknown
+
+Thanks, I was wondering why my MCEs weren't printing a DAR!
+
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+
+>=20
+>=20
+> Signed-off-by: Mahesh Salgaonkar <mahesh@linux.ibm.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 205 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 203 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 70aeab921d0f..d6417fb02174 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -71,6 +71,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -91,6 +92,7 @@ struct vfio_dma {
->  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->  	struct task_struct	*task;
->  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> +	unsigned long		*bitmap;
->  };
->  
->  struct vfio_group {
-> @@ -125,7 +127,10 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> +
->  static int put_pfn(unsigned long pfn, int prot);
-> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->  
->  /*
->   * This code handles mapping and unmapping of user data buffers
-> @@ -175,6 +180,55 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->  	rb_erase(&old->node, &iommu->dma_list);
+> Change in v2:
+> - Fixed coding style issues.
+> ---
+>  hw/ppc/spapr_events.c |   26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 8b32b7eea5..cb6bfedc53 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -243,6 +243,14 @@ struct rtas_event_log_v6_mc {
+>  #define RTAS_LOG_V6_MC_TLB_PARITY                        1
+>  #define RTAS_LOG_V6_MC_TLB_MULTIHIT                      2
+>  #define RTAS_LOG_V6_MC_TLB_INDETERMINATE                 3
+> +/*
+> + * Per PAPR,
+> + * For UE error type, set bit 1 of sub_err_type to indicate effective ad=
+dr is
+> + * provided. For other error types (SLB/ERAT/TLB), set bit 0 to indicate
+> + * same.
+> + */
+> +#define RTAS_LOG_V6_MC_UE_EA_ADDR_PROVIDED               0x40
+> +#define RTAS_LOG_V6_MC_EA_ADDR_PROVIDED                  0x80
+>      uint8_t reserved_1[6];
+>      uint64_t effective_address;
+>      uint64_t logical_address;
+> @@ -726,6 +734,22 @@ void spapr_hotplug_req_remove_by_count_indexed(Spapr=
+DrcType drc_type,
+>                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc=
+_id);
 >  }
->  
-> +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu, uint64_t pgsize)
+> =20
+> +static void spapr_mc_set_ea_provided_flag(struct mc_extended_log *ext_el=
+og)
 > +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +		struct rb_node *p;
-> +		unsigned long npages = dma->size / pgsize;
-> +
-> +		dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-> +		if (!dma->bitmap) {
-> +			struct rb_node *p = rb_prev(n);
-> +
-> +			for (; p; p = rb_prev(p)) {
-> +				struct vfio_dma *dma = rb_entry(n,
-> +							struct vfio_dma, node);
-> +
-> +				kfree(dma->bitmap);
-> +				dma->bitmap = NULL;
-> +			}
-> +			return -ENOMEM;
-> +		}
-> +
-> +		if (RB_EMPTY_ROOT(&dma->pfn_list))
-> +			continue;
-> +
-> +		for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> +			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
-> +							 node);
-> +
-> +			bitmap_set(dma->bitmap,
-> +					(vpfn->iova - dma->iova) / pgsize, 1);
-> +		}
-> +	}
-> +	return 0;
+> +    switch (ext_elog->mc.error_type) {
+> +    case RTAS_LOG_V6_MC_TYPE_UE:
+> +        ext_elog->mc.sub_err_type |=3D RTAS_LOG_V6_MC_UE_EA_ADDR_PROVIDE=
+D;
+> +        break;
+> +    case RTAS_LOG_V6_MC_TYPE_SLB:
+> +    case RTAS_LOG_V6_MC_TYPE_ERAT:
+> +    case RTAS_LOG_V6_MC_TYPE_TLB:
+> +        ext_elog->mc.sub_err_type |=3D RTAS_LOG_V6_MC_EA_ADDR_PROVIDED;
+> +        break;
+> +    default:
+> +        break;
+> +    }
 > +}
 > +
-> +static void vfio_dma_bitmap_free(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		kfree(dma->bitmap);
-> +		dma->bitmap = NULL;
-> +	}
-> +}
-> +
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> @@ -567,6 +621,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  			vfio_unpin_page_external(dma, iova, do_accounting);
->  			goto pin_unwind;
->  		}
-> +
-> +		if (iommu->dirty_page_tracking) {
-> +			unsigned long pgshift =
-> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			bitmap_set(dma->bitmap,
-> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
-> +		}
->  	}
->  
->  	ret = i;
-> @@ -801,6 +863,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->  	vfio_unmap_unpin(iommu, dma, true);
->  	vfio_unlink_dma(iommu, dma);
->  	put_task_struct(dma->task);
-> +	kfree(dma->bitmap);
->  	kfree(dma);
->  	iommu->dma_avail++;
->  }
-> @@ -831,6 +894,50 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	return bitmap;
->  }
->  
-> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> +				  size_t size, uint64_t pgsize,
-> +				  unsigned char __user *bitmap)
-> +{
-> +	struct vfio_dma *dma;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	unsigned int npages, bitmap_size;
-> +
-> +	dma = vfio_find_dma(iommu, iova, 1);
-> +
-> +	if (!dma)
-> +		return -EINVAL;
-> +
-> +	if (dma->iova != iova || dma->size != size)
-> +		return -EINVAL;
-> +
-looks this size is passed from user. how can it ensure size always
-equals to dma->size ?
-
-shouldn't we iterate dma tree to look for dirty for whole range if a
-single dma cannot meet them all?
-
-> +	npages = dma->size >> pgshift;
-> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> +
-> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> +	if (dma->iommu_mapped)
-> +		bitmap_set(dma->bitmap, 0, npages);
-> +
-> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> +{
-> +	uint64_t bsize;
-> +
-> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
-> +		return -EINVAL;
-> +
-> +	bsize = DIRTY_BITMAP_BYTES(npages);
-> +
-> +	if (bitmap_size < bsize)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
+>  static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
+>                                          struct mc_extended_log *ext_elog=
+)
 >  {
-> @@ -2278,6 +2385,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap dirty;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret = 0;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    flags);
-> +
-> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		/* only one flag should be set at a time */
-> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
-> +			return -EINVAL;
-> +
-> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			mutex_lock(&iommu->lock);
-> +			if (!iommu->dirty_page_tracking) {
-> +				ret = vfio_dma_bitmap_alloc(iommu, pgsize);
-> +				if (!ret)
-> +					iommu->dirty_page_tracking = true;
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return ret;
-> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking) {
-> +				iommu->dirty_page_tracking = false;
-> +				vfio_dma_bitmap_free(iommu);
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +		} else if (dirty.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			struct vfio_iommu_type1_dirty_bitmap_get range;
-> +			unsigned long pgshift;
-> +			size_t data_size = dirty.argsz - minsz;
-> +			uint64_t iommu_pgsize =
-> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			if (!data_size || data_size < sizeof(range))
-> +				return -EINVAL;
-> +
-> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
-> +					   sizeof(range)))
-> +				return -EFAULT;
-> +
-> +			/* allow only min supported pgsize */
-> +			if (range.bitmap.pgsize != iommu_pgsize)
-> +				return -EINVAL;
-> +			if (range.iova & (iommu_pgsize - 1))
-> +				return -EINVAL;
-> +			if (!range.size || range.size & (iommu_pgsize - 1))
-> +				return -EINVAL;
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)range.bitmap.data,
-> +				       range.bitmap.size))
-> +				return -EINVAL;
-> +
-> +			pgshift = __ffs(range.bitmap.pgsize);
-> +			ret = verify_bitmap_size(range.size >> pgshift,
-> +						 range.bitmap.size);
-> +			if (ret)
-> +				return ret;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking)
-> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
-> +					 range.size, range.bitmap.pgsize,
-> +				    (unsigned char __user *)range.bitmap.data);
-> +			else
-> +				ret = -EINVAL;
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> @@ -2345,10 +2539,17 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->  
->  	vaddr = dma->vaddr + offset;
->  
-> -	if (write)
-> +	if (write) {
->  		*copied = __copy_to_user((void __user *)vaddr, data,
->  					 count) ? 0 : count;
-> -	else
-> +		if (*copied && iommu->dirty_page_tracking) {
-> +			unsigned long pgshift =
-> +				__ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			bitmap_set(dma->bitmap, offset >> pgshift,
-> +				   *copied >> pgshift);
-> +		}
-> +	} else
->  		*copied = __copy_from_user(data, (void __user *)vaddr,
->  					   count) ? 0 : count;
->  	if (kthread)
-> -- 
-> 2.7.0
-> 
+> @@ -751,6 +775,7 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *c=
+pu, bool recovered,
+>              ext_elog->mc.sub_err_type =3D mc_derror_table[i].error_subty=
+pe;
+>              if (mc_derror_table[i].dar_valid) {
+>                  ext_elog->mc.effective_address =3D cpu_to_be64(env->spr[=
+SPR_DAR]);
+> +                spapr_mc_set_ea_provided_flag(ext_elog);
+>              }
+> =20
+>              summary |=3D mc_derror_table[i].initiator
+> @@ -769,6 +794,7 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *c=
+pu, bool recovered,
+>              ext_elog->mc.sub_err_type =3D mc_ierror_table[i].error_subty=
+pe;
+>              if (mc_ierror_table[i].nip_valid) {
+>                  ext_elog->mc.effective_address =3D cpu_to_be64(env->nip)=
+;
+> +                spapr_mc_set_ea_provided_flag(ext_elog);
+>              }
+> =20
+>              summary |=3D mc_ierror_table[i].initiator
+>=20
+>=20
+=
 
