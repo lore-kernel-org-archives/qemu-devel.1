@@ -2,75 +2,82 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77293C4332E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5514C4332D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:18:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BBA720739
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:07:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BBA720739
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7348C206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 10:18:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rYmySzkU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7348C206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEs5D-00048W-Fn
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 06:07:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51589)
+	id 1jEsGD-0006NB-Jh
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 06:18:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jEs3h-0001yk-D9
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jEsFW-0005yb-SH
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jEs3g-00060h-1M
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34530)
+ (envelope-from <peter.maydell@linaro.org>) id 1jEsFV-0006af-ID
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:18:02 -0400
+Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:42042)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jEs3f-00060S-SN
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:05:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jEs3e-0004bP-Uz
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:05:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E70A12E80AB
- for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 10:05:46 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jEsFV-0006Zm-CS
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 06:18:01 -0400
+Received: by mail-oi1-x232.google.com with SMTP id 13so2068835oiy.9
+ for <qemu-devel@nongnu.org>; Thu, 19 Mar 2020 03:18:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=OJAghR0kAYFOKQi+sL85e8DuAr0F2Wm82Ps/cO63jJc=;
+ b=rYmySzkUbUffRtSVfHmopi27Vm9Dq5jhdmkllv0eodeERKhilW2yo77pswz041TNhq
+ +VupznSooHyD5472zitMaFtMptM+IpgGjcqf3SDccyLc/TO8bzdeKAL1f8vM/alrUoIM
+ LjJm67Oyu+7SmkFRHw5VVJ7B1F/XIe9nAdo/e9s2xgp/6Y2mrNlnAWIXosuXL3fVKVeN
+ Ob+QlsjGt2vo9o0pgAIl9mpliD3vNn+u3DRu0UuCk5SLkEhAYcGT3ly5iqpdk85xyEdg
+ A0vWZin1abjpYVL0BoB+lc3iANIv/Ey0xi1M3XjA2wCD9rZ9tckIFI7JXf54gpg8l2iO
+ ouYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=OJAghR0kAYFOKQi+sL85e8DuAr0F2Wm82Ps/cO63jJc=;
+ b=drBBzWTHst5iFXOFY+IrM100/wouEnaR+GAG8YDjXXPlkmRsESV5JVtLmMq785GXtp
+ DsBP5LFuyi/IJVEMOp9LxgxjuhtYrXQSXzxnDXWIo3Gxogx++YPYF/o3dnJouS02y/ng
+ ForLH/mvh0O9HsAXH/GIOwM+wv3jz+DshZhylPJB5TwG/vVtOgTNmC90KAjdPfUIcghP
+ qPTMJ+zDXzOqp+Gclf3sRZXAY97vwwtj8MnWSYtz2u/JqmXhccYf5fuZ52dKOgJTh5lE
+ jaM4V7jmi5rhiWllw+JocQ+p6W1pzogisjS99IdENrimaBFsoFPI2aAMH+xjOYSAmzDZ
+ O61w==
+X-Gm-Message-State: ANhLgQ1z7ugm24SpZVq4vbiwpEgRXviB2U+PuChaqeSFTOUdHr//x33s
+ ZBdSzpT2te9H4qhG+sp4J1/iAI2J4s6UBFiTqbvbvA==
+X-Google-Smtp-Source: ADFU+vvR4ei80PtnrlX1IocG7yEoMUjbGat+8VHMFR3vthawX7kPULKKIILIwMofSMcz511Vg837Z14wGnJuE4wEYj0=
+X-Received: by 2002:aca:47c8:: with SMTP id u191mr1817747oia.170.1584613080171; 
+ Thu, 19 Mar 2020 03:18:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Mar 2020 09:59:02 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1866870@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Incomplete; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h paelzer tstrike34
-X-Launchpad-Bug-Reporter: tstrike (tstrike34)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
-Message-Id: <158461194220.11915.10998512141124771787.malone@soybean.canonical.com>
-Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c2c8bd268b8eca6cbb5b580977c3b676445878ee
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <20200317190013.25036-1-richard.henderson@linaro.org>
+In-Reply-To: <20200317190013.25036-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Mar 2020 10:17:48 +0000
+Message-ID: <CAFEAcA-guUrvGLQcW-dV_f4Yc3ODwRhfu3FwkFw=yKxo72eKVQ@mail.gmail.com>
+Subject: Re: [PULL 0/5] tcg patch queue
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,92 +86,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Turns out 1.12 is a fairly old build and the working version in Ubuntu was =
-from in Disco, therefore about a year ago.
-=3D> https://launchpad.net/ubuntu/+source/seabios/1.12.0-1/+build/16284605
+On Tue, 17 Mar 2020 at 19:00, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit 40c67636f67c2a89745f2e698522fe917326a952:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200317-pull-request' into staging (2020-03-17 14:00:56 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20200317
+>
+> for you to fetch changes up to 0270bd503e3699b7202200a2d693ad1feb57473f:
+>
+>   tcg: Remove tcg-runtime-gvec.c DO_CMP0 (2020-03-17 08:41:07 -0700)
+>
+> ----------------------------------------------------------------
+> Fix tcg/i386 bug vs sari_vec.
+> Fix tcg-runtime-gvec.c vs i386 without avx.
+>
+> ----------------------------------------------------------------
 
-Therefore I built it in Eoan and even Disco.
-As an overview:
-Disco: gcc 4:8.3.0-1ubuntu3   binutils 2.32-7ubuntu4
-Eoan:  gcc 4:9.2.1-3.1ubuntu1 binutils 2.33-2ubuntu1.2
-Focal: gcc 4:9.2.1-3.1ubuntu1 binutils 2.34-4ubuntu1
 
-I ended up with these binaries to test:
-./git-built-in-eoan/rel-1.12/bios.bin Breaks
-./git-built-in-eoan/rel-1.13/bios.bin Breaks
-./git-built-in-disco/rel-1.13/bios.bin Works
-./git-built-in-disco/rel-1.12/bios.bin Works
-./git-built-in-focal/head/bios.bin Breaks
-./git-built-in-focal/rel-1.12/bios.bin Breaks
-./git-built-in-focal/rel-1.13/bios.bin Breaks
-./packaging/disco-seabios_1.12.0-1/bios.bin Works
-./packaging/focal-seabios_1.13.0-1/bios.bin Breaks
 
-To summarize:
-- qemu breaks on chips of the Penryn generation
-- it only breaks if the seabios bios is executed
-- does not really depend on seabios or qemu version
-- but it depends on seabios build environment
+Applied, thanks.
 
--- =
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1866870
-
-Title:
-  KVM Guest pauses after upgrade to Ubuntu 20.04
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Symptom:
-  Error unpausing domain: internal error: unable to execute QEMU command 'c=
-ont': Resetting the Virtual Machine is required
-
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
-e 66, in newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
- in resume
-      self._backend.resume()
-    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
-      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
-=3Dself)
-  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
-t': Resetting the Virtual Machine is required
-
-  =
-
-  ---
-
-  As outlined here:
-  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
-
-  After upgrade, all KVM guests are in a default pause state. Even after
-  forcing them off via virsh, and restarting them the guests are paused.
-
-  These Guests are not nested.
-
-  A lot of diganostic information are outlined in the previous bug
-  report link provided. The solution mentioned in previous report had
-  been allegedly integrated into the downstream updates.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
+-- PMM
 
