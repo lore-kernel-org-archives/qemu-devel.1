@@ -2,80 +2,82 @@ Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A607C4332B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7BBC4332B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:19:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB43A20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27ADF20724
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 02:19:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="FyBQtPsq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB43A20724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ab9aZhwV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27ADF20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEkmJ-00085C-V4
-	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 22:19:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44039)
+	id 1jEkmT-0008OO-93
+	for qemu-devel@archiver.kernel.org; Wed, 18 Mar 2020 22:19:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@chromium.org>) id 1jEklY-00070U-UL
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:38 -0400
+ (envelope-from <stevensd@chromium.org>) id 1jEkld-00073M-N3
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@chromium.org>) id 1jEklX-000865-R8
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:36 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44805)
+ (envelope-from <stevensd@chromium.org>) id 1jEklc-0000DA-7b
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:41 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33340)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <stevensd@chromium.org>)
- id 1jEklX-0007y3-JP
- for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:35 -0400
-Received: by mail-pl1-x641.google.com with SMTP id h11so338229plr.11
- for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 19:18:35 -0700 (PDT)
+ id 1jEklc-00006Q-1R
+ for qemu-devel@nongnu.org; Wed, 18 Mar 2020 22:18:40 -0400
+Received: by mail-pg1-x542.google.com with SMTP id m5so355687pgg.0
+ for <qemu-devel@nongnu.org>; Wed, 18 Mar 2020 19:18:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6bBz5V/WtkwwqhyJmsiCB2xh086GQ/HDrZAoGycCDqY=;
- b=FyBQtPsq8bx5OCsSO0dGRPlcZN4yQ4dilDnc0G/EjPeWrM+7Z9NNLmLnKUTTpEgpOW
- fotqM6GXOjifswMfDoV4MXousDAWQo2iZFgpf7jXcx8OEy8uSQ1pzPHzCqDztZHpAR1a
- ZJkUESD3QWhQ6MTVbTdcaYamhKJnqPErNPakQ=
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=1C8jLhXuPfBb7h90RHOdI3Yy2sESPpspTtCUaNxuRxE=;
+ b=ab9aZhwV8Ief16HW0MRvphHu2sqdH+8TGCXu2J/DZM2sTVAcH82y5neSsPEP+v4s/g
+ kKOhY1f8E1gjgR7A75Y5DkfTT00HG+m9S9p44G5AO7UyphRi0nUwZXnpRcJ4/qBxtqM/
+ gXiqeeT6GPF6I/JHU0G2kMo9Xp3OFyMnF8MB0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6bBz5V/WtkwwqhyJmsiCB2xh086GQ/HDrZAoGycCDqY=;
- b=KG3zbKiK5rkEO/cThaVBzZyF++ZBxG8TCAaxz+Dyg5QZO95xtnj7DMkHx/5vzKFcFi
- zFjlm+0OBlYTqKmzDRWX0ak99vf+eawOK+8GjHxf0tEbUDzuBO9zK/HN64O7AkMIRuvr
- qzvtRT4sX5Y6tSAwgP/FoH74UEX7YQmE1wGH2enaC2BYEw5nKXHLWIPpkkttj0gBCF9T
- MZrw0smTBK+aUi0ZQKbpxokbV2XrbjdsWnElKED1ygTCM4tqfa1S7Rp0+ubusApDtpRa
- 0eqIBTaSOa3T3riBQdqKsk7xDC+oVttItmrr73Sd+ca4cuqBJdXp/alz9yfO9VnqhaHa
- 1rEw==
-X-Gm-Message-State: ANhLgQ2swDtojkbrD9NtnK5vXViqIL5WJLmG2i5HXVaqf9ptzzQMBC9+
- r9+UhqUz1dlW5Uw2FGvd7fN4WQ==
-X-Google-Smtp-Source: ADFU+vu185Om/KiLaJ5I6R9LggSBMYF/vdJXMV0dPyaYDQ0gYr8yH5gFBEPHWK46VajxmqHXBz9gGA==
-X-Received: by 2002:a17:90a:730b:: with SMTP id
- m11mr1305446pjk.195.1584584314128; 
- Wed, 18 Mar 2020 19:18:34 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=1C8jLhXuPfBb7h90RHOdI3Yy2sESPpspTtCUaNxuRxE=;
+ b=YNCOgi1HnPErZW/vbltWnVg5FglIrctdkEtlQWpscqZZpVNj1QQZjQaHj5epnUYe60
+ LIzl9bcZtrg/UIuPE7nxowSezrkrIkfWvAwM2rX/udrsmcVCykz+20V0pRWj4ZJMB8Nm
+ qWXacZcyoS92MlhUk1Ny/0YoxIBVHFqaUeGaVeoc2G7zGRXxpfHlqYjI33NT/5vCrNKY
+ H6HT40LUbZ1THDuVCcTbBvraIT7/rW7SqKQnxXW6Dik7ImWZly7Lex4aUiVVLWdYEbMo
+ 6SU/8yQtJiN1PKqWLYV84JLoWN1YTqRYGL5VHF5MeMydWSXltvVE0BZoE29gSmJokyle
+ Kh4w==
+X-Gm-Message-State: ANhLgQ3d8sRddf7v4HFI3AoS4Kja3zX0ousNUSh++u0c8UXY2Va3C1O+
+ rj2hR5nC4LxpNwq8szYPXdl09g==
+X-Google-Smtp-Source: ADFU+vsA3Do93d+fKRKpI4+KnCX1CyGpYNhUlFZFW824PU6sMlngpOx8GyHpGZj6qH3Whemhlg7jTw==
+X-Received: by 2002:aa7:870f:: with SMTP id b15mr1443454pfo.190.1584584318862; 
+ Wed, 18 Mar 2020 19:18:38 -0700 (PDT)
 Received: from localhost ([2401:fa00:8f:203:30f2:7a9c:387e:6c7])
- by smtp.gmail.com with ESMTPSA id d11sm305928pfo.39.2020.03.18.19.18.30
+ by smtp.gmail.com with ESMTPSA id m18sm327988pgd.39.2020.03.18.19.18.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Mar 2020 19:18:33 -0700 (PDT)
+ Wed, 18 Mar 2020 19:18:38 -0700 (PDT)
 From: David Stevens <stevensd@chromium.org>
 To: virtio-comment@lists.oasis-open.org
-Subject: [PATCH v4 0/2] Cross-device resource sharing
-Date: Thu, 19 Mar 2020 11:18:21 +0900
-Message-Id: <20200319021823.57219-1-stevensd@chromium.org>
+Subject: [PATCH v4 1/2] content: define what an exported object is
+Date: Thu, 19 Mar 2020 11:18:22 +0900
+Message-Id: <20200319021823.57219-2-stevensd@chromium.org>
 X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
+In-Reply-To: <20200319021823.57219-1-stevensd@chromium.org>
+References: <20200319021823.57219-1-stevensd@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,32 +103,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
+Define a mechanism for sharing objects between different virtio
+devices.
 
-This is the next iteration of patches for adding support for sharing
-resources between different virtio devices. The corresponding Linux
-implementation is [1].
-
-In addition to these patches, the most recent virtio-video patchset
-includes a patch for importing objects into that device [2].
-
-[1] https://markmail.org/thread/bfy6uk4q4v4cus7h
-[2] https://markmail.org/message/wxdne5re7aaugbjg
-
-Changes v3 -> v4:
- - Add virtio-gpu feature bit
- - Move virtio-gpu assign uuid command into 2d command group
- - Rename virtio-gpu uuid response
-
-David Stevens (2):
-  content: define what an exported object is
-  virtio-gpu: add the ability to export resources
-
+Signed-off-by: David Stevens <stevensd@chromium.org>
+---
  content.tex      | 12 ++++++++++++
  introduction.tex |  4 ++++
- virtio-gpu.tex   | 29 +++++++++++++++++++++++++++++
- 3 files changed, 45 insertions(+)
+ 2 files changed, 16 insertions(+)
 
+diff --git a/content.tex b/content.tex
+index b1ea9b9..c8a367b 100644
+--- a/content.tex
++++ b/content.tex
+@@ -373,6 +373,18 @@ \section{Driver Notifications} \label{sec:Virtqueues / Driver notifications}
+ 
+ \input{shared-mem.tex}
+ 
++\section{Exporting Objects}\label{sec:Basic Facilities of a Virtio Device / Exporting Objects}
++
++When an object created by one virtio device needs to be
++shared with a seperate virtio device, the first device can
++export the object by generating a UUID which can then
++be passed to the second device to identify the object.
++
++What constitutes an object, how to export objects, and
++how to import objects are defined by the individual device
++types. It is RECOMMENDED that devices generate version 4
++UUIDs as specified by \hyperref[intro:rfc4122]{[RFC4122]}.
++
+ \chapter{General Initialization And Device Operation}\label{sec:General Initialization And Device Operation}
+ 
+ We start with an overview of device initialization, then expand on the
+diff --git a/introduction.tex b/introduction.tex
+index 40f16f8..fc2aa50 100644
+--- a/introduction.tex
++++ b/introduction.tex
+@@ -40,6 +40,10 @@ \section{Normative References}\label{sec:Normative References}
+ 	\phantomsection\label{intro:rfc2119}\textbf{[RFC2119]} &
+ Bradner S., ``Key words for use in RFCs to Indicate Requirement
+ Levels'', BCP 14, RFC 2119, March 1997. \newline\url{http://www.ietf.org/rfc/rfc2119.txt}\\
++	\phantomsection\label{intro:rfc4122}\textbf{[RFC4122]} &
++Leach, P., Mealling, M., and R. Salz, ``A Universally Unique
++IDentifier (UUID) URN Namespace'', RFC 4122, DOI 10.17487/RFC4122,
++July 2005. \newline\url{http://www.ietf.org/rfc/rfc4122.txt}\\
+ 	\phantomsection\label{intro:S390 PoP}\textbf{[S390 PoP]} & z/Architecture Principles of Operation, IBM Publication SA22-7832, \newline\url{http://publibfi.boulder.ibm.com/epubs/pdf/dz9zr009.pdf}, and any future revisions\\
+ 	\phantomsection\label{intro:S390 Common I/O}\textbf{[S390 Common I/O]} & ESA/390 Common I/O-Device and Self-Description, IBM Publication SA22-7204, \newline\url{http://publibfp.dhe.ibm.com/cgi-bin/bookmgr/BOOKS/dz9ar501/CCONTENTS}, and any future revisions\\
+ 	\phantomsection\label{intro:PCI}\textbf{[PCI]} &
 -- 
 2.25.1.481.gfbce0eb801-goog
 
