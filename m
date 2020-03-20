@@ -2,85 +2,83 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF001C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 12:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58588C4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 12:06:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2737D20732
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 12:03:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C2E620732
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 12:06:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="Sn5IOewD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2737D20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4d4Q/ga"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C2E620732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFGNC-0006ud-BC
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 08:03:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52669)
+	id 1jFGQD-0001Du-8P
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 08:06:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jFGHx-0007m6-2y
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:58:10 -0400
+ (envelope-from <dnbrdsky@gmail.com>) id 1jFGPI-0000Ck-17
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 08:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jFGHv-0000KU-2k
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:58:09 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33294)
+ (envelope-from <dnbrdsky@gmail.com>) id 1jFGPG-0008Hn-Ue
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 08:05:43 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36829)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jFGHu-0000Jv-Ri
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:58:07 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r7so7071368wmg.0
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 04:58:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=yOupkg2tDjhA9k/ASRMhbHI4PkMh+TlmWpBkkRpxw3U=;
- b=Sn5IOewDEAPX8s3C8Ml1ASAToxLM4/6Qz/US9I7XjYOI5AwA5s/YbVPU0ar6zE3/d4
- N50wmeGkO7FB+EUkYmGhTOWnYbDdgVhMJEF3Mgk1lVDVjZd7bcVC7XA/A678AMoeX+W9
- JEpeoCgkqhtwOcKNAtI1CwB3FtPQGDFrOmM0ysX07QjZNAMtkbsaSQiPAUekAOIS4Tl7
- GOtTd1mYVWRZkbqPyVKRnWr9KxN+dEZ1jtX5GNLbkjJ+4eYSqSkOzsBK/ltPmBBuuRyl
- tICkl+UTWcoU4+dPWdVP2l0FRX4/4Dsv5EsoQowzpury+eFqkBLOJ1CK3MAI5/SdJ2Wt
- a2UQ==
+ (Exim 4.71) (envelope-from <dnbrdsky@gmail.com>) id 1jFGPG-0008HN-PF
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 08:05:42 -0400
+Received: by mail-pf1-x442.google.com with SMTP id i13so3137063pfe.3
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 05:05:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=PMS/HT90PAKRMWfiQdAD+nmjuV+Lj/mKrnJ66GdRunI=;
+ b=H4d4Q/ga9fiIG6t3JVM5cv6vl3BXAyaNJGZPrzLU5GA8Zl7F5FssXDVWqrPnFj84wp
+ YbS6TrjHnQXLaUSV4KiwSFEOEoVWDDY7NMdqYqZwu1Mwt6jF6zv9XVhYJGW/Znw+Zhor
+ 7mhcXGtzNQwVdOGATb1S5cp1Ja6Sea0mkejTMuuWCnNwpad782Lch37ApdkCr3AfTKGq
+ XMjSGNzHoEXZsJGsxhb//sRP69g1Yz0DFwFYwqsRk8spg+QLdWpux6StT9UKqFTVRITE
+ /b4zdZRvHjVUSyyCl0/8ybjpdFdjsdL2N+RxSrhyyuR+kH+xqvFK3BaZ33Tbeda7PLtV
+ 1dVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=yOupkg2tDjhA9k/ASRMhbHI4PkMh+TlmWpBkkRpxw3U=;
- b=qTWHomR/u0CSV/NBZcuGugG6XZlyFQIC442Pfq9UkyJHRZ4hUYS6rcN9SAN3s9konX
- 6FRrwhpYEK+ZtyiNwfzIAeyi8MhW/47QKV1mpl4vhCgrNMoTIclc7aSOHBCr9Qda1ayA
- Olkg+HehgP1nhDTKhPblSG3KRxDTxpvHM2SuMhIRcF6tOLN4TFQScHAdhJSOhFHcn0QY
- S0hOdWDAqxaD4OUgCACHlkbMlq8OpLWNxIBfV+Iiq6M5HVpKXivKCQYYThJk+G/RUpeO
- nIfwkDUc/3Aky0qOZZPVschuFOGtMcbFvIxfi9b24Nr6GDbpiqybYba/Eb2pYgA/ySHU
- kDWg==
-X-Gm-Message-State: ANhLgQ1KdqwfAEUDwnFckuFW23ehJwa7YHhvbyd6OL1V70BhFgrXzznH
- d1L/Angn/QVwYtT3QqvXhngsvnqJf3m5kg==
-X-Google-Smtp-Source: ADFU+vt+viySfJpkjWB3yhZ3Hn799Pb+T1oJ/3n5JsL4IYwQbRpq+RkLWIsCeAcKNClRM8dyzX8sYg==
-X-Received: by 2002:a1c:4805:: with SMTP id v5mr9556977wma.98.1584705485248;
- Fri, 20 Mar 2020 04:58:05 -0700 (PDT)
-Received: from f2.redhat.com (bzq-79-179-79-224.red.bezeqint.net.
- [79.179.79.224])
- by smtp.gmail.com with ESMTPSA id c18sm6637645wrx.5.2020.03.20.04.58.04
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 20 Mar 2020 04:58:04 -0700 (PDT)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com,
- quintela@redhat.com, dgilbert@redhat.com
-Subject: [PATCH v6 5/7] virtio-net: reference implementation of hash report
-Date: Fri, 20 Mar 2020 13:57:49 +0200
-Message-Id: <20200320115751.19446-6-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200320115751.19446-1-yuri.benditovich@daynix.com>
-References: <20200320115751.19446-1-yuri.benditovich@daynix.com>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=PMS/HT90PAKRMWfiQdAD+nmjuV+Lj/mKrnJ66GdRunI=;
+ b=Jn62gmuxXZwmYsJ2xKNr8ZrfgnjCTbdueXVUGCTUJKsdhXpWaA32CVVCHfqZ2tHW6x
+ Wiz5aLqF/mneHcMZOOiJC+/OV9BcBH6H1a5jYKypZomZ+JW6U7aaMY1u+lWgMx3reISp
+ 0loD7h/FsRFEAvW1SeKU91N9wj6JFlOsbwkunD9rRyyS9HN95ehDVjqD1XFH2eKQHNoc
+ SHJZ1xJaB46miUhQBJFmbPBeLxrprkv6sWIzrmdgFOdaOZJrkTvFEcu4zghDa/Ob2jWi
+ uiWSnijx7sxMU1hXfhOtFhXY1NkD+9PLK7wXikLk9kiOw3cVui9dJpOCQgqktjkwLoNb
+ C/9Q==
+X-Gm-Message-State: ANhLgQ2w8/zKeJa44EaE51jwR5GVZo42wWE+c4UZblxDzZhjpL+0sdih
+ aylnr/eDfP+FO8gPFTfz8WY=
+X-Google-Smtp-Source: ADFU+vvH5hVs4lIkTrUbSFps+pLLhg2vNRHyDaFlQBUV0Y2zQVdnp8ExlC/F5DCcdHFlnhjiNl/fHg==
+X-Received: by 2002:a63:4e4e:: with SMTP id o14mr8220453pgl.228.1584705941632; 
+ Fri, 20 Mar 2020 05:05:41 -0700 (PDT)
+Received: from esc.telus (node-1w7jr9qmilj27lake3duljaz9.ipv6.telus.net.
+ [2001:569:75e3:4100:12ba:ab1b:8ad3:bb55])
+ by smtp.gmail.com with ESMTPSA id z125sm5617660pfz.92.2020.03.20.05.05.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Mar 2020 05:05:41 -0700 (PDT)
+From: dnbrdsky@gmail.com
+To: dnbrdsky@gmail.com
+Subject: [PATCH v3 0/2] Replaced locks with lock guard macros
+Date: Fri, 20 Mar 2020 05:04:54 -0700
+Message-Id: <20200320120456.1931482-1-dnbrdsky@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,304 +90,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Suggest VIRTIO_NET_F_HASH_REPORT if specified in device
-parameters.
-If the VIRTIO_NET_F_HASH_REPORT is set,
-the device extends configuration space. If the feature
-is negotiated, the packet layout is extended to
-accomodate the hash information. In this case deliver
-packet's hash value and report type in virtio header
-extension.
-Use for configuration the same procedure as already
-used for RSS. We add two fields in rss_data that
-controls what the device does with the calculated hash
-if rss_data.enabled is set. If field 'populate' is set
-the hash is set in the packet, if field 'redirect' is
-set the hash is used to decide the queue to place the
-packet to.
+From: Daniel Brodsky <dnbrdsky@gmail.com>
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/net/virtio-net.c            | 99 +++++++++++++++++++++++++++-------
- include/hw/virtio/virtio-net.h |  2 +
- 2 files changed, 81 insertions(+), 20 deletions(-)
+This patch set adds:
+- a fix for lock guard macros so they can be used multiple times in
+the same function
+- replacement of locks with lock guards where appropriate
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index de2d68d4ca..a0614ad4e6 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -184,7 +184,7 @@ static VirtIOFeature feature_sizes[] = {
-      .end = endof(struct virtio_net_config, mtu)},
-     {.flags = 1ULL << VIRTIO_NET_F_SPEED_DUPLEX,
-      .end = endof(struct virtio_net_config, duplex)},
--    {.flags = 1ULL << VIRTIO_NET_F_RSS,
-+    {.flags = (1ULL << VIRTIO_NET_F_RSS) | (1ULL << VIRTIO_NET_F_HASH_REPORT),
-      .end = endof(struct virtio_net_config_with_rss, supported_hash_types)},
-     {}
- };
-@@ -218,7 +218,8 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-     netcfg.cfg.duplex = n->net_conf.duplex;
-     netcfg.rss_max_key_size = VIRTIO_NET_RSS_MAX_KEY_SIZE;
-     virtio_stw_p(vdev, &netcfg.rss_max_indirection_table_length,
--                 VIRTIO_NET_RSS_MAX_TABLE_LEN);
-+                 virtio_host_has_feature(vdev, VIRTIO_NET_F_RSS) ?
-+                 VIRTIO_NET_RSS_MAX_TABLE_LEN : 1);
-     virtio_stl_p(vdev, &netcfg.supported_hash_types,
-                  VIRTIO_NET_RSS_SUPPORTED_HASHES);
-     memcpy(config, &netcfg, n->config_size);
-@@ -644,7 +645,7 @@ static int peer_has_ufo(VirtIONet *n)
- }
- 
- static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
--                                       int version_1)
-+                                       int version_1, int hash_report)
- {
-     int i;
-     NetClientState *nc;
-@@ -652,7 +653,10 @@ static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
-     n->mergeable_rx_bufs = mergeable_rx_bufs;
- 
-     if (version_1) {
--        n->guest_hdr_len = sizeof(struct virtio_net_hdr_mrg_rxbuf);
-+        n->guest_hdr_len = hash_report ?
-+            sizeof(struct virtio_net_hdr_v1_hash) :
-+            sizeof(struct virtio_net_hdr_mrg_rxbuf);
-+        n->rss_data.populate_hash = true;
-     } else {
-         n->guest_hdr_len = n->mergeable_rx_bufs ?
-             sizeof(struct virtio_net_hdr_mrg_rxbuf) :
-@@ -773,6 +777,8 @@ static uint64_t virtio_net_get_features(VirtIODevice *vdev, uint64_t features,
-         virtio_clear_feature(&features, VIRTIO_NET_F_GUEST_TSO4);
-         virtio_clear_feature(&features, VIRTIO_NET_F_GUEST_TSO6);
-         virtio_clear_feature(&features, VIRTIO_NET_F_GUEST_ECN);
-+
-+        virtio_clear_feature(&features, VIRTIO_NET_F_HASH_REPORT);
-     }
- 
-     if (!peer_has_vnet_hdr(n) || !peer_has_ufo(n)) {
-@@ -785,6 +791,7 @@ static uint64_t virtio_net_get_features(VirtIODevice *vdev, uint64_t features,
-     }
- 
-     virtio_clear_feature(&features, VIRTIO_NET_F_RSS);
-+    virtio_clear_feature(&features, VIRTIO_NET_F_HASH_REPORT);
-     features = vhost_net_get_features(get_vhost_net(nc->peer), features);
-     vdev->backend_features = features;
- 
-@@ -951,12 +958,15 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
-                                virtio_has_feature(features,
-                                                   VIRTIO_NET_F_MRG_RXBUF),
-                                virtio_has_feature(features,
--                                                  VIRTIO_F_VERSION_1));
-+                                                  VIRTIO_F_VERSION_1),
-+                               virtio_has_feature(features,
-+                                                  VIRTIO_NET_F_HASH_REPORT));
- 
-     n->rsc4_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
-         virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO4);
-     n->rsc6_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
-         virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO6);
-+    n->rss_data.redirect = virtio_has_feature(features, VIRTIO_NET_F_RSS);
- 
-     if (n->has_vnet_hdr) {
-         n->curr_guest_offloads =
-@@ -1230,7 +1240,9 @@ static void virtio_net_disable_rss(VirtIONet *n)
- }
- 
- static uint16_t virtio_net_handle_rss(VirtIONet *n,
--                                      struct iovec *iov, unsigned int iov_cnt)
-+                                      struct iovec *iov,
-+                                      unsigned int iov_cnt,
-+                                      bool do_rss)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(n);
-     struct virtio_net_rss_config cfg;
-@@ -1243,10 +1255,14 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
-     const char *err_msg = "";
-     uint32_t err_value = 0;
- 
--    if (!virtio_vdev_has_feature(vdev, VIRTIO_NET_F_RSS)) {
-+    if (do_rss && !virtio_vdev_has_feature(vdev, VIRTIO_NET_F_RSS)) {
-         err_msg = "RSS is not negotiated";
-         goto error;
-     }
-+    if (!do_rss && !virtio_vdev_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT)) {
-+        err_msg = "Hash report is not negotiated";
-+        goto error;
-+    }
-     size_get = offsetof(struct virtio_net_rss_config, indirection_table);
-     s = iov_to_buf(iov, iov_cnt, offset, &cfg, size_get);
-     if (s != size_get) {
-@@ -1258,6 +1274,9 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
-     n->rss_data.indirections_len =
-         virtio_lduw_p(vdev, &cfg.indirection_table_mask);
-     n->rss_data.indirections_len++;
-+    if (!do_rss) {
-+        n->rss_data.indirections_len = 1;
-+    }
-     if (!is_power_of_2(n->rss_data.indirections_len)) {
-         err_msg = "Invalid size of indirection table";
-         err_value = n->rss_data.indirections_len;
-@@ -1268,8 +1287,8 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
-         err_value = n->rss_data.indirections_len;
-         goto error;
-     }
--    n->rss_data.default_queue =
--        virtio_lduw_p(vdev, &cfg.unclassified_queue);
-+    n->rss_data.default_queue = do_rss ?
-+        virtio_lduw_p(vdev, &cfg.unclassified_queue) : 0;
-     if (n->rss_data.default_queue >= n->max_queues) {
-         err_msg = "Invalid default queue";
-         err_value = n->rss_data.default_queue;
-@@ -1303,7 +1322,7 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
-         err_value = (uint32_t)s;
-         goto error;
-     }
--    queues = virtio_lduw_p(vdev, &temp.us);
-+    queues = do_rss ? virtio_lduw_p(vdev, &temp.us) : n->curr_queues;
-     if (queues == 0 || queues > n->max_queues) {
-         err_msg = "Invalid number of queues";
-         err_value = queues;
-@@ -1349,8 +1368,12 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
-     uint16_t queues;
- 
-     virtio_net_disable_rss(n);
-+    if (cmd == VIRTIO_NET_CTRL_MQ_HASH_CONFIG) {
-+        queues = virtio_net_handle_rss(n, iov, iov_cnt, false);
-+        return queues ? VIRTIO_NET_OK : VIRTIO_NET_ERR;
-+    }
-     if (cmd == VIRTIO_NET_CTRL_MQ_RSS_CONFIG) {
--        queues = virtio_net_handle_rss(n, iov, iov_cnt);
-+        queues = virtio_net_handle_rss(n, iov, iov_cnt, true);
-     } else if (cmd == VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET) {
-         struct virtio_net_ctrl_mq mq;
-         size_t s;
-@@ -1637,15 +1660,34 @@ static uint8_t virtio_net_get_hash_type(bool isip4,
-     return 0xff;
- }
- 
-+static void virtio_set_packet_hash(const uint8_t *buf, uint8_t report,
-+                                   uint32_t hash)
-+{
-+    struct virtio_net_hdr_v1_hash *hdr = (void *)buf;
-+    hdr->hash_value = hash;
-+    hdr->hash_report = report;
-+}
-+
- static int virtio_net_process_rss(NetClientState *nc, const uint8_t *buf,
-                                   size_t size)
- {
-     VirtIONet *n = qemu_get_nic_opaque(nc);
--    unsigned int index = nc->queue_index, new_index;
-+    unsigned int index = nc->queue_index, new_index = index;
-     struct NetRxPkt *pkt = n->rx_pkt;
-     uint8_t net_hash_type;
-     uint32_t hash;
-     bool isip4, isip6, isudp, istcp;
-+    static const uint8_t reports[NetPktRssIpV6UdpEx + 1] = {
-+        VIRTIO_NET_HASH_REPORT_IPv4,
-+        VIRTIO_NET_HASH_REPORT_TCPv4,
-+        VIRTIO_NET_HASH_REPORT_TCPv6,
-+        VIRTIO_NET_HASH_REPORT_IPv6,
-+        VIRTIO_NET_HASH_REPORT_IPv6_EX,
-+        VIRTIO_NET_HASH_REPORT_TCPv6_EX,
-+        VIRTIO_NET_HASH_REPORT_UDPv4,
-+        VIRTIO_NET_HASH_REPORT_UDPv6,
-+        VIRTIO_NET_HASH_REPORT_UDPv6_EX
-+    };
- 
-     net_rx_pkt_set_protocols(pkt, buf + n->host_hdr_len,
-                              size - n->host_hdr_len);
-@@ -1659,16 +1701,24 @@ static int virtio_net_process_rss(NetClientState *nc, const uint8_t *buf,
-     net_hash_type = virtio_net_get_hash_type(isip4, isip6, isudp, istcp,
-                                              n->rss_data.hash_types);
-     if (net_hash_type > NetPktRssIpV6UdpEx) {
--        return n->rss_data.default_queue;
-+        if (n->rss_data.populate_hash) {
-+            virtio_set_packet_hash(buf, VIRTIO_NET_HASH_REPORT_NONE, 0);
-+        }
-+        return n->rss_data.redirect ? n->rss_data.default_queue : -1;
-     }
- 
-     hash = net_rx_pkt_calc_rss_hash(pkt, net_hash_type, n->rss_data.key);
--    new_index = hash & (n->rss_data.indirections_len - 1);
--    new_index = n->rss_data.indirections_table[new_index];
--    if (index == new_index) {
--        return -1;
-+
-+    if (n->rss_data.populate_hash) {
-+        virtio_set_packet_hash(buf, reports[net_hash_type], hash);
-     }
--    return new_index;
-+
-+    if (n->rss_data.redirect) {
-+        new_index = hash & (n->rss_data.indirections_len - 1);
-+        new_index = n->rss_data.indirections_table[new_index];
-+    }
-+
-+    return (index == new_index) ? -1 : new_index;
- }
- 
- static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-@@ -1744,6 +1794,11 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-             }
- 
-             receive_header(n, sg, elem->in_num, buf, size);
-+            if (n->rss_data.populate_hash) {
-+                offset = sizeof(mhdr);
-+                iov_from_buf(sg, elem->in_num, offset,
-+                             buf + offset, n->host_hdr_len - sizeof(mhdr));
-+            }
-             offset = n->host_hdr_len;
-             total += n->guest_hdr_len;
-             guest_offset = n->guest_hdr_len;
-@@ -2736,7 +2791,9 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
-     trace_virtio_net_post_load_device();
-     virtio_net_set_mrg_rx_bufs(n, n->mergeable_rx_bufs,
-                                virtio_vdev_has_feature(vdev,
--                                                       VIRTIO_F_VERSION_1));
-+                                                       VIRTIO_F_VERSION_1),
-+                               virtio_vdev_has_feature(vdev,
-+                                                       VIRTIO_NET_F_HASH_REPORT));
- 
-     /* MAC_TABLE_ENTRIES may be different from the saved image */
-     if (n->mac_table.in_use > MAC_TABLE_ENTRIES) {
-@@ -3352,7 +3409,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
- 
-     n->vqs[0].tx_waiting = 0;
-     n->tx_burst = n->net_conf.txburst;
--    virtio_net_set_mrg_rx_bufs(n, 0, 0);
-+    virtio_net_set_mrg_rx_bufs(n, 0, 0, 0);
-     n->promisc = 1; /* for compatibility */
- 
-     n->mac_table.macs = g_malloc0(MAC_TABLE_ENTRIES * ETH_ALEN);
-@@ -3507,6 +3564,8 @@ static Property virtio_net_properties[] = {
-     DEFINE_PROP_BIT64("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ, false),
-     DEFINE_PROP_BIT64("rss", VirtIONet, host_features,
-                     VIRTIO_NET_F_RSS, false),
-+    DEFINE_PROP_BIT64("hash", VirtIONet, host_features,
-+                    VIRTIO_NET_F_HASH_REPORT, false),
-     DEFINE_PROP_BIT64("guest_rsc_ext", VirtIONet, host_features,
-                     VIRTIO_NET_F_RSC_EXT, false),
-     DEFINE_PROP_UINT32("rsc_interval", VirtIONet, rsc_timeout,
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index 5081f3c52a..a45ef8278e 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -131,6 +131,8 @@ typedef struct VirtioNetRscChain {
- 
- typedef struct VirtioNetRssData {
-     bool    enabled;
-+    bool    redirect;
-+    bool    populate_hash;
-     uint32_t hash_types;
-     uint8_t key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
-     uint16_t indirections_len;
+v2 -> v3:
+- added __COUNTER__ fix for additional lock guard macro
+- added missing include header in platform.c
+
+v1 -> v2:
+- fixed whitespace churn
+- added cover letter so patch set referenced correctly
+
+Daniel Brodsky (2):
+  lockable: fix __COUNTER__ macro to be referenced properly
+  lockable: replaced locks with lock guard macros where appropriate
+
+ block/iscsi.c           | 11 +++------
+ block/nfs.c             | 51 +++++++++++++++++++----------------------
+ cpus-common.c           | 13 ++++-------
+ hw/display/qxl.c        | 43 ++++++++++++++++------------------
+ hw/vfio/platform.c      |  5 ++--
+ include/qemu/lockable.h |  4 ++--
+ include/qemu/rcu.h      |  2 +-
+ migration/migration.c   |  3 +--
+ migration/multifd.c     |  8 +++----
+ migration/ram.c         |  3 +--
+ monitor/misc.c          |  4 +---
+ ui/spice-display.c      | 14 +++++------
+ util/log.c              |  4 ++--
+ util/qemu-timer.c       | 17 +++++++-------
+ util/rcu.c              |  8 +++----
+ util/thread-pool.c      |  3 +--
+ util/vfio-helpers.c     |  4 ++--
+ 17 files changed, 87 insertions(+), 110 deletions(-)
+
 -- 
-2.17.1
+2.25.1
 
 
