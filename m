@@ -2,79 +2,99 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5589C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 11:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA8CC4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 11:52:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B35A820732
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 11:50:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7656F20732
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 11:52:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PU06joaf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B35A820732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HO2VHMDn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7656F20732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFGAT-0001VM-Tq
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 07:50:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51810)
+	id 1jFGCQ-0003oP-Lu
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 07:52:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51975)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFG9j-00013f-JU
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:49:40 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jFGBh-0003MW-5I
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:51:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFG9i-0004sS-FH
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:49:39 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40965)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuval.shaia.ml@gmail.com>)
- id 1jFG9i-0004s8-AJ; Fri, 20 Mar 2020 07:49:38 -0400
-Received: by mail-oi1-x244.google.com with SMTP id b17so6126711oic.8;
- Fri, 20 Mar 2020 04:49:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gyOnx1nzAHzLx2CPSjU3uktBQhRrmpu053D+0rZDdrs=;
- b=PU06joafaL9KHCeD+wfxOp8Se3vNNRfIf5pfUDGsvK/6WAb+f5SqruPpmfWJj/xkR9
- 0m1/OcQULBlA5UIts0/PGUhghXUUXdwwIwY39fV6IVtGLmzGsiBjkPfjtZJo8BqqutSK
- q7+NTFZHoLUCS1xxdQeqX3C/+KhaouqAyxVU8WREgveyr/O6WCQ6/uDdKfb5ABcOAniW
- VmZhVuoSv6vt1Sf7m3E4vRmmPBR9DG6Ltl0PRdS2fL5wtLaJfR72J0JJAd601tC4SvEg
- 77TLN2+gV7pZxcRO544BXoaTs4PH4PKWJFL0MYKdbxbc0kvy4kLKoJ+nb+8rP5A5iZ8z
- Xdiw==
+ (envelope-from <pbonzini@redhat.com>) id 1jFGBf-0005mJ-S5
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:51:40 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49688)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jFGBf-0005m3-Nn
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 07:51:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584705098;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hQMOrRJyoQIpWQDVegLoR46epfwgsCUnTwyjzQAgY7Q=;
+ b=HO2VHMDn4ec69gQUqBDEx7DY/Gj+/OdiBzJs21kD1x162obNn9SWDidh8dMdqK2cbbq2eA
+ 3n+Xfkac0OnWkC8IIwOnLe7KL13qTcBznCpDEOnj+ZQYJ/FmKczbH4usxN9pZiW4jR5Ro8
+ c7ZkLZRkOBFx8/YdjyLbSje0qy4c3Gc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-jWD76qQ8N--iT4Y4gterDg-1; Fri, 20 Mar 2020 07:51:37 -0400
+X-MC-Unique: jWD76qQ8N--iT4Y4gterDg-1
+Received: by mail-wr1-f71.google.com with SMTP id p2so2516020wrw.8
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 04:51:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gyOnx1nzAHzLx2CPSjU3uktBQhRrmpu053D+0rZDdrs=;
- b=XBZMTRjuLY8WxIKGskAKdZYxW98AxkBw8W/RY4Hw3MQAF4xsfMn++T3OjZ//3GXmeU
- E+4QRYp4h7i0MC4itV3gN7nQTRMT+sX6pQ91swKZn5SFKwW035LleEgt/ay0zjmktAqR
- xQDffaA84cVi2EGB9x5wM2f1aqhJ0TQdhU5m+Bcz49jU9+qye+NCABX6/YUvXype9mh4
- Xr3BkO+3yQwHNv2tBOP2oVqBrCXVYQI1oXzUZkIq+i4JPEvGfa99I7k9QF9apYltN3b2
- i+NdISH0OiR+C6DFHXpN2AXXbjVshiQDplRll8k6fu6N6Vy5F5oLzvM//NbApRSoIylq
- 1JAQ==
-X-Gm-Message-State: ANhLgQ28sKz3MnlLatQZoGVku+sbpALmc57K+wl6ExPeqfaiqFM0E3kb
- +x9QGP/Yjp/bgbL5CPG6gFeWbYbWKfzOAVscfYM=
-X-Google-Smtp-Source: ADFU+vuRXKolinRzb4RA/S259EekPXxH4S2n+HMzvC3JYl08lzf40ILwEjgLJEDWVF6W7hi+ouu6Fb5E4AviLdy3ees=
-X-Received: by 2002:aca:cc08:: with SMTP id c8mr5912527oig.42.1584704977135;
- Fri, 20 Mar 2020 04:49:37 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hQMOrRJyoQIpWQDVegLoR46epfwgsCUnTwyjzQAgY7Q=;
+ b=nvnpOdPdElNQcu9jqYLhGY0aLMmgyloExX86AtTkog82YzzM72IB4mGVgvoQ+uLakq
+ 4Fg/HgIE2inVPET9RxG7Bgn0LtabH1kpGS0+x7kFd9ne18lM6CV+j0oq/aRStHe7fZWq
+ Hzuok2Yy1AYlak/jjXH/lDCOCo3p08P9NO3guRpDosKqBeERKtbjyFk/yZhBbVSl4UFP
+ UPDxrROSOTgdnGRxYCt8iXPjM1QzwljI7WESner769q0c9renXaF734OjCDf7YccL8vc
+ /W4tXIgvzU8e7QkC0DS6MC7oUU0EaPJfBNkijLHXRGx9kN38GwBx1Z3txJgTT11c9BmP
+ IpAg==
+X-Gm-Message-State: ANhLgQ0ba6i0E0Z0YQjYP/3NpS044EZ2kZvD2jr4Q8+nVvIARG9TvGgI
+ FzSJYLizY56WoK/4CyPGhGrzXA5wgrVi4i+oXyOzymNR3CE8HPlbB5V9v+EjbSuuhsHDCR6LfYs
+ bQlAV5NCJEYgG9js=
+X-Received: by 2002:a05:6000:1203:: with SMTP id
+ e3mr11102404wrx.166.1584705096090; 
+ Fri, 20 Mar 2020 04:51:36 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsr+Xm/dUwMauBDO/5KmxjX1poi86JMHMPkIZaYnp8Q3mH9HLdt6hyL0KjD5mX5Wn3Y6NSniQ==
+X-Received: by 2002:a05:6000:1203:: with SMTP id
+ e3mr11102372wrx.166.1584705095859; 
+ Fri, 20 Mar 2020 04:51:35 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+ by smtp.gmail.com with ESMTPSA id g2sm8335330wrs.42.2020.03.20.04.51.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 20 Mar 2020 04:51:34 -0700 (PDT)
+Subject: Re: [PATCH v4 0/2] add new options to set smbios type 4 fields
+To: Heyi Guo <guoheyi@huawei.com>, Igor Mammedov <imammedo@redhat.com>
+References: <20200318064820.19363-1-guoheyi@huawei.com>
+ <20200319154626.551a7852@redhat.com>
+ <8ae04ed2-e81b-0aa6-f313-0be9bfd93c04@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1e6715fd-c86e-0612-4906-1f13d7c11d4b@redhat.com>
+Date: Fri, 20 Mar 2020 12:51:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200318134849.237011-1-jusual@redhat.com>
-In-Reply-To: <20200318134849.237011-1-jusual@redhat.com>
-From: Yuval Shaia <yuval.shaia.ml@gmail.com>
-Date: Fri, 20 Mar 2020 13:49:26 +0200
-Message-ID: <CAMPkWoPp7mSp5_bBBxmu8KJ1=C+_+-0UXX-oab6Wcw8vNjK5Jg@mail.gmail.com>
-Subject: Re: [PATCH] hw/rdma/vmw/pvrdma_dev_ring: Replace strncpy with pstrcpy
-To: Julia Suvorova <jusual@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000003c6bc105a147e1c5"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <8ae04ed2-e81b-0aa6-f313-0be9bfd93c04@huawei.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,105 +106,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ wanghaibin.wang@huawei.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003c6bc105a147e1c5
-Content-Type: text/plain; charset="UTF-8"
+On 20/03/20 02:29, Heyi Guo wrote:
+> 
+> On 2020/3/19 22:46, Igor Mammedov wrote:
+>> On Wed, 18 Mar 2020 14:48:18 +0800
+>> Heyi Guo <guoheyi@huawei.com> wrote:
+>>
+>>> Common VM users sometimes care about CPU speed, so we add two new
+>>> options to allow VM vendors to present CPU speed to their users.
+>>> Normally these information can be fetched from host smbios.
+>> it's probably too late for this series due to soft-freeze,
+>> pls repost once 5.0 is released
+> 
+> Ah, I didn't pay enough attention to the merge window.
+> 
+> When will the soft-freeze be ended? Will it be announced in the mailing
+> list?
 
-Thanks,
-Reviewed-by: Yuval Shaia <yuval.shaia.ml.gmail.com>
+You can repost about one month from now.  Thanks!
 
-On Wed, 18 Mar 2020 at 15:49, Julia Suvorova <jusual@redhat.com> wrote:
+Paolo
 
-> ring->name is defined as 'char name[MAX_RING_NAME_SZ]'. Replace untruncated
-> strncpy with QEMU function.
-> This case prevented QEMU from compiling with --enable-sanitizers.
->
-> Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> ---
->  hw/rdma/vmw/pvrdma_dev_ring.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
-> index d7bc7f5ccc..c2b3dd70a9 100644
-> --- a/hw/rdma/vmw/pvrdma_dev_ring.c
-> +++ b/hw/rdma/vmw/pvrdma_dev_ring.c
-> @@ -16,6 +16,7 @@
->  #include "qemu/osdep.h"
->  #include "hw/pci/pci.h"
->  #include "cpu.h"
-> +#include "qemu/cutils.h"
->
->  #include "trace.h"
->
-> @@ -30,8 +31,7 @@ int pvrdma_ring_init(PvrdmaRing *ring, const char *name,
-> PCIDevice *dev,
->      int i;
->      int rc = 0;
->
-> -    strncpy(ring->name, name, MAX_RING_NAME_SZ);
-> -    ring->name[MAX_RING_NAME_SZ - 1] = 0;
-> +    pstrcpy(ring->name, MAX_RING_NAME_SZ, name);
->      ring->dev = dev;
->      ring->ring_state = ring_state;
->      ring->max_elems = max_elems;
-> --
-> 2.24.1
->
->
-
---0000000000003c6bc105a147e1c5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Thanks,<div>Reviewed-by: Yuval Shaia &lt;<a href=3D"http:/=
-/yuval.shaia.ml.gmail.com">yuval.shaia.ml.gmail.com</a>&gt;</div></div><br>=
-<div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, 18=
- Mar 2020 at 15:49, Julia Suvorova &lt;<a href=3D"mailto:jusual@redhat.com"=
->jusual@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote=
-" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
-padding-left:1ex">ring-&gt;name is defined as &#39;char name[MAX_RING_NAME_=
-SZ]&#39;. Replace untruncated<br>
-strncpy with QEMU function.<br>
-This case prevented QEMU from compiling with --enable-sanitizers.<br>
-<br>
-Signed-off-by: Julia Suvorova &lt;<a href=3D"mailto:jusual@redhat.com" targ=
-et=3D"_blank">jusual@redhat.com</a>&gt;<br>
----<br>
-=C2=A0hw/rdma/vmw/pvrdma_dev_ring.c | 4 ++--<br>
-=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
-<br>
-diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c<=
-br>
-index d7bc7f5ccc..c2b3dd70a9 100644<br>
---- a/hw/rdma/vmw/pvrdma_dev_ring.c<br>
-+++ b/hw/rdma/vmw/pvrdma_dev_ring.c<br>
-@@ -16,6 +16,7 @@<br>
-=C2=A0#include &quot;qemu/osdep.h&quot;<br>
-=C2=A0#include &quot;hw/pci/pci.h&quot;<br>
-=C2=A0#include &quot;cpu.h&quot;<br>
-+#include &quot;qemu/cutils.h&quot;<br>
-<br>
-=C2=A0#include &quot;trace.h&quot;<br>
-<br>
-@@ -30,8 +31,7 @@ int pvrdma_ring_init(PvrdmaRing *ring, const char *name, =
-PCIDevice *dev,<br>
-=C2=A0 =C2=A0 =C2=A0int i;<br>
-=C2=A0 =C2=A0 =C2=A0int rc =3D 0;<br>
-<br>
--=C2=A0 =C2=A0 strncpy(ring-&gt;name, name, MAX_RING_NAME_SZ);<br>
--=C2=A0 =C2=A0 ring-&gt;name[MAX_RING_NAME_SZ - 1] =3D 0;<br>
-+=C2=A0 =C2=A0 pstrcpy(ring-&gt;name, MAX_RING_NAME_SZ, name);<br>
-=C2=A0 =C2=A0 =C2=A0ring-&gt;dev =3D dev;<br>
-=C2=A0 =C2=A0 =C2=A0ring-&gt;ring_state =3D ring_state;<br>
-=C2=A0 =C2=A0 =C2=A0ring-&gt;max_elems =3D max_elems;<br>
--- <br>
-2.24.1<br>
-<br>
-</blockquote></div>
-
---0000000000003c6bc105a147e1c5--
 
