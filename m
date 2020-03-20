@@ -2,77 +2,79 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D13C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 06:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33AD9C4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 06:42:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58B92072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 06:36:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58B92072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F3B3E2072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 06:42:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MX/I842O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3B3E2072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFBGR-0006bf-Vh
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 02:36:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47703)
+	id 1jFBMY-00088f-7R
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 02:42:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jFBFn-0006BU-Bx
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:35:36 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jFBLv-0007jw-1T
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jFBFm-0004uq-2k
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:35:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48816)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jFBFl-0004rX-Sh
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jFBFk-0007GD-Gl
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 06:35:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7464F2E80C0
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 06:35:32 +0000 (UTC)
+ (envelope-from <kraxel@redhat.com>) id 1jFBLt-0003Cd-5e
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:41:54 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:46307)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jFBLt-0003CJ-0C
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:41:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584686511;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=zIiMql8rUOL5/l47A6mLqkL+iilKl56+acJaSeSetcI=;
+ b=MX/I842Oqkv20LNI5/Ffb1l77PJjXIc0CsMBDEV26GgTG1RKYYxn78yset2YjhhdghBAPB
+ jUu74Z435y/zUWK3+7f8ivn9GAjns779uNl/psEze1rfUhuxbq6mPPksq0ju5xdBTYYgur
+ dJCcMpbd7ZbRqzkfFtTLsXFFldLYqcE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-WiowU-PiM_6ez1OPaTiO_w-1; Fri, 20 Mar 2020 02:41:47 -0400
+X-MC-Unique: WiowU-PiM_6ez1OPaTiO_w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E97D418B60B8;
+ Fri, 20 Mar 2020 06:41:44 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-49.ams2.redhat.com
+ [10.36.112.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CEF094945;
+ Fri, 20 Mar 2020 06:41:44 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 9930C9DB3; Fri, 20 Mar 2020 07:41:43 +0100 (CET)
+Date: Fri, 20 Mar 2020 07:41:43 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v4 0/2] Cross-device resource sharing
+Message-ID: <20200320064143.4b2kyskr5clxsczs@sirius.home.kraxel.org>
+References: <20200319021823.57219-1-stevensd@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Mar 2020 06:28:23 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1867519@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Committed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Tags: focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange mohamadh paelzer
-X-Launchpad-Bug-Reporter: Mohammad Heib (mohamadh)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158428174672.11238.3583143675239092561.malonedeb@soybean.canonical.com>
-Message-Id: <158468570516.18848.2485117046875459284.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1867519] Re: qemu 4.2 segfaults on VF detach
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 715a9e8ef314e2512930e578aca839f32c80e10f
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200319021823.57219-1-stevensd@chromium.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,81 +83,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1867519 <1867519@bugs.launchpad.net>
+Cc: Zach Reizner <zachr@chromium.org>,
+ Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ virtio-comment@lists.oasis-open.org,
+ =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu (Ubuntu)
-       Status: Confirmed =3D> Fix Committed
+On Thu, Mar 19, 2020 at 11:18:21AM +0900, David Stevens wrote:
+> Hi all,
+> 
+> This is the next iteration of patches for adding support for sharing
+> resources between different virtio devices. The corresponding Linux
+> implementation is [1].
+> 
+> In addition to these patches, the most recent virtio-video patchset
+> includes a patch for importing objects into that device [2].
 
--- =
+Looks good to me.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1867519
+So, open a github issue to kick the TC vote process and get this merged?
+(see virtio-spec/.github/PULL_REQUEST_TEMPLATE.md).
 
-Title:
-  qemu 4.2 segfaults on VF detach
+cheers,
+  Gerd
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Fix Committed
-
-Bug description:
-  After updating Ubuntu 20.04 to the Beta version, we get the following
-  error and the virtual machines stucks when detaching PCI devices using
-  virsh command:
-
-  Error:
-  error: Failed to detach device from /tmp/vf_interface_attached.xml
-  error: internal error: End of file from qemu monitor
-
-  steps to reproduce:
-   1. create a VM over Ubuntu 20.04 (5.4.0-14-generic)
-   2. attach PCI device to this VM (Mellanox VF for example)
-   3. try to detaching  the PCI device using virsh command:
-     a. create a pci interface xml file:
-          =
-
-        <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
-        <driver name=3D'vfio'/>
-        <source>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x11' slot=3D'0x00' =
-function=3D'0x2' />
-        </source>
-        </hostdev>
-      =
-
-     b.  #virsh detach-device <VM-Doman-name> <pci interface xml file>
-
-
-  - Ubuntu release:
-    Description:    Ubuntu Focal Fossa (development branch)
-    Release:        20.04
-
-  - Package ver:
-    libvirt0:
-    Installed: 6.0.0-0ubuntu3
-    Candidate: 6.0.0-0ubuntu5
-    Version table:
-       6.0.0-0ubuntu5 500
-          500 http://il.archive.ubuntu.com/ubuntu focal/main amd64 Packages
-   *** 6.0.0-0ubuntu3 100
-          100 /var/lib/dpkg/status
-
-  - What you expected to happen: =
-
-    PCI device detached without any errors.
-
-  - What happened instead:
-    getting the errors above and he VM stuck
-
-  additional info:
-  after downgrading the libvirt0 package and all the dependent packages to =
-5.4 the previous, version, seems that the issue disappeared
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1867519/+subscriptions
 
