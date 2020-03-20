@@ -2,54 +2,87 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3ABDC4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 536F9C4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1D9A20709
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:34:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1D9A20709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D1AE20709
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:35:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfQmQ71l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D1AE20709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFIiq-0000jJ-TD
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 10:34:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49497)
+	id 1jFIkE-0002BK-5A
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 10:35:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFIhg-0000K0-6v
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:32:53 -0400
+ (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFIjP-0001Ct-7O
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFIhd-0006JR-OX
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:32:50 -0400
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:9345)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFIhd-0006Hi-2g
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:32:49 -0400
-Received: from spf.mail.chinamobile.com (unknown[172.16.121.9]) by
- rmmx-syy-dmz-app06-12006 (RichMail) with SMTP id 2ee65e74d3f60ef-45e64;
- Fri, 20 Mar 2020 22:32:24 +0800 (CST)
-X-RM-TRANSID: 2ee65e74d3f60ef-45e64
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG: 00000000
-Received: from maozy-host.mshome.net (unknown[112.25.154.146])
- by rmsmtp-syy-appsvr05-12005 (RichMail) with SMTP id 2ee55e74d3f155d-03a5a;
- Fri, 20 Mar 2020 22:32:24 +0800 (CST)
-X-RM-TRANSID: 2ee55e74d3f155d-03a5a
-From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] xbzrle: update xbzrle doc
-Date: Fri, 20 Mar 2020 22:32:16 +0800
-Message-Id: <20200320143216.423374-1-maozhongyi@cmss.chinamobile.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 221.176.66.80
+ (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFIjN-00070q-TC
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:39 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33326)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuval.shaia.ml@gmail.com>)
+ id 1jFIjN-00070I-N8
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:37 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a25so7785135wrd.0
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 07:34:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=izsjuPvFCwqcf0hTr6C/OKdh9vNSdRz4RAKvPm3nOGE=;
+ b=KfQmQ71l30aZ4zg3BAqD/caXcDUdUBhIF/TJn/lyLqnLKzY1NlvUgBC5xADOOxB5jw
+ JMJo8gCXGcfWV7lewyMEp6oN5/6uUEGuJ02FAnXnOmOtC3wqtmGzJD16AbypGYnuJHTw
+ zo8tczWUg8cRJtnzXTfWve1wNpAI1mV5OjJbB0Kfg+a0BbizB2GjcGMAWAMDn+1TNseo
+ W+z0cwO+XavOniXkM7gXSZA4u52m8uwBpYqQSR66KpCZJmbjWweyer50GQ5M3jcF84KD
+ IqH8veQS8xAfo8fPKi180k/Cxhopz249FgVS5CYGHpe3nwGY8aaJm/v3OngEo5Fp6NVU
+ rmeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=izsjuPvFCwqcf0hTr6C/OKdh9vNSdRz4RAKvPm3nOGE=;
+ b=i7hncAM1Ja2DbG9gPNdr4DPNpJPQKirAoCvwZK/JKXaAzwQtNjm6JNwMpylEU5x1J9
+ Gz9ZY7pl3mHyCCCzEhLHMxXgu98Ghl/drCzQgI2hybnEjbp/P3KWZ8tRakr852pYVw4u
+ P8dpFYbaGQlObR+ovIEr1+aAPRSWflF5qvCdTNphKvACTgogdnWPxm1U8pPMw7lTUsTN
+ CKZ7rb4N7a+0eCsAQc7vWsUK2B0+A11LgSiMEMPctH22/T0ge17fStVP00SE4++EZGhy
+ R5NgXuadHAu/4BHwFt2J3ys3S1yj9aRCa1iSQMOUck0vFZHog7QrdmfAIPUQqZrsF49C
+ Su/g==
+X-Gm-Message-State: ANhLgQ38Pqidxic59Epjp2gnQBhbIDzveQOXDNn7SqSknG4Ne96kmkN6
+ Ji7WlzDZmLygb0lToQNsNXz5ddYr
+X-Google-Smtp-Source: ADFU+vuPU8r/qtKrkH+N0wHWkeYPxn5QKsKjyD3I0Tfc27KRAmHmBDsZPNVWuIHPDjLs7o6Njn7NEg==
+X-Received: by 2002:a5d:644c:: with SMTP id d12mr11690041wrw.54.1584714875717; 
+ Fri, 20 Mar 2020 07:34:35 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:a040:186:a1ad:5254:ff:fe84:1be0])
+ by smtp.gmail.com with ESMTPSA id
+ s22sm7336694wmc.16.2020.03.20.07.34.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Mar 2020 07:34:35 -0700 (PDT)
+From: Yuval Shaia <yuval.shaia.ml@gmail.com>
+To: qemu-devel@nongnu.org, yuval.shaia.ml@gmail.com, marcel.apfelbaum@gmail.com
+Subject: [PATCH v1 1/2] hw/rdma: Cosmetic change - no need for two sge arrays
+Date: Fri, 20 Mar 2020 16:34:28 +0200
+Message-Id: <20200320143429.9490-2-yuval.shaia.ml@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200320143429.9490-1-yuval.shaia.ml@gmail.com>
+References: <20200320143429.9490-1-yuval.shaia.ml@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,77 +94,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dgilbert@redhat.com, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>,
- quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add new parameter description, also:
-1. Remove unsociable space.
-2. Nit picking: s/two/2 in report
+The function build_host_sge_array uses two sge arrays, one for input and
+one for output.
+Since the size of the two arrays is the same, the function can write
+directly to the given source array (i.e. input/output argument).
 
-Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
 ---
- docs/xbzrle.txt       | 7 ++++++-
- migration/migration.c | 2 +-
- monitor/hmp-cmds.c    | 2 +-
- 3 files changed, 8 insertions(+), 3 deletions(-)
+ hw/rdma/rdma_backend.c | 40 ++++++++++++++++------------------------
+ 1 file changed, 16 insertions(+), 24 deletions(-)
 
-diff --git a/docs/xbzrle.txt b/docs/xbzrle.txt
-index c0a7dfd44c..b431bdaf0f 100644
---- a/docs/xbzrle.txt
-+++ b/docs/xbzrle.txt
-@@ -92,6 +92,11 @@ Usage
- power of 2. The cache default value is 64MBytes. (on source only)
-     {qemu} migrate_set_cache_size 256m
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index c346407cd3..b7ffbef9c0 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -378,30 +378,25 @@ static void ah_cache_init(void)
+ }
  
-+Commit 73af8dd8d7 "migration: Make xbzrle_cache_size a migration parameter"
-+(v2.11.0) deprecated migrate-set-cache-size, therefore, the new parameter
-+is recommended.
-+    {qemu} migrate_set_parameter xbzrle-cache-size 256m
-+
- 4. Start outgoing migration
-     {qemu} migrate -d tcp:destination.host:4444
-     {qemu} info migrate
-@@ -108,7 +113,7 @@ power of 2. The cache default value is 64MBytes. (on source only)
-     xbzrle transferred: I kbytes
-     xbzrle pages: J pages
-     xbzrle cache miss: K
--    xbzrle overflow : L
-+    xbzrle overflow: L
+ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+-                                struct ibv_sge *dsge, struct ibv_sge *ssge,
+-                                uint8_t num_sge, uint64_t *total_length)
++                                struct ibv_sge *sge, uint8_t num_sge,
++                                uint64_t *total_length)
+ {
+     RdmaRmMR *mr;
+-    int ssge_idx;
++    int idx;
  
- xbzrle cache-miss: the number of cache misses to date - high cache-miss rate
- indicates that the cache size is set too low.
-diff --git a/migration/migration.c b/migration/migration.c
-index c1d88ace7f..4b26110d57 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1243,7 +1243,7 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    "xbzrle_cache_size",
-                    "is invalid, it should be bigger than target page size"
--                   " and a power of two");
-+                   " and a power of 2");
-         return false;
+-    for (ssge_idx = 0; ssge_idx < num_sge; ssge_idx++) {
+-        mr = rdma_rm_get_mr(rdma_dev_res, ssge[ssge_idx].lkey);
++    for (idx = 0; idx < num_sge; idx++) {
++        mr = rdma_rm_get_mr(rdma_dev_res, sge[idx].lkey);
+         if (unlikely(!mr)) {
+-            rdma_error_report("Invalid lkey 0x%x", ssge[ssge_idx].lkey);
+-            return VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
++            rdma_error_report("Invalid lkey 0x%x", sge[idx].lkey);
++            return VENDOR_ERR_INVLKEY | sge[idx].lkey;
+         }
+ 
+ #ifdef LEGACY_RDMA_REG_MR
+-        dsge->addr = (uintptr_t)mr->virt + ssge[ssge_idx].addr - mr->start;
+-#else
+-        dsge->addr = ssge[ssge_idx].addr;
++        sge[idx].addr = (uintptr_t)mr->virt + sge[idx].addr - mr->start;
+ #endif
+-        dsge->length = ssge[ssge_idx].length;
+-        dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
+-
+-        *total_length += dsge->length;
++        sge[idx].lkey = rdma_backend_mr_lkey(&mr->backend_mr);
+ 
+-        dsge++;
++        *total_length += sge[idx].length;
      }
  
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index f8be6bbb16..dbfb121eb2 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -303,7 +303,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-                        info->xbzrle_cache->cache_miss);
-         monitor_printf(mon, "xbzrle cache miss rate: %0.2f\n",
-                        info->xbzrle_cache->cache_miss_rate);
--        monitor_printf(mon, "xbzrle overflow : %" PRIu64 "\n",
-+        monitor_printf(mon, "xbzrle overflow: %" PRIu64 "\n",
-                        info->xbzrle_cache->overflow);
+     return 0;
+@@ -484,7 +479,6 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+                             void *ctx)
+ {
+     BackendCtx *bctx;
+-    struct ibv_sge new_sge[MAX_SGE];
+     uint32_t bctx_id;
+     int rc;
+     struct ibv_send_wr wr = {}, *bad_wr;
+@@ -518,7 +512,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+ 
+     rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
+ 
+-    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
++    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.tx_len);
+     if (rc) {
+         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+@@ -538,7 +532,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+     wr.num_sge = num_sge;
+     wr.opcode = IBV_WR_SEND;
+     wr.send_flags = IBV_SEND_SIGNALED;
+-    wr.sg_list = new_sge;
++    wr.sg_list = sge;
+     wr.wr_id = bctx_id;
+ 
+     rc = ibv_post_send(qp->ibqp, &wr, &bad_wr);
+@@ -601,7 +595,6 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+                             struct ibv_sge *sge, uint32_t num_sge, void *ctx)
+ {
+     BackendCtx *bctx;
+-    struct ibv_sge new_sge[MAX_SGE];
+     uint32_t bctx_id;
+     int rc;
+     struct ibv_recv_wr wr = {}, *bad_wr;
+@@ -635,7 +628,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+ 
+     rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
+ 
+-    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
++    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+     if (rc) {
+         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+@@ -643,7 +636,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
      }
  
+     wr.num_sge = num_sge;
+-    wr.sg_list = new_sge;
++    wr.sg_list = sge;
+     wr.wr_id = bctx_id;
+     rc = ibv_post_recv(qp->ibqp, &wr, &bad_wr);
+     if (rc) {
+@@ -671,7 +664,6 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+                                 uint32_t num_sge, void *ctx)
+ {
+     BackendCtx *bctx;
+-    struct ibv_sge new_sge[MAX_SGE];
+     uint32_t bctx_id;
+     int rc;
+     struct ibv_recv_wr wr = {}, *bad_wr;
+@@ -688,7 +680,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+ 
+     rdma_protected_gslist_append_int32(&srq->cqe_ctx_list, bctx_id);
+ 
+-    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
++    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+     if (rc) {
+         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+@@ -696,7 +688,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+     }
+ 
+     wr.num_sge = num_sge;
+-    wr.sg_list = new_sge;
++    wr.sg_list = sge;
+     wr.wr_id = bctx_id;
+     rc = ibv_post_srq_recv(srq->ibsrq, &wr, &bad_wr);
+     if (rc) {
 -- 
-2.17.1
-
-
+2.20.1
 
 
