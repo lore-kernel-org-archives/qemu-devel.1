@@ -2,83 +2,68 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0393FC4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8063CC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:21:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C489F20739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:08:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GK1VtT/D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C489F20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BA0220777
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA0220777
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57543 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFM4l-0002CB-0N
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:08:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40622)
+	id 1jFMGo-0004xV-D1
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:21:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42810)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jFM33-0000nb-QS
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:07:11 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jFMGD-0004Ut-Qm
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jFM32-0000K1-4p
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:07:09 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47929)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jFM32-0000Jp-0p
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:07:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584727627;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DBs0wVljz8VFF+RSStNVIDJs5Nk6tUJrzUMX4YcTepM=;
- b=GK1VtT/DhOzNVyeLimM2/WmPrj5kfo5hPt41YQLx6JsfrpyoO0qtkqu8VuOpQvfnQPvZdX
- Zq7c+Ar3vpFRHTSkYUCn74sHmylJCHt+Cf1Xz2FlgWncP7iwWkVX0BD+IbU848fH8nf/ok
- kXimQpLbmcGFRcCaAxnQH2kjTeDdivQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-0roZtBYfMQKVybpXMmTRIQ-1; Fri, 20 Mar 2020 14:07:05 -0400
-X-MC-Unique: 0roZtBYfMQKVybpXMmTRIQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70E401857BE8;
- Fri, 20 Mar 2020 18:07:04 +0000 (UTC)
-Received: from work-vm (ovpn-114-236.ams2.redhat.com [10.36.114.236])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 605251001925;
- Fri, 20 Mar 2020 18:07:03 +0000 (UTC)
-Date: Fri, 20 Mar 2020 18:07:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH] monitor/hmp-cmds: fix bad indentation in 'info
- migrate_parameters' cmd output
-Message-ID: <20200320180700.GF3464@work-vm>
-References: <20200320130013.418557-1-maozhongyi@cmss.chinamobile.com>
- <878sjv11xm.fsf@dusky.pond.sub.org> <20200320173117.GE3464@work-vm>
- <20200320174901.GO2608355@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1jFMGC-0002y1-7t
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:20:45 -0400
+Resent-Date: Fri, 20 Mar 2020 14:20:45 -0400
+Resent-Message-Id: <E1jFMGC-0002y1-7t@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21145)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jFMGC-0002v1-03
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:20:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584728428; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Oas0Gpm32gmBnUdBDsMeCsfQWx+mvocnuHfqOwUEcI/4hdeSg4DXmotbScxcGNvo/i9lK8TjR+slNKP8gy3tHx1SZnn1Q66A1xBjFmDX5RH/6ANShWRn562v+IFljUZlg+iKpyhRwFXcXXj57UH6gBuMk5Y/UjbbWJC4Z5RoIXk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584728428;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=SA3PpHAuMMUDaUHMezN9R3DiwdtVe5XWY6MuSWu8EfM=; 
+ b=oKTl/6nYd9fPfLvnv1I31lKBVzCa+bZEtqiY83E6WBJNgNmz6rbZFQm3izM3lUbjy5hEnHB2wgWWnMyys0Q0LkewmgDjFDcthIzLfk9t6Qp2RZTQkqrzcp+KwYbjiAAHPZmPSegi5yMHVXxUiMohNKuviM4wug+2WY5tW/ZkQNc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1584728425988904.7284635556323;
+ Fri, 20 Mar 2020 11:20:25 -0700 (PDT)
+In-Reply-To: <20200320155106.549514-1-marcandre.lureau@redhat.com>
+Subject: Re: [PULL v2 0/1] Slirp patches
+Message-ID: <158472842482.16549.4040421729686986328@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <20200320174901.GO2608355@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: marcandre.lureau@redhat.com
+Date: Fri, 20 Mar 2020 11:20:25 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,101 +75,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ samuel.thibault@ens-lyon.org, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Fri, Mar 20, 2020 at 05:31:17PM +0000, Dr. David Alan Gilbert wrote:
-> > (Rearranging the text a bit)
-> >=20
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >=20
-> > > David (cc'ed) should be able to tell us which fix is right.
-> > >=20
-> > > @tls_creds and @tls_hostname look like they could have the same issue=
-.
-> >=20
-> > A certain Markus removed the Null checks in 8cc99dc because 4af245d
-> > guaranteed they would be None-Null for tls-creds/hostname - so we
-> > should be OK for those.
-> >=20
-> > But tls-authz came along a lot later in d2f1d29 and doesn't
-> > seem to have the initialisation, which is now in
-> > migration_instance_init.
-> >=20
-> > So I *think* the fix for this is to do the modern equivalent of 4af245d
-> > :
-> >=20
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index c1d88ace7f..0bc1b93277 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -3686,6 +3686,7 @@ static void migration_instance_init(Object *obj)
-> > =20
-> >      params->tls_hostname =3D g_strdup("");
-> >      params->tls_creds =3D g_strdup("");
-> > +    params->tls_authz =3D g_strdup("");
-> > =20
-> >      /* Set has_* up only for parameter checks */
-> >      params->has_compress_level =3D true;
-> >=20
-> > Copying in Dan to check that wouldn't break tls.
->=20
-> It *will* break TLS, because it will cause the TLS code to lookup
-> an object with the ID of "".  NULL must be preserved when calling
-> the TLS APIs.
-
-OK, good I asked...
-
-> The assignment of "" to tls_hostname would also have broken TLS,
-> so the migration_tls_channel_connect method had to turn it back
-> into a real NULL.
->=20
-> The use of "" for tls_creds will similarly cause it to try and
-> lookup an object with ID of "", and fail. That one's harmless
-> though, because it would also fail if it were NULL.
-
-OK.
-
-It looks like the output of query-migrate-parameters though already
-turns it into "", so I don't think you can tell it's NULL from that:
-
-{"QMP": {"version": {"qemu": {"micro": 0, "minor": 2, "major": 4}, "package=
-": "qemu-4.2.0-4.fc31"}, "capabilities": ["oob"]}}
-{ "execute": "qmp_capabilities" }
-{"return": {}}
-{ "execute": "query-migrate-parameters" }
-{"return": {"xbzrle-cache-size": 67108864, "cpu-throttle-initial": 20, "ann=
-ounce-max": 550, "decompress-threads": 2, "compress-threads": 8, "compress-=
-level": 1, "multifd-channels": 2, "announce-initial": 50, "block-incrementa=
-l": false, "compress-wait-thread": true, "downtime-limit": 300, "tls-authz"=
-: "", "announce-rounds": 5, "announce-step": 100, "tls-creds": "", "max-cpu=
--throttle": 99, "max-postcopy-bandwidth": 0, "tls-hostname": "", "max-bandw=
-idth": 33554432, "x-checkpoint-delay": 20000, "cpu-throttle-increment": 10}=
-}
-
-I'm not sure who turns a Null into a "" but I guess it's somewhere in
-the json output iterator.
-
-So we can fix this problem either in qmp_query_migrate_parameters
-and just strdup a "", or substitute it in hmp_info_migrate_parameters.
-
-Dave
-
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyMDE1NTEwNi41NDk1
+MTQtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQVUxMIHYyIDAvMV0gU2xpcnAgcGF0Y2hl
+cwpNZXNzYWdlLWlkOiAyMDIwMDMyMDE1NTEwNi41NDk1MTQtMS1tYXJjYW5kcmUubHVyZWF1QHJl
+ZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNhMDAxNzggc2xpcnA6IHVwZGF0ZSBzdWJtb2R1
+bGUgdG8gdjQuMi4wKwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IE1pc3NpbmcgU2lnbmVk
+LW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyIGxpbmVzIGNo
+ZWNrZWQKCkNvbW1pdCBjYTAwMTc4MzE2MDYgKHNsaXJwOiB1cGRhdGUgc3VibW9kdWxlIHRvIHY0
+LjIuMCspIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzIwMTU1MTA2LjU0OTUxNC0xLW1hcmNh
+bmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
 
