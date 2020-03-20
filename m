@@ -2,92 +2,79 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B063C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92329C4332E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:05:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAB1C20739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:03:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C5BE20739
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:05:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LwA+gXJ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAB1C20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TJg3jdrO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C5BE20739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFK7l-0006RF-Uj
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 12:03:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37058)
+	id 1jFK9H-0000DK-Gp
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 12:05:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFK1y-0008JH-7X
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:57:55 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFK4F-0003Ma-SK
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:00:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFK1x-0003qp-1x
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:57:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50564)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFK1w-0003ov-VH
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:57:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584719872;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=jY9hFXsRQKShgR6fFRHDQkteEgkZAWGBxIuQEuqC1Q8=;
- b=LwA+gXJ7m9egg/faw/0oCQF1iDGAWXyyCRnDuX8oTATAVUCY3iqS5S2yC9q9cStaLq++U0
- rWyjLbMqOOi1OID4ahMfDlz/fpAGEbgWmtKsFPDBrv+eE6nFQHhAEE2HgalziWlDrH37c5
- hMRz/V68POgKsynZWH59J7FoNc9wRW4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-8QhzVx4aMmiVMOLyt-OV3Q-1; Fri, 20 Mar 2020 11:57:50 -0400
-X-MC-Unique: 8QhzVx4aMmiVMOLyt-OV3Q-1
-Received: by mail-wm1-f72.google.com with SMTP id f207so1955606wme.6
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 08:57:50 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jFK4A-0005E4-UA
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:00:15 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:38290)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jFK4A-0005D0-OQ
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:00:10 -0400
+Received: by mail-ot1-x332.google.com with SMTP id t28so6448973ott.5
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 09:00:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2gtrUypW/po+py9ZQStQYZk8bi7M9dsSt8me7y/uEnE=;
+ b=TJg3jdrOaEonS5N71Op2qiIcCXA5DAsl2zvD7qD1NvMJPqq37kt9ymIKLFqnIDFCdW
+ KVpNAojeHXt7cWLBBJbjJbQkzMhwsH8xfWQBhJIQsDmXAJb3C7NGo3Y/kngQkVse/7yU
+ 5j5C+xH2MBLl8SfiINujf6DVTvcFRJ0HH4ls4BRg2+Q615qSGruB2Q31sjanMilpVJQt
+ sTRvgZOuqbwUuEuimixN573bZCGV7B5E8SfaPF57Y+H2elgG1yKU4t7/BN2URJWHdx+J
+ 5O776U76YbmHxkkNB2vXD8kHfx1YpLBrev7lLF017hQ+bFOHMhk82aiW893TURsfRqXq
+ Thnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=yo0Dd1h/opLMkm38keM/qX9N7f08guLSjUkx4P9OCWI=;
- b=M1PE+bIOM+EGAQWWsvHjFpMT1fnoYzsBgMrIAOv0GsvyIN1oR0kzxKFCVPOBpCn+Yf
- gZntwGHLU1edOp+NAvrMqX9nh7dgr02DuN6s/eN/g8q0miL0wLKr7UEZR/aC8ZqawqhV
- CUf/7TRpz4/dMaxInTlsQGAfqc8QfwaO7HzI2v9pWun+FlKdyQQ64Di/B2XbmANYrDpV
- JyLMot0OLS0MFXsNuRc2LvRH3Q0iauoKxfjOlGCkcf74563nL6KL52RfKAglzW5UbYXH
- DrPtMv6t9nCrBusdFM9pDZh33DiGI1m82yMDuf9lE1VWa7jU9LPWAIQgwFWAGCI1K/zc
- Ae6w==
-X-Gm-Message-State: ANhLgQ1SuUtKTSdY5IaePhDaLWGR/eaDgXL7WYoJk5qOPowsT+W83M3P
- EprXFTLv5LCLWFUun6f+wYIsIEyrJZBYtD3hm8RmWIZv5YWYiGDbajfOQALyF6WYKiST+KDwFiP
- Ay8USW1u65zKU4NM=
-X-Received: by 2002:adf:9ccd:: with SMTP id h13mr5342140wre.427.1584719868734; 
- Fri, 20 Mar 2020 08:57:48 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtKNIySo+0h9nKi1gF8SVhvWINxKpB6fvuZ/k49TAlOK+68wRu67Dh8yorrIbw24AcvMbgFaQ==
-X-Received: by 2002:adf:9ccd:: with SMTP id h13mr5342111wre.427.1584719868467; 
- Fri, 20 Mar 2020 08:57:48 -0700 (PDT)
-Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id x5sm9117419wrv.67.2020.03.20.08.57.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Mar 2020 08:57:47 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] ppc/ppc405_boards: Remove unnecessary NULL check
-Date: Fri, 20 Mar 2020 16:57:40 +0100
-Message-Id: <20200320155740.5342-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2gtrUypW/po+py9ZQStQYZk8bi7M9dsSt8me7y/uEnE=;
+ b=syvcbfwMvD4VMpYaaFz0xOYPEluwdVne63dPHPVHhKIyJwFze48phhh9k2o3RU8DW/
+ KGBk+zUO+Rt1QXTsKArWGGIyH+bplJixesKvvhL/R0S5EuKQXY082ce7jaKSysS8JZHR
+ MWhisty0pGKvCj03wUZW5eEAgb4iDQkOgaIQT10oaKM2eGvoox97cIugtVx2UZq+f+Mp
+ 36nJCbdrnh7+O6dm53vMU9DNSVbVWxWs0Ueo2H5OTvKHL1EKafN6pH8TnOUmr6P9N9LC
+ WOHjHub9BIibFanqWpsGUwUbv1lkfQ0MmgRvN8ezFbIzP1VocJ20Y1qlyXOmQ2DFlnza
+ l9nQ==
+X-Gm-Message-State: ANhLgQ1guVjfSpRN7kBAY4rqgBWsX7ff1aL0ry9yaIgd4Ppj13mkx+9f
+ NLohCiQwndhPKlXFJ4J+KnPfA7F4GpYIre1+lboQsg==
+X-Google-Smtp-Source: ADFU+vvOl/UxG/QlTv/jMkgVoUWg0wyR+YurzVv045stpG/0Hw9DhWcgRMbVR1v3jx69X0PaPG7kTeXnjFJ2IOsVOwY=
+X-Received: by 2002:a9d:1d43:: with SMTP id m61mr7394668otm.91.1584720009824; 
+ Fri, 20 Mar 2020 09:00:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <20200318011217.2102748-1-ehabkost@redhat.com>
+In-Reply-To: <20200318011217.2102748-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Mar 2020 15:59:58 +0000
+Message-ID: <CAFEAcA_6i1ponfRK6vUA_KCz_F=2c886CPQNKE8Kn4SifaRRxw@mail.gmail.com>
+Subject: Re: [PULL 0/4] Python queue for 5.0 soft freeze
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,61 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This code is inside the "if (dinfo)" condition, so testing
-again here whether it is NULL is unnecessary.
+On Wed, 18 Mar 2020 at 01:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The following changes since commit d649689a8ecb2e276cc20d3af6d416e3c299cb17:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2020-03-17 18:33:05 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+>
+> for you to fetch changes up to f4abfc6cb037da951e7977a67171f361fc6d21d7:
+>
+>   MAINTAINERS: add simplebench (2020-03-17 21:09:26 -0400)
+>
+> ----------------------------------------------------------------
+> Python queue for 5.0 soft freeze
+>
+> * Add scripts/simplebench (Vladimir Sementsov-Ogievskiy)
+>
 
-Fixes: dd59bcae7 (Don't size flash memory to match backing image)
-Reported-by: Coverity (CID 1421917)
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/ppc/ppc405_boards.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index e6bffb9e1a..6198ec1035 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -191,7 +191,7 @@ static void ref405ep_init(MachineState *machine)
-         bios_size =3D 8 * MiB;
-         pflash_cfi02_register((uint32_t)(-bios_size),
-                               "ef405ep.bios", bios_size,
--                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              blk_by_legacy_dinfo(dinfo),
-                               64 * KiB, 1,
-                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x=
-2AA,
-                               1);
-@@ -459,7 +459,7 @@ static void taihu_405ep_init(MachineState *machine)
-         bios_size =3D 2 * MiB;
-         pflash_cfi02_register(0xFFE00000,
-                               "taihu_405ep.bios", bios_size,
--                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              blk_by_legacy_dinfo(dinfo),
-                               64 * KiB, 1,
-                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x=
-2AA,
-                               1);
-@@ -494,7 +494,7 @@ static void taihu_405ep_init(MachineState *machine)
-     if (dinfo) {
-         bios_size =3D 32 * MiB;
-         pflash_cfi02_register(0xfc000000, "taihu_405ep.flash", bios_size,
--                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              blk_by_legacy_dinfo(dinfo),
-                               64 * KiB, 1,
-                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x=
-2AA,
-                               1);
---=20
-2.21.1
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
