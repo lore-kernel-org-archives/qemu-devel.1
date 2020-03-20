@@ -2,65 +2,68 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F62C4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F5EC4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:15:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0346B2072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:14:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A42D2072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:15:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gZHbs33L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0346B2072C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aINOAAgu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A42D2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFJLU-0007i1-7z
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 11:14:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55608)
+	id 1jFJMq-0000c1-5W
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 11:15:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ovoshcha@redhat.com>) id 1jFJKo-0007IE-RA
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:13:19 -0400
+ (envelope-from <ovoshcha@redhat.com>) id 1jFJLm-000897-Rq
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:14:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ovoshcha@redhat.com>) id 1jFJKn-0002HG-TZ
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:13:18 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:26645)
+ (envelope-from <ovoshcha@redhat.com>) id 1jFJLl-0003HX-KN
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:14:18 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40842)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1jFJKn-0002H1-QJ
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:13:17 -0400
+ (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1jFJLl-0003Gg-B4
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:14:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584717197;
+ s=mimecast20190719; t=1584717255;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=9haJweHq4azCei1Vd5ihEG7An2lKbdhgZVPq70lgSR8=;
- b=gZHbs33LviZWqV4Myv9hqOknfUbFXqVxSMbb6o76BxDHDDjhvS4NzBwmX6mQUFM15L7BHO
- +EZ9XHitHyDOHiiEwqmgwa1iR87Ws8yCKr7lR1Z74ZmzgF7ye3iyGnxYNc/+m5hBohdhge
- W2oJEQx6kJMSAaykPqTDhwisvM2mv48=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pIAxnqLbBPi8HGVHGPcFX+gvFTpwFK4hEINmy/jM51U=;
+ b=aINOAAguubHLWsIEJOwRa+uGndv3AQGlL552XN0SF8j4223oaqtxoCxYjD043QUeGLrJ6Y
+ EiIj5Xm5nvznchyBh4ko2Bwgcxs6/nVoYVBk2p67R5U9DVPRyGLVvZd/FrpxR00S6IwmDP
+ Or6r5ybmqRicgfN4C/BVsNQ2wELwih0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-WN9wiMv_McC15elfaDD1Hg-1; Fri, 20 Mar 2020 11:13:15 -0400
-X-MC-Unique: WN9wiMv_McC15elfaDD1Hg-1
+ us-mta-4-Vv3wbVEWPaOS3-wdUo5hRQ-1; Fri, 20 Mar 2020 11:14:10 -0400
+X-MC-Unique: Vv3wbVEWPaOS3-wdUo5hRQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D941480491F
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 15:13:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BF2A9A3FF
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 15:13:34 +0000 (UTC)
 Received: from kh066.redhat.com (unknown [10.40.193.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 227D210016EB;
- Fri, 20 Mar 2020 15:12:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B20810016EB;
+ Fri, 20 Mar 2020 15:13:10 +0000 (UTC)
 From: Oksana Vohchana <ovoshcha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/3] Acceptance test: Extension of migration tests
-Date: Fri, 20 Mar 2020 17:12:51 +0200
-Message-Id: <20200320151254.16766-1-ovoshcha@redhat.com>
+Subject: [PATCH v3 1/3] Acceptance test: adds param 'address' in _get_free_port
+Date: Fri, 20 Mar 2020 17:12:52 +0200
+Message-Id: <20200320151254.16766-2-ovoshcha@redhat.com>
+In-Reply-To: <20200320151254.16766-1-ovoshcha@redhat.com>
+References: <20200320151254.16766-1-ovoshcha@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
@@ -68,8 +71,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,31 +89,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds a new migration test through RDMA.
-To correct uses of migration need to add a new function to work
-with RDMA service.
-And as a part of migration tests, the series makes small updates to EXEC
-migration and to _get_free_port function
+In the migration test function _get_free_port works only for localhost,
+but in the case to use migration through an RDMA we need to get a free port
+on the configured network RDMA-interface.
+This patch is the start for another migration option
 
-V2:
- - improves commit message in Acceptance test: adds param 'address'
-   in _get_free_port
- - provides import check for netifaces library
- - makes fix to _get_ip_rdma function
- - adds skip to test if not upload python module
+Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
+---
+ tests/acceptance/migration.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-V3:
- - removes unrelated changes
- - updates functions with new avocado features
-
-Oksana Vohchana (3):
-  Acceptance test: adds param 'address' in _get_free_port
-  Acceptance test: provides new functions
-  Acceptance test: provides to use RDMA transport for migration test
-
- tests/acceptance/migration.py | 46 +++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
-
+diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+index a8367ca023..e4c39b85a1 100644
+--- a/tests/acceptance/migration.py
++++ b/tests/acceptance/migration.py
+@@ -52,8 +52,8 @@ class Migration(Test):
+         source_vm.qmp('migrate', uri=3Dsrc_uri)
+         self.assert_migration(source_vm, dest_vm)
+=20
+-    def _get_free_port(self):
+-        port =3D network.find_free_port()
++    def _get_free_port(self, address=3D'localhost'):
++        port =3D network.find_free_port(address=3Daddress)
+         if port is None:
+             self.cancel('Failed to find a free port')
+         return port
 --=20
 2.21.1
 
