@@ -6,85 +6,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A485FC4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373AEC4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:19:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B46820739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:18:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3CA820739
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:19:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xOICcVZ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B46820739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YmZfowtZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3CA820739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFDn3-0007bv-FW
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 05:18:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51077)
+	id 1jFDoB-0000pJ-1w
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 05:19:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jFDmT-0007C6-RZ
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:17:31 -0400
+ (envelope-from <armbru@redhat.com>) id 1jFDn9-0007qI-Uj
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jFDmS-000795-7z
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:17:29 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41913)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jFDmR-00077F-Td
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:17:28 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h9so6470067wrc.8
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 02:17:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=h3vMhOANxcPsV31YqVmNqQFw9idOpZWiwbHYTPT56yc=;
- b=xOICcVZ8iB77qwsxSASDO76QttylmRwuXV3t4H3Fxz37tZ7d0dS1BFPYdWPgHfFT0K
- 1zvTxeoXQ4nK+vkD4Aod5yN+FN3hmmkd+dPLDb5rYtegFlMyIYkzkBGWLODkb9do+kuc
- jVYSzVyo4ol3UxaaU3n/hYAz0e1eUW/CWZD0Dh+5e/LCCf886Bj45gKlgKY/GEg/Qhpb
- 8HD5rutgG4+KlxOYuR0mTOhswE4F9u0F+vypiom+hJnmtCjEIGuJoBaDqKisU7J0rSbb
- ewBZ5ox0cfmKKQTOQuOhmiZ7Sea+jAqoy1yPn4BwG5DGBIo5aZRpyxSywGN/3U1oj4kw
- OZGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=h3vMhOANxcPsV31YqVmNqQFw9idOpZWiwbHYTPT56yc=;
- b=FauqbXse+FGJ6uxeqpkg9jDzRiK2t+y7GpL0uZmrETmepAyG+dM/+Pwt/8vu1SLq/0
- hkHD7124ucL55tmrIX0QWujLqYgiif2KGL70SGCvQM4XGxjtBIWLXrF9FbFTI93dDxJP
- ICoDr+G5Yn+J/3GJcI1bGgVE/br1A559m/8u6tuuSpgnU/RvDjtsVvaZCucIioGc6nUV
- rMYGtW7N6zom5LtivFKuNJmKyRW8VVagMpx/Xjjcm5GOLzfk6USsuYLbfdU7Hm++Eol/
- FVyCeB9szti/UpGXbB6k+SUBtVrKMldN1gqxlIUYCqRjlgPo1PSekEFbyBfVk1Hnu/GE
- b2vQ==
-X-Gm-Message-State: ANhLgQ0M28m8s2Uecs7cNqNW1BHAZdBBHTvw52cbUGo1msp5bLwTkvsT
- uGd3jA9eUFr5iW0Tx57z/OHGNw==
-X-Google-Smtp-Source: ADFU+vvH3TUmRpULgXd2X6EYtmdBaO6WI7IJOv6lYEMp+JlumW0jcUOnevbk9QQd+FSZ1/Ayp4Pz0w==
-X-Received: by 2002:adf:f58c:: with SMTP id f12mr10136802wro.207.1584695846262; 
- Fri, 20 Mar 2020 02:17:26 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f14sm6237866wmb.3.2020.03.20.02.17.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Mar 2020 02:17:24 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D1E3E1FF7E;
- Fri, 20 Mar 2020 09:17:23 +0000 (GMT)
-References: <20200307010051.97022-1-yuanzi@google.com>
- <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Lirong Yuan <yuanzi@google.com>
-Subject: Re: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
-In-reply-to: <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
-Date: Fri, 20 Mar 2020 09:17:23 +0000
-Message-ID: <87imizidwc.fsf@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1jFDn8-000827-BW
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:18:11 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:56294)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jFDn8-000818-74
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:18:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584695889;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7ZEDWYjefeu5Ws2I1asjAQwMJZH/7Vs8pFGmds1C/1s=;
+ b=YmZfowtZyVlHR29wt7BYNXyrAxXWxbmYVds7vnFFHcsTXrG14tw/qd/afKwUwK1gZKnwKO
+ qYrdM/nl9gfQArAxc0BfuIXDM/7bTnwOMxOkkOqLBgVrDGhsc6fbYWoj8D+9a9jAbUXknx
+ Q0Ouq/Tcu5CQp38+aHcvHMCgGylFvr4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-bAD99b00P_-JZzW7KZ268w-1; Fri, 20 Mar 2020 05:18:08 -0400
+X-MC-Unique: bAD99b00P_-JZzW7KZ268w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 154A7107ACCA;
+ Fri, 20 Mar 2020 09:18:07 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
+ [10.36.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7998491295;
+ Fri, 20 Mar 2020 09:18:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0871F1138405; Fri, 20 Mar 2020 10:18:05 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] qapi: Reject section markup in definition documentation
+Date: Fri, 20 Mar 2020 10:18:04 +0100
+Message-Id: <20200320091805.5585-2-armbru@redhat.com>
+In-Reply-To: <20200320091805.5585-1-armbru@redhat.com>
+References: <20200320091805.5585-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,130 +87,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>,
- Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Shu-Chun Weng <scw@google.com>
+Cc: peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Section markup in definition documentation makes no sense and can
+produce invalid Texinfo.  Reject.
 
-Lirong Yuan <yuanzi@google.com> writes:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ docs/devel/qapi-code-gen.txt           |  2 ++
+ scripts/qapi/parser.py                 |  5 +++++
+ tests/qapi-schema/doc-bad-section.err  |  1 +
+ tests/qapi-schema/doc-bad-section.json |  3 +--
+ tests/qapi-schema/doc-bad-section.out  | 24 ------------------------
+ 5 files changed, 9 insertions(+), 26 deletions(-)
 
-> On Fri, Mar 6, 2020 at 5:01 PM Lirong Yuan <yuanzi@google.com> wrote:
->
->> This allows gdb to access the target=E2=80=99s auxiliary vector,
->> which can be helpful for telling system libraries important details
->> about the hardware, operating system, and process.
->>
->> Signed-off-by: Lirong Yuan <yuanzi@google.com>
->> ---
->>  gdbstub.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 55 insertions(+)
->>
->> diff --git a/gdbstub.c b/gdbstub.c
->> index 22a2d630cd..a946af7007 100644
->> --- a/gdbstub.c
->> +++ b/gdbstub.c
->> @@ -2105,6 +2105,12 @@ static void handle_query_supported(GdbCmdContext
->> *gdb_ctx, void *user_ctx)
->>          pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
->>                  ";qXfer:features:read+");
->>      }
->> +#ifdef CONFIG_USER_ONLY
->> +    if (gdb_ctx->s->c_cpu->opaque) {
->> +        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
->> +                ";qXfer:auxv:read+");
->> +    }
->> +#endif
->>
->>      if (gdb_ctx->num_params &&
->>          strstr(gdb_ctx->params[0].data, "multiprocess+")) {
->> @@ -2166,6 +2172,47 @@ static void
->> handle_query_xfer_features(GdbCmdContext *gdb_ctx, void *user_ctx)
->>      put_packet_binary(gdb_ctx->s, gdb_ctx->str_buf, len + 1, true);
->>  }
->>
->> +#ifdef CONFIG_USER_ONLY
->> +static void handle_query_xfer_auxv(GdbCmdContext *gdb_ctx, void *user_c=
-tx)
->> +{
->> +    TaskState *ts;
->> +    unsigned long offset, len, saved_auxv, auxv_len;
->> +    const char *mem;
->> +
->> +    if (gdb_ctx->num_params < 2) {
->> +        put_packet(gdb_ctx->s, "E22");
->> +        return;
->> +    }
->> +
->> +    offset =3D gdb_ctx->params[0].val_ul;
->> +    len =3D gdb_ctx->params[1].val_ul;
->> +
->> +    ts =3D gdb_ctx->s->c_cpu->opaque;
->> +    saved_auxv =3D ts->info->saved_auxv;
->> +    auxv_len =3D ts->info->auxv_len;
->> +    mem =3D (const char *)(saved_auxv + offset);
->> +
->> +    if (offset >=3D auxv_len) {
->> +        put_packet(gdb_ctx->s, "E22");
->> +        return;
->> +    }
->> +
->> +    if (len > (MAX_PACKET_LENGTH - 5) / 2) {
->> +        len =3D (MAX_PACKET_LENGTH - 5) / 2;
->> +    }
->> +
->> +    if (len < auxv_len - offset) {
->> +        gdb_ctx->str_buf[0] =3D 'm';
->> +        len =3D memtox(gdb_ctx->str_buf + 1, mem, len);
->> +    } else {
->> +        gdb_ctx->str_buf[0] =3D 'l';
->> +        len =3D memtox(gdb_ctx->str_buf + 1, mem, auxv_len - offset);
->> +    }
->> +
->> +    put_packet_binary(gdb_ctx->s, gdb_ctx->str_buf, len + 1, true);
->> +}
->> +#endif
->> +
->>  static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ct=
-x)
->>  {
->>      put_packet(gdb_ctx->s, GDB_ATTACHED);
->> @@ -2271,6 +2318,14 @@ static GdbCmdParseEntry gdb_gen_query_table[] =3D=
- {
->>          .cmd_startswith =3D 1,
->>          .schema =3D "s:l,l0"
->>      },
->> +#ifdef CONFIG_USER_ONLY
->> +    {
->> +        .handler =3D handle_query_xfer_auxv,
->> +        .cmd =3D "Xfer:auxv:read:",
->> +        .cmd_startswith =3D 1,
->> +        .schema =3D "l,l0"
->> +    },
->> +#endif
->>      {
->>          .handler =3D handle_query_attached,
->>          .cmd =3D "Attached:",
->> --
->> 2.25.1.481.gfbce0eb801-goog
->>
->>
-> Friendly ping~
-
-Sorry I missed this on my radar. There was a minor re-factor of gdbstub
-that was just merged which will mean this patch needs a re-base to use
-g_string_* functions to expand stings.
-
-Also we have some simple gdbstub tests now - could we come up with a
-multiarch gdbstub test to verify this is working properly?
-
->
-> Link to the patchwork page:
-> http://patchwork.ozlabs.org/patch/1250727/
-
-
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 1967adfa92..382a672874 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -835,6 +835,8 @@ Double the '=3D' for a subsection title:
+=20
+     # =3D=3D Subsection title
+=20
++Both are only permitted in free-form documentation.
++
+ '|' denotes examples:
+=20
+     # | Text of the example, may span
+diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+index abadacbb0e..f12c67d7d2 100644
+--- a/scripts/qapi/parser.py
++++ b/scripts/qapi/parser.py
+@@ -282,6 +282,11 @@ class QAPISchemaParser:
+                 doc.end_comment()
+                 self.accept()
+                 return doc
++            if self.val.startswith('# =3D'):
++                if doc.symbol:
++                    raise QAPIParseError(
++                        self,
++                        "unexpected '=3D' markup in definition documentati=
+on")
+             doc.append(self.val)
+             self.accept(False)
+=20
+diff --git a/tests/qapi-schema/doc-bad-section.err b/tests/qapi-schema/doc-=
+bad-section.err
+index e69de29bb2..785cacc08c 100644
+--- a/tests/qapi-schema/doc-bad-section.err
++++ b/tests/qapi-schema/doc-bad-section.err
+@@ -0,0 +1 @@
++doc-bad-section.json:5:1: unexpected '=3D' markup in definition documentat=
+ion
+diff --git a/tests/qapi-schema/doc-bad-section.json b/tests/qapi-schema/doc=
+-bad-section.json
+index 560df4b087..8175d95867 100644
+--- a/tests/qapi-schema/doc-bad-section.json
++++ b/tests/qapi-schema/doc-bad-section.json
+@@ -1,9 +1,8 @@
+ # =3D section within an expression comment
+-# BUG: not rejected
+=20
+ ##
+ # @Enum:
+-# =3D=3D Produces *invalid* texinfo
++# =3D=3D No good here
+ # @one: The _one_ {and only}
+ #
+ # @two is undocumented
+diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/doc-=
+bad-section.out
+index 367e2a1c3e..e69de29bb2 100644
+--- a/tests/qapi-schema/doc-bad-section.out
++++ b/tests/qapi-schema/doc-bad-section.out
+@@ -1,24 +0,0 @@
+-module None
+-object q_empty
+-enum QType
+-    prefix QTYPE
+-    member none
+-    member qnull
+-    member qnum
+-    member qstring
+-    member qdict
+-    member qlist
+-    member qbool
+-module doc-bad-section.json
+-enum Enum
+-    member one
+-    member two
+-doc symbol=3DEnum
+-    body=3D
+-=3D=3D Produces *invalid* texinfo
+-    arg=3Done
+-The _one_ {and only}
+-    arg=3Dtwo
+-
+-    section=3DNone
+-@two is undocumented
 --=20
-Alex Benn=C3=A9e
+2.21.1
+
 
