@@ -2,82 +2,93 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0CAC4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 13:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B680FC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 13:59:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3396B20739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 13:56:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7857A2051A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 13:59:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dK+uj1ld"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3396B20739
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VW9Qe9Bd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7857A2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFI8b-0003dX-Di
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 09:56:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44630)
+	id 1jFIBf-0005Eb-KZ
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 09:59:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jFI7s-0002gT-NN
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 09:55:53 -0400
+ (envelope-from <armbru@redhat.com>) id 1jFIAw-0004ZP-PV
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 09:59:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jFI7r-0004cx-Ee
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 09:55:52 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39472)
+ (envelope-from <armbru@redhat.com>) id 1jFIAv-0003u2-Ks
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 09:59:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26151)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jFI7r-0004bZ-6K
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 09:55:51 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jFIAv-0003tg-Gt
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 09:59:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584712550;
+ s=mimecast20190719; t=1584712741;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KZsDyS8du2X8IrwYy32S91ORiVnWgKiobQAIvchR8l8=;
- b=dK+uj1ld/4Kp9kBnEl66jeb1EgWwc7iYLXmTsenFaYpxSV6kSJBueoQZLQsi9ebzJy9Eva
- lnhCAkbBcBE0/zfDr3gHc1Aej1JoMixRr3eR4fEz2SrxHtpPODG3TEgFzYXiumzZ0YjsUn
- jgu4N2H+O72Qd0DM1j1eZoCRCU0MSQ8=
+ bh=vG6jOFqL5yyGBydMNsMbILYo5yPiJ8TQta/MyKAx2Y4=;
+ b=VW9Qe9BdN4KIxWnYjoepNR5sMfm7Piy/6yUa8636ZxoQJvFeDT5y19q+7G696RqC8zfx1B
+ X3kWIvzFxqm++pCzDY9t0w8wSvlX3mq5hg8sXT6WfLTd/SPsnO2SrVS8xHBBXHLy45dvgH
+ pYv0jSFCBmtOkRLfd/JjXOQyINKWfmU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-LVNdzydZM-SXDU0odix4BA-1; Fri, 20 Mar 2020 09:55:45 -0400
-X-MC-Unique: LVNdzydZM-SXDU0odix4BA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-146-7hf_sQkxM5aAapW4mr69cw-1; Fri, 20 Mar 2020 09:58:57 -0400
+X-MC-Unique: 7hf_sQkxM5aAapW4mr69cw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDC8E8010F3;
- Fri, 20 Mar 2020 13:55:43 +0000 (UTC)
-Received: from work-vm (ovpn-114-236.ams2.redhat.com [10.36.114.236])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 62D005C1D8;
- Fri, 20 Mar 2020 13:55:33 +0000 (UTC)
-Date: Fri, 20 Mar 2020 13:55:31 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 2/2] lockable: replaced locks with lock guard macros
- where appropriate
-Message-ID: <20200320135531.GC3464@work-vm>
-References: <20200320120456.1931482-1-dnbrdsky@gmail.com>
- <20200320120456.1931482-3-dnbrdsky@gmail.com>
- <20200320123348.GA3464@work-vm>
- <CA+ZmoZVp3M0oF-qVbwkBa=OcO_Q-uTYEO8J5-hXj=G4Rnu9yNQ@mail.gmail.com>
- <20200320125634.GB3464@work-vm>
- <d6b4cbe4-4cf8-7c27-036f-6e180c45e28b@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4617477;
+ Fri, 20 Mar 2020 13:58:55 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
+ [10.36.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 056FB1036B3B;
+ Fri, 20 Mar 2020 13:58:49 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 660E01138404; Fri, 20 Mar 2020 14:58:48 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v9 02/10] scripts: Coccinelle script to use
+ ERRP_AUTO_PROPAGATE()
+References: <20200312085936.9552-1-vsementsov@virtuozzo.com>
+ <20200312085936.9552-3-vsementsov@virtuozzo.com>
+ <874kuto7hq.fsf@dusky.pond.sub.org>
+ <4a70c6ee-10a2-fdc3-f8df-88c05340398b@virtuozzo.com>
+ <875zf8gt2m.fsf@dusky.pond.sub.org>
+ <7c6f9a91-76cf-242d-8166-0693ec14b24d@virtuozzo.com>
+ <87blozex9v.fsf@dusky.pond.sub.org>
+ <f9c8de73-38d8-a14c-632a-8e57d18e00c8@virtuozzo.com>
+ <87o8swk8wc.fsf@dusky.pond.sub.org>
+ <db2fa8a3-48cc-51aa-a3d5-eba88fb29f66@virtuozzo.com>
+ <87wo7jqn8m.fsf@dusky.pond.sub.org>
+ <c944511d-0a10-0840-258f-8e0bac19eb47@virtuozzo.com>
+ <87wo7gd3nb.fsf@dusky.pond.sub.org>
+ <d7bc3318-2d39-ce6f-1bd0-4165084458a2@virtuozzo.com>
+Date: Fri, 20 Mar 2020 14:58:48 +0100
+In-Reply-To: <d7bc3318-2d39-ce6f-1bd0-4165084458a2@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Thu, 19 Mar 2020 15:12:07 +0300")
+Message-ID: <87r1xn2kmf.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <d6b4cbe4-4cf8-7c27-036f-6e180c45e28b@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,45 +102,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:iSCSI" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Peter Lieven <pl@kamp.de>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Daniel Brodsky <dnbrdsky@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
+ Laszlo Ersek <lersek@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 20/03/20 13:56, Dr. David Alan Gilbert wrote:
-> >> According to https://wiki.qemu.org/ToDo/LockGuards cases that are triv=
-ial (no
-> >> conditional logic) shouldn't be replaced.
-> > OK
->=20
-> I don't think that has to be either-or.  Trivial lock/unlock sequences
-> are not the first ones that should be converted, but there's an
-> advantage in having a single patch that converts all possible uses of a
-> lock.  Trivial sequences certainly do not belong in a bigger patch like
-> this, as they would make the patch even bigger.
->=20
-> > So for what you've already got there,
-> >=20
-> > For migration:
-> > Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >=20
->=20
-> Can you just extract that and queue it yourself (for 5.1 probably)?
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
+> 19.03.2020 13:45, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+[...]
+>>> So, understanding that there no such cases in the whole tree, and even
+>>> if your patch works faster on the whole tree, I still don't want to
+>>> drop inheritance, because it's just a correct thing to do. Yes, we've
+>>> added ____ helper. It helps to avoid some problems. Pair-inheritance
+>>> helps to avoid another problems. I understand, that there still may
+>>> other, not-covered problems, but better to be as safe as possible. And
+>>> inheritance here is native and correct thing to do, even with our ____
+>>> additional helper. What do you think?
+>>
+>> I wouldn't call it correct.  It's still unreliable, but less so than
+>> without the function name constraint.  That makes it less wrong.
+>
+> Agree.
+>
+>>
+>> 100% reliable would be nice, but not at any cost.  Something we're
+>> reasonably confident to get right should be good enough.
+>>
+>> To be confident, we need to understand the script's limitations, and how
+>> to compensate for them.  I figure we do now.  You too?
+>>
+>
+> I will not be surprised, if we missed some more interesting cases :)
+> But we should proceed. What is our plan? Will you queue v10 for 5.1?
 
-I can, although it would be easier if Daniel did that; there's no rush
-given it's for 5.1
+v10's PATCH 1+2 look ready.  The error.h comment update could perhaps
+use some polish; I've focused my attention elsewhere.
 
-> Paolo
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+PATCH 8-9 are generated.  They should never be rebased, always be
+regenerated.  We compare regenerated patches to posted ones to make sure
+they are still sane, and the R-bys are still valid.  I can take care of
+the comparing.
+
+I'd like to have a pull request ready when the tree reopens for general
+development.  Let's use the time until then to get more generated
+patches out for review.
+
+If I queue up patches in my tree, we shift the responsibility for
+regenerating patches from you to me, and create a coordination issue:
+you'll want to base patch submissions on the branch I use to queue this
+work, and that's going to be awkward when I rebase / regenerate that
+branch.  I think it's simpler to queue up in your tree until we're ready
+for a pull request.
+
+When you post more patches, use
+
+    Based-on: <20200317151625.20797-1-vsementsov@virtuozzo.com>
+
+so that Patchew applies them on top of this series.  Hmm, probably won't
+do, as PATCH 9 already conflicts.
+
+You could instead repost PATCH 1+2 with each batch.  I hope that's not
+too confusing.
+
+I trust you'll keep providing a tag reviewers can pull.
+
+I suggest to ask maintainers to leave merging these patches to me, in
+cover letters.
+
+Makes sense?
 
 
