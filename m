@@ -2,86 +2,79 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71342C4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DEB3C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:43:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4130820739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:43:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB71120739
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:43:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jkYZVcTI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4130820739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W3vojgQg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB71120739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57715 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFMbr-0002vL-Eb
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:43:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46830)
+	id 1jFMce-000452-WA
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:43:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jFMb8-0002Pu-Uw
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:42:24 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jFMbk-0002zk-Ku
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jFMb6-0000Ul-R8
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:42:22 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14500)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jFMb6-0000UO-Js
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:42:20 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e750e7d0001>; Fri, 20 Mar 2020 11:42:06 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Fri, 20 Mar 2020 11:42:19 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Fri, 20 Mar 2020 11:42:19 -0700
-Received: from [10.40.103.10] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 20 Mar
- 2020 18:42:09 +0000
-Subject: Re: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
- <1584649004-8285-5-git-send-email-kwankhede@nvidia.com>
- <20200319165704.1f4eb36a@w520.home>
- <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
- <20200320120137.6acd89ee@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
-Date: Sat, 21 Mar 2020 00:12:04 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <alistair23@gmail.com>) id 1jFMbf-0000aG-4s
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:43:00 -0400
+Received: from mail-vk1-xa44.google.com ([2607:f8b0:4864:20::a44]:46146)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jFMbe-0000Zz-95; Fri, 20 Mar 2020 14:42:55 -0400
+Received: by mail-vk1-xa44.google.com with SMTP id s139so2007084vka.13;
+ Fri, 20 Mar 2020 11:42:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9QiZckJFhpd07Y6lqebvjbXNhcJYlJbhmyArpO6FNGo=;
+ b=W3vojgQgseRQ0ivUK6rPl8FeYn6ukewalY7bwiNU6QXICvsE4G0dmYez3faIk/z9ie
+ nqdRYkuwcEw7KMc7SsmpiZwN1PbVaGZK9y9rDPnL+kYDeuNZIMHCcoX/xTjhsADkehbm
+ qeXIpNriPvkyccfJZ/ZmEVK0HRnVRvqobB8dldb8lARnbWCja0UtL7odguC9f52MRPlB
+ 2cdk/suRFTS1qC2iuQtI9dFkrCwFwzSlTGwvZ2VGAWAt0j4Huosoui4vuPK0plIbWoii
+ qBtsnt0TRcrjcAL4qgChRZYQ1KLVdV6yKZBuBq5gpp+0YM8RX5q4W/i4XEPlDSSbosSe
+ qsbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9QiZckJFhpd07Y6lqebvjbXNhcJYlJbhmyArpO6FNGo=;
+ b=T2Nm4OfgWCcV9Cx6+Fr7eyKh98fTHvyGkp5zT9z1W/2soz8P/kMo3Kkrror10mSIje
+ EG+kavC2rxxsemTeoMWSla/e1PO0ONusiyL5AD9vu56gxMTrbjGzrea40RThXNkgz8cH
+ KlihaY6YrSPGiN8Hz1TV9wiP4FS91jkb7yLsJgtGZfzNR8inNin09QWNK5cuQHl55Tsm
+ BqJgyWMF9qNNyY9wczAB4+kVcYtRtoUlLmvRqX3BqHbLNqg6Ek7B/kffEqGAhS79NCVj
+ WFz0B3GFK1VUbI4BKM8fSafirz8P9zSbdmKUqtEbixiH2JXh7ka5xbGpGZe4qWH+AIVm
+ HJew==
+X-Gm-Message-State: ANhLgQ3bB/9ATj+zFwuf+gPXC0p51KYbyJw9y3bBUIxQse0hFzNFB0k3
+ WDivarex4InZ67JHwElgHeLLa1DlYxW3k9J7HWc=
+X-Google-Smtp-Source: ADFU+vvbZoMhF3pnGuUUf7vMEOIWVU4kZgky/mrn+a31gDLMBmU7c6VSf8JoIPvp4yia66bo4/CFClhBqCo4SeqAo8w=
+X-Received: by 2002:a1f:4c86:: with SMTP id z128mr6561141vka.70.1584729773353; 
+ Fri, 20 Mar 2020 11:42:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200320120137.6acd89ee@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1584729726; bh=hWqEMqGjcjLbX1dudD5jfb/W5JW8uQKkE5TYekIBFFs=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=jkYZVcTIRXZJ2TlcNLaDDZzURzyQC3Ed07iBXv8NPBU8wu2+pSvV5j8/p0/SUnXED
- Ap/kTUh1gx41kfezG5vb1TQc3vf9Da1HVUA8up3daKw5ot4J37fnXGYj2rjcx2IYkE
- IMe545G2jYUrkOvYPXiVHu+z5CMhNjjgKyh47Ct6eecb4x36rXjpTJeimBFCR7kXn0
- 57wlRg1nIDa8BfgVcTWduoAlK31c2V5Q9fhC+PrY1dmeUZcWM/D1rbCX1O30EgCSrS
- gmiIpWpiJfKzmf2lC8a7svO79PQTCiFWEQ2luHMMCyVWgFtMuKo5weKtgMyCsUmSHw
- Zex3jh4TV0vVQ==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.65
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-14-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-14-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 20 Mar 2020 11:34:55 -0700
+Message-ID: <CAKmqyKNJBJ6BqfdbMj5_XE3cWwYv0ukfDS2_HiTE7f6s8f7=Zg@mail.gmail.com>
+Subject: Re: [PATCH v6 13/61] target/riscv: vector bitwise logical instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::a44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,103 +86,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Mar 17, 2020 at 8:33 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-On 3/20/2020 11:31 PM, Alex Williamson wrote:
-> On Fri, 20 Mar 2020 23:19:14 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> On 3/20/2020 4:27 AM, Alex Williamson wrote:
->>> On Fri, 20 Mar 2020 01:46:41 +0530
->>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>    
+Alistair
 
-<snip>
-
->>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
->>>> +				  size_t size, uint64_t pgsize,
->>>> +				  u64 __user *bitmap)
->>>> +{
->>>> +	struct vfio_dma *dma;
->>>> +	unsigned long pgshift = __ffs(pgsize);
->>>> +	unsigned int npages, bitmap_size;
->>>> +
->>>> +	dma = vfio_find_dma(iommu, iova, 1);
->>>> +
->>>> +	if (!dma)
->>>> +		return -EINVAL;
->>>> +
->>>> +	if (dma->iova != iova || dma->size != size)
->>>> +		return -EINVAL;
->>>> +
->>>> +	npages = dma->size >> pgshift;
->>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
->>>> +
->>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
->>>> +	if (dma->iommu_mapped)
->>>> +		bitmap_set(dma->bitmap, 0, npages);
->>>> +
->>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
->>>> +		return -EFAULT;
->>>
->>> We still need to reset the bitmap here, clearing and re-adding the
->>> pages that are still pinned.
->>>
->>> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
->>>    
->>
->> I thought you agreed on my reply to it
->> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com/
->>
->>   > Why re-populate when there will be no change since
->>   > vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any
->>   > pin request while vfio_iova_dirty_bitmap() is still working, it will
->>   > wait till iommu->lock is released. Bitmap will be populated when page is
->>   > pinned.
-> 
-> As coded, dirty bits are only ever set in the bitmap, never cleared.
-> If a page is unpinned between iterations of the user recording the
-> dirty bitmap, it should be marked dirty in the iteration immediately
-> after the unpinning and not marked dirty in the following iteration.
-> That doesn't happen here.  We're reporting cumulative dirty pages since
-> logging was enabled, we need to be reporting dirty pages since the user
-> last retrieved the dirty bitmap.  The bitmap should be cleared and
-> currently pinned pages re-added after copying to the user.  Thanks,
-> 
-
-Does that mean, we have to track every iteration? do we really need that 
-tracking?
-
-Generally the flow is:
-- vendor driver pin x pages
-- Enter pre-copy-phase where vCPUs are running - user starts dirty pages 
-tracking, then user asks dirty bitmap, x pages reported dirty by 
-VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
-- In pre-copy phase, vendor driver pins y more pages, now bitmap 
-consists of x+y bits set
-- In pre-copy phase, vendor driver unpins z pages, but bitmap is not 
-updated, so again bitmap consists of x+y bits set.
-- Enter in stop-and-copy phase, vCPUs are stopped, mdev devices are stopped
-- user asks dirty bitmap - Since here vCPU and mdev devices are stopped, 
-pages should not get dirty by guest driver or the physical device. 
-Hence, x+y dirty pages would be reported.
-
-I don't think we need to track every iteration of bitmap reporting.
-
-Thanks,
-Kirti
-
-
-
+> ---
+>  target/riscv/helper.h                   | 25 ++++++++++++
+>  target/riscv/insn32.decode              |  9 +++++
+>  target/riscv/insn_trans/trans_rvv.inc.c | 11 ++++++
+>  target/riscv/vector_helper.c            | 51 +++++++++++++++++++++++++
+>  4 files changed, 96 insertions(+)
+>
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index 72c733bf49..4373e9e8c2 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -372,3 +372,28 @@ DEF_HELPER_6(vmsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vmsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vmsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vmsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
+> +
+> +DEF_HELPER_6(vand_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vand_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vand_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vand_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vor_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vor_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vor_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vor_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vand_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vand_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vand_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vand_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vor_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vor_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vor_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vor_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vxor_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index 022c8ea18b..3ad6724632 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -311,6 +311,15 @@ vsbc_vvm        010010 1 ..... ..... 000 ..... 1010111 @r_vm_1
+>  vsbc_vxm        010010 1 ..... ..... 100 ..... 1010111 @r_vm_1
+>  vmsbc_vvm       010011 1 ..... ..... 000 ..... 1010111 @r_vm_1
+>  vmsbc_vxm       010011 1 ..... ..... 100 ..... 1010111 @r_vm_1
+> +vand_vv         001001 . ..... ..... 000 ..... 1010111 @r_vm
+> +vand_vx         001001 . ..... ..... 100 ..... 1010111 @r_vm
+> +vand_vi         001001 . ..... ..... 011 ..... 1010111 @r_vm
+> +vor_vv          001010 . ..... ..... 000 ..... 1010111 @r_vm
+> +vor_vx          001010 . ..... ..... 100 ..... 1010111 @r_vm
+> +vor_vi          001010 . ..... ..... 011 ..... 1010111 @r_vm
+> +vxor_vv         001011 . ..... ..... 000 ..... 1010111 @r_vm
+> +vxor_vx         001011 . ..... ..... 100 ..... 1010111 @r_vm
+> +vxor_vi         001011 . ..... ..... 011 ..... 1010111 @r_vm
+>
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index 4562d5f14f..b4ba6d83f3 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -1247,3 +1247,14 @@ GEN_OPIVX_TRANS(vmsbc_vxm, opivx_vmadc_check)
+>
+>  GEN_OPIVI_TRANS(vadc_vim, 0, vadc_vxm, opivx_vadc_check)
+>  GEN_OPIVI_TRANS(vmadc_vim, 0, vmadc_vxm, opivx_vmadc_check)
+> +
+> +/* Vector Bitwise Logical Instructions */
+> +GEN_OPIVV_GVEC_TRANS(vand_vv, and)
+> +GEN_OPIVV_GVEC_TRANS(vor_vv,  or)
+> +GEN_OPIVV_GVEC_TRANS(vxor_vv, xor)
+> +GEN_OPIVX_GVEC_TRANS(vand_vx, ands)
+> +GEN_OPIVX_GVEC_TRANS(vor_vx,  ors)
+> +GEN_OPIVX_GVEC_TRANS(vxor_vx, xors)
+> +GEN_OPIVI_GVEC_TRANS(vand_vi, 0, vand_vx, andi)
+> +GEN_OPIVI_GVEC_TRANS(vor_vi, 0, vor_vx,  ori)
+> +GEN_OPIVI_GVEC_TRANS(vxor_vi, 0, vxor_vx, xori)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index 9913dcbea2..470bf079b2 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -1235,3 +1235,54 @@ GEN_VEXT_VMADC_VXM(vmsbc_vxm_b, uint8_t,  H1, DO_MSBC)
+>  GEN_VEXT_VMADC_VXM(vmsbc_vxm_h, uint16_t, H2, DO_MSBC)
+>  GEN_VEXT_VMADC_VXM(vmsbc_vxm_w, uint32_t, H4, DO_MSBC)
+>  GEN_VEXT_VMADC_VXM(vmsbc_vxm_d, uint64_t, H8, DO_MSBC)
+> +
+> +/* Vector Bitwise Logical Instructions */
+> +RVVCALL(OPIVV2, vand_vv_b, OP_SSS_B, H1, H1, H1, DO_AND)
+> +RVVCALL(OPIVV2, vand_vv_h, OP_SSS_H, H2, H2, H2, DO_AND)
+> +RVVCALL(OPIVV2, vand_vv_w, OP_SSS_W, H4, H4, H4, DO_AND)
+> +RVVCALL(OPIVV2, vand_vv_d, OP_SSS_D, H8, H8, H8, DO_AND)
+> +RVVCALL(OPIVV2, vor_vv_b, OP_SSS_B, H1, H1, H1, DO_OR)
+> +RVVCALL(OPIVV2, vor_vv_h, OP_SSS_H, H2, H2, H2, DO_OR)
+> +RVVCALL(OPIVV2, vor_vv_w, OP_SSS_W, H4, H4, H4, DO_OR)
+> +RVVCALL(OPIVV2, vor_vv_d, OP_SSS_D, H8, H8, H8, DO_OR)
+> +RVVCALL(OPIVV2, vxor_vv_b, OP_SSS_B, H1, H1, H1, DO_XOR)
+> +RVVCALL(OPIVV2, vxor_vv_h, OP_SSS_H, H2, H2, H2, DO_XOR)
+> +RVVCALL(OPIVV2, vxor_vv_w, OP_SSS_W, H4, H4, H4, DO_XOR)
+> +RVVCALL(OPIVV2, vxor_vv_d, OP_SSS_D, H8, H8, H8, DO_XOR)
+> +GEN_VEXT_VV(vand_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV(vand_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV(vand_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV(vand_vv_d, 8, 8, clearq)
+> +GEN_VEXT_VV(vor_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV(vor_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV(vor_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV(vor_vv_d, 8, 8, clearq)
+> +GEN_VEXT_VV(vxor_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV(vxor_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV(vxor_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV(vxor_vv_d, 8, 8, clearq)
+> +
+> +RVVCALL(OPIVX2, vand_vx_b, OP_SSS_B, H1, H1, DO_AND)
+> +RVVCALL(OPIVX2, vand_vx_h, OP_SSS_H, H2, H2, DO_AND)
+> +RVVCALL(OPIVX2, vand_vx_w, OP_SSS_W, H4, H4, DO_AND)
+> +RVVCALL(OPIVX2, vand_vx_d, OP_SSS_D, H8, H8, DO_AND)
+> +RVVCALL(OPIVX2, vor_vx_b, OP_SSS_B, H1, H1, DO_OR)
+> +RVVCALL(OPIVX2, vor_vx_h, OP_SSS_H, H2, H2, DO_OR)
+> +RVVCALL(OPIVX2, vor_vx_w, OP_SSS_W, H4, H4, DO_OR)
+> +RVVCALL(OPIVX2, vor_vx_d, OP_SSS_D, H8, H8, DO_OR)
+> +RVVCALL(OPIVX2, vxor_vx_b, OP_SSS_B, H1, H1, DO_XOR)
+> +RVVCALL(OPIVX2, vxor_vx_h, OP_SSS_H, H2, H2, DO_XOR)
+> +RVVCALL(OPIVX2, vxor_vx_w, OP_SSS_W, H4, H4, DO_XOR)
+> +RVVCALL(OPIVX2, vxor_vx_d, OP_SSS_D, H8, H8, DO_XOR)
+> +GEN_VEXT_VX(vand_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX(vand_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX(vand_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX(vand_vx_d, 8, 8, clearq)
+> +GEN_VEXT_VX(vor_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX(vor_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX(vor_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX(vor_vx_d, 8, 8, clearq)
+> +GEN_VEXT_VX(vxor_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX(vxor_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX(vxor_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX(vxor_vx_d, 8, 8, clearq)
+> --
+> 2.23.0
+>
 
