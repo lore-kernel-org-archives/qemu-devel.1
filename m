@@ -2,78 +2,92 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C30C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B063C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:03:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B33320739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:00:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAB1C20739
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:03:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ohwMN3bJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B33320739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LwA+gXJ7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAB1C20739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFK4Q-00032j-50
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 12:00:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37278)
+	id 1jFK7l-0006RF-Uj
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 12:03:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37058)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jFK3U-00025Q-40
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:59:29 -0400
+ (envelope-from <philmd@redhat.com>) id 1jFK1y-0008JH-7X
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jFK3S-0004pT-7g
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:59:27 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34328)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jFK3R-0004or-3o
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:59:25 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j5so7022797oij.1
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 08:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ijrISVWIxi7tzoH96MnsY8KNqgYdgLuTO9cfbL6w7cM=;
- b=ohwMN3bJrAgdxgA6bxhzAnd+JIyWHLj6WfvHG/N9zmyL/cNXiwU0qiWyatTjwSYmGX
- wzjZ5k5ChKo0KokmI782NpxtKbiB6hO8YHznsE7ou/r0xQXZtYmmf2+HuJ4t9rga05xS
- hZCq3EbqxG6zHekdh/Z41WtoTaDIbs0dE/AGuB4oBUc2TwCu7C5IYbEkHn4i82WMV/fz
- esfsEME3iXt7NKqRIKrtKNytWp2l9akMgPAc7jgbUCT0E29XowvGd2lN3B9PGEFRPpml
- a7qMlV1GgdTqu0m2IPHSWzasyzjlzTE2h29clrQBgQUlm6Z0FQ+NTLySgGfJ6feXYjMP
- YGcQ==
+ (envelope-from <philmd@redhat.com>) id 1jFK1x-0003qp-1x
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:57:54 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50564)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFK1w-0003ov-VH
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:57:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584719872;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=jY9hFXsRQKShgR6fFRHDQkteEgkZAWGBxIuQEuqC1Q8=;
+ b=LwA+gXJ7m9egg/faw/0oCQF1iDGAWXyyCRnDuX8oTATAVUCY3iqS5S2yC9q9cStaLq++U0
+ rWyjLbMqOOi1OID4ahMfDlz/fpAGEbgWmtKsFPDBrv+eE6nFQHhAEE2HgalziWlDrH37c5
+ hMRz/V68POgKsynZWH59J7FoNc9wRW4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-8QhzVx4aMmiVMOLyt-OV3Q-1; Fri, 20 Mar 2020 11:57:50 -0400
+X-MC-Unique: 8QhzVx4aMmiVMOLyt-OV3Q-1
+Received: by mail-wm1-f72.google.com with SMTP id f207so1955606wme.6
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 08:57:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ijrISVWIxi7tzoH96MnsY8KNqgYdgLuTO9cfbL6w7cM=;
- b=kv2ZdYiCZPo2v6MRjax8zXOBvWCav1eiR+nsVtQ3CKRVmSSR2icUDOhepidNFgiBqF
- PNt3Bzax+KLfA2kH2xAY4usFCo7mGeA/3e8T0VOfUuaBrLPS8ZJM1y7JBDvWLIA+bYxT
- nkz1wWMBUbDDr9Nv0F+zIztoiQGckSbH8lbel1zMhN5SzTTe+e3/2RzWMw6kFPP6CdSr
- dousjORjbbiNT/iZZZTeLHe5xdds/g7H/N7aNDpzW2rC3impqoqPXbrGiiodnJIpLqn+
- cwyW9OwQXgyJefpkE9exMN4V5Lr5M29vGzCte1qbm9x5OsfVhjYAHRseWBqzZbL54GRO
- EFAg==
-X-Gm-Message-State: ANhLgQ1J11dNEs1Kig2f4EAkhgaNMXifE3C4ZvHj7und8InG0Lt6ArFL
- zBmjc+w3tXBwXNTUHJZSn5yu3R7A+ZgcIKsM38lpug==
-X-Google-Smtp-Source: ADFU+vtH8syic/81QuBn/HtCoctW1WZwGiEhJPN6K/rj2Sl8BLW3ddtYrwybGvcv56vPmriu6IelQr7/UV2+hm1/nVw=
-X-Received: by 2002:aca:190f:: with SMTP id l15mr6771333oii.48.1584719964079; 
- Fri, 20 Mar 2020 08:59:24 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yo0Dd1h/opLMkm38keM/qX9N7f08guLSjUkx4P9OCWI=;
+ b=M1PE+bIOM+EGAQWWsvHjFpMT1fnoYzsBgMrIAOv0GsvyIN1oR0kzxKFCVPOBpCn+Yf
+ gZntwGHLU1edOp+NAvrMqX9nh7dgr02DuN6s/eN/g8q0miL0wLKr7UEZR/aC8ZqawqhV
+ CUf/7TRpz4/dMaxInTlsQGAfqc8QfwaO7HzI2v9pWun+FlKdyQQ64Di/B2XbmANYrDpV
+ JyLMot0OLS0MFXsNuRc2LvRH3Q0iauoKxfjOlGCkcf74563nL6KL52RfKAglzW5UbYXH
+ DrPtMv6t9nCrBusdFM9pDZh33DiGI1m82yMDuf9lE1VWa7jU9LPWAIQgwFWAGCI1K/zc
+ Ae6w==
+X-Gm-Message-State: ANhLgQ1SuUtKTSdY5IaePhDaLWGR/eaDgXL7WYoJk5qOPowsT+W83M3P
+ EprXFTLv5LCLWFUun6f+wYIsIEyrJZBYtD3hm8RmWIZv5YWYiGDbajfOQALyF6WYKiST+KDwFiP
+ Ay8USW1u65zKU4NM=
+X-Received: by 2002:adf:9ccd:: with SMTP id h13mr5342140wre.427.1584719868734; 
+ Fri, 20 Mar 2020 08:57:48 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtKNIySo+0h9nKi1gF8SVhvWINxKpB6fvuZ/k49TAlOK+68wRu67Dh8yorrIbw24AcvMbgFaQ==
+X-Received: by 2002:adf:9ccd:: with SMTP id h13mr5342111wre.427.1584719868467; 
+ Fri, 20 Mar 2020 08:57:48 -0700 (PDT)
+Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id x5sm9117419wrv.67.2020.03.20.08.57.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Mar 2020 08:57:47 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] ppc/ppc405_boards: Remove unnecessary NULL check
+Date: Fri, 20 Mar 2020 16:57:40 +0100
+Message-Id: <20200320155740.5342-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200318071620.59748-1-pannengyuan@huawei.com>
-In-Reply-To: <20200318071620.59748-1-pannengyuan@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Mar 2020 15:59:12 +0000
-Message-ID: <CAFEAcA_DGyeH39OL00o+GePGJx=CNu+Xv+r51_6M=zLT0+FmbA@mail.gmail.com>
-Subject: Re: [PATCH] hmp-cmd: fix a missing_break warning
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,31 +99,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Euler Robot <euler.robot@huawei.com>, zhanghailiang@huawei.com,
- Keqian Zhu <zhukeqian1@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Mar 2020 at 07:18, Pan Nengyuan <pannengyuan@huawei.com> wrote:
->
-> This fix coverity issues 94417686:
->     1260        break;
->     CID 94417686: (MISSING_BREAK)
->     1261. unterminated_case: The case for value "MIGRATION_PARAMETER_THROTTLE_TRIGGER_THRESHOLD" is not terminated by a 'break' statement.
->     1261    case MIGRATION_PARAMETER_THROTTLE_TRIGGER_THRESHOLD:
->     1262        p->has_throttle_trigger_threshold = true;
->     1263        visit_type_int(v, param, &p->throttle_trigger_threshold, &err);
->     1264    case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
+This code is inside the "if (dinfo)" condition, so testing
+again here whether it is NULL is unnecessary.
 
-This is CID 1421950. (I'm not sure where your number comes from.)
+Fixes: dd59bcae7 (Don't size flash memory to match backing image)
+Reported-by: Coverity (CID 1421917)
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/ppc/ppc405_boards.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> Fixes: dc14a470763c96fd9d360e1028ce38e8c3613a77
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index e6bffb9e1a..6198ec1035 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -191,7 +191,7 @@ static void ref405ep_init(MachineState *machine)
+         bios_size =3D 8 * MiB;
+         pflash_cfi02_register((uint32_t)(-bios_size),
+                               "ef405ep.bios", bios_size,
+-                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              blk_by_legacy_dinfo(dinfo),
+                               64 * KiB, 1,
+                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x=
+2AA,
+                               1);
+@@ -459,7 +459,7 @@ static void taihu_405ep_init(MachineState *machine)
+         bios_size =3D 2 * MiB;
+         pflash_cfi02_register(0xFFE00000,
+                               "taihu_405ep.bios", bios_size,
+-                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              blk_by_legacy_dinfo(dinfo),
+                               64 * KiB, 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x=
+2AA,
+                               1);
+@@ -494,7 +494,7 @@ static void taihu_405ep_init(MachineState *machine)
+     if (dinfo) {
+         bios_size =3D 32 * MiB;
+         pflash_cfi02_register(0xfc000000, "taihu_405ep.flash", bios_size,
+-                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              blk_by_legacy_dinfo(dinfo),
+                               64 * KiB, 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x=
+2AA,
+                               1);
+--=20
+2.21.1
 
-thanks
--- PMM
 
