@@ -2,55 +2,58 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFBFC4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C796C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:02:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7887020739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:01:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFD8A20739
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:02:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="hvo8zTUb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7887020739
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="XpZaruFq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD8A20739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFLxx-0004GT-Li
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:01:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39262)
+	id 1jFLyl-00058y-2q
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:02:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39492)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <db76c7042cf249ca51ef0269c824213eb73452b0@lizzy.crudebyte.com>)
- id 1jFLx2-0003dG-EP
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:00:57 -0400
+ (envelope-from <77bfe734689fb2242218674195e202a6757a1644@lizzy.crudebyte.com>)
+ id 1jFLxz-0004SZ-PC
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <db76c7042cf249ca51ef0269c824213eb73452b0@lizzy.crudebyte.com>)
- id 1jFLwz-0000IT-NH
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:00:56 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:49491)
+ (envelope-from <77bfe734689fb2242218674195e202a6757a1644@lizzy.crudebyte.com>)
+ id 1jFLxy-0001ID-Qb
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:01:55 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:53025)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71)
- (envelope-from <db76c7042cf249ca51ef0269c824213eb73452b0@lizzy.crudebyte.com>)
- id 1jFLwz-0007Z6-5r
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:00:53 -0400
+ (envelope-from <77bfe734689fb2242218674195e202a6757a1644@lizzy.crudebyte.com>)
+ id 1jFLxy-0000Ik-KD
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:01:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:Message-Id:Content-Type:
- Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Content-ID:
- Content-Description; bh=zP/O9dNFAwWU85LXtneEDXITdC18w33LH28i7aVy9Gg=; b=hvo8z
- TUbyCYACIgd2N8gQ61N6rRQ7ftubru30Hk94MrGFPMLRZStSAAF6hfmKRyFFcP6lH7kpTAL+Yg3mO
- xbk4wR93MKhhGd30BtuPww/XhQpgcnfP1ILY52+UoFPzSZ6j1t1NOXlK5047YXbP9M/EuwaDuE1CZ
- iEQ/7Hr2I918qkeBcW+34yfa8Fshsybhdjsv/Fq3Hk8PMrQDmoeRnPYzSMNJG4hljqisMTY8gEbUD
- HAYHhmsRmSJJCmSw9uFnd5+ulexpkAAdOX5Stj5/DAcIxeKKPgl9nWHlHdq6zTxsZGx9YkGjF04sc
- veb2xkGoOB7IXF58hu0lYwAmLnqQA==;
-Message-Id: <cover.1584723662.git.qemu_oss@crudebyte.com>
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=B9RoK2aLNCCKJGUIXCo19T7dVfKYtpjQkK39vXd2DP0=; b=XpZar
+ uFq7XuCEK2jWXWhYOjk29Ph4j8Vuad0vq4azYhFq6/ZkcluxTaYDjQc8oyXE/tpSRsVm1Dl4w96Qd
+ gPAVEFuCF6XrHFgncJ18F7fMJECpn2m+SwUU9gzPvQpn8el4DWRlCn+43hXbUf9b7RLJXUJT89Xb+
+ VPfN1Oc1gDm3ViCPsQa1vs9Dv41JTCfe9jdOlQzKfAawlFcbF+807aNaTyAupRPURqgpEKjZrt58M
+ zs4EiXtN3j7DC/G8fdXkVAbsAQ2PB5FVygIsyQKRMaWg0/F6fOdIv3L78PIpZrEMJoMJOmOo5N9v/
+ qh1J9kx3VwiAAMquY/5tZLI4kqC/Q==;
+Message-Id: <77bfe734689fb2242218674195e202a6757a1644.1584723662.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1584723662.git.qemu_oss@crudebyte.com>
+References: <cover.1584723662.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Fri, 20 Mar 2020 18:01:02 +0100
-Subject: [PATCH v2 0/4] add support for QEMU 9pfs 'multidevs' option
+Date: Fri, 20 Mar 2020 17:46:38 +0100
+Subject: [PATCH v2 1/4] docs: virtfs: add section separators
 To: libvir-list@redhat.com
 Cc: qemu-devel@nongnu.org,
     Greg Kurz <groug@kaod.org>
@@ -71,84 +74,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU 4.2 added a new option 'multidevs' for 9pfs. The following patch adds
-support for this new option to libvirt.
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+---
+ docs/formatdomain.html.in | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-In short, what is this about: to distinguish files uniquely from each other
-in general, numeric file IDs are typically used for comparison, which in
-practice is the combination of a file's device ID and the file's inode
-number. Unfortunately 9p protocol's QID field used for this purpose,
-currently is too small to fit both the device ID and inode number in, which
-hence is a problem if one 9pfs export contains multiple devices and may
-thus lead to misbheaviours on guest (e.g. with SAMBA file servers) in that
-case due to potential file ID collisions.
-
-To mitigate this problem with 9pfs a 'multidevs' option was introduced in
-QEMU 4.2 for defining how to deal with this, e.g. multidevs=remap will cause
-QEMU's 9pfs implementation to remap all inodes from host side to different
-inode numbers on guest side in a way that prevents file ID collisions.
-
-NOTE: In the libvirt docs changes of this libvirt patch I simply assumed
-"since 6.2.0". So the final libvirt version number would need to be adjusted
-in that text if necessary.
-
-See QEMU discussion with following Message-ID for details:
-8a2ffe17fda3a86b9a5a437e1245276881f1e235.1567680121.git.qemu_oss@crudebyte.com
-
-v1->v2:
-
-  * Unrelated docs/formatdomain.html.in changes to separate patch.
-    [patch 1]
-
-  * Added new capability QEMU_CAPS_VIRTFS_MULTIDEVS.
-    [patch 2]
-
-  * XML changes as isolated patch.
-    [patch 3]
-
-  * Code style fix.
-    [patch 3]
-
-  * QEMU 'multidevs' command handling as isolated patch.
-    [patch 4]
-
-  * Error out if not QEMU_CAPS_VIRTFS_MULTIDEVS capability.
-    [patch 4]
-
-  * Error out on virtiofs (since it does not have the 'multidevs' option).
-    [patch 4]
-
-TODO:
-
-  * Capabilities test cases would fail if <flag name='virtfs-multidevs'/>
-    was added to the other architectures' test case xml files, why?
-    [patch 2]
-
-  * The requested test cases to add: Sorry, the libvirt test case
-    environment is yet a mystery to me, I would not even know where to
-    start here.
-
-Message-ID of v1: E1jEFpL-00028n-Qj@lizzy.crudebyte.com
-
-Christian Schoenebeck (4):
-  docs: virtfs: add section separators
-  qemu: capabilities: add QEMU_CAPS_VIRTFS_MULTIDEVS
-  conf: add 'multidevs' option
-  qemu: add support for 'multidevs' option
-
- docs/formatdomain.html.in                     | 47 ++++++++++++++++++-
- docs/schemas/domaincommon.rng                 | 10 ++++
- src/conf/domain_conf.c                        | 29 ++++++++++++
- src/conf/domain_conf.h                        | 13 +++++
- src/qemu/qemu_capabilities.c                  |  5 ++
- src/qemu/qemu_capabilities.h                  |  1 +
- src/qemu/qemu_command.c                       |  7 +++
- src/qemu/qemu_domain.c                        | 12 +++++
- .../caps_4.2.0.x86_64.xml                     |  1 +
- .../caps_5.0.0.aarch64.xml                    |  1 +
- .../caps_5.0.0.x86_64.xml                     |  1 +
- 11 files changed, 126 insertions(+), 1 deletion(-)
-
+diff --git a/docs/formatdomain.html.in b/docs/formatdomain.html.in
+index 594146009d..cc2c671c14 100644
+--- a/docs/formatdomain.html.in
++++ b/docs/formatdomain.html.in
+@@ -4084,13 +4084,20 @@
+         </dd>
+         </dl>
+ 
++      <p>
+       <span class="since">Since 5.2.0</span>, the filesystem element
+       has an optional attribute <code>model</code> with supported values
+       "virtio-transitional", "virtio-non-transitional", or "virtio".
+       See <a href="#elementsVirtioTransitional">Virtio transitional devices</a>
+       for more details.
++      </p>
++
+       </dd>
+ 
++      <p>
++      The <code>filesystem</code> element may contain the following subelements:
++      </p>
++
+       <dt><code>driver</code></dt>
+       <dd>
+         The optional driver element allows specifying further details
 -- 
 2.20.1
 
