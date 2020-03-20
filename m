@@ -2,80 +2,86 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87612C4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 22:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DB8C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 23:25:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BB8420777
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 22:08:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rucSOfwS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB8420777
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 37DE52072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 23:25:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37DE52072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFPou-0008Nt-GB
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 18:08:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51011)
+	id 1jFR0f-0005Mx-8Q
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 19:25:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jFPo7-0007JH-HH
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 18:08:01 -0400
+ (envelope-from <farosas@linux.ibm.com>) id 1jFR02-0004qO-6m
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 19:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jFPo6-0005fO-IC
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 18:07:59 -0400
-Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:43725)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jFPo6-0005ev-Dv
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 18:07:58 -0400
-Received: by mail-vk1-xa43.google.com with SMTP id t3so2177842vkm.10
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 15:07:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=h1k1A0VwuRw0M9pkZvpDqXi7mpNI2RN5sFEBkJJtHhM=;
- b=rucSOfwS5KPyLVSmARvnR0QfObn83csST9Ate8+fSPeMZPDDjxZYQZjhnVOTOQPmvt
- xuMiP/o2UkTqURHbdFKnCfISS2i87zyXMPtW2mDLgoPu1qWip4RJ/RvNQqOXI+CUDmVj
- TbRD4pjm0rf9zhnuylbV1vmekl1HMiy/tuDp9lkZsZuW2UJhTo0yjuwY0svew38hYH/I
- WZk+UIx0u8yFSI+n4EXUyhK8DnX+/ynT7mst7O4ln93fExy1BvFSLQRDHwkSx+5N2M12
- See/HYfXDj1Ukiq/c86rOZpFtQ97Q/Mw+oKVfWKJoVS3Ky+C7lX+4zgT1EK4SgoVI4ig
- Nmaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=h1k1A0VwuRw0M9pkZvpDqXi7mpNI2RN5sFEBkJJtHhM=;
- b=AU/qI1Ixo+fDqkVkH0HmhFBrIQ2BWLdF5ny+Xe2lgew5Df5euXJMy73gZxz0bMfpEp
- ovxGzGCm3lHn0TtTYPd6mNZc6kQwgl2CzQd0xCJYIhFDO2IgLkBSMzOPQERqG30ph9B/
- Kx3rkQ1IsWvifxS3LffDR6qbx1ys9gYeGgGSan+b7mcU7iwVPY2ZQpyvuXU2ZNdMFanz
- Mmzd76k9CA3uy40BsroZ8xZUkzr6MBQ0YfTAjHuZYGW+mDlexndSt9T2Li7Sm+H0ijWy
- WYOZbXeqZr13WUgaRC4kYY/MFZQy7Ry+6zeQWnw1wErgxzg8vJu1UuIomHd7c59t+j+8
- GLyw==
-X-Gm-Message-State: ANhLgQ21clVEozzJP8ExWmSRqdEQ8GP0G4OEto9mcbVopUxe9LeZUOfU
- VwdSTzrsTnybgJUzr/B62UKH7WGwPD7JENvrsvQ=
-X-Google-Smtp-Source: ADFU+vvyAwUQ88YCzxxhcRkCZAj1rikp4RWG6BP6fa157vzBOK07NdCKbiJxOt+Aek5porFAfMLJEIDfspfclkRwYAk=
-X-Received: by 2002:a1f:5806:: with SMTP id m6mr8189496vkb.37.1584742077636;
- Fri, 20 Mar 2020 15:07:57 -0700 (PDT)
+ (envelope-from <farosas@linux.ibm.com>) id 1jFR00-000799-Or
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 19:24:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43772)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
+ id 1jFQzx-00077M-D7; Fri, 20 Mar 2020 19:24:17 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02KN2Mda107903; Fri, 20 Mar 2020 19:24:02 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yu71cs4ht-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 20 Mar 2020 19:24:01 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02KNMoSU030826;
+ Fri, 20 Mar 2020 23:24:01 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma02dal.us.ibm.com with ESMTP id 2yrpw7gse6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 20 Mar 2020 23:24:01 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
+ [9.57.199.110])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02KNO0dB53150152
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 20 Mar 2020 23:24:00 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4B858AE05F;
+ Fri, 20 Mar 2020 23:24:00 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7609FAE05C;
+ Fri, 20 Mar 2020 23:23:58 +0000 (GMT)
+Received: from farosas.linux.ibm.com.ibmuc.com (unknown [9.85.141.34])
+ by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+ Fri, 20 Mar 2020 23:23:58 +0000 (GMT)
+From: Fabiano Rosas <farosas@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH] target/ppc: Add capability for enabling secure guests
+Date: Fri, 20 Mar 2020 20:23:53 -0300
+Message-Id: <20200320232353.1022066-1-farosas@linux.ibm.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-References: <20200319040326.391090-1-leonardo@linux.ibm.com>
-In-Reply-To: <20200319040326.391090-1-leonardo@linux.ibm.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 20 Mar 2020 14:59:59 -0700
-Message-ID: <CAKmqyKOD9LTN6j157kEEodqjM3fXgdacd68qybG4AvbNyuXt3A@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] device_tree: Add info message when dumping dtb to
- file
-To: Leonardo Bras <leonardo@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::a43
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-20_08:2020-03-20,
+ 2020-03-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0
+ lowpriorityscore=0 malwarescore=0 impostorscore=0 mlxscore=0 phishscore=0
+ priorityscore=1501 adultscore=0 clxscore=1011 bulkscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003200088
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,54 +93,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+Cc: Paul Mackerras <paulus@ozlabs.org>, Ram Pai <linuxram@us.ibm.com>,
+ qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 18, 2020 at 9:03 PM Leonardo Bras <leonardo@linux.ibm.com> wrote:
->
-> When dumping dtb to a file, qemu exits silently before starting the VM.
->
-> Add info message so user can easily track why the proccess exits.
-> Add error message if dtb dump failed.
->
-> Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
+Making use of ppc's Protected Execution Facility (PEF) feature, a
+guest can become a secure guest (aka. secure VM - SVM) and have its
+memory protected from access by the host. This feature is mediated by
+a piece of firmware called the Ultravisor (UV).
 
-Thanks for the patch
+The transition from a regular to a secure VM is initiated by the guest
+kernel during prom_init via the use of an ultracall (enter secure mode
+- UV_ESM) and with cooperation from the hypervisor via an hcall
+(H_SVM_INIT_START).
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Currently QEMU has no knowledge of this process and no way to
+determine if a host supports the feature. A guest with PEF support
+enabled would always try to enter secure mode regardless of user
+intent or hardware support.
 
-I have sent a PR with this patch.
+To address the above, a new KVM capability (KVM_CAP_PPC_SECURE_GUEST
+[1]) is being introduced in the kernel without which KVM will block
+the secure transition.
 
-Alistair
+This patch adds support for checking/enabling this KVM capability via
+a new spapr capability (SPAPR_CAP_SECURE_GUEST) and the equivalent
+command line switch (-machine pseries,cap-svm). The capability
+defaults to off.
 
-> ---
->  device_tree.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/device_tree.c b/device_tree.c
-> index f8b46b3c73..bba6cc2164 100644
-> --- a/device_tree.c
-> +++ b/device_tree.c
-> @@ -530,7 +530,12 @@ void qemu_fdt_dumpdtb(void *fdt, int size)
->
->      if (dumpdtb) {
->          /* Dump the dtb to a file and quit */
-> -        exit(g_file_set_contents(dumpdtb, fdt, size, NULL) ? 0 : 1);
-> +        if (g_file_set_contents(dumpdtb, fdt, size, NULL)) {
-> +            info_report("dtb dumped to %s. Exiting.", dumpdtb);
-> +            exit(0);
-> +        }
-> +        error_report("%s: Failed dumping dtb to %s", __func__, dumpdtb);
-> +        exit(1);
->      }
->  }
->
-> --
-> 2.24.1
->
->
+1- https://lore.kernel.org/kvm/20200319043301.GA13052@blackberry
+
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+---
+
+I have implemented this to be able to test Paul's patch. I'm sending
+it as RFC in case it helps anyone else and if we decide to go in this
+direction I can develop it further.
+
+PS: TCG currently gets in a loop of 0x700 due to the lack of 'sc 2'
+emulation - and all the rest of PEF, of course =).
+
+---
+ hw/ppc/spapr.c         |  1 +
+ hw/ppc/spapr_caps.c    | 30 ++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  3 ++-
+ target/ppc/kvm.c       | 12 ++++++++++++
+ target/ppc/kvm_ppc.h   | 12 ++++++++++++
+ 5 files changed, 57 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9a2bd501aa..a881ac4e29 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4542,6 +4542,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_ON;
+     smc->default_caps.caps[SPAPR_CAP_FWNMI] = SPAPR_CAP_ON;
++    smc->default_caps.caps[SPAPR_CAP_SECURE_GUEST] = SPAPR_CAP_OFF;
+     spapr_caps_add_properties(smc, &error_abort);
+     smc->irq = &spapr_irq_dual;
+     smc->dr_phb_enabled = true;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 679ae7959f..375b7e0b30 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -524,6 +524,27 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
+     }
+ }
+
++static void cap_secure_guest_apply(SpaprMachineState *spapr,
++                                   uint8_t val, Error **errp)
++{
++    if (!val) {
++        /* capability disabled by default */
++        return;
++    }
++
++    if (!kvm_enabled()) {
++        error_setg(errp, "No PEF support in tcg, try cap-svm=off");
++        return;
++    }
++
++    if (!kvmppc_has_cap_secure_guest()) {
++        error_setg(errp, "KVM implementation does not support secure guests, "
++                   "try cap-svm=off");
++    } else if (kvmppc_enable_cap_secure_guest() < 0) {
++        error_setg(errp, "Error enabling cap-svm, try cap-svm=off");
++    }
++}
++
+ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_HTM] = {
+         .name = "htm",
+@@ -632,6 +653,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .type = "bool",
+         .apply = cap_fwnmi_apply,
+     },
++    [SPAPR_CAP_SECURE_GUEST] = {
++        .name = "svm",
++        .description = "Allow the guest to become a Secure Guest",
++        .index = SPAPR_CAP_SECURE_GUEST,
++        .get = spapr_cap_get_bool,
++        .set = spapr_cap_set_bool,
++        .type = "bool",
++        .apply = cap_secure_guest_apply,
++    },
+ };
+
+ static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 42d64a0368..7f5289782d 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -81,8 +81,9 @@ typedef enum {
+ #define SPAPR_CAP_CCF_ASSIST            0x09
+ /* Implements PAPR FWNMI option */
+ #define SPAPR_CAP_FWNMI                 0x0A
++#define SPAPR_CAP_SECURE_GUEST          0x0B
+ /* Num Caps */
+-#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI + 1)
++#define SPAPR_CAP_NUM                   (SPAPR_CAP_SECURE_GUEST + 1)
+
+ /*
+  * Capability Values
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 597f72be1b..9254749cd7 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -88,6 +88,7 @@ static int cap_ppc_safe_indirect_branch;
+ static int cap_ppc_count_cache_flush_assist;
+ static int cap_ppc_nested_kvm_hv;
+ static int cap_large_decr;
++static int cap_ppc_secure_guest;
+
+ static uint32_t debug_inst_opcode;
+
+@@ -135,6 +136,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
+     kvmppc_get_cpu_characteristics(s);
+     cap_ppc_nested_kvm_hv = kvm_vm_check_extension(s, KVM_CAP_PPC_NESTED_HV);
++    cap_ppc_secure_guest = kvm_vm_check_extension(s, KVM_CAP_PPC_SECURE_GUEST);
+     cap_large_decr = kvmppc_get_dec_bits();
+     /*
+      * Note: setting it to false because there is not such capability
+@@ -2532,6 +2534,16 @@ int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable)
+     return 0;
+ }
+
++bool kvmppc_has_cap_secure_guest(void)
++{
++    return !!cap_ppc_secure_guest;
++}
++
++int kvmppc_enable_cap_secure_guest(void)
++{
++    return kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GUEST, 0, 1);
++}
++
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
+ {
+     uint32_t host_pvr = mfpvr();
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 332fa0aa1c..a9a3aa67c6 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -72,6 +72,8 @@ int kvmppc_set_cap_nested_kvm_hv(int enable);
+ int kvmppc_get_cap_large_decr(void);
+ int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable);
+ int kvmppc_enable_hwrng(void);
++bool kvmppc_has_cap_secure_guest(void);
++int kvmppc_enable_cap_secure_guest(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+ void kvmppc_check_papr_resize_hpt(Error **errp);
+@@ -380,6 +382,16 @@ static inline int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable)
+     return -1;
+ }
+
++static inline bool kvmppc_has_cap_secure_guest(void)
++{
++    return false;
++}
++
++static inline int kvmppc_enable_cap_secure_guest(void)
++{
++    return -1;
++}
++
+ static inline int kvmppc_enable_hwrng(void)
+ {
+     return -1;
+--
+2.23.0
 
