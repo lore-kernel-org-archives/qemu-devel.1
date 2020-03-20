@@ -2,69 +2,79 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD2BC4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC74C4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:42:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0169D2070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:41:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0169D2070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id CE0322070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 15:42:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="diabmrS/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0322070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFJmJ-0007re-3k
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 11:41:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58217)
+	id 1jFJn7-0000Xj-Tu
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 11:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jFJWM-0006ua-LN
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:25:16 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jFJlT-0007DA-Tr
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jFJWL-00005e-7s
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:25:14 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:50647)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jFJWK-0008VM-VB
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:25:13 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mo73N-1jeC9d1i0J-00pcOn; Fri, 20 Mar 2020 16:25:02 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v4 30/32] linux-user,
- aarch64: sync syscall numbers with kernel v5.5
-Date: Fri, 20 Mar 2020 16:24:06 +0100
-Message-Id: <20200320152408.182899-31-laurent@vivier.eu>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200320152408.182899-1-laurent@vivier.eu>
-References: <20200320152408.182899-1-laurent@vivier.eu>
+ (envelope-from <alex.williamson@redhat.com>) id 1jFJlR-0000Bo-No
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:40:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:43159)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jFJlR-00009q-If
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 11:40:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584718848;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MLgPz6dx4qU5ydUyrNe62MwsVsy3V4V/f72JiGTuWGo=;
+ b=diabmrS/d2Ct/3LGOFCGU3jVfcnigzET3ctm7Rov+W6nF8BsA6OuDXLfTKjr3p7LeRSCUG
+ PgUl9eaA3wedNVB3urC8eAKiCvuF5HTDnWwbuN9CH/DNqNgPPtZcrgXV214DoWpdRfzUbC
+ w/LotQJsjy4LS+4N2vNRg6xvYHIq18Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-JqywhOmJPNKSmIaMch4wEA-1; Fri, 20 Mar 2020 11:40:44 -0400
+X-MC-Unique: JqywhOmJPNKSmIaMch4wEA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6EAA800D4E;
+ Fri, 20 Mar 2020 15:40:41 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AC0BD91297;
+ Fri, 20 Mar 2020 15:40:39 +0000 (UTC)
+Date: Fri, 20 Mar 2020 09:40:39 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v14 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to
+ get dirty bitmap before unmap
+Message-ID: <20200320094039.4d99408d@w520.home>
+In-Reply-To: <20200320083529.GA5456@joy-OptiPlex-7040>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-6-git-send-email-kwankhede@nvidia.com>
+ <20200320083529.GA5456@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZlHhap4iMVRxw7J2qaHqzFVVUaD8cEiEpmCXqIQXI3dIPBJi281
- Si5SI4e/Zf5ag3zYaE7zDdXNuFElqhHVLbguhWOXEWLkJ/zEXoAmnnV+X1KzL4uKO743jSh
- 1/OxdBD67LJc/fmREOLlzvTedhHEaw7Yl1mndc7UrcMiU4RkvtdddOaXrHwKFULPyaJAs5X
- BKcjNPcO6KNiIn6uDUJpQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IECLQbH+M+0=:bT0lMysktn7ZLGX/eDDj7R
- zrd/vctCp4aXtfc0T9G5M3SxQf4EW4LwxGhqWWCjHqZBW5cr4zKLSLVpTJzRLY50JNmEGLRVB
- uOcPFoBr65WK1ZU42g3k3Oz92SKgmxg07PrGajdrtPPchiQLMq2yC95vqlLEXJWlUH7hUTd07
- bnMhQAM/iFZJ93pWEu2CZXI2wY63PaXvbdhLaOhIf3e6laNergKXqOKmgr0rq/FUSZJPLSvai
- Kx3Zt6u3qg50GxUlBb9L2DRxNW79VKBM5s0Tfpt879oAq2M27WOj6RBoWKR1Bouuxk8Rf2mWi
- yz/K+K3rM0GN5crHkF9HsB4qSp+fZ36+ZR+BJP4dveydZ87t5qfRctRzw2nOo30ydNuGkW2yU
- VLxLDPrGrbk6/Qes+dF9rFMQpHyNgEvm4yLED7LwhjEX3+PAWwUq9dW7kg2WCC4i92lX5tHys
- evORYd4VMyo/acSk4SgOQT9odrU/s9QjLCUMse5gH/0N5bwYhwRjskw2vPSe0NTzZvory2Zl+
- 2QUBgseHJmDS6C562WgVTqpzyIXZDqfmadwmweAECzcedLKcNRMU8Ro5Z/O/GBAeOwkFITQlJ
- aRQK87V94+y1vnGs6Oj7TnIUa9i/p9Gv28LpjxzbcP6yLp9799TGLwdtxEjF6B3HttkZhJ92W
- ISx1iuqJTCHkb9LEsZUVD2hyVEF3AuhZPIeEq6uz4DrktLN/G4luHuqny1XsJVNdxlOrhymDC
- Of4/kANlGEoZ+yUqhy8nVIFuBEb+W0f3/ZC7AzGILeWFVlqob/5v+IouwaFa0x7BYhYXfwylH
- Z7lnU08thVJOJlkghwvw+/wtf4vwXTTs9dK/XesfDbXx7VM0csYD43XhL48bUFvpqgzKkAW
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,114 +86,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>, Alistair Francis <alistair.francis@wdc.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi
+ L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use helper script scripts/gensyscalls.sh to generate the file.
+On Fri, 20 Mar 2020 04:35:29 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-This change TARGET_NR_fstatat64 by TARGET_NR_newfstatat that is correct
-because definitions from linux are:
+> On Thu, Mar 19, 2020 at 03:41:12AM +0800, Kirti Wankhede wrote:
+> > DMA mapped pages, including those pinned by mdev vendor drivers, might
+> > get unpinned and unmapped while migration is active and device is still
+> > running. For example, in pre-copy phase while guest driver could access
+> > those pages, host device or vendor driver can dirty these mapped pages.
+> > Such pages should be marked dirty so as to maintain memory consistency
+> > for a user making use of dirty page tracking.
+> > 
+> > To get bitmap during unmap, user should set flag
+> > VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP, bitmap memory should be allocated and
+> > zeroed by user space application. Bitmap size and page size should be set
+> > by user application.
+> > 
+> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c | 55 ++++++++++++++++++++++++++++++++++++++---
+> >  include/uapi/linux/vfio.h       | 11 +++++++++
+> >  2 files changed, 62 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index d6417fb02174..aa1ac30f7854 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -939,7 +939,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> >  }
+> >  
+> >  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> > -			     struct vfio_iommu_type1_dma_unmap *unmap)
+> > +			     struct vfio_iommu_type1_dma_unmap *unmap,
+> > +			     struct vfio_bitmap *bitmap)
+> >  {
+> >  	uint64_t mask;
+> >  	struct vfio_dma *dma, *dma_last = NULL;
+> > @@ -990,6 +991,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >  	 * will be returned if these conditions are not met.  The v2 interface
+> >  	 * will only return success and a size of zero if there were no
+> >  	 * mappings within the range.
+> > +	 *
+> > +	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
+> > +	 * must be for single mapping. Multiple mappings with this flag set is
+> > +	 * not supported.
+> >  	 */
+> >  	if (iommu->v2) {
+> >  		dma = vfio_find_dma(iommu, unmap->iova, 1);
+> > @@ -997,6 +1002,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >  			ret = -EINVAL;
+> >  			goto unlock;
+> >  		}
+> > +
+> > +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> > +		    (dma->iova != unmap->iova || dma->size != unmap->size)) {  
+> dma is probably NULL here!
 
-arch/arm64/include/uapi/asm/unistd.h
+Yep, I didn't look closely enough there.  This is situated right
+between the check to make sure we're not bisecting a mapping at the
+start of the unmap and the check to make sure we're not bisecting a
+mapping at the end of the unmap.  There's no guarantee that we have a
+valid pointer here.  The test should be in the while() loop below this
+code.
 
-  #define __ARCH_WANT_NEW_STAT
+> And this restriction on UNMAP would make some UNMAP operations of vIOMMU
+> fail.
+> 
+> e.g. below condition indeed happens in reality.
+> an UNMAP ioctl comes for IOVA range from 0xff800000, of size 0x200000
+> However, IOVAs in this range are mapped page by page.i.e., dma->size is 0x1000.
+> 
+> Previous, this UNMAP ioctl could unmap successfully as a whole.
 
-include/uapi/asm-generic/unistd.h
+What triggers this in the guest?  Note that it's only when using the
+GET_DIRTY_BITMAP flag that this is restricted.  Does the event you're
+referring to potentially occur under normal circumstances in that mode?
+Thanks,
 
-  #if defined(__ARCH_WANT_NEW_STAT) || defined(__ARCH_WANT_STAT64)
-  #define __NR3264_fstatat 79
-  __SC_3264(__NR3264_fstatat, sys_fstatat64, sys_newfstatat)
-  #define __NR3264_fstat 80
-  __SC_3264(__NR3264_fstat, sys_fstat64, sys_newfstat)
-  #endif
-  ...
-  #if __BITS_PER_LONG == 64 && !defined(__SYSCALL_COMPAT)
-  ...
-  #if defined(__ARCH_WANT_NEW_STAT) || defined(__ARCH_WANT_STAT64)
-  #define __NR_newfstatat __NR3264_fstatat
-  #define __NR_fstat __NR3264_fstat
-  #endif
-  ...
+Alex
 
-Add syscalls 286 (preadv2) to 435 (clone3).
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200316085620.309769-3-laurent@vivier.eu>
----
- linux-user/aarch64/syscall_nr.h | 34 ++++++++++++++++++++++++++++-----
- 1 file changed, 29 insertions(+), 5 deletions(-)
-
-diff --git a/linux-user/aarch64/syscall_nr.h b/linux-user/aarch64/syscall_nr.h
-index f00ffd7fb82f..85de000b2490 100644
---- a/linux-user/aarch64/syscall_nr.h
-+++ b/linux-user/aarch64/syscall_nr.h
-@@ -1,7 +1,8 @@
- /*
-  * This file contains the system call numbers.
-+ * Do not modify.
-+ * This file is generated by scripts/gensyscalls.sh
-  */
--
- #ifndef LINUX_USER_AARCH64_SYSCALL_NR_H
- #define LINUX_USER_AARCH64_SYSCALL_NR_H
- 
-@@ -84,7 +85,7 @@
- #define TARGET_NR_splice 76
- #define TARGET_NR_tee 77
- #define TARGET_NR_readlinkat 78
--#define TARGET_NR_fstatat64 79
-+#define TARGET_NR_newfstatat 79
- #define TARGET_NR_fstat 80
- #define TARGET_NR_sync 81
- #define TARGET_NR_fsync 82
-@@ -254,8 +255,8 @@
- #define TARGET_NR_prlimit64 261
- #define TARGET_NR_fanotify_init 262
- #define TARGET_NR_fanotify_mark 263
--#define TARGET_NR_name_to_handle_at         264
--#define TARGET_NR_open_by_handle_at         265
-+#define TARGET_NR_name_to_handle_at 264
-+#define TARGET_NR_open_by_handle_at 265
- #define TARGET_NR_clock_adjtime 266
- #define TARGET_NR_syncfs 267
- #define TARGET_NR_setns 268
-@@ -276,5 +277,28 @@
- #define TARGET_NR_membarrier 283
- #define TARGET_NR_mlock2 284
- #define TARGET_NR_copy_file_range 285
-+#define TARGET_NR_preadv2 286
-+#define TARGET_NR_pwritev2 287
-+#define TARGET_NR_pkey_mprotect 288
-+#define TARGET_NR_pkey_alloc 289
-+#define TARGET_NR_pkey_free 290
-+#define TARGET_NR_statx 291
-+#define TARGET_NR_io_pgetevents 292
-+#define TARGET_NR_rseq 293
-+#define TARGET_NR_kexec_file_load 294
-+#define TARGET_NR_pidfd_send_signal 424
-+#define TARGET_NR_io_uring_setup 425
-+#define TARGET_NR_io_uring_enter 426
-+#define TARGET_NR_io_uring_register 427
-+#define TARGET_NR_open_tree 428
-+#define TARGET_NR_move_mount 429
-+#define TARGET_NR_fsopen 430
-+#define TARGET_NR_fsconfig 431
-+#define TARGET_NR_fsmount 432
-+#define TARGET_NR_fspick 433
-+#define TARGET_NR_pidfd_open 434
-+#define TARGET_NR_clone3 435
-+#define TARGET_NR_syscalls 436
-+
-+#endif /* LINUX_USER_AARCH64_SYSCALL_NR_H */
- 
--#endif
--- 
-2.25.1
+> > +			ret = -EINVAL;
+> > +			goto unlock;
+> > +		}
+> > +
+> >  		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+> >  		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+> >  			ret = -EINVAL;
+> > @@ -1014,6 +1026,12 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >  		if (dma->task->mm != current->mm)
+> >  			break;
+> >  
+> > +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> > +		     iommu->dirty_page_tracking)
+> > +			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
+> > +					bitmap->pgsize,
+> > +					(unsigned char __user *) bitmap->data);
+> > +
+> >  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+> >  			struct vfio_iommu_type1_dma_unmap nb_unmap;
+> >  
+> > @@ -2369,17 +2387,46 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >  
+> >  	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+> >  		struct vfio_iommu_type1_dma_unmap unmap;
+> > -		long ret;
+> > +		struct vfio_bitmap bitmap = { 0 };
+> > +		int ret;
+> >  
+> >  		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
+> >  
+> >  		if (copy_from_user(&unmap, (void __user *)arg, minsz))
+> >  			return -EFAULT;
+> >  
+> > -		if (unmap.argsz < minsz || unmap.flags)
+> > +		if (unmap.argsz < minsz ||
+> > +		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
+> >  			return -EINVAL;
+> >  
+> > -		ret = vfio_dma_do_unmap(iommu, &unmap);
+> > +		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
+> > +			unsigned long pgshift;
+> > +			uint64_t iommu_pgsize =
+> > +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
+> > +
+> > +			if (unmap.argsz < (minsz + sizeof(bitmap)))
+> > +				return -EINVAL;
+> > +
+> > +			if (copy_from_user(&bitmap,
+> > +					   (void __user *)(arg + minsz),
+> > +					   sizeof(bitmap)))
+> > +				return -EFAULT;
+> > +
+> > +			/* allow only min supported pgsize */
+> > +			if (bitmap.pgsize != iommu_pgsize)
+> > +				return -EINVAL;
+> > +			if (!access_ok((void __user *)bitmap.data, bitmap.size))
+> > +				return -EINVAL;
+> > +
+> > +			pgshift = __ffs(bitmap.pgsize);
+> > +			ret = verify_bitmap_size(unmap.size >> pgshift,
+> > +						 bitmap.size);
+> > +			if (ret)
+> > +				return ret;
+> > +
+> > +		}
+> > +
+> > +		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
+> >  		if (ret)
+> >  			return ret;
+> >  
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 043e9eafb255..a704e5380f04 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -1010,12 +1010,23 @@ struct vfio_bitmap {
+> >   * field.  No guarantee is made to the user that arbitrary unmaps of iova
+> >   * or size different from those used in the original mapping call will
+> >   * succeed.
+> > + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
+> > + * before unmapping IO virtual addresses. When this flag is set, user must
+> > + * provide data[] as structure vfio_bitmap. User must allocate memory to get
+> > + * bitmap, clear the bitmap memory by setting zero and must set size of
+> > + * allocated memory in vfio_bitmap.size field. One bit in bitmap
+> > + * represents per page, page of user provided page size in 'pgsize',
+> > + * consecutively starting from iova offset. Bit set indicates page at that
+> > + * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
+> > + * returned in vfio_bitmap.data
+> >   */
+> >  struct vfio_iommu_type1_dma_unmap {
+> >  	__u32	argsz;
+> >  	__u32	flags;
+> > +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+> >  	__u64	iova;				/* IO virtual address */
+> >  	__u64	size;				/* Size of mapping (bytes) */
+> > +	__u8    data[];
+> >  };
+> >  
+> >  #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
+> > -- 
+> > 2.7.0
+> >   
+> 
 
 
