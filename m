@@ -2,109 +2,80 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C88C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFBEC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:25:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A9EB2070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:22:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A9EB2070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 29F5D2070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:25:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d/r+oscZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F5D2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFNDi-0006fZ-OF
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 15:22:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54939)
+	id 1jFNH8-00082a-CH
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 15:25:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sw@weilnetz.de>) id 1jFND2-0006Ey-Gs
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:21:33 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jFNGC-0007ON-VM
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1jFND1-0002JE-8P
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:21:32 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:35068
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1jFND1-0002IQ-2W
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:21:31 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id A557DDAEBA7;
- Fri, 20 Mar 2020 20:21:26 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id vj0QfRT-HNqq; Fri, 20 Mar 2020 20:21:25 +0100 (CET)
-Received: from macbook02.fritz.box (pD9EC3042.dip0.t-ipconnect.de
- [217.236.48.66])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 021B4DAEB14;
- Fri, 20 Mar 2020 20:21:24 +0100 (CET)
-Subject: Re: Qemu on Windows 10 - no acceleration found
-To: Jerry Geis <jerry.geis@gmail.com>, qemu-devel@nongnu.org
-References: <CABr8-B4RQo3OT6ogt7J=OWGhOpD6LqHt9zkp7dZTmqifiPCtyA@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <f51c571b-5eda-7837-36bb-9dfd3be39eb9@weilnetz.de>
-Date: Fri, 20 Mar 2020 20:21:24 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.6.0
+ (envelope-from <stefanha@gmail.com>) id 1jFNGB-0003GQ-RY
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:24:48 -0400
+Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:46989)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>)
+ id 1jFNGB-0003FH-LU; Fri, 20 Mar 2020 15:24:47 -0400
+Received: by mail-qv1-xf41.google.com with SMTP id m2so3601912qvu.13;
+ Fri, 20 Mar 2020 12:24:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FOvd847W0q0TdYoTAUUAvSlonLs5p3GVpVVE/l1dbiY=;
+ b=d/r+oscZLrJOrrPFMuCH5lwT8HdSWChgdC5brD3Hc5po3VWNugsz1YnhCeZjY0/Tsk
+ VzSKouflzWKshNlyblKbdvDssNvz3duI4M1BdrAU1jiRQOAo5g1wmaBAoFl1tambsRtr
+ jzmnaPpu/9wVYmp1vleRfUVkUnYyANwV46qFTm8DSiG9sKcGVr3bx94XTukB6gGKsrJ2
+ O1xqVV5MH4nXlFxajmDPUskbTW4SVT/gfICq3m/G+rqKPzI+5SxRlMhAIH9n3DE30wEq
+ M8LGRngnyYoxmsNzDqyX5ZhmwEzS0S7z9YNnsX8Z5SI/M/nlMJBwZDXTGiPbU4v3aII9
+ 95PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FOvd847W0q0TdYoTAUUAvSlonLs5p3GVpVVE/l1dbiY=;
+ b=ttfu5YHJJU+7RKsaha5SqJ0azOUjQumz40Ktx2RqDcIvkF2+X4CVE70OGhqE1cAd/1
+ J/DSCEexcaiC/w4+Sv6B7WkiL/oUY/Zh4SMB5o+HV2gBriqzQjUEf8xpp/GQqp+235ls
+ ysbLO3xUJOepGtxAFJwYKBvb+JIVY1pgbUHsDpGVuXh/FQLTaQxTCrTWsHCbQ6zBz3RZ
+ moNcsLyxBD00dR2edgDgUe4kZelOyMhK+G7re3sgCIkn7/zjBDIrNLBD6uZb/jH4iQ4J
+ EVOWl9XBgOxYJNLf/wWBJ5WLbweRiGDfJRcxQqOnvZUMIJOMtzN3vrK1kuBSNyU4tCgS
+ 91fg==
+X-Gm-Message-State: ANhLgQ0M1D2v7Ox1+7ZemLJ3Pf6Hk61FLsxWzidEGkyYkC9lyLar+BeH
+ e8m9QjNmG9EmOZdCHcPVGn3yR1UN04pZ7W/GdnA=
+X-Google-Smtp-Source: ADFU+vscM2/I+xqd4Ql3m717dcrcauKWiJBdKPp8HzmRasFeGbMPihPaku7/JPSHDJs07DcNIe9I3sF0CQe4btajgFQ=
+X-Received: by 2002:a0c:ec02:: with SMTP id y2mr9592030qvo.171.1584732286582; 
+ Fri, 20 Mar 2020 12:24:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CABr8-B4RQo3OT6ogt7J=OWGhOpD6LqHt9zkp7dZTmqifiPCtyA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 37.120.169.71
+References: <20200318200303.11322-1-andrzej.jakowski@linux.intel.com>
+ <20200320154505.GD138042@stefanha-x1.localdomain>
+ <74c9c6e8-9407-a0fb-0070-b8758b7a46eb@linux.intel.com>
+In-Reply-To: <74c9c6e8-9407-a0fb-0070-b8758b7a46eb@linux.intel.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 20 Mar 2020 19:24:35 +0000
+Message-ID: <CAJSP0QUGPP3YX4-eVQAToSai3JHqv8sFvpvmW-3xvNjFJ7=YCw@mail.gmail.com>
+Subject: Re: [PATCH v3] block/nvme: introduce PMR support from NVMe 1.4 spec
+To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,28 +87,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>,
+ qemu block <qemu-block@nongnu.org>, Dave Gilbert <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Zhang Yi <yi.z.zhang@linux.intel.com>, "He,
+ Junyan" <junyan.he@intel.com>, kbusch@kernel.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 20.03.20 um 18:20 schrieb Jerry Geis:
-
-> Hi All,
+On Fri, Mar 20, 2020 at 5:48 PM Andrzej Jakowski
+<andrzej.jakowski@linux.intel.com> wrote:
 >
-> I have tried QEMU on Windows 10 host with and without HyperV active in
-> the features list.
-> Neither seemed to affect the "really slow" speed. Either option
-> results in -enable-kvm giving "no acceleration=C2=A0found".
+> On 3/20/20 8:45 AM, Stefan Hajnoczi wrote:
+> > Please use qemu_ram_writeback() so that pmem_persist() and qemu_msync()
+> > are used as appropriate.
 >
-> How do I enable acceleration on QEMU for windows.
+> Thx!
+> qemu_ram_writeback() doesn't return any status. How can I know that actual msync succeds?
+
+If the warn_report() message that is already printed by
+qemu_ram_writeback() is insufficient in terms of error reporting, I
+suggest propagating the return value from qemu_ram_writeback() and
+qemu_ram_block_writeback().
+
+> Also qemu_ram_writeback() requires me to include #include "exec/ram_addr.h".
+> After including it when I compile code I'm getting following error:
 >
-> Jerry
+> In file included from hw/block/nvme.c:49:
+> /root/sources/pmr/qemu/include/exec/ram_addr.h:23:10: fatal error: cpu.h: No such file or directory
+>    23 | #include "cpu.h"
+>       |          ^~~~~~~
+> compilation terminated.
+> make: *** [/root/sources/pmr/qemu/rules.mak:69: hw/block/nvme.o] Error 1
+>
+> Why this is happening and what should be changed.
 
+Generally object files are built as part of common-obj-y in
+Makefile.objs.  These object files are built only once across all QEMU
+targets (e.g. qemu-system-x86_64, qemu-system-arm, ...).
 
-Please read https://qemu.weilnetz.de/FAQ.
+Some code embeds target-specific information and is therefore not
+suitable for common-obj-y.  These object files are built as part of
+obj-y in Makefile.objs.
 
-Stefan W.
+You can fix this compilation issue by changing hw/block/Makefile.objs
+to like this:
 
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 4b4a2b338d..12d5d5dac6 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -7,11 +7,11 @@ common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
+ common-obj-$(CONFIG_XEN) += xen-block.o
+ common-obj-$(CONFIG_ECC) += ecc.o
+ common-obj-$(CONFIG_ONENAND) += onenand.o
+-common-obj-$(CONFIG_NVME_PCI) += nvme.o
+ common-obj-$(CONFIG_SWIM) += swim.o
 
+ common-obj-$(CONFIG_SH4) += tc58128.o
 
++obj-$(CONFIG_NVME_PCI) += nvme.o
+ obj-$(CONFIG_VIRTIO_BLK) += virtio-blk.o
+ obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
+
+Stefan
 
