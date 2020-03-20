@@ -2,64 +2,79 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCEA1C4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 398ADC4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:42:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6B2020777
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05D2E20777
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 19:42:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="PbBJ4KFd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B2020777
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ci7W8HJ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05D2E20777
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFNX2-0005PP-Sf
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 15:42:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58674)
+	id 1jFNXZ-00062K-70
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 15:42:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jFNWP-0004pd-1g
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:41:34 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jFNWk-0005DB-5D
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:41:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jFNWO-0002uJ-2f
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:41:32 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:42081)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jFNWN-0002iY-IM; Fri, 20 Mar 2020 15:41:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=+0cl7hH5kvcvTDrsFQRft4HMAoMwj9jt9djWTYSbjLo=; 
- b=PbBJ4KFd74dPM6XTbcQJZmSdwJLgAqGEDXSoQYkD7ljOxvkMOmv1Y2tlsoDpbQLB6RHJ3RWiLH0Hminq7/DQafjCQQWuMxnL+VeoMlyLFJWADVDn7WFcmIIjsXvLWXPNiD9HIbgW99ANueEC7sShpKPDTne8+C221ie1RUAEiG4CaIn1FqTCuAg7nEKuKW3xOo0x2X390AwdRUIwBvsuvOmlfc4IIhwRxTrG56itdrkmv6SsM3K7z4czn6gbMt7f0VIw1uDA5Be2LAeOwdUIekKosDC9fysanrRUgF81aMtff7rKuZQvnK7UX4NqXkxS4VsOgspuqJg3fDBd/Sa2Kw==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jFNWJ-0003HS-M6; Fri, 20 Mar 2020 20:41:27 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jFNWJ-0003vq-CW; Fri, 20 Mar 2020 20:41:27 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: discard and v2 qcow2 images
-In-Reply-To: <c0dcacfd-16cc-e2c2-304a-043e281d6bde@redhat.com>
-References: <20200320185848.GA5720@igalia.com>
- <c0dcacfd-16cc-e2c2-304a-043e281d6bde@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Fri, 20 Mar 2020 20:41:27 +0100
-Message-ID: <w514kuivmoo.fsf@maestria.local.igalia.com>
+ (envelope-from <alex.williamson@redhat.com>) id 1jFNWi-0003HC-Pm
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:41:53 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:24597)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jFNWi-0003EP-KC
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 15:41:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584733311;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sJ40QxRG0OlYWuzwDUDKkNSHifuUoZHuj8C6hMwyzYc=;
+ b=Ci7W8HJ9FFJtUPKPqhRAHrYbIgaG1nxLiFZINT8BUCMuRywqw40p1zbZ3Nxv9O/HTZgNAW
+ RlLiaIYGZEVNHiF8tIRkeLRNnqYdsPpExL6c5dW8boV7FCGy66wb3l0JWHPuY+yZ8uch4n
+ dYRSFuw0zAadrl0LJ+Ypd5eAnFBYdQY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-jzy-x6bGOB2sQYPzmScm1A-1; Fri, 20 Mar 2020 15:41:47 -0400
+X-MC-Unique: jzy-x6bGOB2sQYPzmScm1A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6223E477;
+ Fri, 20 Mar 2020 19:41:45 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7B2125C219;
+ Fri, 20 Mar 2020 19:41:43 +0000 (UTC)
+Date: Fri, 20 Mar 2020 13:41:42 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v14 Kernel 7/7] vfio: Selective dirty page tracking if
+ IOMMU backed device pins pages
+Message-ID: <20200320134142.3abe56ea@w520.home>
+In-Reply-To: <20200319062433.GH4641@joy-OptiPlex-7040>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-8-git-send-email-kwankhede@nvidia.com>
+ <20200319062433.GH4641@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,43 +86,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi
+ L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri 20 Mar 2020 08:35:44 PM CET, Eric Blake <eblake@redhat.com> wrote:
->> This flag is however only supported when qcow_version >= 3. In older
->> images the cluster is simply deallocated, exposing any possible
->> previous data from the backing file.
->
-> Discard is advisory, and has no requirements that discarded data read
-> back as zero.  However, if write zeroes uses discard under the hood,
-> then THAT usage must guarantee reading back as zero.
+On Thu, 19 Mar 2020 02:24:33 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
+> On Thu, Mar 19, 2020 at 03:41:14AM +0800, Kirti Wankhede wrote:
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index 912629320719..deec09f4b0f6 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -72,6 +72,7 @@ struct vfio_iommu {
+> >  	bool			v2;
+> >  	bool			nesting;
+> >  	bool			dirty_page_tracking;
+> > +	bool			pinned_page_dirty_scope;
+> >  };
+> >  
+> >  struct vfio_domain {
+> > @@ -99,6 +100,7 @@ struct vfio_group {
+> >  	struct iommu_group	*iommu_group;
+> >  	struct list_head	next;
+> >  	bool			mdev_group;	/* An mdev group */
+> > +	bool			pinned_page_dirty_scope;
+> >  };
+> >  
+> >  struct vfio_iova {
+> > @@ -132,6 +134,10 @@ struct vfio_regions {
+> >  static int put_pfn(unsigned long pfn, int prot);
+> >  static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+> >  
+> > +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+> > +					       struct iommu_group *iommu_group);
+> > +
+> > +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
+> >  /*
+> >   * This code handles mapping and unmapping of user data buffers
+> >   * into DMA'ble space using the IOMMU
+> > @@ -556,11 +562,13 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> >  }
+> >  
+> >  static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> > +				      struct iommu_group *iommu_group,
+> >  				      unsigned long *user_pfn,
+> >  				      int npage, int prot,
+> >  				      unsigned long *phys_pfn)
+> >  {
+> >  	struct vfio_iommu *iommu = iommu_data;
+> > +	struct vfio_group *group;
+> >  	int i, j, ret;
+> >  	unsigned long remote_vaddr;
+> >  	struct vfio_dma *dma;
+> > @@ -630,8 +638,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >  				   (vpfn->iova - dma->iova) >> pgshift, 1);
+> >  		}
+> >  	}  
+> 
+> Could you provide an interface lightweight than vfio_pin_pages for pass-through
+> devices? e.g. vfio_mark_iova_dirty()
+> 
+> Or at least allowing phys_pfn to be empty for pass-through devices.
+> 
+> This is really inefficient:
+> bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1));
+> i.e.
+> in order to mark an iova dirty, it has to go through iova ---> pfn --> iova
+> while acquiring pfn is not necessary for pass-through devices.
 
-write_zeroes doesn't seem to use discard in any case, so no problem
-there.
+I think this would be possible, but I don't think it should be gating
+to this series.  We don't have such consumers yet.  Thanks,
 
->> @@ -3763,6 +3763,10 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
->>       int ret;
->>       BDRVQcow2State *s = bs->opaque;
->>   
->> +    if (s->qcow_version < 3) {
->> +        return -ENOTSUP;
->> +    }
->> +
->
-> This changes it so you no longer see stale data, but doesn't change
-> the fact that you don't read zeroes (just that your stale data is now
-> from the current layer instead of the backing layer, since we did
-> nothing at all).
+Alex
 
-discard can already fail if the request is not aligned, in this case you
-get -ENOTSUP and stay with the same data as before.
-
-What's different in this case is that you can actually get stale data,
-that doesn't seem like a desirable outcome.
-
-Berto
 
