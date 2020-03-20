@@ -2,97 +2,81 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5CCC4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F51BC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:15:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41C9B20739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:13:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 257E020722
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:15:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vot33jSo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41C9B20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zq/J13Jw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 257E020722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFEev-0006bd-B8
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 06:13:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34075)
+	id 1jFEgw-0007ik-Bh
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 06:15:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFEeI-00068o-KX
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:13:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFEgG-0007CS-FQ
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFEeH-00065o-B7
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:13:06 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:57741)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFEeH-00062j-7a
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:13:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584699184;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6Ox8NyD7+S5jv3R8kB1mKYRrCj5Ao3ik/YHO+wX9Yi0=;
- b=Vot33jSotmJkwrsfGhn/kL3sUFAIafw3nP08tCY1xYVzkuHk6j5dQL1L1t/C87XcGdFExl
- 0/SE5mgKd/1ZIlnveYpu5xCscBgCI02XxqfcUbF2pIfQBmT72Byz6FFiXh1y9Dz1BXl73O
- aeQBhw71qejj410pz53/Uz1fUPzC4ms=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-NSVw9WjfMGOHXYko6_MZdw-1; Fri, 20 Mar 2020 06:13:00 -0400
-X-MC-Unique: NSVw9WjfMGOHXYko6_MZdw-1
-Received: by mail-ed1-f71.google.com with SMTP id a32so4605206edf.17
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 03:13:00 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jFEgE-0003oi-OP
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:15:08 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:44667)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jFEgE-0003nj-EB
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:15:06 -0400
+Received: by mail-ot1-x336.google.com with SMTP id a49so5396667otc.11
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 03:15:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=IsuAvZWWkXr5BZcjiTYRvW+SY5TDwaDVkcrSrqNVFSY=;
+ b=Zq/J13JwK+f1HZB8y2rDYegUh+QyAPPReY1Zbj8JgOURzjD1k3QEKQc9Om9Zd1PQ6o
+ UAaOGTAz+nFb03CD47OKTYmvVRa7gNDFuxPJNBRCr6L9zxEkdHavj2M9nwltSz3F/vA+
+ 7ckklIxFKSNgYOj874P4KOp9iomVvlnT96aXNl+DoDHbG0KKCBCgAQ7I5hUzmNDYVWYb
+ 9ePZ47ry9EgylD4qIPQBe8DvNXnnTyLcSBbTW/AytIqkZJhsM+Ju/5cR1ADAev9QtyoL
+ AvTlnBi+xdVSNbSW8bLtwDK8FebwjcUqqvB+suqqvqCz7I8IQgYyII3ziBnOrKfSo3CO
+ eGvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wU0X9XHMwx6I/yWM497g+uA26l5Ld3talr+tKqoIVPE=;
- b=eB45THFBdri7OFr/PwVLNm+enIrGQk/6UqVCvL/+iZFoDexOUws5ZIaJF86V+6JV3G
- R5BFKAledmwK54eIlSv57sTh6EY9jjTyf2mTXJjcnV4ylECMSAf5QdWbXZzcDACLTjXE
- UG+2uzlhcXI8fbzcemBeJlK+iHr3hmv67T+28UxyQnAjdjmvKkdMPXFhXveMqLm0u+3N
- pLRB1hpN1sQza7IbUFfGhqK3AyAuqctr2ZjAeuS5uZ2EmrvdWgXP429acyRjJDtaLX5J
- CLOHkcu6wM4ZdyW221SROAgBdOteFqVJEndmYkbC/BzYn2tI7EmcQNKI3rCfA1TYc9UZ
- dLBQ==
-X-Gm-Message-State: ANhLgQ0cTbL6hhPV0EMwlN9BRJM8+jXrawi+C+jlhxGvBYjzBb3zUwZW
- JSadPgsxuY2v6Uoo0q6LLgimowZ9wva4y3wIU2VPVbKw2g23L/1pPdE3cwbY219fvAa1iGYFTH/
- 4PND6xEWh7wwMSsw=
-X-Received: by 2002:aa7:d3d7:: with SMTP id o23mr7112523edr.330.1584699179569; 
- Fri, 20 Mar 2020 03:12:59 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vv3PQ2nfAlYyh7chd+sd+bFkTBLU5AECodHRKY8M45xr17GlV8eUs1ve+SeEf4EgFIZG52LcA==
-X-Received: by 2002:aa7:d3d7:: with SMTP id o23mr7112503edr.330.1584699179297; 
- Fri, 20 Mar 2020 03:12:59 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id s2sm62541edx.18.2020.03.20.03.12.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 20 Mar 2020 03:12:58 -0700 (PDT)
-Subject: Re: [PATCH 0/3] iotests: Fix intermittent 030 hang
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200313083617.8326-1-kwolf@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9cc2f46f-9398-c244-b8e5-e7c2509adc26@redhat.com>
-Date: Fri, 20 Mar 2020 11:12:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=IsuAvZWWkXr5BZcjiTYRvW+SY5TDwaDVkcrSrqNVFSY=;
+ b=JyEzZQYQfb+ZQrZvbC7/W2cB6Qd8cEVnGAXLpgvC8fcLcvq9m+iOujmVK280YioPwB
+ ufO8KvCIYqlKD+uqf+FWO0hz+PEEbxwP7N0BL3/6ZOcNTHkXmkisNs9Z+s06l2N5OpaY
+ z+0YMhAc4BB9kYe5aCHc8VGvdVzvJCoEqg1XmE7N4ilwAOubm4mTF++ry/TnR6b58YBE
+ uARV/ETwHpTJeAFUYAueHdckT9QLde5AKHRvPcup+6VofaNgXKp0VRK2lNBrA+vCXDEe
+ Utp2bhwSeKxV7TpI8DgRm57to/RvKtKvrxCPHRl5l4DgtYCnjnBVvJpbEsHNqfpcSq27
+ Vw9A==
+X-Gm-Message-State: ANhLgQ2uYZTa7X+oUbVegBCKlEI8m9RnB+hsj2kGZafHvx6hyc3voK16
+ AOZ/BCB1JG/E1lXjoWIP+Mrd9PhqEGjrrq7Ah/c2cQ==
+X-Google-Smtp-Source: ADFU+vuEiRl4JRwWvzdDDW6dU4gi18PRDSOynWccN0YVLJu/DyllU7Rw3JbrQNNEPaqxVHHZo7uXao2OBH4Z7XC5QQw=
+X-Received: by 2002:a9d:1d43:: with SMTP id m61mr6040808otm.91.1584699305204; 
+ Fri, 20 Mar 2020 03:15:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200313083617.8326-1-kwolf@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20200319112911.353244-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20200319112911.353244-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Mar 2020 10:14:53 +0000
+Message-ID: <CAFEAcA-UyC1o2aNYA=uGWQ1W7y2j2QKPqVgfRrXtXObA13RaVw@mail.gmail.com>
+Subject: Re: [PULL 0/1] Slirp patches
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,28 +88,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/13/20 9:36 AM, Kevin Wolf wrote:
-> Peter ran into a 030 hang while testing a pull request. This turned out
-> to be two bugs in the test suite at once: First was the test failing
-> because a timeout was apparently too short, second was that the timeout
-> would actually cause the test to hang instead of failing. This series
-> should fix both.
->=20
-> Kevin Wolf (3):
->    iotests.py: Enable faulthandler
->    python/qemu: Kill QEMU process if 'quit' doesn't work
->    iotests: Increase pause_wait() timeout
->=20
->   python/qemu/machine.py        | 1 +
->   tests/qemu-iotests/iotests.py | 5 ++++-
->   2 files changed, 5 insertions(+), 1 deletion(-)
->=20
+On Thu, 19 Mar 2020 at 11:33, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> The following changes since commit f57587c7d47b35b2d9b31def3a74d81bdb5475=
+d7:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2020-03-17'=
+ into staging (2020-03-19 10:18:07 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/elmarco/qemu.git tags/slirp-pull-request
+>
+> for you to fetch changes up to 9f6b9fcc153f6d4f2e10193014d2eaf7329fa181:
+>
+>   slirp: update submodule to v4.2.0 + mingw-fix (2020-03-19 12:17:43 +010=
+0)
+>
+> ----------------------------------------------------------------
 
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Hi; this fails to build on NetBSD:
 
+In file included from /usr/pkg/lib/glib-2.0/include/glibconfig.h:9:0,
+                 from /usr/pkg/include/glib-2.0/glib/gtypes.h:32,
+                 from /usr/pkg/include/glib-2.0/glib/galloca.h:32,
+                 from /usr/pkg/include/glib-2.0/glib.h:30,
+                 from /home/qemu/qemu-test.1QzWG1/src/slirp/src/util.h:27,
+                 from /home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.h:47,
+                 from /home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:25:
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c: In function 'slirp_new':
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:277:29: error:
+'SlirpConfig {aka const struct SlirpConfig}' has no member named
+'if_data'
+     g_return_val_if_fail(cfg->if_mtu >=3D IF_MTU_MIN || cfg->if_mtu =3D=3D=
+ 0, NULL);
+                             ^
+/usr/pkg/include/glib-2.0/glib/gmacros.h:928:8: note: in definition of
+macro '_G_BOOLEAN_EXPR'
+    if (expr)                                    \
+        ^
+/usr/pkg/include/glib-2.0/glib/gmessages.h:599:9: note: in expansion
+of macro 'G_LIKELY'
+     if (G_LIKELY (expr)) \
+         ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:277:5: note: in
+expansion of macro 'g_return_val_if_fail'
+     g_return_val_if_fail(cfg->if_mtu >=3D IF_MTU_MIN || cfg->if_mtu =3D=3D=
+ 0, NULL);
+     ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:277:58: error:
+'SlirpConfig {aka const struct SlirpConfig}' has no member named
+'if_data'
+     g_return_val_if_fail(cfg->if_mtu >=3D IF_MTU_MIN || cfg->if_mtu =3D=3D=
+ 0, NULL);
+fcntl(): Invalid argument
+                                                          ^
+/usr/pkg/include/glib-2.0/glib/gmacros.h:928:8: note: in definition of
+macro '_G_BOOLEAN_EXPR'
+    if (expr)                                    \
+        ^
+/usr/pkg/include/glib-2.0/glib/gmessages.h:599:9: note: in expansion
+of macro 'G_LIKELY'
+     if (G_LIKELY (expr)) \
+         ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:277:5: note: in
+expansion of macro 'g_return_val_if_fail'
+     g_return_val_if_fail(cfg->if_mtu >=3D IF_MTU_MIN || cfg->if_mtu =3D=3D=
+ 0, NULL);
+     ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:278:29: error:
+'SlirpConfig {aka const struct SlirpConfig}' has no member named
+'if_data'
+     g_return_val_if_fail(cfg->if_mtu <=3D IF_MTU_MAX, NULL);
+                             ^
+/usr/pkg/include/glib-2.0/glib/gmacros.h:928:8: note: in definition of
+macro '_G_BOOLEAN_EXPR'
+    if (expr)                                    \
+        ^
+/usr/pkg/include/glib-2.0/glib/gmessages.h:599:9: note: in expansion
+of macro 'G_LIKELY'
+     if (G_LIKELY (expr)) \
+         ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:278:5: note: in
+expansion of macro 'g_return_val_if_fail'
+     g_return_val_if_fail(cfg->if_mtu <=3D IF_MTU_MAX, NULL);
+     ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:324:10: error:
+'Slirp {aka struct Slirp}' has no member named 'if_data'
+     slirp->if_mtu =3D cfg->if_mtu =3D=3D 0 ? IF_MTU_DEFAULT : cfg->if_mtu;
+          ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:324:24: error:
+'SlirpConfig {aka const struct SlirpConfig}' has no member named
+'if_data'
+     slirp->if_mtu =3D cfg->if_mtu =3D=3D 0 ? IF_MTU_DEFAULT : cfg->if_mtu;
+                        ^
+/home/qemu/qemu-test.1QzWG1/src/slirp/src/slirp.c:324:60: error:
+'SlirpConfig {aka const struct SlirpConfig}' has no member named
+'if_data'
+     slirp->if_mtu =3D cfg->if_mtu =3D=3D 0 ? IF_MTU_DEFAULT : cfg->if_mtu;
+                                                            ^
+
+
+thanks
+-- PMM
 
