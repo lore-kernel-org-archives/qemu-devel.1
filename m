@@ -2,83 +2,99 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47135C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D10AC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1069C2072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:42:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60EAA2076C
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 10:43:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZePSpkPy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1069C2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgREWU9C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60EAA2076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFF6u-0004yU-7O
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 06:42:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39372)
+	id 1jFF7F-0005Jp-IQ
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 06:43:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39451)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1jFF68-0004La-EH
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:41:53 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jFF6M-0004U1-W8
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1jFF67-0005Yc-Ff
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:41:52 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44054)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1jFF67-0005W5-9d
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:41:51 -0400
-Received: by mail-wr1-x442.google.com with SMTP id o12so6257408wrh.11
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 03:41:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6OOf8rVvLuKGMJZzGbyNc2qt2ug9LX09+SOHYsiRPHc=;
- b=ZePSpkPyT4A09y5hcccsdZ/95ysWUnJBrcnAqBHMrsaynIwz61CMgH/qTGd4t5AR2m
- qQWjrFZGPoDVLeP5WDNKhNchQs3tnBESpf4N0j1lfCEv/ZS1c2LyxL1fZdXGGqs+NV6J
- jLYZFklwI6tm+RscBvieZ51nzHJIu8JcWt97YMaSGokwLtKxIn/EV7/f0TsR2TBvRm0E
- 4jEGc6jIZUC5C5yFEnYi0QPQeOrj/cgTN2HjgazStJ8d5CUkU2DoVen3wr+i0JojvylN
- 5uoEXZAMIp6uMedHybuu3J8T44RbNvzDSooSmude80Wn8UdXxUOFKl85Cto9+gkUyuqr
- Upog==
+ (envelope-from <pbonzini@redhat.com>) id 1jFF6M-0005tJ-16
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:42:06 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32888)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jFF6L-0005rj-TN
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 06:42:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584700925;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aKz9u7AXYPnIpgJfXbA5iM2ySWxulqd6M5ixJ0a9q5c=;
+ b=UgREWU9CstgcnOlNiGJiCDvpoKQBH35LFNn7GQAnhvKluUcxDG4KkMj6Ha5ti0hg9sytVW
+ lS+bvQzxC+TwpJR/4lOYuw1wNyZGxbUyv+KzozWnkl2C2Ch327tUGcFiE/NpxJ3IpcPFJi
+ 40dGFrFxqdiI6EMQ4KqdwRMR5ZGOols=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-72-WOUMkXWiMHWS6TQ_OmLosA-1; Fri, 20 Mar 2020 06:42:01 -0400
+X-MC-Unique: WOUMkXWiMHWS6TQ_OmLosA-1
+Received: by mail-wm1-f71.google.com with SMTP id n188so1651384wmf.0
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 03:42:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=6OOf8rVvLuKGMJZzGbyNc2qt2ug9LX09+SOHYsiRPHc=;
- b=T9ipDhYsne/zWaWLHfZaVfAY8c1xUaR/TnJuYCkt2qZAXGa5vlY+9G+AMOLYL+kcdQ
- 8Tk2PHiaeiEHruW5ta/xBcjvgbr2Dt1KvszdPc5ICaK4zLidf1NROD1s9rV+bgvYRmu5
- nqTsndxzmoqGX8Qly2orsyP7NdQAbybv5u0ZmpevJZdPelgfIeJEtX3YJHwMGYHzvKMy
- OhpoNAOlVLpH7rk9zpR4lhiw9rftgmj7AImucHeuQcB0W80oLQRWJtP8Cl+o0Y3ljSZX
- p3pZ/+erg3v+RXjna78tK/g9pqE87FdlLYuoiGk5vzq29rWzzCJwvqY/Km8UBOy6IDuJ
- No9A==
-X-Gm-Message-State: ANhLgQ0GpyuAqyJi03C3CpD3daSuPqh7dA1JGwHpD+v6aTXpau4EiE9f
- rFC3ggQpnS9H/EvyQF6bdiPCnVfS
-X-Google-Smtp-Source: ADFU+vsKGnjKxt9+2kXJtyZ+G+Gsf9b5tqqxvVV7k8PGzo3sFi5/W2YJ/IuoTZn2XIR5OsIfwR1hiQ==
-X-Received: by 2002:adf:a490:: with SMTP id g16mr10120689wrb.42.1584700909363; 
- Fri, 20 Mar 2020 03:41:49 -0700 (PDT)
-Received: from donizetti.fritz.box ([151.21.15.43])
- by smtp.gmail.com with ESMTPSA id c18sm6366121wrx.5.2020.03.20.03.41.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Mar 2020 03:41:48 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aKz9u7AXYPnIpgJfXbA5iM2ySWxulqd6M5ixJ0a9q5c=;
+ b=kSwhR0TYWmHJ41eeInYhAvMVWPYGNCwoYdyDV+1fGoVia5SjkJW/2CI8BJnUROeB1N
+ qyjEVEEzLc/0RHZSktDaavM28i6xhQsteyOOCIPgvzbkNHxbOtNLjZZ8V9SpD/1/B3ya
+ f3Ukm7FjTY3NrUTn6+Z3XIYLQB5V6H8CsZ10Q5yyy2jhXEHwK82lHpW6oWlYu2V/pDSc
+ nIvmeh0REX2uny8f1oAAA3dq1nf1HgJ/Fzkn1br0qg6W0fzBdcPIDcP6DF/ZiBUYiThr
+ MUyTRmvF0OoeqkQsXpAeViqjsWIDSzh/LXR3f/JDPAj0JQa3te/IGzLB/aLi3jAsGn4+
+ ytZQ==
+X-Gm-Message-State: ANhLgQ3Yq1eGQDhFZ5+R2XtDiF2nqJ1htQhhkpwwtTa4RDLsD3mtRxU+
+ V3+UFkw+cLPiXWtodoIvy95A3cOxb0UpwmMMYIgWATITJ2BgPkG1Hqx9dC92NiAF2hH6zfOVi5x
+ j2L/YloVC9unr0OY=
+X-Received: by 2002:a5d:464e:: with SMTP id j14mr10172874wrs.339.1584700920582; 
+ Fri, 20 Mar 2020 03:42:00 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtYUt7qI1jGlYws7ADWEOisXONqHjJxSdS6e3LgLqBlC70AaROz6klxewlqsL19rTCG4XUU1Q==
+X-Received: by 2002:a5d:464e:: with SMTP id j14mr10172860wrs.339.1584700920407; 
+ Fri, 20 Mar 2020 03:42:00 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+ by smtp.gmail.com with ESMTPSA id v15sm2111864wrs.85.2020.03.20.03.41.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 20 Mar 2020 03:41:59 -0700 (PDT)
+Subject: Re: [PATCH 00/13] microvm: add acpi support
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <20200319080117.7725-1-kraxel@redhat.com>
+ <2ed586e7-d7a1-77b2-ecc6-01b6fb38d72e@redhat.com>
+ <20200319134046.uh2qvyshwtj6ubox@sirius.home.kraxel.org>
+ <259fbf57-6d1f-e3cd-d455-d2e6bc4e8b38@redhat.com>
+ <20200320083227.6fnqrchjoii6hhli@sirius.home.kraxel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] virtio-iommu: depend on PCI
-Date: Fri, 20 Mar 2020 11:41:47 +0100
-Message-Id: <20200320104147.643941-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.24.1
+Message-ID: <1351f912-d79a-656d-3f8d-76607365aa24@redhat.com>
+Date: Fri, 20 Mar 2020 11:41:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <20200320083227.6fnqrchjoii6hhli@sirius.home.kraxel.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,35 +106,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: eric.auger@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, mst@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ eric.auger@redhat.com, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The virtio-iommu device attaches itself to a PCI bus, so it makes
-no sense to include it unless PCI is supported---and in fact
-compilation fails without this change.
+On 20/03/20 09:32, Gerd Hoffmann wrote:
+> Hmm, seems we should have that for better regression testing.
+> master branch doesn't build with pc+q35+isapc turned off:
+> 
+>   LINK    x86_64-softmmu/qemu-system-x86_64
+> hw/virtio/virtio-iommu.o: In function `virtio_iommu_get_bdf':
+> /home/kraxel/projects/qemu/hw/virtio/virtio-iommu.c:66: undefined reference to `pci_bus_num'
+> hw/virtio/virtio-iommu.o: In function `iommu_find_iommu_pcibus':
+> /home/kraxel/projects/qemu/hw/virtio/virtio-iommu.c:84: undefined reference to `pci_bus_num'
+> hw/virtio/virtio-iommu.o: In function `virtio_iommu_device_realize':
+> /home/kraxel/projects/qemu/hw/virtio/virtio-iommu.c:685: undefined reference to `pci_setup_iommu'
+> collect2: error: ld returned 1 exit status
 
-Reported-by: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/virtio/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You need to disable virtio-iommu for now, or apply the patch I've just
+sent and CC you on.
 
-diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
-index d29525b36f..83122424fa 100644
---- a/hw/virtio/Kconfig
-+++ b/hw/virtio/Kconfig
-@@ -12,7 +12,7 @@ config VIRTIO_RNG
- config VIRTIO_IOMMU
-     bool
-     default y
--    depends on VIRTIO
-+    depends on PCI && VIRTIO
- 
- config VIRTIO_PCI
-     bool
--- 
-2.24.1
+Paolo
 
 
