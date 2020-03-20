@@ -2,105 +2,80 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD444C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:44:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619CBC4332E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:52:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EC1C20767
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:44:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC1C20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3427420781
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:52:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrHxWduk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3427420781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFMd2-0004Ya-Lp
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:44:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46992)
+	id 1jFMl5-0006zS-AN
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:52:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1jFMcD-0003VR-6x
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:43:31 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jFMkJ-0006YJ-Ax
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1jFMcB-0000pM-8r
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:43:28 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50704
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1jFMcB-0000pA-37
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:43:27 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02KIXjvU105459
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 14:43:26 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu7dcb4m7-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 14:43:26 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Fri, 20 Mar 2020 18:43:24 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 20 Mar 2020 18:43:20 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02KIhJ8p31261048
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 20 Mar 2020 18:43:19 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 58482AE051;
- Fri, 20 Mar 2020 18:43:19 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C6B28AE045;
- Fri, 20 Mar 2020 18:43:18 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.114.57])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 20 Mar 2020 18:43:18 +0000 (GMT)
-Date: Fri, 20 Mar 2020 19:43:17 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v5 07/18] s390x: protvirt: Inhibit balloon when
- switching to protected mode
-In-Reply-To: <d7d91f47-19d3-06cf-879c-c9556a924a2f@redhat.com>
-References: <20200226122038.61481-1-frankja@linux.ibm.com>
- <20200226122038.61481-8-frankja@linux.ibm.com>
- <ed51d194-1b63-1c54-953a-d2031336a90e@redhat.com>
- <58a51f40-21c7-5737-4f4c-568fdd2477fa@linux.ibm.com>
- <20200227132402.67a38047.pasic@linux.ibm.com>
- <8622efeb-1a4a-338f-d363-53818b00d195@redhat.com>
- <20200319164050.78a01702.pasic@linux.ibm.com>
- <d7d91f47-19d3-06cf-879c-c9556a924a2f@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (envelope-from <alistair23@gmail.com>) id 1jFMkH-0004At-TZ
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:51:51 -0400
+Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:43226)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jFMkH-0004Ae-N4; Fri, 20 Mar 2020 14:51:49 -0400
+Received: by mail-vk1-xa43.google.com with SMTP id t3so2025640vkm.10;
+ Fri, 20 Mar 2020 11:51:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6xJP+kSsXtFzVS4Re3XHnZdAIdkIR4f7k/pFnNFvlUE=;
+ b=KrHxWduk7QkpPq7K1tmCOacevLTgVhheT8LlAHxbUxewIm1adh8EVtl6LtgchcPAt4
+ rFp3Z6BEhrc/4dAJe6LlPtQggBcrWVN+cLZWBkpgk65LIsYJuLUNKFatEd+twlqL+nFm
+ dm39zgya7DemT0t2z1ADrSAcbqrbU+DtIgRyEzpTs8ETSu+RPEstjl8LWQYvhWec64qJ
+ iP++n58to9WEtuf9JrGWO2dD98eWaDtE09haV9YUYh/74bB2ARb7rPsnIUSPeXdG2RJL
+ Lx8rA0ODz5cpiX8IuZQOiYj+n1qrPgP7s0v3MdlhhhZHK1pDoiI2FCANKnv8zfIAwTI0
+ 1beQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6xJP+kSsXtFzVS4Re3XHnZdAIdkIR4f7k/pFnNFvlUE=;
+ b=rCSw7qaIkl4oD7cPq+4CVAUEj1/bZ1wHmznaNgfUidV/LWwqeuyUUrprN6gDWmLb+K
+ 26X7EgiSgxbaNztByHkpTresF52nrr6hK6HCuN00eb8XA082RqN66m9RtPLLIU4UoEAW
+ U6sCTj26Ub1ROELbhpr8GiIArMUogbYVi9d40oMOsxw0OjKjDJwB0KTVkEgKlHtRu1DJ
+ lsY7amByVzZ2Aq8RkEzxS81TVvps2p8JaaYItjFlQwmA+LoMz8yYonp2nzo7ow+QhPIL
+ 6qvXYtyiKOI5TXfJJwV7kctHLMTsysULDThPK8Px9LaUsM7H8fRlz5Ce+RqI+uOpV9iD
+ DBvw==
+X-Gm-Message-State: ANhLgQ0M0fmf+u5F05OccyOxMZVxnGqv7GjQiJC9lGvBvzjh5pujgdhc
+ 1ccW/wmA7xFn/FB4vEw3ljkb/D1Am5s5LmqcNk8=
+X-Google-Smtp-Source: ADFU+vuL34JCpq8CQZ/aIO75C/Tq8Qs3m0QHm89N2sx5sEpYgt06Whh7shnSuHXms90tzLIRYBJQNGkAiw7O6Vtp+bc=
+X-Received: by 2002:a1f:4c86:: with SMTP id z128mr6592123vka.70.1584730308953; 
+ Fri, 20 Mar 2020 11:51:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032018-0020-0000-0000-000003B7EE18
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032018-0021-0000-0000-0000221061D2
-Message-Id: <20200320194317.1cf36b00.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-20_06:2020-03-20,
- 2020-03-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=0
- mlxscore=0 suspectscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003200073
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-16-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-16-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 20 Mar 2020 11:43:51 -0700
+Message-ID: <CAKmqyKMLPCaHnNQXmpA9+smYrbB3khS9C4YzX7sBT1F46EPqyQ@mail.gmail.com>
+Subject: Re: [PATCH v6 15/61] target/riscv: vector narrowing integer right
+ shift instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::a43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,176 +87,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
- Brijesh Singh <brijesh.singh@amd.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Mar 2020 18:31:11 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Tue, Mar 17, 2020 at 8:37 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> [...]
-> 
-> >>
-> >> I asked this question already to Michael (cc) via a different
-> >> channel, but hare is it again:
-> >>
-> >> Why does the balloon driver not support VIRTIO_F_IOMMU_PLATFORM? It
-> >> is absolutely not clear to me. The introducing commit mentioned
-> >> that it "bypasses DMA". I fail to see that.
-> >>
-> >> At least the communication via the SG mechanism should work
-> >> perfectly fine with an IOMMU enabled. So I assume it boils down to
-> >> the pages that we inflate/deflate not being referenced via IOVA?
-> > 
-> > AFAIU the IOVA/GPA stuff is not the problem here. You have said it
-> > yourself, the SG mechanism would work for balloon out of the box, as
-> > it does for the other virtio devices. 
-> > 
-> > But VIRTIO_F_ACCESS_PLATFORM (aka VIRTIO_F_IOMMU_PLATFORM)  not
-> > presented means according to Michael that the device has full access
-> > to the entire guest RAM. If VIRTIO_F_ACCESS_PLATFORM is negotiated
-> > this may or may not be the case.
-> 
-> So you say
-> 
-> "The virtio specification tells that the device is to present
-> VIRTIO_F_ACCESS_PLATFORM (a.k.a. VIRTIO_F_IOMMU_PLATFORM) when the
-> device "can only access certain memory addresses with said access
-> specified and/or granted by the platform"."
-> 
-> So, AFAIU, *any* virtio device (hypervisor side) has to present this
-> flag when PV is enabled. 
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Yes, and balloon says bye bye when running in PV mode is only a secondary
-objective. I've compiled some references:
+Alistair
 
-"To summarize, the necessary conditions for a hack along these lines
-(using DMA API without VIRTIO_F_ACCESS_PLATFORM) are that we detect that:
-
-  - secure guest mode is enabled - so we know that since we don't share
-    most memory regular virtio code won't
-    work, even though the buggy hypervisor didn't set VIRTIO_F_ACCESS_PLATFORM" 
-(Michael Tsirkin, https://lkml.org/lkml/2020/2/20/1021)
-I.e.: PV but !VIRTIO_F_ACCESS_PLATFORM \implies bugy hypervisor
-
-
-"If VIRTIO_F_ACCESS_PLATFORM is set then things just work.  If
-VIRTIO_F_ACCESS_PLATFORM is clear device is supposed to have access to
-all of memory.  You can argue in various ways but it's easier to just
-declare a behaviour that violates this a bug."
-(Michael Tsirkin, https://lkml.org/lkml/2020/2/21/1626)
-This one is about all memory guest, and not just the buffers transfered
-via the virtqueue, which surprised me a bit at the beginning. But balloon
-actually needs this.
-
-"A device SHOULD offer VIRTIO_F_ACCESS_PLATFORM if its access to memory
-is through bus addresses distinct from and translated by the platform to
-physical addresses used by the driver, and/or if it can only access
-certain memory addresses with said access specified and/or granted by
-the platform. A device MAY fail to operate further if
-VIRTIO_F_ACCESS_PLATFORM is not accepted. "
-(https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-4120002)
-
-
-> In that regard, your patch makes perfect sense
-> (although I am not sure it's a good idea to overwrite these feature
-> bits
-> - maybe they should be activated on the cmdline permanently instead
-> when PV is to be used? (or enable )).
-
-I didn't understand the last part. I believe conserving the user
-specified value when not running in PV mode is better than the hard
-overwrite I did here. I wanted a discussion starter.
-
-I think the other option (with respect to let QEMU manage this for user,
-i.e. what I try to do here) is to fence the conversion if virtio devices
-that do not offer VIRTIO_F_ACCESS_PLATFORM are attached; and disallow
-hotplug of such devices at some point during the conversion.
-
-I believe that alternative is even uglier.
-
-IMHO we don't want the end user to fiddle with iommu_platform, because
-all the 'benefit' he gets from that is possibility to make a mistake.
-For example, I got an internal bug report saying virtio is broken with
-PV, which boiled down to an overlooked auto generated NIC, which of
-course had iommu_platform (VIRTIO_F_ACCESS_PLATFORM) not set.
-
-> 
-> > 
-> > The actual problem is that the pages denoted by the buffer
-> > transmitted via the virtqueue are normally not shared pages. I.e.
-> > the hypervisor can not reuse them (what is the point of balloon
-> > inflate). To make this work, the guest would need to share the pages
-> > before saying 'host these are in my balloon, so you can use them'.
-> > This is a piece of logic we
-> 
-> What exactly would have to be done in the hypervisor to support it?
-
-AFAIK nothing. The guest needs to share the pages, and everything works.
-Janosch, can you help me with this one? 
-
-> 
-> Assume we have to trigger sharing/unsharing - this sounds like a very
-> architecture specific thing?
-
-It is, but any guest having sovereignty about its memory may need
-something similar.
-
-> Or is this e.g., doing a map/unmap
-> operation like mapping/unmapping the SG?
-
-No this is something different. We need stronger guarantees than the
-streaming portion of the DMA API provides. And what we actually want
-is not DMA but something very different.
-
-> 
-> Right now it sounds to me "we have to do $ARCHSPECIFIC when
-> inflating/deflating in the guest", which feels wrong.
-> 
-
-It is wrong in a sense. Drivers are mostly supposed to be portable. But
-balloon is not a run of the mill device. I don't see any other way to
-make this work.
-
-> > need only if the host/the device does not have full access to the
-> > guest RAM. That is in my opinion why the balloon driver fences
-> > VIRTIO_F_ACCESS_PLATFORM.> Does that make sense?
-> 
-> Yeah, I understood the "device has to set VIRTIO_F_ACCESS_PLATFORM"
-> part. Struggling with the "what can the guest driver actually do" part.
-> 
-
-Let me try to reword this. The point of PV is that the guest has
-exclusive access to his pages unless the guest decides to share some
-of the using a dedicated ultravisor call.
-
-The point of the memballoon is, as far as I understand, to effectively
-dynamically manage the guests memory size within given boundaries, and
-without requiring memory hotplug. The basic idea is that the pages in
-the balloon belong to the host. The host attempting to re-use a
-non-shared page of a guest leads to problems. AFAIR the main problem
-was that shall we ever want to deflate such a page (make it again
-available for guest use) we would need to do an import, and that can
-only work if we have the exact same content as when it was exported.
-Otherwise integrity check fails as if we had a malicious hypervisor,
-that is trying to inject stuff into the guest.
-
-I'm sure Janosch can provide a better explanation.
-
-I really don't see another way, how memory ballooning could work with
-something like PV, without the balloon driver relinquishing the guests
-ownership of the pages that are going to leave the guest via the balloon.
-
-On that note ccing the AMD SEV people. Balloon is at this point
-dysfunctional for them as well. @Tom: Right? If yes what problems need to
-be solved so virtio-balloon can work under SEV?
-
-Regards,
-Halil 
-
-
+> ---
+>  target/riscv/helper.h                   | 13 ++++
+>  target/riscv/insn32.decode              |  6 ++
+>  target/riscv/insn_trans/trans_rvv.inc.c | 85 +++++++++++++++++++++++++
+>  target/riscv/vector_helper.c            | 14 ++++
+>  4 files changed, 118 insertions(+)
+>
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index 47284c7476..0f36a8ce43 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -422,3 +422,16 @@ DEF_HELPER_6(vsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +
+> +DEF_HELPER_6(vnsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vnsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vnsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vnsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vnsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vnsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vnsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vnsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vnsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vnsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vnsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vnsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index f6d0f5aec5..89fd2aa4e2 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -329,6 +329,12 @@ vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
+>  vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
+>  vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
+>  vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
+> +vnsrl_vv        101100 . ..... ..... 000 ..... 1010111 @r_vm
+> +vnsrl_vx        101100 . ..... ..... 100 ..... 1010111 @r_vm
+> +vnsrl_vi        101100 . ..... ..... 011 ..... 1010111 @r_vm
+> +vnsra_vv        101101 . ..... ..... 000 ..... 1010111 @r_vm
+> +vnsra_vx        101101 . ..... ..... 100 ..... 1010111 @r_vm
+> +vnsra_vi        101101 . ..... ..... 011 ..... 1010111 @r_vm
+>
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index 6ed2466e75..a537b507a0 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -1312,3 +1312,88 @@ GEN_OPIVX_GVEC_SHIFT_TRANS(vsra_vx,  sars)
+>  GEN_OPIVI_GVEC_TRANS(vsll_vi, 1, vsll_vx,  shli)
+>  GEN_OPIVI_GVEC_TRANS(vsrl_vi, 1, vsrl_vx,  shri)
+>  GEN_OPIVI_GVEC_TRANS(vsra_vi, 1, vsra_vx,  sari)
+> +
+> +/* Vector Narrowing Integer Right Shift Instructions */
+> +static bool opivv_narrow_check(DisasContext *s, arg_rmrr *a)
+> +{
+> +    return (vext_check_isa_ill(s) &&
+> +            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
+> +            vext_check_reg(s, a->rd, false) &&
+> +            vext_check_reg(s, a->rs2, true) &&
+> +            vext_check_reg(s, a->rs1, false) &&
+> +            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
+> +                2 << s->lmul) &&
+> +            (s->lmul < 0x3) && (s->sew < 0x3));
+> +}
+> +
+> +/* OPIVV with NARROW */
+> +#define GEN_OPIVV_NARROW_TRANS(NAME)                               \
+> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
+> +{                                                                  \
+> +    if (opivv_narrow_check(s, a)) {                                \
+> +        uint32_t data = 0;                                         \
+> +        static gen_helper_gvec_4_ptr * const fns[3] = {            \
+> +            gen_helper_##NAME##_b,                                 \
+> +            gen_helper_##NAME##_h,                                 \
+> +            gen_helper_##NAME##_w,                                 \
+> +        };                                                         \
+> +        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
+> +        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
+> +        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
+> +        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
+> +            vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),              \
+> +            cpu_env, 0, s->vlen / 8, data, fns[s->sew]);           \
+> +        return true;                                               \
+> +    }                                                              \
+> +    return false;                                                  \
+> +}
+> +GEN_OPIVV_NARROW_TRANS(vnsra_vv)
+> +GEN_OPIVV_NARROW_TRANS(vnsrl_vv)
+> +
+> +static bool opivx_narrow_check(DisasContext *s, arg_rmrr *a)
+> +{
+> +    return (vext_check_isa_ill(s) &&
+> +            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
+> +            vext_check_reg(s, a->rd, false) &&
+> +            vext_check_reg(s, a->rs2, true) &&
+> +            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
+> +                2 << s->lmul) &&
+> +            (s->lmul < 0x3) && (s->sew < 0x3));
+> +}
+> +
+> +/* OPIVX with NARROW */
+> +#define GEN_OPIVX_NARROW_TRANS(NAME)                                     \
+> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
+> +{                                                                        \
+> +    if (opivx_narrow_check(s, a)) {                                      \
+> +        static gen_helper_opivx * const fns[3] = {                         \
+> +            gen_helper_##NAME##_b,                                       \
+> +            gen_helper_##NAME##_h,                                       \
+> +            gen_helper_##NAME##_w,                                       \
+> +        };                                                               \
+> +        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);\
+> +    }                                                                    \
+> +    return false;                                                        \
+> +}
+> +
+> +GEN_OPIVX_NARROW_TRANS(vnsra_vx)
+> +GEN_OPIVX_NARROW_TRANS(vnsrl_vx)
+> +
+> +/* OPIVI with NARROW */
+> +#define GEN_OPIVI_NARROW_TRANS(NAME, ZX, OPIVX)                          \
+> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
+> +{                                                                        \
+> +    if (opivx_narrow_check(s, a)) {                                      \
+> +        static gen_helper_opivx * const fns[3] = {                         \
+> +            gen_helper_##OPIVX##_b,                                      \
+> +            gen_helper_##OPIVX##_h,                                      \
+> +            gen_helper_##OPIVX##_w,                                      \
+> +        };                                                               \
+> +        return opivi_trans(a->rd, a->rs1, a->rs2, a->vm,                 \
+> +                fns[s->sew], s, ZX);                                     \
+> +    }                                                                    \
+> +    return false;                                                        \
+> +}
+> +
+> +GEN_OPIVI_NARROW_TRANS(vnsra_vi, 1, vnsra_vx)
+> +GEN_OPIVI_NARROW_TRANS(vnsrl_vi, 1, vnsrl_vx)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index c3518516f0..8d1f32a7ff 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -1371,3 +1371,17 @@ GEN_VEXT_SHIFT_VX(vsra_vx_b, int8_t, int8_t, H1, H1, DO_SRL, 0x7, clearb)
+>  GEN_VEXT_SHIFT_VX(vsra_vx_h, int16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
+>  GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
+>  GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
+> +
+> +/* Vector Narrowing Integer Right Shift Instructions */
+> +GEN_VEXT_SHIFT_VV(vnsrl_vv_b, uint8_t,  uint16_t, H1, H2, DO_SRL, 0xf, clearb)
+> +GEN_VEXT_SHIFT_VV(vnsrl_vv_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
+> +GEN_VEXT_SHIFT_VV(vnsrl_vv_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
+> +GEN_VEXT_SHIFT_VV(vnsra_vv_b, uint8_t,  int16_t, H1, H2, DO_SRL, 0xf, clearb)
+> +GEN_VEXT_SHIFT_VV(vnsra_vv_h, uint16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
+> +GEN_VEXT_SHIFT_VV(vnsra_vv_w, uint32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
+> +GEN_VEXT_SHIFT_VX(vnsrl_vx_b, uint8_t, uint16_t, H1, H2, DO_SRL, 0xf, clearb)
+> +GEN_VEXT_SHIFT_VX(vnsrl_vx_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
+> +GEN_VEXT_SHIFT_VX(vnsrl_vx_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
+> +GEN_VEXT_SHIFT_VX(vnsra_vx_b, int8_t, int16_t, H1, H2, DO_SRL, 0xf, clearb)
+> +GEN_VEXT_SHIFT_VX(vnsra_vx_h, int16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
+> +GEN_VEXT_SHIFT_VX(vnsra_vx_w, int32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
+> --
+> 2.23.0
+>
 
