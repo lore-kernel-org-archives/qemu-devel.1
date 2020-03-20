@@ -2,68 +2,83 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8063CC4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E97C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:40:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BA0220777
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:21:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA0220777
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C66B420739
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 18:40:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUNWPuSW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C66B420739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57543 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFMGo-0004xV-D1
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:21:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42810)
+	id 1jFMYr-0008QH-Rk
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 14:40:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46091)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jFMGD-0004Ut-Qm
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:20:46 -0400
+ (envelope-from <eblake@redhat.com>) id 1jFMXl-0007af-Il
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:38:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jFMGC-0002y1-7t
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:20:45 -0400
-Resent-Date: Fri, 20 Mar 2020 14:20:45 -0400
-Resent-Message-Id: <E1jFMGC-0002y1-7t@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21145)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jFMGC-0002v1-03
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:20:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584728428; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Oas0Gpm32gmBnUdBDsMeCsfQWx+mvocnuHfqOwUEcI/4hdeSg4DXmotbScxcGNvo/i9lK8TjR+slNKP8gy3tHx1SZnn1Q66A1xBjFmDX5RH/6ANShWRn562v+IFljUZlg+iKpyhRwFXcXXj57UH6gBuMk5Y/UjbbWJC4Z5RoIXk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584728428;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=SA3PpHAuMMUDaUHMezN9R3DiwdtVe5XWY6MuSWu8EfM=; 
- b=oKTl/6nYd9fPfLvnv1I31lKBVzCa+bZEtqiY83E6WBJNgNmz6rbZFQm3izM3lUbjy5hEnHB2wgWWnMyys0Q0LkewmgDjFDcthIzLfk9t6Qp2RZTQkqrzcp+KwYbjiAAHPZmPSegi5yMHVXxUiMohNKuviM4wug+2WY5tW/ZkQNc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584728425988904.7284635556323;
- Fri, 20 Mar 2020 11:20:25 -0700 (PDT)
-In-Reply-To: <20200320155106.549514-1-marcandre.lureau@redhat.com>
-Subject: Re: [PULL v2 0/1] Slirp patches
-Message-ID: <158472842482.16549.4040421729686986328@39012742ff91>
+ (envelope-from <eblake@redhat.com>) id 1jFMXj-0007Yq-Pu
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:38:52 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58787)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jFMXj-0007Yd-HE
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 14:38:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584729530;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=J2jbYCYdauWN2Xf5KOvKo5QlHLFGs95eAP3XKdE869w=;
+ b=PUNWPuSWWZMf5wJeBk5oExXdR2wpHjIdj4S9fpk5tKrjLEg1YXYporoZz7ObjMPlNrNUJy
+ 8PozDI6+W48o1lN7MKoz3opBCY+SmWpSpuGtWeOFxL9AqWta5OqnmC4xlAb0+kKYggd0fM
+ 1Rs6keBJG8yIbskZmSfjkPGl02Or0wo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-4L2o98QRMdGtIOaUf2aShg-1; Fri, 20 Mar 2020 14:38:40 -0400
+X-MC-Unique: 4L2o98QRMdGtIOaUf2aShg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30DC6107ACC4;
+ Fri, 20 Mar 2020 18:38:39 +0000 (UTC)
+Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8857419756;
+ Fri, 20 Mar 2020 18:38:38 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PULL 3/4] qcow2: Add list of bitmaps to
+ ImageInfoSpecificQCow2
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190211205128.27146-1-eblake@redhat.com>
+ <20190211205128.27146-4-eblake@redhat.com>
+ <CAFEAcA9wDiKKfL67B7cH1X=Wm_ayDJb6b0L-Pgiqcp2SkDNBAw@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b902c895-7ba9-9825-69cf-f8277ce26d05@redhat.com>
+Date: Fri, 20 Mar 2020 13:38:38 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: marcandre.lureau@redhat.com
-Date: Fri, 20 Mar 2020 11:20:25 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <CAFEAcA9wDiKKfL67B7cH1X=Wm_ayDJb6b0L-Pgiqcp2SkDNBAw@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,35 +90,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
- samuel.thibault@ens-lyon.org, marcandre.lureau@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:qcow2" <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyMDE1NTEwNi41NDk1
-MTQtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQVUxMIHYyIDAvMV0gU2xpcnAgcGF0Y2hl
-cwpNZXNzYWdlLWlkOiAyMDIwMDMyMDE1NTEwNi41NDk1MTQtMS1tYXJjYW5kcmUubHVyZWF1QHJl
-ZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNhMDAxNzggc2xpcnA6IHVwZGF0ZSBzdWJtb2R1
-bGUgdG8gdjQuMi4wKwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IE1pc3NpbmcgU2lnbmVk
-LW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyIGxpbmVzIGNo
-ZWNrZWQKCkNvbW1pdCBjYTAwMTc4MzE2MDYgKHNsaXJwOiB1cGRhdGUgc3VibW9kdWxlIHRvIHY0
-LjIuMCspIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
-IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzIwMTU1MTA2LjU0OTUxNC0xLW1hcmNh
-bmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+On 3/20/20 12:57 PM, Peter Maydell wrote:
+> On Mon, 11 Feb 2019 at 20:57, Eric Blake <eblake@redhat.com> wrote:
+>>
+>> From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>
+>> In the 'Format specific information' section of the 'qemu-img info'
+>> command output, the supplemental information about existing QCOW2
+>> bitmaps will be shown, such as a bitmap name, flags and granularity:
+> 
+> Hi; Coverity has just noticed an issue (CID 1421894) with this change:
+> 
+
+>> +        Qcow2BitmapInfoList *bitmaps;
+>> +        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
+>> +        if (local_err) {
+>> +            error_propagate(errp, local_err);
+>> +            qapi_free_ImageInfoSpecific(spec_info);
+>> +            return NULL;
+> 
+> If we take this error-exit codepath, then we never free the
+> memory allocated by the earlier call to qcrypto_block_get_info().
+
+Fix sent.
+
+Hmm - it would be nice if the QAPI generator could declare all QAPI 
+types as g_autoptr compatible, so we could simplify our cleanup paths to 
+not have to worry about calling qapi_free_FOO() on all paths.  But while 
+the memory leak fix is a one-liner safe for 5.0, switching to g_autoptr 
+is a bigger task that would be 5.1 material.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
