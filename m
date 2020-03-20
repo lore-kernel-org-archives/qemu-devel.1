@@ -2,140 +2,74 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 501B5C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD0CC4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 184AE20739
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:24:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 184AE20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAF9920739
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 09:25:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cDtHJOwd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF9920739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFDsp-0005MR-A0
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 05:24:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52575)
+	id 1jFDua-0007PH-Q5
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 05:25:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53218)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jFDs5-0004vT-Ng
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:23:18 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jFDtY-0005oy-BQ
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jFDs3-0000dH-Id
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:23:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42404)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jFDs3-0000Yf-CC
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:23:15 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02K93R5C150432
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 05:23:14 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu933yv62-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 05:23:14 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 20 Mar 2020 09:23:11 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 20 Mar 2020 09:23:07 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02K9N59A24641936
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 20 Mar 2020 09:23:06 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D25A252052;
- Fri, 20 Mar 2020 09:23:05 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.26.10])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7A2AD5204F;
- Fri, 20 Mar 2020 09:23:04 +0000 (GMT)
-Subject: Re: [PULL 3/4] s390/ipl: sync back loadparm
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200310150947.3510824-1-borntraeger@de.ibm.com>
- <20200310150947.3510824-4-borntraeger@de.ibm.com>
- <CAFEAcA93+BC_N28fCRwPc8YNGW_UhSOE+=A+0Qo3bB9x8zO9qQ@mail.gmail.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Fri, 20 Mar 2020 10:23:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <eric.auger@redhat.com>) id 1jFDtW-0007ee-Qb
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:24:48 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:22551)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jFDtW-0007Ye-L7
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 05:24:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584696285;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=IeMxV+nJyYzaQLc3wwNQ9aEwBnBicqgUTnOCjDW6Sxo=;
+ b=cDtHJOwdBSE+u1up9vDsINoYWQPnaF5lsTsjXGRsYWS1Wk0R0sHsv1EGA7UYj2Nb4NyEy7
+ cer4cZJT2G0Mk97mnh6M4ho9+zBBMFEz2fWrP7tkb4/fs0P0+qpbTXwiXHm4zP7k9AiCyW
+ owaex6uRxBgTGzqSQUvxlEgppl+lmtw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-MnieVj2aM-qS15lDWykShA-1; Fri, 20 Mar 2020 05:24:41 -0400
+X-MC-Unique: MnieVj2aM-qS15lDWykShA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A75451083E80;
+ Fri, 20 Mar 2020 09:24:39 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A84B45C1D8;
+ Fri, 20 Mar 2020 09:24:32 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+Subject: [kvm-unit-tests PATCH v7 00/13] arm/arm64: Add ITS tests
+Date: Fri, 20 Mar 2020 10:24:15 +0100
+Message-Id: <20200320092428.20880-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA93+BC_N28fCRwPc8YNGW_UhSOE+=A+0Qo3bB9x8zO9qQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032009-4275-0000-0000-000003AF9F7C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032009-4276-0000-0000-000038C4D034
-Message-Id: <bcd562a0-272a-57e3-d8b7-fbc19ebc75bb@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-20_02:2020-03-19,
- 2020-03-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 impostorscore=0
- clxscore=1015 spamscore=0 bulkscore=0 phishscore=0 mlxlogscore=950
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003200040
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,72 +81,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Marc Hartmayer <mhartmay@linux.ibm.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
+ thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This series is a revival of an RFC series sent in Dec 2016 [1].
+Given the amount of code and the lack of traction at that time,
+I haven't respinned until now. However a recent bug found related
+to the ITS migration convinced me that this work may deserve to be
+respinned and enhanced.
 
+Tests exercise main ITS commands and also test migration.
+With the migration framework, we are able to trigger the
+migration from guest and that is very practical actually.
 
-On 19.03.20 21:31, Peter Maydell wrote:
-> On Tue, 10 Mar 2020 at 15:09, Christian Borntraeger
-> <borntraeger@de.ibm.com> wrote:
->>
->> From: Halil Pasic <pasic@linux.ibm.com>
->>
->> We expose loadparm as a r/w machine property, but if loadparm is set by
->> the guest via DIAG 308, we don't update the property. Having a
->> disconnect between the guest view and the QEMU property is not nice in
->> itself, but things get even worse for SCSI, where under certain
->> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
->> expected" for details) we call s390_gen_initial_iplb() on resets
->> effectively overwriting the guest/user supplied loadparm with the stale
->> value.
-> 
-> Hi; Coverity points out (CID 1421966) that you have a buffer overrun here:
-> 
->> +static void update_machine_ipl_properties(IplParameterBlock *iplb)
->> +{
->> +    Object *machine = qdev_get_machine();
->> +    Error *err = NULL;
->> +
->> +    /* Sync loadparm */
->> +    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
->> +        uint8_t *ebcdic_loadparm = iplb->loadparm;
->> +        char ascii_loadparm[8];
-> 
-> This array is 8 bytes...
-> 
->> +        int i;
->> +
->> +        for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
->> +            ascii_loadparm[i] = ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
->> +        }
->> +        ascii_loadparm[i] = 0;
-> 
-> ...but you can write 9 bytes into it (8 from the guest-controlled
-> iplb_loadparm buffer plus one for the trailing NUL).
+What is particular with the ITS programming is that most of
+the commands are passed through queues and there is real error
+handling. Invalid commands are just ignored and that is not
+really tester friendly.
 
-Right, so ascii_loadparm needs to be 9 bytes as this needs the trailing 0.
-Halil, can you spin up a fix patch?
+The series can be fount at:
+https://github.com/eauger/kut/tree/its-v7
 
-> 
->> +        object_property_set_str(machine, ascii_loadparm, "loadparm", &err);
->> +    } else {
->> +        object_property_set_str(machine, "", "loadparm", &err);
->> +    }
->> +    if (err) {
->> +        warn_report_err(err);
->> +    }
->> +}
-> 
-> thanks
-> -- PMM
-> 
+Applies on top of arm/queue.
+
+Best Regards
+
+Eric
+
+History:
+v6 -> v7:
+- Fixed issue reported by Drew in its-migrate-unmapped-collection (a coll=
+ection
+  could be allocated twice depending on the SMP value)
+- Integrated changes prepared by Drew
+- Use for_each_present_cpu()
+
+v5 -> v6:
+- Took into account Zenghui's comments, mostly functional: see invidual
+  history logs
+- fix wrong assert!
+
+v4 -> v5:
+- 32b stubs moved back to arm/gic.c
+- some changes reordering
+- minor style issues
+
+v3 -> v4:
+- addressed comments from Drew and Zenghui
+- added "page_alloc: Introduce get_order()"
+- removed "arm: gic: Provide per-IRQ helper functions"
+- ITS files moved to lib64
+- and many more, see individual logs
+
+v2 -> v3:
+- fix 32b compilation
+- take into account Drew's comments (see individual diff logs)
+
+v1 -> v2:
+- took into account Zenghui's comments
+- collect R-b's from Thomas
+
+References:
+[1] [kvm-unit-tests RFC 00/15] arm/arm64: add ITS framework
+    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00575.html
+
+Execution:
+x For other ITS tests:
+  ./run_tests.sh -g its
+
+x non migration tests can be launched invidually. For instance:
+  ./arm-run arm/gic.flat -smp 8 -append 'its-trigger'
+
+x also tests can be compiled in standalone mode with
+  "make standalone" and tests (even migration ones) can also be
+  launched that way, for instance:
+  MAX_SMP=3D4 tests/its-migrate-unmapped-collection
+
+Eric Auger (13):
+  libcflat: Add other size defines
+  page_alloc: Introduce get_order()
+  arm/arm64: gic: Introduce setup_irq() helper
+  arm/arm64: gicv3: Add some re-distributor defines
+  arm/arm64: gicv3: Set the LPI config and pending tables
+  arm/arm64: ITS: Introspection tests
+  arm/arm64: ITS: its_enable_defaults
+  arm/arm64: ITS: Device and collection Initialization
+  arm/arm64: ITS: Commands
+  arm/arm64: ITS: INT functional tests
+  arm/run: Allow Migration tests
+  arm/arm64: ITS: migration tests
+  arm/arm64: ITS: pending table migration test
+
+ arm/Makefile.arm64         |   1 +
+ arm/Makefile.common        |   2 +-
+ arm/gic.c                  | 460 ++++++++++++++++++++++++++++++++++--
+ arm/run                    |   2 +-
+ arm/unittests.cfg          |  38 +++
+ lib/alloc_page.c           |   7 +-
+ lib/alloc_page.h           |   1 +
+ lib/arm/asm/gic-v3-its.h   |  27 +++
+ lib/arm/asm/gic-v3.h       |  29 +++
+ lib/arm/asm/gic.h          |   1 +
+ lib/arm/asm/processor.h    |   2 +
+ lib/arm/gic-v3.c           |  78 +++++++
+ lib/arm/gic.c              |  40 +++-
+ lib/arm/io.c               |  28 +++
+ lib/arm64/asm/gic-v3-its.h | 174 ++++++++++++++
+ lib/arm64/gic-v3-its-cmd.c | 463 +++++++++++++++++++++++++++++++++++++
+ lib/arm64/gic-v3-its.c     | 171 ++++++++++++++
+ lib/libcflat.h             |   3 +
+ 18 files changed, 1496 insertions(+), 31 deletions(-)
+ create mode 100644 lib/arm/asm/gic-v3-its.h
+ create mode 100644 lib/arm64/asm/gic-v3-its.h
+ create mode 100644 lib/arm64/gic-v3-its-cmd.c
+ create mode 100644 lib/arm64/gic-v3-its.c
+
+--=20
+2.20.1
 
 
