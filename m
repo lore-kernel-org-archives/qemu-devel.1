@@ -2,86 +2,84 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DB8C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 23:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5692EC4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 23:57:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37DE52072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 23:25:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37DE52072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id F419B2072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 23:57:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RlDKznA+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F419B2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFR0f-0005Mx-8Q
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 19:25:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60693)
+	id 1jFRWN-0003PG-45
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 19:57:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farosas@linux.ibm.com>) id 1jFR02-0004qO-6m
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 19:24:23 -0400
+ (envelope-from <yuanzi@google.com>) id 1jFRVj-00030T-I7
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 19:57:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farosas@linux.ibm.com>) id 1jFR00-000799-Or
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 19:24:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43772)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
- id 1jFQzx-00077M-D7; Fri, 20 Mar 2020 19:24:17 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02KN2Mda107903; Fri, 20 Mar 2020 19:24:02 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yu71cs4ht-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 20 Mar 2020 19:24:01 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02KNMoSU030826;
- Fri, 20 Mar 2020 23:24:01 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma02dal.us.ibm.com with ESMTP id 2yrpw7gse6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 20 Mar 2020 23:24:01 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02KNO0dB53150152
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 20 Mar 2020 23:24:00 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4B858AE05F;
- Fri, 20 Mar 2020 23:24:00 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7609FAE05C;
- Fri, 20 Mar 2020 23:23:58 +0000 (GMT)
-Received: from farosas.linux.ibm.com.ibmuc.com (unknown [9.85.141.34])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri, 20 Mar 2020 23:23:58 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH] target/ppc: Add capability for enabling secure guests
-Date: Fri, 20 Mar 2020 20:23:53 -0300
-Message-Id: <20200320232353.1022066-1-farosas@linux.ibm.com>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <yuanzi@google.com>) id 1jFRVh-0007Bj-Lb
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 19:57:07 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45616)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuanzi@google.com>) id 1jFRVh-0007AU-E2
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 19:57:05 -0400
+Received: by mail-oi1-x244.google.com with SMTP id 9so8405258oiq.12
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 16:57:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/Prq1DTsYQjUead4PM+Qk5dnZe6+G68fmb097N6nWcQ=;
+ b=RlDKznA+8M46v4P+6xIzIj2HsSpHaqYsLwgS2zIGJzGkgYClYEyT5QCIMd+LTvD5+b
+ +yd3t8MjLKnU0ajMxCAaNaRkhzDT7GpbTAwEptVim91HLTKEiYFF6jYsju3IeMbTyMX3
+ 87C/webDuptW7VIPbl4/IKrsoiMAIaoHoARPVDBajRier95qBw9tID1LiI9+QPuwvPev
+ Jut4lvb4WXD3QiOwxJvBIHahlfgP7Vo0aes73avKejdX3LuBlt1m9yOXK0iKVNIJ/ZwF
+ PG6jbsWHg2026aDchGDy3cZFsG+StOrEOS0cC1C+Xy4dRRqhKkNrQNS2go4QBs62PAPR
+ FFwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/Prq1DTsYQjUead4PM+Qk5dnZe6+G68fmb097N6nWcQ=;
+ b=UyDJJfVV43NoQQ/pbCqnr2urK0bryHoJPGAuvB0DFRtz0RZ2ghPctI2+PBUpPSMnJv
+ YPhxPKawiUV4QToXwCBSS/WrVz1j7iEOyNtA5glz2bjkHR9z073VjYy9QxoIdr+iYdRC
+ 2+5jJ4zbVZ/wZmnXT2HWsusBHxY1j3JlWWv8872pVXMronYIbrT2P91nq8In5hZTo1Ri
+ w4Udm7T429mpvMdmfv35o8q245GJbh3pjBSbcAKxJICncuSi59/ZDDlwpEyZTCtpFVee
+ Pwyr2JAgNBqAOg7S4NMCcotGztHQtI4JTKVYkN6CyVTNh9BIAIslmx43ChtHX2jYo/Rx
+ oZ3g==
+X-Gm-Message-State: ANhLgQ0wefzyj0aeaqLdMlFNuBRkFVBdlhPw34C+L6MorGdzn8d6l40q
+ a/uFCq110rSah9y7aR14Ad/KcdXiksZlPmJsK1zbEw==
+X-Google-Smtp-Source: ADFU+vvt91jQc6rWvprfqIXlFiuFIwG7zCXtVkEh3uqZh16H1aPZnHvfdKsgdI67d5kmPM0Y9B3ovy6pGq5xWvIzIFY=
+X-Received: by 2002:a05:6808:8:: with SMTP id u8mr8498971oic.37.1584748623730; 
+ Fri, 20 Mar 2020 16:57:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-20_08:2020-03-20,
- 2020-03-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0
- lowpriorityscore=0 malwarescore=0 impostorscore=0 mlxscore=0 phishscore=0
- priorityscore=1501 adultscore=0 clxscore=1011 bulkscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003200088
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+References: <20200307010051.97022-1-yuanzi@google.com>
+ <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
+ <87imizidwc.fsf@linaro.org>
+In-Reply-To: <87imizidwc.fsf@linaro.org>
+From: Lirong Yuan <yuanzi@google.com>
+Date: Fri, 20 Mar 2020 16:56:52 -0700
+Message-ID: <CADjx4CJJdQep+K3ibfhjin7Eo6uCEFGQ6R6yVC0OcNo8MsfvJw@mail.gmail.com>
+Subject: Re: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, 
+ Shu-Chun Weng <scw@google.com>, Josh Kunz <jkz@google.com>
+Content-Type: multipart/alternative; boundary="000000000000c6fce005a1520a2b"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,199 +91,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Mackerras <paulus@ozlabs.org>, Ram Pai <linuxram@us.ibm.com>,
- qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Making use of ppc's Protected Execution Facility (PEF) feature, a
-guest can become a secure guest (aka. secure VM - SVM) and have its
-memory protected from access by the host. This feature is mediated by
-a piece of firmware called the Ultravisor (UV).
+--000000000000c6fce005a1520a2b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The transition from a regular to a secure VM is initiated by the guest
-kernel during prom_init via the use of an ultracall (enter secure mode
-- UV_ESM) and with cooperation from the hypervisor via an hcall
-(H_SVM_INIT_START).
+On Fri, Mar 20, 2020 at 2:17 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 
-Currently QEMU has no knowledge of this process and no way to
-determine if a host supports the feature. A guest with PEF support
-enabled would always try to enter secure mode regardless of user
-intent or hardware support.
-
-To address the above, a new KVM capability (KVM_CAP_PPC_SECURE_GUEST
-[1]) is being introduced in the kernel without which KVM will block
-the secure transition.
-
-This patch adds support for checking/enabling this KVM capability via
-a new spapr capability (SPAPR_CAP_SECURE_GUEST) and the equivalent
-command line switch (-machine pseries,cap-svm). The capability
-defaults to off.
-
-1- https://lore.kernel.org/kvm/20200319043301.GA13052@blackberry
-
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
-
-I have implemented this to be able to test Paul's patch. I'm sending
-it as RFC in case it helps anyone else and if we decide to go in this
-direction I can develop it further.
-
-PS: TCG currently gets in a loop of 0x700 due to the lack of 'sc 2'
-emulation - and all the rest of PEF, of course =).
-
----
- hw/ppc/spapr.c         |  1 +
- hw/ppc/spapr_caps.c    | 30 ++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  3 ++-
- target/ppc/kvm.c       | 12 ++++++++++++
- target/ppc/kvm_ppc.h   | 12 ++++++++++++
- 5 files changed, 57 insertions(+), 1 deletion(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9a2bd501aa..a881ac4e29 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4542,6 +4542,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_FWNMI] = SPAPR_CAP_ON;
-+    smc->default_caps.caps[SPAPR_CAP_SECURE_GUEST] = SPAPR_CAP_OFF;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq = &spapr_irq_dual;
-     smc->dr_phb_enabled = true;
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 679ae7959f..375b7e0b30 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -524,6 +524,27 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
-     }
- }
-
-+static void cap_secure_guest_apply(SpaprMachineState *spapr,
-+                                   uint8_t val, Error **errp)
-+{
-+    if (!val) {
-+        /* capability disabled by default */
-+        return;
-+    }
+>
+> Lirong Yuan <yuanzi@google.com> writes:
+>
+> > On Fri, Mar 6, 2020 at 5:01 PM Lirong Yuan <yuanzi@google.com> wrote:
+> >
+> >> This allows gdb to access the target=E2=80=99s auxiliary vector,
+> >> which can be helpful for telling system libraries important details
+> >> about the hardware, operating system, and process.
+> >>
+> >> Signed-off-by: Lirong Yuan <yuanzi@google.com>
+> >> ---
+> >>  gdbstub.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
 +
-+    if (!kvm_enabled()) {
-+        error_setg(errp, "No PEF support in tcg, try cap-svm=off");
-+        return;
-+    }
-+
-+    if (!kvmppc_has_cap_secure_guest()) {
-+        error_setg(errp, "KVM implementation does not support secure guests, "
-+                   "try cap-svm=off");
-+    } else if (kvmppc_enable_cap_secure_guest() < 0) {
-+        error_setg(errp, "Error enabling cap-svm, try cap-svm=off");
-+    }
-+}
-+
- SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-     [SPAPR_CAP_HTM] = {
-         .name = "htm",
-@@ -632,6 +653,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .type = "bool",
-         .apply = cap_fwnmi_apply,
-     },
-+    [SPAPR_CAP_SECURE_GUEST] = {
-+        .name = "svm",
-+        .description = "Allow the guest to become a Secure Guest",
-+        .index = SPAPR_CAP_SECURE_GUEST,
-+        .get = spapr_cap_get_bool,
-+        .set = spapr_cap_set_bool,
-+        .type = "bool",
-+        .apply = cap_secure_guest_apply,
-+    },
- };
+> >>  1 file changed, 55 insertions(+)
+> >>
+> >> diff --git a/gdbstub.c b/gdbstub.c
+> >> index 22a2d630cd..a946af7007 100644
+> >> --- a/gdbstub.c
+> >> +++ b/gdbstub.c
+> >> @@ -2105,6 +2105,12 @@ static void handle_query_supported(GdbCmdContex=
+t
+> >> *gdb_ctx, void *user_ctx)
+> >>          pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
+> >>                  ";qXfer:features:read+");
+> >>      }
+> >> +#ifdef CONFIG_USER_ONLY
+> >> +    if (gdb_ctx->s->c_cpu->opaque) {
+> >> +        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
+> >> +                ";qXfer:auxv:read+");
+> >> +    }
+> >> +#endif
+> >>
+> >>      if (gdb_ctx->num_params &&
+> >>          strstr(gdb_ctx->params[0].data, "multiprocess+")) {
+> >> @@ -2166,6 +2172,47 @@ static void
+> >> handle_query_xfer_features(GdbCmdContext *gdb_ctx, void *user_ctx)
+> >>      put_packet_binary(gdb_ctx->s, gdb_ctx->str_buf, len + 1, true);
+> >>  }
+> >>
+> >> +#ifdef CONFIG_USER_ONLY
+> >> +static void handle_query_xfer_auxv(GdbCmdContext *gdb_ctx, void
+> *user_ctx)
+> >> +{
+> >> +    TaskState *ts;
+> >> +    unsigned long offset, len, saved_auxv, auxv_len;
+> >> +    const char *mem;
+> >> +
+> >> +    if (gdb_ctx->num_params < 2) {
+> >> +        put_packet(gdb_ctx->s, "E22");
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    offset =3D gdb_ctx->params[0].val_ul;
+> >> +    len =3D gdb_ctx->params[1].val_ul;
+> >> +
+> >> +    ts =3D gdb_ctx->s->c_cpu->opaque;
+> >> +    saved_auxv =3D ts->info->saved_auxv;
+> >> +    auxv_len =3D ts->info->auxv_len;
+> >> +    mem =3D (const char *)(saved_auxv + offset);
+> >> +
+> >> +    if (offset >=3D auxv_len) {
+> >> +        put_packet(gdb_ctx->s, "E22");
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (len > (MAX_PACKET_LENGTH - 5) / 2) {
+> >> +        len =3D (MAX_PACKET_LENGTH - 5) / 2;
+> >> +    }
+> >> +
+> >> +    if (len < auxv_len - offset) {
+> >> +        gdb_ctx->str_buf[0] =3D 'm';
+> >> +        len =3D memtox(gdb_ctx->str_buf + 1, mem, len);
+> >> +    } else {
+> >> +        gdb_ctx->str_buf[0] =3D 'l';
+> >> +        len =3D memtox(gdb_ctx->str_buf + 1, mem, auxv_len - offset);
+> >> +    }
+> >> +
+> >> +    put_packet_binary(gdb_ctx->s, gdb_ctx->str_buf, len + 1, true);
+> >> +}
+> >> +#endif
+> >> +
+> >>  static void handle_query_attached(GdbCmdContext *gdb_ctx, void
+> *user_ctx)
+> >>  {
+> >>      put_packet(gdb_ctx->s, GDB_ATTACHED);
+> >> @@ -2271,6 +2318,14 @@ static GdbCmdParseEntry gdb_gen_query_table[] =
+=3D {
+> >>          .cmd_startswith =3D 1,
+> >>          .schema =3D "s:l,l0"
+> >>      },
+> >> +#ifdef CONFIG_USER_ONLY
+> >> +    {
+> >> +        .handler =3D handle_query_xfer_auxv,
+> >> +        .cmd =3D "Xfer:auxv:read:",
+> >> +        .cmd_startswith =3D 1,
+> >> +        .schema =3D "l,l0"
+> >> +    },
+> >> +#endif
+> >>      {
+> >>          .handler =3D handle_query_attached,
+> >>          .cmd =3D "Attached:",
+> >> --
+> >> 2.25.1.481.gfbce0eb801-goog
+> >>
+> >>
+> > Friendly ping~
+>
+> Sorry I missed this on my radar. There was a minor re-factor of gdbstub
+> that was just merged which will mean this patch needs a re-base to use
+> g_string_* functions to expand stings.
+>
+> Also we have some simple gdbstub tests now - could we come up with a
+> multiarch gdbstub test to verify this is working properly?
+>
+> >
+> > Link to the patchwork page:
+> > http://patchwork.ozlabs.org/patch/1250727/
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
 
- static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 42d64a0368..7f5289782d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -81,8 +81,9 @@ typedef enum {
- #define SPAPR_CAP_CCF_ASSIST            0x09
- /* Implements PAPR FWNMI option */
- #define SPAPR_CAP_FWNMI                 0x0A
-+#define SPAPR_CAP_SECURE_GUEST          0x0B
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_SECURE_GUEST + 1)
+Hi Alex,
 
- /*
-  * Capability Values
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 597f72be1b..9254749cd7 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -88,6 +88,7 @@ static int cap_ppc_safe_indirect_branch;
- static int cap_ppc_count_cache_flush_assist;
- static int cap_ppc_nested_kvm_hv;
- static int cap_large_decr;
-+static int cap_ppc_secure_guest;
+For sure, I will re-base this patch to use g_string_* functions.
 
- static uint32_t debug_inst_opcode;
+Currently we are using qemu aarch64. I am not sure how to do this yet, but
+I could try to add something to
+https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbstub
 
-@@ -135,6 +136,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
-     kvmppc_get_cpu_characteristics(s);
-     cap_ppc_nested_kvm_hv = kvm_vm_check_extension(s, KVM_CAP_PPC_NESTED_HV);
-+    cap_ppc_secure_guest = kvm_vm_check_extension(s, KVM_CAP_PPC_SECURE_GUEST);
-     cap_large_decr = kvmppc_get_dec_bits();
-     /*
-      * Note: setting it to false because there is not such capability
-@@ -2532,6 +2534,16 @@ int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable)
-     return 0;
- }
+Does this sound good?
 
-+bool kvmppc_has_cap_secure_guest(void)
-+{
-+    return !!cap_ppc_secure_guest;
-+}
-+
-+int kvmppc_enable_cap_secure_guest(void)
-+{
-+    return kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GUEST, 0, 1);
-+}
-+
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
- {
-     uint32_t host_pvr = mfpvr();
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 332fa0aa1c..a9a3aa67c6 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -72,6 +72,8 @@ int kvmppc_set_cap_nested_kvm_hv(int enable);
- int kvmppc_get_cap_large_decr(void);
- int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable);
- int kvmppc_enable_hwrng(void);
-+bool kvmppc_has_cap_secure_guest(void);
-+int kvmppc_enable_cap_secure_guest(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
- void kvmppc_check_papr_resize_hpt(Error **errp);
-@@ -380,6 +382,16 @@ static inline int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable)
-     return -1;
- }
+Thanks!
+Lirong
 
-+static inline bool kvmppc_has_cap_secure_guest(void)
-+{
-+    return false;
-+}
-+
-+static inline int kvmppc_enable_cap_secure_guest(void)
-+{
-+    return -1;
-+}
-+
- static inline int kvmppc_enable_hwrng(void)
- {
-     return -1;
---
-2.23.0
+--000000000000c6fce005a1520a2b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><div><div dir=3D"ltr" data-smartmail=3D"g=
+mail_signature"><div dir=3D"ltr"><div><br></div></div></div></div></div><di=
+v class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Mar 2=
+0, 2020 at 2:17 AM Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linar=
+o.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt; wrote:<br></div><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
+t:1px solid rgb(204,204,204);padding-left:1ex"><br>
+Lirong Yuan &lt;<a href=3D"mailto:yuanzi@google.com" target=3D"_blank">yuan=
+zi@google.com</a>&gt; writes:<br>
+<br>
+&gt; On Fri, Mar 6, 2020 at 5:01 PM Lirong Yuan &lt;<a href=3D"mailto:yuanz=
+i@google.com" target=3D"_blank">yuanzi@google.com</a>&gt; wrote:<br>
+&gt;<br>
+&gt;&gt; This allows gdb to access the target=E2=80=99s auxiliary vector,<b=
+r>
+&gt;&gt; which can be helpful for telling system libraries important detail=
+s<br>
+&gt;&gt; about the hardware, operating system, and process.<br>
+&gt;&gt;<br>
+&gt;&gt; Signed-off-by: Lirong Yuan &lt;<a href=3D"mailto:yuanzi@google.com=
+" target=3D"_blank">yuanzi@google.com</a>&gt;<br>
+&gt;&gt; ---<br>
+&gt;&gt;=C2=A0 gdbstub.c | 55 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++++++<br>
+&gt;&gt;=C2=A0 1 file changed, 55 insertions(+)<br>
+&gt;&gt;<br>
+&gt;&gt; diff --git a/gdbstub.c b/gdbstub.c<br>
+&gt;&gt; index 22a2d630cd..a946af7007 100644<br>
+&gt;&gt; --- a/gdbstub.c<br>
+&gt;&gt; +++ b/gdbstub.c<br>
+&gt;&gt; @@ -2105,6 +2105,12 @@ static void handle_query_supported(GdbCmdCo=
+ntext<br>
+&gt;&gt; *gdb_ctx, void *user_ctx)<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pstrcat(gdb_ctx-&gt;str_buf, siz=
+eof(gdb_ctx-&gt;str_buf),<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quo=
+t;;qXfer:features:read+&quot;);<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;&gt; +#ifdef CONFIG_USER_ONLY<br>
+&gt;&gt; +=C2=A0 =C2=A0 if (gdb_ctx-&gt;s-&gt;c_cpu-&gt;opaque) {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 pstrcat(gdb_ctx-&gt;str_buf, sizeof(g=
+db_ctx-&gt;str_buf),<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;;qX=
+fer:auxv:read+&quot;);<br>
+&gt;&gt; +=C2=A0 =C2=A0 }<br>
+&gt;&gt; +#endif<br>
+&gt;&gt;<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 if (gdb_ctx-&gt;num_params &amp;&amp;<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 strstr(gdb_ctx-&gt;params[0].dat=
+a, &quot;multiprocess+&quot;)) {<br>
+&gt;&gt; @@ -2166,6 +2172,47 @@ static void<br>
+&gt;&gt; handle_query_xfer_features(GdbCmdContext *gdb_ctx, void *user_ctx)=
+<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 put_packet_binary(gdb_ctx-&gt;s, gdb_ctx-&gt;s=
+tr_buf, len + 1, true);<br>
+&gt;&gt;=C2=A0 }<br>
+&gt;&gt;<br>
+&gt;&gt; +#ifdef CONFIG_USER_ONLY<br>
+&gt;&gt; +static void handle_query_xfer_auxv(GdbCmdContext *gdb_ctx, void *=
+user_ctx)<br>
+&gt;&gt; +{<br>
+&gt;&gt; +=C2=A0 =C2=A0 TaskState *ts;<br>
+&gt;&gt; +=C2=A0 =C2=A0 unsigned long offset, len, saved_auxv, auxv_len;<br=
+>
+&gt;&gt; +=C2=A0 =C2=A0 const char *mem;<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 if (gdb_ctx-&gt;num_params &lt; 2) {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 put_packet(gdb_ctx-&gt;s, &quot;E22&q=
+uot;);<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt;&gt; +=C2=A0 =C2=A0 }<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 offset =3D gdb_ctx-&gt;params[0].val_ul;<br>
+&gt;&gt; +=C2=A0 =C2=A0 len =3D gdb_ctx-&gt;params[1].val_ul;<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 ts =3D gdb_ctx-&gt;s-&gt;c_cpu-&gt;opaque;<br>
+&gt;&gt; +=C2=A0 =C2=A0 saved_auxv =3D ts-&gt;info-&gt;saved_auxv;<br>
+&gt;&gt; +=C2=A0 =C2=A0 auxv_len =3D ts-&gt;info-&gt;auxv_len;<br>
+&gt;&gt; +=C2=A0 =C2=A0 mem =3D (const char *)(saved_auxv + offset);<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 if (offset &gt;=3D auxv_len) {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 put_packet(gdb_ctx-&gt;s, &quot;E22&q=
+uot;);<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt;&gt; +=C2=A0 =C2=A0 }<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 if (len &gt; (MAX_PACKET_LENGTH - 5) / 2) {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 len =3D (MAX_PACKET_LENGTH - 5) / 2;<=
+br>
+&gt;&gt; +=C2=A0 =C2=A0 }<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 if (len &lt; auxv_len - offset) {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 gdb_ctx-&gt;str_buf[0] =3D &#39;m&#39=
+;;<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 len =3D memtox(gdb_ctx-&gt;str_buf + =
+1, mem, len);<br>
+&gt;&gt; +=C2=A0 =C2=A0 } else {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 gdb_ctx-&gt;str_buf[0] =3D &#39;l&#39=
+;;<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 len =3D memtox(gdb_ctx-&gt;str_buf + =
+1, mem, auxv_len - offset);<br>
+&gt;&gt; +=C2=A0 =C2=A0 }<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 put_packet_binary(gdb_ctx-&gt;s, gdb_ctx-&gt;str_bu=
+f, len + 1, true);<br>
+&gt;&gt; +}<br>
+&gt;&gt; +#endif<br>
+&gt;&gt; +<br>
+&gt;&gt;=C2=A0 static void handle_query_attached(GdbCmdContext *gdb_ctx, vo=
+id *user_ctx)<br>
+&gt;&gt;=C2=A0 {<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 put_packet(gdb_ctx-&gt;s, GDB_ATTACHED);<br>
+&gt;&gt; @@ -2271,6 +2318,14 @@ static GdbCmdParseEntry gdb_gen_query_table=
+[] =3D {<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .cmd_startswith =3D 1,<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .schema =3D &quot;s:l,l0&quot;<b=
+r>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 },<br>
+&gt;&gt; +#ifdef CONFIG_USER_ONLY<br>
+&gt;&gt; +=C2=A0 =C2=A0 {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .handler =3D handle_query_xfer_auxv,<=
+br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .cmd =3D &quot;Xfer:auxv:read:&quot;,=
+<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .cmd_startswith =3D 1,<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .schema =3D &quot;l,l0&quot;<br>
+&gt;&gt; +=C2=A0 =C2=A0 },<br>
+&gt;&gt; +#endif<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 {<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .handler =3D handle_query_attach=
+ed,<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .cmd =3D &quot;Attached:&quot;,<=
+br>
+&gt;&gt; --<br>
+&gt;&gt; 2.25.1.481.gfbce0eb801-goog<br>
+&gt;&gt;<br>
+&gt;&gt;<br>
+&gt; Friendly ping~<br>
+<br>
+Sorry I missed this on my radar. There was a minor re-factor of gdbstub<br>
+that was just merged which will mean this patch needs a re-base to use<br>
+g_string_* functions to expand stings.<br>
+<br>
+Also we have some simple gdbstub tests now - could we come up with a<br>
+multiarch gdbstub test to verify this is working properly?<br>
+<br>
+&gt;<br>
+&gt; Link to the patchwork page:<br>
+&gt; <a href=3D"http://patchwork.ozlabs.org/patch/1250727/" rel=3D"noreferr=
+er" target=3D"_blank">http://patchwork.ozlabs.org/patch/1250727/</a><br>
+<br>
+<br>
+-- <br>
+Alex Benn=C3=A9e<br></blockquote><div><br></div><div>Hi Alex,</div><div><br=
+></div><div>For sure, I will re-base this patch to use g_string_* functions=
+.</div><div><br></div><div>Currently we are using qemu aarch64. I am not su=
+re how to do this yet, but I could try to add something to=C2=A0</div><div>=
+<a href=3D"https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbst=
+ub" target=3D"_blank">https://github.com/qemu/qemu/tree/master/tests/tcg/aa=
+rch64/gdbstub</a></div><div><br></div><div>Does this sound good?</div><div>=
+<br></div><div>Thanks!</div><div>Lirong</div><div><br></div></div></div>
+
+--000000000000c6fce005a1520a2b--
 
