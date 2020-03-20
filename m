@@ -2,81 +2,82 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03004C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15736C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:39:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3C0520722
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1E4F20722
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:39:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TcATmRpS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3C0520722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RDz/oGYT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1E4F20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFLVB-0008K5-VM
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 13:32:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33081)
+	id 1jFLc1-0001sm-05
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 13:39:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jFLUX-0007rT-Uf
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:31:31 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFLbO-0001MW-99
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jFLUW-0004gC-KU
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:31:29 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45686)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jFLUW-0004g2-GG
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:31:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584725488;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Pdpcs61L7/cTOAYvGjRtlCy0cu0eGvmYZXKlkPtHfRE=;
- b=TcATmRpSESztkNmeyKw86v9HO63lHzf+sg+KeBIsxeW2/bulz1aGwG44w7NxJNGrYy/sdF
- DzQEuMPlCnSyIquZHk4qowsEY6ch6jPyFCS0THzS5dpKYgWs3zMpubTKs0lc7Qaf1Cqztd
- ZUXrRChTGnvcyMUfAM1yza6CzC5LXpg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-GXkMCYbBN6q1qkQhmkDWhA-1; Fri, 20 Mar 2020 13:31:26 -0400
-X-MC-Unique: GXkMCYbBN6q1qkQhmkDWhA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A5781085983;
- Fri, 20 Mar 2020 17:31:25 +0000 (UTC)
-Received: from work-vm (ovpn-114-236.ams2.redhat.com [10.36.114.236])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E1F6160C84;
- Fri, 20 Mar 2020 17:31:19 +0000 (UTC)
-Date: Fri, 20 Mar 2020 17:31:17 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, berrange@redhat.com
-Subject: Re: [PATCH] monitor/hmp-cmds: fix bad indentation in 'info
- migrate_parameters' cmd output
-Message-ID: <20200320173117.GE3464@work-vm>
-References: <20200320130013.418557-1-maozhongyi@cmss.chinamobile.com>
- <878sjv11xm.fsf@dusky.pond.sub.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1jFLbM-00020T-QA
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:38:33 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46655)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jFLbM-0001tL-8p
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:38:32 -0400
+Received: by mail-ot1-x343.google.com with SMTP id 111so6728097oth.13
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 10:38:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=zmXwn7ThyhUxdiDoi/tLEV8N4jVj8zB0ymt3kzhW+bw=;
+ b=RDz/oGYTrArMCGlNNgYhUZaXNJdlm1UfThuj4kglYjq/JhMaKQ0lRUSgnxo8sHXhFD
+ /6ac/Ba5qVEiqJxuVfPWYeUFha8XOph3rQ2OrVMmv0C83kSIt0Zj7+p1mb30v2K/yjph
+ 0f+5n/N6ORCocnx8jFpPC1GR6tOzE8fd/L/9LnFneGyk2Br/2xiLWDGFXkMUc3xXy+YP
+ skcnVdcFpo65MnBfqxHOsMSyJMw03QREC8lJ9bYl1ym/uXdzccYh2YTml1gvnMPxQX65
+ 9ZHmmOJGlkB0gH2f16FkXbLbEzc06LhFzNMG0y2Qx/wVeu31sWghWR8F3GZx/Yxp28Zd
+ LkbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zmXwn7ThyhUxdiDoi/tLEV8N4jVj8zB0ymt3kzhW+bw=;
+ b=WnFKIRKsgtbXE1qpv+mXpIgvP8vMROU9PgmJH+5yp4KdVoNCZ2AnV+YAIY7cu/b40W
+ rQCyMvNuE6UQbwtiWxANtY3deDPhMeDX4nQtDyqVGA9XcLSW7D83z4HZqfpSpzBq3ARd
+ dFtTP9EV90zZdNwsoety7vXnwzg1dz1gRcatVo7AQGe/WZ+fQsV3cNTmm/hcsqo8991a
+ Ein3LDo6CdebXErycrEhMFE2JaofqXCqvy5xltORGEpduVdlIpGyMqxO2GgAH6wwewh/
+ LY9ieT6pqWJLnTR3rxtyN45LKhxA0gDsmoUumlmnzRMEdD/ACOTpaCNjsGsQ40GlBJoB
+ ARpw==
+X-Gm-Message-State: ANhLgQ1st0cmaBT5cVHVUFL7wyj3jx5/5uQ1iaxSqYYcDlbxTBZolULS
+ WylOZ7k84I03wzK24Wb8zM2zN0pyWlA4ZybLaNm6eg==
+X-Google-Smtp-Source: ADFU+vvNKFpnJixdjefii6XPn27n+qmTM858prFRTvzTcFq7IlKCd46NwnM8ED6rDH9VNcMfmrv+CLaJRQtqnIfLpHE=
+X-Received: by 2002:a9d:1920:: with SMTP id j32mr7354841ota.221.1584725910985; 
+ Fri, 20 Mar 2020 10:38:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <878sjv11xm.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
+ <20200203061123.59150-7-david@gibson.dropbear.id.au>
+In-Reply-To: <20200203061123.59150-7-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Mar 2020 17:38:19 +0000
+Message-ID: <CAFEAcA-xQTrC1b=dkdvd0F3NFU26CBjfZKuo76qfH0UKy=+mAQ@mail.gmail.com>
+Subject: Re: [PULL 06/35] spapr: Fail CAS if option vector table cannot be
+ parsed
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,142 +89,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-(Rearranging the text a bit)
+On Mon, 3 Feb 2020 at 06:11, David Gibson <david@gibson.dropbear.id.au> wro=
+te:
+>
+> From: Greg Kurz <groug@kaod.org>
+>
+> Most of the option vector helpers have assertions to check their
+> arguments aren't null. The guest can provide an arbitrary address
+> for the CAS structure that would result in such null arguments.
+> Fail CAS with H_PARAMETER and print a warning instead of aborting
+> QEMU.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Message-Id: <157925255250.397143.10855183619366882459.stgit@bahia.lan>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_hcall.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 
-* Markus Armbruster (armbru@redhat.com) wrote:
+Hi; Coverity points out that this change introduces a
+memory leak (CID 1421924):
 
-> David (cc'ed) should be able to tell us which fix is right.
->=20
-> @tls_creds and @tls_hostname look like they could have the same issue.
+>
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index f1799b1b70..ffb14641f9 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1703,7 +1703,15 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>      ov_table =3D addr;
+>
+>      ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
 
-A certain Markus removed the Null checks in 8cc99dc because 4af245d
-guaranteed they would be None-Null for tls-creds/hostname - so we
-should be OK for those.
+spapr_ovec_parse_vector() allocates memory...
 
-But tls-authz came along a lot later in d2f1d29 and doesn't
-seem to have the initialisation, which is now in
-migration_instance_init.
+> +    if (!ov1_guest) {
+> +        warn_report("guest didn't provide option vector 1");
+> +        return H_PARAMETER;
+> +    }
+>      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
+> +    if (!ov5_guest) {
+> +        warn_report("guest didn't provide option vector 5");
+> +        return H_PARAMETER;
 
-So I *think* the fix for this is to do the modern equivalent of 4af245d
-:
+...but if we take this early exit code path it is never freed
+(via spapr_ovec_cleanup()).
 
-diff --git a/migration/migration.c b/migration/migration.c
-index c1d88ace7f..0bc1b93277 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3686,6 +3686,7 @@ static void migration_instance_init(Object *obj)
-=20
-     params->tls_hostname =3D g_strdup("");
-     params->tls_creds =3D g_strdup("");
-+    params->tls_authz =3D g_strdup("");
-=20
-     /* Set has_* up only for parameter checks */
-     params->has_compress_level =3D true;
+> +    }
+>      if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
+>          error_report("guest requested hash and radix MMU, which is inval=
+id.");
+>          exit(EXIT_FAILURE);
 
-Copying in Dan to check that wouldn't break tls.
+All the other error paths in the function either precede
+allocation of the vectors or just call exit() rather than
+returning, so this is the only leak.
 
-Dave
-
-> Mao Zhongyi <maozhongyi@cmss.chinamobile.com> writes:
->=20
-> > run:
-> > (qemu) info migrate_parameters
-> > announce-initial: 50 ms
-> > ...
-> > announce-max: 550 ms
-> > multifd-compression: none
-> > xbzrle-cache-size: 4194304
-> > max-postcopy-bandwidth: 0
-> >  tls-authz: '(null)'
-> >
-> > The last line seems a bit out of place, fix it.
->=20
-> Yes, indentation is off, and your patch fixes that.  But there's also
-> the '(null)', which emanates a certain bug smell.  Let's have a look at
-> the code:
->=20
-> > Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-> > ---
-> >  monitor/hmp-cmds.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> > index 58724031ea..f8be6bbb16 100644
-> > --- a/monitor/hmp-cmds.c
-> > +++ b/monitor/hmp-cmds.c
-> > @@ -459,7 +459,7 @@ void hmp_info_migrate_parameters(Monitor *mon, cons=
-t QDict *qdict)
->    void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->    {
->        MigrationParameters *params;
->=20
->        params =3D qmp_query_migrate_parameters(NULL);
->=20
->        if (params) {
->            [...]
-> >          monitor_printf(mon, "%s: %" PRIu64 "\n",
-> >              MigrationParameter_str(MIGRATION_PARAMETER_MAX_POSTCOPY_BA=
-NDWIDTH),
-> >              params->max_postcopy_bandwidth);
-> > -        monitor_printf(mon, " %s: '%s'\n",
-> > +        monitor_printf(mon, "%s: '%s'\n",
-> >              MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
-> >              params->has_tls_authz ? params->tls_authz : "");
-> >      }
->=20
-> Here, params->tls_authz is null even though params->has_tls_authz is
-> true.
->=20
-> GNU Libc is nice enough not to crash when you attempt to print a null
-> pointer, but other libcs are not.
->=20
-> Where does the null pointer come from?
->=20
->    MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->    {
->        MigrationParameters *params;
->        MigrationState *s =3D migrate_get_current();
->=20
->        /* TODO use QAPI_CLONE() instead of duplicating it inline */
->        params =3D g_malloc0(sizeof(*params));
->        [...]
-> --->   params->has_tls_authz =3D true;
-> --->   params->tls_authz =3D g_strdup(s->parameters.tls_authz);
->        [...]
->=20
->        return params;
->    }
->=20
-> Note we ignore s->parameters.has_tls_authz.
->=20
-> If @tls_authz is should be present in params exactly when it is present
-> in s->params, we should do this:
->=20
->        params->has_tls_authz =3D s->parameters.has_tls_authz;
->        params->tls_authz =3D g_strdup(s->parameters.tls_authz);
->=20
-> If @tls_authz is should be present exactly when it's not null, we should
-> do this:
->=20
->        params->has_tls_authz =3D !!s->parameters.tls_authz;
->        params->tls_authz =3D g_strdup(s->parameters.tls_authz);
->=20
-> If @tls_authz should always be present, we need to substitute the null
-> pointer by a suitable string, like this:
->=20
->        params->has_tls_authz =3D true;
->        params->tls_authz =3D s->parameters.tls_authz
->            ? g_strdup(s->parameters.tls_authz) : "";
->=20
-> The /* TODO use QAPI_CLONE() instead of duplicating it inline */
-> suggests yet another possible fix.
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+thanks
+-- PMM
 
