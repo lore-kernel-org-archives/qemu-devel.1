@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B889C4332B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36214C4332D
 	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 08:51:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D79AA20752
+	by mail.kernel.org (Postfix) with ESMTPS id 039FE20767
 	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 08:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nVhIhFh4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79AA20752
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Z/xhzbzD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 039FE20767
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFDNS-0000rZ-1g
+	id 1jFDNS-0000tL-4a
 	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 04:51:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48094)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jFDMb-0007zO-Tl
+ (envelope-from <dgibson@ozlabs.org>) id 1jFDMb-0007zP-Oj
  for qemu-devel@nongnu.org; Fri, 20 Mar 2020 04:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jFDMa-0002qx-2E
+ (envelope-from <dgibson@ozlabs.org>) id 1jFDMa-0002r4-33
  for qemu-devel@nongnu.org; Fri, 20 Mar 2020 04:50:45 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:56113 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:53395 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jFDMZ-0002h5-GJ; Fri, 20 Mar 2020 04:50:44 -0400
+ id 1jFDMZ-0002h0-0p; Fri, 20 Mar 2020 04:50:44 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48kHY744gdz9sRf; Fri, 20 Mar 2020 19:50:35 +1100 (AEDT)
+ id 48kHY73bh2z9sSN; Fri, 20 Mar 2020 19:50:35 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1584694235;
- bh=pyMBMuqnvpH3Y163AImUTLwESxxQPzVKufbsbXR7jNY=;
+ bh=joyYpIWAtsYaCGLoDXyLrFrtPpTupBaYcHdFyMVkTa4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=nVhIhFh4MEdfxEy+v4x+kN3fzxKJFyk4cHmNjkVC4ZnNj69AB5ruqjdFtjAPILSeN
- oaNxJVOTDw5Tl2y6rxBUk8DuY7CGCdvNR4oSYMXnTAD+oehs+FcpdllM0Oibcen5lz
- 2XNMZBCYSHuSLaCd/atPIDLhsaO2moH5p+eVb5fI=
-Date: Fri, 20 Mar 2020 19:50:22 +1100
+ b=Z/xhzbzDVm2SpYxEPKgONlXfU2yDS6qF9rVlpQi6r35ynAXxhnYC2U1kfy3tCMUZE
+ st0LAJrHU5OTvvHMZ5mAUFJYt6r9ooUOzc/7TiMsKcN7DIKlGdvwjr0Zc5UpEJvOO6
+ NLqrOqxP/4ZzWTfZd1hOmFZoBXZtyhxVP7xV5kQI=
+Date: Fri, 20 Mar 2020 19:49:44 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Vincent Fazio <vfazio@xes-inc.com>
-Subject: Re: [PATCH v3 1/1] target/ppc: don't byte swap ELFv2 signal handler
-Message-ID: <20200320085022.GD781112@umbus.fritz.box>
-References: <20200319133244.8818-1-vfazio@xes-inc.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2] target/ppc: Fix ISA v3.0 (POWER9) slbia implementation
+Message-ID: <20200320084944.GC781112@umbus.fritz.box>
+References: <20200319064439.1020571-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="jL2BoiuKMElzg3CS"
+ protocol="application/pgp-signature"; boundary="DIOMP1UsTsWJauNi"
 Content-Disposition: inline
-In-Reply-To: <20200319133244.8818-1-vfazio@xes-inc.com>
+In-Reply-To: <20200319064439.1020571-1-npiggin@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 203.11.71.1
@@ -68,83 +68,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- Vincent Fazio <vfazio@gmail.com>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---jL2BoiuKMElzg3CS
+--DIOMP1UsTsWJauNi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 19, 2020 at 08:32:44AM -0500, Vincent Fazio wrote:
-> From: Vincent Fazio <vfazio@gmail.com>
+On Thu, Mar 19, 2020 at 04:44:39PM +1000, Nicholas Piggin wrote:
+> The new ISA v3.0 slbia variants have not been implemented for TCG,
+> which can lead to crashing when a POWER9 machine boots Linux using
+> the hash MMU, for example ("disable_radix" kernel command line).
 >=20
-> Previously, the signal handler would be byte swapped if the target and
-> host CPU used different endianness. This would cause a SIGSEGV when
-> attempting to translate the opcode pointed to by the swapped address.
+> Add them.
 >=20
->  Thread 1 "qemu-ppc64" received signal SIGSEGV, Segmentation fault.
->  0x00000000600a9257 in ldl_he_p (ptr=3D0x4c2c061000000000) at qemu/includ=
-e/qemu/bswap.h:351
->  351        __builtin_memcpy(&r, ptr, sizeof(r));
->=20
->  #0  0x00000000600a9257 in ldl_he_p (ptr=3D0x4c2c061000000000) at qemu/in=
-clude/qemu/bswap.h:351
->  #1  0x00000000600a92fe in ldl_be_p (ptr=3D0x4c2c061000000000) at qemu/in=
-clude/qemu/bswap.h:449
->  #2  0x00000000600c0790 in translator_ldl_swap at qemu/include/exec/trans=
-lator.h:201
->  #3  0x000000006011c1ab in ppc_tr_translate_insn at qemu/target/ppc/trans=
-late.c:7856
->  #4  0x000000006005ae70 in translator_loop at qemu/accel/tcg/translator.c=
-:102
->=20
-> The signal handler will be byte swapped as a result of the __get_user()
-> call in sigaction() if it is necessary, no additional swap is required.
->=20
-> Signed-off-by: Vincent Fazio <vfazio@gmail.com>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-Applied to ppc-for-5.0, thanks.
+Applied to ppc-for-5.0.
 
 > ---
-> Changes since v2:
-> - Explain why the swap is not necessary
+> Changes in v2:
+> - Rewrite changelog.
+> - Remove stray slbie hunk that crept in
 >=20
-> Changes since v1:
-> - Drop host/target endianness callouts
-> - Drop unnecessary pointer cast
-> - Clarify commit message
+> I don't think the slbie invalidation is necessary, as explained on the
+> list.
 >=20
->  linux-user/ppc/signal.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  target/ppc/helper.h     |  2 +-
+>  target/ppc/mmu-hash64.c | 56 +++++++++++++++++++++++++++++++++++------
+>  target/ppc/translate.c  |  5 +++-
+>  3 files changed, 54 insertions(+), 9 deletions(-)
 >=20
-> diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
-> index 5b82af6cb6..b8613c5e1b 100644
-> --- a/linux-user/ppc/signal.c
-> +++ b/linux-user/ppc/signal.c
-> @@ -567,10 +567,8 @@ void setup_rt_frame(int sig, struct target_sigaction=
- *ka,
->          env->nip =3D tswapl(handler->entry);
->          env->gpr[2] =3D tswapl(handler->toc);
->      } else {
-> -        /* ELFv2 PPC64 function pointers are entry points, but R12
-> -         * must also be set */
-> -        env->nip =3D tswapl((target_ulong) ka->_sa_handler);
-> -        env->gpr[12] =3D env->nip;
-> +        /* ELFv2 PPC64 function pointers are entry points. R12 must also=
- be set. */
-> +        env->gpr[12] =3D env->nip =3D ka->_sa_handler;
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index ee1498050d..2dfa1c6942 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -615,7 +615,7 @@ DEF_HELPER_FLAGS_3(store_slb, TCG_CALL_NO_RWG, void, =
+env, tl, tl)
+>  DEF_HELPER_2(load_slb_esid, tl, env, tl)
+>  DEF_HELPER_2(load_slb_vsid, tl, env, tl)
+>  DEF_HELPER_2(find_slb_vsid, tl, env, tl)
+> -DEF_HELPER_FLAGS_1(slbia, TCG_CALL_NO_RWG, void, env)
+> +DEF_HELPER_FLAGS_2(slbia, TCG_CALL_NO_RWG, void, env, i32)
+>  DEF_HELPER_FLAGS_2(slbie, TCG_CALL_NO_RWG, void, env, tl)
+>  DEF_HELPER_FLAGS_2(slbieg, TCG_CALL_NO_RWG, void, env, tl)
+>  #endif
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 373d44de74..e5baabf0e1 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -95,9 +95,10 @@ void dump_slb(PowerPCCPU *cpu)
 >      }
+>  }
+> =20
+> -void helper_slbia(CPUPPCState *env)
+> +void helper_slbia(CPUPPCState *env, uint32_t ih)
+>  {
+>      PowerPCCPU *cpu =3D env_archcpu(env);
+> +    int starting_entry;
+>      int n;
+> =20
+>      /*
+> @@ -111,18 +112,59 @@ void helper_slbia(CPUPPCState *env)
+>       * expected that slbmte is more common than slbia, and slbia is usua=
+lly
+>       * going to evict valid SLB entries, so that tradeoff is unlikely to=
+ be a
+>       * good one.
+> +     *
+> +     * ISA v2.05 introduced IH field with values 0,1,2,6. These all inva=
+lidate
+> +     * the same SLB entries (everything but entry 0), but differ in what
+> +     * "lookaside information" is invalidated. TCG can ignore this and f=
+lush
+> +     * everything.
+> +     *
+> +     * ISA v3.0 introduced additional values 3,4,7, which change what SL=
+Bs are
+> +     * invalidated.
+>       */
+> =20
+> -    /* XXX: Warning: slbia never invalidates the first segment */
+> -    for (n =3D 1; n < cpu->hash64_opts->slb_size; n++) {
+> -        ppc_slb_t *slb =3D &env->slb[n];
+> +    env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
+> +
+> +    starting_entry =3D 1; /* default for IH=3D0,1,2,6 */
+> +
+> +    if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
+> +        switch (ih) {
+> +        case 0x7:
+> +            /* invalidate no SLBs, but all lookaside information */
+> +            return;
+> =20
+> -        if (slb->esid & SLB_ESID_V) {
+> -            slb->esid &=3D ~SLB_ESID_V;
+> +        case 0x3:
+> +        case 0x4:
+> +            /* also considers SLB entry 0 */
+> +            starting_entry =3D 0;
+> +            break;
+> +
+> +        case 0x5:
+> +            /* treat undefined values as ih=3D=3D0, and warn */
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "slbia undefined IH field %u.\n", ih);
+> +            break;
+> +
+> +        default:
+> +            /* 0,1,2,6 */
+> +            break;
+>          }
+>      }
+> =20
+> -    env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
+> +    for (n =3D starting_entry; n < cpu->hash64_opts->slb_size; n++) {
+> +        ppc_slb_t *slb =3D &env->slb[n];
+> +
+> +        if (!(slb->esid & SLB_ESID_V)) {
+> +            continue;
+> +        }
+> +        if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
+> +            if (ih =3D=3D 0x3 && (slb->vsid & SLB_VSID_C) =3D=3D 0) {
+> +                /* preserves entries with a class value of 0 */
+> +                continue;
+> +            }
+> +        }
+> +
+> +        slb->esid &=3D ~SLB_ESID_V;
+> +    }
+>  }
+> =20
+>  static void __helper_slbie(CPUPPCState *env, target_ulong addr,
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index eb0ddba850..e514732a09 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -5027,12 +5027,15 @@ static void gen_tlbsync(DisasContext *ctx)
+>  /* slbia */
+>  static void gen_slbia(DisasContext *ctx)
+>  {
+> +    uint32_t ih =3D (ctx->opcode >> 21) & 0x7;
+> +    TCGv_i32 t0 =3D tcg_const_i32(ih);
+> +
+>  #if defined(CONFIG_USER_ONLY)
+>      GEN_PRIV;
 >  #else
->      env->nip =3D (target_ulong) ka->_sa_handler;
+>      CHK_SV;
+> =20
+> -    gen_helper_slbia(cpu_env);
+> +    gen_helper_slbia(cpu_env, t0);
+>  #endif /* defined(CONFIG_USER_ONLY) */
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -152,25 +233,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---jL2BoiuKMElzg3CS
+--DIOMP1UsTsWJauNi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl50g84ACgkQbDjKyiDZ
-s5KOpg//dBmrgwEPWZyVa1NCx7q8dunkVs0vKSLsRwREv9vE/9UjL5rs4LEaWgVc
-EIxk4xAPm16zMCBVx5inrt6uWIO+FqEPGJA03/1BXI+TRHRx1PhUVvIcp22QyJDC
-3/KhQAlA9xRw52KNHoZHtnKrtuOBvwNWa1bvWpoV89wKQBFJSY1aJa5dgIRAdCoJ
-pohJEgjwA4wlAIlSxGAHY0shKvFqOtpkDnNDNVlPZRF++gfDsE1bYaZcE9R7Luen
-yW1rvzSkIfXmFGZcuOmCR9EK7NFJY9PTvgREvLNDM1Wy0JnnrX7qX135YgpWcknI
-WukOLjv68lMfMVDbmUyygU1e9o1n4CEtUoGgzakFlr4mpIakd0lN3GfLElKNjY2S
-OMpXMRVVDrYzvcrTk9xhefuEfXvVwtaOWsMBrQyQojWjqc+TqJ8GFam9FPuWZDjN
-wYNXVrs6eXrsgOQoK0S5Qowd4d/zhYMy2qb53VwUrAs3mUECCq2Paoos/7Xgmf8r
-IhY0sh0w/BXuEPxkThavodzA/CUPAlDqRES1S2PS2VDSiFKtXAH5RQQv9PH1yauD
-b5gEhhEi8hxpGPDob3B0UCPESkLoO2uxTrntap2WkiLxXd9+xvJZK/7M91rez+Pi
-JFxEAqNaEg4E3Uub8+Oi93RKQeq66semwW9LrJDV28PVOPGE/Hw=
-=OVHL
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl50g6cACgkQbDjKyiDZ
+s5KUnBAAnj8OKTxmPvPMDvR5hDpZAEPmIaa0cUlw59hsFj+Upqvht58gXrNu+/at
+veVeMfmAhqeFOrjAuagzbde5mTQYLrSatkcMO03zOMSzKr9/Donyti1GSE11Tpop
+To+iv92Qiq98r4FEtCwcXDHs1jvRBpFy7MsJslPQlEwpsi2tOeuBeFj7lUl3n7FY
+DcC8E7Fza60OtSvsyARN4IElRI1hY50luBUrTqJm/Sx1zRafO9ND7wHtXGUnIxWd
+syw5qWhAQwWppF2PFAqvYf47WOFRQWHnAVeHdnijegm4/Zt1xYV30hAQSgPRQQ2S
+M1vLeFJzPevNgJchkqd4DPXvNtxG1sKLvbR7/AZaBmepUvPoaHMsakHfwd3rTzRK
+8xDiGOoYnZmnpdk8fFkagaJEbyqq0lF2SC6oBMp97S0TvrIgzQ3bHIBE0m2Ap/Y/
+rOlbcxbomdJ5st37eliQP2heYiW63f8IH7WntWQzhP6ZC7fAHosq0Ukpm7jm4zsm
+BgLH26u/NzxMCKVo/tP8eNxoOyZFR2YTwjdEZMSFN1uJbUkWoUkMJZ90rV0yGNLR
+vRo4NygQJy2OH5PnVPQTSqM4VPmWqEJ/4iEZpO2c2ArI9ge8McDoMugP7nKpmtf2
+QqFqsdDwd0Yq7/+cmUk96KPdusi5Y6vja5V5k6GBSTpnYxofbFA=
+=oI3P
 -----END PGP SIGNATURE-----
 
---jL2BoiuKMElzg3CS--
+--DIOMP1UsTsWJauNi--
 
