@@ -1,86 +1,74 @@
-Return-Path: <SRS0=/hVT=5E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1813AC4332D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 23:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7219CC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 01:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D437B20740
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Mar 2020 23:53:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiGz99IK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D437B20740
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 347B320740
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 01:01:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347B320740
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jF4yz-0001ca-S0
-	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 19:53:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47685)
+	id 1jF62q-00010G-BR
+	for qemu-devel@archiver.kernel.org; Thu, 19 Mar 2020 21:01:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56761)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jF4yR-0001EA-AM
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 19:53:17 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jF61x-0000aO-3u
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 21:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jF4yP-00054P-0a
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 19:53:14 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24689)
+ (envelope-from <yan.y.zhao@intel.com>) id 1jF61t-0006AK-Ll
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 21:00:55 -0400
+Received: from mga01.intel.com ([192.55.52.88]:16490)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jF4yO-000512-NK
- for qemu-devel@nongnu.org; Thu, 19 Mar 2020 19:53:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584661991;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=sDJKi0wGTm+IoKyssIxTYidFF9nV4kvOq034Bq755iA=;
- b=XiGz99IKK0KOtUyIsPk2TS1dUUMmdDQPGi6HC7sM7rHgrRmz5yJE9T5sUDsP63tQhLWuVd
- KyHQq+kDqnnqG9m4UVAHYHXfuBPc/4mHY5xYdaIurc4ZDGknbBC38uuEttAE6peCPUHz0I
- ze4hzWHmI53bnKW4al9oKRe3xxgbfWQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-sUJvKqekM_ej_0ZjA1B0_g-1; Thu, 19 Mar 2020 19:53:08 -0400
-X-MC-Unique: sUJvKqekM_ej_0ZjA1B0_g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A321EDB20;
- Thu, 19 Mar 2020 23:53:07 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-2.rdu2.redhat.com [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1986E5D9E2;
- Thu, 19 Mar 2020 23:53:02 +0000 (UTC)
-Date: Thu, 19 Mar 2020 19:53:01 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
-Message-ID: <20200319235301.GA483056@localhost.localdomain>
-References: <CAFEAcA8=3zcffu8FYEenyNR5O=kHh8OJmMCJj6Uwh5HJw_b-WA@mail.gmail.com>
- <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
- <CAFEAcA-jiZ=Pv7Co6gdkqKans=m6-9RwKAQuB9mri-baM5Gssw@mail.gmail.com>
- <849930679.1334346.1584361606961.JavaMail.zimbra@redhat.com>
- <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
- <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
- <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
- <20200317141257.GA5724@localhost.localdomain>
- <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
- <87sgi49uf6.fsf@dusky.pond.sub.org>
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jF61t-0005yi-8D
+ for qemu-devel@nongnu.org; Thu, 19 Mar 2020 21:00:53 -0400
+IronPort-SDR: fnm2VK7CGM3wN+BiUjTlMV646QccwC2hlsaSosrsPgIu+jSLmuZh9/T7tFE8dR796aIWu5eYQa
+ 8eCCZ9P/Ihug==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 19 Mar 2020 18:00:48 -0700
+IronPort-SDR: k5jdLcjTWxc8RnxH9xqj+bTvAbxc0qLU8Pi0MTgzQsf0usvHsAunettib1QPc3OcIYL/mtHXQg
+ i0nJDQVGWPVA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,573,1580803200"; d="scan'208";a="268923613"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by fmsmga004.fm.intel.com with ESMTP; 19 Mar 2020 18:00:42 -0700
+Date: Thu, 19 Mar 2020 20:51:13 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+Message-ID: <20200320005113.GI4641@joy-OptiPlex-7040>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
+ <20200319030639.GD4641@joy-OptiPlex-7040>
+ <20200318220100.1aac12fa@w520.home>
+ <20200319041533.GE4641@joy-OptiPlex-7040>
+ <20200318224053.3651c818@w520.home>
+ <20200319061534.GG4641@joy-OptiPlex-7040>
+ <20200319070635.2ff5db56@x1.home>
+ <31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <87sgi49uf6.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="lrZ03NoBR/3+SXJZ"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,162 +80,410 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>,
- Erik Skultety <eskultet@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Wainer Moschetta <wmoschet@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---lrZ03NoBR/3+SXJZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 20, 2020 at 12:57:30AM +0800, Kirti Wankhede wrote:
+> 
+> 
+> On 3/19/2020 6:36 PM, Alex Williamson wrote:
+> > On Thu, 19 Mar 2020 02:15:34 -0400
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > 
+> >> On Thu, Mar 19, 2020 at 12:40:53PM +0800, Alex Williamson wrote:
+> >>> On Thu, 19 Mar 2020 00:15:33 -0400
+> >>> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >>>    
+> >>>> On Thu, Mar 19, 2020 at 12:01:00PM +0800, Alex Williamson wrote:
+> >>>>> On Wed, 18 Mar 2020 23:06:39 -0400
+> >>>>> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >>>>>      
+> >>>>>> On Thu, Mar 19, 2020 at 03:41:11AM +0800, Kirti Wankhede wrote:
+> >>>>>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+> >>>>>>> - Start dirty pages tracking while migration is active
+> >>>>>>> - Stop dirty pages tracking.
+> >>>>>>> - Get dirty pages bitmap. Its user space application's responsibility to
+> >>>>>>>    copy content of dirty pages from source to destination during migration.
+> >>>>>>>
+> >>>>>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+> >>>>>>> structure. Bitmap size is calculated considering smallest supported page
+> >>>>>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
+> >>>>>>>
+> >>>>>>> Bitmap is populated for already pinned pages when bitmap is allocated for
+> >>>>>>> a vfio_dma with the smallest supported page size. Update bitmap from
+> >>>>>>> pinning functions when tracking is enabled. When user application queries
+> >>>>>>> bitmap, check if requested page size is same as page size used to
+> >>>>>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
+> >>>>>>> error.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >>>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >>>>>>> ---
+> >>>>>>>   drivers/vfio/vfio_iommu_type1.c | 205 +++++++++++++++++++++++++++++++++++++++-
+> >>>>>>>   1 file changed, 203 insertions(+), 2 deletions(-)
+> >>>>>>>
+> >>>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >>>>>>> index 70aeab921d0f..d6417fb02174 100644
+> >>>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+> >>>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >>>>>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
+> >>>>>>>   	unsigned int		dma_avail;
+> >>>>>>>   	bool			v2;
+> >>>>>>>   	bool			nesting;
+> >>>>>>> +	bool			dirty_page_tracking;
+> >>>>>>>   };
+> >>>>>>>   
+> >>>>>>>   struct vfio_domain {
+> >>>>>>> @@ -91,6 +92,7 @@ struct vfio_dma {
+> >>>>>>>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+> >>>>>>>   	struct task_struct	*task;
+> >>>>>>>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+> >>>>>>> +	unsigned long		*bitmap;
+> >>>>>>>   };
+> >>>>>>>   
+> >>>>>>>   struct vfio_group {
+> >>>>>>> @@ -125,7 +127,10 @@ struct vfio_regions {
+> >>>>>>>   #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+> >>>>>>>   					(!list_empty(&iommu->domain_list))
+> >>>>>>>   
+> >>>>>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+> >>>>>>> +
+> >>>>>>>   static int put_pfn(unsigned long pfn, int prot);
+> >>>>>>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+> >>>>>>>   
+> >>>>>>>   /*
+> >>>>>>>    * This code handles mapping and unmapping of user data buffers
+> >>>>>>> @@ -175,6 +180,55 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+> >>>>>>>   	rb_erase(&old->node, &iommu->dma_list);
+> >>>>>>>   }
+> >>>>>>>   
+> >>>>>>> +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu, uint64_t pgsize)
+> >>>>>>> +{
+> >>>>>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> >>>>>>> +
+> >>>>>>> +	for (; n; n = rb_next(n)) {
+> >>>>>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> >>>>>>> +		struct rb_node *p;
+> >>>>>>> +		unsigned long npages = dma->size / pgsize;
+> >>>>>>> +
+> >>>>>>> +		dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+> >>>>>>> +		if (!dma->bitmap) {
+> >>>>>>> +			struct rb_node *p = rb_prev(n);
+> >>>>>>> +
+> >>>>>>> +			for (; p; p = rb_prev(p)) {
+> >>>>>>> +				struct vfio_dma *dma = rb_entry(n,
+> >>>>>>> +							struct vfio_dma, node);
+> >>>>>>> +
+> >>>>>>> +				kfree(dma->bitmap);
+> >>>>>>> +				dma->bitmap = NULL;
+> >>>>>>> +			}
+> >>>>>>> +			return -ENOMEM;
+> >>>>>>> +		}
+> >>>>>>> +
+> >>>>>>> +		if (RB_EMPTY_ROOT(&dma->pfn_list))
+> >>>>>>> +			continue;
+> >>>>>>> +
+> >>>>>>> +		for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
+> >>>>>>> +			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
+> >>>>>>> +							 node);
+> >>>>>>> +
+> >>>>>>> +			bitmap_set(dma->bitmap,
+> >>>>>>> +					(vpfn->iova - dma->iova) / pgsize, 1);
+> >>>>>>> +		}
+> >>>>>>> +	}
+> >>>>>>> +	return 0;
+> >>>>>>> +}
+> >>>>>>> +
+> >>>>>>> +static void vfio_dma_bitmap_free(struct vfio_iommu *iommu)
+> >>>>>>> +{
+> >>>>>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> >>>>>>> +
+> >>>>>>> +	for (; n; n = rb_next(n)) {
+> >>>>>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> >>>>>>> +
+> >>>>>>> +		kfree(dma->bitmap);
+> >>>>>>> +		dma->bitmap = NULL;
+> >>>>>>> +	}
+> >>>>>>> +}
+> >>>>>>> +
+> >>>>>>>   /*
+> >>>>>>>    * Helper Functions for host iova-pfn list
+> >>>>>>>    */
+> >>>>>>> @@ -567,6 +621,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>>>>>>   			vfio_unpin_page_external(dma, iova, do_accounting);
+> >>>>>>>   			goto pin_unwind;
+> >>>>>>>   		}
+> >>>>>>> +
+> >>>>>>> +		if (iommu->dirty_page_tracking) {
+> >>>>>>> +			unsigned long pgshift =
+> >>>>>>> +					 __ffs(vfio_pgsize_bitmap(iommu));
+> >>>>>>> +
+> >>>>>>> +			bitmap_set(dma->bitmap,
+> >>>>>>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
+> >>>>>>> +		}
+> >>>>>>>   	}
+> >>>>>>>   
+> >>>>>>>   	ret = i;
+> >>>>>>> @@ -801,6 +863,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+> >>>>>>>   	vfio_unmap_unpin(iommu, dma, true);
+> >>>>>>>   	vfio_unlink_dma(iommu, dma);
+> >>>>>>>   	put_task_struct(dma->task);
+> >>>>>>> +	kfree(dma->bitmap);
+> >>>>>>>   	kfree(dma);
+> >>>>>>>   	iommu->dma_avail++;
+> >>>>>>>   }
+> >>>>>>> @@ -831,6 +894,50 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+> >>>>>>>   	return bitmap;
+> >>>>>>>   }
+> >>>>>>>   
+> >>>>>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> >>>>>>> +				  size_t size, uint64_t pgsize,
+> >>>>>>> +				  unsigned char __user *bitmap)
+> >>>>>>> +{
+> >>>>>>> +	struct vfio_dma *dma;
+> >>>>>>> +	unsigned long pgshift = __ffs(pgsize);
+> >>>>>>> +	unsigned int npages, bitmap_size;
+> >>>>>>> +
+> >>>>>>> +	dma = vfio_find_dma(iommu, iova, 1);
+> >>>>>>> +
+> >>>>>>> +	if (!dma)
+> >>>>>>> +		return -EINVAL;
+> >>>>>>> +
+> >>>>>>> +	if (dma->iova != iova || dma->size != size)
+> >>>>>>> +		return -EINVAL;
+> >>>>>>> +
+> >>>>>> looks this size is passed from user. how can it ensure size always
+> >>>>>> equals to dma->size ?
+> >>>>>>
+> >>>>>> shouldn't we iterate dma tree to look for dirty for whole range if a
+> >>>>>> single dma cannot meet them all?
+> >>>>>
+> >>>>> Please see the discussion on v12[1], the problem is with the alignment
+> >>>>> of DMA mapped regions versus the bitmap.  A DMA mapping only requires
+> >>>>> page alignment, so for example imagine a user requests the bitmap from
+> >>>>> page zero to 4GB, but we have a DMA mapping starting at 4KB.  We can't
+> >>>>> efficiently copy the bitmap tracked by the vfio_dma structure to the
+> >>>>> user buffer when it's shifted by 1 bit.  Adjacent mappings can also
+> >>>>> make for a very complicated implementation.  In the discussion linked
+> >>>>> we decided to compromise on a more simple implementation that requires
+> >>>>> the user to ask for a bitmap which exactly matches a single DMA
+> >>>>> mapping, which Kirti indicates is what we require to support QEMU.
+> >>>>> Later in the series, the unmap operation also makes this requirement
+> >>>>> when used with the flags to retrieve the dirty bitmap.  Thanks,
+> >>>>>     
+> >>>>
+> >>>> so, what about for vIOMMU enabling case?
+> >>>> if IOVAs are mapped per page, then there's a log_sync in qemu,
+> >>>> it's supposed for range from 0-U64MAX, qemu has to find out which
+> >>>> ones are mapped and cut them into pages before calling this IOCTL?
+> >>>> And what if those IOVAs are mapped for len more than one page?
+> >>>
+> >>> Good question.  Kirti?
+> >>>
+> 
+> In log_sync with vIOMMU, loop for range such that:
+> 
+> - find iotlb entry for iova, get iova_xlat
+> - size = iotlb.addr_mask + 1; This is same caculation as when mapping 
+> are created from vfio_iommu_map_notify()
+> - use the <iova_xlat, size> for VFIO_IOMMU_DIRTY_PAGES ioctl
+> - increment iova: iova += size
+> - iterate above steps till end of range.
+>
+Ok. It makes sense, though not efficient :)
+think about when there's no iotlb found for an iova, page by page
+incremental of iova is required. right?
 
-On Thu, Mar 19, 2020 at 05:33:01PM +0100, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
-> > On Tue, 17 Mar 2020 at 14:13, Cleber Rosa <crosa@redhat.com> wrote:
+> >>>>> [1] https://lore.kernel.org/kvm/20200218215330.5bc8fc6a@w520.home/
+> >>>>>       
+> >>>>>>> +	npages = dma->size >> pgshift;
+> >>>>>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+> >>>>>>> +
+> >>>>>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
+> >>>>>>> +	if (dma->iommu_mapped)
+> >>>>>>> +		bitmap_set(dma->bitmap, 0, npages);
+> >>>>>>> +
+> >>>>>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+> >>>>>>> +		return -EFAULT;
+> >>>>>>> +
+> >> Here, dma->bitmap needs to be cleared. right?
+> > 
+> > Ah, I missed re-checking this in my review.  v13 did clear it, but I
+> > noted that we need to re-populate any currently pinned pages.  This
+> > neither clears nor repopulates.  That's wrong.  Thanks,
+> > 
+> 
+> Why re-populate when there will be no change since 
+> vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any 
+> pin request while vfio_iova_dirty_bitmap() is still working, it will 
+> wait till iommu->lock is released. Bitmap will be populated when page is 
+> pinned.
+> 
+> Thanks,
+> Kirti
+> 
+> > Alex
+> >   
+> >>>>>>> +	return 0;
+> >>>>>>> +}
+> >>>>>>> +
+> >>>>>>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> >>>>>>> +{
+> >>>>>>> +	uint64_t bsize;
+> >>>>>>> +
+> >>>>>>> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)
+> >>>>>>> +		return -EINVAL;
+> >>>>>>> +
+> >>>>>>> +	bsize = DIRTY_BITMAP_BYTES(npages);
+> >>>>>>> +
+> >>>>>>> +	if (bitmap_size < bsize)
+> >>>>>>> +		return -EINVAL;
+> >>>>>>> +
+> >>>>>>> +	return 0;
+> >>>>>>> +}
+> >>>>>>> +
+> >>>>>>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>>>>   			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >>>>>>>   {
+> >>>>>>> @@ -2278,6 +2385,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>>>>>>   
+> >>>>>>>   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> >>>>>>>   			-EFAULT : 0;
+> >>>>>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> >>>>>>> +		struct vfio_iommu_type1_dirty_bitmap dirty;
+> >>>>>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> >>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> >>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> >>>>>>> +		int ret = 0;
+> >>>>>>> +
+> >>>>>>> +		if (!iommu->v2)
+> >>>>>>> +			return -EACCES;
+> >>>>>>> +
+> >>>>>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> >>>>>>> +				    flags);
+> >>>>>>> +
+> >>>>>>> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
+> >>>>>>> +			return -EFAULT;
+> >>>>>>> +
+> >>>>>>> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
+> >>>>>>> +			return -EINVAL;
+> >>>>>>> +
+> >>>>>>> +		/* only one flag should be set at a time */
+> >>>>>>> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
+> >>>>>>> +			return -EINVAL;
+> >>>>>>> +
+> >>>>>>> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> >>>>>>> +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
+> >>>>>>> +
+> >>>>>>> +			mutex_lock(&iommu->lock);
+> >>>>>>> +			if (!iommu->dirty_page_tracking) {
+> >>>>>>> +				ret = vfio_dma_bitmap_alloc(iommu, pgsize);
+> >>>>>>> +				if (!ret)
+> >>>>>>> +					iommu->dirty_page_tracking = true;
+> >>>>>>> +			}
+> >>>>>>> +			mutex_unlock(&iommu->lock);
+> >>>>>>> +			return ret;
+> >>>>>>> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> >>>>>>> +			mutex_lock(&iommu->lock);
+> >>>>>>> +			if (iommu->dirty_page_tracking) {
+> >>>>>>> +				iommu->dirty_page_tracking = false;
+> >>>>>>> +				vfio_dma_bitmap_free(iommu);
+> >>>>>>> +			}
+> >>>>>>> +			mutex_unlock(&iommu->lock);
+> >>>>>>> +			return 0;
+> >>>>>>> +		} else if (dirty.flags &
+> >>>>>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> >>>>>>> +			struct vfio_iommu_type1_dirty_bitmap_get range;
+> >>>>>>> +			unsigned long pgshift;
+> >>>>>>> +			size_t data_size = dirty.argsz - minsz;
+> >>>>>>> +			uint64_t iommu_pgsize =
+> >>>>>>> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
+> >>>>>>> +
+> >>>>>>> +			if (!data_size || data_size < sizeof(range))
+> >>>>>>> +				return -EINVAL;
+> >>>>>>> +
+> >>>>>>> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
+> >>>>>>> +					   sizeof(range)))
+> >>>>>>> +				return -EFAULT;
+> >>>>>>> +
+> >>>>>>> +			/* allow only min supported pgsize */
+> >>>>>>> +			if (range.bitmap.pgsize != iommu_pgsize)
+> >>>>>>> +				return -EINVAL;
+> >>>>>>> +			if (range.iova & (iommu_pgsize - 1))
+> >>>>>>> +				return -EINVAL;
+> >>>>>>> +			if (!range.size || range.size & (iommu_pgsize - 1))
+> >>>>>>> +				return -EINVAL;
+> >>>>>>> +			if (range.iova + range.size < range.iova)
+> >>>>>>> +				return -EINVAL;
+> >>>>>>> +			if (!access_ok((void __user *)range.bitmap.data,
+> >>>>>>> +				       range.bitmap.size))
+> >>>>>>> +				return -EINVAL;
+> >>>>>>> +
+> >>>>>>> +			pgshift = __ffs(range.bitmap.pgsize);
+> >>>>>>> +			ret = verify_bitmap_size(range.size >> pgshift,
+> >>>>>>> +						 range.bitmap.size);
+> >>>>>>> +			if (ret)
+> >>>>>>> +				return ret;
+> >>>>>>> +
+> >>>>>>> +			mutex_lock(&iommu->lock);
+> >>>>>>> +			if (iommu->dirty_page_tracking)
+> >>>>>>> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
+> >>>>>>> +					 range.size, range.bitmap.pgsize,
+> >>>>>>> +				    (unsigned char __user *)range.bitmap.data);
+> >>>>>>> +			else
+> >>>>>>> +				ret = -EINVAL;
+> >>>>>>> +			mutex_unlock(&iommu->lock);
+> >>>>>>> +
+> >>>>>>> +			return ret;
+> >>>>>>> +		}
+> >>>>>>>   	}
+> >>>>>>>   
+> >>>>>>>   	return -ENOTTY;
+> >>>>>>> @@ -2345,10 +2539,17 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+> >>>>>>>   
+> >>>>>>>   	vaddr = dma->vaddr + offset;
+> >>>>>>>   
+> >>>>>>> -	if (write)
+> >>>>>>> +	if (write) {
+> >>>>>>>   		*copied = __copy_to_user((void __user *)vaddr, data,
+> >>>>>>>   					 count) ? 0 : count;
+> >>>>>>> -	else
+> >>>>>>> +		if (*copied && iommu->dirty_page_tracking) {
+> >>>>>>> +			unsigned long pgshift =
+> >>>>>>> +				__ffs(vfio_pgsize_bitmap(iommu));
+> >>>>>>> +
+> >>>>>>> +			bitmap_set(dma->bitmap, offset >> pgshift,
+> >>>>>>> +				   *copied >> pgshift);
+> >>>>>>> +		}
+> >>>>>>> +	} else
+> >>>>>>>   		*copied = __copy_from_user(data, (void __user *)vaddr,
+> >>>>>>>   					   count) ? 0 : count;
+> >>>>>>>   	if (kthread)
+> >>>>>>> -- 
+> >>>>>>> 2.7.0
+> >>>>>>>        
+> >>>>>>      
+> >>>>>      
+> >>>>    
+> >>>    
 > >>
-> >> On Tue, Mar 17, 2020 at 09:29:32AM +0000, Peter Maydell wrote:
-> >> > Ah, I see. My assumption was that this was all stuff that you were
-> >> > working on, so that I would then be able to test that it worked corr=
-ectly,
-> >> > not that I would need to do configuration of the gitlab.com setup.
-> >
-> >> So, I had to use temporary hardware resources to set this up (and set
-> >> it up countless times TBH).  I had the understanding based on the list
-> >> of machines you documented[1] that at least some of them would be used
-> >> for the permanent setup.
-> >
-> > Well, some of them will be (eg the s390 box), but some of them
-> > are my personal ones that can't be reused easily. I'd assumed
-> > in any case that gitlab would have at least support for x86 hosts:
-> > we are definitely not going to continue to use my desktop machine
-> > for running CI builds! Also IIRC RedHat said they'd be able to
-> > provide some machines for runners.
-
-While GitLab let's you run x86 code for free with the "Linux Shared
-Runners"[1], I don't think it would be suitable to what we're trying
-to achieve.  It's limited to a single OS (CoreOS), single architecture
-and really geared towards running containers.  BTW, if it isn't clear,
-this is the approach being used today for the jobs defined on
-".gitlab-ci.yml".
-
-IMO we can leverage and still expand on the use of the "Linux Shared
-Runners", but to really get a grasp oh how well this model can work
-for QEMU, we'll need "Specific Runners", because we're validating
-how/if we can depend on it for OS/architectures they don't support on
-shared runners (and sometimes not even for the gitlab-runner agent).
-
->=20
-> Correct!  As discussed at the QEMU summit, we'll gladly chip in runners
-> to test the stuff we care about, but to match the coverage of your
-> private zoo of machines, others will have to chip in, too.
->
-
-I'm sorry I missed the original discussions, and I'm even more sorry
-if that led to any misunderstandings here.
-
-> >> OK, I see it, now it makes more sense.  So we're "only" missing the
-> >> setup for the machines we'll use for the more permanent setup.  Would
-> >> you like to do a staged setup/migration using one or some of the
-> >> machines you documented?  I'm 100% onboard to help with this, meaning
-> >> that I can assist you with instructions, or do "pair setup" of the
-> >> machines if needed.  I think a good part of the evaluation here comes
-> >> down to how manageable/reproducible the setup is, so it'd make sense
-> >> for one to be part of the setup itself.
-> >
-> > I think we should start by getting the gitlab setup working
-> > for the basic "x86 configs" first. Then we can try adding
-> > a runner for s390 (that one's logistically easiest because
-> > it is a project machine, not one owned by me personally or
-> > by Linaro) once the basic framework is working, and expand
-> > from there.
->=20
-> Makes sense to me.
->=20
-> Next steps to get this off the ground:
->=20
-> * Red Hat provides runner(s) for x86 stuff we care about.
->=20
-> * If that doesn't cover 'basic "x86 configs" in your judgement, we
->   fill the gaps as described below under "Expand from there".
->=20
-> * Add an s390 runner using the project machine you mentioned.
->=20
-> * Expand from there: identify the remaining gaps, map them to people /
->   organizations interested in them, and solicit contributions from these
->   guys.
->=20
-> A note on contributions: we need both hardware and people.  By people I
-> mean maintainers for the infrastructure, the tools and all the runners.
-> Cleber & team are willing to serve for the infrastructure, the tools and
-> the Red Hat runners.
-
-Right, while we've tried to streamline the process of setting up the
-machines, there will be plenty of changes to improve the automation.
-
-More importantly, maintaining the machines is very important to the
-super important goal of catching code regressions only, and not facing
-other failures.  Mundane tasks such as making sure enough disk space
-is always available can be completely change the perception of the
-usefulness of a CI environment.  And for this maintenance, we need
-help from people "owning" those machines.
-
->=20
-> Does this sound workable?
->=20
-> > But to a large degree I really don't want to have to get
-> > into the details of how gitlab works or setting up runners
-> > myself if I can avoid it. We're going through this migration
-> > because I want to be able to hand off the CI stuff to other
-> > people, not to retain control of it.
->=20
-> Understand.  We need contributions to gating CI, but the whole point of
-> this exercise is to make people other than *you* contribute to our
-> gating CI :)
->=20
-> Let me use this opportunity to say thank you for all your integration
-> work!
->=20
->
-
-^ THIS.  I have to say that I'm still amazed as to how Peter has
-managed to automate, integrate and run all those tests in such varied
-environments for so long.  Major kudos!
-
-- Cleber.
-
-[1] https://docs.gitlab.com/ee/user/gitlab_com/#linux-shared-runners
-
---lrZ03NoBR/3+SXJZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl50BdkACgkQZX6NM6Xy
-CfOsPQ//VM6LuSltGeAYA+nWeUrYCt+oJL6vyNEEUQmQiNFKK2EDlKz5S6xRf5QK
-biEtUMTwgbtpa+3CiWT8jeLQZSwQADzFBIDfpewJvQdhdmwWTyy2nteUpOx2pouq
-v9uaN9dQrU1/fn9ut9TGjjJIQgYxBG5VKjnHIfwIggdXC5SibEte3HMRWZMLGzM9
-+oKAevczMZWKfHS1aGgAdAGXpqd5bjAdK5dYaDehWmVLEXlCKlIW96uOizJPvAGy
-vRasAZUGfK3z4UTq3Sn/N9aPoniG1L5u70QszJJbnSqNLthwKc/nlUS8Ga4CWKbR
-LRrINWFH4mMuCIKzWMK32bBUC9eCfaJa/HMnWsy4sZ8RAQf11Zm/wWV8Jz7mUChu
-NR9q1Dh4l+LUp2PY9qUeJrKndd+6RaD2MExVcr2cnAPsx99wRBbX4SW1lobowwVy
-2w+xjvTU5wahsZ8HYQprdx2o+siWZTQQs5m8Kk4nL5k7VC6ZMYbPsdXEvgpHxaC9
-FMSu7DxCZW093PKbLjQjlHXU79L3ZVYLbK/r1BBkGWRsVdaYg+L2xl0elLbklrFs
-MoloULfzo7slXUizJnFImYPZE3KsCmQ9vGn9ky6URJGyEaq1+22yBmSrLMnJ0XUQ
-UOWOmJGMnxKsWc89nE+Qk4kS6B2UJlZMTrgSYd9r+TKclWBI8bQ=
-=wf9P
------END PGP SIGNATURE-----
-
---lrZ03NoBR/3+SXJZ--
-
+> > 
 
