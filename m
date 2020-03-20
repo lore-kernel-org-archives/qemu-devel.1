@@ -2,101 +2,83 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F455C43332
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2568AC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:22:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D01F20724
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2C9720724
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 16:22:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bdBkvxin"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D01F20724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GxZEby7a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2C9720724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFKO9-0006um-5m
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 12:20:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44287)
+	id 1jFKPq-00084f-2U
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 12:22:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFKN6-0005SW-G4
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:19:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFKPB-0007av-2r
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:21:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFKN5-0003Y9-CG
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:19:44 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:49045)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFKN5-0003Xv-8M
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:19:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584721182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kD34915ohKfPx4X1fBfkodPESkIf3cEZUh6ZtZG5rvU=;
- b=bdBkvxinCNWc+cv+1Ysn+mLvojJIa46F+D0PujnlYqalk5pKjAN4B34Bc58bIX/zD3Zx+r
- vtXguhf1/1WfORXfngha0hrPlYbwJ6QyP2nSrKCukTHVmiysaFTGFBJEdtlFY4oSKSHQM2
- tsvHlKJYVEK0Zcm6z6ojP6XLU+3lGlc=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77-w8FFvgnzMou1GO26tn8I2w-1; Fri, 20 Mar 2020 12:19:40 -0400
-X-MC-Unique: w8FFvgnzMou1GO26tn8I2w-1
-Received: by mail-ed1-f72.google.com with SMTP id b9so4386884edj.10
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 09:19:40 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jFKP9-0006zy-S7
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:21:52 -0400
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:46815)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jFKP9-0006xf-JV
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 12:21:51 -0400
+Received: by mail-oi1-x22d.google.com with SMTP id x5so7025029oic.13
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 09:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=EM4PKHel8jgcnWu0r6iUBxzvX1JBMCmh19NcDQzjfeE=;
+ b=GxZEby7aFyNSthXdj7p0FbYHdJ9JW5JgSarbkEQtoIvCJgoFSHZ/0NJC0w0nMoLSKc
+ dVrnj9Es28JST3aLCV9qeFYmKXYc3LXBkzwJa0BXAbO53DRPgmPrbkPq1QSV45XJnUHr
+ s6SvUi4zYfFYWgNYEYB0OCzj4kFnBnIZyAhMWtRmCfG/sLvG7D114bLI4B2lKTuKUneV
+ C1wcMEuxrPs9g4cEtYWhF6ct3cOfr/v2lqdd5b1RkCxUm4CRuVTNwOAlHkFDDyJSJGOS
+ bHtRHlmhH0tY4LIfnjrVX6TnGuZPXS1SCJ8zbarq6DsJmhiTS0qFI6zJscOnPi/pNSsx
+ PYRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kVWOkBaUZ+ucppvlQiTMZlu2xEl17c5C+O6SXpMbzeI=;
- b=nhGTUqPN6MfCvBUK9F68S0ulcS0jhLvcV6lM88qphgURi44Wg+8AzMNKxPc+uNJmKf
- Vp6Kd9QICLXcVkpHmkW5xss2OI0xsz3qMScHKZ0co+LjR31xUIjt8I5ZkIdRJqulSOrL
- Wnbuk56R8q3U5K4qu+ejghAHQFZCmsxvla6z/0OIkYzD3g6cZ4lnBmF9HlTyKYrSABo1
- A+lF9ZGsliB2DI26hQcsJWi+ouoAMvnIibdItm3Y4SqYO4Pgp/IyqvZHhUdW8fZDQtaR
- DTIp8Y/tmld6wMA0df3IoXVTrfxNlg7Rh/pEuN7EXvZ85g41eM/qdfaaYQPpeB5THtZ4
- vtuA==
-X-Gm-Message-State: ANhLgQ15twPNq5VgdEOBVeegOtQnMBye2HIBETFPVf5MnE04yTJEXvfM
- JYugGWIVjySSrAMxqbYaLrbzy8l7eA7lGA6hxf1NwOlup8jTp09N6ejeF2USE6htwDckc8hvasf
- NxMBlLj8J6hT9CIE=
-X-Received: by 2002:aa7:d488:: with SMTP id b8mr8433100edr.48.1584721179582;
- Fri, 20 Mar 2020 09:19:39 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuguiyOyPgXm/ntuMbcgilPDnY+GFQLJYOw5Tfo1aBLwSNoxjPDYZn6xhSrx73IluhdBoKvCg==
-X-Received: by 2002:aa7:d488:: with SMTP id b8mr8433077edr.48.1584721179335;
- Fri, 20 Mar 2020 09:19:39 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id qk2sm132968ejb.80.2020.03.20.09.19.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 20 Mar 2020 09:19:38 -0700 (PDT)
-Subject: Re: [PULL 0/4] Python queue for 5.0 soft freeze
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200318011217.2102748-1-ehabkost@redhat.com>
- <CAFEAcA_6i1ponfRK6vUA_KCz_F=2c886CPQNKE8Kn4SifaRRxw@mail.gmail.com>
- <ae222b3b-04ef-7dc7-4560-2e24d32b69b5@redhat.com>
- <CAFEAcA8M4P3a-QGA9qjOTmpsAKGBcKDG2KRhOC1V=iLHK3mqkw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <72ee2882-94b5-4eb5-7178-f8af29ca317f@redhat.com>
-Date: Fri, 20 Mar 2020 17:19:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=EM4PKHel8jgcnWu0r6iUBxzvX1JBMCmh19NcDQzjfeE=;
+ b=XANBUynEZhfwgWrY2+QSUnVuz6SsMwq2i8KlezTvybEyjTIAigz+e55zocFvWMKQtk
+ rWI9W0e+w8rzGxy8v1DtXqISps8LNmMnoF5PnF5yySc476ycHoxkOoGrUo+qrHhMcXtf
+ 8SEEMlLiCS/KHj9TOctEUNPPOAgJ/IogBshyDMSCBvoPyRWnEl3XXuyXk+Rd7i6dnA4n
+ bRGQRgdz/NiZF6xF+mhsBGACVC5omIFNG640GC8FqwwSTNG4eo+9jioIHgeKS2douCCl
+ Wni88LV7lQHa50xH05WTu1IUusEfqq+wATEqgaidwDe2eudP+JWE+IzFJw4zy6frwjI3
+ R8zw==
+X-Gm-Message-State: ANhLgQ0SIYreClUZZ92vBslP7pET2zCtw6OKpKwa58YJgo2Tjs+PVAgS
+ STUD4gw8TTQnnsqnCR8+ei5CCyFCKmu8lvs9K9bdaA==
+X-Google-Smtp-Source: ADFU+vsdlZzyNOmkpy6ojnkwOxAPkgJKS6GTv4FLDGluakjfrlaGdlAahZkLQ4TwLABSCLICDVCeW2uyf+F5EvaHQm8=
+X-Received: by 2002:aca:c608:: with SMTP id w8mr7295888oif.163.1584721310406; 
+ Fri, 20 Mar 2020 09:21:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8M4P3a-QGA9qjOTmpsAKGBcKDG2KRhOC1V=iLHK3mqkw@mail.gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20200320103551.29246-1-f4bug@amsat.org>
+ <20200320103551.29246-2-f4bug@amsat.org>
+ <c7cf4bab-b9ac-4387-0709-a02c04b24061@redhat.com>
+ <e4bc22f6-128d-99e9-9359-3253f666c065@linaro.org>
+In-Reply-To: <e4bc22f6-128d-99e9-9359-3253f666c065@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Mar 2020 16:21:37 +0000
+Message-ID: <CAFEAcA8RM6U1hKX1Wn5YmR71y=VrGimt46z_OR=+O1i9neahiw@mail.gmail.com>
+Subject: Re: [PULL v2 05/13] target/rx: CPU definitions
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,59 +90,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/20/20 5:14 PM, Peter Maydell wrote:
-> On Fri, 20 Mar 2020 at 16:11, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->>
->> On 3/20/20 4:59 PM, Peter Maydell wrote:
->>> On Wed, 18 Mar 2020 at 01:12, Eduardo Habkost <ehabkost@redhat.com> wro=
-te:
->>>>
->>>> The following changes since commit d649689a8ecb2e276cc20d3af6d416e3c29=
-9cb17:
->>>>
->>>>     Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' i=
-nto staging (2020-03-17 18:33:05 +0000)
->>>>
->>>> are available in the Git repository at:
->>>>
->>>>     git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->>>>
->>>> for you to fetch changes up to f4abfc6cb037da951e7977a67171f361fc6d21d=
-7:
->>>>
->>>>     MAINTAINERS: add simplebench (2020-03-17 21:09:26 -0400)
->>>>
->>>> ----------------------------------------------------------------
->>>> Python queue for 5.0 soft freeze
->>>>
->>>> * Add scripts/simplebench (Vladimir Sementsov-Ogievskiy)
->>>>
->>>
->>>
->>> Applied, thanks.
->>
->> I guess there was a mis understanding with Eduardo, he was going to
->> resend this pullrequest due to:
->>
->> ERROR: please use python3 interpreter
->=20
-> Ah, sorry. I'd read the replies to this thread as meaning that
-> those things were OK to fix as followup patches rather than
-> requiring a respin of the pull.
+On Fri, 20 Mar 2020 at 16:19, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 3/20/20 9:04 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Not related to this patch, but this line generates a warning with Clang=
+:
+> >
+> >   CC      rx-softmmu/target/rx/cpu.o
+> > target/rx/cpu.c:158:33: warning: The result of the left shift is undefi=
+ned
+> > because the left operand is negative
+> >     address =3D physical =3D addr & TARGET_PAGE_MASK;
+> >                                 ^~~~~~~~~~~~~~~~
+> > include/exec/cpu-all.h:234:45: note: expanded from macro 'TARGET_PAGE_M=
+ASK'
+> > #define TARGET_PAGE_MASK   ((target_long)-1 << TARGET_PAGE_BITS)
+> >                             ~~~~~~~~~~~~~~~ ^
+> > 1 warning generated.
+>
+> >From configure:
+>
+> > # We use -fwrapv to tell the compiler that we require a C dialect where
+> > # left shift of signed integers is well defined and has the expected
+> > # 2s-complement style results. (Both clang and gcc agree that it
+> > # provides these semantics.)
+>
+> Clang is *supposed* to be not generating those warnings.
 
-As you noticed, scripts/simplebench/bench_block_job.py is not run in our=20
-tests, so no need to hold the other pull requests, we'll fix later.
+I do have clang in my build tests, so at least some versions of
+clang do indeed correctly handle -fwrapv. What version are
+you using, Philippe ?
 
-Thanks,
-
-Phil.
-
+thanks
+-- PMM
 
