@@ -2,91 +2,79 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D37D5C4332B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F87CC4332D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B6AA20709
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48D8120722
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 17:26:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wf8fc8L+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B6AA20709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EP/ayn8i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D8120722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFLLc-00038m-QN
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 13:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59382)
+	id 1jFLPO-0004ac-GT
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 13:26:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60037)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jFLKz-0002Wm-Fk
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:21:38 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jFLOm-00049i-GA
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jFLKy-0007nd-5W
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:21:37 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34614)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jFLKx-0007mb-Uv
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:21:36 -0400
-Received: by mail-wr1-x441.google.com with SMTP id z15so8482066wrl.1
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 10:21:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=hzpLOqUSNBopjv0pKzF+fI66qNOFTJFKxWO4BRQyU8U=;
- b=Wf8fc8L+iEzJPfg36lQ0opvLxbWDrXP4/DHPDuGMw6ErwOaYE/ruyV34p1CN4naECm
- DZ4tu/od1nLx0Km9RXXjRZJ42qmidjYa7zkQ9CkJnJUzwT0WAyllbif8Mbqi4j5zRGgm
- 2UzuELxT/tUvq3AEwINbWmGPwLaQXHMkP5Qc+2skjglb9hciwMaBjYaV9aO6yFeU/BuX
- jqVtjSJZOOcB01K+KA/jVA/aKTMicgiMShUteQb83CKDiHjHN1JL1pp2UPWDK31o50EG
- RWlhB3DPRdfp37+CZY5OYScQBOG2N5i3jJBdLSzRQpYHHjAZBbZ9ktlhCr9qqdknubf5
- i8Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=hzpLOqUSNBopjv0pKzF+fI66qNOFTJFKxWO4BRQyU8U=;
- b=F6AEArEG433OkFmDrSDeaPcyRFHqwWu2U97U4J5idywu79iDPxf5wCPQpT/hYKoURY
- ybR7TrC29TVn8rGa48MW0rOu40BHlr8I0EaxZq+HDfB7FNay9LfEGv1RNg1epulQxx91
- n3XQudmlyywQfraR83OiZR/SkWGwyF2gCqj+IFXEy1g1aRQpG6XB2Ehz1o5EpZw8X1zN
- xDAilFGWNTRb9oQAADppP4m9AHQcw/+3G7s7o/iZKQd3eWtNga9Bw2wRp3blBOh7utwr
- GtRuJpEASbzoj+MN/6/0JGmlFoZqmBV+jTfFDZU0ImX2yilH4erpIwhhJGrVSLuIiLiJ
- h3uw==
-X-Gm-Message-State: ANhLgQ2VYeOSC61fuUZAhVOMxZ2xwkIXnxCEm0aXTLDqbe2rFm596hKS
- oLLZvprVlOvD2sedBgkpPcgQaw==
-X-Google-Smtp-Source: ADFU+vt3C0EECoFCeeysGMq6P2fg2eGPtWhWzaN62wfrE6b6jvaM82I3bCWamu+n0rGVQNIxdBpRRg==
-X-Received: by 2002:a05:6000:110:: with SMTP id
- o16mr12935346wrx.296.1584724894218; 
- Fri, 20 Mar 2020 10:21:34 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b5sm9374957wrj.1.2020.03.20.10.21.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Mar 2020 10:21:32 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6C5B71FF7E;
- Fri, 20 Mar 2020 17:21:31 +0000 (GMT)
-References: <20200320114522.16273-1-alex.bennee@linaro.org>
- <CAHiYmc7vOK=DD0Cb623x3PDJW_NS2H+Y79jcWT1Kujxij5Jsrg@mail.gmail.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: Re: [RFC PATCH for 5.0] configure: disable MTTCG for MIPS guests
-In-reply-to: <CAHiYmc7vOK=DD0Cb623x3PDJW_NS2H+Y79jcWT1Kujxij5Jsrg@mail.gmail.com>
-Date: Fri, 20 Mar 2020 17:21:31 +0000
-Message-ID: <871rpnhrhg.fsf@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1jFLOl-0001FA-HA
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:25:32 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:31771)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jFLOl-0001F2-EG
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 13:25:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584725131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/UulfTDATDKmuiYYGHDqEMixfJD+JrIQ5gT+09FhOPc=;
+ b=EP/ayn8icKepm6ATuHLezKaYkJ8xm6YBdGX6//WZTFV372nHxiyQc2i5oI2E7B3y/IqL1P
+ PtpclHDPBUvodRyobL4rDxyI60I++hTUso3I+jUBJ8wDKuPw9S5TK6L2VSwYu7/ESPNph9
+ Z1AmAHk8SQC8l0ONUHOMDODC4+QJY6g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-77-uqLU-QsUP9GsZr3pCcadiQ-1; Fri, 20 Mar 2020 13:25:27 -0400
+X-MC-Unique: uqLU-QsUP9GsZr3pCcadiQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FD6F107ACC4;
+ Fri, 20 Mar 2020 17:25:26 +0000 (UTC)
+Received: from gondolin (ovpn-113-89.ams2.redhat.com [10.36.113.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D017CBBBEE;
+ Fri, 20 Mar 2020 17:25:21 +0000 (UTC)
+Date: Fri, 20 Mar 2020 18:25:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/ipl: fix off-by-one in
+ update_machine_ipl_properties()
+Message-ID: <20200320182518.69bbb053.cohuck@redhat.com>
+In-Reply-To: <20200320143101.41764-1-pasic@linux.ibm.com>
+References: <20200320143101.41764-1-pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,115 +86,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>,
- Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 20 Mar 2020 15:31:01 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
+> In update_machine_ipl_properties() the array ascii_loadparm needs to
+> hold the 8 char lodparm and a string terminating zero char.
 
-> =D0=BF=D0=B5=D1=82, 20. =D0=BC=D0=B0=D1=80 2020. =D1=83 12:45 Alex Benn=
-=C3=A9e <alex.bennee@linaro.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->>
->> While debugging check-acceptance failures I found an instability in
->> the mips64el test case. Briefly the test case:
->>
->>   retry.py -n 100 -c -- ./mips64el-softmmu/qemu-system-mips64el \
->>     -display none -vga none -serial mon:stdio \
->>     -machine malta -kernel ./vmlinux-4.7.0-rc1.I6400 \
->>     -cpu I6400 -smp 8 -vga std \
->>     -append "printk.time=3D0 clocksource=3DGIC console=3Dtty0 console=3D=
-ttyS0 panic=3D-1" \
->>     --no-reboot
->>
->
-> Thank for the findings!
->
-> Could you perhaps attach or link to "retry.py"?
+s/lodparm/loadparm/
 
-Sure - it's just a noddy python script which I use for repeated testing:
+> Let's increase the size of ascii_loadparm accordingly.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Fixes: 0a01e082a4 ("s390/ipl: sync back loadparm")
 
-  https://github.com/stsquad/retry
+Fixes: Coverity CID 1421966
 
-> Did you run this particular test for the first time now, or it used to
-> pass before?
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/s390x/ipl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index b81942e1e6..8c3e019571 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -546,7 +546,7 @@ static void update_machine_ipl_properties(IplParameterBlock *iplb)
+>      /* Sync loadparm */
+>      if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
+>          uint8_t *ebcdic_loadparm = iplb->loadparm;
+> -        char ascii_loadparm[8];
+> +        char ascii_loadparm[9];
+>          int i;
+>  
+>          for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
+> 
+> base-commit: 226cd20706e20264c176f8edbaf17d7c9b7ade4a
 
-I only noticed it since it was added to check-acceptance and has been
-flakey since added I think.
+Thanks, queued to s390-fixes.
 
->
-> Thanks,
-> Aleksandar
->
->> Reports about a 9% failure rate:
->>
->>   Results summary:
->>   0: 91 times (91.00%), avg time 5.547 (0.45 varience/0.67 deviation)
->>   -6: 9 times (9.00%), avg time 3.394 (0.02 varience/0.13 deviation)
->>   Ran command 100 times, 91 passes
->>
->> When re-run with "--accel tcg,thread=3Dsingle" the instability goes
->> away.
->>
->>   Results summary:
->>   0: 100 times (100.00%), avg time 17.318 (249.76 varience/15.80 deviati=
-on)
->>   Ran command 100 times, 100 passes
->>
->> Which seems to indicate there is some aspect of the MIPS MTTCG fixes
->> that has been missed. Ideally we would fix that but I'm afraid I don't
->> have time to investigate and am not super familiar with the
->> architecture anyway.
->>
->> I've disabled all the mips guests as I assume it's a fundamental
->> synchronisation primitive that is broken but I haven't tested them all
->> (there are a lot!).
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> Cc: Aurelien Jarno <aurelien@aurel32.net>
->> Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
->> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  configure | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/configure b/configure
->> index 206d22c5153..002792d21dc 100755
->> --- a/configure
->> +++ b/configure
->> @@ -7832,19 +7832,19 @@ case "$target_name" in
->>      echo "TARGET_ABI32=3Dy" >> $config_target_mak
->>    ;;
->>    mips|mipsel)
->> -    mttcg=3D"yes"
->> +    mttcg=3D"no"
->>      TARGET_ARCH=3Dmips
->>      echo "TARGET_ABI_MIPSO32=3Dy" >> $config_target_mak
->>    ;;
->>    mipsn32|mipsn32el)
->> -    mttcg=3D"yes"
->> +    mttcg=3D"no"
->>      TARGET_ARCH=3Dmips64
->>      TARGET_BASE_ARCH=3Dmips
->>      echo "TARGET_ABI_MIPSN32=3Dy" >> $config_target_mak
->>      echo "TARGET_ABI32=3Dy" >> $config_target_mak
->>    ;;
->>    mips64|mips64el)
->> -    mttcg=3D"yes"
->> +    mttcg=3D"no"
->>      TARGET_ARCH=3Dmips64
->>      TARGET_BASE_ARCH=3Dmips
->>      echo "TARGET_ABI_MIPSN64=3Dy" >> $config_target_mak
->> --
->> 2.20.1
->>
-
-
---=20
-Alex Benn=C3=A9e
 
