@@ -2,74 +2,75 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33AD9C4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 06:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8094C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 07:27:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3B3E2072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 06:42:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B39920767
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 07:27:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MX/I842O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3B3E2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MNufcjQ2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B39920767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFBMY-00088f-7R
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 02:42:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49030)
+	id 1jFC3Z-0000Kn-Ic
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 03:27:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jFBLv-0007jw-1T
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:41:56 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jFC2W-0007qx-Us
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 03:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jFBLt-0003Cd-5e
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:41:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:46307)
+ (envelope-from <kraxel@redhat.com>) id 1jFC2V-0000nn-Mq
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 03:25:56 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:54716)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jFBLt-0003CJ-0C
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 02:41:53 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jFC2V-0000nE-JC
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 03:25:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584686511;
+ s=mimecast20190719; t=1584689154;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=zIiMql8rUOL5/l47A6mLqkL+iilKl56+acJaSeSetcI=;
- b=MX/I842Oqkv20LNI5/Ffb1l77PJjXIc0CsMBDEV26GgTG1RKYYxn78yset2YjhhdghBAPB
- jUu74Z435y/zUWK3+7f8ivn9GAjns779uNl/psEze1rfUhuxbq6mPPksq0ju5xdBTYYgur
- dJCcMpbd7ZbRqzkfFtTLsXFFldLYqcE=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=AqfJaUwyKKozsHj6p3Arn418LsLAi7FzeMOuWBmvhD4=;
+ b=MNufcjQ2vsrc4XwWyDAt3kOl7jHyFtXqjwpGqz0Ke/kq+/iwghzbyRYqyEh0cZ0ahMLUwk
+ kjbMiGoMoV7R0XXabBD3qFJEEYGSunJ7ZARMUDQNBBAeq2q72qYPSZsEvtkK6VC0CfprU6
+ HY9205FDKveiWh/RL1jFskt7pBsqPyE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-WiowU-PiM_6ez1OPaTiO_w-1; Fri, 20 Mar 2020 02:41:47 -0400
-X-MC-Unique: WiowU-PiM_6ez1OPaTiO_w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-52-oW2kei_3O22pDDo9RSO_4w-1; Fri, 20 Mar 2020 03:25:52 -0400
+X-MC-Unique: oW2kei_3O22pDDo9RSO_4w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E97D418B60B8;
- Fri, 20 Mar 2020 06:41:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 895DD107ACC4;
+ Fri, 20 Mar 2020 07:25:51 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-49.ams2.redhat.com
  [10.36.112.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6CEF094945;
- Fri, 20 Mar 2020 06:41:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 964DB1001925;
+ Fri, 20 Mar 2020 07:25:48 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9930C9DB3; Fri, 20 Mar 2020 07:41:43 +0100 (CET)
-Date: Fri, 20 Mar 2020 07:41:43 +0100
+ id 724489DB3; Fri, 20 Mar 2020 08:25:47 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v4 0/2] Cross-device resource sharing
-Message-ID: <20200320064143.4b2kyskr5clxsczs@sirius.home.kraxel.org>
-References: <20200319021823.57219-1-stevensd@chromium.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/1] Vga 20200320 patches
+Date: Fri, 20 Mar 2020 08:25:46 +0100
+Message-Id: <20200320072547.19003-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200319021823.57219-1-stevensd@chromium.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,36 +84,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zach Reizner <zachr@chromium.org>,
- Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- virtio-comment@lists.oasis-open.org,
- =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 19, 2020 at 11:18:21AM +0900, David Stevens wrote:
-> Hi all,
-> 
-> This is the next iteration of patches for adding support for sharing
-> resources between different virtio devices. The corresponding Linux
-> implementation is [1].
-> 
-> In addition to these patches, the most recent virtio-video patchset
-> includes a patch for importing objects into that device [2].
+The following changes since commit e6d567db23219fe9979f16d74e13f27145f07f84=
+:
 
-Looks good to me.
+  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' i=
+nto staging (2020-03-19 15:31:09 +0000)
 
-So, open a github issue to kick the TC vote process and get this merged?
-(see virtio-spec/.github/PULL_REQUEST_TEMPLATE.md).
+are available in the Git repository at:
 
-cheers,
-  Gerd
+  git://git.kraxel.org/qemu tags/vga-20200320-pull-request
+
+for you to fetch changes up to 02501fc39381c4dabaf6becdd12c2a4754c3847c:
+
+  compat: disable edid on correct virtio-gpu device (2020-03-20 07:50:52 +0=
+100)
+
+----------------------------------------------------------------
+vga: edid compat fix for virtio-gpu
+
+----------------------------------------------------------------
+
+Cornelia Huck (1):
+  compat: disable edid on correct virtio-gpu device
+
+ hw/core/machine.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--=20
+2.18.2
 
 
