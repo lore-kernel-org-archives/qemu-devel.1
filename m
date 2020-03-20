@@ -2,87 +2,84 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 536F9C4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5804C4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:36:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D1AE20709
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DA3020709
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:36:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfQmQ71l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D1AE20709
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p/KXe7Lg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DA3020709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFIkE-0002BK-5A
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 10:35:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49661)
+	id 1jFIlA-0003Qm-KJ
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 10:36:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49645)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFIjP-0001Ct-7O
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:40 -0400
+ (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFIjN-0001Ca-CI
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFIjN-00070q-TC
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:39 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33326)
+ (envelope-from <yuval.shaia.ml@gmail.com>) id 1jFIjM-0006zJ-9d
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:37 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34094)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <yuval.shaia.ml@gmail.com>)
- id 1jFIjN-00070I-N8
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:37 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a25so7785135wrd.0
- for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 07:34:37 -0700 (PDT)
+ id 1jFIjM-0006yn-4I
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:34:36 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 26so3173931wmk.1
+ for <qemu-devel@nongnu.org>; Fri, 20 Mar 2020 07:34:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ h=from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=izsjuPvFCwqcf0hTr6C/OKdh9vNSdRz4RAKvPm3nOGE=;
- b=KfQmQ71l30aZ4zg3BAqD/caXcDUdUBhIF/TJn/lyLqnLKzY1NlvUgBC5xADOOxB5jw
- JMJo8gCXGcfWV7lewyMEp6oN5/6uUEGuJ02FAnXnOmOtC3wqtmGzJD16AbypGYnuJHTw
- zo8tczWUg8cRJtnzXTfWve1wNpAI1mV5OjJbB0Kfg+a0BbizB2GjcGMAWAMDn+1TNseo
- W+z0cwO+XavOniXkM7gXSZA4u52m8uwBpYqQSR66KpCZJmbjWweyer50GQ5M3jcF84KD
- IqH8veQS8xAfo8fPKi180k/Cxhopz249FgVS5CYGHpe3nwGY8aaJm/v3OngEo5Fp6NVU
- rmeQ==
+ bh=MSy2m9Hc8R9mimywtmcC2XkgYtSZ8HfEQRcayL/1MSs=;
+ b=p/KXe7LgQGNBDE20R2vbhSKypXHBlAA0fUw0CTaqpoqdNbKILwBvSc6uyuTpMzlKwE
+ pDz8O9juY5GK1PyqN8gsqdOYRHnP4ChctX0+c2S8EIMRfPy5IbPqM55w7TSBWbeX3V5Q
+ 16X0kMk3eQVCz7WzGltId6bE0fyy6jylYp8oRvy9EfVYP/Q/rhQdPtoXwwgoVq/jVURh
+ 92hkb12iH0kv/nsDpP0aJOvBtZFm79vbiTUc3Kdf3VV5obHqngC28xppLEyeAk/kiRyv
+ nY+DOm8dTnPK9GBnwA9kB0w6VAFKKHyXjP7VB9W8EegXkSGTBCVzPpC8zLntuTcbNkUo
+ fLYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=izsjuPvFCwqcf0hTr6C/OKdh9vNSdRz4RAKvPm3nOGE=;
- b=i7hncAM1Ja2DbG9gPNdr4DPNpJPQKirAoCvwZK/JKXaAzwQtNjm6JNwMpylEU5x1J9
- Gz9ZY7pl3mHyCCCzEhLHMxXgu98Ghl/drCzQgI2hybnEjbp/P3KWZ8tRakr852pYVw4u
- P8dpFYbaGQlObR+ovIEr1+aAPRSWflF5qvCdTNphKvACTgogdnWPxm1U8pPMw7lTUsTN
- CKZ7rb4N7a+0eCsAQc7vWsUK2B0+A11LgSiMEMPctH22/T0ge17fStVP00SE4++EZGhy
- R5NgXuadHAu/4BHwFt2J3ys3S1yj9aRCa1iSQMOUck0vFZHog7QrdmfAIPUQqZrsF49C
- Su/g==
-X-Gm-Message-State: ANhLgQ38Pqidxic59Epjp2gnQBhbIDzveQOXDNn7SqSknG4Ne96kmkN6
- Ji7WlzDZmLygb0lToQNsNXz5ddYr
-X-Google-Smtp-Source: ADFU+vuPU8r/qtKrkH+N0wHWkeYPxn5QKsKjyD3I0Tfc27KRAmHmBDsZPNVWuIHPDjLs7o6Njn7NEg==
-X-Received: by 2002:a5d:644c:: with SMTP id d12mr11690041wrw.54.1584714875717; 
- Fri, 20 Mar 2020 07:34:35 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=MSy2m9Hc8R9mimywtmcC2XkgYtSZ8HfEQRcayL/1MSs=;
+ b=VmulNoMvM+laHR6BA0xKLBoDEqYmtQWoGxcOFwtfYlQM5ZJKzNk31NgHt2zc0Xdp7W
+ +WztU4fMmnLUkZkKV3tqK9UHQVi4uVr3v9+p8wCklxWewbPB32m5KevGzj361LXBrcUJ
+ gMiMuvuv3IJ5owHMfMbZODxJ68L1cSBWzrUqQ2WhErFcqgrZTinMz5X10KDI4ZGw8cfh
+ qPO57bzpl5k5GhNtyFUX9QpUr92MCwp52TSK+M3Yf5CjeRvNla69bc55xy7Cqmu52xjA
+ 5cwvYKC190V1Ygttsyfbhjz15aWSVWYAtWWBVjuSt2CJoghdIRGUu4cyn1vpMi3j+anf
+ +RhQ==
+X-Gm-Message-State: ANhLgQ23+sIF2zSPaXgrvKxti23ajcK8efOlHuydRXO5Ulqn6rHV2UEX
+ S/N4jgVHS1FjF2dkZBSoML0+jsox
+X-Google-Smtp-Source: ADFU+vvS9P2ORhhlRTlNVJ5y93oRwifHfKl5Ix48qQBKmLe9UCR+IUTUulft4F8Az/JkE9pv7Mp9yA==
+X-Received: by 2002:a1c:a5d4:: with SMTP id o203mr1801522wme.47.1584714874638; 
+ Fri, 20 Mar 2020 07:34:34 -0700 (PDT)
 Received: from localhost.localdomain ([2a00:a040:186:a1ad:5254:ff:fe84:1be0])
  by smtp.gmail.com with ESMTPSA id
- s22sm7336694wmc.16.2020.03.20.07.34.34
+ s22sm7336694wmc.16.2020.03.20.07.34.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Mar 2020 07:34:35 -0700 (PDT)
+ Fri, 20 Mar 2020 07:34:34 -0700 (PDT)
 From: Yuval Shaia <yuval.shaia.ml@gmail.com>
 To: qemu-devel@nongnu.org, yuval.shaia.ml@gmail.com, marcel.apfelbaum@gmail.com
-Subject: [PATCH v1 1/2] hw/rdma: Cosmetic change - no need for two sge arrays
-Date: Fri, 20 Mar 2020 16:34:28 +0200
-Message-Id: <20200320143429.9490-2-yuval.shaia.ml@gmail.com>
+Subject: [PATCH v1 0/2] hw/rdma: Last step in eliminating data-path processing
+Date: Fri, 20 Mar 2020 16:34:27 +0200
+Message-Id: <20200320143429.9490-1-yuval.shaia.ml@gmail.com>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200320143429.9490-1-yuval.shaia.ml@gmail.com>
-References: <20200320143429.9490-1-yuval.shaia.ml@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,139 +95,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The function build_host_sge_array uses two sge arrays, one for input and
-one for output.
-Since the size of the two arrays is the same, the function can write
-directly to the given source array (i.e. input/output argument).
+With emulated device we have the luxury of doing things in data-path.
+Considering a future virtio-rdma device we no longer have this luxury. The
+driver will directly post WQEs to HW queues, bypassing the device emulator
+in qemu. These WQEs will consist of addresses known to the device (even if
+it is guest addresses) and ID of an HW memory region (mr).
 
-Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
----
- hw/rdma/rdma_backend.c | 40 ++++++++++++++++------------------------
- 1 file changed, 16 insertions(+), 24 deletions(-)
+Commit 68b89aee71 ("Utilize ibv_reg_mr_iova for memory registration") did
+the first important step of utilizing a new rdma API so addresses
+translation is no longer needed.
+This patch-set continues and remove entirely the processing in data-path by
+eliminating the need to translate emulated mr_id to backend device mr_id.
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index c346407cd3..b7ffbef9c0 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -378,30 +378,25 @@ static void ah_cache_init(void)
- }
- 
- static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
--                                struct ibv_sge *dsge, struct ibv_sge *ssge,
--                                uint8_t num_sge, uint64_t *total_length)
-+                                struct ibv_sge *sge, uint8_t num_sge,
-+                                uint64_t *total_length)
- {
-     RdmaRmMR *mr;
--    int ssge_idx;
-+    int idx;
- 
--    for (ssge_idx = 0; ssge_idx < num_sge; ssge_idx++) {
--        mr = rdma_rm_get_mr(rdma_dev_res, ssge[ssge_idx].lkey);
-+    for (idx = 0; idx < num_sge; idx++) {
-+        mr = rdma_rm_get_mr(rdma_dev_res, sge[idx].lkey);
-         if (unlikely(!mr)) {
--            rdma_error_report("Invalid lkey 0x%x", ssge[ssge_idx].lkey);
--            return VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
-+            rdma_error_report("Invalid lkey 0x%x", sge[idx].lkey);
-+            return VENDOR_ERR_INVLKEY | sge[idx].lkey;
-         }
- 
- #ifdef LEGACY_RDMA_REG_MR
--        dsge->addr = (uintptr_t)mr->virt + ssge[ssge_idx].addr - mr->start;
--#else
--        dsge->addr = ssge[ssge_idx].addr;
-+        sge[idx].addr = (uintptr_t)mr->virt + sge[idx].addr - mr->start;
- #endif
--        dsge->length = ssge[ssge_idx].length;
--        dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
--
--        *total_length += dsge->length;
-+        sge[idx].lkey = rdma_backend_mr_lkey(&mr->backend_mr);
- 
--        dsge++;
-+        *total_length += sge[idx].length;
-     }
- 
-     return 0;
-@@ -484,7 +479,6 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-                             void *ctx)
- {
-     BackendCtx *bctx;
--    struct ibv_sge new_sge[MAX_SGE];
-     uint32_t bctx_id;
-     int rc;
-     struct ibv_send_wr wr = {}, *bad_wr;
-@@ -518,7 +512,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
- 
-     rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
- 
--    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-+    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
-                               &backend_dev->rdma_dev_res->stats.tx_len);
-     if (rc) {
-         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-@@ -538,7 +532,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-     wr.num_sge = num_sge;
-     wr.opcode = IBV_WR_SEND;
-     wr.send_flags = IBV_SEND_SIGNALED;
--    wr.sg_list = new_sge;
-+    wr.sg_list = sge;
-     wr.wr_id = bctx_id;
- 
-     rc = ibv_post_send(qp->ibqp, &wr, &bad_wr);
-@@ -601,7 +595,6 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-                             struct ibv_sge *sge, uint32_t num_sge, void *ctx)
- {
-     BackendCtx *bctx;
--    struct ibv_sge new_sge[MAX_SGE];
-     uint32_t bctx_id;
-     int rc;
-     struct ibv_recv_wr wr = {}, *bad_wr;
-@@ -635,7 +628,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
- 
-     rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
- 
--    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-+    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
-                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
-     if (rc) {
-         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-@@ -643,7 +636,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-     }
- 
-     wr.num_sge = num_sge;
--    wr.sg_list = new_sge;
-+    wr.sg_list = sge;
-     wr.wr_id = bctx_id;
-     rc = ibv_post_recv(qp->ibqp, &wr, &bad_wr);
-     if (rc) {
-@@ -671,7 +664,6 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
-                                 uint32_t num_sge, void *ctx)
- {
-     BackendCtx *bctx;
--    struct ibv_sge new_sge[MAX_SGE];
-     uint32_t bctx_id;
-     int rc;
-     struct ibv_recv_wr wr = {}, *bad_wr;
-@@ -688,7 +680,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
- 
-     rdma_protected_gslist_append_int32(&srq->cqe_ctx_list, bctx_id);
- 
--    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-+    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
-                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
-     if (rc) {
-         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-@@ -696,7 +688,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
-     }
- 
-     wr.num_sge = num_sge;
--    wr.sg_list = new_sge;
-+    wr.sg_list = sge;
-     wr.wr_id = bctx_id;
-     rc = ibv_post_srq_recv(srq->ibsrq, &wr, &bad_wr);
-     if (rc) {
+v0 -> v1:
+	* Accept comment from Marcel
+
+Yuval Shaia (2):
+  hw/rdma: Cosmetic change - no need for two sge arrays
+  hw/rdma: Skip data-path mr_id translation
+
+ hw/rdma/rdma_backend.c | 61 +++++++++++++++++++++---------------------
+ hw/rdma/rdma_backend.h |  5 ----
+ hw/rdma/rdma_rm.c      | 13 +++++----
+ 3 files changed, 36 insertions(+), 43 deletions(-)
+
 -- 
 2.20.1
 
