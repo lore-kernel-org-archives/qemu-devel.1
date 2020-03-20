@@ -2,68 +2,86 @@ Return-Path: <SRS0=cIHa=5F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D14C4332D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DFCC4332B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 383A52072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:04:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 383A52072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4A27020754
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Mar 2020 14:05:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbZCpQKK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A27020754
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFIGd-00006N-6M
-	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 10:04:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45712)
+	id 1jFIH6-0000k5-Ee
+	for qemu-devel@archiver.kernel.org; Fri, 20 Mar 2020 10:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jFIEe-0007D0-58
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:02:53 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jFIFv-0008C2-Rf
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:04:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jFIEY-00065e-Aj
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:02:51 -0400
-Resent-Date: Fri, 20 Mar 2020 10:02:51 -0400
-Resent-Message-Id: <E1jFIEY-00065e-Aj@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21191)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jFIEY-00065M-35
- for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:02:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584712957; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=USixjKjdQBFKHuQXWAqitGRxJHosSn3VO7KcKAW7e0i0Zl9p7sNWHTduq6riISLOIzvj60PZsAsD5lYEKEPzuZfbNsJ7PqsO1h4MKt7vBZrbBF42Ib1kfJ3Dm5iOYDNa2segamRUM8/RG6jF6MMqe8r4ZmWWBigqKQmApoSzUd4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584712957;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ndbBxLKFW4B7s2v5Imwh+Ea91rIH1isOq/c+Jlz2QB4=; 
- b=kNlN0STpcoLVpzg7KK917BqREMFM3vuFGYcuhuJ2A5j1+x9cxq8D4ou1iE/gyuvuI2RV27R+UrMev5DTyVkEuGRq07DDuTZgnFvFLvgUjJLmRRVUhGLyIBn4bGi6+V47t1rG/vrfauVSVZilYVlIIVeUl3MoBEDqDGhd/TRUA9A=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584712953894709.0395486995387;
- Fri, 20 Mar 2020 07:02:33 -0700 (PDT)
-In-Reply-To: <20200320120456.1931482-1-dnbrdsky@gmail.com>
-Subject: Re: [PATCH v3 0/2] Replaced locks with lock guard macros
-Message-ID: <158471295294.15782.3617482949930071577@39012742ff91>
+ (envelope-from <stefanha@gmail.com>) id 1jFIFu-0006c8-LN
+ for qemu-devel@nongnu.org; Fri, 20 Mar 2020 10:04:11 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55243)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>)
+ id 1jFIFu-0006bN-By; Fri, 20 Mar 2020 10:04:10 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f130so5451204wmf.4;
+ Fri, 20 Mar 2020 07:04:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=73KCCYSwGSq9irnuaUcZKSkQ2zWBpWoys7duxTzinOE=;
+ b=DbZCpQKKxHBpQIgzBVgmn5Nhyts62skPrKx4h2Tx02nPg4lIyUly6znObMFygFlCQ7
+ UspKQyS1m0TOnJKmpJcmWOfS5Wo2KXyppJ6brp6zxH9LPMGg1S5NyZcr7PKCVlFqBXtO
+ M9hjp2ogMhLEqyBsHVY6dmA5ibqr4quXfvEfnpbnZxbZ4eowPoUtYdchwVAyGbv473/s
+ KpjfljjDoQT5jldyBxTPgzKVIXTo410JJ4wD1KV1bTi+oq/IN8LmsaLGlJ6/HTUgc8A4
+ gVdkKSQgH4+MMhP+T/JTvsfqRzdmChVdeqfhgVE6tfs5JAHU6Qlw9y964p4IrUWNRZyv
+ wF+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=73KCCYSwGSq9irnuaUcZKSkQ2zWBpWoys7duxTzinOE=;
+ b=BhLauPzBnOxa6A0Rqi3ulA1GJE4UVDdYX2TOBalJAqEPPnKcBMVUo2KS7CkZ3+fegN
+ 7GAcYC7GanIVXjnL/a2EUSgvSHYveWdQK8NBcK6pn7uGfKDR6TiSuQ/kJZEdlTnBkkYe
+ eHWTDurAgThRpttABJCbjMsjmj6STfs4/7Vs2kplrWQTeBaanqB3bGcMevh95ZbNvwGA
+ wY7VLKTXtn1PpQbPGK/r25ghnaZ4vzZW2quo2ieCiZq5spsUPWp0rv4N9WYDkUXF0IhP
+ gnJ4AsKBGqjeLI1Rzvlm/oHIWXnhl+l+dWrxDrv65+HJjPndZwbcwDmW4I83h6P+bDwO
+ Y8Jw==
+X-Gm-Message-State: ANhLgQ2PLQpawcAm+YecxPqq5UA2eMpnvoqg1+lfNlaHsB1Xw3ZKYJ0S
+ RRsrxcIsuZS56Ytf0mHMeVA=
+X-Google-Smtp-Source: ADFU+vu1UkY+uJLdm+mzwhBu8KZsG5zoPXlqyJ2iVgnF1APfInZ9YBGqKQZLCEzFcWJrHWl3quJ1Vw==
+X-Received: by 2002:a1c:b686:: with SMTP id g128mr10447572wmf.75.1584713049028; 
+ Fri, 20 Mar 2020 07:04:09 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id p10sm4172337wrm.6.2020.03.20.07.04.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Mar 2020 07:04:08 -0700 (PDT)
+Date: Fri, 20 Mar 2020 14:04:06 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3] block/iscsi:use the flags in iscsi_open() prevent
+ Clang warning
+Message-ID: <20200320140406.GA138042@stefanha-x1.localdomain>
+References: <20200311032927.35092-1-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dnbrdsky@gmail.com
-Date: Fri, 20 Mar 2020 07:02:33 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
+Content-Disposition: inline
+In-Reply-To: <20200311032927.35092-1-kuhn.chenqun@huawei.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,50 +93,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: dnbrdsky@gmail.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, zhang.zhanghailiang@huawei.com,
+ qemu-trivial@nongnu.org, Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyMDEyMDQ1Ni4xOTMx
-NDgyLTEtZG5icmRza3lAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
-YXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhl
-aXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHBy
-b2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9
-MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElT
-VD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-ICBDQyAgICAgIHV0aWwvbW1hcC1hbGxvYy5vCiAgQ0MgICAgICB1dGlsL29zbGliLXBvc2l4Lm8K
-ICBDQyAgICAgIHV0aWwvcWVtdS1vcGVucHR5Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvdGhy
-ZWFkLXBvb2wuYzoyMTM6NTogZXJyb3I6IHVudXNlZCB2YXJpYWJsZSAncWVtdV9sb2NrYWJsZV9h
-dXRvMScgWy1XZXJyb3IsLVd1bnVzZWQtdmFyaWFibGVdCiAgICBRRU1VX0xPQ0tfR1VBUkQoJnBv
-b2wtPmxvY2spOwogICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11L2xvY2thYmxl
-Lmg6MTczOjI5OiBub3RlOiBleHBhbmRlZCBmcm9tIG1hY3JvICdRRU1VX0xPQ0tfR1VBUkQnCi0t
-LQpxZW11X2xvY2thYmxlX2F1dG8xCl4KMSBlcnJvciBnZW5lcmF0ZWQuCm1ha2U6ICoqKiBbL3Rt
-cC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogdXRpbC90aHJlYWQtcG9vbC5vXSBFcnJvciAx
-Cm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAobW9z
-dCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBs
-aW5lIDY2NCwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0
-Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRv
-JywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51
-dWlkPTE0NjQ4YzhjOGUzMzQ2MTU4ZGQyOTAwZGEyMmNmNjgyJywgJy11JywgJzEwMDEnLCAnLS1z
-ZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VU
-X0xJU1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
-JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScs
-ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
-Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWtocGdpcXNsL3NyYy9kb2NrZXItc3JjLjIwMjAtMDMt
-MjAtMDkuNTguNTAuMjE1NTg6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92
-YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBz
-dGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MTQ2
-NDhjOGM4ZTMzNDYxNThkZDI5MDBkYTIyY2Y2ODIKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBF
-cnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAta2hwZ2lxc2wvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1kZWJ1Z0BmZWRv
-cmFdIEVycm9yIDIKCnJlYWwgICAgM200My4zMTBzCnVzZXIgICAgMG04LjU1MnMKCgpUaGUgZnVs
-bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzIwMTIw
-NDU2LjE5MzE0ODItMS1kbmJyZHNreUBnbWFpbC5jb20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+
+--6TrnltStXW4iwmi0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Mar 11, 2020 at 11:29:27AM +0800, Chen Qun wrote:
+> Clang static code analyzer show warning:
+>   block/iscsi.c:1920:9: warning: Value stored to 'flags' is never read
+>         flags &=3D ~BDRV_O_RDWR;
+>         ^        ~~~~~~~~~~~~
+>=20
+> In iscsi_allocmap_init() only checks BDRV_O_NOCACHE, which
+> is the same in both of flags and bs->open_flags.
+> We can use the flags instead bs->open_flags to prevent Clang warning.
+>=20
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+
+This can go via Paolo's SCSI tree.
+
+> ---
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Lieven <pl@kamp.de>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+>=20
+> v1->v2:
+>  Keep the 'flags' then use it(Base on Kevin's comments).
+>=20
+> v2->v3:
+>  Modify subject and commit messages(Base on Kevin's and Laurent's comment=
+s).
+> ---
+>  block/iscsi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 682abd8e09..50bae51700 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -2002,7 +2002,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *=
+options, int flags,
+>          iscsilun->cluster_size =3D iscsilun->bl.opt_unmap_gran *
+>              iscsilun->block_size;
+>          if (iscsilun->lbprz) {
+> -            ret =3D iscsi_allocmap_init(iscsilun, bs->open_flags);
+> +            ret =3D iscsi_allocmap_init(iscsilun, flags);
+>          }
+>      }
+> =20
+> --=20
+> 2.23.0
+>=20
+>=20
+>=20
+
+--6TrnltStXW4iwmi0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl50zVYACgkQnKSrs4Gr
+c8ivZQf/ZUeVWKUHOMH/mnrkpp6hvahHi3xc06MRKHPuN0B3vNZ+0MGWHen74qHJ
+wfqvDEdF3onbddapTQwszioUbjjsizkVFYFZMt+QqEDwk6fga9HM/b9bOUGVzloZ
+XSIEr3HdGsNutgAXvE0JfdAxU4Tzw5bwjusKFtjFga6D6kbAMdg8vAJJuDBTDGOa
+OxQCoPFuB3iV4nwzI8u2RQPGcoPNRLEVKuhRHMeqi/1V3WtLJYWZY5vJXENrHeY0
+ecJc6TkSDtdSQm0lSG4HBe0a/HMH3f/REkY8zVmJ5aU3QTLaYKcCuhBtq9MDvBGj
+5X4EjJKPBANVPWaxxxXF4vf/SHLZlw==
+=lkRs
+-----END PGP SIGNATURE-----
+
+--6TrnltStXW4iwmi0--
 
