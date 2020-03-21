@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1C8C4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 12:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A6AC4332D
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:06:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5362420637
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 12:59:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5362420637
+	by mail.kernel.org (Postfix) with ESMTPS id 60F3020724
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:06:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F3020724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFdil-0004rA-GL
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 08:59:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45250)
+	id 1jFdpH-0007Sw-Hy
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 09:06:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jFdi8-0003wu-CT
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 08:58:45 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jFdoM-0006L6-58
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jFdi7-00035I-Am
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 08:58:44 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:44100)
+ (envelope-from <balaton@eik.bme.hu>) id 1jFdoK-0001E6-Vv
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:05:10 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:25240)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jFdi1-0002Vg-Kg; Sat, 21 Mar 2020 08:58:38 -0400
+ id 1jFdoG-0000bi-JP; Sat, 21 Mar 2020 09:05:04 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id F0227747871;
- Sat, 21 Mar 2020 13:58:33 +0100 (CET)
+ by localhost (Postfix) with SMTP id D56DA7476D5;
+ Sat, 21 Mar 2020 14:04:59 +0100 (CET)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id CF6537476D5; Sat, 21 Mar 2020 13:58:33 +0100 (CET)
+ id B3F187475F6; Sat, 21 Mar 2020 14:04:59 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id CD57D7475F6;
- Sat, 21 Mar 2020 13:58:33 +0100 (CET)
-Date: Sat, 21 Mar 2020 13:58:33 +0100 (CET)
+ by zero.eik.bme.hu (Postfix) with ESMTP id B1BAB746381;
+ Sat, 21 Mar 2020 14:04:59 +0100 (CET)
+Date: Sat, 21 Mar 2020 14:04:59 +0100 (CET)
 From: BALATON Zoltan <balaton@eik.bme.hu>
 To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.0 04/11] hw/input/adb-kbd: Remove dead assignment
-In-Reply-To: <20200321114615.5360-5-philmd@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003211347330.82121@zero.eik.bme.hu>
+Subject: Re: [PATCH-for-5.0 05/11] hw/ide/sii3112: Remove dead assignment
+In-Reply-To: <20200321114615.5360-6-philmd@redhat.com>
+Message-ID: <alpine.BSF.2.22.395.2003211400040.82121@zero.eik.bme.hu>
 References: <20200321114615.5360-1-philmd@redhat.com>
- <20200321114615.5360-5-philmd@redhat.com>
+ <20200321114615.5360-6-philmd@redhat.com>
 User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-964345878-1584795513=:82121"
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+Content-Type: multipart/mixed; boundary="3866299591-68472195-1584795899=:82121"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,47 +86,48 @@ Sender: "Qemu-devel"
   This message is in MIME format.  The first part should be readable text,
   while the remaining parts are likely unreadable without MIME-aware tools.
 
---3866299591-964345878-1584795513=:82121
+--3866299591-68472195-1584795899=:82121
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
 On Sat, 21 Mar 2020, Philippe Mathieu-Daud=C3=A9 wrote:
 > Fix warning reported by Clang static code analyzer:
 >
->    CC      hw/input/adb-kbd.o
->  hw/input/adb-kbd.c:200:5: warning: Value stored to 'olen' is never rea=
-d
->      olen =3D 0;
->      ^      ~
+>    CC      hw/ide/sii3112.o
+>  hw/ide/sii3112.c:204:9: warning: Value stored to 'val' is never read
+>          val =3D 0;
+>          ^     ~
 >
 > Reported-by: Clang Static Analyzer
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
-> hw/input/adb-kbd.c | 1 -
-> 1 file changed, 1 deletion(-)
+> hw/ide/sii3112.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
-> index 0ba8207589..b0565be21b 100644
-> --- a/hw/input/adb-kbd.c
-> +++ b/hw/input/adb-kbd.c
-> @@ -197,7 +197,6 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf=
-)
->     int keycode;
->     int olen;
->
-> -    olen =3D 0;
->     if (s->count =3D=3D 0) {
->         return 0;
+> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+> index 06605d7af2..36f1905ddb 100644
+> --- a/hw/ide/sii3112.c
+> +++ b/hw/ide/sii3112.c
+> @@ -125,7 +125,7 @@ static uint64_t sii3112_reg_read(void *opaque, hwad=
+dr addr,
+>         val =3D (uint32_t)d->regs[1].sien << 16;
+>         break;
+>     default:
+> -        val =3D 0;
+> +        break;
 >     }
+>     trace_sii3112_read(size, addr, val);
+>     return val;
 
-Is this variable still needed at all? Looks like it's a remnant after=20
-a1f4971863 that can now only return 0 or 2 so you could just remove this=20
-variable and return 2 where now it's assigned as 2 or change return olen=20
-at the end to return 2 or maybe keep olen and change the return 0 above t=
-o=20
-return olen to silence warning but I think this could be cleaned up.
+Value is clearly used in trace and return so don't really get why the=20
+compiler complains here. Looks like wrong warning to me. It's true howeve=
+r=20
+that since val is init to 0 at the beginning this assignment is not=20
+strictily needed and this should work as well, so
+
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 
 Regards,
 BALATON Zoltan
---3866299591-964345878-1584795513=:82121--
+--3866299591-68472195-1584795899=:82121--
 
