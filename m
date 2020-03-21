@@ -2,59 +2,79 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0031FC4332D
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 15:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FF0C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 16:33:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C743A20722
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 15:12:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C743A20722
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id C4DFA20732
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 16:33:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yJc9LBDA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4DFA20732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFfnw-000511-W8
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 11:12:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36730)
+	id 1jFh3e-0004wW-RU
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 12:33:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jFfnA-0004GJ-7C
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 11:12:05 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFh2x-0004Pp-MC
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 12:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jFfn9-0001Dm-6W
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 11:12:04 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:52287)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jFfn3-0001BP-VL; Sat, 21 Mar 2020 11:11:58 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 142A3747DCF;
- Sat, 21 Mar 2020 16:11:56 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id E38E6747DF8; Sat, 21 Mar 2020 16:11:55 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id DE5A3747871;
- Sat, 21 Mar 2020 16:11:55 +0100 (CET)
-Date: Sat, 21 Mar 2020 16:11:55 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: Re: [PATCH-for-5.0 01/11] block: Remove dead assignment
-In-Reply-To: <CAHiYmc5gpHCUfc5bPMs8Qa7NETYkkj8rfV5dTyqZF4ZQTeNa8Q@mail.gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2003211608170.82121@zero.eik.bme.hu>
-References: <20200321114615.5360-1-philmd@redhat.com>
- <20200321114615.5360-2-philmd@redhat.com>
- <CAHiYmc5gpHCUfc5bPMs8Qa7NETYkkj8rfV5dTyqZF4ZQTeNa8Q@mail.gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <peter.maydell@linaro.org>) id 1jFh2w-0005k2-5a
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 12:32:27 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37068)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jFh2v-0005jG-Nn
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 12:32:26 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w13so10052636oih.4
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 09:32:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=guGBqHTgHj7fxVYDwbndUd+clOWJpa8ff0rnPSjz4JU=;
+ b=yJc9LBDACrKKvncofBKd+wgMwtNKNh3ze+iXpoVSWI6RbDQ3LScpyYYTMabGUuuo1t
+ troT5w/TT8II3WGNCST9L2v0qCfnMBA6O+85i13dCWBipor19IDMDy9jkHT7cT3msEsy
+ gIp7Dht9lBnuQ+Z0MTf4EfMeOqR/bnPsSXsBqzqaHGhrI30pZcTJkjTVOsjnUpBlJ8aL
+ n77SWoYY5I4WpP9kjC5BhIXSLkCwoYmcQo/d+I4orrAzw+2n3TL+vmfIGeZeeMkO0NZE
+ jWf/RKRNXMInIGd7l/d65u16iEWOOa0YZitB35tEu12mn0YLeusPtEuduKiSp1Iw5Dlj
+ tLYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=guGBqHTgHj7fxVYDwbndUd+clOWJpa8ff0rnPSjz4JU=;
+ b=HUmnI/kKYk0HER5nqvbDqgdh4cZe+fh9Q3sPiDQOWO+z+65Fr/U0QWzR/p5i2tMbQ+
+ xRNQz1h8UvULDc/BoUAkAL8fJynmzj9IVhndy8x+MiwORduKFAV3XswrloVlRRkMIxc6
+ zISluZ3v7/19Wfag9SW+8znOLAuSnJqye8ARaro/aX2syZ8DtZQDGIBL/KesLVoIz17F
+ 0fLhjR++6DMdRaIRC1Phqm/dz7CXAtru81i80o01+/8ffIKuPSd+HtZhdBqaBw/GDoQ4
+ kMkmh9iZRQL1whDQkeDkVsQn2TJgA6OTvj30yl7qEPSsBtrW8njIINXHJcO5GM8/cVHD
+ jnzQ==
+X-Gm-Message-State: ANhLgQ2BdapqoOc0UOxk28uIZoveNAp40v80Z9QjRjOc8B9VUs4vJsX7
+ mAfrU2+plqnmV64ydTYA5m5K47mwQrOXOjLmnIxXmA==
+X-Google-Smtp-Source: ADFU+vvlyGft/qZoCxy46iV6oExPZANoimPGSXeGApRd9+yEbxAbgksdpHeqOXz3ZxtRDeKM70dQDIjd+Hk7wdV3JzE=
+X-Received: by 2002:aca:c608:: with SMTP id w8mr11268117oif.163.1584808343664; 
+ Sat, 21 Mar 2020 09:32:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1870441923-1584803515=:82121"
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+References: <20200320152408.182899-1-laurent@vivier.eu>
+In-Reply-To: <20200320152408.182899-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 21 Mar 2020 16:32:12 +0000
+Message-ID: <CAFEAcA_HXYMP99ai9QRf8OF+5k+QhUSXCcH01dfT_A0anSM-8Q@mail.gmail.com>
+Subject: Re: [PULL v4 00/32] Linux user for 5.0 patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,87 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- Kevin Wolf <kwolf@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- Max Reitz <mreitz@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Fri, 20 Mar 2020 at 15:27, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 373c7068dd610e97f0b551b5a6d0a27cd6da4506:
+>
+>   qemu.nsi: Install Sphinx documentation (2020-03-09 16:45:00 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/linux-user-for-5.0-pull-request
+>
+> for you to fetch changes up to a64ddbb03acf1ee916c826ae89e0e1aa6500d5ae:
+>
+>   linux-user, openrisc: sync syscall numbers with kernel v5.5 (2020-03-20 16:02:00 +0100)
+>
+> ----------------------------------------------------------------
+> update syscall numbers to linux 5.5 (with scripts)
+> add clock_gettime64/clock_settime64
+> add AT_EXECFN
+>
+> v4: restore syscall.tbl series but remove vsyscall series
+> v3: remove syscall.tbl series
+> v2: guard copy_to_user_timezone() with TARGET_NR_gettimeofday
+>     remove "Support futex_time64" patch
+>     guard sys_futex with TARGET_NR_exit
+>
+> ----------------------------------------------------------------
 
---3866299591-1870441923-1584803515=:82121
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Applied, thanks.
 
-On Sat, 21 Mar 2020, Aleksandar Markovic wrote:
-> 12:49 PM Sub, 21.03.2020. Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> =D1=98=D0=B5
-> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->>
->> Fix warning reported by Clang static code analyzer:
->>
->>   block.c:3167:5: warning: Value stored to 'ret' is never read
->>       ret =3D bdrv_fill_options(&options, filename, &flags, &local_err=
-);
->>       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>
->> Reported-by: Clang Static Analyzer
->
-> Peter, and others,
->
-> Is this allowed use of "Reported-by:" mark?
->
-> I did not notice it being used this way before. And was under impressio=
-n
-> that all similar tags/marks must be followed by a person, not a tool.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-I think there were previous patches with Reported-by: Euler Robot which=20
-may be similar to this usage.
-
-Regards,
-BALATON Zoltan
-
->
-> Regards,
-> Aleksandar
->
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  block.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/block.c b/block.c
->> index a2542c977b..908c109a8c 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -3164,7 +3164,7 @@ static BlockDriverState *bdrv_open_inherit(const
-> char *filename,
->>                                      parent->open_flags, parent->optio=
-ns);
->>      }
->>
->> -    ret =3D bdrv_fill_options(&options, filename, &flags, &local_err)=
-;
->> +    bdrv_fill_options(&options, filename, &flags, &local_err);
->>      if (local_err) {
->>          goto fail;
->>      }
->> --
->> 2.21.1
->>
->>
->
---3866299591-1870441923-1584803515=:82121--
+-- PMM
 
