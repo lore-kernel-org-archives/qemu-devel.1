@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5E1C4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0465C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:49:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0750120637
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:49:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6B5B20714
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:49:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OMfDhfGB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0750120637
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LhhPvsHq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B5B20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFcdI-0006d6-5q
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 07:49:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34523)
+	id 1jFcda-0007DM-QF
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 07:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFcaK-0000Pj-6H
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:46:37 -0400
+ (envelope-from <philmd@redhat.com>) id 1jFcaW-0000zE-RS
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFcaJ-0006JM-6U
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:46:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52668)
+ (envelope-from <philmd@redhat.com>) id 1jFcaV-0006RQ-SE
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:46:48 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:33888)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFcaJ-0006J4-3N
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:46:35 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFcaV-0006R4-Ns
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:46:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584791194;
+ s=mimecast20190719; t=1584791207;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eMQ8dVIZnYJPrg4MRf01ROr1UWOuRMuavJ9h1G8fyNE=;
- b=OMfDhfGBrTPSZDPZ4Nl3XO6mYEV3Jrt7wwV5TCeZ+x/9mcmvnOl3S9mDiI3gFXGEasxOtI
- 2OKm0MQyWlCNueHVHDb8DNbZmznUcNuVTy09RkDq7zIXR4cjlecwchWfEA25IvCSAIZl51
- FWjIqfMW/VBcspyTY5xM2r9TAdBMGas=
+ bh=kQDd9EbUfb0uuK6iIsTzZMSp5qbZytglJrEh2QYroHU=;
+ b=LhhPvsHqd+9gdTRral+5RxEjZBb55LkoxKF+M+4woFoWlVl+baD2C8ezh9bEWIunzAXSje
+ O/orR9E5XjJosjOliB1f/hibVjX1f6VjNcsja31nVJ4ebaoLz4XzBg6dbHAM1v0SM7fqVZ
+ KMeqTee5qLPCkZE4k7fTRcyuGG0l7OM=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-p52w7N_xNnq_aS2t7NQ9Ag-1; Sat, 21 Mar 2020 07:46:33 -0400
-X-MC-Unique: p52w7N_xNnq_aS2t7NQ9Ag-1
-Received: by mail-wr1-f70.google.com with SMTP id l17so3771852wro.3
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 04:46:32 -0700 (PDT)
+ us-mta-462-9XMnFl3QMz24FJrC1AOHUQ-1; Sat, 21 Mar 2020 07:46:45 -0400
+X-MC-Unique: 9XMnFl3QMz24FJrC1AOHUQ-1
+Received: by mail-wr1-f70.google.com with SMTP id b12so4215754wro.4
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 04:46:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kX8C0eEcHvhI8rcexY79cvumv+xMMYTkKA4klDytxcc=;
- b=MlWXlhqwC4Hbe4Wrz4ihkn6Tam3e4nLMZp1LGyY6kRhXF++lLX+d670Y6NFqCBtvKX
- F/ezyxNouIYJpu7V24Bt0I2HYB3x3l3psJ3VpBt80v+1U7c4xDpM5Owya3Z31xHxTwk0
- uySwJZX0R1IMgOhwYOG4Sov2qEqLknTSFcVYSe7H8wGC6MZISq/USlHxt6zGLmJs4bBz
- ZLKWxBwIPgFlPYHIDGrexaF0bHFdg9yGwlZhINv46KxTx0UtgkfzTcHvjWEs5vHND2Ag
- NiT0xA9oO54yWCMQozzOp8T3B0Qc4XBszAtqtIE1E6wmJk0qCINDAgZi92/3qgpxl9Fe
- ihIg==
-X-Gm-Message-State: ANhLgQ2/p3P0CY04awKHFfKxmWK/rSfMelSN3GBiEq2/wcmK5Oat7E6Y
- 6+9WKXaJj3k3uksDjeI47TgV4eIbJRPnXRcPtYEo+DMptlXB5Oe1VCbt/DUR/9JJaZsQzCpcIoJ
- CkISgQyu+05bm0xQ=
-X-Received: by 2002:adf:c44c:: with SMTP id a12mr17986423wrg.172.1584791191385; 
- Sat, 21 Mar 2020 04:46:31 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuT3XdAAValv75OTSe0ODvom2WIFeUB+FFeo0vbikqEyZ6JXGrJZ1M3aU7NlUmOl7P+zQMFFA==
-X-Received: by 2002:adf:c44c:: with SMTP id a12mr17986387wrg.172.1584791191199; 
- Sat, 21 Mar 2020 04:46:31 -0700 (PDT)
+ bh=7jHPzgLUxabSngeicFYbktzokTE6KbRJJJ5XQsCuGXA=;
+ b=fFSjHh4f0tzltGK6FCynw8xMGYrJyqFIsBgy9zrOkgaibK6PmpxJBCw2qyDEaQOqno
+ XXyM6siefXXfM7JdplhjLAXZXlCdHDaLRG8hNJy4WDvKOz6aeoFgOb8jATMqY2AtTUKv
+ PZ+2BmHUy8XxtHefjwcOWkOcjI2vbBUzzMczw+BYx3paNhguMfd2rxiYSolc+Sqt6Pma
+ yw6RZKZGAJA5PbA/YkHw+XmkTAnUJXcrDesVX3Pqay0bXUJVce5NuhfU9gC20s6RyXHO
+ FvKQE7EyL9fpxN63FoGL235H3z7VXRT9rNBjTGmYTE1uz+xs+p5/HuYdzzBZlZ8eQID/
+ GlWA==
+X-Gm-Message-State: ANhLgQ0NON0Dl0x+4r0Y87OyDGiyuhEO6QeafGPrHEgGRlj0zaVGFFQS
+ hSOL37MjtYdosEHgBfnVBjqqzJGrd+rxfwiJMfUjmmjy+dSap3QVW6/SX1fl0pEyyQ7+e1OTuQG
+ fbcK0pKDmPz2dYCs=
+X-Received: by 2002:a5d:66c2:: with SMTP id k2mr16786078wrw.408.1584791204442; 
+ Sat, 21 Mar 2020 04:46:44 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuFSW+CXcA6YfLipptcKR9ABiJniuj3MZjBTWYLGZb0p+0Bf/8+S0d9XoeCUTxe7T9qj4FMdg==
+X-Received: by 2002:a5d:66c2:: with SMTP id k2mr16786051wrw.408.1584791204274; 
+ Sat, 21 Mar 2020 04:46:44 -0700 (PDT)
 Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id d5sm2667163wrh.40.2020.03.21.04.46.28
+ by smtp.gmail.com with ESMTPSA id i67sm13424296wri.50.2020.03.21.04.46.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 21 Mar 2020 04:46:30 -0700 (PDT)
+ Sat, 21 Mar 2020 04:46:43 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 01/11] block: Remove dead assignment
-Date: Sat, 21 Mar 2020 12:46:05 +0100
-Message-Id: <20200321114615.5360-2-philmd@redhat.com>
+Subject: [PATCH-for-5.0 03/11] hw/i2c/pm_smbus: Remove dead assignment
+Date: Sat, 21 Mar 2020 12:46:07 +0100
+Message-Id: <20200321114615.5360-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200321114615.5360-1-philmd@redhat.com>
 References: <20200321114615.5360-1-philmd@redhat.com>
@@ -90,8 +90,7 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,30 +123,29 @@ Sender: "Qemu-devel"
 
 Fix warning reported by Clang static code analyzer:
 
-  block.c:3167:5: warning: Value stored to 'ret' is never read
-      ret =3D bdrv_fill_options(&options, filename, &flags, &local_err);
-      ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CC      hw/i2c/pm_smbus.o
+  hw/i2c/pm_smbus.c:187:17: warning: Value stored to 'ret' is never read
+                  ret =3D 0;
+                  ^     ~
 
 Reported-by: Clang Static Analyzer
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- block.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/i2c/pm_smbus.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index a2542c977b..908c109a8c 100644
---- a/block.c
-+++ b/block.c
-@@ -3164,7 +3164,7 @@ static BlockDriverState *bdrv_open_inherit(const char=
- *filename,
-                                     parent->open_flags, parent->options);
-     }
-=20
--    ret =3D bdrv_fill_options(&options, filename, &flags, &local_err);
-+    bdrv_fill_options(&options, filename, &flags, &local_err);
-     if (local_err) {
-         goto fail;
-     }
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index 36994ff585..4728540c37 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -184,7 +184,6 @@ static void smb_transaction(PMSMBus *s)
+                 s->smb_stat |=3D STS_HOST_BUSY | STS_BYTE_DONE;
+                 s->smb_data[0] =3D s->smb_blkdata;
+                 s->smb_index =3D 0;
+-                ret =3D 0;
+             }
+             goto out;
+         }
 --=20
 2.21.1
 
