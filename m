@@ -2,76 +2,80 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E1AC4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 20:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 031F9C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 22:35:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2804520753
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 20:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2A4520754
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 22:35:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vg1u5aOh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2804520753
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x54J11Dn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A4520754
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFl5z-0005tp-99
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 16:51:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51090)
+	id 1jFmij-0006vP-Sc
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 18:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jFl52-0004tU-6C
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 16:50:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFmhy-000671-Ip
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 18:35:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jFl50-0006wU-Oy
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 16:50:51 -0400
-Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:38965)
+ (envelope-from <peter.maydell@linaro.org>) id 1jFmhx-0006P7-3i
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 18:35:10 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36742)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jFl50-0006vP-Er
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 16:50:50 -0400
-Received: by mail-oi1-x22d.google.com with SMTP id d63so10527129oig.6
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 13:50:46 -0700 (PDT)
+ id 1jFmhw-0006Or-Ou
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 18:35:09 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 39so9746631otu.3
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 15:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:from:date:message-id:subject:to;
- bh=sWnqZE9uT1vmDyBo8aw3hK2K4I8vlaQG0yYSU/ctzGQ=;
- b=Vg1u5aOhg9pwwd8DJYO/f3vjLVkobxjKGkX7cqDMesHwDC9MKDeW4BsFu2wYAYVMGt
- CldCQQdZxZcc75y59FusrVn2VP1nCWCcIkHg9QkLInf530p2lSG7LwI+PB3lRgyJbEMR
- DvWe70HaFArhq9NmzU68rU5w1vkNUPUEmhcDfCHjbRCR0LiG+6gUKSLClDYyxC72VKWY
- lsi0k6gOQJKcCvahQfiw2oxYYH5SWYUxP1wEk2rDnPXiuNLSnGPZJSY63a1yAnnbnsVI
- 30Kdud7PFMSLrPUz0lajNSLC/eleL14p+8299CxYbzZX6HOlZ/JY35kLEE554mYlMpsu
- ECug==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=qE42XWvgxD24BI8lQjYxSyZcGPy7xszUsV9/hIPzd+M=;
+ b=x54J11DnKvGe7QNno+B7yoPf05obFGKwqHz8Yl82hP3pWGZOXj8SuHW5MMckXkUKOH
+ 9Trl9pTtLW1oqIY2ybDLyaflH25+YJCd/inn8Sw2IYhcdoAEFH6JDhN2Z58aCXawWBkv
+ YQnlf/C3a6QkPaiqNYZmUKDqQcXBprMGk8/tCF8U6S/18FQ2bSJrRthf3NIJePB/TQwm
+ psMkZF+kSGOZdWgjgyWF1RsT7FSoNQ2Ar6DOz/+bRX5IcDe7gUzz+20hEKJFn7c6/70u
+ x7fqY6iWU4nxF4dLAYj3wNJ4V1PBuLsjh3vtv2d7ShBqryEBJqEA0o6kPc2cZUxfUry4
+ 6BWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=sWnqZE9uT1vmDyBo8aw3hK2K4I8vlaQG0yYSU/ctzGQ=;
- b=q5yenIKQoCMFXl4BpiIK4l4+4J3tL1j5/pXX1tCu4RftYjJFJyW6CudjvCXcayFUej
- peLsSULyLWq076QfskV2x98HPb8WMAbfLFnayDwdpZdloPoUbCk3rp5xSly7hqZEvsif
- +Lw1C6RkDfAbINCayixHgkjuLMCmdDiadZ1opOPwAOi6VQpgl+StmHth2bEeU7vi+U10
- MKl0WDVPUK5gXlzfM9pPSXvKTyjJgJkQdtC8v79r1WNxDB/cPBeiJAW9l1Ram8yf+C9g
- YFfnN0CD+UEz28Hf5xRZqwgxz4chVZrIj36amAQfgiId/dMf2XxrhfF17WyOgfQocWaS
- VIiw==
-X-Gm-Message-State: ANhLgQ1rpGI1kcZWWCebolM+gyCxroQRn9uXvgq1eDe0T0qvHwQI4IzL
- n0CCB4Y3HlfAPmnc0J7yWMJi+VDYWpNKym7YJUkSnla5Dija0g==
-X-Google-Smtp-Source: ADFU+vtFXPQp2K51GoZT/6fZAdmXJKN52LwOG0Fy0xUq3LK8d0KTiCMMKFcZYYUIo+2T8wK1oGAKkCkUjgLWY8xLFoM=
-X-Received: by 2002:aca:c608:: with SMTP id w8mr11951680oif.163.1584823845564; 
- Sat, 21 Mar 2020 13:50:45 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=qE42XWvgxD24BI8lQjYxSyZcGPy7xszUsV9/hIPzd+M=;
+ b=NeAocC6MXmlgyv9IfETWZurdHWIvhOWealvhdyomZnPYN3Oemhg99x2NqO5Ydr3NCu
+ zj3njlKJSjVt2GOFfeQBaQceUT2Ue7jMjFHMrh+JKLEh15N41ORbpmA/yMxU4QybsqyC
+ 2tOaUM4PYClE/gSLuN/NqOs8tJee/r3X45qSY4m8iNFkDfqMsT2wmOK445FzY9EXeboP
+ kye3CnQBFCKuyN++JEv6Q7AXhKH4HZLfFgNF/bM4HThmXlPEoUkfSVhlebfx1pi8x0UH
+ 800EQES3nc2XWaoLmAqUT3OV3yJYRNNgCCWPdd+U+uzN1H3wMM3XvAhoKFInt0XcGW7K
+ cq2w==
+X-Gm-Message-State: ANhLgQ3KF9zVFjbAZLNyuq7b+YLT9UDpTS+bVb1tcMVJAaLyouC38wEU
+ c8oxALz94xIu7ArrsiIha7PM3bVFeyR9KMIrYjHpBQ==
+X-Google-Smtp-Source: ADFU+vv39tcXOA7PK6tNXU7aAcG2rlxfxM2ISJ+AMP0eiynPwZxFs/+09am3IW8bXn1GDrcVTfrjT8+H2XB6sHt//CQ=
+X-Received: by 2002:a05:6830:20c8:: with SMTP id
+ z8mr12521582otq.135.1584830107748; 
+ Sat, 21 Mar 2020 15:35:07 -0700 (PDT)
 MIME-Version: 1.0
+References: <20200321191311.31537-1-marcel.apfelbaum@gmail.com>
+In-Reply-To: <20200321191311.31537-1-marcel.apfelbaum@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 21 Mar 2020 20:50:34 +0000
-Message-ID: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
-Subject: deprecation of in-tree builds
-To: QEMU Developers <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 21 Mar 2020 22:34:56 +0000
+Message-ID: <CAFEAcA-8e=NLR=x-hXJX=YJZ69Jy0D1uLFW4yxFcRQDMPCQLoQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH PULL 0/4] RDMA queue
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::22d
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,29 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Juan Quintela <quintela@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-AIUI from Paolo, the intention is to deprecate and eventually
-stop supporting "in-tree" builds, so that the only option is
-building in a separate build directory. I thought we should
-probably mention that in the 5.0 changelog, so I wrote up some
-text:
+On Sat, 21 Mar 2020 at 19:13, Marcel Apfelbaum
+<marcel.apfelbaum@gmail.com> wrote:
+>
+> The following changes since commit 52a96afaa23d883d281bc7b95b9e69db7d6d3d3f:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0-pull-request' into staging (2020-03-20 16:00:21 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/marcel-apf/qemu tags/rdma-pull-request
+>
+> for you to fetch changes up to f93cfdc583d4c26b2a878642adf574e11909863c:
+>
+>   hw/rdma: avoid suspicious strncpy() use (2020-03-21 19:21:20 +0200)
+>
+> ----------------------------------------------------------------
+> RDMA queue
+>
+> * hw/rdma: fix gcc 9.2 warnings
+> * hw/rdma: eliminate data-path processing
+> * hw/rdma: Replace strncpy with pstrcpy
 
-https://wiki.qemu.org/ChangeLog/5.0#Build_Information
 
-Suggestions for changes/comments etc welcome.
+Applied, thanks.
 
-(One thing we will need to fix before we can do separate build
-tree is the Coverity Scan build process, which (a) does an
-in-tree build (b) can't be easily switched to a builddir because
-all the source paths get baked into the scan results and moving
-to a builddir changes them all...)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-We could also make configure actively warn if used in
-the source tree.
-
-thanks
 -- PMM
 
