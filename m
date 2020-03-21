@@ -2,92 +2,101 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E06CC4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C43C4332D
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:13:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6033A20754
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:56:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DC0020754
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:13:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lZDdAdBw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6033A20754
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQYd09d+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC0020754
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFecR-0006JP-FS
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 09:56:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52855)
+	id 1jFesF-0001sI-C4
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 10:13:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jFebp-0005sx-7P
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:56:18 -0400
+ (envelope-from <philmd@redhat.com>) id 1jFerC-0000ye-SW
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:12:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jFebn-0005ep-Pp
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:56:16 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51337)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jFebn-0005dC-BG
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:56:15 -0400
-Received: by mail-wm1-x342.google.com with SMTP id c187so9434484wme.1
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 06:56:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:message-id
- :date:mime-version:content-transfer-encoding;
- bh=ZafcH+DwkL/AMMqK5bC8oPK3+j9uqrvaddbO0mPp09k=;
- b=lZDdAdBwonymPAOrxePFIKjDOGFL+aHk8kWc14kONfQjPShq4OLqa2+slF0MPCDbPc
- y8VeZNdtB3hNMTa4sCFfLHkfhudqAI2llJwK/8JqvsN4J1AC01SHwKVVq7t+nvxiQiYJ
- wzuUu6ORpdEKveD5g0TR1uqOzLErcCM2Eu6XgdUOueCk4GVAIVC+YKFtSgnyhfZPybg9
- Syp2AyUvi+w1GSKaMHQDWd36NStOThTuL+itJVo8nt+fKjOeL3fYVl75wV3xBhhkUG9Y
- J7OPQqoFgzuHqFeGG770cGIUQkvOS+HLZKLqKKid/65L8hSn1RzFOgHsePJ2wTdIyjIY
- AHFA==
+ (envelope-from <philmd@redhat.com>) id 1jFerB-0005K7-BH
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:12:10 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24629)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFerB-0005Iy-3u
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:12:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584799927;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vdctJkNr5flfamIlFadkGaxBCJU9nr8W/MsX0dp2l2I=;
+ b=AQYd09d+SlEur792/nXQOFU1UqEqmJxtpN1kckTBulq2PscUQOfRR4Acog+ldFmF4JQnBC
+ +3fqym3yUvGjdLPLtNjmE4f46iTY4vEbaX9MzROp//m1nSyOzXmUK3DHxPF0AzAkm9PrO7
+ /qCUU73OxY4Hve04Mg5nEz5p4I+xi00=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-cjSoNiy6OQ-d0xksa01t3Q-1; Sat, 21 Mar 2020 10:12:05 -0400
+X-MC-Unique: cjSoNiy6OQ-d0xksa01t3Q-1
+Received: by mail-ed1-f71.google.com with SMTP id dm17so7586106edb.3
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 07:12:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:message-id:date:mime-version:content-transfer-encoding;
- bh=ZafcH+DwkL/AMMqK5bC8oPK3+j9uqrvaddbO0mPp09k=;
- b=YPzVXZ21lhp15hDcgKpqBxBGBpjel/hq7YJmvD/Rl5DXA7wDykmbxYSMo/f7IHCg3O
- v0UlGcLSTPgtUymQbwKPIiyO3tVVIv/dz1MR03bnAPJSjuaWDQnY+1RqRsY6eWn7Qhtf
- T/PQIZ0y3nCwZ2ouV2DMM0Gs6CZ6GNoJe4S/5yzDuyHmRXcSnDSi7JXgvASVM0K5faQw
- apDPM5zz+vvZWwKeF2ABXqJdu1gOQ1ji7ZYqqqwbwIaQieR/ZcRdl02ONEVPU58UdoQw
- szNh0Np1hO8vOcSX0x14gjslXFylE+o5mYVORkFeeJ0U6nFEY6fwqlTWB3/NHdtwnSxm
- edoA==
-X-Gm-Message-State: ANhLgQ0afCxO/snEBrmzO3TniRIHTnbZ6ALUc27CyxwvZMbPqJ7EH4P+
- ZqXhohkfUPt991coCVqa9uyZkQ==
-X-Google-Smtp-Source: ADFU+vu7aZH+u61ymBAsPgtxMojWV/+Khrc+eAIGTKZGwKrKYP8uXiX7TOJgLJrHowGoF4lTeqX4nA==
-X-Received: by 2002:a1c:23c8:: with SMTP id
- j191mr16586943wmj.117.1584798973767; 
- Sat, 21 Mar 2020 06:56:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q72sm12517615wme.31.2020.03.21.06.56.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 21 Mar 2020 06:56:12 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 627E51FF7E;
- Sat, 21 Mar 2020 13:56:11 +0000 (GMT)
-References: <20200307010051.97022-1-yuanzi@google.com>
- <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
- <87imizidwc.fsf@linaro.org>
- <CADjx4CJJdQep+K3ibfhjin7Eo6uCEFGQ6R6yVC0OcNo8MsfvJw@mail.gmail.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Lirong Yuan <yuanzi@google.com>
-Subject: Re: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
-In-reply-to: <CADjx4CJJdQep+K3ibfhjin7Eo6uCEFGQ6R6yVC0OcNo8MsfvJw@mail.gmail.com>
-Message-ID: <87d095u804.fsf@linaro.org>
-Date: Sat, 21 Mar 2020 13:56:11 +0000
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5YTr7B8Vhgph7+l62ANtSEn/6x+hhNiv2LZGdPA8a70=;
+ b=LINrXU65jlVU/kd+5bwrZEckB25zgs5Mg4/bZWxYDCp7VrfeWsAY88fVz4lvqNlLD8
+ 2XzQiYQIusWw7U8uLlhjkfCYqcYJcY2nGiu8T2LAcoT1iCdq11dlvkY738liYJqitVX6
+ 3E8oMlwsdo32M27tKe7jW2aY+bfOvSYtymzrC//M5PK+hjzfeT6tXyQXerSVmezhyi4X
+ PcP2AzleSMrta/V6hprU3YCS3I9Es+ZTJpDm40tkZzizSPMcWwO3erwrLtTBImRvIfhC
+ g36sukdz8xm+neV1RKQ6kfq0D2x4NIbPXElvxO0CXhL/isgVL0OAIgF+Af0ViXxlHz8R
+ 3HFg==
+X-Gm-Message-State: ANhLgQ3O8oSNfJoQlEpyEYB3jTSSpE4KNuzF75GHzlNnpMqdIeXMGvSm
+ F2qxDL7pAPZW032+rw5mLknXdIKB0ZXLyjccu4n/bWMgIyaAhYZG3yQ2pNN9RldR776ZBt9GUmf
+ Q2t6SbFkW0+3KOqs=
+X-Received: by 2002:a17:906:c835:: with SMTP id
+ dd21mr12788920ejb.140.1584799924253; 
+ Sat, 21 Mar 2020 07:12:04 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vswvkINXM0tFJgCuBXez3xd6Rkdtm0y9xcA9GO2JYtSqgDsa1eOwjCFZ/2m9CnVXgMc2rEQ2A==
+X-Received: by 2002:a17:906:c835:: with SMTP id
+ dd21mr12788886ejb.140.1584799923899; 
+ Sat, 21 Mar 2020 07:12:03 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id oz27sm579169ejb.13.2020.03.21.07.12.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 21 Mar 2020 07:12:02 -0700 (PDT)
+Subject: Re: [PATCH-for-5.0 07/11] hw/gpio/aspeed_gpio: Remove dead assignment
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <20200321114615.5360-1-philmd@redhat.com>
+ <20200321114615.5360-8-philmd@redhat.com>
+ <alpine.BSF.2.22.395.2003211420450.82121@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <41f0d6a5-8699-e272-4832-fc1fce2e019e@redhat.com>
+Date: Sat, 21 Mar 2020 15:12:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <alpine.BSF.2.22.395.2003211420450.82121@zero.eik.bme.hu>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,66 +108,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>,
- Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Shu-Chun Weng <scw@google.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Alistair Francis <alistair@alistair23.me>,
+ qemu-arm@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
+ Kevin Wolf <kwolf@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Max Reitz <mreitz@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Lirong Yuan <yuanzi@google.com> writes:
-
-> On Fri, Mar 20, 2020 at 2:17 AM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
-<snip>
+On 3/21/20 2:22 PM, BALATON Zoltan wrote:
+> On Sat, 21 Mar 2020, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Fix warning reported by Clang static code analyzer:
 >>
->> Sorry I missed this on my radar. There was a minor re-factor of gdbstub
->> that was just merged which will mean this patch needs a re-base to use
->> g_string_* functions to expand stings.
+>> =C2=A0hw/gpio/aspeed_gpio.c:717:18: warning: Value stored to 'g_idx' dur=
+ing=20
+>> its initialization is never read
+>> =C2=A0=C2=A0=C2=A0=C2=A0 int set_idx, g_idx =3D *group_idx;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~=C2=A0=C2=A0 ~~~~~~~~~~
 >>
->> Also we have some simple gdbstub tests now - could we come up with a
->> multiarch gdbstub test to verify this is working properly?
+>> Reported-by: Clang Static Analyzer
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>> hw/gpio/aspeed_gpio.c | 4 ++--
+>> 1 file changed, 2 insertions(+), 2 deletions(-)
 >>
-<snip>
-> For sure, I will re-base this patch to use g_string_* functions.
->
-> Currently we are using qemu aarch64. I am not sure how to do this yet, but
-> I could try to add something to
-> https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbstub
+>> diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
+>> index 41e11ea9b0..cc07ab9866 100644
+>> --- a/hw/gpio/aspeed_gpio.c
+>> +++ b/hw/gpio/aspeed_gpio.c
+>> @@ -714,11 +714,11 @@ static void aspeed_gpio_write(void *opaque,=20
+>> hwaddr offset, uint64_t data,
+>> static int get_set_idx(AspeedGPIOState *s, const char *group, int=20
+>> *group_idx)
+>> {
+>> =C2=A0=C2=A0=C2=A0 AspeedGPIOClass *agc =3D ASPEED_GPIO_GET_CLASS(s);
+>> -=C2=A0=C2=A0=C2=A0 int set_idx, g_idx =3D *group_idx;
+>> +=C2=A0=C2=A0=C2=A0 int set_idx;
+>>
+>> =C2=A0=C2=A0=C2=A0 for (set_idx =3D 0; set_idx < agc->nr_gpio_sets; set_=
+idx++) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const GPIOSetProperties *set_=
+props =3D &agc->props[set_idx];
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (g_idx =3D 0; g_idx < AS=
+PEED_GROUPS_PER_SET; g_idx++) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (int g_idx =3D 0; g_idx =
+< ASPEED_GROUPS_PER_SET; g_idx++) {
+>=20
+> Is declaring variables here allowed by coding style? Shouldn't you only=
+=20
+> remove init value from above?
 
-If the auxv support is appropriate to all linux-user targets you can
-plumb it into the multiarch tests - you can even use the existing
-binaries.
+You are right, it is not (yet?) allowed by QEMU coding style.
 
-So you need:
+>=20
+> Regards,
+> BALATON Zoltan
+>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!=
+strncmp(group, set_props->group_label[g_idx],=20
+>> strlen(group))) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 *group_idx =3D g_idx;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 return set_idx;
+>>
 
-  - a stanza in the makefiles to launch the test (see
-    tests/tcg/aarch64/Makefile.target)
-
-  - a .py test script that manipulates gdbstub to check things are working
-
-So something like:
-
-.PHONY: gdbstub-foo-binary
-run-gdbstub-foo-binary: foo-binary
-	$(call run-test, $@, $(GDB_SCRIPT) \
-		--gdb $(HAVE_GDB_BIN) \
-		--qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
-		--bin $< --test $(MULTIARCH_SRC)/gdbstub/test-foo.py, \
-	"basic gdbstub FOO support")
-
-
->
-> Does this sound good?
-
-Hope that helps.
-
->
-> Thanks!
-> Lirong
-
-
---=20
-Alex Benn=C3=A9e
 
