@@ -2,82 +2,93 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B2CC4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 17:18:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA047C4332D
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 17:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D30B20724
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 17:18:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B391420724
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 17:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gyYg7nDN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D30B20724
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="syD25026"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B391420724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFhlO-0002VT-9V
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 13:18:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54464)
+	id 1jFhrH-00046o-UY
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 13:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55118)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jFhkl-00025P-QI
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:17:45 -0400
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFhqX-0003eW-Nr
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jFhkk-0004wg-7V
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:17:43 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38610)
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFhqW-0007VM-F4
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:23:41 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35692)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jFhkk-0004wS-1c
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:17:42 -0400
-Received: by mail-io1-xd42.google.com with SMTP id m15so4479166iob.5
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 10:17:41 -0700 (PDT)
+ (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+ id 1jFhqW-0007ST-9E
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:23:40 -0400
+Received: by mail-wm1-x342.google.com with SMTP id m3so9878782wmi.0
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 10:23:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=KbQldffzCEJ4E2mNJ0T7zxHDa8S/Y/TEGNYQZXxKz/g=;
- b=gyYg7nDNFPpTC3Ozw7QTLcdW7Eg1R+ROvzkd7k3aTPyhAtwRY3uKSL+2elQ+UduqaW
- aUvOzfC1DMacRGCyEUsaIAF1eIDFECmdLZP2SmTrCcXGdiLQqkfsWx52nXT92fApM3ML
- trjZR5R4swTJhiy0L7PEF+4IES59aRZ9bPW9SJFjQ4eKQJWx5l8W0LgA+YhhyEIXmvw5
- SG7eupbglEah7d1DvsJ9kj51jA3rBz84chLZdgY7Q9pMl5L3eRvCBxKsBt3yGhunnOmm
- FwcT+SoXWC7W2pDIooEolR1HlwLMu6dAKA6bjtinzvfFPKfgsC9oMjIxuZRiRoaB7ENV
- ibhA==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-transfer-encoding:content-language;
+ bh=4COvmHZnbLJIekYtKN//zI3GQIWRlJTgF/3iVATa9o4=;
+ b=syD250269ipnDb9Af8aMa+7K7VG2IjY55vuJ3LZ0eoc8vlzL1tBK5105Wk+2DmAgBu
+ gSE2KUGaEDYxP3FloW0ISUOWKyhJsBfUxV11g3rhgX0gCTCr2u4b7YfiszfZIZ764oCD
+ Lgkq7m0SSUZ/qmkxzkY5Tsq6WMUPlS35q4KZcIWNcaWnJJ2xMhlEsMesEpQRhMUjUVPC
+ P3PJp4PytTDbl6hbYdDZAS31q2SnekVuln0/LcCucBuuLxqAG7rFtwxp+ZOFe8CUtD7w
+ 5WsUtkaS3oyLeqR3dh09CGXKZpfDQYQpHbuYbxk7e5Ae4sazCjDjsACANgjNQZx+3C9H
+ 5eQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=KbQldffzCEJ4E2mNJ0T7zxHDa8S/Y/TEGNYQZXxKz/g=;
- b=PQIJjnNX/ba6/h5IEdpHTOQk/M239AAoWB+oe80d6edXLk9bFMT7Z0fRWU6e2r2xm8
- oxlVaFIRM7iXkB4r7hdobXcmiR46nuOpEugM3cVf3eXV7CZEdm2err1ro61OleoFUDnr
- VZCd+azvqHWXxtQ5d+oeeJWMly1/UU5HRzvoRDRBEpP+n6dpwo3NmVCx0hGU8eOFDDIB
- EdmHfGiSO/8WUVRWSJEm4r/7XOEnNCBFd8ASjP89v0LClhQYD9aZzll5/0+mR0Qyhb60
- 1H9uKBAW8ThCKO6tve1VxlzeYJxjhWpURCsgMPcLAURkl+UrceKALOe3ZCUA0wPWbemM
- m6Yg==
-X-Gm-Message-State: ANhLgQ1E4eesT6HXqqUjUdvXJfdTRUnRxVT0iAAjFZyiJoiLDU9QV2cy
- CpZwuPAQx/zYmtmI3DhBlI70mvOluhfrOHc2MMs=
-X-Google-Smtp-Source: ADFU+vscqQGr6xL/R/Mw/vFrWuMXaF6YgMvLwQMSkB8b+tNWL9+wzBxHiRe3sp1sB/yg2NVw5wFXdkSA4CgbNFWslZU=
-X-Received: by 2002:a6b:5103:: with SMTP id f3mr12557514iob.181.1584811060560; 
- Sat, 21 Mar 2020 10:17:40 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-transfer-encoding
+ :content-language;
+ bh=4COvmHZnbLJIekYtKN//zI3GQIWRlJTgF/3iVATa9o4=;
+ b=YA6q+3r5OdBF+PimdaFZNF18ieeCWcTnVYMDzyyaMS36ez048+U1eBdoY4s76RtA6y
+ oYuMsQYiE2paJ0vJAWuhW4l4LXwuplAcphHwpNiBzpTVF7XFSNscUoahRc7Mvhzc8+C5
+ ccUTF7gixZ74l+kksEbQE6kRUz4iCFcW0GSTCzBV8lKhUARGBspro9ojYt0/ndncsOOm
+ 4ofMw4uvdwbLVr94mzMLHDKqKBtLKlq0WIkYJtCqlffKmA+U9MZ5Gm5M8w8zRsfUWWZc
+ U6u0H9cWyI4gn0j8OwgL6/0e1yd7gANjmm28VE0hA3Lx2hwWQ9yhStnW9h/EUatInuyC
+ JW3Q==
+X-Gm-Message-State: ANhLgQ3nbZbdNKdRCr2VaTO80vMCSYPVK+UK7pwT04o02E3sj7xCk8h+
+ P/chDAtL5EMGeOBbX8mQrAM=
+X-Google-Smtp-Source: ADFU+vtILGLnq38TeTdJ5fViDfDoZcU8Z/eU0geLVAu/b5xZXVF1dgq7xXgnBDGBRjKWyy2d1ZvLmw==
+X-Received: by 2002:a1c:1d4d:: with SMTP id d74mr16899166wmd.123.1584811418707; 
+ Sat, 21 Mar 2020 10:23:38 -0700 (PDT)
+Received: from [192.168.86.37] ([37.142.144.12])
+ by smtp.gmail.com with ESMTPSA id s8sm9847902wrv.97.2020.03.21.10.23.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 21 Mar 2020 10:23:38 -0700 (PDT)
+Subject: Re: [PATCH 2/2] hw/rdma: avoid suspicious strncpy() use
+To: Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200316160702.478964-1-stefanha@redhat.com>
+ <20200316160702.478964-3-stefanha@redhat.com>
+ <CAMPkWoMFD+-zbt1Xb-0M-MQWJ_QonQxUkJWBRoLUdJzfC49VfA@mail.gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <1600942b-181d-2102-d3b0-6892a882d47a@gmail.com>
+Date: Sat, 21 Mar 2020 19:25:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-References: <20200312164459.25924-1-peter.maydell@linaro.org>
- <20200312164459.25924-22-peter.maydell@linaro.org>
- <CAFEAcA-F85aJ4yigDdEMd4=kAEaPV+f4zn9cuyhyoO-xhEcAng@mail.gmail.com>
-In-Reply-To: <CAFEAcA-F85aJ4yigDdEMd4=kAEaPV+f4zn9cuyhyoO-xhEcAng@mail.gmail.com>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Sat, 21 Mar 2020 18:17:29 +0100
-Message-ID: <CAPan3WrW=YwnjiGnhQ1Wdyj7jwcsLXiVy0eQv-K_LhRfAZvyQg@mail.gmail.com>
-Subject: Re: [PULL 21/36] hw/arm/allwinner-h3: add Boot ROM support
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000004d051105a160944f"
+In-Reply-To: <CAMPkWoMFD+-zbt1Xb-0M-MQWJ_QonQxUkJWBRoLUdJzfC49VfA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,206 +100,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004d051105a160944f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Stefan,
 
-Hi Peter,
-
-
-On Fri, Mar 20, 2020 at 1:08 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On Thu, 12 Mar 2020 at 16:45, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> >
-> > From: Niek Linnenbank <nieklinnenbank@gmail.com>
-> >
-> > A real Allwinner H3 SoC contains a Boot ROM which is the
-> > first code that runs right after the SoC is powered on.
-> > The Boot ROM is responsible for loading user code (e.g. a bootloader)
-> > from any of the supported external devices and writing the downloaded
-> > code to internal SRAM. After loading the SoC begins executing the code
-> > written to SRAM.
-> >
-> > This commits adds emulation of the Boot ROM firmware setup functionalit=
-y
-> > by loading user code from SD card in the A1 SRAM. While the A1 SRAM is
-> > 64KiB, we limit the size to 32KiB because the real H3 Boot ROM also
-> rejects
-> > sizes larger than 32KiB. For reference, this behaviour is documented
-> > by the Linux Sunxi project wiki at:
-> >
-> >   https://linux-sunxi.org/BROM#U-Boot_SPL_limitations
-> >
-> > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> > Message-id: 20200311221854.30370-11-nieklinnenbank@gmail.com
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
-> Hi; Coverity (CID 1421882) points out a possible NULL
-> pointer dereference in this change:
->
-> > diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
-> > index d65bbf8a2fe..b8ebcb08b76 100644
-> > --- a/hw/arm/orangepi.c
-> > +++ b/hw/arm/orangepi.c
-> > @@ -97,6 +97,11 @@ static void orangepi_init(MachineState *machine)
-> >      memory_region_add_subregion(get_system_memory(),
-> h3->memmap[AW_H3_SDRAM],
-> >                                  machine->ram);
-> >
-> > +    /* Load target kernel or start using BootROM */
-> > +    if (!machine->kernel_filename && blk_is_available(blk)) {
-> > +        /* Use Boot ROM to copy data from SD card to SRAM */
-> > +        allwinner_h3_bootrom_setup(h3, blk);
-> > +    }
->
-> blk_is_available() assumes its argument is non-NULL, but
-> earlier in the function we set up blk with:
->    b=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BFlk =3D=
- di ? blk_by_legacy_dinfo(di) : NULL;
->
-> so it can be NULL here.
+On 3/20/20 1:55 PM, Yuval Shaia wrote:
 >
 >
-Right, indeed.
-
-
-> Could you send a patch to fix this, please? Probably
+> On Mon, 16 Mar 2020 at 18:07, Stefan Hajnoczi <stefanha@redhat.com 
+> <mailto:stefanha@redhat.com>> wrote:
 >
-just adding '&& blk' in the middle of the condition
-> is sufficient.
+>     gcc (GCC) 9.2.1 20190827 (Red Hat 9.2.1-1) with sanitizers enabled
+>     reports the following error:
 >
-
-Sure, I'll make a small patch for this, and also the other one you reported
-for the SDRAM controller.
-
-By the way, I do not have the coverity tool unfortunately. So I can't
-really check myself
-if any of the other Allwinner H3 files also have warnings that can be
-fixed..
-But if coverity finds more, just let me know, and I'll look into it.
-
-Regards,
-Niek
-
-
-
+>       CC      x86_64-softmmu/hw/rdma/vmw/pvrdma_dev_ring.o
+>     In file included from /usr/include/string.h:495,
+>                      from include/qemu/osdep.h:101,
+>                      from hw/rdma/vmw/pvrdma_dev_ring.c:16:
+>     In function ‘strncpy’,
+>         inlined from ‘pvrdma_ring_init’ at
+>     hw/rdma/vmw/pvrdma_dev_ring.c:33:5:
+>     /usr/include/bits/string_fortified.h:106:10: error:
+>     ‘__builtin_strncpy’ specified bound 32 equals destination size
+>     [-Werror=stringop-truncation]
+>       106 |   return __builtin___strncpy_chk (__dest, __src, __len,
+>     __bos (__dest));
+>           | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 >
-> thanks
-> -- PMM
+>     Use pstrcpy() instead of strncpy().  It is guaranteed to NUL-terminate
+>     strings.
 >
-
-
---=20
-Niek Linnenbank
-
---0000000000004d051105a160944f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><div>Hi Peter,</div><div><br></div></div>=
-<br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri=
-, Mar 20, 2020 at 1:08 PM Peter Maydell &lt;<a href=3D"mailto:peter.maydell=
-@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br></div><blockquote c=
-lass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px soli=
-d rgb(204,204,204);padding-left:1ex">On Thu, 12 Mar 2020 at 16:45, Peter Ma=
-ydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank">pet=
-er.maydell@linaro.org</a>&gt; wrote:<br>
-&gt;<br>
-&gt; From: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" =
-target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
-&gt;<br>
-&gt; A real Allwinner H3 SoC contains a Boot ROM which is the<br>
-&gt; first code that runs right after the SoC is powered on.<br>
-&gt; The Boot ROM is responsible for loading user code (e.g. a bootloader)<=
-br>
-&gt; from any of the supported external devices and writing the downloaded<=
-br>
-&gt; code to internal SRAM. After loading the SoC begins executing the code=
-<br>
-&gt; written to SRAM.<br>
-&gt;<br>
-&gt; This commits adds emulation of the Boot ROM firmware setup functionali=
-ty<br>
-&gt; by loading user code from SD card in the A1 SRAM. While the A1 SRAM is=
-<br>
-&gt; 64KiB, we limit the size to 32KiB because the real H3 Boot ROM also re=
-jects<br>
-&gt; sizes larger than 32KiB. For reference, this behaviour is documented<b=
-r>
-&gt; by the Linux Sunxi project wiki at:<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0<a href=3D"https://linux-sunxi.org/BROM#U-Boot_SPL_limitat=
-ions" rel=3D"noreferrer" target=3D"_blank">https://linux-sunxi.org/BROM#U-B=
-oot_SPL_limitations</a><br>
-&gt;<br>
-&gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gm=
-ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
-&gt; Reviewed-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro=
-.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
-&gt; Message-id: <a href=3D"mailto:20200311221854.30370-11-nieklinnenbank@g=
-mail.com" target=3D"_blank">20200311221854.30370-11-nieklinnenbank@gmail.co=
-m</a><br>
-&gt; Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linar=
-o.org" target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
-<br>
-Hi; Coverity (CID 1421882) points out a possible NULL<br>
-pointer dereference in this change:<br>
-<br>
-&gt; diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c<br>
-&gt; index d65bbf8a2fe..b8ebcb08b76 100644<br>
-&gt; --- a/hw/arm/orangepi.c<br>
-&gt; +++ b/hw/arm/orangepi.c<br>
-&gt; @@ -97,6 +97,11 @@ static void orangepi_init(MachineState *machine)<br=
+>     Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com
+>     <mailto:stefanha@redhat.com>>
+>     ---
+>      hw/rdma/vmw/pvrdma_dev_ring.c | 4 ++--
+>      1 file changed, 2 insertions(+), 2 deletions(-)
 >
-&gt;=C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(get_system_memory(), h=
-3-&gt;memmap[AW_H3_SDRAM],<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 machine-&gt;ram);<br>
-&gt;<br>
-&gt; +=C2=A0 =C2=A0 /* Load target kernel or start using BootROM */<br>
-&gt; +=C2=A0 =C2=A0 if (!machine-&gt;kernel_filename &amp;&amp; blk_is_avai=
-lable(blk)) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Use Boot ROM to copy data from SD card=
- to SRAM */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 allwinner_h3_bootrom_setup(h3, blk);<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-<br>
-blk_is_available() assumes its argument is non-NULL, but<br>
-earlier in the function we set up blk with:<br>
-=C2=A0 =C2=A0b=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=
-=BFlk =3D di ? blk_by_legacy_dinfo(di) : NULL;<br>
-<br>
-so it can be NULL here.<br>
-<br></blockquote><div><br></div><div>Right, indeed.<br></div><div>=C2=A0</d=
-iv><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bord=
-er-left:1px solid rgb(204,204,204);padding-left:1ex">
-Could you send a patch to fix this, please? Probably <br></blockquote><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:=
-1px solid rgb(204,204,204);padding-left:1ex">
-just adding &#39;&amp;&amp; blk&#39; in the middle of the condition<br>
-is sufficient.<br></blockquote><div><br></div><div>Sure, I&#39;ll make a sm=
-all patch for this, and also the other one you reported for the SDRAM contr=
-oller.</div><div><br></div><div>By the way, I do not have the coverity tool=
- unfortunately. So I can&#39;t really check myself</div><div> if any of the=
- other Allwinner H3 files also have warnings that can be fixed..</div><div>=
-But if coverity finds more, just let me know, and I&#39;ll look into it.<br=
-></div><div><br></div><div>Regards,</div><div>Niek<br></div><div><br></div>=
-<div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
-0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-thanks<br>
--- PMM<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
+>     diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c
+>     b/hw/rdma/vmw/pvrdma_dev_ring.c
+>     index d7bc7f5ccc..74b8fa834c 100644
+>     --- a/hw/rdma/vmw/pvrdma_dev_ring.c
+>     +++ b/hw/rdma/vmw/pvrdma_dev_ring.c
+>     @@ -14,6 +14,7 @@
+>       */
+>
+>      #include "qemu/osdep.h"
+>     +#include "qemu/cutils.h"
+>      #include "hw/pci/pci.h"
+>      #include "cpu.h"
+>
+>     @@ -30,8 +31,7 @@ int pvrdma_ring_init(PvrdmaRing *ring, const
+>     char *name, PCIDevice *dev,
+>          int i;
+>          int rc = 0;
+>
+>     -    strncpy(ring->name, name, MAX_RING_NAME_SZ);
+>     -    ring->name[MAX_RING_NAME_SZ - 1] = 0;
+>     +    pstrcpy(ring->name, MAX_RING_NAME_SZ, name);
+>          ring->dev = dev;
+>          ring->ring_state = ring_state;
+>          ring->max_elems = max_elems;
+>     -- 
+>     2.24.1
+>
+>
+> Thanks,
+>
+> Reviewed-by: Yuval Shaia <yuval.shaia.ml.gmail.com 
+> <http://yuval.shaia.ml.gmail.com>>
 
---0000000000004d051105a160944f--
+I'll add this patch to the pvrdma queue.
+
+Thanks,
+Marcel
+
 
