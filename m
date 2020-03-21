@@ -2,91 +2,82 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E81D0C4332E
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 16:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B2CC4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 17:18:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B60E720753
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 16:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D30B20724
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 17:18:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNPRVaIH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B60E720753
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gyYg7nDN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D30B20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFhKr-0003hZ-Qi
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 12:50:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51602)
+	id 1jFhlO-0002VT-9V
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 13:18:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFhJW-0002js-5w
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 12:49:35 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jFhkl-00025P-QI
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:17:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFhJU-0004Zo-T6
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 12:49:34 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34366)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jFhkk-0004wg-7V
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:17:43 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38610)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1jFhJU-0004Zg-LD
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 12:49:32 -0400
-Received: by mail-wr1-x443.google.com with SMTP id z15so11306889wrl.1
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 09:49:32 -0700 (PDT)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jFhkk-0004wS-1c
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 13:17:42 -0400
+Received: by mail-io1-xd42.google.com with SMTP id m15so4479166iob.5
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 10:17:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-transfer-encoding:content-language;
- bh=Q+e1HpA1qAylc/i0MFpY//uE6Mbmb1MdTFTJJeA2ZoY=;
- b=TNPRVaIHYgUUm0h1iylKC0zClbwlQBnm7yNvCc6pTrb6+ks5UQZVI84MSGs45gLF28
- 1AH4aCZdTkp4mIkO3lr9dUDkiX6acQ2z4mP9O+PxC+aAlqbaUYiPgt5t6Y1C+A0PQwR2
- f62Sn/KKjvAPk1x4GFeegZDk3MxUr2kbaJAPBpqQTtE/01INooRfeAj5y+VvOIZ9q8UA
- bbB/1TFLt1v/UUBPIqaQjPUIeXuifhfi+oce8tsV+rMu6D1Bb4zAzjbBMbf/z7Q0RhxD
- VpYpbWCAHKb7Nulavg1yyb4KqXLbBkJNDsvn5DaMTjn5AePepqzRrraJN8I4qerVC9Od
- vKhw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KbQldffzCEJ4E2mNJ0T7zxHDa8S/Y/TEGNYQZXxKz/g=;
+ b=gyYg7nDNFPpTC3Ozw7QTLcdW7Eg1R+ROvzkd7k3aTPyhAtwRY3uKSL+2elQ+UduqaW
+ aUvOzfC1DMacRGCyEUsaIAF1eIDFECmdLZP2SmTrCcXGdiLQqkfsWx52nXT92fApM3ML
+ trjZR5R4swTJhiy0L7PEF+4IES59aRZ9bPW9SJFjQ4eKQJWx5l8W0LgA+YhhyEIXmvw5
+ SG7eupbglEah7d1DvsJ9kj51jA3rBz84chLZdgY7Q9pMl5L3eRvCBxKsBt3yGhunnOmm
+ FwcT+SoXWC7W2pDIooEolR1HlwLMu6dAKA6bjtinzvfFPKfgsC9oMjIxuZRiRoaB7ENV
+ ibhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=Q+e1HpA1qAylc/i0MFpY//uE6Mbmb1MdTFTJJeA2ZoY=;
- b=GAzO/t37qvLboEILyUCJKwECstXzIw76ooDZ3/9RnvU1upr2edIbYnvULVqst1hNNi
- KZmI14pkGe0nmdTk+rBBVJnoCBZLWJfFJ6iNWTojAzLwbR5i4uajLy5VUQ1Vh8zIfFj6
- VWab6eaWlrR3MyJPXj6uUMpKJ5CuL/Lgx0YSWVDaaGgWulCv5+0mba73EAxbgiokr3JC
- t0rL9QGdmE7C5Tjj7Lo3siRDgIahZFKX6gjAlB9XLZAeVizmEe/yuK92o6dG1uwoLHsp
- WEB0C+dhDhIRV4Psf2gd6YOwfNCoR0PB3ikqWRwHJ2/Bm7zFnSurc2Fim6H3LpDuhb7k
- agjw==
-X-Gm-Message-State: ANhLgQ27law3zk6tLFtc5PhGspQLiqr0zLtWiJRd/w2KVIA/WKAIhXJL
- Emca3S93Ign1XE2No345YnU0uHW8
-X-Google-Smtp-Source: ADFU+vtN79JmmcolCAWH+255NmecwJE80EqPvtyaJs0tXWORK+wRAOPn34Z0JJ8xDT/lx22p75Sgug==
-X-Received: by 2002:adf:f8c1:: with SMTP id f1mr3494818wrq.345.1584809371081; 
- Sat, 21 Mar 2020 09:49:31 -0700 (PDT)
-Received: from [192.168.86.37] ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id i21sm13884442wmb.23.2020.03.21.09.49.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 21 Mar 2020 09:49:30 -0700 (PDT)
-Subject: Re: [PATCH v1 2/2] hw/rdma: Skip data-path mr_id translation
-To: Yuval Shaia <yuval.shaia.ml@gmail.com>, qemu-devel@nongnu.org
-References: <20200320143429.9490-1-yuval.shaia.ml@gmail.com>
- <20200320143429.9490-3-yuval.shaia.ml@gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <9adf4de6-9987-6904-8f23-2b6f66939e73@gmail.com>
-Date: Sat, 21 Mar 2020 18:51:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KbQldffzCEJ4E2mNJ0T7zxHDa8S/Y/TEGNYQZXxKz/g=;
+ b=PQIJjnNX/ba6/h5IEdpHTOQk/M239AAoWB+oe80d6edXLk9bFMT7Z0fRWU6e2r2xm8
+ oxlVaFIRM7iXkB4r7hdobXcmiR46nuOpEugM3cVf3eXV7CZEdm2err1ro61OleoFUDnr
+ VZCd+azvqHWXxtQ5d+oeeJWMly1/UU5HRzvoRDRBEpP+n6dpwo3NmVCx0hGU8eOFDDIB
+ EdmHfGiSO/8WUVRWSJEm4r/7XOEnNCBFd8ASjP89v0LClhQYD9aZzll5/0+mR0Qyhb60
+ 1H9uKBAW8ThCKO6tve1VxlzeYJxjhWpURCsgMPcLAURkl+UrceKALOe3ZCUA0wPWbemM
+ m6Yg==
+X-Gm-Message-State: ANhLgQ1E4eesT6HXqqUjUdvXJfdTRUnRxVT0iAAjFZyiJoiLDU9QV2cy
+ CpZwuPAQx/zYmtmI3DhBlI70mvOluhfrOHc2MMs=
+X-Google-Smtp-Source: ADFU+vscqQGr6xL/R/Mw/vFrWuMXaF6YgMvLwQMSkB8b+tNWL9+wzBxHiRe3sp1sB/yg2NVw5wFXdkSA4CgbNFWslZU=
+X-Received: by 2002:a6b:5103:: with SMTP id f3mr12557514iob.181.1584811060560; 
+ Sat, 21 Mar 2020 10:17:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200320143429.9490-3-yuval.shaia.ml@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20200312164459.25924-1-peter.maydell@linaro.org>
+ <20200312164459.25924-22-peter.maydell@linaro.org>
+ <CAFEAcA-F85aJ4yigDdEMd4=kAEaPV+f4zn9cuyhyoO-xhEcAng@mail.gmail.com>
+In-Reply-To: <CAFEAcA-F85aJ4yigDdEMd4=kAEaPV+f4zn9cuyhyoO-xhEcAng@mail.gmail.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Sat, 21 Mar 2020 18:17:29 +0100
+Message-ID: <CAPan3WrW=YwnjiGnhQ1Wdyj7jwcsLXiVy0eQv-K_LhRfAZvyQg@mail.gmail.com>
+Subject: Re: [PULL 21/36] hw/arm/allwinner-h3: add Boot ROM support
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000004d051105a160944f"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,146 +89,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--0000000000004d051105a160944f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Peter,
 
 
-On 3/20/20 4:34 PM, Yuval Shaia wrote:
-> With the change made in commit 68b89aee71 ("Utilize ibv_reg_mr_iova for
-> memory registration") the MR emulation is no longer needed in order to
-> translate the guest addresses into host addresses.
-> With that, the next obvious step is to skip entirely the processing in
-> data-path.
-> To accomplish this, return the backend's lkey to driver so we will not
-> need to do the emulated mr_id to backend mr_id translation in data-path.
+On Fri, Mar 20, 2020 at 1:08 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On Thu, 12 Mar 2020 at 16:45, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+> >
+> > From: Niek Linnenbank <nieklinnenbank@gmail.com>
+> >
+> > A real Allwinner H3 SoC contains a Boot ROM which is the
+> > first code that runs right after the SoC is powered on.
+> > The Boot ROM is responsible for loading user code (e.g. a bootloader)
+> > from any of the supported external devices and writing the downloaded
+> > code to internal SRAM. After loading the SoC begins executing the code
+> > written to SRAM.
+> >
+> > This commits adds emulation of the Boot ROM firmware setup functionalit=
+y
+> > by loading user code from SD card in the A1 SRAM. While the A1 SRAM is
+> > 64KiB, we limit the size to 32KiB because the real H3 Boot ROM also
+> rejects
+> > sizes larger than 32KiB. For reference, this behaviour is documented
+> > by the Linux Sunxi project wiki at:
+> >
+> >   https://linux-sunxi.org/BROM#U-Boot_SPL_limitations
+> >
+> > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Message-id: 20200311221854.30370-11-nieklinnenbank@gmail.com
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> The function build_host_sge_array is still called in data-path but only
-> for backward computability with statistics collection.
+> Hi; Coverity (CID 1421882) points out a possible NULL
+> pointer dereference in this change:
 >
-> While there, as a cosmetic change to make the code cleaner - make one
-> copy of the function rdma_backend_create_mr and leave the redundant
-> guest_start argument in the legacy code.
+> > diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+> > index d65bbf8a2fe..b8ebcb08b76 100644
+> > --- a/hw/arm/orangepi.c
+> > +++ b/hw/arm/orangepi.c
+> > @@ -97,6 +97,11 @@ static void orangepi_init(MachineState *machine)
+> >      memory_region_add_subregion(get_system_memory(),
+> h3->memmap[AW_H3_SDRAM],
+> >                                  machine->ram);
+> >
+> > +    /* Load target kernel or start using BootROM */
+> > +    if (!machine->kernel_filename && blk_is_available(blk)) {
+> > +        /* Use Boot ROM to copy data from SD card to SRAM */
+> > +        allwinner_h3_bootrom_setup(h3, blk);
+> > +    }
 >
-> Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
-> ---
->   hw/rdma/rdma_backend.c | 21 ++++++++++++++-------
->   hw/rdma/rdma_backend.h |  5 -----
->   hw/rdma/rdma_rm.c      | 13 ++++++-------
->   3 files changed, 20 insertions(+), 19 deletions(-)
+> blk_is_available() assumes its argument is non-NULL, but
+> earlier in the function we set up blk with:
+>    b=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BFlk =3D=
+ di ? blk_by_legacy_dinfo(di) : NULL;
 >
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index b7ffbef9c0..3dd39fe1a7 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -377,6 +377,7 @@ static void ah_cache_init(void)
->                                       destroy_ah_hash_key, destroy_ah_hast_data);
->   }
->   
-> +#ifdef LEGACY_RDMA_REG_MR
->   static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
->                                   struct ibv_sge *sge, uint8_t num_sge,
->                                   uint64_t *total_length)
-> @@ -391,9 +392,7 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
->               return VENDOR_ERR_INVLKEY | sge[idx].lkey;
->           }
->   
-> -#ifdef LEGACY_RDMA_REG_MR
->           sge[idx].addr = (uintptr_t)mr->virt + sge[idx].addr - mr->start;
-> -#endif
->           sge[idx].lkey = rdma_backend_mr_lkey(&mr->backend_mr);
->   
->           *total_length += sge[idx].length;
-> @@ -401,6 +400,19 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
->   
->       return 0;
->   }
-> +#else
-> +static inline int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
-> +                                       struct ibv_sge *sge, uint8_t num_sge,
-> +                                       uint64_t *total_length)
-> +{
-> +    int idx;
-> +
-> +    for (idx = 0; idx < num_sge; idx++) {
-> +        *total_length += sge[idx].length;
-> +    }
-> +    return 0;
-> +}
-> +#endif
->   
->   static void trace_mad_message(const char *title, char *buf, int len)
->   {
-> @@ -731,13 +743,8 @@ void rdma_backend_destroy_pd(RdmaBackendPD *pd)
->       }
->   }
->   
-> -#ifdef LEGACY_RDMA_REG_MR
-> -int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, void *addr,
-> -                           size_t length, int access)
-> -#else
->   int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, void *addr,
->                              size_t length, uint64_t guest_start, int access)
-> -#endif
->   {
->   #ifdef LEGACY_RDMA_REG_MR
->       mr->ibmr = ibv_reg_mr(pd->ibpd, addr, length, access);
-> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> index 127f96e2d5..225af481e0 100644
-> --- a/hw/rdma/rdma_backend.h
-> +++ b/hw/rdma/rdma_backend.h
-> @@ -78,13 +78,8 @@ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
->   int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd);
->   void rdma_backend_destroy_pd(RdmaBackendPD *pd);
->   
-> -#ifdef LEGACY_RDMA_REG_MR
-> -int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, void *addr,
-> -                           size_t length, int access);
-> -#else
->   int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, void *addr,
->                              size_t length, uint64_t guest_start, int access);
-> -#endif
->   void rdma_backend_destroy_mr(RdmaBackendMR *mr);
->   
->   int rdma_backend_create_cq(RdmaBackendDev *backend_dev, RdmaBackendCQ *cq,
-> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> index 1524dfaeaa..7e9ea283c9 100644
-> --- a/hw/rdma/rdma_rm.c
-> +++ b/hw/rdma/rdma_rm.c
-> @@ -227,21 +227,20 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
->           mr->length = guest_length;
->           mr->virt += (mr->start & (TARGET_PAGE_SIZE - 1));
->   
-> -#ifdef LEGACY_RDMA_REG_MR
-> -        ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, mr->virt,
-> -                                     mr->length, access_flags);
-> -#else
->           ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, mr->virt,
->                                        mr->length, guest_start, access_flags);
-> -#endif
->           if (ret) {
->               ret = -EIO;
->               goto out_dealloc_mr;
->           }
-> +#ifdef LEGACY_RDMA_REG_MR
-> +        /* We keep mr_handle in lkey so send and recv get get mr ptr */
-> +        *lkey = *mr_handle;
-> +#else
-> +        *lkey = rdma_backend_mr_lkey(&mr->backend_mr);
-> +#endif
->       }
->   
-> -    /* We keep mr_handle in lkey so send and recv get get mr ptr */
-> -    *lkey = *mr_handle;
->       *rkey = -1;
->   
->       mr->pd_handle = pd_handle;
+> so it can be NULL here.
+>
+>
+Right, indeed.
 
 
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Could you send a patch to fix this, please? Probably
+>
+just adding '&& blk' in the middle of the condition
+> is sufficient.
+>
 
-Thanks,
-Marcel
+Sure, I'll make a small patch for this, and also the other one you reported
+for the SDRAM controller.
 
+By the way, I do not have the coverity tool unfortunately. So I can't
+really check myself
+if any of the other Allwinner H3 files also have warnings that can be
+fixed..
+But if coverity finds more, just let me know, and I'll look into it.
+
+Regards,
+Niek
+
+
+
+>
+> thanks
+> -- PMM
+>
+
+
+--=20
+Niek Linnenbank
+
+--0000000000004d051105a160944f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><div>Hi Peter,</div><div><br></div></div>=
+<br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri=
+, Mar 20, 2020 at 1:08 PM Peter Maydell &lt;<a href=3D"mailto:peter.maydell=
+@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br></div><blockquote c=
+lass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px soli=
+d rgb(204,204,204);padding-left:1ex">On Thu, 12 Mar 2020 at 16:45, Peter Ma=
+ydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank">pet=
+er.maydell@linaro.org</a>&gt; wrote:<br>
+&gt;<br>
+&gt; From: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" =
+target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
+&gt;<br>
+&gt; A real Allwinner H3 SoC contains a Boot ROM which is the<br>
+&gt; first code that runs right after the SoC is powered on.<br>
+&gt; The Boot ROM is responsible for loading user code (e.g. a bootloader)<=
+br>
+&gt; from any of the supported external devices and writing the downloaded<=
+br>
+&gt; code to internal SRAM. After loading the SoC begins executing the code=
+<br>
+&gt; written to SRAM.<br>
+&gt;<br>
+&gt; This commits adds emulation of the Boot ROM firmware setup functionali=
+ty<br>
+&gt; by loading user code from SD card in the A1 SRAM. While the A1 SRAM is=
+<br>
+&gt; 64KiB, we limit the size to 32KiB because the real H3 Boot ROM also re=
+jects<br>
+&gt; sizes larger than 32KiB. For reference, this behaviour is documented<b=
+r>
+&gt; by the Linux Sunxi project wiki at:<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0<a href=3D"https://linux-sunxi.org/BROM#U-Boot_SPL_limitat=
+ions" rel=3D"noreferrer" target=3D"_blank">https://linux-sunxi.org/BROM#U-B=
+oot_SPL_limitations</a><br>
+&gt;<br>
+&gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gm=
+ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
+&gt; Reviewed-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro=
+.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
+&gt; Message-id: <a href=3D"mailto:20200311221854.30370-11-nieklinnenbank@g=
+mail.com" target=3D"_blank">20200311221854.30370-11-nieklinnenbank@gmail.co=
+m</a><br>
+&gt; Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linar=
+o.org" target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
+<br>
+Hi; Coverity (CID 1421882) points out a possible NULL<br>
+pointer dereference in this change:<br>
+<br>
+&gt; diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c<br>
+&gt; index d65bbf8a2fe..b8ebcb08b76 100644<br>
+&gt; --- a/hw/arm/orangepi.c<br>
+&gt; +++ b/hw/arm/orangepi.c<br>
+&gt; @@ -97,6 +97,11 @@ static void orangepi_init(MachineState *machine)<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(get_system_memory(), h=
+3-&gt;memmap[AW_H3_SDRAM],<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 machine-&gt;ram);<br>
+&gt;<br>
+&gt; +=C2=A0 =C2=A0 /* Load target kernel or start using BootROM */<br>
+&gt; +=C2=A0 =C2=A0 if (!machine-&gt;kernel_filename &amp;&amp; blk_is_avai=
+lable(blk)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Use Boot ROM to copy data from SD card=
+ to SRAM */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 allwinner_h3_bootrom_setup(h3, blk);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+<br>
+blk_is_available() assumes its argument is non-NULL, but<br>
+earlier in the function we set up blk with:<br>
+=C2=A0 =C2=A0b=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=
+=BFlk =3D di ? blk_by_legacy_dinfo(di) : NULL;<br>
+<br>
+so it can be NULL here.<br>
+<br></blockquote><div><br></div><div>Right, indeed.<br></div><div>=C2=A0</d=
+iv><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bord=
+er-left:1px solid rgb(204,204,204);padding-left:1ex">
+Could you send a patch to fix this, please? Probably <br></blockquote><bloc=
+kquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:=
+1px solid rgb(204,204,204);padding-left:1ex">
+just adding &#39;&amp;&amp; blk&#39; in the middle of the condition<br>
+is sufficient.<br></blockquote><div><br></div><div>Sure, I&#39;ll make a sm=
+all patch for this, and also the other one you reported for the SDRAM contr=
+oller.</div><div><br></div><div>By the way, I do not have the coverity tool=
+ unfortunately. So I can&#39;t really check myself</div><div> if any of the=
+ other Allwinner H3 files also have warnings that can be fixed..</div><div>=
+But if coverity finds more, just let me know, and I&#39;ll look into it.<br=
+></div><div><br></div><div>Regards,</div><div>Niek<br></div><div><br></div>=
+<div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
+0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+thanks<br>
+-- PMM<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--0000000000004d051105a160944f--
 
