@@ -8,79 +8,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1470DC4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F0FC4332D
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:15:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D045620663
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:14:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82E1220663
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:15:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Spczl3WS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D045620663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hj4pl9j4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82E1220663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFjaF-0007Y5-1d
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 15:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39562)
+	id 1jFjbA-0000IC-Ok
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 15:15:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFjYd-0005Pv-Js
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:20 -0400
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFjYf-0005RE-Pg
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFjYc-0005lq-Il
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:19 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39241)
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFjYe-0005nH-Em
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:21 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46943)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1jFjYc-0005lR-DG
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:18 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id h6so11584098wrs.6
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 12:13:18 -0700 (PDT)
+ id 1jFjYe-0005mk-8V
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:20 -0400
+Received: by mail-wr1-x441.google.com with SMTP id j17so8194953wru.13
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 12:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=m5gz0JlOnw+UpHFzqPtGTuq9wcw2D7Vvrwm78V+zTTA=;
- b=Spczl3WShUBDAAAiGAH+IkAENIeXGMdDUPKjyyVMgfI519Tx/7gS79lH84TjFFqoFk
- 2ZZ9MI4XVzkyTkHkfiRek7OGK/R6gwJiKaZQ7kwUCPx+beP9uxm5OpVih//esfENKcFr
- mWxogw5I0FkPUVan4aOZakQehte/YuFgOmj69Z1AVjwjfN4zcNCPxq1AWSzbzazSmwkt
- TCItf2BKQpMUvC40wUBDecFUpb0gv4lSKFHBNyC750zhZJenGfwCRINbmso2+Fm/AnBt
- RV7zp1LQmqBU1/usFZZ1FIdymopU5y/KgirEqJbIiI0ulIlUYcIJYT5qyJNQTUNPPRxN
- MRng==
+ bh=9WcigWUnLHfXhXyLoz7lUzEcGO8vLAxIfw1iSBHyvI4=;
+ b=Hj4pl9j4shIQnskpqwUaOjpWyPpISN3fijSdZLQBi+YhNggk3eyH2fRKVtA824ddNM
+ Eg+c9wmAGbwAqXAibuaPM9Rfs4TLx9vzLfQDih3nwYG1wI0CNeD9d2MP2HHj4w+IYSDR
+ YUfsDk/ZF11p7K/LDr1Y62e1K9rPZ1iKdYrhE2BmzJWNtQ7ATXGneP5n9RCjba3Ysoks
+ YCkvb0X2bONM4c+BZ9rv2QaXgxWwm0YFNDR2wiQ6E6eldbr0p1uFStf6YjTun2fzSey9
+ PRRifPDtDbNzA4P3+R2tXyIyR5/pmTpdzdv1xg+XOt/Ahc7Qk12aSZrSDiJ6N4cAE1So
+ zzhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=m5gz0JlOnw+UpHFzqPtGTuq9wcw2D7Vvrwm78V+zTTA=;
- b=lZmbYgo4avr8B9U/rLr8WntIWBxMOkz9lWO2uEGula1/SlX6jQES8vL98FKnBhzH2L
- /zOrsEY2p4lIVGUzeZZN7Vfd/GJsXJ3t9wpKx6fewfD0v6fVDWzqxUJNIebXhfdU519D
- SPnHFhTEXIme4ptOK23WKXieMIVaYf27IRuGzjrQdDhfGvjygztZAWLBavgJtpUiEBD0
- DQCbczSwneIC3sHd0Rs5AsJ3GjIcw9VpnpKtqcHRjIdkf1NiHIF4lGhVU0yfJuPq2HBT
- Vo8R4mGNT9Jv99ppDS5WKnLiipuPX8SAVP7vwlD8CLYWp2o60P3BvmWCVSn57IeGFJOp
- KQVw==
-X-Gm-Message-State: ANhLgQ343M7GFnYjoF4AdQmLatjwa0sLtjBmmJcm3s9LJ0Wd9oYKOdJn
- /Ogd6P+X4sNv/L6tVl3IQ0SjRZ4D
-X-Google-Smtp-Source: ADFU+vv9GSFIqG6UcxLJQW/zlCVT1FdtUstZ3Nl/GHHBgwiCrhEnate9bzidEAy5Nu7ddzY6iRQwzw==
-X-Received: by 2002:adf:ef92:: with SMTP id d18mr18629386wro.193.1584817997161; 
- Sat, 21 Mar 2020 12:13:17 -0700 (PDT)
+ bh=9WcigWUnLHfXhXyLoz7lUzEcGO8vLAxIfw1iSBHyvI4=;
+ b=qK5nmpnp2rkiK4JM3PAP2FEQKUELm7MfvYAjDLEXzrelbjMjAz04yTY4OtjQW4fKtV
+ no5EQjTpmi0gryVK65SQ8bW5tgGN/u0rce2hHTACs6LYbQEnMN/u6Lm4MvOuf9Elc1i/
+ uUtF3q6/LSXWs7vBeVsvaMSDI+do4bLhD8CxLE5Ucd9LUGojKUlWpLPPRVs6x5QLK4Iv
+ 2FY6NxNsOozaYXjwASwyzd8tqAsoD1NTyGjYG9Ky0vZ1EbZ31H+MG4sj6kztskQ6TU5X
+ Ydx+UCJF5tK3DqaefadwMIUwcRiod44WBilx+lQUvUszOvn3F6gCYK8Gh3tAVr1CDn4v
+ TXSg==
+X-Gm-Message-State: ANhLgQ39Vhl2hrB2FpvbwA2xFq854AfRO+7OSRaNw2MiIfm7uzMntkSa
+ XLdfb1Hf6NsTeof6CDiaW+aqKhLn
+X-Google-Smtp-Source: ADFU+vs77amrZMIzWmc1ciNWrtCrZXTd3DzY20GTrnLqnKtZjogN4b8zqwktfxM4hDuV2gU4PxAY7w==
+X-Received: by 2002:adf:de8b:: with SMTP id w11mr3926356wrl.397.1584817998978; 
+ Sat, 21 Mar 2020 12:13:18 -0700 (PDT)
 Received: from localhost.localdomain ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id i1sm15226252wrs.18.2020.03.21.12.13.15
+ by smtp.gmail.com with ESMTPSA id i1sm15226252wrs.18.2020.03.21.12.13.17
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 21 Mar 2020 12:13:16 -0700 (PDT)
+ Sat, 21 Mar 2020 12:13:18 -0700 (PDT)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [Qemu-devel] [PATCH PULL 1/4] hw/rdma/vmw/pvrdma_dev_ring: Replace
- strncpy with pstrcpy
-Date: Sat, 21 Mar 2020 21:13:08 +0200
-Message-Id: <20200321191311.31537-2-marcel.apfelbaum@gmail.com>
+Subject: [Qemu-devel] [PATCH PULL 2/4] hw/rdma: Cosmetic change - no need for
+ two sge arrays
+Date: Sat, 21 Mar 2020 21:13:09 +0200
+Message-Id: <20200321191311.31537-3-marcel.apfelbaum@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200321191311.31537-1-marcel.apfelbaum@gmail.com>
 References: <20200321191311.31537-1-marcel.apfelbaum@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,43 +98,144 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Julia Suvorova <jusual@redhat.com>
+From: Yuval Shaia <yuval.shaia.ml@gmail.com>
 
-ring->name is defined as 'char name[MAX_RING_NAME_SZ]'. Replace untruncated
-strncpy with QEMU function.
-This case prevented QEMU from compiling with --enable-sanitizers.
+The function build_host_sge_array uses two sge arrays, one for input and
+one for output.
+Since the size of the two arrays is the same, the function can write
+directly to the given source array (i.e. input/output argument).
 
-Signed-off-by: Julia Suvorova <jusual@redhat.com>
-Message-Id: <20200318134849.237011-1-jusual@redhat.com>
-Reviewed-by: Yuval Shaia <yuval.shaia.ml.gmail.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-Id: <20200320143429.9490-2-yuval.shaia.ml@gmail.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/vmw/pvrdma_dev_ring.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/rdma/rdma_backend.c | 40 ++++++++++++++++------------------------
+ 1 file changed, 16 insertions(+), 24 deletions(-)
 
-diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
-index d7bc7f5ccc..c2b3dd70a9 100644
---- a/hw/rdma/vmw/pvrdma_dev_ring.c
-+++ b/hw/rdma/vmw/pvrdma_dev_ring.c
-@@ -16,6 +16,7 @@
- #include "qemu/osdep.h"
- #include "hw/pci/pci.h"
- #include "cpu.h"
-+#include "qemu/cutils.h"
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index c346407cd3..b7ffbef9c0 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -378,30 +378,25 @@ static void ah_cache_init(void)
+ }
  
- #include "trace.h"
+ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+-                                struct ibv_sge *dsge, struct ibv_sge *ssge,
+-                                uint8_t num_sge, uint64_t *total_length)
++                                struct ibv_sge *sge, uint8_t num_sge,
++                                uint64_t *total_length)
+ {
+     RdmaRmMR *mr;
+-    int ssge_idx;
++    int idx;
  
-@@ -30,8 +31,7 @@ int pvrdma_ring_init(PvrdmaRing *ring, const char *name, PCIDevice *dev,
-     int i;
-     int rc = 0;
+-    for (ssge_idx = 0; ssge_idx < num_sge; ssge_idx++) {
+-        mr = rdma_rm_get_mr(rdma_dev_res, ssge[ssge_idx].lkey);
++    for (idx = 0; idx < num_sge; idx++) {
++        mr = rdma_rm_get_mr(rdma_dev_res, sge[idx].lkey);
+         if (unlikely(!mr)) {
+-            rdma_error_report("Invalid lkey 0x%x", ssge[ssge_idx].lkey);
+-            return VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
++            rdma_error_report("Invalid lkey 0x%x", sge[idx].lkey);
++            return VENDOR_ERR_INVLKEY | sge[idx].lkey;
+         }
  
--    strncpy(ring->name, name, MAX_RING_NAME_SZ);
--    ring->name[MAX_RING_NAME_SZ - 1] = 0;
-+    pstrcpy(ring->name, MAX_RING_NAME_SZ, name);
-     ring->dev = dev;
-     ring->ring_state = ring_state;
-     ring->max_elems = max_elems;
+ #ifdef LEGACY_RDMA_REG_MR
+-        dsge->addr = (uintptr_t)mr->virt + ssge[ssge_idx].addr - mr->start;
+-#else
+-        dsge->addr = ssge[ssge_idx].addr;
++        sge[idx].addr = (uintptr_t)mr->virt + sge[idx].addr - mr->start;
+ #endif
+-        dsge->length = ssge[ssge_idx].length;
+-        dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
++        sge[idx].lkey = rdma_backend_mr_lkey(&mr->backend_mr);
+ 
+-        *total_length += dsge->length;
+-
+-        dsge++;
++        *total_length += sge[idx].length;
+     }
+ 
+     return 0;
+@@ -484,7 +479,6 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+                             void *ctx)
+ {
+     BackendCtx *bctx;
+-    struct ibv_sge new_sge[MAX_SGE];
+     uint32_t bctx_id;
+     int rc;
+     struct ibv_send_wr wr = {}, *bad_wr;
+@@ -518,7 +512,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+ 
+     rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
+ 
+-    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
++    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.tx_len);
+     if (rc) {
+         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+@@ -538,7 +532,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+     wr.num_sge = num_sge;
+     wr.opcode = IBV_WR_SEND;
+     wr.send_flags = IBV_SEND_SIGNALED;
+-    wr.sg_list = new_sge;
++    wr.sg_list = sge;
+     wr.wr_id = bctx_id;
+ 
+     rc = ibv_post_send(qp->ibqp, &wr, &bad_wr);
+@@ -601,7 +595,6 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+                             struct ibv_sge *sge, uint32_t num_sge, void *ctx)
+ {
+     BackendCtx *bctx;
+-    struct ibv_sge new_sge[MAX_SGE];
+     uint32_t bctx_id;
+     int rc;
+     struct ibv_recv_wr wr = {}, *bad_wr;
+@@ -635,7 +628,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+ 
+     rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
+ 
+-    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
++    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+     if (rc) {
+         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+@@ -643,7 +636,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+     }
+ 
+     wr.num_sge = num_sge;
+-    wr.sg_list = new_sge;
++    wr.sg_list = sge;
+     wr.wr_id = bctx_id;
+     rc = ibv_post_recv(qp->ibqp, &wr, &bad_wr);
+     if (rc) {
+@@ -671,7 +664,6 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+                                 uint32_t num_sge, void *ctx)
+ {
+     BackendCtx *bctx;
+-    struct ibv_sge new_sge[MAX_SGE];
+     uint32_t bctx_id;
+     int rc;
+     struct ibv_recv_wr wr = {}, *bad_wr;
+@@ -688,7 +680,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+ 
+     rdma_protected_gslist_append_int32(&srq->cqe_ctx_list, bctx_id);
+ 
+-    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
++    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+     if (rc) {
+         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+@@ -696,7 +688,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+     }
+ 
+     wr.num_sge = num_sge;
+-    wr.sg_list = new_sge;
++    wr.sg_list = sge;
+     wr.wr_id = bctx_id;
+     rc = ibv_post_srq_recv(srq->ibsrq, &wr, &bad_wr);
+     if (rc) {
 -- 
 2.17.2
 
