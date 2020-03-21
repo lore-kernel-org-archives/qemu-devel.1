@@ -2,68 +2,104 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52262C4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 10:59:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8868C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:06:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C5DD20663
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 10:59:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6823B20732
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:06:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="Tmp9XJ2t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C5DD20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DnSt92nF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6823B20732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFbr0-0003og-8N
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 06:59:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56538)
+	id 1jFbxW-0005dL-Ho
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 07:06:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jFbqP-0003QK-Jb
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 06:59:10 -0400
+ (envelope-from <philmd@redhat.com>) id 1jFbwu-0005Ck-5V
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:05:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jFbqN-0008Cn-SI
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 06:59:08 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17928)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jFbqL-0007zu-VB
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 06:59:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1584788284; 
- s=mail; d=flygoat.com; i=jiaxun.yang@flygoat.com;
- h=Date:In-Reply-To:References:MIME-Version:Content-Type:Content-Transfer-Encoding:Subject:To:CC:From:Message-ID;
- bh=HVE3rDrbW7bnlxv/mAtYrY2291ekxjVM1YUgW9Xo1LU=;
- b=Tmp9XJ2tBzIfHL4HI2Ae0mOAVwA1dqvTT7Z40SjuPv164HlOSXCF6EiJBkAPZJMV
- yuF8yGcp5A2t9ayNiWDSdhgBDbSsSkafwhHxqdee2nqpvd9jF36UChuUBxwRF5VLqU+
- dyOdGIP7UXnZyyJUayDEcR9nDuhVNer2QvnuKnDQ=
-Received: from [10.233.233.252] (183.157.46.148 [183.157.46.148]) by
- mx.zoho.com.cn with SMTPS id 1584788281616355.39496232866725;
- Sat, 21 Mar 2020 18:58:01 +0800 (CST)
-Date: Sat, 21 Mar 2020 18:57:54 +0800
-User-Agent: K-9 Mail for Android
-In-Reply-To: <3a52de21-180b-9f85-e33d-563752151017@redhat.com>
-References: <20200321045621.2139953-1-jiaxun.yang@flygoat.com>
- <3a52de21-180b-9f85-e33d-563752151017@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1jFbws-0004e2-7n
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:05:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:36083)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFbws-0004cx-2V
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:05:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584788749;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wpFs7PxFsTSLwk+CSE8Qu8tEzu7aOPzY7KVP7Q5kQf4=;
+ b=DnSt92nFDzNpSA5Z26K1xGsc/J1uvoxyClP0gHyi5xGy5Ara+TABLvDARO+Rn/t3t8qlpD
+ i0GxjrM9noGzrDZRbmd9uO+KzxeBrtFqWbKdQGyh9Kekmu32L6caQ0qST+ESvPP3qB4Oky
+ YONki1lWbo6oJORjnSAFy2xoGeLyCYY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-CJc8rph5NEW3FHOO29F-nA-1; Sat, 21 Mar 2020 07:05:41 -0400
+X-MC-Unique: CJc8rph5NEW3FHOO29F-nA-1
+Received: by mail-ed1-f72.google.com with SMTP id a32so7333006edf.17
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 04:05:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7J1ZWVl3+HE/uqcOn+5IQNiieZl0YKqO0tzbaLyko3Y=;
+ b=HR8uzCOwi+iAVuQKhiOLxbfN85uLjC8qNVpKjKA4O+oYFw87ZUVvibcSAbFnGOJmFa
+ GHdpMyQgMV4f8XzNhHT1tgGoFe5SIae8fbmJ8eG3tmXu/5mMOuat4Po0UDemmjU1DQFG
+ XlaSs+fDDZcOaUiEIN3uXU1L+BI4L3nui76lKq4kW8pE9EmWUPfkSmAtgP5MQSEFoZ1o
+ 3xSB4A2Q2xkgRtriOUVu980CjZGJ5vQ4ik1TrH17bYusbiChiTO6rlxw/oeogCp7NwUK
+ i8Qe80uo4QBahmxMGqmkMKxfcpGqNxRk0B9Lvlu0BtoGuvqPzjR/QrAhW/nbApQGnaQV
+ muNA==
+X-Gm-Message-State: ANhLgQ0dNydPdogi1TOMimGHjOPvu5deWOtX1gxqbIfZ/ub4e6HDChLn
+ SOEKzAB/rIlsHh+3tYUuZ/N6+jGlnmcsIVA0DSrIYJNZSrD+Y8HcACLiMDUN1Wb31G1n/TnSImM
+ FoUauvg0FMItIx3Y=
+X-Received: by 2002:a17:906:e097:: with SMTP id
+ gh23mr8042059ejb.209.1584788740158; 
+ Sat, 21 Mar 2020 04:05:40 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuXNaCracbqcE+04bXwP2GTJNcPg7RIK3NMX766VS/KBVBAmPIlxjrXUJP0jPfV6dNjUNEGcA==
+X-Received: by 2002:a17:906:e097:: with SMTP id
+ gh23mr8042031ejb.209.1584788739799; 
+ Sat, 21 Mar 2020 04:05:39 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id f17sm280155edj.86.2020.03.21.04.05.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 21 Mar 2020 04:05:38 -0700 (PDT)
+Subject: Re: [PULL v2 05/13] target/rx: CPU definitions
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200320103551.29246-1-f4bug@amsat.org>
+ <20200320103551.29246-2-f4bug@amsat.org>
+ <c7cf4bab-b9ac-4387-0709-a02c04b24061@redhat.com>
+ <e4bc22f6-128d-99e9-9359-3253f666c065@linaro.org>
+ <CAFEAcA8RM6U1hKX1Wn5YmR71y=VrGimt46z_OR=+O1i9neahiw@mail.gmail.com>
+ <70930618-a369-cb26-1b9b-aa7864deefc9@redhat.com>
+ <CAFEAcA_xRmiTfNfYHW7DLM9pCSvssNRXZWkqoQSggFLgEUPMRw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c37c2932-a409-238f-9906-422c98583833@redhat.com>
+Date: Sat, 21 Mar 2020 12:05:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+In-Reply-To: <CAFEAcA_xRmiTfNfYHW7DLM9pCSvssNRXZWkqoQSggFLgEUPMRw@mail.gmail.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] target/mips: Fix loongson multimedia condition
- instructions
-To: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <A9E2018B-82A0-4889-B311-DD5D5D59D90F@flygoat.com>
-X-ZohoCNMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 124.251.121.243
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,140 +111,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.qemu.devel@gmail.com, aleksandar.rikalo@rt-rk.com,
- aurelien@aurel32.net
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 3/20/20 5:37 PM, Peter Maydell wrote:
+> On Fri, 20 Mar 2020 at 16:32, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+>> -fwrapv is here indeed.
+>>
+>> I use
+>> --extra-cflags=3D-fsanitize=3Daddress,alignment,array-bounds,bool,builti=
+n,enum,float-cast-overflow,float-divide-by-zero,function,integer-divide-by-=
+zero,nonnull-attribute,null,pointer-overflow,return,returns-nonnull-attribu=
+te,shift-base,shift-exponent,signed-integer-overflow,unreachable,vla-bound,=
+vptr
+>=20
+> There was a bug in older clang versions where the shift-base
+> sanitizer didn't honour -fwrapv:
+> https://bugs.llvm.org/show_bug.cgi?id=3D25552
+>=20
+> https://wiki.qemu.org/Testing#clang_UBSan
+> says you can work around the clang bug with -fno-sanitize=3Dshift-base.
+>=20
+> The bug was fixed upstream back in 2016, though, so the
+> fix ought to be in clang 4, I think. Are you using an
+> old clang version, or has it regressed in newer clang?
 
+I am sorry I am very confused here.
 
-=E4=BA=8E 2020=E5=B9=B43=E6=9C=8821=E6=97=A5 GMT+08:00 =E4=B8=8B=E5=8D=886=
-:39:21, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat=2Ecom> =E5=86=99=E5=88=
-=B0:
->On 3/21/20 5:56 AM, Jiaxun Yang wrote:
->> Loongson multimedia condition instructions were previously
->implemented as
->> write 0 to rd due to lack of documentation=2E So I just confirmed with
->Loongson
->> about their encoding and implemented them correctly=2E
->
->Can you refer to the datasheet in the commit message, or have someone=20
->from Loongson Technology, Lemote Tech or with access to the specs ack=20
->your patch?
+$ clang -v
+clang version 8.0.0 (Fedora 8.0.0-3.fc30)
 
-I just confirmed with Loongson guys on IM=2E
+I use scan-build which set CC=3Dccc-analyzer.
 
-+ Huacai
+$ ccc-analyzer -v
+gcc version 9.2.1 20190827 (Red Hat 9.2.1-1) (GCC)
 
-Hi Huacai,
+I use the output of 'make V=3D1' and run directly ccc-analyzer, I get:
 
-Could you please acknowledge this change,
-Thanks=2E
+gcc: error: unrecognized argument to =E2=80=98-fsanitize=3D=E2=80=99 option=
+: =E2=80=98array-bounds=E2=80=99
+gcc: error: unrecognized argument to =E2=80=98-fsanitize=3D=E2=80=99 option=
+: =E2=80=98function=E2=80=99
 
---
-Jiaxun Yang
+So Clang is used.
 
->
->>=20
->> Signed-off-by: Jiaxun Yang <jiaxun=2Eyang@flygoat=2Ecom>
->> ---
->>   target/mips/translate=2Ec | 40
->++++++++++++++++++++++++++++++++++------
->>   1 file changed, 34 insertions(+), 6 deletions(-)
->>=20
->> diff --git a/target/mips/translate=2Ec b/target/mips/translate=2Ec
->> index d745bd2803=2E=2E43be8d27b5 100644
->> --- a/target/mips/translate=2Ec
->> +++ b/target/mips/translate=2Ec
->> @@ -5529,6 +5529,8 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>   {
->>       uint32_t opc, shift_max;
->>       TCGv_i64 t0, t1;
->> +    TCGCond cond;
->> +    TCGLabel *lab;
->>  =20
->>       opc =3D MASK_LMI(ctx->opcode);
->>       switch (opc) {
->> @@ -5816,7 +5818,7 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>       case OPC_DADD_CP2:
->>           {
->>               TCGv_i64 t2 =3D tcg_temp_new_i64();
->> -            TCGLabel *lab =3D gen_new_label();
->> +            lab =3D gen_new_label();
->>  =20
->>               tcg_gen_mov_i64(t2, t0);
->>               tcg_gen_add_i64(t0, t1, t2);
->> @@ -5837,7 +5839,7 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>       case OPC_DSUB_CP2:
->>           {
->>               TCGv_i64 t2 =3D tcg_temp_new_i64();
->> -            TCGLabel *lab =3D gen_new_label();
->> +            lab =3D gen_new_label();
->>  =20
->>               tcg_gen_mov_i64(t2, t0);
->>               tcg_gen_sub_i64(t0, t1, t2);
->> @@ -5862,14 +5864,39 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>  =20
->>       case OPC_SEQU_CP2:
->>       case OPC_SEQ_CP2:
->> +        cond =3D TCG_COND_EQ;
->> +        goto do_cc_cond;
->> +        break;
->> +
->>       case OPC_SLTU_CP2:
->> +        cond =3D TCG_COND_LTU;
->> +        goto do_cc_cond;
->> +        break;
->> +
->>       case OPC_SLT_CP2:
->> +        cond =3D TCG_COND_LT;
->> +        goto do_cc_cond;
->> +        break;
->> +
->>       case OPC_SLEU_CP2:
->> +        cond =3D TCG_COND_LEU;
->> +        goto do_cc_cond;
->> +        break;
->> +
->>       case OPC_SLE_CP2:
->> -        /*
->> -         * ??? Document is unclear: Set FCC[CC]=2E  Does that mean the
->> -         * FD field is the CC field?
->> -         */
->> +        cond =3D TCG_COND_LE;
->> +    do_cc_cond:
->> +        {
->> +            int cc =3D (ctx->opcode >> 8) & 0x7;
->> +            lab =3D gen_new_label();
->> +            tcg_gen_ori_i32(fpu_fcr31, fpu_fcr31, 1 <<
->get_fp_bit(cc));
->> +            tcg_gen_brcond_i64(cond, t0, t1, lab);
->> +            tcg_gen_xori_i32(fpu_fcr31, fpu_fcr31, 1 <<
->get_fp_bit(cc));
->> +            gen_set_label(lab);
->> +        }
->> +        goto no_rd;
->> +        break;
->> +
->>       default:
->>           MIPS_INVAL("loongson_cp2");
->>           generate_exception_end(ctx, EXCP_RI);
->> @@ -5878,6 +5905,7 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>  =20
->>       gen_store_fpr64(ctx, t0, rd);
->>  =20
->> +no_rd:
->>       tcg_temp_free_i64(t0);
->>       tcg_temp_free_i64(t1);
->>   }
->>=20
+I notice ccc-analyzer appends -Wno-shift-negative-value, however if I=20
+run the 'make V=3D1' output using clang instead (with all the -fsanitize=20
+options, -fwrapv, -Wno-shift-negative-value) then no warning are emitted.
 
---=20
-Jiaxun Yang
+So I think this is simply a problem with scan-build/ccc-analyzer, or I=20
+should tune it more for QEMU.
+
 
