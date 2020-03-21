@@ -2,59 +2,54 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56EBFC4332D
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5F0C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:38:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A7F20754
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:26:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A7F20754
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 27EB920780
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 13:38:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27EB920780
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFe97-0005Xq-6R
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 09:26:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48912)
+	id 1jFeKy-0000xp-8B
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 09:38:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jFe8O-0004lG-Va
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:25:53 -0400
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFeKB-0000Yy-2K
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:38:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jFe8N-0007mv-UZ
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:25:52 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:33896)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jFe8J-0007gn-2x; Sat, 21 Mar 2020 09:25:47 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 458BA747DFB;
- Sat, 21 Mar 2020 14:25:43 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id A10F274638A; Sat, 21 Mar 2020 14:25:42 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 9837D746381;
- Sat, 21 Mar 2020 14:25:42 +0100 (CET)
-Date: Sat, 21 Mar 2020 14:22:16 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.0 07/11] hw/gpio/aspeed_gpio: Remove dead assignment
-In-Reply-To: <20200321114615.5360-8-philmd@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003211420450.82121@zero.eik.bme.hu>
-References: <20200321114615.5360-1-philmd@redhat.com>
- <20200321114615.5360-8-philmd@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-224705287-1584797142=:82121"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:738:2001:2001::2001
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFeK9-0007tR-Nm
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:38:02 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:2590)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFeK1-0007S5-Iv
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 09:38:01 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.1]) by
+ rmmx-syy-dmz-app03-12003 (RichMail) with SMTP id 2ee35e76189272c-5359c;
+ Sat, 21 Mar 2020 21:37:23 +0800 (CST)
+X-RM-TRANSID: 2ee35e76189272c-5359c
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from maozy-host.localdomain (unknown[117.136.68.181])
+ by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee15e76188d843-6c9b5;
+ Sat, 21 Mar 2020 21:37:23 +0800 (CST)
+X-RM-TRANSID: 2ee15e76188d843-6c9b5
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] migration: use "" instead of (null) for tls-authz
+Date: Sat, 21 Mar 2020 21:37:15 +0800
+Message-Id: <0a9dc2fcb78da13eb326992384bc4e57de83d9f9.1584797648.git.maozhongyi@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 221.176.66.79
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,71 +61,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, Alistair Francis <alistair@alistair23.me>,
- qemu-arm@nongnu.org, =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- Kevin Wolf <kwolf@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Max Reitz <mreitz@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: armbru@redhat.com, berrange@redhat.com, dgilbert@redhat.com,
+ Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+run:
+(qemu) info migrate_parameters
+announce-initial: 50 ms
+...
+announce-max: 550 ms
+multifd-compression: none
+xbzrle-cache-size: 4194304
+max-postcopy-bandwidth: 0
+ tls-authz: '(null)'
 
---3866299591-224705287-1584797142=:82121
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Migration parameter 'tls-authz' is used to provide the QOM ID
+of a QAuthZ subclass instance that provides the access control
+check, default is NULL. But the empty string is not a valid
+object ID, so use "" instead of the default. Although it will
+fail when lookup an object with ID "", it is harmless, just
+consistent with tls_creds.
 
-On Sat, 21 Mar 2020, Philippe Mathieu-Daud=C3=A9 wrote:
-> Fix warning reported by Clang static code analyzer:
->
->  hw/gpio/aspeed_gpio.c:717:18: warning: Value stored to 'g_idx' during =
-its initialization is never read
->      int set_idx, g_idx =3D *group_idx;
->                   ^~~~~   ~~~~~~~~~~
->
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> hw/gpio/aspeed_gpio.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
-> index 41e11ea9b0..cc07ab9866 100644
-> --- a/hw/gpio/aspeed_gpio.c
-> +++ b/hw/gpio/aspeed_gpio.c
-> @@ -714,11 +714,11 @@ static void aspeed_gpio_write(void *opaque, hwadd=
-r offset, uint64_t data,
-> static int get_set_idx(AspeedGPIOState *s, const char *group, int *grou=
-p_idx)
-> {
->     AspeedGPIOClass *agc =3D ASPEED_GPIO_GET_CLASS(s);
-> -    int set_idx, g_idx =3D *group_idx;
-> +    int set_idx;
->
->     for (set_idx =3D 0; set_idx < agc->nr_gpio_sets; set_idx++) {
->         const GPIOSetProperties *set_props =3D &agc->props[set_idx];
-> -        for (g_idx =3D 0; g_idx < ASPEED_GROUPS_PER_SET; g_idx++) {
-> +        for (int g_idx =3D 0; g_idx < ASPEED_GROUPS_PER_SET; g_idx++) =
-{
+Also fixed the bad indentation on the last line.
 
-Is declaring variables here allowed by coding style? Shouldn't you only=20
-remove init value from above?
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+---
+ migration/migration.c | 3 ++-
+ monitor/hmp-cmds.c    | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Regards,
-BALATON Zoltan
+diff --git a/migration/migration.c b/migration/migration.c
+index c1d88ace7f..b060153ef7 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -790,7 +790,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->has_tls_hostname = true;
+     params->tls_hostname = g_strdup(s->parameters.tls_hostname);
+     params->has_tls_authz = true;
+-    params->tls_authz = g_strdup(s->parameters.tls_authz);
++    params->tls_authz = s->parameters.tls_authz ? \
++                        g_strdup(s->parameters.tls_authz) : g_strdup("");
+     params->has_max_bandwidth = true;
+     params->max_bandwidth = s->parameters.max_bandwidth;
+     params->has_downtime_limit = true;
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 58724031ea..f8be6bbb16 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -459,7 +459,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRIu64 "\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_MAX_POSTCOPY_BANDWIDTH),
+             params->max_postcopy_bandwidth);
+-        monitor_printf(mon, " %s: '%s'\n",
++        monitor_printf(mon, "%s: '%s'\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
+             params->has_tls_authz ? params->tls_authz : "");
+     }
+-- 
+2.17.1
 
->             if (!strncmp(group, set_props->group_label[g_idx], strlen(g=
-roup))) {
->                 *group_idx =3D g_idx;
->                 return set_idx;
->
---3866299591-224705287-1584797142=:82121--
+
+
 
