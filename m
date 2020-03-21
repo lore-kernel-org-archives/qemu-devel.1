@@ -2,69 +2,66 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC94FC4332D
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA2CC4332D
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A724820732
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:18:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="REoeB/iY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A724820732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2BAE520658
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 11:24:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BAE520658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFc9U-0001CP-SB
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 07:18:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59023)
+	id 1jFcF0-00045h-Ai
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 07:24:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59539)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jFc8d-00007F-6P
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:18:00 -0400
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFcEN-0003gc-Ov
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:23:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jFc8b-0002jj-Sr
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:17:59 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17892)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jFc8b-0002ho-Ds
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:17:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1584789427; 
- s=mail; d=flygoat.com; i=jiaxun.yang@flygoat.com;
- h=Date:In-Reply-To:References:MIME-Version:Content-Type:Content-Transfer-Encoding:Subject:To:CC:From:Message-ID;
- bh=YVuEOosOU91IVRkqld1gnFkK4jPBhUNnXMKWLQso+/A=;
- b=REoeB/iYUiyopXITB/HfSlWsCuPVdPBnoSHxqYtRzfYZcVDYDWDOY4+I6/WNoS8d
- bPi8sc4G99/AxjNGWXt+O36EMDM+BB4vm8EUOKFTBfrTvBDwRvKRhqxJTgVjpSLsb+z
- xMQIf/knF/YuWZKmHh5lFMgFjln/u5+nwvlR3nVA=
-Received: from [10.233.233.252] (183.157.46.148 [183.157.46.148]) by
- mx.zoho.com.cn with SMTPS id 1584789425482547.3666928076909;
- Sat, 21 Mar 2020 19:17:05 +0800 (CST)
-Date: Sat, 21 Mar 2020 19:17:02 +0800
-User-Agent: K-9 Mail for Android
-In-Reply-To: <A9E2018B-82A0-4889-B311-DD5D5D59D90F@flygoat.com>
-References: <20200321045621.2139953-1-jiaxun.yang@flygoat.com>
- <3a52de21-180b-9f85-e33d-563752151017@redhat.com>
- <A9E2018B-82A0-4889-B311-DD5D5D59D90F@flygoat.com>
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFcEM-0004V0-Aq
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:23:55 -0400
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:37502)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jFcEL-0004Mx-Ns
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 07:23:54 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.3]) by
+ rmmx-syy-dmz-app11-12011 (RichMail) with SMTP id 2eeb5e75f91e457-52226;
+ Sat, 21 Mar 2020 19:23:12 +0800 (CST)
+X-RM-TRANSID: 2eeb5e75f91e457-52226
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from [192.168.43.82] (unknown[117.136.68.181])
+ by rmsmtp-syy-appsvr02-12002 (RichMail) with SMTP id 2ee25e75f91fcea-6b2dc;
+ Sat, 21 Mar 2020 19:23:12 +0800 (CST)
+X-RM-TRANSID: 2ee25e75f91fcea-6b2dc
+Subject: Re: [PATCH] monitor/hmp-cmds: fix bad indentation in 'info
+ migrate_parameters' cmd output
+To: Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200320130013.418557-1-maozhongyi@cmss.chinamobile.com>
+ <878sjv11xm.fsf@dusky.pond.sub.org> <20200320173117.GE3464@work-vm>
+ <20200320174901.GO2608355@redhat.com> <20200320180700.GF3464@work-vm>
+ <87mu8auqlc.fsf@dusky.pond.sub.org>
+From: maozy <maozhongyi@cmss.chinamobile.com>
+Message-ID: <bb6a4634-f38c-a8f0-0a8c-fcf193b818db@cmss.chinamobile.com>
+Date: Sat, 21 Mar 2020 19:23:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] target/mips: Fix loongson multimedia condition
- instructions
-To: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <CF83865C-3904-4144-A68C-89804599EA38@flygoat.com>
-X-ZohoCNMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 124.251.121.243
+In-Reply-To: <87mu8auqlc.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 221.176.66.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,148 +73,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chenhuacai@gmail.com, chenhc@lemote.com, aleksandar.qemu.devel@gmail.com,
- aleksandar.rikalo@rt-rk.com, aurelien@aurel32.net
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-
-=E4=BA=8E 2020=E5=B9=B43=E6=9C=8821=E6=97=A5 GMT+08:00 =E4=B8=8B=E5=8D=886=
-:57:54, Jiaxun Yang <jiaxun=2Eyang@flygoat=2Ecom> =E5=86=99=E5=88=B0:
+On 3/21/20 3:14 PM, Markus Armbruster wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 >
->
->=E4=BA=8E 2020=E5=B9=B43=E6=9C=8821=E6=97=A5 GMT+08:00 =E4=B8=8B=E5=8D=88=
-6:39:21, "Philippe Mathieu-Daud=C3=A9"
-><philmd@redhat=2Ecom> =E5=86=99=E5=88=B0:
->>On 3/21/20 5:56 AM, Jiaxun Yang wrote:
->>> Loongson multimedia condition instructions were previously
->>implemented as
->>> write 0 to rd due to lack of documentation=2E So I just confirmed with
->>Loongson
->>> about their encoding and implemented them correctly=2E
+>> * Daniel P. Berrangé (berrange@redhat.com) wrote:
+>>> On Fri, Mar 20, 2020 at 05:31:17PM +0000, Dr. David Alan Gilbert wrote:
+>>>> (Rearranging the text a bit)
+>>>>
+>>>> * Markus Armbruster (armbru@redhat.com) wrote:
+>>>>
+>>>>> David (cc'ed) should be able to tell us which fix is right.
+>>>>>
+>>>>> @tls_creds and @tls_hostname look like they could have the same issue.
+>>>> A certain Markus removed the Null checks in 8cc99dc because 4af245d
+>>>> guaranteed they would be None-Null for tls-creds/hostname - so we
+>>>> should be OK for those.
+>>>>
+>>>> But tls-authz came along a lot later in d2f1d29 and doesn't
+>>>> seem to have the initialisation, which is now in
+>>>> migration_instance_init.
+>>>>
+>>>> So I *think* the fix for this is to do the modern equivalent of 4af245d
+>>>> :
+>>>>
+>>>> diff --git a/migration/migration.c b/migration/migration.c
+>>>> index c1d88ace7f..0bc1b93277 100644
+>>>> --- a/migration/migration.c
+>>>> +++ b/migration/migration.c
+>>>> @@ -3686,6 +3686,7 @@ static void migration_instance_init(Object *obj)
+>>>>   
+>>>>       params->tls_hostname = g_strdup("");
+>>>>       params->tls_creds = g_strdup("");
+>>>> +    params->tls_authz = g_strdup("");
+>>>>   
+>>>>       /* Set has_* up only for parameter checks */
+>>>>       params->has_compress_level = true;
+>>>>
+>>>> Copying in Dan to check that wouldn't break tls.
+>>> It *will* break TLS, because it will cause the TLS code to lookup
+>>> an object with the ID of "".  NULL must be preserved when calling
+>>> the TLS APIs.
+>> OK, good I asked...
 >>
->>Can you refer to the datasheet in the commit message, or have someone=20
->>from Loongson Technology, Lemote Tech or with access to the specs ack=20
->>your patch?
->
->I just confirmed with Loongson guys on IM=2E
->
->+ Huacai
-
-+Huacai's Gmail as his Lemote mail rejected my bounce=2E
-
->
->Hi Huacai,
->
->Could you please acknowledge this change,
->Thanks=2E
->
->--
->Jiaxun Yang
->
+>>> The assignment of "" to tls_hostname would also have broken TLS,
+>>> so the migration_tls_channel_connect method had to turn it back
+>>> into a real NULL.
+>>>
+>>> The use of "" for tls_creds will similarly cause it to try and
+>>> lookup an object with ID of "", and fail. That one's harmless
+>>> though, because it would also fail if it were NULL.
+>> OK.
 >>
->>>=20
->>> Signed-off-by: Jiaxun Yang <jiaxun=2Eyang@flygoat=2Ecom>
->>> ---
->>>   target/mips/translate=2Ec | 40
->>++++++++++++++++++++++++++++++++++------
->>>   1 file changed, 34 insertions(+), 6 deletions(-)
->>>=20
->>> diff --git a/target/mips/translate=2Ec b/target/mips/translate=2Ec
->>> index d745bd2803=2E=2E43be8d27b5 100644
->>> --- a/target/mips/translate=2Ec
->>> +++ b/target/mips/translate=2Ec
->>> @@ -5529,6 +5529,8 @@ static void
->>gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>>   {
->>>       uint32_t opc, shift_max;
->>>       TCGv_i64 t0, t1;
->>> +    TCGCond cond;
->>> +    TCGLabel *lab;
->>>  =20
->>>       opc =3D MASK_LMI(ctx->opcode);
->>>       switch (opc) {
->>> @@ -5816,7 +5818,7 @@ static void
->>gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>>       case OPC_DADD_CP2:
->>>           {
->>>               TCGv_i64 t2 =3D tcg_temp_new_i64();
->>> -            TCGLabel *lab =3D gen_new_label();
->>> +            lab =3D gen_new_label();
->>>  =20
->>>               tcg_gen_mov_i64(t2, t0);
->>>               tcg_gen_add_i64(t0, t1, t2);
->>> @@ -5837,7 +5839,7 @@ static void
->>gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>>       case OPC_DSUB_CP2:
->>>           {
->>>               TCGv_i64 t2 =3D tcg_temp_new_i64();
->>> -            TCGLabel *lab =3D gen_new_label();
->>> +            lab =3D gen_new_label();
->>>  =20
->>>               tcg_gen_mov_i64(t2, t0);
->>>               tcg_gen_sub_i64(t0, t1, t2);
->>> @@ -5862,14 +5864,39 @@ static void
->>gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>>  =20
->>>       case OPC_SEQU_CP2:
->>>       case OPC_SEQ_CP2:
->>> +        cond =3D TCG_COND_EQ;
->>> +        goto do_cc_cond;
->>> +        break;
->>> +
->>>       case OPC_SLTU_CP2:
->>> +        cond =3D TCG_COND_LTU;
->>> +        goto do_cc_cond;
->>> +        break;
->>> +
->>>       case OPC_SLT_CP2:
->>> +        cond =3D TCG_COND_LT;
->>> +        goto do_cc_cond;
->>> +        break;
->>> +
->>>       case OPC_SLEU_CP2:
->>> +        cond =3D TCG_COND_LEU;
->>> +        goto do_cc_cond;
->>> +        break;
->>> +
->>>       case OPC_SLE_CP2:
->>> -        /*
->>> -         * ??? Document is unclear: Set FCC[CC]=2E  Does that mean
->the
->>> -         * FD field is the CC field?
->>> -         */
->>> +        cond =3D TCG_COND_LE;
->>> +    do_cc_cond:
->>> +        {
->>> +            int cc =3D (ctx->opcode >> 8) & 0x7;
->>> +            lab =3D gen_new_label();
->>> +            tcg_gen_ori_i32(fpu_fcr31, fpu_fcr31, 1 <<
->>get_fp_bit(cc));
->>> +            tcg_gen_brcond_i64(cond, t0, t1, lab);
->>> +            tcg_gen_xori_i32(fpu_fcr31, fpu_fcr31, 1 <<
->>get_fp_bit(cc));
->>> +            gen_set_label(lab);
->>> +        }
->>> +        goto no_rd;
->>> +        break;
->>> +
->>>       default:
->>>           MIPS_INVAL("loongson_cp2");
->>>           generate_exception_end(ctx, EXCP_RI);
->>> @@ -5878,6 +5905,7 @@ static void
->>gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>>  =20
->>>       gen_store_fpr64(ctx, t0, rd);
->>>  =20
->>> +no_rd:
->>>       tcg_temp_free_i64(t0);
->>>       tcg_temp_free_i64(t1);
->>>   }
->>>=20
+>> It looks like the output of query-migrate-parameters though already
+>> turns it into "", so I don't think you can tell it's NULL from that:
+>>
+>> {"QMP": {"version": {"qemu": {"micro": 0, "minor": 2, "major": 4}, "package": "qemu-4.2.0-4.fc31"}, "capabilities": ["oob"]}}
+>> { "execute": "qmp_capabilities" }
+>> {"return": {}}
+>> { "execute": "query-migrate-parameters" }
+>> {"return": {"xbzrle-cache-size": 67108864, "cpu-throttle-initial": 20, "announce-max": 550, "decompress-threads": 2, "compress-threads": 8, "compress-level": 1, "multifd-channels": 2, "announce-initial": 50, "block-incremental": false, "compress-wait-thread": true, "downtime-limit": 300, "tls-authz": "", "announce-rounds": 5, "announce-step": 100, "tls-creds": "", "max-cpu-throttle": 99, "max-postcopy-bandwidth": 0, "tls-hostname": "", "max-bandwidth": 33554432, "x-checkpoint-delay": 20000, "cpu-throttle-increment": 10}}
+>>
+>> I'm not sure who turns a Null into a "" but I guess it's somewhere in
+>> the json output iterator.
+> It's this wart:
+>
+>      static void qobject_output_type_str(Visitor *v, const char *name, char **obj,
+>                                          Error **errp)
+>      {
+>          QObjectOutputVisitor *qov = to_qov(v);
+>          if (*obj) {
+>              qobject_output_add(qov, name, qstring_from_str(*obj));
+>          } else {
+>              qobject_output_add(qov, name, qstring_from_str(""));
+>          }
+>      }
+>
+> Warty since day 1.
+>
+> In theory, !*obj should not happen, since QAPI type 'str' is not
+> nullable.
+>
+> In practice, it handwritten code can easily make it happen.
+>
+>> So we can fix this problem either in qmp_query_migrate_parameters
+>> and just strdup a "", or substitute it in hmp_info_migrate_parameters.
+> Fixing it in qmp_query_migrate_parameters() is cleaner: it avoids null
+> 'str', and bypasses the wart.
+>
+OK,  thanks for the kind reply, will fix it in v2.
 
---=20
-Jiaxun Yang
+Thanks,
+Mao
+
+
 
