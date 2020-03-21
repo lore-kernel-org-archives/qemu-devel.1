@@ -6,78 +6,76 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BE8C4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DD5C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:50:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01F9F2072C
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A44D2072C
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:50:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XIlo52aG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01F9F2072C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LmxEESqz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A44D2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFk6p-0000w1-8J
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 15:48:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43375)
+	id 1jFk91-0002xH-RT
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 15:50:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jFk63-0000K7-ON
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:47:52 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFk7e-0001r3-Qy
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jFk62-0005Ko-Th
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:47:51 -0400
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:44149)
+ (envelope-from <peter.maydell@linaro.org>) id 1jFk7b-0006Am-I9
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:49:28 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:44883)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jFk62-0005KY-LC
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:47:50 -0400
-Received: by mail-ot1-x32c.google.com with SMTP id a49so9464100otc.11
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 12:47:50 -0700 (PDT)
+ id 1jFk7b-00069k-Di
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:49:27 -0400
+Received: by mail-oi1-x234.google.com with SMTP id v134so1409371oie.11
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 12:49:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=X+2sTSl6/HGgz0AttJNlhj5F4o3+tmJ8IPqA52c9ei8=;
- b=XIlo52aGC0iYlE52AOU1fW6znEd9WpfKBePPI3L3g1iIitutYkySeL8GlB0vLOxSuR
- gZv+wdvH6ikRwssfCyr81Wj0/YHkj0fK2zN2Lx00njUljgT84MM7m/RDILu59JZiVgLe
- oUm4JmHEs9iHqJ/8EIf+GO5oGBQGgzS9BLQ2Oi9YITtzuxt+TWxMkLofK2lg2cMNKmeA
- nsq1P28bEbj3tVMPlmK4IN7OcGxP20s2qINVdYnlC4/f6RJWeH+F+VYFntInZ4wpOFdF
- HeiyAUgkAe0aSzlE66mwCvTy3Wb2HjxEIFdzgfXxt7Wu0tzb3syNg54OhufUAaDPPnjJ
- JP1w==
+ :cc; bh=wxS2n1qfBjTinTrtu0P4p/AbYBm81q0DAWQNozY5h2I=;
+ b=LmxEESqzbEmK36kOtnbQCattN9wvyVJpfd9SCJF/HI/J6VrIkIPnGBxpkWAYZvuXUO
+ pcR4THeqWu9Kb0G00HliwF2Lgfj7fR+r55MGSnPiLpornUvnoYpm/kQWS0GLlSsUG1OY
+ VYUf+nX5DbS7RSY2Tsb+3yRgl6BzrEe4AVE7Uls+o06U0GQz1ccZnEzV0pE07cyWOPxl
+ h/K8EjGNwM5hwV/HkJ2SU8BfZ02HgzqMbrPSgO1q6wKV+oTzyoqgRKaJVUFtPp0gOrsL
+ mBJzK0DETe01NM3O06St/ptmPF8m4x1QrjuLkeK75kK1E+ZCd0t8GaZED+WJXvi4Dyv/
+ TyVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=X+2sTSl6/HGgz0AttJNlhj5F4o3+tmJ8IPqA52c9ei8=;
- b=bv+aXX0l97yEtWcziV1/E608IDsbX10L9HzjThk/ulP5W3jW5pIIT4zZ2GIy+GsJ1H
- k2fRTeH3xHRLlnX7fcT3BkWp8e+PpTlzd3sHreWi121kUbBVFqzyaCxeXw2F5xE0ueBa
- HBjI+HfvAQdSKH5hWswMVTXNhVbNMs5rAkWv0EMYikfrYh7kGHZ1MFiN8HwLud06fbUq
- uEjUS+I2+HjMoO5IQXGnZJlxSo7NGChknn81Oxki4rqL8bD6HOXMPEDbGwOc7DLumleg
- Y2UXMs0grq9q9PAiuQnL1xdzwaHcHwu8jVy+MqAwb18LC2OMxHq2R7JlFlmkskU5kEzE
- opvA==
-X-Gm-Message-State: ANhLgQ2f32iqJb5LofaurnqJtMvrmSlHemGDpaoro7bnNKlaXWqedlzW
- 95p3nRyZhOtLHZqkgFTtiFFeTFbNEKJZoXSWwNbasyV8WlM=
-X-Google-Smtp-Source: ADFU+vud3bSS+vvAABzU8Ydp3EyoGsb3QFClX68g9uZeqhbd095vKDi/vBUSNNkXTw7zrYlJdrg/+1/0TY7cbueufLw=
-X-Received: by 2002:a05:6830:20c8:: with SMTP id
- z8mr12123083otq.135.1584820069752; 
- Sat, 21 Mar 2020 12:47:49 -0700 (PDT)
+ bh=wxS2n1qfBjTinTrtu0P4p/AbYBm81q0DAWQNozY5h2I=;
+ b=R6yO6KmiiNx7tXYJ+RzZDq2k4nUZgXAaODDFURTsii7bbsgoPGxX8fDnBi6krL4etM
+ CuYJSJBXq2Jmqv6J9vHJm6vEulYBRpWidm44eQDv0VTmV+190X+aBrODPkg/HDoqVKmA
+ ix4+WBU1ge1EFeeGPeQUHRAozakV3S6LvrNg+XXa4WdFKUQ/bgckZYpXsahhkB5/t+TS
+ AN0ofG5i1MXt8teD3ZCCF/dJNOcNY6DMXC4Hm3IK077Os8uPm/pxCOVRHaH1z0DyE8dH
+ Wu3IjoV4Cu1kA937tyv8xeZ2GJD/7BlGGL2rcKq6AFvUk9s4qZlSWNhJROCr0av+Zzv1
+ Ulcg==
+X-Gm-Message-State: ANhLgQ2c2nCH88THj1xqFxahvqqudI1J3Oc9TNhCC9Ux7gSGfsDy+RJk
+ EH2COS2riwnsiyT08pKHa1zb8w4TvV4JKZni7+7Olu+wEXY=
+X-Google-Smtp-Source: ADFU+vulcElA6SCqJzHeU1h1mRHcWF6B1oxhV2+6wgZkV6VB5d6C9z6Hrki6fhIkOYwM7g6FLbfldVQ4QV0AqGAeU3Q=
+X-Received: by 2002:aca:c608:: with SMTP id w8mr11796706oif.163.1584820166556; 
+ Sat, 21 Mar 2020 12:49:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200312164459.25924-1-peter.maydell@linaro.org>
- <20200312164459.25924-22-peter.maydell@linaro.org>
- <CAFEAcA-F85aJ4yigDdEMd4=kAEaPV+f4zn9cuyhyoO-xhEcAng@mail.gmail.com>
- <CAPan3WrW=YwnjiGnhQ1Wdyj7jwcsLXiVy0eQv-K_LhRfAZvyQg@mail.gmail.com>
-In-Reply-To: <CAPan3WrW=YwnjiGnhQ1Wdyj7jwcsLXiVy0eQv-K_LhRfAZvyQg@mail.gmail.com>
+References: <alpine.BSF.2.22.395.2003211825370.55214@zero.eik.bme.hu>
+ <67cff836-d895-3a1c-1ead-13a0e14507d6@vivier.eu>
+ <alpine.BSF.2.22.395.2003211924410.70812@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.22.395.2003211924410.70812@zero.eik.bme.hu>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 21 Mar 2020 19:47:37 +0000
-Message-ID: <CAFEAcA_+UPTtsVhgnXY1bo1JFaL=rd=caxWXkd7OFVXyXipbVA@mail.gmail.com>
-Subject: Re: [PULL 21/36] hw/arm/allwinner-h3: add Boot ROM support
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Sat, 21 Mar 2020 19:49:14 +0000
+Message-ID: <CAFEAcA97=hHU+GqSjM90tP54HVjKnf-n2T2QkiqBen5otL6EUg@mail.gmail.com>
+Subject: Re: In tree configure errors since 6116aea9
+To: BALATON Zoltan <balaton@eik.bme.hu>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32c
+X-Received-From: 2607:f8b0:4864:20::234
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,21 +87,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 21 Mar 2020 at 17:17, Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
-> By the way, I do not have the coverity tool unfortunately. So I can't really check myself
-> if any of the other Allwinner H3 files also have warnings that can be fixed..
-> But if coverity finds more, just let me know, and I'll look into it.
+On Sat, 21 Mar 2020 at 18:32, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> On Sat, 21 Mar 2020, Laurent Vivier wrote:
+> > I didn't see that because I always do an out-of-tree build.
+>
+> Isn't there a test for that or should there be one?
 
-Yeah, we only have Coverity as an online tool, so it
-just runs once code gets into master, and then we
-fix stuff after the fact. Either I or somebody else
-will usually go through the reported new issues when
-we get a new run and alert relevant people.
+It's not in my set of CI tests (mostly because it's a bit
+awkward to do). We're planning to drop support for
+in-tree builds at some point: out-of-tree is just
+generally better and trying to support both tends to
+mean that one or the other gets accidentally broken
+periodically.
 
 thanks
 -- PMM
