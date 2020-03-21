@@ -7,81 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0030BC4332D
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65933C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:49:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C18A32072D
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:49:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FC1420732
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:49:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alEv05n2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18A32072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZaZT9Kv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FC1420732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFfQq-0007fG-RP
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 10:49:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59831)
+	id 1jFfRP-0008Mz-Bl
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 10:49:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60010)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFfJo-00058A-55
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:45 -0400
+ (envelope-from <philmd@redhat.com>) id 1jFfK6-0005jT-KE
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFfJn-0007On-1T
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:44 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44217)
+ (envelope-from <philmd@redhat.com>) id 1jFfK5-0007cm-Fk
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:42:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39494)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFfJm-0007OP-T0
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:42 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFfK5-0007cW-Be
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:42:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584801702;
+ s=mimecast20190719; t=1584801721;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HG9aIClnSQgwbfwrNWlQigZ+p9jo+t2veKUaX85pzII=;
- b=alEv05n2sfcCenreaQ42B7wM3I9K2QyGTYZ/MOk7pImV/CRtija0xP0/vTgOt924/374W/
- hjzjKpX3p9ZcA4DNLwdbhllifUP3ywBB28RsAa8H1xW0BeLH4ckw7OrvOTki6Q1JQJJKos
- aUSHudgDfdfkUbKKzOpK4AOInkioVWg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-gvao1BEFNta2hZ19pTJemg-1; Sat, 21 Mar 2020 10:41:40 -0400
-X-MC-Unique: gvao1BEFNta2hZ19pTJemg-1
-Received: by mail-wm1-f71.google.com with SMTP id h203so2403826wme.2
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 07:41:40 -0700 (PDT)
+ bh=Wabz9ShZfSLuxIv0MTXDbxATC0FT6q8THWUJCXN/WkY=;
+ b=XZaZT9Kv1kzu7sGM8bfJcaa0BGUWav1tr2dRp9uLV4k/w2LxoFp5hsF5HStBV99vEw6Wey
+ 7Z0joxoWn/asczC6AsCzFO4rhYt+3TdWJu/HOoSGJqJGms7rfH7frlBgT67M4u5H8lEje7
+ /2sw0Z5cBo1y5knW3KG6F/PbA6qa/9w=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-kPHGW_RPPMSK83UAxrRCVQ-1; Sat, 21 Mar 2020 10:41:59 -0400
+X-MC-Unique: kPHGW_RPPMSK83UAxrRCVQ-1
+Received: by mail-wr1-f71.google.com with SMTP id w11so4360004wrp.20
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 07:41:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Eqn1OJZAYDlLgDc90kBVx1WWSAviOqkIwIwDScG0wiQ=;
- b=T4ixOD9XaNTVwIGkbsAKSe/DCjD8xqtUHmb5B5A8dFcwPurBQep7DSTD5OPNCsgsAX
- DkdYtT1ARv4YNe55xqnbCXYQoDyinZLYWFF0CReMtCIIhvwEmt1fuTEgt1ULw1Vp8fw0
- QzVgE938R7hjDTVHvaX5wlAgdBYkhO3X/q4qJxz4rE9X2KNwsbFHpepL30d3C8Mtg4Cx
- 46DxGIlAK+yrYAlX/c8tZC3yAyNCdae4TsoW0Hdb/tebUB99uh3pQeojufjL02kXl3Yj
- KYaaXuCD+xPdQUJ/VxKYRPEf6kXfc5frSnObbUG+ZPDGVexhjwiwKat55bo1eNncHk84
- izIA==
-X-Gm-Message-State: ANhLgQ2ZoM3msB59pFjDI63LC2N1lepYfIvxc/pHnIGj+EPffCjd9QEg
- 7Xho7CPCSzRYswxIybxk5zrckAyFrqH2jYB+jwI7tvWu0EYqZ6T2YmNXEHGLsr2M5lEHkOpsKZP
- 1f9qs1jBOXwCQO+w=
-X-Received: by 2002:a05:600c:4145:: with SMTP id
- h5mr16372107wmm.3.1584801699580; 
- Sat, 21 Mar 2020 07:41:39 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsFAJVC1HBS34XteUQ0Qhlp+mZ6lovZPo5MIfUGGv+y3kPDMfyEF1bRg2/TCyRoOapzMf1fsQ==
-X-Received: by 2002:a05:600c:4145:: with SMTP id
- h5mr16372067wmm.3.1584801699378; 
- Sat, 21 Mar 2020 07:41:39 -0700 (PDT)
+ bh=eDep/UAh9LxMQ+p+ZbiwORp8mGO979hnIy8cu0Ibo6A=;
+ b=Xm6VtI2hdnrze/8QtMlErKhf8eGAtuTk7+ubMBdcocH0hYeODVp/PKmiuOFmonJr9V
+ yhoO7HM/enVtyFwqO7F49yjV3PL0pc3ex5gsdMuatOpfJO3iJR8blrBLvHbQJjM5zQtd
+ tMFfKROtoO5RNb+/WgQPCmhSwJivDVrgqqcJUinz6xVOXfhKh0yIjBbrtpC5zueuoBDi
+ LeQxc1qPjE/E2s4NjEYwPKzRCmYO6Nwh2smiijN3MjXdNZbvp0GC7sROqFsK4BaZWYKR
+ 980UTTI6sVWFvF8PAOWbYa/Rcx/nNO4yhKga9ZAPQ8wel06G6P6XWyGvKx+mdm8tdreX
+ 8C6Q==
+X-Gm-Message-State: ANhLgQ3+MKXvUV3KGmkzM4y0q6FulobEM6K6TRwIiuPTgjahNSQDr6hs
+ OdUVJe3PiCrWChhVIefnrhhKQYDdS8xe58tBvSgdvGmuEbv4ebeo1mRomWzF7FtB3mlyC9PmRFI
+ /RQNzQgI/n/b4WVQ=
+X-Received: by 2002:adf:b307:: with SMTP id j7mr18622715wrd.128.1584801718379; 
+ Sat, 21 Mar 2020 07:41:58 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtfnFMlK5o2AUliKihnwwfvHrClOE3oeCNEnuVDhJ9fRMly5LXyQNqsh5zSzzZ49D+7xGs/WA==
+X-Received: by 2002:adf:b307:: with SMTP id j7mr18622686wrd.128.1584801718221; 
+ Sat, 21 Mar 2020 07:41:58 -0700 (PDT)
 Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id a13sm14020382wrh.80.2020.03.21.07.41.37
+ by smtp.gmail.com with ESMTPSA id l8sm12553155wmj.2.2020.03.21.07.41.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 21 Mar 2020 07:41:38 -0700 (PDT)
+ Sat, 21 Mar 2020 07:41:57 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 v2 04/11] hw/input/adb-kbd: Remove dead assignment
-Date: Sat, 21 Mar 2020 15:41:03 +0100
-Message-Id: <20200321144110.5010-5-philmd@redhat.com>
+Subject: [PATCH-for-5.0 v2 07/11] hw/gpio/aspeed_gpio: Remove dead assignment
+Date: Sat, 21 Mar 2020 15:41:06 +0100
+Message-Id: <20200321144110.5010-8-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200321144110.5010-1-philmd@redhat.com>
 References: <20200321144110.5010-1-philmd@redhat.com>
@@ -123,59 +121,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 5a1f49718 the 'olen' variable is not really
-used. Remove it to fix a warning reported by Clang static
-code analyzer:
+Fix warning reported by Clang static code analyzer:
 
-    CC      hw/input/adb-kbd.o
-  hw/input/adb-kbd.c:200:5: warning: Value stored to 'olen' is never read
-      olen =3D 0;
-      ^      ~
+  hw/gpio/aspeed_gpio.c:717:18: warning: Value stored to 'g_idx' during its=
+ initialization is never read
+      int set_idx, g_idx =3D *group_idx;
+                   ^~~~~   ~~~~~~~~~~
 
-Fixes: 5a1f49718 (adb: add support for QKeyCode)
 Reported-by: Clang Static Analyzer
-Suggested-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: Remove 'olen' (Zoltan)
+v2: Do not declare g_idx in for() (Zoltan)
 ---
- hw/input/adb-kbd.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ hw/gpio/aspeed_gpio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
-index 0ba8207589..a6d5c9b7c9 100644
---- a/hw/input/adb-kbd.c
-+++ b/hw/input/adb-kbd.c
-@@ -195,9 +195,7 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
+diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
+index 41e11ea9b0..bd19db31f4 100644
+--- a/hw/gpio/aspeed_gpio.c
++++ b/hw/gpio/aspeed_gpio.c
+@@ -714,7 +714,7 @@ static void aspeed_gpio_write(void *opaque, hwaddr offs=
+et, uint64_t data,
+ static int get_set_idx(AspeedGPIOState *s, const char *group, int *group_i=
+dx)
  {
-     KBDState *s =3D ADB_KEYBOARD(d);
-     int keycode;
--    int olen;
+     AspeedGPIOClass *agc =3D ASPEED_GPIO_GET_CLASS(s);
+-    int set_idx, g_idx =3D *group_idx;
++    int set_idx, g_idx;
 =20
--    olen =3D 0;
-     if (s->count =3D=3D 0) {
-         return 0;
-     }
-@@ -216,7 +214,6 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
-     if (keycode =3D=3D 0x7f) {
-         obuf[0] =3D 0x7f;
-         obuf[1] =3D 0x7f;
--        olen =3D 2;
-     } else {
-         obuf[0] =3D keycode;
-         /* NOTE: the power key key-up is the two byte sequence 0xff 0xff;
-@@ -224,10 +221,9 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
-          * byte, but choose not to bother.
-          */
-         obuf[1] =3D 0xff;
--        olen =3D 2;
-     }
-=20
--    return olen;
-+    return 2;
- }
-=20
- static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
+     for (set_idx =3D 0; set_idx < agc->nr_gpio_sets; set_idx++) {
+         const GPIOSetProperties *set_props =3D &agc->props[set_idx];
 --=20
 2.21.1
 
