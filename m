@@ -2,88 +2,81 @@ Return-Path: <SRS0=wc0w=5G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD408C4332B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C4E1C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:44:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81CC020663
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA12E2072C
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 19:44:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gRXJS2wv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81CC020663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="itGlp9/7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA12E2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFjc7-0001LP-OT
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 15:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39595)
+	id 1jFk31-0007fm-0T
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 15:44:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42953)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFjYj-0005Vb-AJ
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:26 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jFk2R-0007GW-JL
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:44:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jFjYi-0005qD-9K
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:25 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54547)
+ (envelope-from <peter.maydell@linaro.org>) id 1jFk2Q-0003bB-0U
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:44:07 -0400
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:42797)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1jFjYi-0005p4-3b
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:13:24 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f130so8833632wmf.4
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 12:13:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=sspz/br+P8mUAXaacMtETm/32ruEWwdUnsySxlRkdEg=;
- b=gRXJS2wvF9x8E1wNK0xgIqCDDJm/HzlZT3vxrdSap0MObaE5Qd9Pmahl43/xswU7i2
- l1hElMblmPyQXhnqAq0QFUpl+mnlctLKflOc5xoFOGfGcuUcqJQuPySStOy8UJfi7uF1
- nY3A7fzNgpMP2ou1dbaclIobgHl+aKidC2sQhR0qtefkzhknJeAld7bFbUM3FN7AiKpa
- v1eAl8llG9H6ubtKLepFy78rbXrXcIKHlC4kONBHYPdXxdxGNHvrMoN/6UAVvhvOL/EE
- nSvR5kU/rTrflUR3RIIpndxE7uQfrNAU3Ayd8t144XE99sX43tF2VlvdLmqdBF1tmia7
- yJPw==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jFk2P-0003as-Np
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 15:44:05 -0400
+Received: by mail-oi1-x22e.google.com with SMTP id 13so10421338oiy.9
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 12:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NEk2qgjf+cDAcrDFogVFeelmvrXXXeP76Nomtm9c3lA=;
+ b=itGlp9/7h6yrDnn0rfpgsgdYco4nZt38zBbqVriA86bby0/iwO7wVjIzAoPzKdjk4Z
+ Eh3LL9sWkkkZacLjb+KsdG+ePO8PB52M+H2egGvb4T9d+bQPokvj4EdikqgKvxa9oG9t
+ tlztaDDUfkEFSSx66rmw+pHQeWdu+ewEDfyc4Q9mFQ15lc/xOkSV9dJo87PP7BuZKb/2
+ UNn34EVnG/XotiZKI+Ple9fjffhl0FRLdaDophmHvGWep8/gHkZCBn8OWDd/iGrDehrm
+ wWzltcWs3S4jcNJle+TMzyiqBQamnS15fE12TH4samGubaSYTj1yw6beZALCok3W7PSx
+ 1d/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=sspz/br+P8mUAXaacMtETm/32ruEWwdUnsySxlRkdEg=;
- b=rD+9A+Vp/UTnSJlCFuFWShm+yOfdyyCsxHhsRCThNZvWKllTGIeEwBUvTXlF5hh+o1
- SiVdSln27QlTEk1QsSbeOE8bgQ41rNfRbzjj1XATV93BmuwfbUpzDK8vvH77iSRGIZdl
- 1aGQ3BSanBhMAJ8ilpvKHyh3kI/iscGemvpMXW0H3Y1qlgNRZsUb76rIWku8K8iXZWI2
- LKFPPXiqGfyg9c1F1Zy3iugKTJgxaJrAVFPJOZXsEwSzkt7danFKtNi5d540Ng0I70mI
- ZthZdvsU2oWmLuya/xmaeN8TAXQJ9erAutAc0YDcEPRArel2n/pthlkqNN3yeVtUZWyq
- H7Vg==
-X-Gm-Message-State: ANhLgQ29aj4Bp7p/auqvTJbhs65FTpHdUxBbOT7z6SXz7AmciLF/EngP
- 6OP7MnW1qNRcX3Sp468WvPi6O52v
-X-Google-Smtp-Source: ADFU+vvj0dx3RdKk1pibdINBNN/Bm2KEsW0U36u6py3iV6j2B/qOWPlgTtGMJEJjX6wNBtwlWZegpw==
-X-Received: by 2002:a7b:c305:: with SMTP id k5mr18431419wmj.189.1584818002856; 
- Sat, 21 Mar 2020 12:13:22 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id i1sm15226252wrs.18.2020.03.21.12.13.21
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 21 Mar 2020 12:13:22 -0700 (PDT)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [Qemu-devel] [PATCH PULL 4/4] hw/rdma: avoid suspicious strncpy() use
-Date: Sat, 21 Mar 2020 21:13:11 +0200
-Message-Id: <20200321191311.31537-5-marcel.apfelbaum@gmail.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20200321191311.31537-1-marcel.apfelbaum@gmail.com>
-References: <20200321191311.31537-1-marcel.apfelbaum@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NEk2qgjf+cDAcrDFogVFeelmvrXXXeP76Nomtm9c3lA=;
+ b=neP6ectZ4msP3f37SE6UVtEbHCtNid4i689tvQhM74efe5c8vOQuYghFUQ2CQJnEgQ
+ Cbyy/wNfMcNY8TV2N9E2bVMnToExoJ6eBtMsV1ST5tQvGnATU/uz4AE1W9fNokRESN3f
+ undhUuvVOqRofIR1l3x+g+a6XqrUd1guYzAeSd0LbXySUrr7GUELQJq5cZFqZI4p8L6s
+ VHO59E8TjrGV861QO8Y8CErthBiNk7fZvVy9gZHw8cOjzAUUd7ehCwQMtS00JJlUXAmx
+ Yv+Kpb4JYVGsAep+au+fEQFF7AvnQA9Xx8BCCPOIqguiMJb5G7dduKGfyPhR0OqOoLXw
+ hKcw==
+X-Gm-Message-State: ANhLgQ0XR7PlmuHTuJb0fo3O6lW0MPP2RZlRfNS8fGWSNk5M1W60z+//
+ hyXSXPL4QtSs2kOZy2kUn+pKmNSTQyMaQA43OQg5bQ==
+X-Google-Smtp-Source: ADFU+vt6l+KeS1RmrOSVxTOQd89L90oraCA+aootkjuVdyQYPnSL8oGaM7cW5EpeUImNsOK0Xxyp87lTzLHFBMpeRUY=
+X-Received: by 2002:aca:190f:: with SMTP id l15mr11080656oii.48.1584819844248; 
+ Sat, 21 Mar 2020 12:44:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200320155106.549514-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20200320155106.549514-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 21 Mar 2020 19:43:53 +0000
+Message-ID: <CAFEAcA-RBQGQm+oM0xe27tQgYgpH-PEvcoAXLjcq4+X7c7=jUQ@mail.gmail.com>
+Subject: Re: [PULL v2 0/1] Slirp patches
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::22e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,52 +88,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jusual@redhat.com, stefanha@redhat.com, yuval.shaia.ml@gmail.com,
- quintela@redhat.com
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+On Fri, 20 Mar 2020 at 15:51, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> The following changes since commit f57587c7d47b35b2d9b31def3a74d81bdb5475=
+d7:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2020-03-17'=
+ into staging (2020-03-19 10:18:07 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/elmarco/qemu.git tags/slirp-pull-request
+>
+> for you to fetch changes up to aa63573a84c92b14c23f557fcc93a12b1a93c187:
+>
+>   slirp: update submodule to v4.2.0+ (2020-03-20 16:50:12 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>   slirp: update submodule to v4.2.0+
+>
+>  slirp | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-gcc (GCC) 9.2.1 20190827 (Red Hat 9.2.1-1) with sanitizers enabled
-reports the following error:
+Hi; this fails to build on most platforms (though it works on
+the BSDs, oddly):
 
-  CC      x86_64-softmmu/hw/rdma/vmw/pvrdma_dev_ring.o
-In file included from /usr/include/string.h:495,
-                 from include/qemu/osdep.h:101,
-                 from hw/rdma/vmw/pvrdma_dev_ring.c:16:
-In function ‘strncpy’,
-    inlined from ‘pvrdma_ring_init’ at hw/rdma/vmw/pvrdma_dev_ring.c:33:5:
-/usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 32 equals destination size [-Werror=stringop-truncation]
-  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/ubuntu/qemu/slirp/src/version.c: In function =E2=80=98slirp_version_s=
+tring=E2=80=99:
+/home/ubuntu/qemu/slirp/src/version.c:7:12: error:
+=E2=80=98SLIRP_VERSION_STRING=E2=80=99 undeclared (first use in this functi=
+on); did
+you mean =E2=80=98LIBSLIRP_VERSION_H_=E2=80=99?
+     return SLIRP_VERSION_STRING;
+            ^~~~~~~~~~~~~~~~~~~~
+            LIBSLIRP_VERSION_H_
+/home/ubuntu/qemu/slirp/src/version.c:7:12: note: each undeclared
+identifier is reported only once for each function it appears in
+/home/ubuntu/qemu/slirp/src/version.c:8:1: error: control reaches end
+of non-void function [-Werror=3Dreturn-type]
+ }
+ ^
+cc1: all warnings being treated as errors
+Makefile:45: recipe for target
+'/home/ubuntu/qemu/build/all/slirp/src/version.o' failed
 
-Use pstrcpy() instead of strncpy().  It is guaranteed to NUL-terminate
-strings.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Yuval Shaia <yuval.shaia.ml.gmail.com>
-Message-Id: <20200316160702.478964-3-stefanha@redhat.com>
-Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
----
- hw/rdma/vmw/pvrdma_dev_ring.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
-index c2b3dd70a9..c122fe7035 100644
---- a/hw/rdma/vmw/pvrdma_dev_ring.c
-+++ b/hw/rdma/vmw/pvrdma_dev_ring.c
-@@ -14,6 +14,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "hw/pci/pci.h"
- #include "cpu.h"
- #include "qemu/cutils.h"
--- 
-2.17.2
-
+thanks
+-- PMM
 
