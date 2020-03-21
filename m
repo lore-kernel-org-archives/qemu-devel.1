@@ -7,81 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C235C4332D
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34425C4332B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:45:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCB0920409
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:43:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDE0220757
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Mar 2020 14:45:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OcPR5Z8M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB0920409
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cwt4HIDO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDE0220757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFfLX-0007dd-0d
-	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 10:43:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59699)
+	id 1jFfNe-0002mi-3H
+	for qemu-devel@archiver.kernel.org; Sat, 21 Mar 2020 10:45:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFfJb-0004ho-AL
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:32 -0400
+ (envelope-from <philmd@redhat.com>) id 1jFfJu-0005Q0-NL
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFfJa-0007H1-7O
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:31 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:33211)
+ (envelope-from <philmd@redhat.com>) id 1jFfJt-0007V9-Kt
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24366)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFfJa-0007GM-3V
- for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:30 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFfJt-0007Uv-HN
+ for qemu-devel@nongnu.org; Sat, 21 Mar 2020 10:41:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584801689;
+ s=mimecast20190719; t=1584801709;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2U6ARuvMvLKS+fqGTEoijz7r0B3fBwOwTnOOBFQNRAw=;
- b=OcPR5Z8MaC/teIqHLYrkBtvCh/3ixO47hPlR6SsEbjxbANl5zCrQSKJc6neBDahnrxoSGL
- VQSxdpN6BrtgN20EssYpBLC9/Q+R+Kx3E54Q1GAzsYCt9i62Vu1coHFCAoGtqG/m6u+aIT
- klqjpXjuJN/5FAHzS16xpfv2c4X8AYU=
+ bh=XvtpmJoV32BEyOe596XwKOYG0GxD3I0LNs6dD0KNAUs=;
+ b=Cwt4HIDO8AQsqVGCL3OLnJGOmupuZxiZ0aJW78aOXREVrDGYFHxksKyvlkq1RR2PmXU7Ce
+ fsUfTqRXZ1cExln8I5oIhI7VC3f9lZkDizbLThIVxorKQmpQAVhNkXn82S2bG8E+KJWS2o
+ KEkL4vfFVrMNq4e2BWpueWxoHgyy5uo=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-Ta8MsF--PWKq39LolxhfaA-1; Sat, 21 Mar 2020 10:41:28 -0400
-X-MC-Unique: Ta8MsF--PWKq39LolxhfaA-1
-Received: by mail-wr1-f71.google.com with SMTP id b12so4405662wro.4
- for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 07:41:28 -0700 (PDT)
+ us-mta-460-D54etfosOv26yJD7_MCgDg-1; Sat, 21 Mar 2020 10:41:47 -0400
+X-MC-Unique: D54etfosOv26yJD7_MCgDg-1
+Received: by mail-wr1-f71.google.com with SMTP id i18so4352266wrx.17
+ for <qemu-devel@nongnu.org>; Sat, 21 Mar 2020 07:41:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ez+E9s5mwrT8B9y8nVUYgFPf3iN6ckUcWWVa90evmD4=;
- b=oIbfvpHOtT4+CvVWq1QjXwByxA++YVyEFROpeEbrfnOf4eEMyXTfBGUf02tRP/l6GU
- t6z1lPcJa/gvb/3BfW8h5YD2aMiijm3YnGjxbsf1NeXnJKtcz7VXg6EgMlBBnatK2nrE
- sMwDHcBRQMrvE3yU261+vPDJZedNh6DVTPc8PMIu0gfBP2lA+3kRyuATMfj9mlR0nD28
- 9Dr272M+OlmrsynyAyMl6zetRtvKMNRehkHVW9D60DuUR8qYlNr0GC1MjhHr1mSg6S86
- +cpM5nO4OfzTGizUXPkdvNMvOtWeUnIJuM+TVwtwFjZdRhuYd/8xm4S2veEcAdSB8Q39
- NU6A==
-X-Gm-Message-State: ANhLgQ0HOkrxculNTpFisulYy+PZM4UeTN31TAh1qA7VMXy+TsDDKZzc
- eEwQFzCzIM/qWuZgGlQX2e8RgRFAc3cLn00cy3hqJByHp5TNF/cb6RYOuoXEB0/YJ1y/oOo2dRe
- 7TvT/EA6zz7d7LZg=
-X-Received: by 2002:adf:9071:: with SMTP id
- h104mr17944858wrh.359.1584801686947; 
- Sat, 21 Mar 2020 07:41:26 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvT4CVQxA5nLMDXZhZEREy/9sQIXUlQ2wJ9ez38CCElrT64mFRDHk077ZFhB6T9v5dilo0t2Q==
-X-Received: by 2002:adf:9071:: with SMTP id
- h104mr17944810wrh.359.1584801686647; 
- Sat, 21 Mar 2020 07:41:26 -0700 (PDT)
+ bh=bL5NUrmTjbHjm3pvKXbJpPZgk/5XIoNG4lJHv7ZuRaU=;
+ b=SIz6Wz4MPoUqU6OUWVbZ0hWrSHE6PkajIxljV95mVclH4RhY0x8YhVys6O5HTBI25V
+ 6BzXtihMVUKUZcz1PFZOAF5tgWdPerSnsoyuIpvbMa1ISA+jXPVyRSUbLPQjBjaXX7X6
+ niKGB6FHzHNSI+u2CKoSHw6ddKI1d/NrneXnG6gR3h+m8hzrZ/Bh4lzYleSy1SVGmbax
+ UFhWFZ3tioWDYu/mUWqPvwJdCFVP9exXWCysxvqCydGl4JQci75a2Jbb5IWJklwLa6A1
+ tx7R+g+FguVRXAGtIZ3bo9dJRTMmCdZ9MhFdTUzR37WxawuOkgPfi7hsF8mSBLdRKCR+
+ 093A==
+X-Gm-Message-State: ANhLgQ2YZPR6rpEDliSwN6/fHbeYNgFSC0HL1fmU6M9gU+b+gUFr7aTA
+ +zF7bvkOZA8vduIpHYCk0nnuwvxxaLzbncz/H8YTm472yt7ph9R7PILRPJiuthzY+wM9zQSDc5l
+ rBghAaNYajRjovzA=
+X-Received: by 2002:a7b:c5d9:: with SMTP id n25mr17193376wmk.160.1584801705931; 
+ Sat, 21 Mar 2020 07:41:45 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvPBABnTVrFLPi9F6uhCW5QPfP0PaTUxHoC+sJfC9KClGy5HdXjRGO23/0BW9pONNYT7mVwuA==
+X-Received: by 2002:a7b:c5d9:: with SMTP id n25mr17193337wmk.160.1584801705724; 
+ Sat, 21 Mar 2020 07:41:45 -0700 (PDT)
 Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id r3sm14054273wrw.76.2020.03.21.07.41.24
+ by smtp.gmail.com with ESMTPSA id n2sm14551205wro.25.2020.03.21.07.41.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 21 Mar 2020 07:41:26 -0700 (PDT)
+ Sat, 21 Mar 2020 07:41:45 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 v2 02/11] blockdev: Remove dead assignment
-Date: Sat, 21 Mar 2020 15:41:01 +0100
-Message-Id: <20200321144110.5010-3-philmd@redhat.com>
+Subject: [PATCH-for-5.0 v2 05/11] hw/ide/sii3112: Remove dead assignment
+Date: Sat, 21 Mar 2020 15:41:04 +0100
+Message-Id: <20200321144110.5010-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200321144110.5010-1-philmd@redhat.com>
 References: <20200321144110.5010-1-philmd@redhat.com>
@@ -124,31 +122,54 @@ Sender: "Qemu-devel"
 
 Fix warning reported by Clang static code analyzer:
 
-    CC      blockdev.o
-  blockdev.c:2744:5: warning: Value stored to 'ret' is never read
-      ret =3D blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
-      ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CC      hw/ide/sii3112.o
+  hw/ide/sii3112.c:204:9: warning: Value stored to 'val' is never read
+          val =3D 0;
+          ^     ~
 
+Fixes: a9dd6604
 Reported-by: Clang Static Analyzer
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- blockdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v2: Fix the correct function (Aleksandar review)
+---
+ hw/ide/sii3112.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index fa8630cb41..6effd5afaa 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2741,7 +2741,7 @@ void qmp_block_resize(bool has_device, const char *de=
-vice,
+diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+index 06605d7af2..b2ff6dd6d9 100644
+--- a/hw/ide/sii3112.c
++++ b/hw/ide/sii3112.c
+@@ -42,7 +42,7 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr add=
+r,
+                                 unsigned int size)
+ {
+     SiI3112PCIState *d =3D opaque;
+-    uint64_t val =3D 0;
++    uint64_t val;
+=20
+     switch (addr) {
+     case 0x00:
+@@ -126,6 +126,7 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr a=
+ddr,
+         break;
+     default:
+         val =3D 0;
++        break;
      }
+     trace_sii3112_read(size, addr, val);
+     return val;
+@@ -201,7 +202,7 @@ static void sii3112_reg_write(void *opaque, hwaddr addr=
+,
+         d->regs[1].sien =3D (val >> 16) & 0x3eed;
+         break;
+     default:
+-        val =3D 0;
++        break;
+     }
+ }
 =20
-     bdrv_drained_begin(bs);
--    ret =3D blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
-+    blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
-     bdrv_drained_end(bs);
-=20
- out:
 --=20
 2.21.1
 
