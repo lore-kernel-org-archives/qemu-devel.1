@@ -1,85 +1,82 @@
 Return-Path: <SRS0=K/vF=5H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1533C4332B
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 19:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CDAC4332B
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 19:52:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87B4920724
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 19:23:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D802820719
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 19:52:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h/dWmYjv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B4920724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k0InpjH4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D802820719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jG6CE-0005vV-Kk
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 15:23:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33637)
+	id 1jG6eW-0003KB-0P
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 15:52:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jG6Bc-0005RN-GN
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:23:05 -0400
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jG6dr-0002uw-RM
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:52:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jG6Ba-00080u-Vb
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:23:04 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38021)
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jG6dq-0002QL-IB
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:52:15 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39765)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jG6Ba-0007zu-NB
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:23:02 -0400
-Received: by mail-wm1-x344.google.com with SMTP id l20so12288771wmi.3
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 12:23:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Ev/rARBqmxuXFlqAqZsGEHnb8NKhJeii6ub3R0/lfxI=;
- b=h/dWmYjvSLHhRegqt5P69A6otdshUfg5oJHRLswClGJmwC3LEf1IEuXyunIE7TmII7
- rWstGizYTrMUGvkHV+w28a0n8LigZBs7HAb163DlpHTxIcngYm3ZVkk5f58xt4zruwge
- u72iAd6DsWPd1HgLVRYIp2JUC7BYh7veqzZ8Ht/T82K5zCQ7NDJaSts42UkiD5ofc7l7
- jg8OC0vSM0BxFVUSvtVgjx/YIa0plmgcTRdCMl9fe0JG8XTf9hZZGF1kvsmd7ZVAFIyH
- QKbqD5k3HVARGXcujU35AnQZY881VDfRWdLMEvDj/aebGJbuwrsP8u1OxEh26WAIo+VC
- H2UA==
+ (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jG6dq-0002Q3-Bj
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:52:14 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id p10so1849744wrt.6
+ for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 12:52:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=INYBBYLFUqEOW2rWRKr982rY7t35xkrPsVORhDugoxw=;
+ b=k0InpjH4NwN2GsZuncqbHNAjnzZ8QH9Tib7wo3wMoGKxp2NN2iCZTZ3uGPnw7akUMU
+ TtsPMllsssq2/13DiFbZWlpj4pmhgvObsYsOR5POy1HopjWKEUy6+tJ860vSzGxjYJMp
+ xVd2DCfoOSfD/ZwFp0T+Os6SjoSjCwvE6aGN3d1u5XK4DyyTUjX0mf3ltm4OhuJ/qRdZ
+ 3pZY+jx0qd8/cISzK78N7ufwDuDwteV+eQM6Sy1hj3lPYzprYnsH8EkZw5mO/MA6d6VS
+ JBg99MUAQY3p/m4VuQSYe4h7P2SPISTzyDwJVjWVqQzV880z6nHdK+A4XQe+H8b7A0PV
+ n21g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Ev/rARBqmxuXFlqAqZsGEHnb8NKhJeii6ub3R0/lfxI=;
- b=e7oMr9HLweS23g8Du6t+QA2QJOx9NNIe7xiOU8Gfig1fq2WWIg2W/c7iHoIVt3s6ar
- c3nVTdpLE3LmxkMd/E6PJn0fcpjiq+2VCxQtssbdrsmtYRFtwa1kpP+MCn+gVySS+DCW
- tscgTtVF8lSOmKatBPF4h9+GWmw5FZcLcrculAqBcqLLNnw1s6S8taj+UFthTsM5AKuG
- tNMwf6eF1QDr64cn75LFsuYU14vuOsiJLcgtiGkIekaaPBGfEWBWwSDgJkckZ4B/Vmv4
- O4+AhIUBVaPxS1jeQIXdbbkMGl9kDpM8h0HUnzvK2Gx3KWoa+033xN7p+oudF/PSIaDS
- 7lWg==
-X-Gm-Message-State: ANhLgQ05/PaVU6Oq1YIHii53TnmasgW9Bm2NP6OpI9RTrijZ0WTO3umj
- rCa7Cgx/VxYhJZGosjWH+g5Nu53KM7QcYA==
-X-Google-Smtp-Source: ADFU+vszxio4Oa257JqLaP9HfXhCsVkrRthK/a3qDKsWT7/B3yygCxCN6gdnlnxWKHOeFmyGR22ZaQ==
-X-Received: by 2002:a1c:4645:: with SMTP id t66mr23561871wma.6.1584904981078; 
- Sun, 22 Mar 2020 12:23:01 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q8sm12086755wmj.22.2020.03.22.12.22.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 22 Mar 2020 12:23:00 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.0] hw/ppc: Take QEMU lock when calling
- ppc_dcr_read/write()
-Date: Sun, 22 Mar 2020 19:22:58 +0000
-Message-Id: <20200322192258.14039-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=INYBBYLFUqEOW2rWRKr982rY7t35xkrPsVORhDugoxw=;
+ b=YSlRgLJyFyqcSERyNEeEs5DYbpMYg/J8fSZNTq8lDyGGNUZwb9szwO7IOJInN+VcFl
+ 6awuKtP+1mkndOt3DBdKlAuU2FlFfBfkuob1jYZSDwlIAxy5z10rhz0e3GzCoqSXCl7R
+ nTVEd2ABCMYOHZ0dRbKY7t2zzCY4eppAiliPBjSzGi4F2mrt+Up2N9MW8AMA4KN447fa
+ ioSMKiEpgsxkNjbipCS0Ox04MoINJpAK2skNAzDuwHKTJSmGNzA90LmzMe23yrNgstMd
+ cehsA2JwhvFUTXwOxdroAupV17GWarE9mlVEmMdQhcSQRgBvqFJhj8M0tAEBqjXL/dHd
+ vEvw==
+X-Gm-Message-State: ANhLgQ1uRi5a9XqbAULCkG7g6I5SPD1yy3l0mJtCiE8aoPo3EXjMPw0r
+ fGVCWE92SHuGYTHgngfryPvcva/1NA45B37/CeI=
+X-Google-Smtp-Source: ADFU+vsWy9Z2llbomneOGondPJ5I1otGvVlF9j2Dq8YkFxcI2d1r+wzM2HfrqFj1DQsXt8iiG8eSXvMq7KrnR10a09U=
+X-Received: by 2002:adf:ba47:: with SMTP id t7mr23892301wrg.147.1584906732528; 
+ Sun, 22 Mar 2020 12:52:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+ <CAL1e-=gKB0qRxGntXrU0im2gjMh1tq_SLGTm+HsmgBRGXQ9+Bg@mail.gmail.com>
+ <CAFEAcA-Yn_O=G-63O1Ug9=HYqN0_o_NH_nLpWmBv2bjk2Y_85A@mail.gmail.com>
+In-Reply-To: <CAFEAcA-Yn_O=G-63O1Ug9=HYqN0_o_NH_nLpWmBv2bjk2Y_85A@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Sun, 22 Mar 2020 20:51:56 +0100
+Message-ID: <CAHiYmc4Qv4yL8LMp_nFqx20bq-hRO-umh5R899H6hdSyKrpNBA@mail.gmail.com>
+Subject: Re: deprecation of in-tree builds
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000cb666405a176da14"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,95 +88,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Amit Lazar <abasarlaz@hotmail.com>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ppc_dcr_read() and ppc_dcr_write() functions call into callbacks
-in device code, so we need to hold the QEMU iothread lock while
-calling them.  This is the case already for the callsites in
-kvmppc_handle_dcr_read/write(), but we must also take the lock when
-calling the helpers from TCG.
+--000000000000cb666405a176da14
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This fixes a bug where attempting to initialise the PPC405EP
-SDRAM will cause an assertion when sdram_map_bcr() attempts
-to remap memory regions.
+18:21 Ned, 22.03.2020. Peter Maydell <peter.maydell@linaro.org> =D1=98=D0=
+=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On Sun, 22 Mar 2020 at 15:29, Aleksandar Markovic
+> <aleksandar.m.mail@gmail.com> wrote:
+> > If the "progress" (in the form of deprecation) is so impotrant, than
+the authors should devise it so that there is no dammage to existing
+features, and no adverse effects.
+> >
+> > In this light, perhaps in-tree builds deorecation is 5.0 is little
+premature.
+>
+> The idea of deprecation is to give advance warning. So it's
+> better for our users if we announce it earlier, rather than
+> later. Strictly speaking our deprecation policy is for
+> user-facing features, not build-time stuff, where we are...
 
-Reported-by: Amit Lazar <abasarlaz@hotmail.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Amit reported this bug via IRC.
+If an end-user feature works only in in-tree builds (so, explitely said:
+not in out-of-tree builds), this is not a build-time stuff, but user-facing
+feature issue.
 
- target/ppc/timebase_helper.c | 40 +++++++++++++++++++++++-------------
- 1 file changed, 26 insertions(+), 14 deletions(-)
+If someone is keen on removing any feature (as is truly in this case), I
+expect at least some moderate investigation being done on what could be
+affected (prior to announcing deprecation), rather than attitude "ok, let's
+announce deprecation, see if someone start clamoring, and, if not, we are
+good to go with removing". For me, this slightly disappointing.
 
-diff --git a/target/ppc/timebase_helper.c b/target/ppc/timebase_helper.c
-index 703bd9ed18b..d16360ab667 100644
---- a/target/ppc/timebase_helper.c
-+++ b/target/ppc/timebase_helper.c
-@@ -21,6 +21,7 @@
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
- #include "qemu/log.h"
-+#include "qemu/main-loop.h"
- 
- /*****************************************************************************/
- /* SPR accesses */
-@@ -167,13 +168,19 @@ target_ulong helper_load_dcr(CPUPPCState *env, target_ulong dcrn)
-         raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                                POWERPC_EXCP_INVAL |
-                                POWERPC_EXCP_INVAL_INVAL, GETPC());
--    } else if (unlikely(ppc_dcr_read(env->dcr_env,
--                                     (uint32_t)dcrn, &val) != 0)) {
--        qemu_log_mask(LOG_GUEST_ERROR, "DCR read error %d %03x\n",
--                      (uint32_t)dcrn, (uint32_t)dcrn);
--        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
--                               POWERPC_EXCP_INVAL |
--                               POWERPC_EXCP_PRIV_REG, GETPC());
-+    } else {
-+        int ret;
-+
-+        qemu_mutex_lock_iothread();
-+        ret = ppc_dcr_read(env->dcr_env, (uint32_t)dcrn, &val);
-+        qemu_mutex_unlock_iothread();
-+        if (unlikely(ret != 0)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "DCR read error %d %03x\n",
-+                          (uint32_t)dcrn, (uint32_t)dcrn);
-+            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-+                                   POWERPC_EXCP_INVAL |
-+                                   POWERPC_EXCP_PRIV_REG, GETPC());
-+        }
-     }
-     return val;
- }
-@@ -185,12 +192,17 @@ void helper_store_dcr(CPUPPCState *env, target_ulong dcrn, target_ulong val)
-         raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                                POWERPC_EXCP_INVAL |
-                                POWERPC_EXCP_INVAL_INVAL, GETPC());
--    } else if (unlikely(ppc_dcr_write(env->dcr_env, (uint32_t)dcrn,
--                                      (uint32_t)val) != 0)) {
--        qemu_log_mask(LOG_GUEST_ERROR, "DCR write error %d %03x\n",
--                      (uint32_t)dcrn, (uint32_t)dcrn);
--        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
--                               POWERPC_EXCP_INVAL |
--                               POWERPC_EXCP_PRIV_REG, GETPC());
-+    } else {
-+        int ret;
-+        qemu_mutex_lock_iothread();
-+        ret = ppc_dcr_write(env->dcr_env, (uint32_t)dcrn, (uint32_t)val);
-+        qemu_mutex_unlock_iothread();
-+        if (unlikely(ret != 0)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "DCR write error %d %03x\n",
-+                          (uint32_t)dcrn, (uint32_t)dcrn);
-+            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-+                                   POWERPC_EXCP_INVAL |
-+                                   POWERPC_EXCP_PRIV_REG, GETPC());
-+        }
-     }
- }
--- 
-2.20.1
+I haven't seen anyone doing a sufficiently thourough analysis on what
+happens without in-tree builds, and doesn't work in out-of-tree builds in a
+proper way.
 
+But, ok, this is just my opinion, probably unpopular within dev comunity,
+since it requires additional effort by us. Still, we should guide ourself
+with "what is right to do", and not "what is easy to do" principles.
+
+Regards,
+Aleksandar
+
+> less strict about how much notice we give people. But it
+> seems to me that if it's easy to give some advance notice
+> then why shouldn't we do so?
+>
+> I agree that we should obviously make sure that everything
+> that currently assumes an in-tree build also works with an
+> out-of-tree build before we drop the support...
+>
+> (Also, if we don't announce that we're planning to drop
+> support, nobody's going to report to us issues which
+> we need to fix :-))
+>
+> thanks
+> -- PMM
+>
+
+--000000000000cb666405a176da14
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">18:21 Ned, 22.03.2020. Peter Maydell &lt;<a href=3D"mailto:p=
+eter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; =D1=98=D0=B5 =D0=
+=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; On Sun, 22 Mar 2020 at 15:29, Aleksandar Markovic<br>
+&gt; &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@g=
+mail.com</a>&gt; wrote:<br>
+&gt; &gt; If the &quot;progress&quot; (in the form of deprecation) is so im=
+potrant, than the authors should devise it so that there is no dammage to e=
+xisting features, and no adverse effects.<br>
+&gt; &gt;<br>
+&gt; &gt; In this light, perhaps in-tree builds deorecation is 5.0 is littl=
+e premature.<br>
+&gt;<br>
+&gt; The idea of deprecation is to give advance warning. So it&#39;s<br>
+&gt; better for our users if we announce it earlier, rather than<br>
+&gt; later. Strictly speaking our deprecation policy is for<br>
+&gt; user-facing features, not build-time stuff, where we are...</p>
+<p dir=3D"ltr">If an end-user feature works only in in-tree builds (so, exp=
+litely said: not in out-of-tree builds), this is not a build-time stuff, bu=
+t user-facing feature issue.</p>
+<p dir=3D"ltr">If someone is keen on removing any feature (as is truly in t=
+his case), I expect at least some moderate investigation being done on what=
+ could be affected (prior to announcing deprecation), rather than attitude =
+&quot;ok, let&#39;s announce deprecation, see if someone start clamoring, a=
+nd, if not, we are good to go with removing&quot;. For me, this slightly di=
+sappointing.</p>
+<p dir=3D"ltr">I haven&#39;t seen anyone doing a sufficiently thourough ana=
+lysis on what happens without in-tree builds, and doesn&#39;t work in out-o=
+f-tree builds in a proper way.</p>
+<p dir=3D"ltr">But, ok, this is just my opinion, probably unpopular within =
+dev comunity, since it requires additional effort by us. Still, we should g=
+uide ourself with &quot;what is right to do&quot;, and not &quot;what is ea=
+sy to do&quot; principles.</p>
+<p dir=3D"ltr">Regards,<br>
+Aleksandar<br><br></p>
+<p dir=3D"ltr">&gt; less strict about how much notice we give people. But i=
+t<br>
+&gt; seems to me that if it&#39;s easy to give some advance notice<br>
+&gt; then why shouldn&#39;t we do so?<br>
+&gt;<br>
+&gt; I agree that we should obviously make sure that everything<br>
+&gt; that currently assumes an in-tree build also works with an<br>
+&gt; out-of-tree build before we drop the support...<br>
+&gt;<br>
+&gt; (Also, if we don&#39;t announce that we&#39;re planning to drop<br>
+&gt; support, nobody&#39;s going to report to us issues which<br>
+&gt; we need to fix :-))<br>
+&gt;<br>
+&gt; thanks<br>
+&gt; -- PMM<br>
+&gt;<br>
+</p>
+
+--000000000000cb666405a176da14--
 
