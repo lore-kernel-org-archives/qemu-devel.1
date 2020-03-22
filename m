@@ -2,65 +2,74 @@ Return-Path: <SRS0=K/vF=5H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC31C4332D
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 08:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E4DC43332
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 09:01:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE9D2206F9
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 08:51:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BI1ljb8Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE9D2206F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 942F120753
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 09:01:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942F120753
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFwJy-0001e3-UZ
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 04:51:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52073)
+	id 1jFwUY-00041V-Ls
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 05:01:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jFwJA-0000uc-Ii
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 04:50:14 -0400
+ (envelope-from <bounces@canonical.com>) id 1jFwTe-0003cv-LH
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 05:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jFwJ9-0006ak-37
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 04:50:12 -0400
-Received: from ozlabs.org ([203.11.71.1]:35043)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jFwJ6-0006XB-6R; Sun, 22 Mar 2020 04:50:10 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48lWRb3TMdz9sPR; Sun, 22 Mar 2020 19:50:03 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584867003;
- bh=2y/HzrokipazfD/bHXe9liTQjcDQwirCaigMtKSAj+E=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=BI1ljb8ZvYWhiC5blzOgyz/YbZMG+PJSYIk/VKBgvV0Gl/3SVtxGxgSA8rJV7go3o
- X1u9Y8R6nH0VFsVqFFVKditAopMwnjzKICcfkq83pAZggjZF5kDYSSiVzh6hZJXtFs
- 0pZ0HJ2iBp9bUZUVKQV8Hdqyur9/jvB4Uknp20LA=
-Date: Sun, 22 Mar 2020 19:46:08 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] ppc/ppc405_boards: Remove unnecessary NULL check
-Message-ID: <20200322084608.GI781112@umbus.fritz.box>
-References: <20200320155740.5342-1-philmd@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1jFwTc-0005KL-M9
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 05:01:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46544)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jFwTc-0005Hz-Fs
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 05:01:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jFwTa-00046w-7m
+ for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 09:00:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 39BF42E80C7
+ for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 09:00:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="cDtQGJ/EJIRf/Cpq"
-Content-Disposition: inline
-In-Reply-To: <20200320155740.5342-1-philmd@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 22 Mar 2020 08:50:26 -0000
+From: Philippe Vaucher <philippe.vaucher@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philippe-vaucher pmaydell
+X-Launchpad-Bug-Reporter: Philippe Vaucher (philippe-vaucher)
+X-Launchpad-Bug-Modifier: Philippe Vaucher (philippe-vaucher)
+References: <158022582642.18726.3284794136336139049.malonedeb@gac.canonical.com>
+Message-Id: <158486702632.20119.10613932728480874623.malone@wampee.canonical.com>
+Subject: [Bug 1861161] Re: qemu-arm-static stuck with 100% CPU when
+ cross-compiling emacs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: d6b7aabedc1015a65c2c08397f1587e454574172
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,94 +78,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-ppc@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1861161 <1861161@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I tried several workarounds including removing `dir_index` from ext4
+partitions and using a 32 bit qemu-user-static version, but it does not
+work:
 
---cDtQGJ/EJIRf/Cpq
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The process still gets stuck in a loop involving `getdents64`:
 
-On Fri, Mar 20, 2020 at 04:57:40PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> This code is inside the "if (dinfo)" condition, so testing
-> again here whether it is NULL is unnecessary.
->=20
-> Fixes: dd59bcae7 (Don't size flash memory to match backing image)
-> Reported-by: Coverity (CID 1421917)
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Applied to ppc-for-5.1.
+```
+root@earth:~# file /usr/bin/qemu-arm-static
+/usr/bin/qemu-arm-static: ELF 32-bit LSB executable, Intel 80386, version 1=
+ (GNU/Linux), statically linked, for GNU/Linux 3.2.0, BuildID[sha1]=3Dff122=
+4d87ca5dece8d0b0f5735cfee7fae97ee58, stripped
 
-> ---
->  hw/ppc/ppc405_boards.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-> index e6bffb9e1a..6198ec1035 100644
-> --- a/hw/ppc/ppc405_boards.c
-> +++ b/hw/ppc/ppc405_boards.c
-> @@ -191,7 +191,7 @@ static void ref405ep_init(MachineState *machine)
->          bios_size =3D 8 * MiB;
->          pflash_cfi02_register((uint32_t)(-bios_size),
->                                "ef405ep.bios", bios_size,
-> -                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                              blk_by_legacy_dinfo(dinfo),
->                                64 * KiB, 1,
->                                2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
->                                1);
-> @@ -459,7 +459,7 @@ static void taihu_405ep_init(MachineState *machine)
->          bios_size =3D 2 * MiB;
->          pflash_cfi02_register(0xFFE00000,
->                                "taihu_405ep.bios", bios_size,
-> -                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                              blk_by_legacy_dinfo(dinfo),
->                                64 * KiB, 1,
->                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
->                                1);
-> @@ -494,7 +494,7 @@ static void taihu_405ep_init(MachineState *machine)
->      if (dinfo) {
->          bios_size =3D 32 * MiB;
->          pflash_cfi02_register(0xfc000000, "taihu_405ep.flash", bios_size,
-> -                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                              blk_by_legacy_dinfo(dinfo),
->                                64 * KiB, 1,
->                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
->                                1);
+root@earth:~# ps afx | grep qemu
+21031 pts/0    S+     0:00          \_ grep --color=3Dauto qemu
+ 1036 ?        Ss     0:00 /usr/sbin/qemu-ga --daemonize -m virtio-serial -=
+p /dev/virtio-ports/org.qemu.guest_agent.0
+10584 ?        Ssl    0:00      |   |   \_ /usr/bin/qemu-arm-static /usr/bi=
+n/make install
+28768 ?        Sl     0:01      |   |       \_ /usr/bin/qemu-arm-static /us=
+r/bin/make -C src VCSWITNESS=3D$(srcdir)/../.git/logs/HEAD all
+16718 ?        Sl     0:00      |   |           \_ /usr/bin/qemu-arm-static=
+ /usr/bin/make -C ../lisp compile-first EMACS=3D../src/bootstrap-emacs
+16726 ?        Rl    48:24      |   |               \_ /usr/bin/qemu-arm-st=
+atic ../src/bootstrap-emacs -batch --no-site-file --no-site-lisp --eval (se=
+tq load-prefer-newer t) -f batch-byte-compile emacs-lisp/macroexp.el
+10696 ?        Ssl    0:00      |       \_ /usr/bin/qemu-aarch64-static /us=
+r/bin/make install
+10972 ?        Sl     0:02      |           \_ /usr/bin/qemu-aarch64-static=
+ /usr/bin/make -C src VCSWITNESS=3D$(srcdir)/../.git/logs/HEAD all
+20397 ?        Sl     0:00      |               \_ /usr/bin/qemu-aarch64-st=
+atic /usr/bin/make -C ../lisp compile-first EMACS=3D../src/bootstrap-emacs
+20405 ?        Rl    24:09      |                   \_ /usr/bin/qemu-aarch6=
+4-static ../src/bootstrap-emacs -batch --no-site-file --no-site-lisp --eval=
+ (setq load-prefer-newer t) -f batch-byte-compile emacs-lisp/macroexp.el
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+root@earth:~# strace -p 16726
+clock_gettime(CLOCK_REALTIME, {tv_sec=3D1584794027, tv_nsec=3D921230669}) =
+=3D 0
+getdents64(5, /* 0 entries */, 2048)    =3D 0
+_llseek(5, 0, [0], SEEK_SET)            =3D 0
+getdents64(5, /* 5 entries */, 2048)    =3D 144
+tgkill(29984, 29987, SIGRT_2)           =3D -1 EAGAIN (Resource temporarily=
+ unavailable)
+clock_gettime(CLOCK_REALTIME, {tv_sec=3D1584794027, tv_nsec=3D921642405}) =
+=3D 0
+getdents64(5, /* 0 entries */, 2048)    =3D 0
+_llseek(5, 0, [0], SEEK_SET)            =3D 0
+getdents64(5, /* 5 entries */, 2048)    =3D 144
+tgkill(29984, 29987, SIGRT_2)           =3D -1 EAGAIN (Resource temporarily=
+ unavailable)
+clock_gettime(CLOCK_REALTIME, {tv_sec=3D1584794027, tv_nsec=3D922333065}) =
+=3D 0
+getdents64(5, /* 0 entries */, 2048)    =3D 0
+_llseek(5, 0, [0], SEEK_SET)            =3D 0
+getdents64(5, /* 5 entries */, 2048)    =3D 144
+tgkill(29984, 29987, SIGRT_2)           =3D -1 EAGAIN (Resource temporarily=
+ unavailable)
+clock_gettime(CLOCK_REALTIME, ^C{tv_sec=3D1584794027, tv_nsec=3D923201432})=
+ =3D 0
+strace: Process 16726 detached
+```
 
---cDtQGJ/EJIRf/Cpq
-Content-Type: application/pgp-signature; name="signature.asc"
+What is interesting is that the qemu-aarch64-static process also get
+stuck, which if I understand the bug correctly should not happen. I'll
+try stracing the process to figure out what happens.
 
------BEGIN PGP SIGNATURE-----
+-- =
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl53Jc0ACgkQbDjKyiDZ
-s5I47g/+OBaZMNt8//hA9xNBehjOda4KnnfY62FA7zCxOy12LJiyAQ4EEeEFSwgX
-fEKACCibetla400+VYQnmOFe2xIQPX46LfezTalJ4TY2PAIpFU/XMbfhrcj3P5Dh
-IYYOAOCprXvLSL8K+AsNTaLWR+uBordi/+vgIUBlZ9pHIS7um+5ogg+utSApqdDJ
-y3CjsGGC4gYc5bPgJVevdvM7gQQNWV/OkRKOXfIj6Lpi4BqJgvnBDV92BxaC/GIM
-2PEG+ePAuAasebkUzSCEyR/3nbwnslTP2foYKVvNwzd+QKHMxZPIPsPigCmyLKpU
-0wWcVjfTZZzNTjwFhMrmIRsNVN557AC8C/EGeaJrtRK2pJgh7FpqG/wIPUASCPGY
-nmCECddxnvKZqsPalW32/ESWiorofmttH9k0Ar2JdZ6meRReM4IW7/F/yqz34IQN
-+9vaVphVsK61GZcrRikEbE+O0dTp7GCMC8i4AGa6FXVxhGxE1C7JSGqAEMKKMkzV
-qmo+j0WIqIAq12Wdapra18YdgdLFcoYYJZHKVHA/ay/NSzPu++mmID7Ucb54uKHo
-5ixHXZpncRPMgu5oyTrU3YinF2Jyi9X7OflZOcrJEGRl1mV21N89SomPaLrdwObU
-98U7a86Wmju/SXg3eom08+MErh+1u3Ai6aZd19vPSesTGkndYsc=
-=6j5G
------END PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1861161
 
---cDtQGJ/EJIRf/Cpq--
+Title:
+  qemu-arm-static stuck with 100% CPU when cross-compiling emacs
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  I'm trying to build multi-arch docker images for
+  https://hub.docker.com/r/silex/emacs.
+
+  Here is the machine I'm building on (hetzner cloud machine):
+
+  root@ubuntu-4gb-fsn1-1:~# lsb_release -a
+  No LSB modules are available.
+  Distributor ID: Ubuntu
+  Description:    Ubuntu 18.04.3 LTS
+  Release:        18.04
+  Codename:       bionic
+  root@ubuntu-4gb-fsn1-1:~# uname -a
+  Linux ubuntu-4gb-fsn1-1 4.15.0-74-generic #84-Ubuntu SMP Thu Dec 19 08:06=
+:28 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+
+  Whenever I try to build the following alpine Dockerfile
+  https://gitlab.com/Silex777/docker-
+  emacs/blob/master/26.3/alpine/3.9/dev/Dockerfile like this:
+
+  $ sysctl kernel.randomize_va_space=3D0
+  $ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  $ docker build --pull -t test --platform arm .
+
+  It builds fine until this:
+
+  root@ubuntu-4gb-fsn1-1:~# ps -ef | grep qemu
+  root     26473 26465 99 14:26 pts/0    01:59:58 /usr/bin/qemu-arm-static =
+../src/bootstrap-emacs -batch --no-site-file --no-site-lisp --eval (setq lo=
+ad-prefer-newer t) -f batch-byte-compile emacs-lisp/macroexp.el
+
+  This is supposed to take a few seconds, but here it takes 100% CPU and
+  never ends. When I strace the process I see a never ending loop like
+  this:
+
+  getdents64(5, /* 0 entries */, 2048)    =3D 0
+  lseek(5, 0, SEEK_SET)                   =3D 0
+  getdents64(5, /* 5 entries */, 2048)    =3D 120
+  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
+ly unavailable)
+  getdents64(5, /* 0 entries */, 2048)    =3D 0
+  lseek(5, 0, SEEK_SET)                   =3D 0
+  getdents64(5, /* 5 entries */, 2048)    =3D 120
+  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
+ly unavailable)
+  getdents64(5, /* 0 entries */, 2048)    =3D 0
+  lseek(5, 0, SEEK_SET)                   =3D 0
+  getdents64(5, /* 5 entries */, 2048)    =3D 120
+  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
+ly unavailable)
+  getdents64(5, /* 0 entries */, 2048)    =3D 0
+  lseek(5, 0, SEEK_SET)                   =3D 0
+  getdents64(5, /* 5 entries */, 2048)    =3D 120
+  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
+ly unavailable)
+  getdents64(5, /* 0 entries */, 2048)    =3D 0
+  lseek(5, 0, SEEK_SET)                   =3D 0
+  getdents64(5, /* 5 entries */, 2048)    =3D 120
+  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
+ly unavailable)
+
+  It happens with all the QEMU versions I tested:
+  - 2.11.1 (OS version)
+  - 4.1.1-1 (from multiarch/qemu-user-static:4.1.1-1)
+  - 4.2.0-2 (from multiarch/qemu-user-static)
+
+  Any ideas of what I could do to debug it further?
+
+  Kind regards,
+  Philippe
+
+  p.s: Everything builds fine when the base image is ubuntu. I also had
+  similar hangs with basic commands like "apt-get install foo"
+  sometimes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1861161/+subscriptions
 
