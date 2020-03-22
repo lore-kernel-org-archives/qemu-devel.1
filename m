@@ -7,52 +7,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C190C4332E
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01325C4332E
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EA2120724
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:34:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EA2120724
+	by mail.kernel.org (Postfix) with ESMTPS id C9DC8206F8
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:34:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9DC8206F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFznu-00064c-Dd
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:34:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47877)
+	id 1jFzoB-0006Ip-VU
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48085)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jFzkm-0000wt-Hp
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:58 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jFzl0-0001Gg-T9
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:31:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jFzkk-0003t6-H8
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:56 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jFzkz-00040e-6u
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:31:10 -0400
 Received: from mga02.intel.com ([134.134.136.20]:41752)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jFzkf-0003r4-77
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:51 -0400
-IronPort-SDR: qJqkFktaKMaRU0tW1JnMJPz/f8yGOFBEIC3QSPpWvVqo8cw4EHXV3l1z0mjSCrot+8cAhCTO7g
- JIS8W7EtoPhw==
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jFzky-0003r4-Tg
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:31:09 -0400
+IronPort-SDR: zQSVixKM/IXbDb1s5vrKCZrM+qGhS+CMO1+ya36+ThP2W+JSNrVFfXlzQX+/f4SgMqr2kjbeGG
+ OcZtuJpEWwMQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Mar 2020 05:30:38 -0700
-IronPort-SDR: ZixMWGhic1XTd8cYcie6djNE42p1WRqBzLAHAstRd5jFqB5NgCboBbCgW3SOYhS9AuOpFLjZ3I
- 24w3QUPW8y9A==
+ 22 Mar 2020 05:30:39 -0700
+IronPort-SDR: SLLOdTgyyrKTFMGw5Yl8cEyLsmxlekfnBvxw38wuSKZHkTg4i9p4l/kLYVHhyUfhNUuAhKR+h5
+ uROmuERj0Zcw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; d="scan'208";a="239664374"
+X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; d="scan'208";a="239664414"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
  by orsmga008.jf.intel.com with ESMTP; 22 Mar 2020 05:30:38 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [PATCH v1 08/22] vfio: init HostIOMMUContext per-container
-Date: Sun, 22 Mar 2020 05:36:05 -0700
-Message-Id: <1584880579-12178-9-git-send-email-yi.l.liu@intel.com>
+Subject: [PATCH v1 20/22] intel_iommu: propagate PASID-based iotlb
+ invalidation to host
+Date: Sun, 22 Mar 2020 05:36:17 -0700
+Message-Id: <1584880579-12178-21-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
 References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
@@ -70,230 +71,223 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, david@gibson.dropbear.id.au
+ hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After confirming dual stage DMA translation support with kernel by
-checking VFIO_TYPE1_NESTING_IOMMU, VFIO inits HostIOMMUContet instance
-and exposes it to PCI layer. Thus vIOMMU emualtors may make use of
-such capability by leveraging the methods provided by HostIOMMUContext.
+This patch propagates PASID-based iotlb invalidation to host.
+
+Intel VT-d 3.0 supports nested translation in PASID granular.
+Guest SVA support could be implemented by configuring nested
+translation on specific PASID. This is also known as dual stage
+DMA translation.
+
+Under such configuration, guest owns the GVA->GPA translation
+which is configured as first level page table in host side for
+a specific pasid, and host owns GPA->HPA translation. As guest
+owns first level translation table, piotlb invalidation should
+be propagated to host since host IOMMU will cache first level
+page table related mappings during DMA address translation.
+
+This patch traps the guest PASID-based iotlb flush and propagate
+it to host.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/vfio/common.c                      | 80 +++++++++++++++++++++++++++++++++++
- hw/vfio/pci.c                         | 13 ++++++
- include/hw/iommu/host_iommu_context.h |  3 ++
- include/hw/vfio/vfio-common.h         |  4 ++
- 4 files changed, 100 insertions(+)
+ hw/i386/intel_iommu.c          | 139 +++++++++++++++++++++++++++++++++++++++++
+ hw/i386/intel_iommu_internal.h |   7 +++
+ 2 files changed, 146 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index c276732..e4f5f10 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1179,10 +1179,55 @@ static int vfio_get_iommu_type(VFIOContainer *container,
-     return -EINVAL;
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index b9ac07d..10d314d 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3134,15 +3134,154 @@ static bool vtd_process_pasid_desc(IntelIOMMUState *s,
+     return (ret == 0) ? true : false;
  }
  
-+static int vfio_host_icx_pasid_alloc(HostIOMMUContext *host_icx,
-+                                  uint32_t min, uint32_t max, uint32_t *pasid)
++/**
++ * Caller of this function should hold iommu_lock.
++ */
++static void vtd_invalidate_piotlb(IntelIOMMUState *s,
++                                  VTDBus *vtd_bus,
++                                  int devfn,
++                                  DualIOMMUStage1Cache *stage1_cache)
 +{
-+    VFIOContainer *container = container_of(host_icx, VFIOContainer, host_icx);
-+    struct vfio_iommu_type1_pasid_request req;
-+    unsigned long argsz;
-+    int ret;
++    VTDHostIOMMUContext *vtd_dev_icx;
++    HostIOMMUContext *host_icx;
 +
-+    argsz = sizeof(req);
-+    req.argsz = argsz;
-+    req.flags = VFIO_IOMMU_PASID_ALLOC;
-+    req.alloc_pasid.min = min;
-+    req.alloc_pasid.max = max;
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req)) {
-+        ret = -errno;
-+        error_report("%s: %d, alloc failed", __func__, ret);
-+        return ret;
++    vtd_dev_icx = vtd_bus->dev_icx[devfn];
++    if (!vtd_dev_icx) {
++        goto out;
 +    }
-+    *pasid = req.alloc_pasid.result;
-+    return 0;
++    host_icx = vtd_dev_icx->host_icx;
++    if (!host_icx) {
++        goto out;
++    }
++    if (host_iommu_ctx_flush_stage1_cache(host_icx, stage1_cache)) {
++        error_report("Cache flush failed");
++    }
++out:
++    return;
 +}
 +
-+static int vfio_host_icx_pasid_free(HostIOMMUContext *host_icx,
-+                                    uint32_t pasid)
++static inline bool vtd_pasid_cache_valid(
++                          VTDPASIDAddressSpace *vtd_pasid_as)
 +{
-+    VFIOContainer *container = container_of(host_icx, VFIOContainer, host_icx);
-+    struct vfio_iommu_type1_pasid_request req;
-+    unsigned long argsz;
-+    int ret;
-+
-+    argsz = sizeof(req);
-+    req.argsz = argsz;
-+    req.flags = VFIO_IOMMU_PASID_FREE;
-+    req.free_pasid = pasid;
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req)) {
-+        ret = -errno;
-+        error_report("%s: %d, free failed", __func__, ret);
-+        return ret;
-+    }
-+    return 0;
++    return vtd_pasid_as->iommu_state &&
++           (vtd_pasid_as->iommu_state->pasid_cache_gen
++             == vtd_pasid_as->pasid_cache_entry.pasid_cache_gen);
 +}
 +
- static int vfio_init_container(VFIOContainer *container, int group_fd,
-                                Error **errp)
++/**
++ * This function is a loop function for the s->vtd_pasid_as
++ * list with VTDPIOTLBInvInfo as execution filter. It propagates
++ * the piotlb invalidation to host. Caller of this function
++ * should hold iommu_lock.
++ */
++static void vtd_flush_pasid_iotlb(gpointer key, gpointer value,
++                                  gpointer user_data)
++{
++    VTDPIOTLBInvInfo *piotlb_info = user_data;
++    VTDPASIDAddressSpace *vtd_pasid_as = value;
++    uint16_t did;
++
++    /*
++     * Needs to check whether the pasid entry cache stored in
++     * vtd_pasid_as is valid or not. "invalid" means the pasid
++     * cache has been flushed, thus host should have done piotlb
++     * invalidation together with a pasid cache invalidation, so
++     * no need to pass down piotlb invalidation to host for better
++     * performance. Only when pasid entry cache is "valid", should
++     * a piotlb invalidation be propagated to host since it means
++     * guest just modified a mapping in its page table.
++     */
++    if (!vtd_pasid_cache_valid(vtd_pasid_as)) {
++        return;
++    }
++
++    did = vtd_pe_get_domain_id(
++                &(vtd_pasid_as->pasid_cache_entry.pasid_entry));
++
++    if ((piotlb_info->domain_id == did) &&
++        (piotlb_info->pasid == vtd_pasid_as->pasid)) {
++        vtd_invalidate_piotlb(vtd_pasid_as->iommu_state,
++                              vtd_pasid_as->vtd_bus,
++                              vtd_pasid_as->devfn,
++                              piotlb_info->stage1_cache);
++    }
++
++    /*
++     * TODO: needs to add QEMU piotlb flush when QEMU piotlb
++     * infrastructure is ready. For now, it is enough for passthru
++     * devices.
++     */
++}
++
+ static void vtd_piotlb_pasid_invalidate(IntelIOMMUState *s,
+                                         uint16_t domain_id,
+                                         uint32_t pasid)
  {
-     int iommu_type, ret;
-+    uint64_t flags = 0;
- 
-     iommu_type = vfio_get_iommu_type(container, errp);
-     if (iommu_type < 0) {
-@@ -1210,6 +1255,18 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
-         return -errno;
-     }
- 
-+    if (iommu_type == VFIO_TYPE1_NESTING_IOMMU) {
-+        /*
-+         * TODO: config flags per host IOMMU nesting capability
-+         * e.g. check if VFIO_TYPE1_NESTING_IOMMU supports PASID
-+         * alloc/free
-+         */
-+        host_iommu_ctx_init(&container->host_icx,
-+                            sizeof(container->host_icx),
-+                            TYPE_VFIO_HOST_IOMMU_CONTEXT,
-+                            flags);
-+    }
++    VTDPIOTLBInvInfo piotlb_info;
++    DualIOMMUStage1Cache *stage1_cache;
++    struct iommu_cache_invalidate_info *cache_info;
 +
-     container->iommu_type = iommu_type;
-     return 0;
++    stage1_cache = g_malloc0(sizeof(*stage1_cache));
++    stage1_cache->pasid = pasid;
++
++    cache_info = &stage1_cache->cache_info;
++    cache_info->version = IOMMU_UAPI_VERSION;
++    cache_info->cache = IOMMU_CACHE_INV_TYPE_IOTLB;
++    cache_info->granularity = IOMMU_INV_GRANU_PASID;
++    cache_info->pasid_info.pasid = pasid;
++    cache_info->pasid_info.flags = IOMMU_INV_PASID_FLAGS_PASID;
++
++    piotlb_info.domain_id = domain_id;
++    piotlb_info.pasid = pasid;
++    piotlb_info.stage1_cache = stage1_cache;
++
++    vtd_iommu_lock(s);
++    /*
++     * Here loops all the vtd_pasid_as instances in s->vtd_pasid_as
++     * to find out the affected devices since piotlb invalidation
++     * should check pasid cache per architecture point of view.
++     */
++    g_hash_table_foreach(s->vtd_pasid_as,
++                         vtd_flush_pasid_iotlb, &piotlb_info);
++    vtd_iommu_unlock(s);
++    g_free(stage1_cache);
  }
-@@ -1456,6 +1513,7 @@ static void vfio_disconnect_container(VFIOGroup *group)
-         }
  
-         trace_vfio_disconnect_container(container->fd);
-+        host_iommu_ctx_destroy(&container->host_icx);
-         close(container->fd);
-         g_free(container);
- 
-@@ -1791,3 +1849,25 @@ int vfio_eeh_as_op(AddressSpace *as, uint32_t op)
-     }
-     return vfio_eeh_container_op(container, op);
+ static void vtd_piotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
+                              uint32_t pasid, hwaddr addr, uint8_t am, bool ih)
+ {
++    VTDPIOTLBInvInfo piotlb_info;
++    DualIOMMUStage1Cache *stage1_cache;
++    struct iommu_cache_invalidate_info *cache_info;
++
++    stage1_cache = g_malloc0(sizeof(*stage1_cache));
++    stage1_cache->pasid = pasid;
++
++    cache_info = &stage1_cache->cache_info;
++    cache_info->version = IOMMU_UAPI_VERSION;
++    cache_info->cache = IOMMU_CACHE_INV_TYPE_IOTLB;
++    cache_info->granularity = IOMMU_INV_GRANU_ADDR;
++    cache_info->addr_info.flags = IOMMU_INV_ADDR_FLAGS_PASID;
++    cache_info->addr_info.flags |= ih ? IOMMU_INV_ADDR_FLAGS_LEAF : 0;
++    cache_info->addr_info.pasid = pasid;
++    cache_info->addr_info.addr = addr;
++    cache_info->addr_info.granule_size = 1 << (12 + am);
++    cache_info->addr_info.nb_granules = 1;
++
++    piotlb_info.domain_id = domain_id;
++    piotlb_info.pasid = pasid;
++    piotlb_info.stage1_cache = stage1_cache;
++
++    vtd_iommu_lock(s);
++    /*
++     * Here loops all the vtd_pasid_as instances in s->vtd_pasid_as
++     * to find out the affected devices since piotlb invalidation
++     * should check pasid cache per architecture point of view.
++     */
++    g_hash_table_foreach(s->vtd_pasid_as,
++                         vtd_flush_pasid_iotlb, &piotlb_info);
++    vtd_iommu_unlock(s);
++    g_free(stage1_cache);
  }
-+
-+static void vfio_host_iommu_context_class_init(ObjectClass *klass,
-+                                                       void *data)
-+{
-+    HostIOMMUContextClass *hicxc = HOST_IOMMU_CONTEXT_CLASS(klass);
-+
-+    hicxc->pasid_alloc = vfio_host_icx_pasid_alloc;
-+    hicxc->pasid_free = vfio_host_icx_pasid_free;
-+}
-+
-+static const TypeInfo vfio_host_iommu_context_info = {
-+    .parent = TYPE_HOST_IOMMU_CONTEXT,
-+    .name = TYPE_VFIO_HOST_IOMMU_CONTEXT,
-+    .class_init = vfio_host_iommu_context_class_init,
+ 
+ static bool vtd_process_piotlb_desc(IntelIOMMUState *s,
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 314e2c4..967cc4f 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -560,6 +560,13 @@ struct VTDPASIDCacheInfo {
+                                       VTD_PASID_CACHE_DEVSI)
+ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
+ 
++struct VTDPIOTLBInvInfo {
++    uint16_t domain_id;
++    uint32_t pasid;
++    DualIOMMUStage1Cache *stage1_cache;
 +};
++typedef struct VTDPIOTLBInvInfo VTDPIOTLBInvInfo;
 +
-+static void vfio_register_types(void)
-+{
-+    type_register_static(&vfio_host_iommu_context_info);
-+}
-+
-+type_init(vfio_register_types)
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 5e75a95..f099df3 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2717,6 +2717,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     VFIODevice *vbasedev_iter;
-     VFIOGroup *group;
-+    VFIOContainer *container;
-     char *tmp, *subsys, group_path[PATH_MAX], *group_name;
-     Error *err = NULL;
-     ssize_t len;
-@@ -3028,6 +3029,11 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     vfio_register_req_notifier(vdev);
-     vfio_setup_resetfn_quirk(vdev);
- 
-+    container = vdev->vbasedev.group->container;
-+    if (container->host_icx.initialized) {
-+        pci_device_set_iommu_context(pdev, &container->host_icx);
-+    }
-+
-     return;
- 
- out_deregister:
-@@ -3072,9 +3078,16 @@ static void vfio_instance_finalize(Object *obj)
- static void vfio_exitfn(PCIDevice *pdev)
- {
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOContainer *container;
- 
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-+
-+    container = vdev->vbasedev.group->container;
-+    if (container->host_icx.initialized) {
-+        pci_device_unset_iommu_context(pdev);
-+    }
-+
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-     if (vdev->irqchip_change_notifier.notify) {
-         kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
-index cfbf5ac..5f11a4c 100644
---- a/include/hw/iommu/host_iommu_context.h
-+++ b/include/hw/iommu/host_iommu_context.h
-@@ -33,6 +33,9 @@
- #define TYPE_HOST_IOMMU_CONTEXT "qemu:host-iommu-context"
- #define HOST_IOMMU_CONTEXT(obj) \
-         OBJECT_CHECK(HostIOMMUContext, (obj), TYPE_HOST_IOMMU_CONTEXT)
-+#define HOST_IOMMU_CONTEXT_CLASS(klass) \
-+        OBJECT_CLASS_CHECK(HostIOMMUContextClass, (klass), \
-+                         TYPE_HOST_IOMMU_CONTEXT)
- #define HOST_IOMMU_CONTEXT_GET_CLASS(obj) \
-         OBJECT_GET_CLASS(HostIOMMUContextClass, (obj), \
-                          TYPE_HOST_IOMMU_CONTEXT)
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index fd56420..532b78d 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -26,12 +26,15 @@
- #include "qemu/notify.h"
- #include "ui/console.h"
- #include "hw/display/ramfb.h"
-+#include "hw/iommu/host_iommu_context.h"
- #ifdef CONFIG_LINUX
- #include <linux/vfio.h>
- #endif
- 
- #define VFIO_MSG_PREFIX "vfio %s: "
- 
-+#define TYPE_VFIO_HOST_IOMMU_CONTEXT "qemu:vfio-host-iommu-context"
-+
- enum {
-     VFIO_DEVICE_TYPE_PCI = 0,
-     VFIO_DEVICE_TYPE_PLATFORM = 1,
-@@ -71,6 +74,7 @@ typedef struct VFIOContainer {
-     MemoryListener listener;
-     MemoryListener prereg_listener;
-     unsigned iommu_type;
-+    HostIOMMUContext host_icx;
-     Error *error;
-     bool initialized;
-     unsigned long pgsizes;
+ /* PASID Table Related Definitions */
+ #define VTD_PASID_DIR_BASE_ADDR_MASK  (~0xfffULL)
+ #define VTD_PASID_TABLE_BASE_ADDR_MASK (~0xfffULL)
 -- 
 2.7.4
 
