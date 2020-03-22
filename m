@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D16DDC1975A
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 22:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0271AC54EEB
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 22:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9156E2070A
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 22:30:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC5B82070A
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 22:31:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYRHktbv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9156E2070A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fx1C96k8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC5B82070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jG96Y-00070y-LD
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 18:30:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50190)
+	id 1jG987-0000ty-RX
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 18:31:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jG95X-0005nk-P5
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 18:29:00 -0400
+ (envelope-from <pauldzim@gmail.com>) id 1jG95K-0005dV-W9
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 18:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pauldzim@gmail.com>) id 1jG95W-0001oH-DG
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 18:28:59 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54362)
+ (envelope-from <pauldzim@gmail.com>) id 1jG95J-0001km-Gt
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 18:28:46 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35569)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pauldzim@gmail.com>) id 1jG95W-0001o3-7d
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 18:28:58 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id np9so5214759pjb.4
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 15:28:58 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pauldzim@gmail.com>) id 1jG95J-0001kU-Af
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 18:28:45 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 7so6175023pgr.2
+ for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 15:28:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Vxb2BeSPk/Bmh9uLAezVoaXmCjxCb8Nm9qZIiQVVzXg=;
- b=cYRHktbvu9aziuY2NZyOwbi0CsyJUs8pVAF94hXRn1e4PUlpY3m7iirg5Bg6hOtbE4
- U+/7GGjRS2sgWlBwNWAWF5y365NRDnNO8H2GB704pESYMgpFdUaYLYIcXcK0gaB0p1Z8
- 3Wn+HT2TcPgYgU4f/KURM84JFuLMhAvnR0ySCJkZHyiLXdd5TpG5Psf6Y4p94CY4isp4
- iznKKPB8G2W5kTlbfDmd4MOYtl8MPrOl7WNszH//yYTzBQvoVcCojm+SUHzaSXb5nhPV
- 4aVN0JN45oIjtihWMCcbAvLSuuv27tcp3vR7WEbs/S8sjhe1HzpcVpuqg/tjLK9qjJYs
- 4xRQ==
+ bh=TAly9/d/X3HJ3E1hx4IccIxFzwoI83pMuNOPqWOVyM0=;
+ b=Fx1C96k8nr2Fj7E5wDYRNXePfOiY5k8ITy3Ole6aDTRiK1RWyC3AA+K1+Gb9tP0XnI
+ VYLvWeMOMdox/dTNI7ru/TX2ykQ2BGjBdkqGMZRlefclR/fhW3u2ahqbK+cQ34Ms3wwE
+ JQhcWFTmspRSq2nm0nqgtBA4XzhjRjUUdlCDsHec+7unKWqqMs+o4czcHpgp42+3h1ij
+ pHYSbP1Him5kK/gdSx5y7B81TPrfVuEEilBwO9VtV+thSxbTNhUn+n6BBDerzNdZmXTv
+ UAmaSB+18s6BlpDwelDY9nWPBlbfvLKQsEso0Ha3SWXORAtsN3UtZQ+n+yvu+WjjBqkB
+ 1whQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=Vxb2BeSPk/Bmh9uLAezVoaXmCjxCb8Nm9qZIiQVVzXg=;
- b=qn/y3vfyQnYgMGnjKTCLypO0NpPtXBfvd/pNLDFEKOfM5T/XL+tv8xhJeh+a/o+XDx
- 79yId2eEj8FaifvWhmSSrBdKL/H79yvgDksQAKhTrbrO8Uex3KaoUmMiJV/o7dq8gzEX
- JkVXOR5Web1PqTdcpsUqxEJ3I3k8G87sYvcvbGKltXDVY/IMQSLzjeLu6tblgxHRamFf
- /EdvA4EPlH2+/gro9iEEzeBvG++ixeKVdK2ugZZOW5P3E/zSSjW6TSp7XA/QetHINdD9
- V+8jNOusJDzIBMghIi/pYoogIiYisRjYzka2uefWhOYvpwhM7y2Zu7FXKPSCxyLafgEi
- cEBQ==
-X-Gm-Message-State: ANhLgQ2L2pf+7TMwVWTWIk0NXhWLKqlEQ7jn1J6BpZgPZcgWqkfwnYxz
- kV2GkpuNRsfdok0gh0+SPeQ=
-X-Google-Smtp-Source: ADFU+vsB7eziAwR7qguk7cXZKccP0DuxMDYBea7rbRjjulP2wfM8+ochWUKMtj0oXX+i7x/B+ptEig==
-X-Received: by 2002:a17:90b:3683:: with SMTP id
- mj3mr21426132pjb.153.1584916137232; 
- Sun, 22 Mar 2020 15:28:57 -0700 (PDT)
+ bh=TAly9/d/X3HJ3E1hx4IccIxFzwoI83pMuNOPqWOVyM0=;
+ b=CUcCUfi7zx3kUh48DrZw64zCamokJ5NnyMOI6k04EyBNZG71QeBTyfvZ5KlgKsnTZ8
+ xVrQOO+udj5si9Wmaw6N0LeP7i7yxhaF8XNn1npBjVUE6uctYgJmEnZndTW4y7VSm4Zn
+ uMHYoT2smrNGHxRWTr81Y2zYpoWGwPv1GnZHfsa9zLzy7+Pj+Y1vzgdzPWpAmUs+gYu+
+ yuU14WVN2BggYSVD1wn5fmXMTtsiEYVDcdYEOQhhYgIzcq6UoCf+pOf4R3btj13cmscT
+ ZgBtnetnqvCZNG1hKCXY+gC6oWWvuteCZFRMrmqOTUI6VjiLED2VTUB6TJUOOMkkOMl8
+ R0/g==
+X-Gm-Message-State: ANhLgQ0oqcYJi1FFXo/yM3YZ4seg+NnwO4WA+qbcAAaprYeiG+5qpybT
+ SzgMfqp1bmPQgAJmsUvDFBo=
+X-Google-Smtp-Source: ADFU+vuUJJ/smFU+T4fto9PT3C8dv6Cn6iXbTstUcHQ5CaoTBYhr4psElpF7SFtCCzk68H+BR/U6XA==
+X-Received: by 2002:a62:3487:: with SMTP id
+ b129mr21314547pfa.150.1584916124050; 
+ Sun, 22 Mar 2020 15:28:44 -0700 (PDT)
 Received: from localhost.localdomain ([75.167.220.149])
- by smtp.gmail.com with ESMTPSA id e10sm11440315pfm.121.2020.03.22.15.28.56
+ by smtp.gmail.com with ESMTPSA id e10sm11440315pfm.121.2020.03.22.15.28.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 22 Mar 2020 15:28:56 -0700 (PDT)
+ Sun, 22 Mar 2020 15:28:43 -0700 (PDT)
 From: Paul Zimmerman <pauldzim@gmail.com>
 To: kraxel@redhat.com
-Subject: [PATCH 6/6] Wire in the dwc-hsotg USB host controller emulation
-Date: Sun, 22 Mar 2020 15:27:26 -0700
-Message-Id: <20200322222726.10244-7-pauldzim@gmail.com>
+Subject: [PATCH 3/6] dwc-hsotg USB host controller state definitions
+Date: Sun, 22 Mar 2020 15:27:23 -0700
+Message-Id: <20200322222726.10244-4-pauldzim@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200322222726.10244-1-pauldzim@gmail.com>
 References: <20200322222726.10244-1-pauldzim@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,111 +96,201 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Wire the dwc-hsotg (dwc2) emulation into Qemu
+Add the dwc-hsotg (dwc2) USB host controller state definitions.
+Mostly based on hw/usb/hcd-ehci.h.
 
 Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
 ---
- hw/arm/bcm2835_peripherals.c         | 21 ++++++++++++++++++++-
- hw/usb/Kconfig                       |  5 +++++
- hw/usb/Makefile.objs                 |  1 +
- include/hw/arm/bcm2835_peripherals.h |  3 ++-
- 4 files changed, 28 insertions(+), 2 deletions(-)
+ hw/usb/hcd-dwc2.h | 180 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 180 insertions(+)
+ create mode 100644 hw/usb/hcd-dwc2.h
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index dd7e6883cb..932d084a50 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -127,6 +127,13 @@ static void bcm2835_peripherals_init(Object *obj)
-     sysbus_init_child_obj(obj, "mphi", &s->mphi, sizeof(s->mphi),
-                           TYPE_BCM2835_MPHI);
- 
-+    /* DWC2 */
-+    sysbus_init_child_obj(obj, "dwc2", &s->dwc2, sizeof(s->dwc2),
-+                          TYPE_DWC2_USB);
+diff --git a/hw/usb/hcd-dwc2.h b/hw/usb/hcd-dwc2.h
+new file mode 100644
+index 0000000000..c5f5037b91
+--- /dev/null
++++ b/hw/usb/hcd-dwc2.h
+@@ -0,0 +1,180 @@
++/*
++ * dwc-hsotg (dwc2) USB host controller state definitions
++ *
++ * Based on hw/usb/hcd-ehci.h
++ *
++ * Copyright (c) 2020 Paul Zimmerman <pauldzim@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ */
 +
-+    object_property_add_const_link(OBJECT(&s->dwc2), "dma-mr",
-+                                   OBJECT(&s->gpu_bus_mr), &error_abort);
++#ifndef HW_USB_DWC2_H
++#define HW_USB_DWC2_H
 +
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhci",
-                                    OBJECT(&s->sdhci.sdbus), &error_abort);
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhost",
-@@ -384,6 +391,19 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-                                INTERRUPT_HOSTPORT));
- 
-+    /* DWC2 */
-+    object_property_set_bool(OBJECT(&s->dwc2), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
++#include "qemu/timer.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++#include "hw/usb.h"
++#include "sysemu/dma.h"
 +
-+    memory_region_add_subregion(&s->peri_mr, USB_OTG_OFFSET,
-+                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dwc2), 0));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->dwc2), 0,
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-+                               INTERRUPT_USB));
++#define DWC2_MMIO_SIZE  0x11000
 +
-     create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
-     create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
-     create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
-@@ -397,7 +417,6 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-     create_unimp(s, &s->otp, "bcm2835-otp", OTP_OFFSET, 0x80);
-     create_unimp(s, &s->dbus, "bcm2835-dbus", DBUS_OFFSET, 0x8000);
-     create_unimp(s, &s->ave0, "bcm2835-ave0", AVE0_OFFSET, 0x8000);
--    create_unimp(s, &s->dwc2, "dwc-usb2", USB_OTG_OFFSET, 0x1000);
-     create_unimp(s, &s->sdramc, "bcm2835-sdramc", SDRAMC_OFFSET, 0x100);
- }
- 
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index 464348ba14..d4d8c37c28 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -46,6 +46,11 @@ config USB_MUSB
-     bool
-     select USB
- 
-+config USB_DWC2
-+    bool
-+    default y
-+    select USB
++#define NB_PORTS        1       /* Number of downstream ports */
++#define NB_CHAN         8       /* Number of host channels */
++#define MAX_XFER_SIZE   65536   /* Max transfer size expected in HCTSIZ */
 +
- config TUSB6010
-     bool
-     select USB_MUSB
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 66835e5bf7..fa5c3fa1b8 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -12,6 +12,7 @@ common-obj-$(CONFIG_USB_EHCI_SYSBUS) += hcd-ehci-sysbus.o
- common-obj-$(CONFIG_USB_XHCI) += hcd-xhci.o
- common-obj-$(CONFIG_USB_XHCI_NEC) += hcd-xhci-nec.o
- common-obj-$(CONFIG_USB_MUSB) += hcd-musb.o
-+common-obj-$(CONFIG_USB_DWC2) += hcd-dwc2.o
- 
- common-obj-$(CONFIG_TUSB6010) += tusb6010.o
- common-obj-$(CONFIG_IMX)      += chipidea.o
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 77958ca60e..0841d54614 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -26,6 +26,7 @@
- #include "hw/sd/bcm2835_sdhost.h"
- #include "hw/gpio/bcm2835_gpio.h"
- #include "hw/timer/bcm2835_systmr.h"
-+#include "hw/usb/hcd-dwc2.h"
- #include "hw/misc/unimp.h"
- 
- #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
-@@ -66,7 +67,7 @@ typedef struct BCM2835PeripheralState {
-     UnimplementedDeviceState ave0;
-     UnimplementedDeviceState bscsl;
-     UnimplementedDeviceState smi;
--    UnimplementedDeviceState dwc2;
-+    DWC2State dwc2;
-     UnimplementedDeviceState sdramc;
- } BCM2835PeripheralState;
- 
++typedef struct DWC2Packet DWC2Packet;
++typedef struct DWC2State DWC2State;
++
++enum async_state {
++    DWC2_ASYNC_NONE = 0,
++    DWC2_ASYNC_INITIALIZED,
++    DWC2_ASYNC_INFLIGHT,
++    DWC2_ASYNC_FINISHED,
++};
++
++struct DWC2Packet {
++    USBPacket packet;
++    USBDevice *dev;
++    USBEndpoint *ep;
++    uint32_t index;
++    uint32_t epnum;
++    uint32_t mps;
++    uint32_t pid;
++    uint32_t pcnt;
++    uint32_t len;
++    bool small;
++    bool needs_service;
++    enum async_state async;
++};
++
++struct DWC2State {
++    SysBusDevice parent_obj;
++    USBBus bus;
++    DeviceState *device;
++    qemu_irq irq;
++    MemoryRegion *dma_mr;
++    AddressSpace *as;
++    AddressSpace dma_as;
++    MemoryRegion mem;
++    MemoryRegion mem_glbreg;
++    MemoryRegion mem_fszreg;
++    MemoryRegion mem_hreg0;
++    MemoryRegion mem_hreg1;
++    MemoryRegion mem_pcgreg;
++    MemoryRegion mem_hreg2;
++    uint16_t glbregbase;
++    uint16_t fszregbase;
++    uint16_t hreg0base;
++    uint16_t hreg1base;
++    uint16_t pcgregbase;
++    uint16_t hreg2base;
++    uint16_t portnr;
++
++    union {
++        uint32_t glbreg[0x70/sizeof(uint32_t)];
++        struct {
++            uint32_t gotgctl;       /* 00 */
++            uint32_t gotgint;       /* 04 */
++            uint32_t gahbcfg;       /* 08 */
++            uint32_t gusbcfg;       /* 0c */
++            uint32_t grstctl;       /* 10 */
++            uint32_t gintsts;       /* 14 */
++            uint32_t gintmsk;       /* 18 */
++            uint32_t grxstsr;       /* 1c */
++            uint32_t grxstsp;       /* 20 */
++            uint32_t grxfsiz;       /* 24 */
++            uint32_t gnptxfsiz;     /* 28 */
++            uint32_t gnptxsts;      /* 2c */
++            uint32_t gi2cctl;       /* 30 */
++            uint32_t gpvndctl;      /* 34 */
++            uint32_t ggpio;         /* 38 */
++            uint32_t guid;          /* 3c */
++            uint32_t gsnpsid;       /* 40 */
++            uint32_t ghwcfg1;       /* 44 */
++            uint32_t ghwcfg2;       /* 48 */
++            uint32_t ghwcfg3;       /* 4c */
++            uint32_t ghwcfg4;       /* 50 */
++            uint32_t glpmcfg;       /* 54 */
++            uint32_t gpwrdn;        /* 58 */
++            uint32_t gdfifocfg;     /* 5c */
++            uint32_t gadpctl;       /* 60 */
++            uint32_t grefclk;       /* 64 */
++            uint32_t gintmsk2;      /* 68 */
++            uint32_t gintsts2;      /* 6c */
++        };
++    };
++
++    union {
++        uint32_t fszreg[0x4/sizeof(uint32_t)];
++        struct {
++            uint32_t hptxfsiz;      /* 100 */
++        };
++    };
++
++    union {
++        uint32_t hreg0[0x44/sizeof(uint32_t)];
++        struct {
++            uint32_t hcfg;          /* 400 */
++            uint32_t hfir;          /* 404 */
++            uint32_t hfnum;         /* 408 */
++            uint32_t rsvd0;         /* 40c */
++            uint32_t hptxsts;       /* 410 */
++            uint32_t haint;         /* 414 */
++            uint32_t haintmsk;      /* 418 */
++            uint32_t hflbaddr;      /* 41c */
++            uint32_t rsvd1[8];      /* 420-43c */
++            uint32_t hprt0;         /* 440 */
++        };
++    };
++
++    uint32_t hreg1[0x20*NB_CHAN/sizeof(uint32_t)];
++#define hcchar(_ch)     hreg1[((_ch) << 3) + 0] /* 500, 520, ... */
++#define hcsplt(_ch)     hreg1[((_ch) << 3) + 1] /* 504, 524, ... */
++#define hcint(_ch)      hreg1[((_ch) << 3) + 2] /* 508, 528, ... */
++#define hcintmsk(_ch)   hreg1[((_ch) << 3) + 3] /* 50c, 52c, ... */
++#define hctsiz(_ch)     hreg1[((_ch) << 3) + 4] /* 510, 530, ... */
++#define hcdma(_ch)      hreg1[((_ch) << 3) + 5] /* 514, 534, ... */
++#define hcdmab(_ch)     hreg1[((_ch) << 3) + 7] /* 51c, 53c, ... */
++
++    union {
++        uint32_t pcgreg[0x8/sizeof(uint32_t)];
++        struct {
++            uint32_t pcgctl;        /* e00 */
++            uint32_t pcgcctl1;      /* e04 */
++        };
++    };
++
++    /* TODO - implement FIFO registers for slave mode */
++
++    /*
++     *  Internal state
++     */
++    QEMUTimer *eof_timer;
++    QEMUTimer *frame_timer;
++    QEMUBH *async_bh;
++    int64_t sof_time;
++    int64_t usb_frame_time;
++    int64_t usb_bit_time;
++    uint16_t frame_number;
++    uint16_t fsmps;
++    uint16_t fi;
++    uint16_t next_chan;
++    bool working;
++    USBPort ports[NB_PORTS];
++    DWC2Packet packet[NB_CHAN];                 /* one packet per channel */
++    uint8_t usb_buf[NB_CHAN][MAX_XFER_SIZE];    /* one buffer per channel */
++};
++
++#define TYPE_DWC2_USB   "dwc2-usb"
++#define DWC2_USB(obj)   OBJECT_CHECK(DWC2State, (obj), TYPE_DWC2_USB)
++
++#endif
 -- 
 2.17.1
 
