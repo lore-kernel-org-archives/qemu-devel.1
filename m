@@ -1,82 +1,85 @@
 Return-Path: <SRS0=K/vF=5H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CDAC4332B
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 19:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E60C4332B
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 20:15:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D802820719
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 19:52:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A120206C3
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 20:15:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k0InpjH4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D802820719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VLGYregA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A120206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jG6eW-0003KB-0P
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 15:52:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35944)
+	id 1jG70L-0008KW-EH
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 16:15:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37427)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jG6dr-0002uw-RM
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:52:17 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jG6zX-0007gc-7P
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 16:14:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jG6dq-0002QL-IB
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:52:15 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39765)
+ (envelope-from <peter.maydell@linaro.org>) id 1jG6zV-0001Uk-Df
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 16:14:38 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:43739)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jG6dq-0002Q3-Bj
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 15:52:14 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id p10so1849744wrt.6
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 12:52:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jG6zV-0001Ty-36
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 16:14:37 -0400
+Received: by mail-ot1-x334.google.com with SMTP id a6so11296288otb.10
+ for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 13:14:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=INYBBYLFUqEOW2rWRKr982rY7t35xkrPsVORhDugoxw=;
- b=k0InpjH4NwN2GsZuncqbHNAjnzZ8QH9Tib7wo3wMoGKxp2NN2iCZTZ3uGPnw7akUMU
- TtsPMllsssq2/13DiFbZWlpj4pmhgvObsYsOR5POy1HopjWKEUy6+tJ860vSzGxjYJMp
- xVd2DCfoOSfD/ZwFp0T+Os6SjoSjCwvE6aGN3d1u5XK4DyyTUjX0mf3ltm4OhuJ/qRdZ
- 3pZY+jx0qd8/cISzK78N7ufwDuDwteV+eQM6Sy1hj3lPYzprYnsH8EkZw5mO/MA6d6VS
- JBg99MUAQY3p/m4VuQSYe4h7P2SPISTzyDwJVjWVqQzV880z6nHdK+A4XQe+H8b7A0PV
- n21g==
+ :cc:content-transfer-encoding;
+ bh=0OKjznXIQq39G5WV8wDKjOLj8w++VwuhSW5jB0pD0JE=;
+ b=VLGYregAPZ+OPXXnmNe8XMkv9NttHl18O6/3K/neNUHj6Mrq5Qw4BoemB7CCLXxZmR
+ RCpeEKo1ENvM3k17L/G8fIHO6m84WaoIiygOblL9wYkjhAFLqlx5/wsjTQgPNNQKL5q+
+ Gcs8ohSoQOHqg/uYa5vBbSnsIPA+kaFGO6+qoMrzzPDwjZm/JhzBM46ha6UOKeP4c4CN
+ IOueshmIPIoZjutD1rAv9SmR2dd1sgv+u5CCfEGj1at989LiluJW5Fn2kbSvjywovYYr
+ TyarWDf0c4k1CoLfaNDwJskIZ0NETjK+JfMM3BsrafmAlEUrFKf+GDQH6W2qeM0S8WzL
+ NlgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=INYBBYLFUqEOW2rWRKr982rY7t35xkrPsVORhDugoxw=;
- b=YSlRgLJyFyqcSERyNEeEs5DYbpMYg/J8fSZNTq8lDyGGNUZwb9szwO7IOJInN+VcFl
- 6awuKtP+1mkndOt3DBdKlAuU2FlFfBfkuob1jYZSDwlIAxy5z10rhz0e3GzCoqSXCl7R
- nTVEd2ABCMYOHZ0dRbKY7t2zzCY4eppAiliPBjSzGi4F2mrt+Up2N9MW8AMA4KN447fa
- ioSMKiEpgsxkNjbipCS0Ox04MoINJpAK2skNAzDuwHKTJSmGNzA90LmzMe23yrNgstMd
- cehsA2JwhvFUTXwOxdroAupV17GWarE9mlVEmMdQhcSQRgBvqFJhj8M0tAEBqjXL/dHd
- vEvw==
-X-Gm-Message-State: ANhLgQ1uRi5a9XqbAULCkG7g6I5SPD1yy3l0mJtCiE8aoPo3EXjMPw0r
- fGVCWE92SHuGYTHgngfryPvcva/1NA45B37/CeI=
-X-Google-Smtp-Source: ADFU+vsWy9Z2llbomneOGondPJ5I1otGvVlF9j2Dq8YkFxcI2d1r+wzM2HfrqFj1DQsXt8iiG8eSXvMq7KrnR10a09U=
-X-Received: by 2002:adf:ba47:: with SMTP id t7mr23892301wrg.147.1584906732528; 
- Sun, 22 Mar 2020 12:52:12 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=0OKjznXIQq39G5WV8wDKjOLj8w++VwuhSW5jB0pD0JE=;
+ b=jXTnQzp+Fisy+dE6O83bF3GCV2rrTEjS9/zOF1V9GsY7xrtBfQatkQ0TTUOx95edr1
+ hCLijFSRj130mkJ7pSv2Ctxk+2QaIQbz5128pNOoZPCddLFy4DAHiIFMXtm1+BHjbx+i
+ Ofs3nh3gtjQO03FIyib3dF9F7/B88uPYUS2H39LXMISRAzarLMNh0kHL/a+JLTjCPhFN
+ a56QWK/O9XONUx9NY/FBn9g8CUkfw7qhRCYdfMr86cQpxnMgcA5E03D/3BjGaPH1lpsP
+ 8s6PWO6/5JC8WojPKwNiB/S7JhVFxVVJ+L+BZb2KyjgmOSCfyqZp7no+U26j8XN6UbVZ
+ hOdA==
+X-Gm-Message-State: ANhLgQ18q/tydU1NOv9a3olih+VQb2Zc41OjGLcDQAhvOc2Ro4ECFGEq
+ 8cfiFSgkg2ZZ8LsvgJCXZ0nT3CwhWOhXoG0LsWHcyw==
+X-Google-Smtp-Source: ADFU+vtImPb7liZV14qPhnrakv6pyIcCCJtsGWilC5lmhQzz7R9ZSTmzsRfrrs1tZyaCC4kZtzjKKmqEzcI5Mf7ZlmY=
+X-Received: by 2002:a05:6830:1f39:: with SMTP id
+ e25mr386042oth.135.1584908075821; 
+ Sun, 22 Mar 2020 13:14:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
  <CAL1e-=gKB0qRxGntXrU0im2gjMh1tq_SLGTm+HsmgBRGXQ9+Bg@mail.gmail.com>
  <CAFEAcA-Yn_O=G-63O1Ug9=HYqN0_o_NH_nLpWmBv2bjk2Y_85A@mail.gmail.com>
-In-Reply-To: <CAFEAcA-Yn_O=G-63O1Ug9=HYqN0_o_NH_nLpWmBv2bjk2Y_85A@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Sun, 22 Mar 2020 20:51:56 +0100
-Message-ID: <CAHiYmc4Qv4yL8LMp_nFqx20bq-hRO-umh5R899H6hdSyKrpNBA@mail.gmail.com>
+ <CAHiYmc4Qv4yL8LMp_nFqx20bq-hRO-umh5R899H6hdSyKrpNBA@mail.gmail.com>
+In-Reply-To: <CAHiYmc4Qv4yL8LMp_nFqx20bq-hRO-umh5R899H6hdSyKrpNBA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 22 Mar 2020 20:14:24 +0000
+Message-ID: <CAFEAcA_hfhusu8n8OXLg=vjiMSw09HVy2zhVr=R2hmGdEQJtew@mail.gmail.com>
 Subject: Re: deprecation of in-tree builds
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000cb666405a176da14"
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,123 +98,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000cb666405a176da14
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Sun, 22 Mar 2020 at 19:52, Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
+> If an end-user feature works only in in-tree builds (so,
+> explitely said: not in out-of-tree builds), this is not
+> a build-time stuff, but user-facing feature issue.
 
-18:21 Ned, 22.03.2020. Peter Maydell <peter.maydell@linaro.org> =D1=98=D0=
-=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On Sun, 22 Mar 2020 at 15:29, Aleksandar Markovic
-> <aleksandar.m.mail@gmail.com> wrote:
-> > If the "progress" (in the form of deprecation) is so impotrant, than
-the authors should devise it so that there is no dammage to existing
-features, and no adverse effects.
-> >
-> > In this light, perhaps in-tree builds deorecation is 5.0 is little
-premature.
->
-> The idea of deprecation is to give advance warning. So it's
-> better for our users if we announce it earlier, rather than
-> later. Strictly speaking our deprecation policy is for
-> user-facing features, not build-time stuff, where we are...
+gprof is a developer feature, not an end-user-facing
+feature. By the latter I mean "some feature that users
+who have installed a built binary might be using":
+command line stuff, actual functionality in the QEMU
+binary, QMP protocol, that kind of thing.
 
-If an end-user feature works only in in-tree builds (so, explitely said:
-not in out-of-tree builds), this is not a build-time stuff, but user-facing
-feature issue.
+> If someone is keen on removing any feature (as is truly in this case), I =
+expect at least some moderate investigation being done on what could be aff=
+ected (prior to announcing deprecation), rather than attitude "ok, let's an=
+nounce deprecation, see if someone start clamoring, and, if not, we are goo=
+d to go with removing". For me, this slightly disappointing.
 
-If someone is keen on removing any feature (as is truly in this case), I
-expect at least some moderate investigation being done on what could be
-affected (prior to announcing deprecation), rather than attitude "ok, let's
-announce deprecation, see if someone start clamoring, and, if not, we are
-good to go with removing". For me, this slightly disappointing.
+Before you told me about the gprof issue, the *only* thing
+I was aware of that might break was the coverity scan build,
+which is a purely project internal bit of infrastructure.
+From my point of view, we did the investigation, in the
+sense that for years we have had out-of-tree as our standard
+recommended way of building QEMU and the thing we test
+in our CI. Anything that breaks out-of-tree is by definition
+something that fell through the gaps in our CI and which
+we couldn't know about unless somebody tells us about it.
+The "announce deprecation" part is the final part of the
+process, and sometimes it does, yes, result in somebody
+saying "you missed this thing", because we know our CI
+is far from perfect.
 
-I haven't seen anyone doing a sufficiently thourough analysis on what
-happens without in-tree builds, and doesn't work in out-of-tree builds in a
-proper way.
+> I haven't seen anyone doing a sufficiently thourough analysis
+>on what happens without in-tree builds, and doesn't work in
+>out-of-tree builds in a proper way.
 
-But, ok, this is just my opinion, probably unpopular within dev comunity,
-since it requires additional effort by us. Still, we should guide ourself
-with "what is right to do", and not "what is easy to do" principles.
+*Everything* is supposed to work in out of tree builds.
+If it doesn't that's a bug -- unless people report bugs
+we'll never know to fix them. Most developers use out
+of tree builds and all our CI is out of tree builds, so
+they actually get better ad-hoc and CI coverage than
+in-tree. Out-of-tree is overwhelmingly what we build and
+what we test, so it's in-tree that breaks more often and
+where I'd expect to find more things we didn't realise
+were broken.
 
-Regards,
-Aleksandar
+To be clear, I'm not saying we should pull the rug out
+from anybody. I'm saying:
+ * we should clearly say what our plans are, with a
+   long warning if we can reasonably give longer warning
+ * if there's anything that we would accidentally
+   be breaking with those plans, we should adjust the
+   plans so we don't break things we didn't mean to break
 
-> less strict about how much notice we give people. But it
-> seems to me that if it's easy to give some advance notice
-> then why shouldn't we do so?
->
-> I agree that we should obviously make sure that everything
-> that currently assumes an in-tree build also works with an
-> out-of-tree build before we drop the support...
->
-> (Also, if we don't announce that we're planning to drop
-> support, nobody's going to report to us issues which
-> we need to fix :-))
->
-> thanks
-> -- PMM
->
+This doesn't seem controversial to me...
 
---000000000000cb666405a176da14
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">18:21 Ned, 22.03.2020. Peter Maydell &lt;<a href=3D"mailto:p=
-eter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; =D1=98=D0=B5 =D0=
-=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; On Sun, 22 Mar 2020 at 15:29, Aleksandar Markovic<br>
-&gt; &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@g=
-mail.com</a>&gt; wrote:<br>
-&gt; &gt; If the &quot;progress&quot; (in the form of deprecation) is so im=
-potrant, than the authors should devise it so that there is no dammage to e=
-xisting features, and no adverse effects.<br>
-&gt; &gt;<br>
-&gt; &gt; In this light, perhaps in-tree builds deorecation is 5.0 is littl=
-e premature.<br>
-&gt;<br>
-&gt; The idea of deprecation is to give advance warning. So it&#39;s<br>
-&gt; better for our users if we announce it earlier, rather than<br>
-&gt; later. Strictly speaking our deprecation policy is for<br>
-&gt; user-facing features, not build-time stuff, where we are...</p>
-<p dir=3D"ltr">If an end-user feature works only in in-tree builds (so, exp=
-litely said: not in out-of-tree builds), this is not a build-time stuff, bu=
-t user-facing feature issue.</p>
-<p dir=3D"ltr">If someone is keen on removing any feature (as is truly in t=
-his case), I expect at least some moderate investigation being done on what=
- could be affected (prior to announcing deprecation), rather than attitude =
-&quot;ok, let&#39;s announce deprecation, see if someone start clamoring, a=
-nd, if not, we are good to go with removing&quot;. For me, this slightly di=
-sappointing.</p>
-<p dir=3D"ltr">I haven&#39;t seen anyone doing a sufficiently thourough ana=
-lysis on what happens without in-tree builds, and doesn&#39;t work in out-o=
-f-tree builds in a proper way.</p>
-<p dir=3D"ltr">But, ok, this is just my opinion, probably unpopular within =
-dev comunity, since it requires additional effort by us. Still, we should g=
-uide ourself with &quot;what is right to do&quot;, and not &quot;what is ea=
-sy to do&quot; principles.</p>
-<p dir=3D"ltr">Regards,<br>
-Aleksandar<br><br></p>
-<p dir=3D"ltr">&gt; less strict about how much notice we give people. But i=
-t<br>
-&gt; seems to me that if it&#39;s easy to give some advance notice<br>
-&gt; then why shouldn&#39;t we do so?<br>
-&gt;<br>
-&gt; I agree that we should obviously make sure that everything<br>
-&gt; that currently assumes an in-tree build also works with an<br>
-&gt; out-of-tree build before we drop the support...<br>
-&gt;<br>
-&gt; (Also, if we don&#39;t announce that we&#39;re planning to drop<br>
-&gt; support, nobody&#39;s going to report to us issues which<br>
-&gt; we need to fix :-))<br>
-&gt;<br>
-&gt; thanks<br>
-&gt; -- PMM<br>
-&gt;<br>
-</p>
-
---000000000000cb666405a176da14--
+thanks
+-- PMM
 
