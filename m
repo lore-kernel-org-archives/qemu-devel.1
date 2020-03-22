@@ -2,57 +2,60 @@ Return-Path: <SRS0=K/vF=5H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D25C54FCF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAE4C4332E
 	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:34:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3202520724
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:34:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3202520724
+	by mail.kernel.org (Postfix) with ESMTPS id C23D620724
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:34:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C23D620724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFznk-0005qr-Aa
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:34:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47851)
+	id 1jFznj-0005og-Uq
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:33:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jFzkk-0000wS-IJ
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:56 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jFzkn-0000yC-VT
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jFzkf-0003ro-5f
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:52 -0400
-Received: from mga11.intel.com ([192.55.52.93]:51464)
+ (envelope-from <yi.l.liu@intel.com>) id 1jFzkk-0003tI-Hm
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:57 -0400
+Received: from mga11.intel.com ([192.55.52.93]:51489)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jFzkd-0003ok-6w
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:47 -0400
-IronPort-SDR: YyPVi5VP2ob6kN/907DPpUv1rjtrXzKhFD2O8R1HNWm/lUIJPGbbXW18vgQydyJhy75IgeyPug
- EZCvTdAAc53A==
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jFzkf-0003r7-9E
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:51 -0400
+IronPort-SDR: 4I+qsm8TnNSdmgNxOJxXe4Df7X2veffjegQSES0Tm0u5HJef4v4PgxqvzFcHgr7w9PKo3QkoA9
+ 28dsZuxsALFA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  22 Mar 2020 05:30:38 -0700
-IronPort-SDR: uSfxUwmnjJc1rtK+WmXQLMJcsd8CSy8SPd1SvU5zGoXlsFBUNjtT+ToMX5uo2k7Tmehe46lfs/
- vY8cMjO59o5Q==
+IronPort-SDR: sHQa3+iz5MjbbqGtfYdvOJE8Qj9O/kWCJertHsh/VkqCosi2PMC4ZL4IoQPv4EVfKN6HhUZ26R
+ /w56lzqmKK2w==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; d="scan'208";a="239664350"
+X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; d="scan'208";a="239664356"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
  by orsmga008.jf.intel.com with ESMTP; 22 Mar 2020 05:30:37 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [PATCH v1 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
-Date: Sun, 22 Mar 2020 05:35:57 -0700
-Message-Id: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+Subject: [PATCH v1 02/22] header file update VFIO/IOMMU vSVA APIs
+Date: Sun, 22 Mar 2020 05:35:59 -0700
+Message-Id: <1584880579-12178-3-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
 X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,200 +70,578 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com, pbonzini@redhat.com,
- hao.wu@intel.com, david@gibson.dropbear.id.au
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, Cornelia Huck <cohuck@redhat.com>, eric.auger@redhat.com,
+ yi.y.sun@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
-Intel platforms allows address space sharing between device DMA and
-applications. SVA can reduce programming complexity and enhance security.
+The kernel uapi/linux/iommu.h header file includes the
+extensions for vSVA support. e.g. bind gpasid, iommu
+fault report related user structures and etc.
 
-This QEMU series is intended to expose SVA usage to VMs. i.e. Sharing
-guest application address space with passthru devices. This is called
-vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
-changes.
+Note: this should be replaced with a full header files update when
+the vSVA uPAPI is stable.
 
-The high-level architecture for SVA virtualization is as below, the key
-design of vSVA support is to utilize the dual-stage IOMMU translation (
-also known as IOMMU nesting translation) capability in host IOMMU.
-
-    .-------------.  .---------------------------.
-    |   vIOMMU    |  | Guest process CR3, FL only|
-    |             |  '---------------------------'
-    .----------------/
-    | PASID Entry |--- PASID cache flush -
-    '-------------'                       |
-    |             |                       V
-    |             |                CR3 in GPA
-    '-------------'
-Guest
-------| Shadow |--------------------------|--------
-      v        v                          v
-Host
-    .-------------.  .----------------------.
-    |   pIOMMU    |  | Bind FL for GVA-GPA  |
-    |             |  '----------------------'
-    .----------------/  |
-    | PASID Entry |     V (Nested xlate)
-    '----------------\.------------------------------.
-    |             |   |SL for GPA-HPA, default domain|
-    |             |   '------------------------------'
-    '-------------'
-Where:
- - FL = First level/stage one page tables
- - SL = Second level/stage two page tables
-
-The complete vSVA kernel upstream patches are divided into three phases:
-    1. Common APIs and PCI device direct assignment
-    2. IOMMU-backed Mediated Device assignment
-    3. Page Request Services (PRS) support
-
-This QEMU patchset is aiming for the phase 1 and phase 2. It is based
-on the two kernel series below.
-[1] [PATCH V10 00/11] Nested Shared Virtual Address (SVA) VT-d support:
-https://lkml.org/lkml/2020/3/20/1172
-[2] [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing to VMs
-https://lkml.org/lkml/2020/3/22/116
-
-There are roughly two parts:
- 1. Introduce HostIOMMUContext as abstract of host IOMMU. It provides explicit
-    method for vIOMMU emulators to communicate with host IOMMU. e.g. propagate
-    guest page table binding to host IOMMU to setup dual-stage DMA translation
-    in host IOMMU and flush iommu iotlb.
- 2. Setup dual-stage IOMMU translation for Intel vIOMMU. Includes 
-    - Check IOMMU uAPI version compatibility and VFIO Nesting capabilities which
-      includes hardware compatibility (stage 1 format) and VFIO_PASID_REQ
-      availability. This is preparation for setting up dual-stage DMA translation
-      in host IOMMU.
-    - Propagate guest PASID allocation and free request to host.
-    - Propagate guest page table binding to host to setup dual-stage IOMMU DMA
-      translation in host IOMMU.
-    - Propagate guest IOMMU cache invalidation to host to ensure iotlb
-      correctness.
-
-The complete QEMU set can be found in below link:
-https://github.com/luxis1999/qemu.git: sva_vtd_v10_v1
-
-Complete kernel can be found in:
-https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.6-rc6
-
-Tests: basci vSVA functionality test, VM reboot/shutdown/crash, kernel build in
-guest, boot VM with vSVA disabled, full comapilation.
-
-Regards,
-Yi Liu
-
-Changelog:
-	- RFC v3.1 -> Patch v1:
-	  a) Implement HostIOMMUContext in QOM manner.
-	  b) Add pci_set/unset_iommu_context() to register HostIOMMUContext to
-	     vIOMMU, thus the lifecircle of HostIOMMUContext is awared in vIOMMU
-	     side. In such way, vIOMMU could use the methods provided by the
-	     HostIOMMUContext safely.
-	  c) Add back patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
-	  RFCv3.1: https://patchwork.kernel.org/cover/11397879/
-
-	- RFC v3 -> v3.1:
-	  a) Drop IOMMUContext, and rename DualStageIOMMUObject to HostIOMMUContext.
-	     HostIOMMUContext is per-vfio-container, it is exposed to  vIOMMU via PCI
-	     layer. VFIO registers a PCIHostIOMMUFunc callback to PCI layer, vIOMMU
-	     could get HostIOMMUContext instance via it.
-	  b) Check IOMMU uAPI version by VFIO_CHECK_EXTENSION
-	  c) Add a check on VFIO_PASID_REQ availability via VFIO_GET_IOMMU_IHNFO
-	  d) Reorder the series, put vSVA linux header file update in the beginning
-	     put the x-scalable-mode option mofification in the end of the series.
-	  e) Dropped patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
-	  RFCv3: https://patchwork.kernel.org/cover/11356033/
-
-	- RFC v2 -> v3:
-	  a) Introduce DualStageIOMMUObject to abstract the host IOMMU programming
-	  capability. e.g. request PASID from host, setup IOMMU nesting translation
-	  on host IOMMU. The pasid_alloc/bind_guest_page_table/iommu_cache_flush
-	  operations are moved to be DualStageIOMMUOps. Thus, DualStageIOMMUObject
-	  is an abstract layer which provides QEMU vIOMMU emulators with an explicit
-	  method to program host IOMMU.
-	  b) Compared with RFC v2, the IOMMUContext has also been updated. It is
-	  modified to provide an abstract for vIOMMU emulators. It provides the
-	  method for pass-through modules (like VFIO) to communicate with host IOMMU.
-	  e.g. tell vIOMMU emulators about the IOMMU nesting capability on host side
-	  and report the host IOMMU DMA translation faults to vIOMMU emulators.
-	  RFC v2: https://www.spinics.net/lists/kvm/msg198556.html
-
-	- RFC v1 -> v2:
-	  Introduce IOMMUContext to abstract the connection between VFIO
-	  and vIOMMU emulators, which is a replacement of the PCIPASIDOps
-	  in RFC v1. Modify x-scalable-mode to be string option instead of
-	  adding a new option as RFC v1 did. Refined the pasid cache management
-	  and addressed the TODOs mentioned in RFC v1. 
-	  RFC v1: https://patchwork.kernel.org/cover/11033657/
-
-
-Eric Auger (1):
-  scripts/update-linux-headers: Import iommu.h
-
-Liu Yi L (21):
-  header file update VFIO/IOMMU vSVA APIs
-  vfio: check VFIO_TYPE1_NESTING_IOMMU support
-  hw/iommu: introduce HostIOMMUContext
-  hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
-  hw/pci: introduce pci_device_set/unset_iommu_context()
-  intel_iommu: add set/unset_iommu_context callback
-  vfio: init HostIOMMUContext per-container
-  vfio/common: check PASID alloc/free availability
-  intel_iommu: add virtual command capability support
-  intel_iommu: process PASID cache invalidation
-  intel_iommu: add PASID cache management infrastructure
-  vfio: add bind stage-1 page table support
-  intel_iommu: bind/unbind guest page table to host
-  intel_iommu: replay guest pasid bindings to host
-  intel_iommu: replay pasid binds after context cache invalidation
-  intel_iommu: do not pass down pasid bind for PASID #0
-  vfio: add support for flush iommu stage-1 cache
-  intel_iommu: process PASID-based iotlb invalidation
-  intel_iommu: propagate PASID-based iotlb invalidation to host
-  intel_iommu: process PASID-based Device-TLB invalidation
-  intel_iommu: modify x-scalable-mode to be string option
-
- hw/Makefile.objs                      |    1 +
- hw/alpha/typhoon.c                    |    6 +-
- hw/arm/smmu-common.c                  |    6 +-
- hw/hppa/dino.c                        |    6 +-
- hw/i386/amd_iommu.c                   |    6 +-
- hw/i386/intel_iommu.c                 | 1221 ++++++++++++++++++++++++++++++++-
- hw/i386/intel_iommu_internal.h        |  118 ++++
- hw/i386/trace-events                  |    6 +
- hw/iommu/Makefile.objs                |    1 +
- hw/iommu/host_iommu_context.c         |  178 +++++
- hw/pci-host/designware.c              |    6 +-
- hw/pci-host/pnv_phb3.c                |    6 +-
- hw/pci-host/pnv_phb4.c                |    6 +-
- hw/pci-host/ppce500.c                 |    6 +-
- hw/pci-host/prep.c                    |    6 +-
- hw/pci-host/sabre.c                   |    6 +-
- hw/pci/pci.c                          |   53 +-
- hw/ppc/ppc440_pcix.c                  |    6 +-
- hw/ppc/spapr_pci.c                    |    6 +-
- hw/s390x/s390-pci-bus.c               |    8 +-
- hw/vfio/common.c                      |  257 ++++++-
- hw/vfio/pci.c                         |   13 +
- hw/virtio/virtio-iommu.c              |    6 +-
- include/hw/i386/intel_iommu.h         |   62 +-
- include/hw/iommu/host_iommu_context.h |  116 ++++
- include/hw/pci/pci.h                  |   18 +-
- include/hw/pci/pci_bus.h              |    2 +-
- include/hw/vfio/vfio-common.h         |    4 +
- linux-headers/linux/iommu.h           |  378 ++++++++++
- linux-headers/linux/vfio.h            |  127 ++++
- scripts/update-linux-headers.sh       |    2 +-
- 31 files changed, 2599 insertions(+), 44 deletions(-)
- create mode 100644 hw/iommu/Makefile.objs
- create mode 100644 hw/iommu/host_iommu_context.c
- create mode 100644 include/hw/iommu/host_iommu_context.h
+Cc: Kevin Tian <kevin.tian@intel.com>
+Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+---
+ linux-headers/linux/iommu.h | 378 ++++++++++++++++++++++++++++++++++++++++++++
+ linux-headers/linux/vfio.h  | 127 +++++++++++++++
+ 2 files changed, 505 insertions(+)
  create mode 100644 linux-headers/linux/iommu.h
 
+diff --git a/linux-headers/linux/iommu.h b/linux-headers/linux/iommu.h
+new file mode 100644
+index 0000000..9025496
+--- /dev/null
++++ b/linux-headers/linux/iommu.h
+@@ -0,0 +1,378 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * IOMMU user API definitions
++ */
++
++#ifndef _IOMMU_H
++#define _IOMMU_H
++
++#include <linux/types.h>
++
++/**
++ * Current version of the IOMMU user API. This is intended for query
++ * between user and kernel to determine compatible data structures.
++ *
++ * UAPI version can be bumped up with the following rules:
++ * 1. All data structures passed between user and kernel space share
++ *    the same version number. i.e. any extension to any structure
++ *    results in version number increment.
++ *
++ * 2. Data structures are open to extension but closed to modification.
++ *    Extension should leverage the padding bytes first where a new
++ *    flag bit is required to indicate the validity of each new member.
++ *    The above rule for padding bytes also applies to adding new union
++ *    members.
++ *    After padding bytes are exhausted, new fields must be added at the
++ *    end of each data structure with 64bit alignment. Flag bits can be
++ *    added without size change but existing ones cannot be altered.
++ *
++ * 3. Versions are backward compatible.
++ *
++ * 4. Version to size lookup is supported by kernel internal API for each
++ *    API function type. @version is mandatory for new data structures
++ *    and must be at the beginning with type of __u32.
++ */
++#define IOMMU_UAPI_VERSION	1
++static __inline__ int iommu_get_uapi_version(void)
++{
++	return IOMMU_UAPI_VERSION;
++}
++
++/*
++ * Supported UAPI features that can be reported to user space.
++ * These types represent the capability available in the kernel.
++ *
++ * REVISIT: UAPI version also implies the capabilities. Should we
++ * report them explicitly?
++ */
++enum IOMMU_UAPI_DATA_TYPES {
++	IOMMU_UAPI_BIND_GPASID,
++	IOMMU_UAPI_CACHE_INVAL,
++	IOMMU_UAPI_PAGE_RESP,
++	NR_IOMMU_UAPI_TYPE,
++};
++
++#define IOMMU_UAPI_CAP_MASK ((1 << IOMMU_UAPI_BIND_GPASID) |	\
++				(1 << IOMMU_UAPI_CACHE_INVAL) |	\
++				(1 << IOMMU_UAPI_PAGE_RESP))
++
++#define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
++#define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
++#define IOMMU_FAULT_PERM_EXEC	(1 << 2) /* exec */
++#define IOMMU_FAULT_PERM_PRIV	(1 << 3) /* privileged */
++
++/* Generic fault types, can be expanded IRQ remapping fault */
++enum iommu_fault_type {
++	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
++	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
++};
++
++enum iommu_fault_reason {
++	IOMMU_FAULT_REASON_UNKNOWN = 0,
++
++	/* Could not access the PASID table (fetch caused external abort) */
++	IOMMU_FAULT_REASON_PASID_FETCH,
++
++	/* PASID entry is invalid or has configuration errors */
++	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
++
++	/*
++	 * PASID is out of range (e.g. exceeds the maximum PASID
++	 * supported by the IOMMU) or disabled.
++	 */
++	IOMMU_FAULT_REASON_PASID_INVALID,
++
++	/*
++	 * An external abort occurred fetching (or updating) a translation
++	 * table descriptor
++	 */
++	IOMMU_FAULT_REASON_WALK_EABT,
++
++	/*
++	 * Could not access the page table entry (Bad address),
++	 * actual translation fault
++	 */
++	IOMMU_FAULT_REASON_PTE_FETCH,
++
++	/* Protection flag check failed */
++	IOMMU_FAULT_REASON_PERMISSION,
++
++	/* access flag check failed */
++	IOMMU_FAULT_REASON_ACCESS,
++
++	/* Output address of a translation stage caused Address Size fault */
++	IOMMU_FAULT_REASON_OOR_ADDRESS,
++};
++
++/**
++ * struct iommu_fault_unrecoverable - Unrecoverable fault data
++ * @reason: reason of the fault, from &enum iommu_fault_reason
++ * @flags: parameters of this fault (IOMMU_FAULT_UNRECOV_* values)
++ * @pasid: Process Address Space ID
++ * @perm: requested permission access using by the incoming transaction
++ *        (IOMMU_FAULT_PERM_* values)
++ * @addr: offending page address
++ * @fetch_addr: address that caused a fetch abort, if any
++ */
++struct iommu_fault_unrecoverable {
++	__u32	reason;
++#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
++#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 1)
++#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 2)
++	__u32	flags;
++	__u32	pasid;
++	__u32	perm;
++	__u64	addr;
++	__u64	fetch_addr;
++};
++
++/**
++ * struct iommu_fault_page_request - Page Request data
++ * @flags: encodes whether the corresponding fields are valid and whether this
++ *         is the last page in group (IOMMU_FAULT_PAGE_REQUEST_* values)
++ * @pasid: Process Address Space ID
++ * @grpid: Page Request Group Index
++ * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
++ * @addr: page address
++ * @private_data: device-specific private information
++ */
++struct iommu_fault_page_request {
++#define IOMMU_FAULT_PAGE_REQUEST_PASID_VALID	(1 << 0)
++#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
++#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
++	__u32	flags;
++	__u32	pasid;
++	__u32	grpid;
++	__u32	perm;
++	__u64	addr;
++	__u64	private_data[2];
++};
++
++/**
++ * struct iommu_fault - Generic fault data
++ * @type: fault type from &enum iommu_fault_type
++ * @padding: reserved for future use (should be zero)
++ * @event: fault event, when @type is %IOMMU_FAULT_DMA_UNRECOV
++ * @prm: Page Request message, when @type is %IOMMU_FAULT_PAGE_REQ
++ * @padding2: sets the fault size to allow for future extensions
++ */
++struct iommu_fault {
++	__u32	type;
++	__u32	padding;
++	union {
++		struct iommu_fault_unrecoverable event;
++		struct iommu_fault_page_request prm;
++		__u8 padding2[56];
++	};
++};
++
++/**
++ * enum iommu_page_response_code - Return status of fault handlers
++ * @IOMMU_PAGE_RESP_SUCCESS: Fault has been handled and the page tables
++ *	populated, retry the access. This is "Success" in PCI PRI.
++ * @IOMMU_PAGE_RESP_FAILURE: General error. Drop all subsequent faults from
++ *	this device if possible. This is "Response Failure" in PCI PRI.
++ * @IOMMU_PAGE_RESP_INVALID: Could not handle this fault, don't retry the
++ *	access. This is "Invalid Request" in PCI PRI.
++ */
++enum iommu_page_response_code {
++	IOMMU_PAGE_RESP_SUCCESS = 0,
++	IOMMU_PAGE_RESP_INVALID,
++	IOMMU_PAGE_RESP_FAILURE,
++};
++
++/**
++ * struct iommu_page_response - Generic page response information
++ * @version: IOMMU_UAPI_VERSION
++ * @flags: encodes whether the corresponding fields are valid
++ *         (IOMMU_FAULT_PAGE_RESPONSE_* values)
++ * @pasid: Process Address Space ID
++ * @grpid: Page Request Group Index
++ * @code: response code from &enum iommu_page_response_code
++ */
++struct iommu_page_response {
++	__u32	version;
++#define IOMMU_PAGE_RESP_PASID_VALID	(1 << 0)
++	__u32	flags;
++	__u32	pasid;
++	__u32	grpid;
++	__u32	code;
++};
++
++/* defines the granularity of the invalidation */
++enum iommu_inv_granularity {
++	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective invalidation */
++	IOMMU_INV_GRANU_PASID,	/* PASID-selective invalidation */
++	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation */
++	IOMMU_INV_GRANU_NR,	/* number of invalidation granularities */
++};
++
++/**
++ * struct iommu_inv_addr_info - Address Selective Invalidation Structure
++ *
++ * @flags: indicates the granularity of the address-selective invalidation
++ * - If the PASID bit is set, the @pasid field is populated and the invalidation
++ *   relates to cache entries tagged with this PASID and matching the address
++ *   range.
++ * - If ARCHID bit is set, @archid is populated and the invalidation relates
++ *   to cache entries tagged with this architecture specific ID and matching
++ *   the address range.
++ * - Both PASID and ARCHID can be set as they may tag different caches.
++ * - If neither PASID or ARCHID is set, global addr invalidation applies.
++ * - The LEAF flag indicates whether only the leaf PTE caching needs to be
++ *   invalidated and other paging structure caches can be preserved.
++ * @pasid: process address space ID
++ * @archid: architecture-specific ID
++ * @addr: first stage/level input address
++ * @granule_size: page/block size of the mapping in bytes
++ * @nb_granules: number of contiguous granules to be invalidated
++ */
++struct iommu_inv_addr_info {
++#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
++#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
++#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
++	__u32	flags;
++	__u32	archid;
++	__u64	pasid;
++	__u64	addr;
++	__u64	granule_size;
++	__u64	nb_granules;
++};
++
++/**
++ * struct iommu_inv_pasid_info - PASID Selective Invalidation Structure
++ *
++ * @flags: indicates the granularity of the PASID-selective invalidation
++ * - If the PASID bit is set, the @pasid field is populated and the invalidation
++ *   relates to cache entries tagged with this PASID and matching the address
++ *   range.
++ * - If the ARCHID bit is set, the @archid is populated and the invalidation
++ *   relates to cache entries tagged with this architecture specific ID and
++ *   matching the address range.
++ * - Both PASID and ARCHID can be set as they may tag different caches.
++ * - At least one of PASID or ARCHID must be set.
++ * @pasid: process address space ID
++ * @archid: architecture-specific ID
++ */
++struct iommu_inv_pasid_info {
++#define IOMMU_INV_PASID_FLAGS_PASID	(1 << 0)
++#define IOMMU_INV_PASID_FLAGS_ARCHID	(1 << 1)
++	__u32	flags;
++	__u32	archid;
++	__u64	pasid;
++};
++
++/**
++ * struct iommu_cache_invalidate_info - First level/stage invalidation
++ *     information
++ * @version: IOMMU_UAPI_VERSION
++ * @cache: bitfield that allows to select which caches to invalidate
++ * @granularity: defines the lowest granularity used for the invalidation:
++ *     domain > PASID > addr
++ * @padding: reserved for future use (should be zero)
++ * @pasid_info: invalidation data when @granularity is %IOMMU_INV_GRANU_PASID
++ * @addr_info: invalidation data when @granularity is %IOMMU_INV_GRANU_ADDR
++ *
++ * Not all the combinations of cache/granularity are valid:
++ *
++ * +--------------+---------------+---------------+---------------+
++ * | type /       |   DEV_IOTLB   |     IOTLB     |      PASID    |
++ * | granularity  |               |               |      cache    |
++ * +==============+===============+===============+===============+
++ * | DOMAIN       |       N/A     |       Y       |       Y       |
++ * +--------------+---------------+---------------+---------------+
++ * | PASID        |       Y       |       Y       |       Y       |
++ * +--------------+---------------+---------------+---------------+
++ * | ADDR         |       Y       |       Y       |       N/A     |
++ * +--------------+---------------+---------------+---------------+
++ *
++ * Invalidations by %IOMMU_INV_GRANU_DOMAIN don't take any argument other than
++ * @version and @cache.
++ *
++ * If multiple cache types are invalidated simultaneously, they all
++ * must support the used granularity.
++ */
++struct iommu_cache_invalidate_info {
++	__u32	version;
++/* IOMMU paging structure cache */
++#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
++#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device IOTLB */
++#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID cache */
++#define IOMMU_CACHE_INV_TYPE_NR		(3)
++	__u8	cache;
++	__u8	granularity;
++	__u8	padding[2];
++	union {
++		struct iommu_inv_pasid_info pasid_info;
++		struct iommu_inv_addr_info addr_info;
++	};
++};
++
++/**
++ * struct iommu_gpasid_bind_data_vtd - Intel VT-d specific data on device and guest
++ * SVA binding.
++ *
++ * @flags:	VT-d PASID table entry attributes
++ * @pat:	Page attribute table data to compute effective memory type
++ * @emt:	Extended memory type
++ *
++ * Only guest vIOMMU selectable and effective options are passed down to
++ * the host IOMMU.
++ */
++struct iommu_gpasid_bind_data_vtd {
++#define IOMMU_SVA_VTD_GPASID_SRE	(1 << 0) /* supervisor request */
++#define IOMMU_SVA_VTD_GPASID_EAFE	(1 << 1) /* extended access enable */
++#define IOMMU_SVA_VTD_GPASID_PCD	(1 << 2) /* page-level cache disable */
++#define IOMMU_SVA_VTD_GPASID_PWT	(1 << 3) /* page-level write through */
++#define IOMMU_SVA_VTD_GPASID_EMTE	(1 << 4) /* extended mem type enable */
++#define IOMMU_SVA_VTD_GPASID_CD		(1 << 5) /* PASID-level cache disable */
++	__u64 flags;
++	__u32 pat;
++	__u32 emt;
++};
++#define IOMMU_SVA_VTD_GPASID_EMT_MASK	(IOMMU_SVA_VTD_GPASID_CD | \
++					 IOMMU_SVA_VTD_GPASID_EMTE | \
++					 IOMMU_SVA_VTD_GPASID_PCD |  \
++					 IOMMU_SVA_VTD_GPASID_PWT)
++/**
++ * struct iommu_gpasid_bind_data - Information about device and guest PASID binding
++ * @version:	IOMMU_UAPI_VERSION
++ * @format:	PASID table entry format
++ * @flags:	Additional information on guest bind request
++ * @gpgd:	Guest page directory base of the guest mm to bind
++ * @hpasid:	Process address space ID used for the guest mm in host IOMMU
++ * @gpasid:	Process address space ID used for the guest mm in guest IOMMU
++ * @addr_width:	Guest virtual address width
++ * @padding:	Reserved for future use (should be zero)
++ * @dummy	Reserve space for vendor specific data in the union. New
++ *		members added to the union cannot exceed the size of dummy.
++ *		The fixed size union is needed to allow further expansion
++ *		after the end of the union while still maintain backward
++ *		compatibility.
++ * @vtd:	Intel VT-d specific data
++ *
++ * Guest to host PASID mapping can be an identity or non-identity, where guest
++ * has its own PASID space. For non-identify mapping, guest to host PASID lookup
++ * is needed when VM programs guest PASID into an assigned device. VMM may
++ * trap such PASID programming then request host IOMMU driver to convert guest
++ * PASID to host PASID based on this bind data.
++ */
++struct iommu_gpasid_bind_data {
++	__u32 version;
++#define IOMMU_PASID_FORMAT_INTEL_VTD	1
++	__u32 format;
++#define IOMMU_SVA_GPASID_VAL	(1 << 0) /* guest PASID valid */
++	__u64 flags;
++	__u64 gpgd;
++	__u64 hpasid;
++	__u64 gpasid;
++	__u32 addr_width;
++	__u8  padding[12];
++	/* Vendor specific data */
++	union {
++		__u8 dummy[128];
++		struct iommu_gpasid_bind_data_vtd vtd;
++	};
++};
++
++#endif /* _IOMMU_H */
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index fb10370..29d0071 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -14,6 +14,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/ioctl.h>
++#include <linux/iommu.h>
+ 
+ #define VFIO_API_VERSION	0
+ 
+@@ -47,6 +48,15 @@
+ #define VFIO_NOIOMMU_IOMMU		8
+ 
+ /*
++ * Hardware IOMMUs with two-stage translation capability give userspace
++ * the ownership of stage-1 translation structures (e.g. page tables).
++ * VFIO exposes the two-stage IOMMU programming capability to userspace
++ * based on the IOMMU UAPIs. Therefore user of VFIO_TYPE1_NESTING should
++ * check the IOMMU UAPI version compatibility.
++ */
++#define VFIO_NESTING_IOMMU_UAPI		9
++
++/*
+  * The IOCTL interface is designed for extensibility by embedding the
+  * structure length (argsz) and flags into structures passed between
+  * kernel and userspace.  We therefore use the _IO() macro for these
+@@ -748,6 +758,15 @@ struct vfio_iommu_type1_info_cap_iova_range {
+ 	struct	vfio_iova_range iova_ranges[];
+ };
+ 
++#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  2
++
++struct vfio_iommu_type1_info_cap_nesting {
++	struct	vfio_info_cap_header header;
++#define VFIO_IOMMU_PASID_REQS	(1 << 0)
++	__u32	nesting_capabilities;
++	__u32	stage1_formats;
++};
++
+ #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+ 
+ /**
+@@ -794,6 +813,114 @@ struct vfio_iommu_type1_dma_unmap {
+ #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+ #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
++/*
++ * PASID (Process Address Space ID) is a PCIe concept which
++ * has been extended to support DMA isolation in fine-grain.
++ * With device assigned to user space (e.g. VMs), PASID alloc
++ * and free need to be system wide. This structure defines
++ * the info for pasid alloc/free between user space and kernel
++ * space.
++ *
++ * @flag=VFIO_IOMMU_PASID_ALLOC, refer to the @alloc_pasid
++ * @flag=VFIO_IOMMU_PASID_FREE, refer to @free_pasid
++ */
++struct vfio_iommu_type1_pasid_request {
++	__u32	argsz;
++#define VFIO_IOMMU_PASID_ALLOC	(1 << 0)
++#define VFIO_IOMMU_PASID_FREE	(1 << 1)
++	__u32	flags;
++	union {
++		struct {
++			__u32 min;
++			__u32 max;
++			__u32 result;
++		} alloc_pasid;
++		__u32 free_pasid;
++	};
++};
++
++#define VFIO_PASID_REQUEST_MASK	(VFIO_IOMMU_PASID_ALLOC | \
++					 VFIO_IOMMU_PASID_FREE)
++
++/**
++ * VFIO_IOMMU_PASID_REQUEST - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
++ *				struct vfio_iommu_type1_pasid_request)
++ *
++ * Availability of this feature depends on PASID support in the device,
++ * its bus, the underlying IOMMU and the CPU architecture. In VFIO, it
++ * is available after VFIO_SET_IOMMU.
++ *
++ * returns: 0 on success, -errno on failure.
++ */
++#define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 22)
++
++/**
++ * Supported flags:
++ *	- VFIO_IOMMU_BIND_GUEST_PGTBL: bind guest page tables to host for
++ *			nesting type IOMMUs. In @data field It takes struct
++ *			iommu_gpasid_bind_data.
++ *	- VFIO_IOMMU_UNBIND_GUEST_PGTBL: undo a bind guest page table operation
++ *			invoked by VFIO_IOMMU_BIND_GUEST_PGTBL.
++ *
++ */
++struct vfio_iommu_type1_bind {
++	__u32		argsz;
++	__u32		flags;
++#define VFIO_IOMMU_BIND_GUEST_PGTBL	(1 << 0)
++#define VFIO_IOMMU_UNBIND_GUEST_PGTBL	(1 << 1)
++	__u8		data[];
++};
++
++#define VFIO_IOMMU_BIND_MASK	(VFIO_IOMMU_BIND_GUEST_PGTBL | \
++					VFIO_IOMMU_UNBIND_GUEST_PGTBL)
++
++/**
++ * VFIO_IOMMU_BIND - _IOW(VFIO_TYPE, VFIO_BASE + 23,
++ *				struct vfio_iommu_type1_bind)
++ *
++ * Manage address spaces of devices in this container. Initially a TYPE1
++ * container can only have one address space, managed with
++ * VFIO_IOMMU_MAP/UNMAP_DMA.
++ *
++ * An IOMMU of type VFIO_TYPE1_NESTING_IOMMU can be managed by both MAP/UNMAP
++ * and BIND ioctls at the same time. MAP/UNMAP acts on the stage-2 (host) page
++ * tables, and BIND manages the stage-1 (guest) page tables. Other types of
++ * IOMMU may allow MAP/UNMAP and BIND to coexist, where MAP/UNMAP controls
++ * the traffics only require single stage translation while BIND controls the
++ * traffics require nesting translation. But this depends on the underlying
++ * IOMMU architecture and isn't guaranteed. Example of this is the guest SVA
++ * traffics, such traffics need nesting translation to gain gVA->gPA and then
++ * gPA->hPA translation.
++ *
++ * Availability of this feature depends on the device, its bus, the underlying
++ * IOMMU and the CPU architecture.
++ *
++ * returns: 0 on success, -errno on failure.
++ */
++#define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 23)
++
++/**
++ * VFIO_IOMMU_CACHE_INVALIDATE - _IOW(VFIO_TYPE, VFIO_BASE + 24,
++ *			struct vfio_iommu_type1_cache_invalidate)
++ *
++ * Propagate guest IOMMU cache invalidation to the host. The cache
++ * invalidation information is conveyed by @cache_info, the content
++ * format would be structures defined in uapi/linux/iommu.h. User
++ * should be aware of that the struct  iommu_cache_invalidate_info
++ * has a @version field, vfio needs to parse this field before getting
++ * data from userspace.
++ *
++ * Availability of this IOCTL is after VFIO_SET_IOMMU.
++ *
++ * returns: 0 on success, -errno on failure.
++ */
++struct vfio_iommu_type1_cache_invalidate {
++	__u32   argsz;
++	__u32   flags;
++	struct	iommu_cache_invalidate_info cache_info;
++};
++#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
+ /*
 -- 
 2.7.4
 
