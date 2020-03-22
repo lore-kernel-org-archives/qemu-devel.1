@@ -2,97 +2,61 @@ Return-Path: <SRS0=K/vF=5H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5B5C4332E
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7600C54FCF
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:32:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DE0A2070A
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:06:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="em6Nmibe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DE0A2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AAF5220732
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAF5220732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFzNK-0005DG-Aj
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:06:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44786)
+	id 1jFzlo-0002Tf-Qo
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFzIN-0000iH-7Y
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:36 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jFzkf-0000n6-Tb
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFzIK-0001XF-Ne
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:35 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:58297)
+ (envelope-from <yi.l.liu@intel.com>) id 1jFzkc-0003qv-VM
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:48 -0400
+Received: from mga11.intel.com ([192.55.52.93]:51464)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFzIK-0001X4-Ho
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584878492;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eWg8qEkdtHLS5RiJUs/y2SIc9XLbwUaK9DS/kS4AUxY=;
- b=em6NmibexIotHy6EK82WNFFF1EdolBVe5hWGMtJn4pQVp+iipJJhwL39NzAEowzXkR6Us8
- ie/kPhHqtzxVWLLdeZSb3NdBBCrUR1r0JMi3A+pgecyS4AqkDMM8scM2jvg74fMOw9EGKG
- aWIgt+Uqtu3QY2HwneAXU3B46IV73kQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-Xr9i-N69OyWOFByhUAHl1w-1; Sun, 22 Mar 2020 08:01:28 -0400
-X-MC-Unique: Xr9i-N69OyWOFByhUAHl1w-1
-Received: by mail-wr1-f71.google.com with SMTP id v6so5660690wrg.22
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 05:01:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=FIrEvJM3MZZKAXLyDJ7b+Sj8plkho1NeMMKpejJfyeY=;
- b=QGlJ26pp4nwgER49wL8UEnymWo/WzRJpSe/iM+fKI2vv2OBPnHv4njuePhoi7B5IZW
- oGhIjbfawqIbWmQXg25w9tW/2KgZoO1VTJ+yiMvwjHl1Sj2UJxPmzYIoZPxpWJHUI6K1
- 3UeT0F0QXe58gN6bzc6DpJ31lQZZzHM22ajbFGi7UJOCyweVyCiIFTRLt1CuahLdET1s
- FV5s9EojolqnB4zo7hr2PwyBhYlYd/fCL1+byqERo+6vUQQBEAnQOjQS6iMDdzNONr7H
- RGglnnOEtc6xOrwewZxk/VW5xe5t9ZRBub1V4xKjfuYlpY0C+FnotqtOB3k5EaNUEau/
- YEUg==
-X-Gm-Message-State: ANhLgQ37dDT7cXho183DTGlR+Z2FXgGhyqohGVC9zPXJy5Z6i0wA0Mvq
- 8oVQA5051Ekx8aM3iuIoZitRS15bZKtfFxZnlnvEb2bkn2GnZxNuUoYqsD3mo7slpF4lKgx6bew
- LgAfNG6ZcJcbDK/M=
-X-Received: by 2002:adf:fc8a:: with SMTP id g10mr22820318wrr.82.1584878487056; 
- Sun, 22 Mar 2020 05:01:27 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuwj0ttfBmDGhxKpBCrFMAH/r8tIJToX6p8qZbkzwN3kTEeUMelj4n0LUe5mvhmCYRv2GqbWQ==
-X-Received: by 2002:adf:fc8a:: with SMTP id g10mr22820303wrr.82.1584878486897; 
- Sun, 22 Mar 2020 05:01:26 -0700 (PDT)
-Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id h26sm14912074wmb.19.2020.03.22.05.01.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 22 Mar 2020 05:01:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 v2 4/4] tests/docker: Add libepoxy and libudev
- packages to the Fedora image
-Date: Sun, 22 Mar 2020 13:01:04 +0100
-Message-Id: <20200322120104.21267-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200322120104.21267-1-philmd@redhat.com>
-References: <20200322120104.21267-1-philmd@redhat.com>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jFzkc-0003ok-3f
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:30:46 -0400
+IronPort-SDR: PZMt++oVfTA/NlQYoWUa8VTxjyVrrv/qHqpc7viF+KkZtu8oZoBzACTQS+PV7EbINAA+0aZfMt
+ S/M+X3D2NyUQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Mar 2020 05:30:38 -0700
+IronPort-SDR: htDY/owjdKMDnf6H8wwZhdcxULwRXP+FHsPWdgWI8nSmhCEYFBXpTgRTVHQgrHIXh25HyvV59a
+ ioB6EBufEIWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; d="scan'208";a="239664353"
+Received: from jacob-builder.jf.intel.com ([10.7.199.155])
+ by orsmga008.jf.intel.com with ESMTP; 22 Mar 2020 05:30:37 -0700
+From: Liu Yi L <yi.l.liu@intel.com>
+To: qemu-devel@nongnu.org,
+	alex.williamson@redhat.com,
+	peterx@redhat.com
+Subject: [PATCH v1 01/22] scripts/update-linux-headers: Import iommu.h
+Date: Sun, 22 Mar 2020 05:35:58 -0700
+Message-Id: <1584880579-12178-2-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,44 +68,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, Cornelia Huck <cohuck@redhat.com>, eric.auger@redhat.com,
+ yi.y.sun@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Install optional dependencies of QEMU to get better coverage.
+From: Eric Auger <eric.auger@redhat.com>
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Update the script to import the new iommu.h uapi header.
+
+Cc: Kevin Tian <kevin.tian@intel.com>
+Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- tests/docker/dockerfiles/fedora.docker | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/update-linux-headers.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfi=
-les/fedora.docker
-index 174979c7af..4bd2c953af 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -29,6 +29,7 @@ ENV PACKAGES \
-     libblockdev-mpath-devel \
-     libcap-ng-devel \
-     libcurl-devel \
-+    libepoxy-devel \
-     libfdt-devel \
-     libiscsi-devel \
-     libjpeg-devel \
-@@ -38,6 +39,7 @@ ENV PACKAGES \
-     libseccomp-devel \
-     libssh-devel \
-     libubsan \
-+    libudev-devel \
-     libusbx-devel \
-     libxml2-devel \
-     libzstd-devel \
---=20
-2.21.1
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 29c27f4..5b64ee3 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -141,7 +141,7 @@ done
+ 
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+-for header in kvm.h vfio.h vfio_ccw.h vhost.h \
++for header in kvm.h vfio.h vfio_ccw.h vhost.h iommu.h \
+               psci.h psp-sev.h userfaultfd.h mman.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
+-- 
+2.7.4
 
 
