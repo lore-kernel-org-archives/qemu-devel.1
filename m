@@ -2,81 +2,85 @@ Return-Path: <SRS0=K/vF=5H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5CBC4332B
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 17:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50355C4332B
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 17:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47C63206C3
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 17:49:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13D28206C3
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 17:49:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H/lvuw6V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C63206C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o+fVZLKb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13D28206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jG4ij-0000bf-CN
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 13:49:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53960)
+	id 1jG4is-0000u4-8W
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 13:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jwsu1986@gmail.com>) id 1jG4hk-0008It-IB
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 13:48:09 -0400
+ (envelope-from <jwsu1986@gmail.com>) id 1jG4hp-0008Lx-KB
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 13:48:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jwsu1986@gmail.com>) id 1jG4hj-0005tw-Jj
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 13:48:08 -0400
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:41451)
+ (envelope-from <jwsu1986@gmail.com>) id 1jG4ho-0005yQ-HW
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 13:48:13 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33005)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jwsu1986@gmail.com>) id 1jG4hj-0005sA-F5
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 13:48:07 -0400
-Received: by mail-pl1-x630.google.com with SMTP id t16so4854930plr.8
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 10:48:07 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jwsu1986@gmail.com>) id 1jG4ho-0005xp-C4
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 13:48:12 -0400
+Received: by mail-pl1-x642.google.com with SMTP id g18so4874961plq.0
+ for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 10:48:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=Tw6TZag1rN3xcTxLCUtj/Pzrexg2kHttRCpB9ZuYSJU=;
- b=H/lvuw6VagsZT15cAbfwJfQm02FTo8s6ytH3CxI0uxESL1oaPHsAboG/BObZlgBk5s
- vYTtLe+7qlkjpNsr/0SrY6ByDot9J2PB8edUqY/vvYFXK7vDl6x/c4DWj/5h+Fcql8/u
- P0OPAo3ZDqXhGU16UM7uaNnUMJr4tyiDwQi2wC33JmGgCRzLthvEWpSs4XoDuw1Da2K1
- AXw2xQcRkSeg7oHrvqv8272vYCNQ+tMRZyMj8YngPva4+N5uJXHCrfIUkU2TFxcRA4+M
- fomHrUKexoiymtZaQRTPe142JnEx9iQPVIgoE4++QGojN2TywoiHhZ+htgHlrycecxUr
- T/8w==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=f6sHN97Z5k0H0NePRruYOF0pxNWEQGvMVIWCmlh8Qaw=;
+ b=o+fVZLKb4Ww9+uxkUvNJcwuPxpurrzDwhubdccAbY4dj2pZ7JGVnw1fxMylCafYmH7
+ zPu8keQea/UO/808JQhIhQffE9/dG3Om1L54Ae1YFKco7FjRZSZTYxA00HfKal7UzaW0
+ R2fpXAAXYGjuZfyEdvdSfeD9JlvLHZR3jFIN3nMj/m+LybWpbKLL1QuAHT/lnLVqnT8f
+ eTP+LaviHLQ7dS0ITWkVksBKD8iZvYzymPITFfhVaUbx2+NHDFvplVJC4oZkRH99jJg4
+ dBLDjZD70OuroiXfGyMOpBOuscyyQ1JOGshnUUFlzioNx0w3K31eokCUYAufDj8cNHWR
+ 9ZWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=Tw6TZag1rN3xcTxLCUtj/Pzrexg2kHttRCpB9ZuYSJU=;
- b=Wg/2QtPjT2WoRpE+ywtwP3jFNjgqDlXPs1hQ4UrBxidq75nmJnwdVNiUZSg3+uSvGK
- mpANIYwUUr6i5J6Ix8AwvLPzaaBBjFQVv6ggeaheGkrRUP5cXe/K98kgZI5dzh5aBCWn
- /STUO9bFN70LhFuKfh7tns4rroNPdx0HqoJzHijAPefk5BjXZfn1tftVbXpvFuxkm8mD
- JrXnhEwGRolhNGmzG9y9+w8hZ7hAAEIg5UD1hEQ3oMe0ewxGwZa9YfifVM9Yb/qdkR05
- xgLKfBvg3TzFIja3vHzNC1jRuh4mJ+5yoEtEN/Im2w3lm9DqICkgPZoTDOa65D7KaHax
- SPpw==
-X-Gm-Message-State: ANhLgQ2udC1QdAirNOwCG6/9doacPI9jqj4/DDodQX47+jPugAQaCPbY
- S5lGriJxoDrOQjRfFIOXU8hQKvXuro1wIg==
-X-Google-Smtp-Source: ADFU+vtcAJSqioCL74PWMe4+exAAQ8pcb97mgj29M2SGW9VS/ozWzOE16xS/jRLVtUXXJzZ1AY1NTQ==
-X-Received: by 2002:a17:90a:ba17:: with SMTP id
- s23mr20241782pjr.162.1584899285930; 
- Sun, 22 Mar 2020 10:48:05 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=f6sHN97Z5k0H0NePRruYOF0pxNWEQGvMVIWCmlh8Qaw=;
+ b=OW0Vo40c93qPIk9v8d1JdbUfpb6+xeCj6p8UY3sS2umqHkU0tPlUp+/JlOn82Axa8H
+ GKapvL6Unohw4MzyESFO//590VNQK4i8msZOaYXAIKaZ1cKNOMc9xixT+YWLvAvCwW3Y
+ SfND94TfUuwh3VOuW6qLueFKvirCcjsgCzRab5LlUMY4a2LSr06jtQU+9yQMsGfDhRK7
+ QHJmT7UyVYUexGKr8bAaiusz4UboXSzZc7SelCNymFANR3DLIq6B6Y/DSQ6wF+Rb/j0X
+ XTs/sWZKNh5vZyhjcAwTht0gE1Kv3JGWhy8m9qEkmXeqT1VRx+bje5SIWIpG/PUEr3qc
+ kyPA==
+X-Gm-Message-State: ANhLgQ1ya9UJmMzhd801ddVBLrUIRXWeONE+eREbNKKXK6obe93+/He5
+ Np+QDitWULUyjNxIzdeRuRSgXpoGP6Bf0g==
+X-Google-Smtp-Source: ADFU+vtNKajIGzjlUJutSCCfnnl3TDtujJghpX55vdm0+ULF7j6DR4itYV6MqNThWDv3PDkZyrmYDA==
+X-Received: by 2002:a17:902:7c86:: with SMTP id
+ y6mr5714234pll.49.1584899291171; 
+ Sun, 22 Mar 2020 10:48:11 -0700 (PDT)
 Received: from localhost.localdomain (1-161-253-93.dynamic-ip.hinet.net.
  [1.161.253.93])
- by smtp.gmail.com with ESMTPSA id w19sm10460410pgm.27.2020.03.22.10.48.04
+ by smtp.gmail.com with ESMTPSA id w19sm10460410pgm.27.2020.03.22.10.48.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 22 Mar 2020 10:48:05 -0700 (PDT)
+ Sun, 22 Mar 2020 10:48:10 -0700 (PDT)
 From: Derek Su <jwsu1986@gmail.com>
 X-Google-Original-From: Derek Su <dereksu@qnap.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/1] COLO: Fix memory leak in packet_enqueue()
-Date: Mon, 23 Mar 2020 01:47:50 +0800
-Message-Id: <20200322174751.12559-1-dereksu@qnap.com>
+Subject: [PATCH v2 1/1] net/colo-compare.c: Fix memory leak in packet_enqueue()
+Date: Mon, 23 Mar 2020 01:47:51 +0800
+Message-Id: <20200322174751.12559-2-dereksu@qnap.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200322174751.12559-1-dereksu@qnap.com>
+References: <20200322174751.12559-1-dereksu@qnap.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::630
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,31 +98,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch is to fix the memory leak in packet_enqueue().
+The patch is to fix the "pkt" memory leak in packet_enqueue().
 The allocated "pkt" needs to be freed if the colo compare
-primary or secondary queue is too big to insert.
+primary or secondary queue is too big.
 
-Reproduce steps:
-(1) Setup PVM and SVM both with NIC e1000 by the steps descripted
-    in the wiki qemu/COLO
-(2) Run "iperf3 -s" in PVM
-(3) Run "iperfs -c <PVM-IP> -t 7200"
-
-The memory usage of qemu-system-x86_64 increases as the PVM's QMP 
-shows "qemu-system-x86_64: colo compare secondary queue size too big,
-drop packet".
-
-Please review, thanks.
-
-V2:
- - Fix incorrect patch format
-
-Derek Su (1):
-  net/colo-compare.c: Fix memory leak in packet_enqueue()
-
+Signed-off-by: Derek Su <dereksu@qnap.com>
+---
  net/colo-compare.c | 23 +++++++++++++++--------
  1 file changed, 15 insertions(+), 8 deletions(-)
 
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 7ee17f2cf8..cdd87b2aa8 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -120,6 +120,10 @@ enum {
+     SECONDARY_IN,
+ };
+ 
++static const char *colo_mode[] = {
++    [PRIMARY_IN] = "primary",
++    [SECONDARY_IN] = "secondary",
++};
+ 
+ static int compare_chr_send(CompareState *s,
+                             const uint8_t *buf,
+@@ -215,6 +219,7 @@ static int packet_enqueue(CompareState *s, int mode, Connection **con)
+     ConnectionKey key;
+     Packet *pkt = NULL;
+     Connection *conn;
++    int ret;
+ 
+     if (mode == PRIMARY_IN) {
+         pkt = packet_new(s->pri_rs.buf,
+@@ -243,16 +248,18 @@ static int packet_enqueue(CompareState *s, int mode, Connection **con)
+     }
+ 
+     if (mode == PRIMARY_IN) {
+-        if (!colo_insert_packet(&conn->primary_list, pkt, &conn->pack)) {
+-            error_report("colo compare primary queue size too big,"
+-                         "drop packet");
+-        }
++        ret = colo_insert_packet(&conn->primary_list, pkt, &conn->pack);
+     } else {
+-        if (!colo_insert_packet(&conn->secondary_list, pkt, &conn->sack)) {
+-            error_report("colo compare secondary queue size too big,"
+-                         "drop packet");
+-        }
++        ret = colo_insert_packet(&conn->secondary_list, pkt, &conn->sack);
+     }
++
++    if (!ret) {
++        error_report("colo compare %s queue size too big,"
++                     "drop packet", colo_mode[mode]);
++        packet_destroy(pkt, NULL);
++        pkt = NULL;
++    }
++
+     *con = conn;
+ 
+     return 0;
 -- 
 2.17.1
 
