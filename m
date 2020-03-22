@@ -7,80 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BF4C4332E
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFC6FC4332E
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:04:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 804AF2070A
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:02:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B72CE2070A
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Mar 2020 12:04:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXBm3uc8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 804AF2070A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9upL+om"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B72CE2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jFzJR-0001Zz-Ha
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:02:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44727)
+	id 1jFzKv-0003EV-PV
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 08:04:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jFzIA-0000Z5-NC
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1jFzI7-0000V9-6h
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jFzI9-0001S6-JL
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:22 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:21738)
+ (envelope-from <philmd@redhat.com>) id 1jFzI6-0001QB-5d
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:26486)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFzI9-0001Rr-F5
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:21 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jFzI6-0001Q5-2U
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 08:01:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584878481;
+ s=mimecast20190719; t=1584878477;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HR85THirGrRubaJXrP0zhSj5RRMPaILm65JYID0iOvI=;
- b=ZXBm3uc8QdmL5eCDQsa/0ewWwhg1MKL7NTSHJSqHaKqEptTv37cCp7NzVpgnQzIFtmiUR8
- xh7c6+5Q6uiFIaoaYZnTc2aluKb8A4AkReWyAWIRcMMwpDML8EaVXew499ThKj0n4QOC6X
- ipE+vo3hWD+7vspwgqMBCEfbM/e9JgI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-tOsFxJt6PU6QbiX29ndaCQ-1; Sun, 22 Mar 2020 08:01:18 -0400
-X-MC-Unique: tOsFxJt6PU6QbiX29ndaCQ-1
-Received: by mail-wr1-f70.google.com with SMTP id d17so5717058wrw.19
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 05:01:18 -0700 (PDT)
+ bh=64m8B2UB0OQtPH/xPaPLPPNVBYf+7O3z70ZNwLaWtY8=;
+ b=g9upL+omL+j4/fMk1w4hPlqIxPYYjgHJCCnBEGNpSUtsYnPwajQ+C+YndnWHIy6YW7PRfC
+ 0NdbJvb/ZIjgdPpLMtV1ndANOefBImYamgxjPhKzafVpnmN3CyycRe3HxPDZENEntJBeU/
+ 3Yihd8oNg7Ugxj6OLzoDLWmjKveMGz4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-b8Mh4N9VNval4RYMWhjGAQ-1; Sun, 22 Mar 2020 08:01:13 -0400
+X-MC-Unique: b8Mh4N9VNval4RYMWhjGAQ-1
+Received: by mail-wr1-f71.google.com with SMTP id w11so5708372wrp.20
+ for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 05:01:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=w5pIm6ZcNYKkaXeolWHSHFzKOmcIZRr6UxX1a0Co/a8=;
- b=jAOIOdZiiqZXmXyex9MOJzMmmSMIkh7y8Q3U9qVkXlGMVXDfYKOQzIomvEj1cI1Ij8
- qIw5RNkxO+W0LkWpUsrkMXQriG5SAxRcozq/3kjzIYmNmNjhLUTUaPOQSy+oHt7FNcmX
- p9aEsVvGFLypehc/kIHwoTwDOh+fYdbc1YDI6jk9BK7v1A56kEdx+lZ13iEUrUpKnjjm
- XTkeWmJ1GQ2bmvB2jYP+uNWWOMkAnNdiabg+NteoDI8aB2Lyd4E1A9Nyznklxrje/+6v
- HifiZnHAcL5WdDKiaPxyT5bTEhuAzbTnFEKc8QKlbWAFQQ6y9EUIQMplWNVFCr7N1NjH
- 9pHg==
-X-Gm-Message-State: ANhLgQ2eyC1ZjAhluYtnY4glX3FFFu2120FTgX3pfcr5sxfS5BheZCAz
- 5DWPjgTE8NuzujLKHVD7wkAHIVs2UF6+W1yJyR5KMIizb6/C53gSg1luyce9aeut4KsH7fDwHVn
- XyIxSLBIaxwUex+c=
-X-Received: by 2002:a7b:ca58:: with SMTP id m24mr20619594wml.76.1584878477360; 
- Sun, 22 Mar 2020 05:01:17 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvHHhKTVeB4/FC2oDQESykw12HsVKj1Fl/48e/n10oaew3smarRU8mTPNTxV8G0mG7wi2430g==
-X-Received: by 2002:a7b:ca58:: with SMTP id m24mr20619573wml.76.1584878477046; 
- Sun, 22 Mar 2020 05:01:17 -0700 (PDT)
+ bh=Fs7lcEzn6cPhH2KxpoF9rs1jMY7joUqJZjQQkVjATH4=;
+ b=k3Dvm81T74OlxSIZYZKSiEjHAVy1k7VCUdGScSo9juTdPoRCZ14b7Me4BM69zGZ/7+
+ whKp1cpVXO8vDOgr9Ag2u69MaVukpCN6ecMHBinq2ewFquLW3bv3fIfgQOe8G+no3CIj
+ WYSiL6HmCDlbdiPyJTl/X3aC4gAIGGp/AQeQzVTSq50sWAOz4x1hc4FHhfZy2+kkrpiP
+ 18WSepv0IbJVYfegJttPhOft8sFxJdne8CUQJZaiViWizdKtiHC/JCtbHHyHi6ebcYxZ
+ h58M3l98G1zMraqVUTTdtLgkSaZnQEh9/wvdptCe7DIOfr2cFon/TxvYykBAPjvxpI67
+ 5x+A==
+X-Gm-Message-State: ANhLgQ3anodZwcaMjudC2ZiuYKD1/l2mn1P3BgxvJZr0CsatZl7aDKvL
+ yshxUGmHZ3yP7YjjLjQhw/dWlbing9FWmMU4dtOgbA14YK0k6uykRa6b221wzf8clZw1y6Rn/nU
+ vFTJXSe6YjU3+OH8=
+X-Received: by 2002:a05:600c:286:: with SMTP id
+ 6mr21774706wmk.56.1584878472396; 
+ Sun, 22 Mar 2020 05:01:12 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsoI+SEbtgLQD0x06tR8tKC6SLXumVTaig0LwrWcvwkgrUuJnZp1uj/xk6WsiEfTyyvi+4bLA==
+X-Received: by 2002:a05:600c:286:: with SMTP id
+ 6mr21774693wmk.56.1584878472208; 
+ Sun, 22 Mar 2020 05:01:12 -0700 (PDT)
 Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id f10sm18211949wrw.96.2020.03.22.05.01.16
+ by smtp.gmail.com with ESMTPSA id b80sm17430663wme.24.2020.03.22.05.01.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 22 Mar 2020 05:01:16 -0700 (PDT)
+ Sun, 22 Mar 2020 05:01:11 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 v2 2/4] tests/docker: Install gcrypt devel package in
- Debian image
-Date: Sun, 22 Mar 2020 13:01:02 +0100
-Message-Id: <20200322120104.21267-3-philmd@redhat.com>
+Subject: [PATCH-for-5.0 v2 1/4] tests/docker: Keep package list sorted
+Date: Sun, 22 Mar 2020 13:01:01 +0100
+Message-Id: <20200322120104.21267-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200322120104.21267-1-philmd@redhat.com>
 References: <20200322120104.21267-1-philmd@redhat.com>
@@ -91,7 +92,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,42 +112,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In commit 6f8bbb374be we enabled building with the gcrypt library
-on the the Debian 'x86 host', which was based on Debian Stretch.
-Later in commit 698a71edbed we upgraded the Debian base image to
-Buster.
+Keep package list sorted, this eases rebase/cherry-pick.
 
-Apparently Debian Stretch was listing gcrypt as a QEMU dependency,
-but this is not the case anymore in Buster, so we need to install
-it manually (it it not listed by 'apt-get -s build-dep qemu' in
-the common debian10.docker anymore). This fixes:
-
- $ ../configure $QEMU_CONFIGURE_OPTS
-
-  ERROR: User requested feature gcrypt
-         configure was not able to find it.
-         Install gcrypt devel >=3D 1.5.0
-
+Fixes: 3a6784813
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: Reword description, do not use 'Fixes:' tag (Aleksandar)
----
- tests/docker/dockerfiles/debian-amd64.docker | 1 +
- 1 file changed, 1 insertion(+)
+ tests/docker/dockerfiles/centos7.docker | 6 ++++--
+ tests/docker/dockerfiles/fedora.docker  | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/do=
-ckerfiles/debian-amd64.docker
-index d4849f509f..957f0bc2e7 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -16,6 +16,7 @@ RUN apt update && \
-     apt install -y --no-install-recommends \
-         libbz2-dev \
-         liblzo2-dev \
-+        libgcrypt20-dev \
-         librdmacm-dev \
-         libsasl2-dev \
-         libsnappy-dev \
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerf=
+iles/centos7.docker
+index cdd72de7eb..9a2a2e515d 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -2,6 +2,8 @@ FROM centos:7
+ RUN yum install -y epel-release centos-release-xen-48
+=20
+ RUN yum -y update
++
++# Please keep this list sorted alphabetically
+ ENV PACKAGES \
+     bison \
+     bzip2 \
+@@ -19,6 +21,7 @@ ENV PACKAGES \
+     libepoxy-devel \
+     libfdt-devel \
+     librdmacm-devel \
++    libzstd-devel \
+     lzo-devel \
+     make \
+     mesa-libEGL-devel \
+@@ -33,7 +36,6 @@ ENV PACKAGES \
+     tar \
+     vte-devel \
+     xen-devel \
+-    zlib-devel \
+-    libzstd-devel
++    zlib-devel
+ RUN yum install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfi=
+les/fedora.docker
+index a6522228c0..019eb12dcb 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -1,4 +1,6 @@
+ FROM fedora:30
++
++# Please keep this list sorted alphabetically
+ ENV PACKAGES \
+     bc \
+     bison \
+@@ -38,6 +40,7 @@ ENV PACKAGES \
+     libubsan \
+     libusbx-devel \
+     libxml2-devel \
++    libzstd-devel \
+     llvm \
+     lzo-devel \
+     make \
+@@ -92,8 +95,7 @@ ENV PACKAGES \
+     vte291-devel \
+     which \
+     xen-devel \
+-    zlib-devel \
+-    libzstd-devel
++    zlib-devel
+ ENV QEMU_CONFIGURE_OPTS --python=3D/usr/bin/python3
+=20
+ RUN dnf install -y $PACKAGES
 --=20
 2.21.1
 
