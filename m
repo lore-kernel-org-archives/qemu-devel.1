@@ -2,67 +2,62 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEB7C4332E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 19:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB981C4332E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 19:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 343662073C
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 19:40:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 343662073C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B659B2070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 19:45:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="k0waLvH9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B659B2070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGSwB-0005n6-8M
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 15:40:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47460)
+	id 1jGT1J-0000s0-UZ
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 15:45:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48355)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jGSvY-0005EX-Gj
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:40:01 -0400
+ (envelope-from <berto@igalia.com>) id 1jGT0G-0008FH-He
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:44:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jGSvW-0001Af-Ep
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:40:00 -0400
-Resent-Date: Mon, 23 Mar 2020 15:40:00 -0400
-Resent-Message-Id: <E1jGSvW-0001Af-Ep@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21141)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jGSvW-0001A5-78; Mon, 23 Mar 2020 15:39:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584992388; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Smk4mDWKaKyDKqXZQOR0vaxYZ8gdZxS0o/0GBAFipSreGA9nYGImmY6jPIgoxvLUjqReYgyTAIuOdTcCpUv/H0n/UtZ7xygoFdd4MmrMGFnMU5jgbNo4dcZs2cdfI6iEh9OWfYIBcwVdSO972YKI3IIhGvfYF27lC2W74IpxGuM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584992388;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=1b/ZWqEbKQh1wWyq2RdBFWNssRbgtdKRcnNim3lZeq8=; 
- b=Fk2sSrOVLJjv/dmeAx/SNiaQbrpZe7B+UVUCZmie9X3sGYmapGcABBl3pv2NiErZ5OluHRQfo4ltxJbkRcHtiNsjEYQ/KZ8NFbFENrEB5067nijm+vmJTySPrIEThIEYPFkLw/YZFHvRuvjdI73qCiz4UGSE3tmEtW7S0d1Dp78=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 158499238385560.67236955972862;
- Mon, 23 Mar 2020 12:39:43 -0700 (PDT)
-In-Reply-To: <20200319131921.2367-1-frankja@linux.ibm.com>
-Subject: Re: [PATCH v11 00/16] s390x: Protected Virtualization support
-Message-ID: <158499238242.8863.16290762018805329885@39012742ff91>
+ (envelope-from <berto@igalia.com>) id 1jGT0D-00032h-GH
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:44:51 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:57829)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jGT0C-00030M-Qo; Mon, 23 Mar 2020 15:44:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
+ bh=Fvd2Yeca7+eLaerH3b0g1IeaFvn1PlHDtSwgvTxdWC4=; 
+ b=k0waLvH9QcMooC6/DgJ+IaRgE9uccdWgXs21iBrtF+mHjZ2ozf7ViP8xLGi9NJlE0KMbb98VDpbWFrL/JhoxyCe3EXRI8PAk8pl5jQ6soaqN51nyDlbMtSkIi7i3F4/TtAEd/CupjIHZXrnc+EdkYOEh3oMvd+zqhh1Fb4j0rnceiIiTTH5Qb7YZVnsFO3RtU/IzPpelFmkAwlq63Aunx3d+LcoUJ3cAr4mxIzUzl2MDZWZ0A0GcjQ+4AMrz9nVM1+8/KEy+t6/a+l1bWGEjcvJgLbOc5tlnyNmBsHHQpdli+pXoYxj/SG9qMzTjOVu4o7Ke9psRbM49h8pyn00OuQ==;
+Received: from static.113.35.0.81.ibercom.com ([81.0.35.113]
+ helo=perseus.local) by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1jGT08-0002le-6M; Mon, 23 Mar 2020 20:44:44 +0100
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1jGSzv-0000ST-9W; Mon, 23 Mar 2020 20:44:31 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qcow2: Forbid discard in qcow2 v2 images with backing files
+Date: Mon, 23 Mar 2020 20:44:29 +0100
+Message-Id: <20200323194429.1717-1-berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: frankja@linux.ibm.com
-Date: Mon, 23 Mar 2020 12:39:43 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,91 +69,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- qemu-devel@nongnu.org, david@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxOTEzMTkyMS4yMzY3
-LTEtZnJhbmtqYUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjExIDAwLzE2XSBzMzkweDogUHJvdGVjdGVk
-IFZpcnR1YWxpemF0aW9uIHN1cHBvcnQKTWVzc2FnZS1pZDogMjAyMDAzMTkxMzE5MjEuMjM2Ny0x
-LWZyYW5ramFAbGludXguaWJtLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
-dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzQ5NmNkMCBzMzkweDog
-QWRkIHVucGFjayBmYWNpbGl0eSBmZWF0dXJlIHRvIEdBMQowM2Q0MGMxIGRvY3M6IHN5c3RlbTog
-QWRkIHByb3R2aXJ0IGRvY3MKNGY3NGUyYSBzMzkweDogcHJvdHZpcnQ6IEhhbmRsZSBTSUdQIHN0
-b3JlIHN0YXR1cyBjb3JyZWN0bHkKMjQzZTY4MSBzMzkweDogcHJvdHZpcnQ6IE1vdmUgSU8gY29u
-dHJvbCBzdHJ1Y3R1cmVzIG92ZXIgU0lEQQowNWFhMmEyIHMzOTB4OiBwcm90dmlydDogRGlzYWJs
-ZSBhZGRyZXNzIGNoZWNrcyBmb3IgUFYgZ3Vlc3QgSU8gZW11bGF0aW9uCjk0MzAwNTkgczM5MHg6
-IHByb3R2aXJ0OiBNb3ZlIGRpYWcgMzA4IGRhdGEgb3ZlciBTSURBCmNhN2UxNTAgczM5MHg6IHBy
-b3R2aXJ0OiBTZXQgZ3Vlc3QgSVBMIFBTVwo3MjE0ZWNkIHMzOTB4OiBwcm90dmlydDogU0NMUCBp
-bnRlcnByZXRhdGlvbgo2MDg0ZmEwIHMzOTB4OiBwcm90dmlydDogTW92ZSBTVFNJIGRhdGEgb3Zl
-ciBTSURBRAoxMmEyODQ4IHMzOTB4OiBBZGQgU0lEQSBtZW1vcnkgb3BzCmYwNTFjNWEgczM5MHg6
-IHByb3R2aXJ0OiBLVk0gaW50ZXJjZXB0IGNoYW5nZXMKNGExMzE5MSBzMzkweDogcHJvdHZpcnQ6
-IEluaGliaXQgYmFsbG9vbiB3aGVuIHN3aXRjaGluZyB0byBwcm90ZWN0ZWQgbW9kZQpkMWFmYTM5
-IHMzOTB4OiBwcm90dmlydDogQWRkIG1pZ3JhdGlvbiBibG9ja2VyCjJiNzlmMGUgczM5MHg6IHBy
-b3R2aXJ0OiBTdXBwb3J0IHVucGFjayBmYWNpbGl0eQpjZGRjMTU1IFN5bmMgcHYKNDgxYzY0ZiBz
-MzkweDogTW92ZSBkaWFnbm9zZSAzMDggc3ViY29kZXMgYW5kIHJjcyBpbnRvIGlwbC5oCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQoxLzE2IENoZWNraW5nIGNvbW1pdCA0ODFjNjRmMjUxYTAgKHMzOTB4
-OiBNb3ZlIGRpYWdub3NlIDMwOCBzdWJjb2RlcyBhbmQgcmNzIGludG8gaXBsLmgpCjIvMTYgQ2hl
-Y2tpbmcgY29tbWl0IGNkZGMxNTU3NWIwOSAoU3luYyBwdikKMy8xNiBDaGVja2luZyBjb21taXQg
-MmI3OWYwZTQ0ZGM3IChzMzkweDogcHJvdHZpcnQ6IFN1cHBvcnQgdW5wYWNrIGZhY2lsaXR5KQpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiMzMjY6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY2NDogRklMRTogaW5jbHVkZS9ody9zMzkweC9wdi5oOjQ4
-Ogorc3RhdGljIGlubGluZSBpbnQgczM5MF9wdl9zZXRfc2VjX3Bhcm1zKHVpbnQ2NF90IG9yaWdp
-biwgdWludDY0X3QgbGVuZ3RoKSB7IHJldHVybiAwOyB9CgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzY2NTogRklMRTogaW5jbHVkZS9ody9zMzkweC9wdi5oOjQ5Ogorc3RhdGljIGlu
-bGluZSBpbnQgczM5MF9wdl91bnBhY2sodWludDY0X3QgYWRkciwgdWludDY0X3Qgc2l6ZSwgdWlu
-dDY0X3QgdHdlYWspIHsgcmV0dXJuIDA7IH0KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM3NjU6IEZJTEU6IHRhcmdldC9zMzkweC9kaWFnLmM6MTIyOgorICAgICAgICB2YWxpZCA9
-IHN1YmNvZGUgPT0gRElBRzMwOF9QVl9TRVQgPyBpcGxiX3ZhbGlkX3B2KGlwbGIpIDogaXBsYl92
-YWxpZChpcGxiKTsKCnRvdGFsOiAxIGVycm9ycywgMyB3YXJuaW5ncywgNzMxIGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDMvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTYgQ2hlY2tpbmcg
-Y29tbWl0IGQxYWZhMzllYmY1MyAoczM5MHg6IHByb3R2aXJ0OiBBZGQgbWlncmF0aW9uIGJsb2Nr
-ZXIpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IDRhMTMxOTFiMTU1MSAoczM5MHg6IHByb3R2aXJ0OiBJ
-bmhpYml0IGJhbGxvb24gd2hlbiBzd2l0Y2hpbmcgdG8gcHJvdGVjdGVkIG1vZGUpCjYvMTYgQ2hl
-Y2tpbmcgY29tbWl0IGYwNTFjNWE2MTE4ZiAoczM5MHg6IHByb3R2aXJ0OiBLVk0gaW50ZXJjZXB0
-IGNoYW5nZXMpCkVSUk9SOiBzd2l0Y2ggYW5kIGNhc2Ugc2hvdWxkIGJlIGF0IHRoZSBzYW1lIGlu
-ZGVudAojNTA6IEZJTEU6IHRhcmdldC9zMzkweC9rdm0uYzoxNzAxOgogICAgIHN3aXRjaCAoaWNw
-dF9jb2RlKSB7ClsuLi5dCisgICAgICAgIGNhc2UgSUNQVF9QVl9JTlNUUjoKKyAgICAgICAgY2Fz
-ZSBJQ1BUX1BWX0lOU1RSX05PVElGSUNBVElPTjoKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKNy8xNiBDaGVja2luZyBjb21taXQgMTJhMjg0ODI3MDY2IChzMzkweDogQWRkIFNJREEgbWVt
-b3J5IG9wcykKOC8xNiBDaGVja2luZyBjb21taXQgNjA4NGZhMDgxNDU0IChzMzkweDogcHJvdHZp
-cnQ6IE1vdmUgU1RTSSBkYXRhIG92ZXIgU0lEQUQpCjkvMTYgQ2hlY2tpbmcgY29tbWl0IDcyMTRl
-Y2RlMjYyMyAoczM5MHg6IHByb3R2aXJ0OiBTQ0xQIGludGVycHJldGF0aW9uKQoxMC8xNiBDaGVj
-a2luZyBjb21taXQgY2E3ZTE1MDMxM2M5IChzMzkweDogcHJvdHZpcnQ6IFNldCBndWVzdCBJUEwg
-UFNXKQoxMS8xNiBDaGVja2luZyBjb21taXQgOTQzMDA1OTdiY2Y5IChzMzkweDogcHJvdHZpcnQ6
-IE1vdmUgZGlhZyAzMDggZGF0YSBvdmVyIFNJREEpCjEyLzE2IENoZWNraW5nIGNvbW1pdCAwNWFh
-MmEyYzc0Y2EgKHMzOTB4OiBwcm90dmlydDogRGlzYWJsZSBhZGRyZXNzIGNoZWNrcyBmb3IgUFYg
-Z3Vlc3QgSU8gZW11bGF0aW9uKQoxMy8xNiBDaGVja2luZyBjb21taXQgMjQzZTY4MWNkYTcxIChz
-MzkweDogcHJvdHZpcnQ6IE1vdmUgSU8gY29udHJvbCBzdHJ1Y3R1cmVzIG92ZXIgU0lEQSkKMTQv
-MTYgQ2hlY2tpbmcgY29tbWl0IDRmNzRlMmFmZGI2MCAoczM5MHg6IHByb3R2aXJ0OiBIYW5kbGUg
-U0lHUCBzdG9yZSBzdGF0dXMgY29ycmVjdGx5KQoxNS8xNiBDaGVja2luZyBjb21taXQgMDNkNDBj
-MTg4NWZjIChkb2NzOiBzeXN0ZW06IEFkZCBwcm90dmlydCBkb2NzKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDY4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE1LzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjE2LzE2IENoZWNraW5nIGNvbW1pdCAzNDk2Y2QwNWFiOGEgKHMzOTB4OiBBZGQgdW5wYWNrIGZh
-Y2lsaXR5IGZlYXR1cmUgdG8gR0ExKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMxOTEzMTkyMS4yMzY3LTEtZnJhbmtqYUBsaW51eC5pYm0u
-Y29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+A discard request deallocates the selected clusters so they read back
+as zeroes. This is done by clearing the cluster offset field and
+setting QCOW_OFLAG_ZERO in the L2 entry.
+
+This flag is however only supported when qcow_version >= 3. In older
+images the cluster is simply deallocated, exposing any possible stale
+data from the backing file.
+
+Since discard is an advisory operation it's safer to simply forbid it
+in this scenario.
+
+Note that we are adding this check to qcow2_co_pdiscard() and not to
+qcow2_cluster_discard() or discard_in_l2_slice() because the last
+two are also used by qcow2_snapshot_create() to discard the clusters
+used by the VM state. In this case there's no risk of exposing stale
+data to the guest and we really want that the clusters are always
+discarded.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2.c              |  6 +++
+ tests/qemu-iotests/060     |  5 ++-
+ tests/qemu-iotests/060.out |  2 -
+ tests/qemu-iotests/289     | 90 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/289.out | 52 ++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 6 files changed, 152 insertions(+), 4 deletions(-)
+ create mode 100755 tests/qemu-iotests/289
+ create mode 100644 tests/qemu-iotests/289.out
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index d44b45633d..7bb7e392e1 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3763,6 +3763,12 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
+     int ret;
+     BDRVQcow2State *s = bs->opaque;
+ 
++    /* If the image does not support QCOW_OFLAG_ZERO then discarding
++     * clusters could expose stale data from the backing file. */
++    if (s->qcow_version < 3 && bs->backing) {
++        return -ENOTSUP;
++    }
++
+     if (!QEMU_IS_ALIGNED(offset | bytes, s->cluster_size)) {
+         assert(bytes < s->cluster_size);
+         /* Ignore partial clusters, except for the special case of the
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 043f12904a..4a4fdfb1e1 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -167,9 +167,10 @@ _make_test_img -o 'compat=0.10' -b "$BACKING_IMG" 1G
+ # Write two clusters, the second one enforces creation of an L2 table after
+ # the first data cluster.
+ $QEMU_IO -c 'write 0k 64k' -c 'write 512M 64k' "$TEST_IMG" | _filter_qemu_io
+-# Discard the first cluster. This cluster will soon enough be reallocated and
++# Free the first cluster. This cluster will soon enough be reallocated and
+ # used for COW.
+-$QEMU_IO -c 'discard 0k 64k' "$TEST_IMG" | _filter_qemu_io
++poke_file "$TEST_IMG" '262144' "\x00\x00\x00\x00\x00\x00\x00\x00" # 0x40000 - L2 entry
++poke_file "$TEST_IMG" '131082' "\x00\x00" # 0x2000a - Refcount entry
+ # Now, corrupt the image by marking the second L2 table cluster as free.
+ poke_file "$TEST_IMG" '131084' "\x00\x00" # 0x2000c
+ # Start a write operation requiring COW on the image stopping it right before
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index d27692a33c..09caaea865 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -105,8 +105,6 @@ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 65536/65536 bytes at offset 536870912
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-discard 65536/65536 bytes at offset 0
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qcow2: Marking image as corrupt: Preventing invalid write on metadata (overlaps with active L2 table); further corruption events will be suppressed
+ blkdebug: Suspended request '0'
+ write failed: Input/output error
+diff --git a/tests/qemu-iotests/289 b/tests/qemu-iotests/289
+new file mode 100755
+index 0000000000..13b4984721
+--- /dev/null
++++ b/tests/qemu-iotests/289
+@@ -0,0 +1,90 @@
++#!/usr/bin/env bash
++#
++# Test how 'qemu-io -c discard' behaves on v2 and v3 qcow2 images
++#
++# Copyright (C) 2020 Igalia, S.L.
++# Author: Alberto Garcia <berto@igalia.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berto@igalia.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++status=1    # failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f "$TEST_IMG.backing"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++echo
++echo "### Test 'qemu-io -c discard' on a QCOW2 image without a backing file"
++echo
++for qcow2_compat in 0.10 1.1; do
++    echo "# Create an image with compat=$qcow2_compat without a backing file"
++    _make_test_img -o "compat=$qcow2_compat" 128k
++
++    echo "# Fill all clusters with data and then discard them"
++    $QEMU_IO -c 'write -P 0x01 0 128k' "$TEST_IMG" | _filter_qemu_io
++    $QEMU_IO -c 'discard 0 128k' "$TEST_IMG" | _filter_qemu_io
++
++    echo "# Read the data from the discarded clusters"
++    $QEMU_IO -c 'read -P 0x00 0 128k' "$TEST_IMG" | _filter_qemu_io
++done
++
++echo
++echo "### Test 'qemu-io -c discard' on a QCOW2 image with a backing file"
++echo
++
++echo "# Create a backing image and fill it with data"
++TEST_IMG="$TEST_IMG.backing" _make_test_img 128k
++$QEMU_IO -c 'write -P 0xff 0 128k' "$TEST_IMG.backing" | _filter_qemu_io
++
++for qcow2_compat in 0.10 1.1; do
++    echo "# Create an image with compat=$qcow2_compat and a backing file"
++    _make_test_img -o "compat=$qcow2_compat" -b "$TEST_IMG.backing"
++
++    echo "# Fill all clusters with data and then discard them"
++    $QEMU_IO -c 'write -P 0x01 0 128k' "$TEST_IMG" | _filter_qemu_io
++    $QEMU_IO -c 'discard 0 128k' "$TEST_IMG" | _filter_qemu_io
++
++    echo "# Read the data from the discarded clusters"
++    if [ "$qcow2_compat" = "1.1" ]; then
++        # In qcow2 v3 clusters are zeroed (with QCOW_OFLAG_ZERO)
++        $QEMU_IO -c 'read -P 0x00 0 128k' "$TEST_IMG" | _filter_qemu_io
++    else
++        # In qcow2 v2 if there's a backing image we cannot zero the clusters
++        # without exposing the backing file data so discard does nothing
++        $QEMU_IO -c 'read -P 0x01 0 128k' "$TEST_IMG" | _filter_qemu_io
++    fi
++done
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/289.out b/tests/qemu-iotests/289.out
+new file mode 100644
+index 0000000000..dcd82c6d07
+--- /dev/null
++++ b/tests/qemu-iotests/289.out
+@@ -0,0 +1,52 @@
++QA output created by 289
++
++### Test 'qemu-io -c discard' on a QCOW2 image without a backing file
++
++# Create an image with compat=0.10 without a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Create an image with compat=1.1 without a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++### Test 'qemu-io -c discard' on a QCOW2 image with a backing file
++
++# Create a backing image and fill it with data
++Formatting 'TEST_DIR/t.IMGFMT.backing', fmt=IMGFMT size=131072
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Create an image with compat=0.10 and a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.backing
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Create an image with compat=1.1 and a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.backing
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index ec2b2302e5..891b3ce858 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -295,3 +295,4 @@
+ 284 rw
+ 286 rw quick
+ 288 quick
++289 rw auto quick
+-- 
+2.20.1
+
 
