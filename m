@@ -2,120 +2,77 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A019AC4332E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87EC2C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:36:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D2952072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DE9D2073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:36:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="e8WhmZSx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D2952072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avOP2qeb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DE9D2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGMEx-0005F7-8v
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 08:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50659)
+	id 1jGMJF-0006w9-62
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 08:36:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jGMDs-0004TT-VT
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:30:30 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jGMIZ-0006PT-A8
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jGMDr-0001bD-Ey
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:30:28 -0400
-Received: from mail-eopbgr40092.outbound.protection.outlook.com
- ([40.107.4.92]:62215 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jGMDm-0001Xd-Ke; Mon, 23 Mar 2020 08:30:24 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LfRpdCvqvchJuLdwW8QCR/x72ot1+ffzmQHuVjVAzhbHHdiiVqXMQ+lQAynsrdEt/hHDrqZpCto54YUkh2liu6rfDiFxZoZFsTcaVMsrgCWRNnt9M5QVisODOCEc2+++armIamaw8QLvKoTBG6RXZ3QfQt5y88vgcmx3ChbQsUwzST1+caBqImgFs0cCb5OdWBDuu3I514a0Wd5V7UhL6FnZmTr4b8TlGO237RKcqZbBDOuaaMxCyk+QNNW0fUQNsXZB8HZgH5Jo2HtOk4YKlsTG8kRDaUSbhZk33YOJdHqHqySaMCyj6mkG/viEpP/IEEnpPbAove7YIqS5BZNktw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FolWKZtU2Hbs5IXuF50jC6ThkF8wBaBxK8nhe53tcF8=;
- b=ZA7e2EQY5VH2KmnYxc+HohjKKxojwZkli2PaK944RzEQ5C4gDziFSJ3xjlElsPRmTGkQzg/g/sfp2JwsDPtKvpobZwEh6PoIbeNj3DAE4vvs0yC3IHkPSSSUfZE+UF3yCrhrfhb4VYqZsJ7RCKykvGsCCfA4GBdtEHWyrp9jmTL6LC/d7hekzTy3ZBpk8fxNdXadL9ksXaEG2qmyRlltA8DbXr5A2KnTmzwTIxpNcurWL7yDqNZnMdKlridJS0Sx0Vl5YRubDcQu6Ynl1pY96xnWrFJElvbCPKM2H53vbM0SNO9NPs/RvigQAYBMuXuebN57wyg6tdZIQK8PjBG/iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FolWKZtU2Hbs5IXuF50jC6ThkF8wBaBxK8nhe53tcF8=;
- b=e8WhmZSxNivZwkLmyR7HfFksX1IrurawhNNx7VX2wdcgE1pOYxSK9aU/2GNpzwKt5Y6PFNY9oodoeTi3/wOlwj/Sf99pKGj/Yn2pcEXDqfqv8Y9sUr++ZIniREjEk27wS0K7PK32kgAUSnW4eS4/lpLfvvXrICE5SsErvrxgyKg=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=dplotnikov@virtuozzo.com; 
-Received: from VI1PR08MB3760.eurprd08.prod.outlook.com (20.178.80.91) by
- VI1PR08MB3277.eurprd08.prod.outlook.com (52.134.31.158) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2835.18; Mon, 23 Mar 2020 12:30:18 +0000
-Received: from VI1PR08MB3760.eurprd08.prod.outlook.com
- ([fe80::acf5:3103:8e4d:af20]) by VI1PR08MB3760.eurprd08.prod.outlook.com
- ([fe80::acf5:3103:8e4d:af20%7]) with mapi id 15.20.2835.021; Mon, 23 Mar 2020
- 12:30:18 +0000
-Subject: Re: [PATCH v8 1/4] qcow2: introduce compression type feature
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200321143431.19629-1-dplotnikov@virtuozzo.com>
- <20200321143431.19629-2-dplotnikov@virtuozzo.com>
- <401c0627-a7ad-3434-a861-69f4a5d58d21@virtuozzo.com>
- <ea557760-b2a5-db20-cb48-fa94a4a2d1e9@virtuozzo.com>
- <b263d14d-b667-898f-8757-f9363d126c29@virtuozzo.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <274152bd-10ea-ded3-7427-50861b4585a9@virtuozzo.com>
-Date: Mon, 23 Mar 2020 15:30:14 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <b263d14d-b667-898f-8757-f9363d126c29@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-ClientProxiedBy: HE1PR0301CA0013.eurprd03.prod.outlook.com
- (2603:10a6:3:76::23) To VI1PR08MB3760.eurprd08.prod.outlook.com
- (2603:10a6:803:c1::27)
+ (envelope-from <imammedo@redhat.com>) id 1jGMIX-0003Xh-FO
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:35:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:52156)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jGMIX-0003XO-B2
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:35:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584966916;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/GJC9N4gq0co+skicPzvDbjxLzrHi9LuPkxH3vicEDs=;
+ b=avOP2qebK2QFkQ3Y7ZyAhKekgWMUvafxxJatWwSdrMwgRGuwp7kDNGPQIqf0EmozCoVe9/
+ rT3wQeP35HlUA+0A2ZUF7mVJg5ZT1kdM7LzR5XEO0dZ5ZmW2Vkx58VzzLyS6D7qBhZbc7B
+ CDZkmMN6mh/hSaapRG2fFinVPAAOpKQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-nDv4TMR-Oz6ZyhvZcDfrkA-1; Mon, 23 Mar 2020 08:35:10 -0400
+X-MC-Unique: nDv4TMR-Oz6ZyhvZcDfrkA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCEC9DB60;
+ Mon, 23 Mar 2020 12:35:05 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AC427E325;
+ Mon, 23 Mar 2020 12:34:51 +0000 (UTC)
+Date: Mon, 23 Mar 2020 13:34:50 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v3 02/10] fw_cfg: Migrate ACPI table mr sizes separately
+Message-ID: <20200323133450.6fa65992@redhat.com>
+In-Reply-To: <20200311172014.33052-3-shameerali.kolothum.thodi@huawei.com>
+References: <20200311172014.33052-1-shameerali.kolothum.thodi@huawei.com>
+ <20200311172014.33052-3-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.64] (94.255.82.30) by
- HE1PR0301CA0013.eurprd03.prod.outlook.com (2603:10a6:3:76::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2835.18 via Frontend Transport; Mon, 23 Mar 2020 12:30:17 +0000
-X-Originating-IP: [94.255.82.30]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2b6c7f69-fe11-4001-cd02-08d7cf25f22b
-X-MS-TrafficTypeDiagnostic: VI1PR08MB3277:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR08MB3277E41AB3719B9F407769D1CFF00@VI1PR08MB3277.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-Forefront-PRVS: 0351D213B3
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(396003)(39840400004)(376002)(136003)(366004)(346002)(199004)(86362001)(52116002)(186003)(6666004)(53546011)(2906002)(26005)(16526019)(36756003)(8936002)(6486002)(5660300002)(31696002)(66946007)(31686004)(8676002)(66556008)(81166006)(81156014)(66476007)(316002)(956004)(4326008)(478600001)(16576012)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3277;
- H:VI1PR08MB3760.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qPg6lY6IK4ZCikktoo/oPAlb5Icm1kSjH5EC4iDcEyfmFrpUzBA09Srv9DwJY4NDmNh6kRMXbNm9sdJXnBwOWM1rTc7FNE1ulJ41K0n74NxqMInmy+r0rIGeTnhmu8IDlOljPzZOmlkno3NVHPfaomKoQNHax18KZUAG8JaPmnLzAxX/iA2YsR5e+6VM+LPbnpQRfc3XEHnxXQQmiY8+FHoGATw5ZXc1sVUZ7yH7s+ZYfFQt//gQtcqf6IQg6ye9bMBO9Ged0xxzxMyzHtq85ZuEScTpyg13Zk4LQbObwC1ExXqbgJ8UJwic4/76ou0gsAsTxoKThxOLH0740z+TDQSQ9tVZWIbObMqu6dZUELU85kaTF2S04QFGW28cAMazDZ+qFwmX+VbuAAFPqxh790Pvi+X38fGH3mxDSXCp6QCdb3ClOv+gxv1LhdmfPaVA
-X-MS-Exchange-AntiSpam-MessageData: Rq72eRAX8ZCwyvg3lw3rcnvbgPQ4O09R0FaPvwK4wZu0u3Lclr+Hw57hFQ7gJqYQBmvodmsB7qHPVQCGNwoZ2vXRaaDhKjVsKFK4JE5FrpcgdZW+rtRg4K9xmwocKw84baoa8F2dS+1oaX0LlyWeiw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b6c7f69-fe11-4001-cd02-08d7cf25f22b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2020 12:30:18.1310 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KTzFxMNmVjBIEgwMw3AFfnK3gbxZy/sTItNhcN4nkgYI5PKtpalVFYQ8fa3qpTJfDTS5FxSEPConBfL6BihRd1zLqAsGAVspUmYHsickrJ8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3277
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.4.92
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,182 +84,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, david@redhat.com,
+ shannon.zhaosl@gmail.com, mst@redhat.com, qemu-devel@nongnu.org,
+ xuwei5@hisilicon.com, linuxarm@huawei.com, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 11 Mar 2020 17:20:06 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
+> Any sub-page size update to ACPI table MRs will be lost during
+> migration, as we use aligned size in ram_load_precopy() ->
+> qemu_ram_resize() path. This will result in inconsistency in sizes
+> between source and destination.
+I'm not sure what problem is and if it matters in case of migration,
+an example here with numbers from affected acpi blob would be useful here.
 
-On 23.03.2020 15:26, Vladimir Sementsov-Ogievskiy wrote:
-> 23.03.2020 15:22, Denis Plotnikov wrote:
->>
->>
->> On 23.03.2020 11:00, Vladimir Sementsov-Ogievskiy wrote:
->>> 21.03.2020 17:34, Denis Plotnikov wrote:
->>>> The patch adds some preparation parts for incompatible compression=20
->>>> type
->>>> feature to qcow2 allowing the use different compression methods for
->>>> image clusters (de)compressing.
->>>>
->>>> It is implied that the compression type is set on the image=20
->>>> creation and
->>>> can be changed only later by image conversion, thus compression type
->>>> defines the only compression algorithm used for the image, and thus,
->>>> for all image clusters.
->>>>
->>>> The goal of the feature is to add support of other compression methods
->>>> to qcow2. For example, ZSTD which is more effective on compression=20
->>>> than ZLIB.
->>>>
->>>> The default compression is ZLIB. Images created with ZLIB=20
->>>> compression type
->>>> are backward compatible with older qemu versions.
->>>>
->>>> Adding of the compression type breaks a number of tests because now=20
->>>> the
->>>> compression type is reported on image creation and there are some=20
->>>> changes
->>>> in the qcow2 header in size and offsets.
->>>>
->>>> The tests are fixed in the following ways:
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 * filter out compression_type for many tests
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 * fix header size, feature table size and bac=
-king file offset
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 affected tests: 031, 036, 061, 08=
-0
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 header_size +=3D8: 1 byte compres=
-sion type
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 7 byt=
-es padding
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 feature_table +=3D 48: incompatib=
-le feature compression type
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 backing_file_offset +=3D 56 (8 + =
-48 -> header_change +=20
->>>> feature_table_change)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 * add "compression type" for test output matc=
-hing when it=20
->>>> isn't filtered
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 affected tests: 049, 060, 061, 06=
-5, 144, 182, 242, 255
->>>>
->>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
->>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>
->>> [...]
->>>
->>>> @@ -4859,6 +4949,7 @@ static ImageInfoSpecific=20
->>>> *qcow2_get_specific_info(BlockDriverState *bs,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .data_file=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-=3D g_strdup(s->image_data_file),
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .has_data_file_raw=C2=A0 =3D has_data_file(bs),
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .data_file_raw=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D data_file_is_raw=
-(bs),
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .c=
-ompression_type=C2=A0=C2=A0 =3D s->compression_type,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* if this asse=
-rtion fails, this probably means a new=20
->>>> version was
->>>> @@ -5248,6 +5339,22 @@ static int=20
->>>> qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "images");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 }
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (!strcmp(desc->n=
-ame, BLOCK_OPT_COMPRESSION_TYPE)) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 in=
-t compression_type =3D
->>>> + qapi_enum_parse(&Qcow2CompressionType_lookup,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_opt_get(opts,=20
->>>> BLOCK_OPT_COMPRESSION_TYPE),
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -1, errp);
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- (compression_type =3D=3D -EINVAL) {
->>>
->>> You should compare to -1, as qapi_enum_parse returns given default=20
->>> on error.
->> ok
->>>
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Unknown compression type");
->>>
->>> and errp is already set (ofcourse, if qemu_opt_get returned non=20
->>> NULL, but I hope it is guaranteed by if (!strcmp(desc->name,=20
->>> BLOCK_OPT_COMPRESSION_TYPE)) condition
->> I wouldn't propagate the error from qapi_enum_parse because it looks=20
->> like "invalid parameter value: foo". I think it's better to print=20
->> "Unknown compression type: foo"
->
-> No objections. Then you should pass NULL to qapi_enum_parse instead of=20
-> errp. (As you can't set errp twice, second try will crash).
-ok
->
->>>
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return -ENOTSUP;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- (compression_type !=3D s->compression_type) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Changing the compression type "
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "is not supported");
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return -ENOTSUP;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 /* if this point is reached, this probably means a=20
->>>> new option was
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 * added without having it covered here */
->>>> @@ -5516,6 +5623,12 @@ static QemuOptsList qcow2_create_opts =3D {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .help =3D "Width of a reference count entry in bits",
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .def_value_str =3D "16"
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .n=
-ame =3D BLOCK_OPT_COMPRESSION_TYPE,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .t=
-ype =3D QEMU_OPT_STRING,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .h=
-elp =3D "Compression method used for image cluster=20
->>>> compression",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .d=
-ef_value_str =3D "zlib"
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { /* end of lis=
-t */ }
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0 };
->>>
->>>
->>> [...]
->>>
->>>
->>
->
->
+PS:
+could you point to mail thread where problem was discussed
+
+> In order to avoid this, save and
+> restore them separately during migration.
+> 
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+> Please find the discussion here,
+> https://patchwork.kernel.org/patch/11339591/
+> ---
+>  hw/core/machine.c         |  1 +
+>  hw/nvram/fw_cfg.c         | 86 ++++++++++++++++++++++++++++++++++++++-
+>  include/hw/nvram/fw_cfg.h |  6 +++
+>  3 files changed, 92 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 9e8c06036f..6d960bd47f 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -39,6 +39,7 @@ GlobalProperty hw_compat_4_2[] = {
+>      { "usb-redir", "suppress-remote-wake", "off" },
+>      { "qxl", "revision", "4" },
+>      { "qxl-vga", "revision", "4" },
+> +    { "fw_cfg", "acpi-mr-restore", "false" },
+>  };
+>  const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
+>  
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 179b302f01..36d1e32f83 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -39,6 +39,7 @@
+>  #include "qemu/config-file.h"
+>  #include "qemu/cutils.h"
+>  #include "qapi/error.h"
+> +#include "hw/acpi/aml-build.h"
+>  
+>  #define FW_CFG_FILE_SLOTS_DFLT 0x20
+>  
+> @@ -610,6 +611,50 @@ bool fw_cfg_dma_enabled(void *opaque)
+>      return s->dma_enabled;
+>  }
+>  
+> +static bool fw_cfg_acpi_mr_restore(void *opaque)
+> +{
+> +    FWCfgState *s = opaque;
+> +    return s->acpi_mr_restore;
+> +}
+> +
+> +static void fw_cfg_update_mr(FWCfgState *s, uint16_t key, size_t size)
+> +{
+> +    MemoryRegion *mr;
+> +    ram_addr_t offset;
+> +    int arch = !!(key & FW_CFG_ARCH_LOCAL);
+> +    void *ptr;
+> +
+> +    key &= FW_CFG_ENTRY_MASK;
+> +    assert(key < fw_cfg_max_entry(s));
+> +
+> +    ptr = s->entries[arch][key].data;
+> +    mr = memory_region_from_host(ptr, &offset);
+> +
+> +    memory_region_ram_resize(mr, size, &error_abort);
+> +}
+> +
+> +static int fw_cfg_acpi_mr_restore_post_load(void *opaque, int version_id)
+> +{
+> +    FWCfgState *s = opaque;
+> +    int i, index;
+> +
+> +    assert(s->files);
+> +
+> +    index = be32_to_cpu(s->files->count);
+> +
+> +    for (i = 0; i < index; i++) {
+> +        if (!strcmp(s->files->f[i].name, ACPI_BUILD_TABLE_FILE)) {
+> +            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i, s->table_mr_size);
+> +        } else if (!strcmp(s->files->f[i].name, ACPI_BUILD_LOADER_FILE)) {
+> +            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i, s->linker_mr_size);
+> +        } else if (!strcmp(s->files->f[i].name, ACPI_BUILD_RSDP_FILE)) {
+> +            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i, s->rsdp_mr_size);
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  static const VMStateDescription vmstate_fw_cfg_dma = {
+>      .name = "fw_cfg/dma",
+>      .needed = fw_cfg_dma_enabled,
+> @@ -619,6 +664,20 @@ static const VMStateDescription vmstate_fw_cfg_dma = {
+>      },
+>  };
+>  
+> +static const VMStateDescription vmstate_fw_cfg_acpi_mr = {
+> +    .name = "fw_cfg/acpi_mr",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = fw_cfg_acpi_mr_restore,
+> +    .post_load = fw_cfg_acpi_mr_restore_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT64(table_mr_size, FWCfgState),
+> +        VMSTATE_UINT64(linker_mr_size, FWCfgState),
+> +        VMSTATE_UINT64(rsdp_mr_size, FWCfgState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_fw_cfg = {
+>      .name = "fw_cfg",
+>      .version_id = 2,
+> @@ -631,6 +690,7 @@ static const VMStateDescription vmstate_fw_cfg = {
+>      },
+>      .subsections = (const VMStateDescription*[]) {
+>          &vmstate_fw_cfg_dma,
+> +        &vmstate_fw_cfg_acpi_mr,
+>          NULL,
+>      }
+>  };
+> @@ -815,6 +875,23 @@ static struct {
+>  #define FW_CFG_ORDER_OVERRIDE_LAST 200
+>  };
+>  
+> +/*
+> + * Any sub-page size update to these table MRs will be lost during migration,
+> + * as we use aligned size in ram_load_precopy() -> qemu_ram_resize() path.
+> + * In order to avoid the inconsistency in sizes save them seperately and
+> + * migrate over in vmstate post_load().
+> + */
+> +static void fw_cfg_acpi_mr_save(FWCfgState *s, const char *filename, size_t len)
+> +{
+> +    if (!strcmp(filename, ACPI_BUILD_TABLE_FILE)) {
+> +        s->table_mr_size = len;
+> +    } else if (!strcmp(filename, ACPI_BUILD_LOADER_FILE)) {
+> +        s->linker_mr_size = len;
+> +    } else if (!strcmp(filename, ACPI_BUILD_RSDP_FILE)) {
+> +        s->rsdp_mr_size = len;
+> +    }
+> +}
+> +
+>  static int get_fw_cfg_order(FWCfgState *s, const char *name)
+>  {
+>      int i;
+> @@ -914,6 +991,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+>      trace_fw_cfg_add_file(s, index, s->files->f[index].name, len);
+>  
+>      s->files->count = cpu_to_be32(count+1);
+> +    fw_cfg_acpi_mr_save(s, filename, len);
+>  }
+>  
+>  void fw_cfg_add_file(FWCfgState *s,  const char *filename,
+> @@ -937,6 +1015,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>              ptr = fw_cfg_modify_bytes_read(s, FW_CFG_FILE_FIRST + i,
+>                                             data, len);
+>              s->files->f[i].size   = cpu_to_be32(len);
+> +            fw_cfg_acpi_mr_save(s, filename, len);
+>              return ptr;
+>          }
+>      }
+> @@ -973,7 +1052,10 @@ static void fw_cfg_machine_ready(struct Notifier *n, void *data)
+>      qemu_register_reset(fw_cfg_machine_reset, s);
+>  }
+>  
+> -
+> +static Property fw_cfg_properties[] = {
+> +    DEFINE_PROP_BOOL("acpi-mr-restore", FWCfgState, acpi_mr_restore, true),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+>  
+>  static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
+>  {
+> @@ -1097,6 +1179,8 @@ static void fw_cfg_class_init(ObjectClass *klass, void *data)
+>  
+>      dc->reset = fw_cfg_reset;
+>      dc->vmsd = &vmstate_fw_cfg;
+> +
+> +    device_class_set_props(dc, fw_cfg_properties);
+>  }
+>  
+>  static const TypeInfo fw_cfg_info = {
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index b5291eefad..457fee7425 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -53,6 +53,12 @@ struct FWCfgState {
+>      dma_addr_t dma_addr;
+>      AddressSpace *dma_as;
+>      MemoryRegion dma_iomem;
+> +
+> +    /* restore during migration */
+> +    bool acpi_mr_restore;
+> +    size_t table_mr_size;
+> +    size_t linker_mr_size;
+> +    size_t rsdp_mr_size;
+>  };
+>  
+>  struct FWCfgIoState {
 
 
