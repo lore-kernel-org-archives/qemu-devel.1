@@ -2,91 +2,87 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA9BC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92427C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:41:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E1A62072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B5B52072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:41:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BAiTSYQ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1A62072D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VeQEvntk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B5B52072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGR0P-0002xb-87
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:36:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51614)
+	id 1jGR5A-00061N-Bf
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:41:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jGQzj-0002Wm-QB
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:36:12 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGR3h-0004OG-Hw
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jGQzi-0001SH-K1
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:36:11 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40373)
+ (envelope-from <peter.maydell@linaro.org>) id 1jGR3g-0003hZ-If
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:17 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39659)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jGQzi-0001RN-5X
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:36:10 -0400
-Received: by mail-pl1-x641.google.com with SMTP id h11so6200051plk.7
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 10:36:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGR3g-0003g3-5v
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:16 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p10so5764031wrt.6
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 10:40:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=yZUTVmgYw51H82cm4DpkH8NxJUhsYOxNVLcCAhDQeZw=;
- b=BAiTSYQ5Fk3xY3H73ikG44Vd8HOVsByQ/g14GUABVkUCD9iENEYKNr8qgzBbgbBjCY
- HF0yaRPMSkCf+UpG1S9lEvCoFRvDnlNhG1AOqHHktPeGqt6ex4mYFnhzku0YNlBBdgfe
- 0xRYSMTrC1fcZM+9BZvj/PSLgPgxToWpnWhEnpm+eD/LITotCxuMGr5x+bXukEX0L0xk
- XvCScgis2skbTGgkHoMADrPUAC9dpIW+V1xxH4BIPGMlGK5TzVYjR/PXHf39m0MUwj8C
- AvKWfrjgI3bOh2yvvUiCK7iz182DrPBNusO5sg/iJePiwWCr8G6vYCSlb3zGOxL35w16
- ewwA==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=Bajoz+UVKNChgk5fuej6bzALgtOzMFKSB1SLz/XHXRk=;
+ b=VeQEvntktYkrFhTTinhzDdlSffzgyQJcqnsTTuyZyemL9UGRjlxdJincdEA5cSuYec
+ Txvs51POF+yI0Pbi+MC9ov1W4VSpu9zFj7PRCZEeToZjZXldz7vqJldGgBuIDOuwlftx
+ jGXIzxrOHwd3ohksrxFm7rnva+BcluBQIwbMqWM+vhLS24ZaTQ9MZQwLZm4OeDWhbSBt
+ azwDrZm8ibQZeYFZdK86y26+EOuYZ8GBj9slLafFXj4D5nTcPy7cUi1CocPP+RRXNumM
+ U+PxFpZ2HPaS68kTywFsagD+HgBUT67TBi3lVWgX9V4RjZkcVyS2nAOQ09pk+uZ+2sAH
+ dVOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yZUTVmgYw51H82cm4DpkH8NxJUhsYOxNVLcCAhDQeZw=;
- b=m0X3aFTsPSV96BAriHEV38vlpvG4P5bd3kCeaHOh+r5Z4DARqJeFZyehTNFvPjMYVw
- jr6E0Wz17GGU9aJyPQG15Bt+IHrkCvPfOpOdI9vfsxCboiTJ4rYgjaDlka2fx0tFJZi5
- 9oOqHPmya+4qb4drapfcSE8eFuAK0JTN+WGFHNp6tMsKZGzrl9OYa0oKeTGBy4WvvpQH
- DzHMfm/A4rK0VfpMKQcGhWS6uZ6LIk3+B1USIkhvp++UrkMxhAKJBeFTzUgKvJW9veBm
- +Vm/1ohSeYD8LmAx5ajoWA22STTlssMRxF+vRQ8QDBXjoHir3obN9NwNdB/m5MM82XFb
- 5AvA==
-X-Gm-Message-State: ANhLgQ1GLZ9I4KtQrTtg3iuFN1ifB/X8j2a+ItVBASCE5zHC/vReH905
- yXYDZOFFc1tMCgNVOwMQWAvl3A==
-X-Google-Smtp-Source: ADFU+vu3DQBALhvkUUT6ORZNClf/qcGLfNJZLs3svrqbY7jBcEeSIl714WUmAYVdTxs0bLzGWr8r8Q==
-X-Received: by 2002:a17:902:8647:: with SMTP id
- y7mr22829507plt.224.1584984968231; 
- Mon, 23 Mar 2020 10:36:08 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- i23sm13868448pfq.157.2020.03.23.10.36.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 23 Mar 2020 10:36:07 -0700 (PDT)
-Subject: Re: [PATCH] target/mips: Fix loongson multimedia condition
- instructions
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org
-References: <20200321045621.2139953-1-jiaxun.yang@flygoat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0f0864ce-200c-dc0b-a1e0-5f4ddda29386@linaro.org>
-Date: Mon, 23 Mar 2020 10:36:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Bajoz+UVKNChgk5fuej6bzALgtOzMFKSB1SLz/XHXRk=;
+ b=R2nNumqp+86y2RoIMM0kRONevzPDqV2nLeQ9G+NZXnJi9MjVVDt0+bmuag34sEoyF/
+ YwuOmphVWehPgnNEabTL5mtEUopQ1Vqy1+9MJKHDwLVl9C+AA9jJ8T/WQhGH/3oZwM2B
+ mYSCpGUrF5uiwHDnjKfklKmpAvOQ0q2sLIA11Qzo48ZzEnHYJFYfqHoY2pZn/4hRmTI7
+ XkLsZO//L2Q+mVnL/uvmSy2O1AJoTuZ2FA4ZMHu8SLjGWzdRPlq1Qn5hxTAcEo2EcGV6
+ ecQrraiyQaerZ8EadZm6D1wJiMiKubRebWpXDRgc0kO9pW1z1wF0gvJaO287agnxsOQb
+ 5qsw==
+X-Gm-Message-State: ANhLgQ13Qc89MG/ZW8BRb0znZmjzpgYZ80NTdfINg4uAZZzP+WwgVJac
+ rvWw3Av+ASHkj90yQHnUnWiVrVYgsj/86A==
+X-Google-Smtp-Source: ADFU+vsabAUZ/Hx2f2uURgCoAc8fPBPFO5E1BBweePnyxqncscz7rDhNZa61qi5MPILHBaAC3sfuZw==
+X-Received: by 2002:adf:efc9:: with SMTP id i9mr10965935wrp.23.1584985214122; 
+ Mon, 23 Mar 2020 10:40:14 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o9sm25145282wrw.20.2020.03.23.10.40.13
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Mar 2020 10:40:13 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 4/5] target/arm: Assert immh != 0 in disas_simd_shift_imm
+Date: Mon, 23 Mar 2020 17:40:05 +0000
+Message-Id: <20200323174006.8468-5-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200323174006.8468-1-peter.maydell@linaro.org>
+References: <20200323174006.8468-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200321045621.2139953-1-jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,44 +94,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.qemu.devel@gmail.com, aleksandar.rikalo@rt-rk.com,
- aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/20/20 9:56 PM, Jiaxun Yang wrote:
->      case OPC_SLE_CP2:
-> -        /*
-> -         * ??? Document is unclear: Set FCC[CC].  Does that mean the
-> -         * FD field is the CC field?
-> -         */
-> +        cond = TCG_COND_LE;
-> +    do_cc_cond:
-> +        {
-> +            int cc = (ctx->opcode >> 8) & 0x7;
-> +            lab = gen_new_label();
-> +            tcg_gen_ori_i32(fpu_fcr31, fpu_fcr31, 1 << get_fp_bit(cc));
-> +            tcg_gen_brcond_i64(cond, t0, t1, lab);
-> +            tcg_gen_xori_i32(fpu_fcr31, fpu_fcr31, 1 << get_fp_bit(cc));
-> +            gen_set_label(lab);
-> +        }
-> +        goto no_rd;
-> +        break;
+From: Richard Henderson <richard.henderson@linaro.org>
 
-There is no need for a branch here.  This is a deposit operation.
+Coverity raised a shed-load of errors cascading from inferring
+that clz32(immh) might yield 32, from immh might be 0.
 
-    TCGv_i64 t64 = tcg_temp_new_i64();
-    TCGv_i32 t32 = tcg_temp_new_i32();
+While immh cannot be 0 from encoding, it is not obvious even to
+a human how we've checked that: via the filtering provided by
+data_proc_simd[].
 
-    tcg_gen_setcond_i64(cond, t64, t0, t1);
-    tcg_gen_extrl_i64_i32(t32, t64);
-    tcg_gen_deposit_i32(cpu_fcr31, cpu_fcr31, t32,
-                        get_fp_bit(cc), 1);
+Reported-by: Coverity (CID 1421923, and more)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200320160622.8040-3-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate-a64.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-    tcg_temp_free_i32(t32);
-    tcg_temp_free_i64(t64);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 8fffb52203d..032478614c4 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -10405,6 +10405,9 @@ static void disas_simd_shift_imm(DisasContext *s, uint32_t insn)
+     bool is_u = extract32(insn, 29, 1);
+     bool is_q = extract32(insn, 30, 1);
+ 
++    /* data_proc_simd[] has sent immh == 0 to disas_simd_mod_imm. */
++    assert(immh != 0);
++
+     switch (opcode) {
+     case 0x08: /* SRI */
+         if (!is_u) {
+-- 
+2.20.1
 
-
-r~
 
