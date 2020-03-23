@@ -2,61 +2,142 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 364D9C10F26
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BA6C10F26
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:17:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081AB20732
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:11:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081AB20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B38120732
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:17:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B38120732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGHFC-00080x-31
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 03:11:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37050)
+	id 1jGHKe-0000vK-Gc
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 03:17:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37421)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jGHEL-0007Jg-Nm
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:10:38 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jGHJi-0000U0-By
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:16:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jGHEK-0001Ca-8D
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:10:37 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:32998)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jGHEJ-0001C4-PT; Mon, 23 Mar 2020 03:10:36 -0400
-X-Alimail-AntiSpam: AC=SUSPECT; BC=0.6466425|-1; BR=01201311R941b1; CH=blue;
- DM=||false|; DS=CONTINUE|ham_alarm|0.431571-0.000189887-0.568239;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03307; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=12; RT=12; SR=0; TI=SMTPD_---.H3rj3ad_1584947424; 
-Received: from 172.16.31.150(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H3rj3ad_1584947424)
- by smtp.aliyun-inc.com(10.147.44.129);
- Mon, 23 Mar 2020 15:10:24 +0800
-Subject: Re: [PATCH v6 04/61] target/riscv: add vector configure instruction
-To: Kito Cheng <kito.cheng@gmail.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
-References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
- <20200317150653.9008-5-zhiwei_liu@c-sky.com>
- <CA+yXCZCWS2fF+LOi-4bUgNXrGm=v9yuYUQR5gpk7+230Z86ykw@mail.gmail.com>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <769218a3-5409-9b6b-974d-193daed48ce6@c-sky.com>
-Date: Mon, 23 Mar 2020 15:10:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <borntraeger@de.ibm.com>) id 1jGHJg-0002WT-Gp
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:16:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48308)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jGHJf-0002VP-Fn
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:16:08 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02N73j8j009482
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:16:03 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ywd8b1vqv-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:16:03 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Mon, 23 Mar 2020 07:16:01 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 23 Mar 2020 07:15:58 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02N7FvAJ49938472
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 23 Mar 2020 07:15:57 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5BE9D52054;
+ Mon, 23 Mar 2020 07:15:57 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.169.7])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1703A52073;
+ Mon, 23 Mar 2020 07:15:55 +0000 (GMT)
+Subject: Re: [PATCH v11 03/16] s390x: protvirt: Support unpack facility
+To: Bruce Rogers <brogers@suse.com>,
+ "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20200319131921.2367-1-frankja@linux.ibm.com>
+ <20200319131921.2367-4-frankja@linux.ibm.com>
+ <85df56f2bc703e38a19150f51c9a6501dffefd16.camel@suse.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Mon, 23 Mar 2020 08:15:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CA+yXCZCWS2fF+LOi-4bUgNXrGm=v9yuYUQR5gpk7+230Z86ykw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <85df56f2bc703e38a19150f51c9a6501dffefd16.camel@suse.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20032307-0016-0000-0000-000002F60C44
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20032307-0017-0000-0000-00003359A31E
+Message-Id: <28dc03df-79ac-35f8-32af-4e793a3559b8@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-23_01:2020-03-21,
+ 2020-03-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 suspectscore=2
+ malwarescore=0 mlxlogscore=856 spamscore=0 lowpriorityscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003230042
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,107 +149,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- alistair23@gmail.com, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>, "david@redhat.com" <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+[...]
 
-
-On 2020/3/23 14:51, Kito Cheng wrote:
-> Hi Zhiwei:
->
-> vsetvl and vsetvli seems like missing ISA checking before translate,
-> this cause those 2 instructions can be executed even RVV not enable.
-> My testing env is qemu riscv64-linux-user mode.
-Hi Kito,
-
-I think you are right. Thanks for pointing that.
-
-Zhiwei
->> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
->> new file mode 100644
->> index 0000000000..7381c24295
->> --- /dev/null
->> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
->> @@ -0,0 +1,69 @@
->> +/*
->> + * RISC-V translation routines for the RVV Standard Extension.
->> + *
->> + * Copyright (c) 2020 C-SKY Limited. All rights reserved.
->> + *
->> + * This program is free software; you can redistribute it and/or modify it
->> + * under the terms and conditions of the GNU General Public License,
->> + * version 2 or later, as published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope it will be useful, but WITHOUT
->> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
->> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
->> + * more details.
->> + *
->> + * You should have received a copy of the GNU General Public License along with
->> + * this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
+>> +int s390_ipl_prepare_pv_header(void)
 >> +{
-> Missing vext_check_isa_ill(s) check?
->
->> +    TCGv s1, s2, dst;
->> +    s2 = tcg_temp_new();
->> +    dst = tcg_temp_new();
+>> +    IplParameterBlock *ipib = s390_ipl_get_iplb_pv();
+>> +    IPLBlockPV *ipib_pv = &ipib->pv;
+>> +    void *hdr = g_malloc(ipib_pv->pv_header_len);
+>> +    int rc;
 >> +
->> +    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
->> +    if (a->rs1 == 0) {
->> +        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
->> +        s1 = tcg_const_tl(RV_VLEN_MAX);
->> +    } else {
->> +        s1 = tcg_temp_new();
->> +        gen_get_gpr(s1, a->rs1);
->> +    }
->> +    gen_get_gpr(s2, a->rs2);
->> +    gen_helper_vsetvl(dst, cpu_env, s1, s2);
->> +    gen_set_gpr(a->rd, dst);
->> +    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
->> +    lookup_and_goto_ptr(ctx);
->> +    ctx->base.is_jmp = DISAS_NORETURN;
->> +
->> +    tcg_temp_free(s1);
->> +    tcg_temp_free(s2);
->> +    tcg_temp_free(dst);
->> +    return true;
->> +}
->> +
->> +static bool trans_vsetvli(DisasContext *ctx, arg_vsetvli * a)
->> +{
-> Missing vext_check_isa_ill(s) check?
->
->
->> +    TCGv s1, s2, dst;
->> +    s2 = tcg_const_tl(a->zimm);
->> +    dst = tcg_temp_new();
->> +
->> +    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
->> +    if (a->rs1 == 0) {
->> +        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
->> +        s1 = tcg_const_tl(RV_VLEN_MAX);
->> +    } else {
->> +        s1 = tcg_temp_new();
->> +        gen_get_gpr(s1, a->rs1);
->> +    }
->> +    gen_helper_vsetvl(dst, cpu_env, s1, s2);
->> +    gen_set_gpr(a->rd, dst);
->> +    gen_goto_tb(ctx, 0, ctx->pc_succ_insn);
->> +    ctx->base.is_jmp = DISAS_NORETURN;
->> +
->> +    tcg_temp_free(s1);
->> +    tcg_temp_free(s2);
->> +    tcg_temp_free(dst);
->> +    return true;
->> +}
+>> +    cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
+>> +                             ipib_pv->pv_header_len);
+>> +    rc = s390_pv_set_sec_parms((uint64_t)hdr,
+>> +                               ipib_pv->pv_header_len);
+> This causes a compiler issue when building for 32 bit x86 as follows:
+> 
+> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c: In function
+> 's390_ipl_prepare_pv_header':
+> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c:659:32: error:
+> cast from pointer to integer of different size [-Werror=pointer-to-int-
+> cast]
+>   659 |     rc = s390_pv_set_sec_parms((uint64_t)hdr,
+>       |                                ^
+
+Interesting. It seems that there is no travis-ci coverage for this
+case.
+
+I guess we need something like this.
+
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 1d04cd5..01bdf81 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -656,7 +656,7 @@ int s390_ipl_prepare_pv_header(void)
+ 
+     cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
+                              ipib_pv->pv_header_len);
+-    rc = s390_pv_set_sec_parms((uint64_t)hdr,
++    rc = s390_pv_set_sec_parms((uint64_t)(unsigned long) hdr,
+                                ipib_pv->pv_header_len);
+     g_free(hdr);
+     return rc;
 
 
