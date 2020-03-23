@@ -2,79 +2,96 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 208C6C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:39:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CFEC4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:42:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA12120735
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:38:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B5D020735
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:42:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bSvFM7FW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA12120735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rz0sX6o0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5D020735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGNIB-0006wS-3R
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:38:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60775)
+	id 1jGNLG-0008HT-OX
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:42:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jGNHM-0006Nt-6g
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:38:09 -0400
+ (envelope-from <mst@redhat.com>) id 1jGNKV-0007rW-Vi
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jGNHL-0006LH-8z
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:38:08 -0400
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:44765)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jGNHK-0006L3-Vp
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:38:07 -0400
-Received: by mail-ot1-x330.google.com with SMTP id a49so13327956otc.11
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 06:38:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xLovUn17+NyywV5MntGL4YugD8f0YBvWkMdBJZZg/3o=;
- b=bSvFM7FW8aNIGnTYEF8uOsSMJotkocm8bHYPBKSxJCop831x9D6seSmM3/XS79om6r
- jO9v3lK+QNN+Z9AfoX1xp5HIPNEJkgIRPsJi6EtExUjK1/A7hVy3qTu+UXxx+iZwNuLs
- 5xMR187ZxlLkTF4K3zyyUa+pA7O1XBLTG8ArpcOevOCbv59o9vi6I4LjiJoJUlKUwEnC
- ikWdaMmmOsz/TGKeCXSu4VvhmLDOkrStOP4Rpw8TEvYqyYLksYv+9gLHhhLvnr5hAJ3j
- OE1S3Tp/UePWKBC/cezQaIvUHrDOLTjHTxUWIMZxXdf32+Q38gVKPzO6rJ7Gd7qguxBZ
- 0dYQ==
+ (envelope-from <mst@redhat.com>) id 1jGNKV-0008Hz-2o
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:41:23 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60800)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jGNKU-0008Hp-Ux
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:41:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584970882;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2jBHKS3B1faRGiQN25joeqmk9aJVCO9fgr6MQuDfgFk=;
+ b=Rz0sX6o0ji77HHQc2DawN0MkoqA02Rtn/SVuUx/QJJGtchovQ+BmNbCJfSAmEptMKBaD24
+ eKsTPxSM/V3AOSgKF5V3xY9OTnHILlEGQmgSmssl/KGEelxe9pdoCPmZmPmEDjETHF1nJr
+ c+/NqHBoj+Y/Hdmhil3skUVe0CivX9M=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-PiAZjChRNFqX9CnFvUcY_A-1; Mon, 23 Mar 2020 09:41:21 -0400
+X-MC-Unique: PiAZjChRNFqX9CnFvUcY_A-1
+Received: by mail-qv1-f70.google.com with SMTP id z2so759031qvw.7
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 06:41:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xLovUn17+NyywV5MntGL4YugD8f0YBvWkMdBJZZg/3o=;
- b=l4jvBTw8dzm4pKdOPj0B03RzmHmmuZdxJRdKYa5JMLiwyQXMvHL2+iZJDDRzPlnilC
- frbQgEOgPo0soGs2xOwY0LDMMA9gHIExPXwPL23x5QoMbub6W3w3qxR1W1l5DvNTZbH6
- XG1XqK80ZXxBnfWCuwRBm5o8VYzhQv04DN9/vBz4soUKjgn0Qs7mIRxSSOYRbPS0Mz5S
- v8TawOKy//oXvv/G2uZp8CWh+jriFNzNVcVw3/gR7B3im+THdOHU12jnBeZh5lfgvwoa
- GQmJoMAtohYIjTO+/FT7c925MrFQQWQ0BicB3ZVn2aUZjxvF4j3v4IYgVEDdFS6DSCUW
- EDFg==
-X-Gm-Message-State: ANhLgQ1hfMqbeP2vYsRkdrq0J9FjgAD31Y8yHtGEAU64wFFVe0eiciYC
- 6wJHIBjlJAuC5WDwHis9fcNK8OXlVHvxCWmejx9Ocg==
-X-Google-Smtp-Source: ADFU+vtdi5HpEJlve0tM5gSt9xKB0Z4XnMeIyiuudWpx37a+YcUknoUtX/sm+xVRWl7LD9AjZYTTK7LZpZPG5v+dJoY=
-X-Received: by 2002:a9d:1d43:: with SMTP id m61mr18060050otm.91.1584970686085; 
- Mon, 23 Mar 2020 06:38:06 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=iVpEbrDp4+ilWZlYRp0JNWmhyIo6pKTfGb+Qh8gsbag=;
+ b=CI9tji46hf6qnU6aTS/mYxOwERRPzWoNnV+afKbz7FRvu1d405fr/9Rj3LrcWGFb8D
+ SeKJc9Rs3zFHyT+seV0SWwcG3osmNQlm2tjQJuBj5v2ZfqSc79WtM+g4MBbLiH6aP8sk
+ 5Z6OBd6dhQhkRZnhMsjX8WmC67Hzjhqd0LWG54T3/Sieucrp/fm8n1VVcdUdNM5yhXja
+ woolQDskMNXCMoGmsvJtGWpsZ972YxynxfIoZElshd3F8VQloaX6kQx/n4fMRFZNlRK0
+ mlcZ5Cw42GuzUURt+mmQrcxr+mwFhY9itEIU3XU+WstbrOJmMewxIwBGk6HRAYzGDiR/
+ dN7w==
+X-Gm-Message-State: ANhLgQ2FQbf2JBa6BxsnpDlIJnLuAuIuVRWAIXqjXBq4VGCSoMn2BEb5
+ Izn/m9bjwZJ5nyJBUyOjpNCmhWlRzx21Xw2MIY7bq6PEGGr+b83Isu2iwCRKC1AITuDQSz9HmDn
+ 3OBJiPuzBfr90SmY=
+X-Received: by 2002:ac8:2c51:: with SMTP id e17mr20153141qta.290.1584970880560; 
+ Mon, 23 Mar 2020 06:41:20 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtaTCFg0oxspA+vYhzil2vhGqkLI3W6XYSlGIIBDK8T+pPGee3AfZJTngGROtLRiXaYAuwYsA==
+X-Received: by 2002:ac8:2c51:: with SMTP id e17mr20153119qta.290.1584970880284; 
+ Mon, 23 Mar 2020 06:41:20 -0700 (PDT)
+Received: from redhat.com (bzq-109-65-52-82.red.bezeqint.net. [109.65.52.82])
+ by smtp.gmail.com with ESMTPSA id
+ z43sm12279246qtb.92.2020.03.23.06.41.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Mar 2020 06:41:19 -0700 (PDT)
+Date: Mon, 23 Mar 2020 09:41:14 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0 0/3] virtio, vhost-gpu: Release memory returned by
+ malloc() with free()
+Message-ID: <20200323094104-mutt-send-email-mst@kernel.org>
+References: <20200323112943.12010-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <CADUS3onjS+T-SSYC6ocKNm3oXsCpiQbDa0eJobhOnts3gZ_gEw@mail.gmail.com>
-In-Reply-To: <CADUS3onjS+T-SSYC6ocKNm3oXsCpiQbDa0eJobhOnts3gZ_gEw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Mar 2020 13:37:55 +0000
-Message-ID: <CAFEAcA8tU58_Bdpp7tmpF+X4D5zyxpV4pA-wz97EpP41SQ7sqA@mail.gmail.com>
-Subject: Re: qemu-system-aarch64 windows binary run Arm64 defconfig kernel not
- working
-To: yoma sophian <sophian.yoma@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::330
+In-Reply-To: <20200323112943.12010-1-philmd@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,19 +103,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Mar 2020 at 13:34, yoma sophian <sophian.yoma@gmail.com> wrote:
-> My environment are:
-> 1. the versionof qemu-system-aarch64 windows binary is 4.0.92
+On Mon, Mar 23, 2020 at 12:29:40PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Coverity reported a ALLOC_FREE_MISMATCH in vg_handle_cursor(),
+> because the memory returned by vu_queue_pop() is allocated with
+> malloc(). Fix it.
+>=20
+> Similar error occurs with virtio. Document and fix.
 
-Is it possible for you to try with a newer version of QEMU? That one
-is a release candidate snapshot from before a release that we made
-a year ago.
+I will queue this. Thanks!
 
-thanks
--- PMM
+> Philippe Mathieu-Daud=E9 (3):
+>   vhost-user-gpu: Release memory returned by vu_queue_pop() with free()
+>   virtio: Document virtqueue_pop()
+>   virtio-gpu: Release memory returned by virtqueue_pop() with free()
+>=20
+>  include/hw/virtio/virtio.h              | 8 ++++++++
+>  contrib/vhost-user-gpu/vhost-user-gpu.c | 4 ++--
+>  contrib/vhost-user-gpu/virgl.c          | 2 +-
+>  hw/display/virtio-gpu-3d.c              | 2 +-
+>  hw/display/virtio-gpu.c                 | 8 ++++----
+>  5 files changed, 16 insertions(+), 8 deletions(-)
+>=20
+> --=20
+> 2.21.1
+
 
