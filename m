@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEF8C54EEB
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37533C54FCE
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:02:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE65320637
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:02:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 060CD20637
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:02:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RS3zMTig"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE65320637
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5qT6cS8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 060CD20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGPWm-0005NC-SQ
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:02:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60040)
+	id 1jGPXC-0005rm-1s
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:02:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60425)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jGPU8-0002Tg-SD
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:59:30 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jGPVE-00041e-0k
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:00:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jGPU7-00055U-Lz
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:59:28 -0400
-Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:33988)
+ (envelope-from <alistair23@gmail.com>) id 1jGPV9-0005qc-6w
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:00:35 -0400
+Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:41410)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jGPU7-00055D-I8; Mon, 23 Mar 2020 11:59:27 -0400
-Received: by mail-vs1-xe41.google.com with SMTP id t10so9108014vsp.1;
- Mon, 23 Mar 2020 08:59:27 -0700 (PDT)
+ id 1jGPV8-0005qW-Vy; Mon, 23 Mar 2020 12:00:31 -0400
+Received: by mail-ua1-x943.google.com with SMTP id l7so5163559uap.8;
+ Mon, 23 Mar 2020 09:00:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=1VNaMrSp8YPbwEnbO46igXUns6tuTzgRCPCucupcPrM=;
- b=RS3zMTig/IS/fkiMCeXiCs5HSb3l8zAbqBq6/mWNXog7ax4Cu0zTVj2BLMrDU71Kf9
- 4xu82WTxF2/FTlNDHGtbd7YJI/5N+rhwLlYtWf5Nb0LBCQJVH7A/coI2dN7km9ovDMGj
- ySIRD5ue/du4zV5Q7G6xCOEnb2dscuwWof+LZMJHe2SgC7441v4fsoFgee5EL3XdEhMR
- 0OEkJHuyGUfbR7m4kOgfWNEBYxS75XTGpivSaPN/mE3iCj6kNIyFH89c34lqt1pansAf
- 6Pr97B5jisdT76dCu+GYFqpeDNQLPyrbGrT0jaQoxEytVMht0RcqQtJlwOWgoxXf9rBY
- JW0Q==
+ bh=3+zyZBOZgnwvj6HjjkL9VZ1uuTPjSF+4X1NUFEoixK8=;
+ b=P5qT6cS8WdtDBs/RaI8BcVZFtcAZvKg37b7J4V+WkUawV3bPJQwrFoUQrPgnDFy7bk
+ /1sXtAbKdBx0CvBH4Nl1W3DJbzssBJHYK76OGovRSZRAWy5BXy+9DITHrmHkX4tynDpb
+ HQXUfllfeTdbz61GlwN7GQuOgHZJaLHTftocgR7hJEnur+DuF29VaVomBuPTt/G/ya1f
+ hjCDok7Ep8TSQ8SynaG5tX73xrxoeGn8xcrhdRF46Ed5PrSk8c1nOEiPLQu8V36PNbu6
+ 8cCz44AwQFk2XXZClq68BDVCpkQseLSrJB73m2nTy/1pzLw/fBB9LHDeP9/wpfA2joyw
+ 1Jdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=1VNaMrSp8YPbwEnbO46igXUns6tuTzgRCPCucupcPrM=;
- b=i8EQmitIIUk5EVJyTQPgvSBEQQHPQEGjf6P5SQCR3HwEd2JirXAlo7dgdoYvw4W27J
- OKVP7xxyWDd1dutr/JfDFtz3LDjfI0PRxAM8d5/AffBEpVvIkuV7I/m1DWVPSTw0nBt4
- FJifxnIM9DkE7m0xSlh+pN2wbf4CquXhL4fvAl2hwnYMq8HaP9m5rpBR0LXrJQkWjl5+
- 7GZxijITlRpTbUqu3+Iznef9pcW+DNsEoKQQZZhMtspwRF66hFvkf3XVja/pjfa9L2y+
- 8nGUnUTSVKuwYrazMgmJlT+w+VUoWCyoU7jYsBL0Pkf8dZEircCsTT3ofyZThJNze+7t
- BWaA==
-X-Gm-Message-State: ANhLgQ11Gpyh8OjJ/hD58QWel9r3Ot463HdTdVlr3qOZPiUEDrJ3MUO7
- NwKbt4lCA0V7GXGZVNFr1VfGrhB4iz0qeMRhBKk=
-X-Google-Smtp-Source: ADFU+vtiBguuZnEkbXr8Rbs0FGpWLkyNOJVIWNogzlDl3XwvNEFqQMpTaIGWKblDr+J9eXvYuC3ABXfYT5f9sDz3K+c=
-X-Received: by 2002:a67:902:: with SMTP id 2mr8946031vsj.133.1584979166826;
- Mon, 23 Mar 2020 08:59:26 -0700 (PDT)
+ bh=3+zyZBOZgnwvj6HjjkL9VZ1uuTPjSF+4X1NUFEoixK8=;
+ b=mub9rgF4In92f80lcvpib8AVZBZJ89dYk0b7mLVdpHfucvbEQW0m9Ux3b63+KH6too
+ J5WBydEhItcbEmq2LuGfMuRwcMd9Y2JK93nZz7F+IsBfojdzmhB/Xo/XKv6SsirnP/7K
+ 7zB72OXpEK3fKLYk76Ah8/OqSjha3Oia+a081mxnDKXhfZYAYOBIYaB8bteWAnL999be
+ 9D/jeSFEoil5RLPRWS6yU7uGmhOL0neLVQ55eFQonAyCbqsHd18lNfb/dub7hB/2kg4b
+ iEHVcyiARB8Sw1CeKMYApCCavCm9pLlC4/uQLktJMrfHDm7uNo9xl1GfumYJ7uVp4DD4
+ Y9rw==
+X-Gm-Message-State: ANhLgQ2eM/FDYiSVm4awUpVHOUgmEo2iCkSc1GUkzqqqPu4qq/cfpJ83
+ 7mPj1EKQFEkGJpdlvioUXdpMZPaL8PjqgrurAfI=
+X-Google-Smtp-Source: ADFU+vtWBYqeznwDdZO/XqcYBYd0LVWzbRWHUvYuoVNOZG1XzUVo5qBnIxhn2lLobWfde94ajISnsNJY6t5JbbRoRJY=
+X-Received: by 2002:a9f:3311:: with SMTP id o17mr15011469uab.30.1584979230391; 
+ Mon, 23 Mar 2020 09:00:30 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200321144110.5010-1-philmd@redhat.com>
- <20200321144110.5010-7-philmd@redhat.com>
-In-Reply-To: <20200321144110.5010-7-philmd@redhat.com>
+ <20200321144110.5010-9-philmd@redhat.com>
+In-Reply-To: <20200321144110.5010-9-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 23 Mar 2020 08:51:28 -0700
-Message-ID: <CAKmqyKMOmdWy=TrDDNR2-pkRQ4XPQaRWfQ2UzQ9rYg6AbPMYCg@mail.gmail.com>
-Subject: Re: [PATCH-for-5.0 v2 06/11] hw/isa/i82378: Remove dead assignment
+Date: Mon, 23 Mar 2020 08:52:30 -0700
+Message-ID: <CAKmqyKMHq58PA3epAE8gjhHdyrOPz12JDPtPezVyPzeFK0xutA@mail.gmail.com>
+Subject: Re: [PATCH-for-5.0 v2 08/11] hw/timer/exynos4210_mct: Remove dead
+ assignments
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::e41
+X-Received-From: 2607:f8b0:4864:20::943
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,17 +108,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Mar 21, 2020 at 7:46 AM Philippe Mathieu-Daud=C3=A9
+On Sat, Mar 21, 2020 at 7:50 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> Rename the unique variable assigned as 'pit' which better
-> represents what it holds, to fix a warning reported by the
-> Clang static code analyzer:
+> Fix warnings reported by Clang static code analyzer:
 >
->     CC      hw/isa/i82378.o
->   hw/isa/i82378.c:108:5: warning: Value stored to 'isa' is never read
->       isa =3D isa_create_simple(isabus, "i82374");
->       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   hw/timer/exynos4210_mct.c:1370:9: warning: Value stored to 'index' is n=
+ever read
+>         index =3D GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+>         ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   hw/timer/exynos4210_mct.c:1399:9: warning: Value stored to 'index' is n=
+ever read
+>         index =3D GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+>         ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   hw/timer/exynos4210_mct.c:1441:9: warning: Value stored to 'index' is n=
+ever read
+>         index =3D GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+>         ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 >
 > Reported-by: Clang Static Analyzer
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
@@ -127,41 +134,40 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/isa/i82378.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  hw/timer/exynos4210_mct.c | 3 ---
+>  1 file changed, 3 deletions(-)
 >
-> diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-> index dcb6b479ea..d9e6c7fa00 100644
-> --- a/hw/isa/i82378.c
-> +++ b/hw/isa/i82378.c
-> @@ -67,7 +67,7 @@ static void i82378_realize(PCIDevice *pci, Error **errp=
-)
->      I82378State *s =3D I82378(dev);
->      uint8_t *pci_conf;
->      ISABus *isabus;
-> -    ISADevice *isa;
-> +    ISADevice *pit;
+> diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
+> index 944120aea5..c0a25e71ec 100644
+> --- a/hw/timer/exynos4210_mct.c
+> +++ b/hw/timer/exynos4210_mct.c
+> @@ -1367,7 +1367,6 @@ static void exynos4210_mct_write(void *opaque, hwad=
+dr offset,
 >
->      pci_conf =3D pci->config;
->      pci_set_word(pci_conf + PCI_COMMAND,
-> @@ -99,13 +99,13 @@ static void i82378_realize(PCIDevice *pci, Error **er=
-rp)
->      isa_bus_irqs(isabus, s->i8259);
+>      case L0_TCNTB: case L1_TCNTB:
+>          lt_i =3D GET_L_TIMER_IDX(offset);
+> -        index =3D GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
 >
->      /* 1 82C54 (pit) */
-> -    isa =3D i8254_pit_init(isabus, 0x40, 0, NULL);
-> +    pit =3D i8254_pit_init(isabus, 0x40, 0, NULL);
+>          /*
+>           * TCNTB is updated to internal register only after CNT expired.
+> @@ -1396,7 +1395,6 @@ static void exynos4210_mct_write(void *opaque, hwad=
+dr offset,
 >
->      /* speaker */
-> -    pcspk_init(isabus, isa);
-> +    pcspk_init(isabus, pit);
+>      case L0_ICNTB: case L1_ICNTB:
+>          lt_i =3D GET_L_TIMER_IDX(offset);
+> -        index =3D GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
 >
->      /* 2 82C37 (dma) */
-> -    isa =3D isa_create_simple(isabus, "i82374");
-> +    isa_create_simple(isabus, "i82374");
->  }
+>          s->l_timer[lt_i].reg.wstat |=3D L_WSTAT_ICNTB_WRITE;
+>          s->l_timer[lt_i].reg.cnt[L_REG_CNT_ICNTB] =3D value &
+> @@ -1438,7 +1436,6 @@ static void exynos4210_mct_write(void *opaque, hwad=
+dr offset,
 >
->  static void i82378_init(Object *obj)
+>      case L0_FRCNTB: case L1_FRCNTB:
+>          lt_i =3D GET_L_TIMER_IDX(offset);
+> -        index =3D GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+>
+>          DPRINTF("local timer[%d] FRCNTB write %llx\n", lt_i, value);
+>
 > --
 > 2.21.1
 >
