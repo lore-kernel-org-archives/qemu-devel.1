@@ -2,79 +2,99 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D01C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D6DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D4C206F8
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:01:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 634122076A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:02:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A3AiYMV2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D4C206F8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hbs3r9vN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 634122076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGOZg-0000Zl-IP
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:01:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46166)
+	id 1jGOb9-0002L1-Gi
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:02:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jGOYH-0007wV-Ry
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:59:43 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGOZl-0000wz-6c
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jGOYG-0006Ks-GK
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:59:41 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:43903)
+ (envelope-from <philmd@redhat.com>) id 1jGOZj-0008IM-KS
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:01:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:43147)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jGOYG-0006Kk-DJ
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:59:40 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGOZj-0008G9-FV
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:01:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584975580;
+ s=mimecast20190719; t=1584975671;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=u7nyB+lWQprElDIOs52J7ylHk6LCg+31QVwb10AMke8=;
- b=A3AiYMV2VtyuINddZf3nCTUNvJ4aOU3dKhavG3ipKdGmzd+ty+jusDG6AuK/RDEKo8OKQc
- f5a5mKgXZ7SwEEPRNqtIyadHEQKD5kqFmsF/1oDoYOXobJtXfyV2F4K/BVjUVC/LRMarJk
- vH81+jRl2KjCdg/YhSFaPmdUO9yp4JE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-gcDtLcoxP42q9KgFlcU8sQ-1; Mon, 23 Mar 2020 10:59:35 -0400
-X-MC-Unique: gcDtLcoxP42q9KgFlcU8sQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D2F08024CD;
- Mon, 23 Mar 2020 14:59:34 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.31])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 386785DA85;
- Mon, 23 Mar 2020 14:59:18 +0000 (UTC)
-Date: Mon, 23 Mar 2020 15:59:17 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v3 04/10] hw/acpi/nvdimm: Fix for NVDIMM incorrect DSM
- output buffer length
-Message-ID: <20200323155917.60ce6c0f@redhat.com>
-In-Reply-To: <20200311172014.33052-5-shameerali.kolothum.thodi@huawei.com>
-References: <20200311172014.33052-1-shameerali.kolothum.thodi@huawei.com>
- <20200311172014.33052-5-shameerali.kolothum.thodi@huawei.com>
+ bh=KKeE6h7tq0L0aScGIdzsCho9ssli9lSjPim6mqvxRxM=;
+ b=Hbs3r9vNL7BOMZP9gPPgpJdr6km7WTEtQZRqV5FVxRNhajgCG0O/MaAvFIrwu21wrnXYjq
+ aBNl2bEUQ0R57MJQqvuqfNknx02ojLjfPHLFLekuFMkhr0ZTprK/TEfrIvKK2KGk/+CSSB
+ 0c+WKLpuzkgShZ7mwENUEcZEYOrx480=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-k94KlYssNNC0eF-Ghj8GBA-1; Mon, 23 Mar 2020 11:01:08 -0400
+X-MC-Unique: k94KlYssNNC0eF-Ghj8GBA-1
+Received: by mail-wr1-f71.google.com with SMTP id h14so1342764wrr.12
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 08:01:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=B6se+74uq8IigJ1DNxLJ6QpeoObvmc8ZqUW9UUwi4Q0=;
+ b=jehAnD4gyx7dltO1m1bYxBnJTn12bGIJZ3+cjnk08G1BiBTQ2Ojdij8M/ZnfWNdAIT
+ zNrMcQn3sfz1BKaYU9xn76QFOsVeOgax1/pn3sfZ93CKBts3WRj9hBoy7DAg7oEJzYVc
+ DI1T7uMsmrza272f99Xuzd0cMJFZsdoLP5YQl7sJPwk8WB6oMvFLk+vQ9PioZPkUK+FF
+ DotiRKWd+w7ymh8dl4rRCOzvpd6EJFFayKnS1gjw6Jw7UgkPkztjb3VxnycvaJV9URnI
+ bnomJlbi+IpqZ8CpVsEsVK67xHtC/Zd96Zik1FRFdduS2XlFPmjh41VGqXOEEijxOv+h
+ xVYQ==
+X-Gm-Message-State: ANhLgQ2GHuLzHJwVuTBWDTdC64a2aAmrMi1EBGRIIKYkfmVAyFvR5X2T
+ Zg91kiEM6jk04g9DHPul49m7k70HCsrxZ3W8XgK6WkivneN9KmlHpc7pljbg51EV1uvtjommbkL
+ j83mcQG27KXjoLbw=
+X-Received: by 2002:adf:8187:: with SMTP id 7mr17180826wra.358.1584975667297; 
+ Mon, 23 Mar 2020 08:01:07 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsqbZz7XS24jPIEitY/s+pboxe+xe1aAHnfRZBsn+CWsdJyJn151SubRHkXg56MfNDCQw9PTg==
+X-Received: by 2002:adf:8187:: with SMTP id 7mr17180780wra.358.1584975666830; 
+ Mon, 23 Mar 2020 08:01:06 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id f14sm21834164wmb.3.2020.03.23.08.01.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 08:01:06 -0700 (PDT)
+Subject: Re: [PATCH-for-5.0 v2 00/11] misc: Trivial static code analyzer fixes
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20200321144110.5010-1-philmd@redhat.com>
+ <1c711740-6166-c730-ef67-d07511add1e6@vivier.eu>
+ <262f8318-1590-1c48-f4de-a6482fdc3071@redhat.com>
+ <10431e44-880a-cbec-c35e-1d425064c40b@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1016a691-244d-9890-01bb-894e62414963@redhat.com>
+Date: Mon, 23 Mar 2020 16:01:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <10431e44-880a-cbec-c35e-1d425064c40b@vivier.eu>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,116 +106,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
- shannon.zhaosl@gmail.com, david@redhat.com, qemu-devel@nongnu.org,
- xuwei5@hisilicon.com, linuxarm@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, mst@redhat.com, lersek@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Michael Tokarev <mjt@tls.msk.ru>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Max Reitz <mreitz@redhat.com>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Mar 2020 17:20:08 +0000
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+On 3/23/20 3:55 PM, Laurent Vivier wrote:
+> Le 23/03/2020 =C3=A0 15:45, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=
+=A0:
+>> On 3/23/20 3:32 PM, Laurent Vivier wrote:
+>>> Le 21/03/2020 =C3=A0 15:40, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=
+=A0:
+>>>> Fix trivial warnings reported by the Clang static code analyzer.
+>>>>
+>>>> Since v1:
+>>>> - Addressed Markus/Zoltan/Aleksandar review comments
+>>>>
+>>>> Philippe Mathieu-Daud=C3=A9 (11):
+>>>>  =C2=A0=C2=A0 block: Avoid dead assignment
+>>>>  =C2=A0=C2=A0 blockdev: Remove dead assignment
+>>>>  =C2=A0=C2=A0 hw/i2c/pm_smbus: Remove dead assignment
+>>>>  =C2=A0=C2=A0 hw/input/adb-kbd: Remove dead assignment
+>>>>  =C2=A0=C2=A0 hw/ide/sii3112: Remove dead assignment
+>>>>  =C2=A0=C2=A0 hw/isa/i82378: Remove dead assignment
+>>>>  =C2=A0=C2=A0 hw/gpio/aspeed_gpio: Remove dead assignment
+>>>>  =C2=A0=C2=A0 hw/timer/exynos4210_mct: Remove dead assignments
+>>>>  =C2=A0=C2=A0 hw/timer/stm32f2xx_timer: Remove dead assignment
+>>>>  =C2=A0=C2=A0 hw/timer/pxa2xx_timer: Add assertion to silent static an=
+alyzer
+>>>> warning
+>>>>  =C2=A0=C2=A0 hw/scsi/esp-pci: Remove dead assignment
+>>>>
+>>>>  =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 2 +-
+>>>>  =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 2 +-
+>>>>  =C2=A0 hw/gpio/aspeed_gpio.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 2 +-
+>>>>  =C2=A0 hw/i2c/pm_smbus.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 | 1 -
+>>>>  =C2=A0 hw/ide/sii3112.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 | 5 +++--
+>>>>  =C2=A0 hw/input/adb-kbd.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 6 +-----
+>>>>  =C2=A0 hw/isa/i82378.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 | 8 ++++----
+>>>>  =C2=A0 hw/scsi/esp-pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 | 1 -
+>>>>  =C2=A0 hw/timer/exynos4210_mct.c=C2=A0 | 3 ---
+>>>>  =C2=A0 hw/timer/pxa2xx_timer.c=C2=A0=C2=A0=C2=A0 | 1 +
+>>>>  =C2=A0 hw/timer/stm32f2xx_timer.c | 1 -
+>>>>  =C2=A0 11 files changed, 12 insertions(+), 20 deletions(-)
+>>>>
+>>>
+>>> I think your series covers cases already covered by:
+>>>
+>>> [PATCH v3 00/12] redundant code: Fix warnings reported by Clang static
+>>> code analyzer
+>>> https://patchew.org/QEMU/20200302130715.29440-1-kuhn.ch
+>>
+>> Unfortunately [for me...] I don't have v3 in my INBOX... *sigh*
+>> This was 3 weeks ago. *sigh*.
+>>
+>> I can see the series in the archives:
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg00219.html
+>> But I can't find the outcome, was it queued in the trivial tree?
+>> Any idea when this will be merged in the master tree?
+>=20
+> Some patches are already merged via trivial (1, 2 (should go by SCSI
+> queue) 3, 5, 6, 7, 9, 11 (by USB queue), 12).
+>=20
+> But others needed R-b tags or new version. I didn't check which of your
+> patches are already covered by this series.
+>=20
+> I'm sorry to not have checked your series earlier...
 
-> As per ACPI spec 6.3, Table 19-419 Object Conversion Rules, if
-> the Buffer Field <= to the size of an Integer (in bits), it will
-> be treated as an integer. Moreover, the integer size depends on
-> DSDT tables revision number. If revision number is < 2, integer
-> size is 32 bits, otherwise it is 64 bits. Current NVDIMM common
-> DSM aml code (NCAL) uses CreateField() for creating DSM output
-> buffer. This creates an issue in arm/virt platform where DSDT
-> revision number is 2 and results in DSM buffer with a wrong
-> size(8 bytes) gets returned when actual length is < 8 bytes.
-> This causes guest kernel to report,
-> 
-> "nfit ACPI0012:00: found a zero length table '0' parsing nfit"
-> 
-> In order to fix this, aml code is now modified such that it builds
-> the DSM output buffer in a byte by byte fashion when length is
-> smaller than Integer size.
-> 
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Don't be sorry, the problem is my INBOX that is unreliable.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+I was using NNTP last month until I heard it was working properly again,=20
+which is not the case apparently. I'll try to find them on NNTP and=20
+review them.
 
-> ---
-> v2 -> v3
->  - Using Integer size as 8 bytes instead of SizeOf(Integer) 
-> ---
->  hw/acpi/nvdimm.c                            | 40 +++++++++++++++++++--
->  tests/qtest/bios-tables-test-allowed-diff.h |  2 ++
->  2 files changed, 39 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index 5219dd0e2e..213556f35d 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -938,6 +938,7 @@ static void nvdimm_build_common_dsm(Aml *dev)
->      Aml *method, *ifctx, *function, *handle, *uuid, *dsm_mem, *elsectx2;
->      Aml *elsectx, *unsupport, *unpatched, *expected_uuid, *uuid_invalid;
->      Aml *pckg, *pckg_index, *pckg_buf, *field, *dsm_out_buf, *dsm_out_buf_size;
-> +    Aml *whilectx, *offset;
->      uint8_t byte_list[1];
->  
->      method = aml_method(NVDIMM_COMMON_DSM, 5, AML_SERIALIZED);
-> @@ -1091,13 +1092,46 @@ static void nvdimm_build_common_dsm(Aml *dev)
->      /* RLEN is not included in the payload returned to guest. */
->      aml_append(method, aml_subtract(aml_name(NVDIMM_DSM_OUT_BUF_SIZE),
->                 aml_int(4), dsm_out_buf_size));
-> +
-> +    /*
-> +     * As per ACPI spec 6.3, Table 19-419 Object Conversion Rules, if
-> +     * the Buffer Field <= to the size of an Integer (in bits), it will
-> +     * be treated as an integer. Moreover, the integer size depends on
-> +     * DSDT tables revision number. If revision number is < 2, integer
-> +     * size is 32 bits, otherwise it is 64 bits.
-> +     * Because of this CreateField() canot be used if RLEN < Integer Size.
-> +     *
-> +     * Also please note that APCI ASL operator SizeOf() doesn't support
-> +     * Integer and there isn't any other way to figure out the Integer
-> +     * size. Hence we assume 8 byte as Integer size and if RLEN < 8 bytes,
-> +     * build dsm_out_buf byte by byte.
-> +     */
-> +    ifctx = aml_if(aml_lless(dsm_out_buf_size, aml_int(8)));
-> +    offset = aml_local(2);
-> +    aml_append(ifctx, aml_store(aml_int(0), offset));
-> +    aml_append(ifctx, aml_name_decl("TBUF", aml_buffer(1, NULL)));
-> +    aml_append(ifctx, aml_store(aml_buffer(0, NULL), dsm_out_buf));
-> +
-> +    whilectx = aml_while(aml_lless(offset, dsm_out_buf_size));
-> +    /* Copy 1 byte at offset from ODAT to temporary buffer(TBUF). */
-> +    aml_append(whilectx, aml_store(aml_derefof(aml_index(
-> +                                   aml_name(NVDIMM_DSM_OUT_BUF), offset)),
-> +                                   aml_index(aml_name("TBUF"), aml_int(0))));
-> +    aml_append(whilectx, aml_concatenate(dsm_out_buf, aml_name("TBUF"),
-> +                                         dsm_out_buf));
-> +    aml_append(whilectx, aml_increment(offset));
-> +    aml_append(ifctx, whilectx);
-> +
-> +    aml_append(ifctx, aml_return(dsm_out_buf));
-> +    aml_append(method, ifctx);
-> +
-> +    /* If RLEN >= Integer size, just use CreateField() operator */
->      aml_append(method, aml_store(aml_shiftleft(dsm_out_buf_size, aml_int(3)),
->                                   dsm_out_buf_size));
->      aml_append(method, aml_create_field(aml_name(NVDIMM_DSM_OUT_BUF),
->                 aml_int(0), dsm_out_buf_size, "OBUF"));
-> -    aml_append(method, aml_concatenate(aml_buffer(0, NULL), aml_name("OBUF"),
-> -                                       dsm_out_buf));
-> -    aml_append(method, aml_return(dsm_out_buf));
-> +    aml_append(method, aml_return(aml_name("OBUF")));
-> +
->      aml_append(dev, method);
->  }
->  
-> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-> index dfb8523c8b..eb8bae1407 100644
-> --- a/tests/qtest/bios-tables-test-allowed-diff.h
-> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
-> @@ -1 +1,3 @@
->  /* List of comma-separated changed AML files to ignore */
-> +"tests/data/acpi/pc/SSDT.dimmpxm",
-> +"tests/data/acpi/q35/SSDT.dimmpxm",
+>=20
+> Thanks,
+> Laurent
+>=20
 
 
