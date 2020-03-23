@@ -2,78 +2,121 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B811C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA70C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:56:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEB0A2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:50:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D266206F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 12:56:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SsP5/qoT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEB0A2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HJn3SVWe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D266206F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGMXa-00055x-UZ
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 08:50:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53383)
+	id 1jGMcb-0007cS-9H
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 08:56:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54332)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jGMWQ-0003mV-M6
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:49:39 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jGMbp-00070t-5V
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:55:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jGMWP-0000t4-Kq
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:49:38 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:59395)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jGMWP-0000sP-IM
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:49:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584967777;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fVE0rc5UgDMuPPGqt/A4H+FWifCqAZzhBTjHm2+rASY=;
- b=SsP5/qoTE1ya/+rqvoAbr7PUii5cZjzZy199Ni9bYthbPFkO7MgP2hrKYlQKbuZjOr8j7y
- v6g7YzjmwC133IP0IlxFJRYdgsfP1uJO+a5WQaCl17j+ACmg+ji7ouv+MHJj+oYSRGRkDs
- eecSaiEWa/GfPaMKADaCbFXXTG+TKHE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-smMkgOjrNpKV-4phGIkZcg-1; Mon, 23 Mar 2020 08:49:35 -0400
-X-MC-Unique: smMkgOjrNpKV-4phGIkZcg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0202B1088380;
- Mon, 23 Mar 2020 12:49:34 +0000 (UTC)
-Received: from localhost (ovpn-113-18.ams2.redhat.com [10.36.113.18])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 96C67BBBE5;
- Mon, 23 Mar 2020 12:49:33 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL for-5.0 2/2] s390/ipl: fix off-by-one in
- update_machine_ipl_properties()
-Date: Mon, 23 Mar 2020 13:49:23 +0100
-Message-Id: <20200323124923.24014-3-cohuck@redhat.com>
-In-Reply-To: <20200323124923.24014-1-cohuck@redhat.com>
-References: <20200323124923.24014-1-cohuck@redhat.com>
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jGMbo-0005wu-6d
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 08:55:13 -0400
+Received: from mail-eopbgr00123.outbound.protection.outlook.com
+ ([40.107.0.123]:51155 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jGMbl-0005iq-0J; Mon, 23 Mar 2020 08:55:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FEtU2cIL46ufnk9KMYoS2C18Vy3/e3P2E0qXkqK4wtRlsNEgkCYkJAEd75BttCZqfRiAxYKRaWmr7vomgVEeGEoT7/IE6oi4s56Sg1vmaWDUgFwTqpmnFyvA7/vMXfcI7C38sbUpzsTyC8Q/7k084IrNvSIj6IgBmjEgzHVGQSP1vGj8MY8p6e0orNtctGXvJzg50juonrMkAi7YS5iBdLFdMe1mWpoViWgxDZ45Yn9Ztr8dfp+iSSF1zqMKCSPqa4NXkcRcd6hKZ7Y8owOoeuoHtLBHkkzMov9rLxm/ue4RDOjq6d+iNOvmRJNk+h1/A5PlKURZXoX7WGMiAfu5Mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0QgftWDH+pOamCz++0Y0d/249LA6xA217SZs0WfqwzY=;
+ b=AiwBEkVeMEJNn5cD6lhr9vlNsY+4OJDXzQdrw/8DWAp3VJHmN0cp9LpVcSDoE9FyDG8lXzFr7QlNpuFm3HObcbctYiNQFLqTA7YYDBgqjnz6L3gd+xoDn9XHThl47m4+y3RnhSHwVOJUKhrP1YuesAsidRtfJL+AOoymqgASmc3tGE1Sor/c4A3zZGfdrvCMv5CYzVVYOZ0eehMOEX7MlmbWLAVZeztxxUGaOKYsU773+YBCA1w5uxHy1lqT6ePUmvQbha60XSrSMwyz/XCnmxCMQ2V9PGivR7xAO0Saq3jm216HMy7Eu/KpUnp66+v4ksZy6OtRbaf+xmJhah7Ufg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0QgftWDH+pOamCz++0Y0d/249LA6xA217SZs0WfqwzY=;
+ b=HJn3SVWePP6naI91v3xWlc0LYUcO/26QMhE/+5POq8V1mP6ERv2IrjV/6YGAAbtWH42bLrW/QqxBrdtGlVSLXB+dOhwC0Fos+ExlGqVs5S1j07ujqLdTf09FLzOqddEQMF1rzSFFfrrbWdc3iU5fDUnpt61RAvLsq+8YFJLadSg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+Received: from VI1PR08MB3760.eurprd08.prod.outlook.com (20.178.80.91) by
+ VI1PR08MB3214.eurprd08.prod.outlook.com (52.133.15.154) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2835.22; Mon, 23 Mar 2020 12:55:06 +0000
+Received: from VI1PR08MB3760.eurprd08.prod.outlook.com
+ ([fe80::acf5:3103:8e4d:af20]) by VI1PR08MB3760.eurprd08.prod.outlook.com
+ ([fe80::acf5:3103:8e4d:af20%7]) with mapi id 15.20.2835.021; Mon, 23 Mar 2020
+ 12:55:06 +0000
+Subject: Re: [PATCH v8 3/4] qcow2: add zstd cluster compression
+To: Alberto Garcia <berto@igalia.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200321143431.19629-1-dplotnikov@virtuozzo.com>
+ <20200321143431.19629-4-dplotnikov@virtuozzo.com>
+ <a1830b65-bd38-c458-d382-1f3981355d2e@virtuozzo.com>
+ <2914bee8-50b9-2759-7dda-8f5fd39e5fa5@virtuozzo.com>
+ <w51369z8cg7.fsf@maestria.local.igalia.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <55f6d94f-100c-fd7f-dbb8-d0b3014017a7@virtuozzo.com>
+Date: Mon, 23 Mar 2020 15:55:02 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <w51369z8cg7.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR05CA0363.eurprd05.prod.outlook.com
+ (2603:10a6:7:94::22) To VI1PR08MB3760.eurprd08.prod.outlook.com
+ (2603:10a6:803:c1::27)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.64] (94.255.82.30) by
+ HE1PR05CA0363.eurprd05.prod.outlook.com (2603:10a6:7:94::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2835.21 via Frontend Transport; Mon, 23 Mar 2020 12:55:05 +0000
+X-Originating-IP: [94.255.82.30]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8a99fe36-2e28-4a19-1e3f-08d7cf296943
+X-MS-TrafficTypeDiagnostic: VI1PR08MB3214:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR08MB3214CBDB2EB7E443EBE4FDF6CFF00@VI1PR08MB3214.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-Forefront-PRVS: 0351D213B3
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(4636009)(376002)(39850400004)(136003)(396003)(366004)(346002)(199004)(6666004)(52116002)(6486002)(81156014)(86362001)(81166006)(4744005)(8676002)(8936002)(66476007)(66946007)(186003)(66556008)(16526019)(31686004)(26005)(5660300002)(53546011)(956004)(2906002)(110136005)(16576012)(31696002)(2616005)(316002)(36756003)(4326008)(478600001)(107886003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3214;
+ H:VI1PR08MB3760.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tybNCCPwTr/NoeY/Bo+IPN8tBtyt0vXxHoQFmU9aSjhxF2NpId1iQtYDjy4qHr4Mor45a15TdIPoFbkgZnpoB/qnULoMSNL59mawuwj68ZkFN1XCUBHa5YnkNvtb6YGQpzKrfjig4fn9LB0py3rW/Mi9rJkg3cpsTMEGhl4G59TrooDUH0m4fJ04LYA/Osa4MO+mgcGwfH+P6fAHn5L+URV/XM9DrgKGXlnHPigJbphiNS8bag3PFW+cDWxOKYZ95qFnuvfjFglmVl29u+jsGWQR2E3j5u0SYdeQU21cnFg8eqeDmuvJWLOjkP6/A+rf2c4Cf++8zTaMbLe5kys3Bn8n8UczMPL+iaBW2RMs6Y4KntNFds+C/r0i0CWorh/xBn/lshavnVoe+1pbD9W9em3TcFrPd3e4Ii7AUNE4SG/IzdRyinrwTWMbWvLm0S6G
+X-MS-Exchange-AntiSpam-MessageData: k9bqjWRJxoMA2F1rqPXgD39kLG71+RQIJ0zx1vcIpEsFakWq0i5jFEym/SBseNI1LOlYx22xgpHMvRdFtZX3rtaDxfooH0L9TGSVo3DJpAukbt6tGwVwBouxjsGZbSX2V1J7d8JnANX7e3OsJBdg1Q==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a99fe36-2e28-4a19-1e3f-08d7cf296943
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2020 12:55:06.4348 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RMSCgMtWSLkds9hYacev6fvzOTCFbLpDzzvuBZ48r2fGS13yKXh0XPaZ7YIE2CMQsp900gpl8g84c/78Wc9IC4XHFxLU7AshZJz16RrP3YQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3214
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.123
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,44 +128,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Halil Pasic <pasic@linux.ibm.com>
 
-In update_machine_ipl_properties() the array ascii_loadparm needs to
-hold the 8 char loadparm and a string terminating zero char.
 
-Let's increase the size of ascii_loadparm accordingly.
-
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Fixes: 0a01e082a428 ("s390/ipl: sync back loadparm")
-Fixes: Coverity CID 1421966
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20200320143101.41764-1-pasic@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- hw/s390x/ipl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index b81942e1e6f9..8c3e01957176 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -546,7 +546,7 @@ static void update_machine_ipl_properties(IplParameterB=
-lock *iplb)
-     /* Sync loadparm */
-     if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
-         uint8_t *ebcdic_loadparm =3D iplb->loadparm;
--        char ascii_loadparm[8];
-+        char ascii_loadparm[9];
-         int i;
-=20
-         for (i =3D 0; i < 8 && ebcdic_loadparm[i]; i++) {
---=20
-2.21.1
+On 23.03.2020 15:47, Alberto Garcia wrote:
+> On Mon 23 Mar 2020 11:20:42 AM CET, Denis Plotnikov wrote:
+>>> But consider corrupted image: it may contain any data. And we should
+>>> not crash because of it. So, we should return error here.
+>> If the image is corrupted we can't continue anyway. If we return -EIO
+>> on this condition, we need to do some work investigating what has
+>> happened.
+> Cannot you just mark the image as corrupted and return -EIO ? I also
+> don't think that we should crash QEMU because of malformed input data.
+>
+> Berto
+ok, will return -EIO
 
 
