@@ -2,86 +2,76 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D5AC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:50:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EC9C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:51:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DBA32076A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:50:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwECtmxs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DBA32076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C48372076A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C48372076A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGLaw-0005KU-9U
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:50:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45127)
+	id 1jGLc5-0006Ph-FN
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:51:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jGLa2-0004ua-C4
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:49:19 -0400
+ (envelope-from <bounces@canonical.com>) id 1jGLbO-0005qq-0F
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jGLa1-0005L3-9x
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:49:18 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:53660)
+ (envelope-from <bounces@canonical.com>) id 1jGLbL-0005pE-NV
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:50:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59784)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jGLa1-0005Ki-4N
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:49:17 -0400
-Received: by mail-wm1-x331.google.com with SMTP id b12so1298504wmj.3
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 04:49:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=6ugVyVHamM0S6zQ0REmf8yJDkXLxnl3i0L0vqbG9BsE=;
- b=QwECtmxszVvGx+VNrp0krL/7dETiKdCX9HjiDjy9VRB/T9M3jicSux7LiTPhB3+m10
- DM2rYgP0T49HFNK/1XX3b1nF8cn3WP1XeJQHCIauzrhfRn6QELdqwroYPMn8K9S8Jvoy
- zQfZIomuET8TzcMjtqqIRsDe2XxmA/wUkGbSlV6sS40XNR/tm5JWTrmQY/VPKoiaAfd6
- Sb40R6cIEMNkwOYUUc/ZvOhmkvCmZM/kpn2VjkDogvmyhNIym3Fwr2wlVU+MSVWOAG+P
- OgsAVtPbEK4G0wyxIZySGnVzKeyoYWO0cqKMg0YAUcbvcCgLfSdgIqtnQMQfhLJ/dvN+
- xBYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=6ugVyVHamM0S6zQ0REmf8yJDkXLxnl3i0L0vqbG9BsE=;
- b=C0eAJ1CIkgH+X6cFwTs7AZAbSwKbP++3EIBMHFR+8sz3bHOSVe1vqwBPXCXmMBGkKb
- gc/6sEUwrevuAoZ/1iKTgc2kZVY3Nx3ToryEWhV6AsbmhF9yxPnk5U2NqtSazSd7+pNm
- X7bakVGRxAUJEdxVwdKwOjlpGfqUi/5Ed6cPhNkKytmj3uXzHoVT8uhYsia6/PgIQ6Io
- QHwGRL8wmpSYGN1jTV4Cn49oyFVPcBv5f3IFQRkz/43Jwtrtzxb1C8PXMTCDoMOZcNTn
- IER4rJFZXM4OndHTWrYATm/h+b3mpkJYP36msseZCE5hu6MXnSy9TcIyRShUQjthTxxX
- nkBA==
-X-Gm-Message-State: ANhLgQ3Rstk/eeazMG+dFy1JjZjAVBRjW/0mHTWBZz96w8GKSMNNgap0
- jH3ObeoFkuhkOeqLbzlHmcxDUHpzUReOYBhV7Gg=
-X-Google-Smtp-Source: ADFU+vuRpTuMpkqpEhwYtbEc/YFMVoG81HQTJcEBWEbcB0nQKvXO5qqXjM22FDjjf7BlMtAzxi5T5riLd62GekeF73U=
-X-Received: by 2002:a1c:1d8e:: with SMTP id d136mr13320221wmd.26.1584964155984; 
- Mon, 23 Mar 2020 04:49:15 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jGLbL-0005oe-HN
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:50:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jGLbI-0004y8-Uz
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 11:50:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D87AF2E8082
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 11:50:36 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200322171635.678219-1-marcandre.lureau@redhat.com>
- <20200322171635.678219-2-marcandre.lureau@redhat.com>
- <87h7yfb8qs.fsf@linaro.org>
-In-Reply-To: <87h7yfb8qs.fsf@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 23 Mar 2020 12:49:04 +0100
-Message-ID: <CAJ+F1CL1dRGRb0Yobk4H1Kyqrf0owB9HT7ZgHWus+1V4LVo+HQ@mail.gmail.com>
-Subject: Re: [PULL v3 1/1] slirp: update submodule to v4.2.0+
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::331
+Date: Mon, 23 Mar 2020 11:41:04 -0000
+From: Launchpad Bug Tracker <1867519@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Tags: focal
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange janitor mohamadh paelzer
+X-Launchpad-Bug-Reporter: Mohammad Heib (mohamadh)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <158428174672.11238.3583143675239092561.malonedeb@soybean.canonical.com>
+Message-Id: <158496373315.22817.15560815764388671608.launchpad@ackee.canonical.com>
+Subject: [Bug 1867519] Re: qemu 4.2 segfaults on VF detach
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2ad780fc4bbf63b633248749ee0d58fb0d6821b2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,47 +80,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reply-To: Bug 1867519 <1867519@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+** Merge proposal linked:
+   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
+/381033
 
-On Mon, Mar 23, 2020 at 12:40 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > git shortlog
-> > 126c04acbabd7ad32c2b018fe10dfac2a3bc1210..55ab21c9a36852915b81f1b41ebaf=
-3b6509dd8ba
-> >
-> <snip>
-> >       build-sys: make libslirp-version.h depend on Makefile
->
-> FWIW I ran into a build error when I updated to the latest tree. It was
-> failing while building version.o. In the end I tracked it down to a
-> duplicate of slirp/src/libslirp-version.h (one in the build tree and one
-> in the src tree). I didn't spot it for a while because git was telling
-> me the tree was clean because of .gitignore:
->
->   /src/libslirp-version.h
->
-> Is this stale now? Is slirp always built out of tree?
->
+-- =
 
-The rule to build libslirp-version.h hasn't changed much:
-https://gitlab.freedesktop.org/slirp/libslirp/-/blob/master/Makefile#L26
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1867519
 
-I think this means that at some point, you built qemu/slirp in tree,
-and /src/libslirp-version.h was left, conflicting with out-of-tree
-version.
+Title:
+  qemu 4.2 segfaults on VF detach
+
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+
+Bug description:
+  After updating Ubuntu 20.04 to the Beta version, we get the following
+  error and the virtual machines stucks when detaching PCI devices using
+  virsh command:
+
+  Error:
+  error: Failed to detach device from /tmp/vf_interface_attached.xml
+  error: internal error: End of file from qemu monitor
+
+  steps to reproduce:
+   1. create a VM over Ubuntu 20.04 (5.4.0-14-generic)
+   2. attach PCI device to this VM (Mellanox VF for example)
+   3. try to detaching  the PCI device using virsh command:
+     a. create a pci interface xml file:
+          =
+
+        <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+        <driver name=3D'vfio'/>
+        <source>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x11' slot=3D'0x00' =
+function=3D'0x2' />
+        </source>
+        </hostdev>
+      =
+
+     b.  #virsh detach-device <VM-Doman-name> <pci interface xml file>
 
 
+  - Ubuntu release:
+    Description:    Ubuntu Focal Fossa (development branch)
+    Release:        20.04
 
---=20
-Marc-Andr=C3=A9 Lureau
+  - Package ver:
+    libvirt0:
+    Installed: 6.0.0-0ubuntu3
+    Candidate: 6.0.0-0ubuntu5
+    Version table:
+       6.0.0-0ubuntu5 500
+          500 http://il.archive.ubuntu.com/ubuntu focal/main amd64 Packages
+   *** 6.0.0-0ubuntu3 100
+          100 /var/lib/dpkg/status
+
+  - What you expected to happen: =
+
+    PCI device detached without any errors.
+
+  - What happened instead:
+    getting the errors above and he VM stuck
+
+  additional info:
+  after downgrading the libvirt0 package and all the dependent packages to =
+5.4 the previous, version, seems that the issue disappeared
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1867519/+subscriptions
 
