@@ -2,86 +2,104 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C967DC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0599AC4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:36:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91EF020735
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C46FC20735
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kL35UxJz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91EF020735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLkVhl/q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C46FC20735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGNF9-0003GH-PV
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:35:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59952)
+	id 1jGNFG-0003SM-V7
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:35:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jGNCD-00075V-Ci
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:32:50 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGNDE-0000K3-HQ
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:33:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1jGNCC-0004UM-5d
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:32:49 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36683)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jGNCB-0004Ts-Tg
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:32:48 -0400
-Received: by mail-wr1-x442.google.com with SMTP id 31so11070879wrs.3
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 06:32:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=mHsnQRz3LMbpYVZDpWDu0mqozYVRPCHGwQl6OjHiHO0=;
- b=kL35UxJzOzZIKNojXQmwtbrRV4m9t0jTDeZKo6ozXpIesbptE9B1UYeuGStrxpscjc
- KzfIL4LkDyRD3wgYrw+QsUHohAR9WU4bXT5wi08xqPMMUQUvoEJ4aucaPn626OMgN54R
- trqzKo2AQ+8n5ZbwlIvyAW5oYHGspt5lktpgDc1uiJ6Tvh/ZNaPkR1bxgp3P7ZKG+NXN
- zVvua2n1pGoZ3H81mXrIRRQaJZW2k/wVafK10XloJwIXnEBFHOBLfBboD+9vzrQ5IXkv
- 0OUljKInfFPg5JuLrSHlyMCQPLzxe5CKO7CKcugHG/c31XSSkZqls6Nml+Dh3GRfaXVO
- uJXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=mHsnQRz3LMbpYVZDpWDu0mqozYVRPCHGwQl6OjHiHO0=;
- b=l1PsjiBQOddCJgdPNPuhx2n4Hf6mG43c8J+2+YbluLuXK4pBcBmsdkwT0y80X2El3L
- 4wWxI6de+UTbT283DPKYTR6axX94tBDSIFgk8A3KWHMf0Cpjr0Ti2aaRKSZ+XBSc0d+7
- /XhkwhNcg/rStMNIbd43YzRdFOf2D9sK4Mq0Tx2nshDNjluPnXa2b0YvhdNwQw+nbcVL
- OtG84ndmk19nJPxtmd25qr0nIVVcDce+QwGEB/Z4y93h0RsdqDVW7gjPL4tRK6SKG7WA
- ltDrle/HszxTd/+cCXiRYhuV/ACqJexiV5XaOeQCP3IDeJaNqcat4SP/RPPJxwLnPeZZ
- lqlg==
-X-Gm-Message-State: ANhLgQ1e5jFLxjTH2BTo4EbcuaPrrecYBGqwhQdWML0A2XZO8uWJDiwb
- 8O8ZclupWBdW8WVosPwH8dI=
-X-Google-Smtp-Source: ADFU+vtxRlV+360PLUuoqs/OW2ozBYfv7a/ogfc2mh/WWYXjpfiHn0HQYYHTWd6r1IwZjzBfT49Q6Q==
-X-Received: by 2002:a5d:674f:: with SMTP id l15mr11453484wrw.196.1584970366641; 
- Mon, 23 Mar 2020 06:32:46 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id 71sm8197989wrc.53.2020.03.23.06.32.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 06:32:45 -0700 (PDT)
-Date: Mon, 23 Mar 2020 13:32:44 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: deprecation of in-tree builds
-Message-ID: <20200323133244.GK261260@stefanha-x1.localdomain>
-References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
- <alpine.BSF.2.22.395.2003212338020.36211@zero.eik.bme.hu>
+ (envelope-from <mreitz@redhat.com>) id 1jGNDB-0004wK-VX
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:33:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:22286)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGNDA-0004vW-1J
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:33:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584970426;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=KV5sDWjEBqaZiIvMoaAVIDhz898up8t7py+Rw6BijCs=;
+ b=RLkVhl/qh3QjU2OdKgC/Z/4tmwOTW3dsjYVIMBh9O8Ju9zahXRMfT3dF3KF11yh223BsfI
+ Nsi2Sra1t0MLQ1NvfzglVAJj1TkVGom/jcq0UmPfoFSn5M83TeyoaWOhaypx/fghSclO2o
+ sUAuP979ZGq6gqRm4cW/GkMVSnaKFEs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-satjfPK9PPe0tu7XPVCYPw-1; Mon, 23 Mar 2020 09:33:40 -0400
+X-MC-Unique: satjfPK9PPe0tu7XPVCYPw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C80D0477;
+ Mon, 23 Mar 2020 13:33:38 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-242.ams2.redhat.com
+ [10.36.114.242])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DFAE25C1C7;
+ Mon, 23 Mar 2020 13:33:36 +0000 (UTC)
+Subject: Re: [PATCH] block: Avoid memleak on qcow2 image info failure
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200320183620.1112123-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <c827e930-fa72-2bad-9261-8e7ceb809edb@redhat.com>
+Date: Mon, 23 Mar 2020 14:33:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200320183620.1112123-1-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6K2R/cS9K4qvcBNq"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.22.395.2003212338020.36211@zero.eik.bme.hu>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+ protocol="application/pgp-signature";
+ boundary="8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,73 +111,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org,
+ "open list:qcow2" <qemu-block@nongnu.org>, andrey.shinkevich@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX
+Content-Type: multipart/mixed; boundary="RXJS9tA9h937ZG6ydt1y41KfRTZFXLK1U"
 
---6K2R/cS9K4qvcBNq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--RXJS9tA9h937ZG6ydt1y41KfRTZFXLK1U
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 21, 2020 at 11:50:23PM +0100, BALATON Zoltan wrote:
-> On Sat, 21 Mar 2020, Peter Maydell wrote:
-> > AIUI from Paolo, the intention is to deprecate and eventually
-> > stop supporting "in-tree" builds, so that the only option is
-> > building in a separate build directory. I thought we should
-> > probably mention that in the 5.0 changelog, so I wrote up some
-> > text:
-> >=20
-> > https://wiki.qemu.org/ChangeLog/5.0#Build_Information
-> >=20
-> > Suggestions for changes/comments etc welcome.
-> >=20
-> > (One thing we will need to fix before we can do separate build
-> > tree is the Coverity Scan build process, which (a) does an
-> > in-tree build (b) can't be easily switched to a builddir because
-> > all the source paths get baked into the scan results and moving
-> > to a builddir changes them all...)
-> >=20
-> > We could also make configure actively warn if used in
-> > the source tree.
+On 20.03.20 19:36, Eric Blake wrote:
+> If we fail to get bitmap info, we must not leak the encryption info.
 >=20
-> This was discussed before. I think instead of annoying people with a
-> warning, rather configure should be changed to create a build dir if run
-> from source and have a Makefile in top dir that runs make -C builddir so
-> people don't have to care about this or change their ways and can continue
-> to run configure && make from source dir but you don't have to support
-> in-tree build. Then you can deprecate in-tree builds but supporting only
-> out-of-tree without this convenience would not just unnecessarily annoy
-> those who prefer working in a single tree but people (and apparently some
-> tools) expect sources to build with usual configure; make; make install so
-> that should be the minimum to support.
+> Fixes: b8968c875f403
+> Fixes: Coverity CID 1421894
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Yes, please!  I use in-tree builds and find it tedious to cd into a
-build dir manually.
+Thanks, applied to my block branch:
 
-Also, many build scripts (packaging, etc) we'll break if we simply
-remove in-tree builds.  I think make && make install should continue to
-work.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-Stefan
+Max
 
---6K2R/cS9K4qvcBNq
+
+--RXJS9tA9h937ZG6ydt1y41KfRTZFXLK1U--
+
+--8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl54unwACgkQnKSrs4Gr
-c8g+bgf+MA7k4g2GRpZ5d/oKJ0yon3OW6MawALyFawsagDlKyECtvBQO2fD2z9o6
-CnYkz4OwUxJ+8pKZ02YawyUAyisksbJim/7lVW/hkq63f4d19qOrphpmCmoBIKq8
-NSj2/sUoycdz6Ou7RWlm2ljiYcFeLLKY7EWvR5R8VksmFFvRLZLJrOjlq20rc+st
-guSZnL3JWOPj6LXZKWy575Ks0/9Y8frzvFXtMi0HSSXqY6P/Jn2eu1tQIEiBlirg
-XwtE12vtTh/afp5hB3gN5iwhDBpWIO++oqgn1xoUsTUHi3Z2U7Rxc1Z0W3VQ3D/o
-yEqr+2kNG4MfhBPdk93mzU0pDynY9w==
-=Al1e
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl54uq4ACgkQ9AfbAGHV
+z0AC2wgAn4ABPGJY36y3gSh/jVrSXjGKqA5G0J/hY23gUH073x7EaMK2rzXCK5CC
+T5xtLPJedVgEz5LDJGlkTEn4GbhNJBxMEz1hjf2eWqVM15cMO38Gg0IDcsJ+OOrd
+qo3Khd54w5wiYxqVm58vtVS8UxWJghqlzDa/fuYNI/Y62zHSMMa5bjPTe8OTqI/d
+Mn4HyVVL4kT9EW/+zXcKRnKq9Xxr0fpT67RQ0JuUPGvvwmpxb6XPM7kquG5NY0cR
+2t5A5VB8Xhomof48RoOxUrdnYPXAriWRUwt+VGB78vg0E+PXtqIiM6X7F81lV1Kg
+loIeZoMXp29OoKdweKloiw7skffAHQ==
+=sOik
 -----END PGP SIGNATURE-----
 
---6K2R/cS9K4qvcBNq--
+--8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX--
+
 
