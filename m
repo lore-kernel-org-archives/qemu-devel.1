@@ -2,86 +2,98 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1798C54FCF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56285C54EEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:51:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ED5220753
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:51:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2593120786
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:51:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="naCHOSZR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ED5220753
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dR2A0ky4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2593120786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGOQ9-0003LH-GC
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 10:51:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44064)
+	id 1jGOQa-0004GK-97
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 10:51:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jGOP4-0002ad-QY
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:12 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGOPe-00030e-Oj
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1jGOP3-0002K8-PO
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:10 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36405)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jGOP3-0002J1-GL
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:09 -0400
-Received: by mail-wr1-x441.google.com with SMTP id 31so11416033wrs.3
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 07:50:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=g0+tPwdBRpPGcuPH/3R2+AnsW3DYs4XGmhemVGqcBvo=;
- b=naCHOSZRwHC273ltDqnEiUAGc0RwAHqxWbxn2pYm4JpQbgrYUaI7AtW2PUg/AFbCqC
- 6EVf/aTRszThhZxyshFLxw9tzVMf7tia4bppG+gAo9Vsfh0+78KAbdhy5eUaPG2hzoW3
- xLTBQzLY15BHlT+5avUJdx/+am3V/QEdGHEsZOsSbMtED6fqR0xyRS09foj+CSz/h+F/
- R+ppKCKKEk1NxBVrSOPTikk5ZDIjPLfSr2uEl+FGbdQpmwTavmB1sHANxBlg4AZ94/+A
- 3NOD3QZDJsmEnI8EyFIHOasEB5WqFM4lMylNLo0KJBCI1OOKbgphvgcwVIqYP/ZBEzlH
- bmqA==
+ (envelope-from <philmd@redhat.com>) id 1jGOPd-0002dX-0R
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:46 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40186)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGOPc-0002dJ-TE
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584975044;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Xn4zrrLC0Aq9194Vkg3Ovqh1sYUadqtoQJs+dsnQp58=;
+ b=dR2A0ky4T7d9/ZEteAThyOLZUdJw74j3EvljyWRUYm0QbTJUCIku/JwWDkriMsVmE7rSMu
+ OOKSsYhUwL3FSXFMuAsmRLqKFkLBwvnhUaLgU7zUCtDyiT1NVbwHg/J7OSoeThQzq0DtHw
+ U31GjOTsvqpshqMKAaHauNzIGPgkYkQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-q9Z5ZZTHP3qL4r1XJG76BQ-1; Mon, 23 Mar 2020 10:50:40 -0400
+X-MC-Unique: q9Z5ZZTHP3qL4r1XJG76BQ-1
+Received: by mail-wm1-f70.google.com with SMTP id s15so4098217wmc.0
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 07:50:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=g0+tPwdBRpPGcuPH/3R2+AnsW3DYs4XGmhemVGqcBvo=;
- b=aka/0effmHKhz5S8tZR9boN+6F3vUoJXi/npiMA78Ktm8I5QUH4seF+AXWuyiK61GC
- GcDx3kT/ntmYRFJB/cDva2CodXNxbzTIMZ8Y8TJ9AxgBdqBqJ0rMN1+Q4xnBTylyHLzG
- UwC21oRUdVyLx0m4EtGZJvnOM0DuzzB2ukCXcZliSMMjZi2Vjt7xUDXa9U3og6Sw9MMp
- DEg0diDLjzZoUx5OH5U0DsdzJVpHSwO8i/wq/ytm6ouIDpStWCVn13j9ki5NEbuHboyJ
- /w63ZCOccOG+1rciJQiZLbaEl+jVtdzB8WBhBlgxVnJI1+8WIph9Ra7eQAgB1VAOzmiy
- Af/A==
-X-Gm-Message-State: ANhLgQ2aTS9NS/sAavJOMPVnyUlWA9A50kchgPl2WEhm6X0B638eYQB6
- LT0YvE6C1J/bZ0MQ4sKiSs4=
-X-Google-Smtp-Source: ADFU+vs2RRIP4Lm+Rg6fq4EwQLO1ZnOY4uYlNhKLlWdlGZYcH5wzKfiKZKh6zO9YejiDkcbhZG3eXQ==
-X-Received: by 2002:adf:f7cf:: with SMTP id a15mr25435171wrq.224.1584975008415; 
- Mon, 23 Mar 2020 07:50:08 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id w9sm1256676wrk.18.2020.03.23.07.50.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 07:50:06 -0700 (PDT)
-Date: Mon, 23 Mar 2020 14:50:05 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Coiby Xu <coiby.xu@gmail.com>
-Subject: Re: [PATCH v5 1/5] allow vu_message_read to be replaced
-Message-ID: <20200323145005.GA313555@stefanha-x1.localdomain>
-References: <20200309100342.14921-1-coiby.xu@gmail.com>
- <20200309100342.14921-2-coiby.xu@gmail.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Xn4zrrLC0Aq9194Vkg3Ovqh1sYUadqtoQJs+dsnQp58=;
+ b=LSnZzEpfopQqq6L5T1J2Mr+Ujm6eVMBPtjlbdMFQ71VHSqwGZay485yQD5lgLDErHB
+ ainXFtYZP16tytaaxaBDSYQAlyUoY7zkASdx5GVWzTyDGh1IHTh1dyHQyXKJXwXjtcoG
+ SiY5HF3VwalFPHvsfnVR7Y581fnnAx6GSHnv0JZADd9wOTqIeis33mvWMODUgj/QzFHK
+ 1CWp+9qIh4VpniA5WEsSsSONDpBk6qy+U70TIUUi3UucwqRPkyxTdYOgI3ViK8t5DfwM
+ 4V6XNvFoS0cYzPIJkVl4apyX11kxEkmSVPfQj4fopp6rBJdrBlotIVuwI/6B0y4pJhcc
+ hTLg==
+X-Gm-Message-State: ANhLgQ1NkWI9WIHhweJjXlwnkm17+qXUkPaPwhAvhd9m1J9JrwvYfo5n
+ HAcxVTI6BcSRrRBzvFiCZAxAyN8YkXMJO2mfaV92qmOfmLEPOJyEBPwpjc7vDjZJhOHPE3t6UoK
+ wdqEMVS8DJqmMPyE=
+X-Received: by 2002:adf:ce8a:: with SMTP id r10mr9191674wrn.211.1584975039606; 
+ Mon, 23 Mar 2020 07:50:39 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuhLWjUig3K7TOLx/TLXxPyrMkRe8U85ebG5z+mRyixQcDkPWfiiZur/2VWJPUJ94gONOVCKw==
+X-Received: by 2002:adf:ce8a:: with SMTP id r10mr9191650wrn.211.1584975039328; 
+ Mon, 23 Mar 2020 07:50:39 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id q8sm15625734wmj.22.2020.03.23.07.50.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 07:50:38 -0700 (PDT)
+Subject: Re: [PATCH] ide/sii3112: Avoid leaking irqs array
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <20200323143514.DB3B4747E04@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <9dd18e5b-d1f1-7c3b-428f-0e549616a9d6@redhat.com>
+Date: Mon, 23 Mar 2020 15:50:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
-Content-Disposition: inline
-In-Reply-To: <20200309100342.14921-2-coiby.xu@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <20200323143514.DB3B4747E04@zero.eik.bme.hu>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,71 +105,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org,
- stefanha@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---RnlQjJ0d97Da+TV1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Mar 09, 2020 at 06:03:38PM +0800, Coiby Xu wrote:
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-> index 6fc8000e99..7e3f0c8598 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -30,6 +30,8 @@
->=20
->  #define VHOST_MEMORY_MAX_NREGIONS 8
->=20
-> +#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
+On 3/23/20 3:32 PM, BALATON Zoltan wrote:
+> Coverity CID 1421984 reports a leak in allocated irqs, this patch
+> attempts to plug that.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>   hw/ide/sii3112.c | 14 +++++++++++---
+>   1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+> index 06605d7af2..c886916873 100644
+> --- a/hw/ide/sii3112.c
+> +++ b/hw/ide/sii3112.c
+> @@ -31,6 +31,7 @@ typedef struct SiI3112Regs {
+>   typedef struct SiI3112PCIState {
+>       PCIIDEState i;
+>       MemoryRegion mmio;
+> +    qemu_irq *irqs;
+>       SiI3112Regs regs[2];
+>   } SiI3112PCIState;
+>   
+> @@ -252,7 +253,6 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
+>       SiI3112PCIState *d = SII3112_PCI(dev);
+>       PCIIDEState *s = PCI_IDE(dev);
+>       MemoryRegion *mr;
+> -    qemu_irq *irq;
+>       int i;
+>   
+>       pci_config_set_interrupt_pin(dev->config, 1);
+> @@ -280,10 +280,10 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
+>       memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
+>       pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
+>   
+> -    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
+> +    d->irqs = qemu_allocate_irqs(sii3112_set_irq, d, 2);
+>       for (i = 0; i < 2; i++) {
+>           ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
+> -        ide_init2(&s->bus[i], irq[i]);
+> +        ide_init2(&s->bus[i], d->irqs[i]);
+>   
+>           bmdma_init(&s->bus[i], &s->bmdma[i], s);
+>           s->bmdma[i].bus = &s->bus[i];
+> @@ -291,6 +291,13 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
+>       }
+>   }
+>   
+> +static void sii3112_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    SiI3112PCIState *d = SII3112_PCI(dev);
 > +
->  typedef enum VhostSetConfigType {
->      VHOST_SET_CONFIG_TYPE_MASTER =3D 0,
->      VHOST_SET_CONFIG_TYPE_MIGRATION =3D 1,
-> @@ -205,6 +207,7 @@ typedef uint64_t (*vu_get_features_cb) (VuDev *dev);
->  typedef void (*vu_set_features_cb) (VuDev *dev, uint64_t features);
->  typedef int (*vu_process_msg_cb) (VuDev *dev, VhostUserMsg *vmsg,
->                                    int *do_reply);
-> +typedef bool (*vu_read_msg_cb) (VuDev *dev, int sock, VhostUserMsg *vmsg=
-);
->  typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, bool star=
-ted);
->  typedef bool (*vu_queue_is_processed_in_order_cb) (VuDev *dev, int qidx);
->  typedef int (*vu_get_config_cb) (VuDev *dev, uint8_t *config, uint32_t l=
-en);
-> @@ -373,6 +376,8 @@ struct VuDev {
->      bool broken;
->      uint16_t max_queues;
->=20
-> +    /* allowing vu_read_msg_cb to be replaced */
-> +    vu_read_msg_cb read_msg;
+> +    qemu_free_irqs(d->irqs, 2);
 
-Please document this function pointer fully so it's clear how custom
-implementations of this function should behave.  The return value should
-be explained.
+You can't do that without calling unrealize() on all the devices in each 
+IDEBus. Apparently there is no code available to do that. Maybe easier 
+to not add any sii3112_unrealize(). Keeping a reference in the state 
+should be enough to silent Coverity.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> +}
+> +
+>   static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+>   {
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -301,6 +308,7 @@ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+>       pd->class_id = PCI_CLASS_STORAGE_RAID;
+>       pd->revision = 1;
+>       pd->realize = sii3112_pci_realize;
+> +    dc->unrealize = sii3112_unrealize;
+>       dc->reset = sii3112_reset;
+>       dc->desc = "SiI3112A SATA controller";
+>       set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> 
 
---RnlQjJ0d97Da+TV1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl54zJ0ACgkQnKSrs4Gr
-c8jCjwf9GywWNRVA/vYfR0T7Ru89m18jQPm0pvgBvdO28w33oZUD87xOrhAvJLrt
-d6IzDXZhCUjE3m4o0Gg7OIKqwJSuBy3KWUe5mxbxvp/bKFM1RJr+eGfI+WA9Rbry
-vUz26/X6DvzwctDeyBOtWSEko0pIuhqQvwlvDR2Ckm+2QrwdlhQmdG/imhQ9smr4
-sPACo/i6VbBKIhOjTSVgwtt6YC9sqDl3jdMQYC0EcjvKph4p9lTyO4cf6OzUuRrr
-g9PdBDoz/PtmWdpZx+AEL4zImdaqH5WFjt4wCGOQqYWQOkJwnFOh7aSwi8GA1EvJ
-Hz2QipAd1PAvg8JigppbsAQ5XWOPNQ==
-=vaDd
------END PGP SIGNATURE-----
-
---RnlQjJ0d97Da+TV1--
 
