@@ -2,81 +2,67 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCDEC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 09:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 603D0C4332E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 09:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85BC22072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 09:52:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hxpAkmem"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85BC22072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 389452074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 09:53:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 389452074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGJks-0003EW-P7
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 05:52:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56565)
+	id 1jGJlu-0004Bz-EF
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 05:53:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56713)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jGJkF-0002kU-6R
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 05:51:44 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jGJlI-0003h7-EH
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 05:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jGJkE-0002hG-4Q
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 05:51:43 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25157)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jGJkE-0002h6-1U
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 05:51:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584957101;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CNa8iCJTHhnJbWOKq9OanBw15fWGGMIvyoguE/mi5EU=;
- b=hxpAkmemhidkpR22IA9bGvTn1e2GltyQ/CsgUtMp41hkmVprNdG2zJJ2KGfxok5hHE2Kav
- 1m7cpMc4muEhru6dSvXSIXWJsCv5YeAd2oIONUmny+wpfNuU+wjA4N0qPyLSa2nipQ8Wgu
- ZCFOmY01iXD6NcC+QSIiNnWrUiXkcsA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-5P8WT0_xOsW1Gvuqfo5V6A-1; Mon, 23 Mar 2020 05:51:38 -0400
-X-MC-Unique: 5P8WT0_xOsW1Gvuqfo5V6A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BE69107ACC7;
- Mon, 23 Mar 2020 09:51:37 +0000 (UTC)
-Received: from redhat.com (ovpn-112-208.ams2.redhat.com [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 57F5C9B930;
- Mon, 23 Mar 2020 09:51:35 +0000 (UTC)
-Date: Mon, 23 Mar 2020 09:51:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: discard and v2 qcow2 images
-Message-ID: <20200323095132.GB3379720@redhat.com>
-References: <20200320185848.GA5720@igalia.com>
- <c0dcacfd-16cc-e2c2-304a-043e281d6bde@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1jGJlG-0003D8-Og
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 05:52:48 -0400
+Resent-Date: Mon, 23 Mar 2020 05:52:48 -0400
+Resent-Message-Id: <E1jGJlG-0003D8-Og@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21186)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jGJlG-00039g-J7; Mon, 23 Mar 2020 05:52:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584957149; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=EAk7mgztBi4csGhFR99rqrzX1aAgXQ1VU+jQ/+m6t7xZZAhttwzzglnNXpIjiK1VceJVEgbwt5pTbIsM14T2ZNl9WiXTxBH5jteReuHgF0HD8IlrM2KGJIcgKnUJp6QI6kxiV5hqv4nzJhGRIPX/HyHTJEDKkvMJ35G2pdEmUJg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584957149;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=YXGPmcUBSpgv5n/wzzAihEWlqexpi6/37601B4Xw/2A=; 
+ b=RUPGuXY5q3vnfHcQw8klGhTHwhM4FkIPS2k6Jp8A6tgQVp0N4j9+QZEnjhTpVctnysZVs97ls9deSCh9avxCnrLPKuc3CkNIqC7stYmhgahPs3cLxsHbZE/OCtdWK9qtvBCgqOGydlG4496y35UrfUxSfaSZW9sH+2wnwGOkUtc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1584957147905366.51560484912125;
+ Mon, 23 Mar 2020 02:52:27 -0700 (PDT)
+In-Reply-To: <20200323084617.1782-1-bbhushan2@marvell.com>
+Subject: Re: [PATCH v9 0/9] virtio-iommu: VFIO integration
+Message-ID: <158495714567.4794.13061570154282709223@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <c0dcacfd-16cc-e2c2-304a-043e281d6bde@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: bbhushan2@marvell.com
+Date: Mon, 23 Mar 2020 02:52:27 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,62 +74,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, drjones@redhat.com, peterx@redhat.com,
+ qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ bharatb.linux@gmail.com, jean-philippe@linaro.org, linuc.decode@gmail.com,
+ bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 20, 2020 at 02:35:44PM -0500, Eric Blake wrote:
-> On 3/20/20 1:58 PM, Alberto Garcia wrote:
-> > Hi,
-> >=20
-> > when full_discard is false in discard_in_l2_slice() then the selected
-> > cluster should be deallocated and it should read back as zeroes. This
-> > is done by clearing the cluster offset field and setting OFLAG_ZERO in
-> > the L2 entry.
-> >=20
-> > This flag is however only supported when qcow_version >=3D 3. In older
-> > images the cluster is simply deallocated, exposing any possible
-> > previous data from the backing file.
->=20
-> Discard is advisory, and has no requirements that discarded data read bac=
-k
-> as zero.  However, if write zeroes uses discard under the hood, then THAT
-> usage must guarantee reading back as zero.
->=20
-> >=20
-> > This can be trivially reproduced like this:
-> >=20
-> >     qemu-img create -f qcow2 backing.img 64k
-> >     qemu-io -c 'write -P 0xff 0 64k' backing.img
-> >     qemu-img create -f qcow2 -o compat=3D0.10 -b backing.img top.img
-> >     qemu-io -c 'write -P 0x01 0 64k' top.img
-> >=20
-> > After this, top.img is filled with 0x01. Now we issue a discard
-> > command:
-> >=20
-> >     qemu-io -c 'discard 0 64k' top.img
-> >=20
-> > top.img should now read as zeroes, but instead you get the data from
-> > the backing file (0xff). If top.img was created with compat=3D1.1
-> > instead (the default) then it would read as zeroes after the discard.
->=20
-> I'd argue that this is undesirable behavior, but not a bug.
-
-I think the ability to read old data from the backing file could
-potentially be considered a security flaw, depending on what the
-original data was in the backing file.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyMzA4NDYxNy4xNzgy
+LTEtYmJodXNoYW4yQG1hcnZlbGwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjkgMC85XSB2aXJ0aW8taW9tbXU6IFZGSU8g
+aW50ZWdyYXRpb24KTWVzc2FnZS1pZDogMjAyMDAzMjMwODQ2MTcuMTc4Mi0xLWJiaHVzaGFuMkBt
+YXJ2ZWxsLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZy
+b20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIDliMjZhNjEuLjI5
+ZTA4NTUgIG1hc3RlciAgICAgLT4gbWFzdGVyCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcv
+MjAyMDAzMjAxNjA2MjIuODA0MC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0
+Y2hldy8yMDIwMDMyMDE2MDYyMi44MDQwLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpT
+d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhlZWI2MGMgdmlydGlvLWlvbW11OiBhZGQg
+aW9tbXUgbm90aWZpZXIgbWVtb3J5LXJlZ2lvbgoxNzZlMDgzIHZpcnRpby1pb21tdTogSW1wbGVt
+ZW50IHByb2JlIHJlcXVlc3QKMjIxZjRiYSB2aXJ0aW8taW9tbXU6IGFkZCBpb21tdSByZXBsYXkK
+MzAyMTFmZCB2aXJ0aW8taW9tbXU6IENhbGwgaW9tbXUgbm90aWZpZXIgZm9yIGF0dGFjaC9kZXRh
+Y2gKODRmMzE2ZCB2aXJ0aW8taW9tbXU6IEFkZCBpb21tdSBub3RpZmllciBmb3IgbWFwL3VubWFw
+CjhjYzU1OWYgdmlydGlvLWlvbW11OiBzZXQgc3VwcG9ydGVkIHBhZ2Ugc2l6ZSBtYXNrCmQ0MDYy
+YTkgdmZpbzogc2V0IGlvbW11IHBhZ2Ugc2l6ZSBhcyBwZXIgaG9zdCBzdXBwb3J0ZWQgcGFnZSBz
+aXplCmNjOTMxMGYgbWVtb3J5OiBBZGQgaW50ZXJmYWNlIHRvIHNldCBpb21tdSBwYWdlIHNpemUg
+bWFzawoyYjQzNTU1IGh3L3ZmaW8vY29tbW9uOiBSZW1vdmUgZXJyb3IgcHJpbnQgb24gbW1pbyBy
+ZWdpb24gdHJhbnNsYXRpb24gYnkgdmlvbW11Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzkgQ2hl
+Y2tpbmcgY29tbWl0IDJiNDM1NTVhMmY2MiAoaHcvdmZpby9jb21tb246IFJlbW92ZSBlcnJvciBw
+cmludCBvbiBtbWlvIHJlZ2lvbiB0cmFuc2xhdGlvbiBieSB2aW9tbXUpCjIvOSBDaGVja2luZyBj
+b21taXQgY2M5MzEwZjMyZDA2IChtZW1vcnk6IEFkZCBpbnRlcmZhY2UgdG8gc2V0IGlvbW11IHBh
+Z2Ugc2l6ZSBtYXNrKQozLzkgQ2hlY2tpbmcgY29tbWl0IGQ0MDYyYTk1M2NlZiAodmZpbzogc2V0
+IGlvbW11IHBhZ2Ugc2l6ZSBhcyBwZXIgaG9zdCBzdXBwb3J0ZWQgcGFnZSBzaXplKQo0LzkgQ2hl
+Y2tpbmcgY29tbWl0IDhjYzU1OWYwMjVhZSAodmlydGlvLWlvbW11OiBzZXQgc3VwcG9ydGVkIHBh
+Z2Ugc2l6ZSBtYXNrKQo1LzkgQ2hlY2tpbmcgY29tbWl0IDg0ZjMxNmQ2ODQyOSAodmlydGlvLWlv
+bW11OiBBZGQgaW9tbXUgbm90aWZpZXIgZm9yIG1hcC91bm1hcCkKNi85IENoZWNraW5nIGNvbW1p
+dCAzMDIxMWZkYjM2Y2QgKHZpcnRpby1pb21tdTogQ2FsbCBpb21tdSBub3RpZmllciBmb3IgYXR0
+YWNoL2RldGFjaCkKNy85IENoZWNraW5nIGNvbW1pdCAyMjFmNGJhMGQxMjUgKHZpcnRpby1pb21t
+dTogYWRkIGlvbW11IHJlcGxheSkKOC85IENoZWNraW5nIGNvbW1pdCAxNzZlMDgzNGJjZWUgKHZp
+cnRpby1pb21tdTogSW1wbGVtZW50IHByb2JlIHJlcXVlc3QpCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzkzOiBGSUxFOiBody92aXJ0aW8vdmlydGlvLWlvbW11LmM6
+NTM5OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTIy
+OiBGSUxFOiBody92aXJ0aW8vdmlydGlvLWlvbW11LmM6NTY4OgorXklicmVhazskCgp0b3RhbDog
+MiBlcnJvcnMsIDAgd2FybmluZ3MsIDI1MCBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzkgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvOSBDaGVja2luZyBjb21taXQgOGVlYjYwYzEyYWNlICh2
+aXJ0aW8taW9tbXU6IGFkZCBpb21tdSBub3RpZmllciBtZW1vcnktcmVnaW9uKQo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMyMzA4NDYxNy4x
+NzgyLTEtYmJodXNoYW4yQG1hcnZlbGwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
