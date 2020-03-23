@@ -2,86 +2,78 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C4DAC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 20:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E2AC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 20:33:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 077972070A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 20:32:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pf1N8tvj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077972070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DFFA2070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 20:33:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DFFA2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGTk5-0006qQ-3n
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 16:32:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57534)
+	id 1jGTl5-00083A-FZ
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 16:33:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jGTis-0005cD-PK
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 16:30:59 -0400
+ (envelope-from <bounces@canonical.com>) id 1jGTik-0005TU-B2
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 16:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jGTir-0000Yz-JE
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 16:30:58 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52517)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jGTir-0000Yq-Fx
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 16:30:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584995457;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UlIULzxpZnyUqrzlDG0sOgiICKn19mY66jy1Bqo/I1Y=;
- b=Pf1N8tvjHPg9R1/UTP9YWrd9Vsne3aw5v+I9CocRBlwTcb/hn5pO/piRDjhPSXuKgQy5GD
- Q8mB8+rKyUZKDV+++Qm1eDShitXPYkS1dNa+nOx8Oybv8FpENu7oSJdQJmI2dgbEvQi4r9
- 6oTLXmZHDkvm3V6YiS8ht9eVd/TeMAE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-G0bunP3LPU6Vu93X0USvQQ-1; Mon, 23 Mar 2020 16:30:53 -0400
-X-MC-Unique: G0bunP3LPU6Vu93X0USvQQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A692107ACCD;
- Mon, 23 Mar 2020 20:30:50 +0000 (UTC)
-Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD48D9496C;
- Mon, 23 Mar 2020 20:30:42 +0000 (UTC)
-Subject: Re: [PATCH v15 Kernel 2/7] vfio iommu: Remove atomicity of ref_count
- of pinned pages
-To: Kirti Wankhede <kwankhede@nvidia.com>, alex.williamson@redhat.com,
- cjia@nvidia.com
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
- <1584649004-8285-3-git-send-email-kwankhede@nvidia.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b2e791ee-e55a-3142-119c-c2f4300fabd5@redhat.com>
-Date: Mon, 23 Mar 2020 21:30:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <bounces@canonical.com>) id 1jGTij-0000RH-1F
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 16:30:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38386)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jGTii-0000Ps-Q9
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 16:30:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jGTig-0007UC-W3
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 20:30:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EEA842E8079
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 20:30:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1584649004-8285-3-git-send-email-kwankhede@nvidia.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Mar 2020 20:21:58 -0000
+From: Andreas Hasenack <andreas@canonical.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Invalid; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=seabios; component=main;
+ status=Fix Released; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h janitor paelzer
+ tstrike34
+X-Launchpad-Bug-Reporter: tstrike (tstrike34)
+X-Launchpad-Bug-Modifier: Andreas Hasenack (ahasenack)
+References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
+Message-Id: <158499491887.11989.2855854261686670711.malone@soybean.canonical.com>
+Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e621898ecdfc3ea36e29dbbefa11018e430b8620
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,75 +82,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
- ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
- felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Kirti,
+apt-get will be enough once it's published, and looks like it just was
+published.
 
-On 3/19/20 9:16 PM, Kirti Wankhede wrote:
-> vfio_pfn.ref_count is always updated by holding iommu->lock, using atomic
-> variable is overkill.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+-- =
 
-Thanks
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1866870
 
-Eric
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 9fdfae1cb17a..70aeab921d0f 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -112,7 +112,7 @@ struct vfio_pfn {
->  	struct rb_node		node;
->  	dma_addr_t		iova;		/* Device address */
->  	unsigned long		pfn;		/* Host pfn */
-> -	atomic_t		ref_count;
-> +	unsigned int		ref_count;
->  };
->  
->  struct vfio_regions {
-> @@ -233,7 +233,7 @@ static int vfio_add_to_pfn_list(struct vfio_dma *dma, dma_addr_t iova,
->  
->  	vpfn->iova = iova;
->  	vpfn->pfn = pfn;
-> -	atomic_set(&vpfn->ref_count, 1);
-> +	vpfn->ref_count = 1;
->  	vfio_link_pfn(dma, vpfn);
->  	return 0;
->  }
-> @@ -251,7 +251,7 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
->  
->  	if (vpfn)
-> -		atomic_inc(&vpfn->ref_count);
-> +		vpfn->ref_count++;
->  	return vpfn;
->  }
->  
-> @@ -259,7 +259,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
->  {
->  	int ret = 0;
->  
-> -	if (atomic_dec_and_test(&vpfn->ref_count)) {
-> +	vpfn->ref_count--;
-> +	if (!vpfn->ref_count) {
->  		ret = put_pfn(vpfn->pfn, dma->prot);
->  		vfio_remove_from_pfn_list(dma, vpfn);
->  	}
-> 
+Title:
+  KVM Guest pauses after upgrade to Ubuntu 20.04
 
+Status in QEMU:
+  Invalid
+Status in qemu package in Ubuntu:
+  Invalid
+Status in seabios package in Ubuntu:
+  Fix Released
+
+Bug description:
+  Symptom:
+  Error unpausing domain: internal error: unable to execute QEMU command 'c=
+ont': Resetting the Virtual Machine is required
+
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
+wrapper
+      callback(asyncjob, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
+pcb
+      callback(*args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
+e 66, in newfn
+      ret =3D fn(self, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
+ in resume
+      self._backend.resume()
+    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
+      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
+=3Dself)
+  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
+t': Resetting the Virtual Machine is required
+
+  =
+
+  ---
+
+  As outlined here:
+  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
+
+  After upgrade, all KVM guests are in a default pause state. Even after
+  forcing them off via virsh, and restarting them the guests are paused.
+
+  These Guests are not nested.
+
+  A lot of diganostic information are outlined in the previous bug
+  report link provided. The solution mentioned in previous report had
+  been allegedly integrated into the downstream updates.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
 
