@@ -2,83 +2,83 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B27B6C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 971BBC4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79D5120658
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56D9E2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:29:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W27SgD41"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D5120658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iN5osEg+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56D9E2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGKFv-0002jK-L7
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 06:24:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60593)
+	id 1jGKKz-0004Lj-Ho
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 06:29:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jGKFM-0002Aq-Sm
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:23:53 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jGKKK-0003wt-Nr
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:29:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jGKFL-00022o-Vz
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:23:52 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:50875)
+ (envelope-from <jasowang@redhat.com>) id 1jGKKJ-00045E-QH
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:29:00 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:30991)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jGKFL-00022Z-T5
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:23:51 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jGKKJ-00044s-MN
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:28:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584959031;
+ s=mimecast20190719; t=1584959338;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=daDnbBNoHF11R61Pi4ceqAtvjN+hB7a/SCk81WqvW3M=;
- b=W27SgD41xDT0Si0eDwTVIgM8ZnVCaaofRzwO4bKoUuzkXvmMrcLfiPHEVX9/4tzQCT6JUJ
- pXDdlUF7Fc9KJMpJsCkjqXPa+P5/5HQsZAyTVN3zApfsZe2YTJLA1QV9OorsPVGeUstITj
- U1pUlTYYakY4OdI+sDLEXwb+s9EcnAA=
+ bh=uXZ+XAKwCi3tTOLv9A7nu/l6secYFD7icP6HN2DCu7o=;
+ b=iN5osEg+W10xHke1E0uU//bIOKXcXO3C6BVlmocH4hZ9teSeZJDclI6rlbNnwmLBTYtKQr
+ 88YbEUzjzYO0MLB78tJGapUM3CHJBDUmQN9iLKTVifOkEqTVZBHl6rCXsLoBiCmnTlNa1p
+ ccFVVKC6FCXWVJDGsaoG+XADKkxL3wc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-_Jv2WlICMba5qzRnWcfd-Q-1; Mon, 23 Mar 2020 06:23:47 -0400
-X-MC-Unique: _Jv2WlICMba5qzRnWcfd-Q-1
+ us-mta-254-uEnT6JNMMFKOanundC7Slw-1; Mon, 23 Mar 2020 06:28:55 -0400
+X-MC-Unique: uEnT6JNMMFKOanundC7Slw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76D21800D48;
- Mon, 23 Mar 2020 10:23:46 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-49.ams2.redhat.com
- [10.36.112.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18ED010027AF;
- Mon, 23 Mar 2020 10:23:46 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 540E817449; Mon, 23 Mar 2020 11:23:45 +0100 (CET)
-Date: Mon, 23 Mar 2020 11:23:45 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: Re: [PATCH 13/13] microvm/acpi: use GSI 16-23 for virtio
-Message-ID: <20200323102345.so4l25ya67nvz6l5@sirius.home.kraxel.org>
-References: <20200319080117.7725-1-kraxel@redhat.com>
- <20200319080117.7725-14-kraxel@redhat.com>
- <20200320153016.GK4541@char.us.oracle.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C99538017CC;
+ Mon, 23 Mar 2020 10:28:53 +0000 (UTC)
+Received: from [10.72.12.124] (ovpn-12-124.pek2.redhat.com [10.72.12.124])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E107E1036D00;
+ Mon, 23 Mar 2020 10:28:50 +0000 (UTC)
+Subject: Re: [PATCH v5 0/3] net: tulip: add checks to avoid OOB access
+To: P J P <ppandit@redhat.com>
+References: <20200319174050.759794-1-ppandit@redhat.com>
+ <20f29d89-6d52-2edc-ef7e-13124908256a@redhat.com>
+ <26c0091a-89f1-c956-efba-d1b2e4a13d76@redhat.com>
+ <nycvar.YSQ.7.76.2003231008390.5086@xnncv>
+ <nycvar.YSQ.7.76.2003231056520.5086@xnncv>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <739d25c4-4fd7-2650-a236-902eed1a6eed@redhat.com>
+Date: Mon, 23 Mar 2020 18:28:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200320153016.GK4541@char.us.oracle.com>
+In-Reply-To: <nycvar.YSQ.7.76.2003231056520.5086@xnncv>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,30 +90,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Sven Schnelle <svens@stackframe.org>,
+ Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <pangpei.lq@antfin.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Ziming Zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 20, 2020 at 11:30:16AM -0400, Konrad Rzeszutek Wilk wrote:
-> On Thu, Mar 19, 2020 at 09:01:17AM +0100, Gerd Hoffmann wrote:
-> > With ACPI enabled and IO-APIC being properly declared in the ACPI table=
-s
-> > we can use interrupt lines 16-23 for virtio and avoid shared interrupts=
-.
->=20
-> 7 interrupt lines? Is there a specific requirements of which
-> ones should be assigned to what device?
 
-8 lines (23 is inclusive), one for each virtio device.  It wouldn't give
-you separate config change or per-queue interrupts (I think virtio-mmio
-doesn't support that).  It only avoids sharing interrupts with legacy
-pc devices like rtc and acpi.
+On 2020/3/23 =E4=B8=8B=E5=8D=881:40, P J P wrote:
+> +-- On Mon, 23 Mar 2020, P J P wrote --+
+> | +-- On Mon, 23 Mar 2020, Jason Wang wrote --+
+> | | hw/net/tulip.c:305:20: error: initialization of =E2=80=98_Bool (*)(Ne=
+tClientState *)=E2=80=99
+> | | {aka =E2=80=98_Bool (*)(struct NetClientState *)=E2=80=99} from incom=
+patible pointer type =E2=80=98int
+> | | (*)(NetClientState *)=E2=80=99 {aka =E2=80=98int (*)(struct NetClient=
+State *)=E2=80=99}
+> | | [-Werror=3Dincompatible-pointer-types]
+> | | =C2=A0=C2=A0=C2=A0=C2=A0 .can_receive =3D tulip_can_receive,
+> | | =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~~~~
+> |
+> | Strange, I did not get it.
+>
+> qemu/include/net.h:
+>
+>    typedef int (NetCanReceive)(NetClientState *);
+>
+>    typedef struct NetClientInfo {
+>      ...
+>      NetCanReceive *can_receive;
+>      ...
+>    }
+>
+> @Jason,
+>    Looking at the definition above, 'NetCanReceive' is returning an 'int'=
+ type.
+> When I change 'tulip_can_receive' to return a 'bool', I get the reverse e=
+rror
+>
+> hw/net/tulip.c:305:20: error: initialization of =E2=80=98int (*)(NetClien=
+tState *)=E2=80=99 {aka =E2=80=98int (*)(struct NetClientState *)=E2=80=99}=
+ from incompatible pointer type =E2=80=98_Bool (*)(NetClientState *)=E2=80=
+=99 {aka =E2=80=98_Bool (*)(struct NetClientState *)=E2=80=99}
+> [-Werror=3Dincompatible-pointer-types]
+>    305 |     .can_receive =3D tulip_can_receive,
+>        |                    ^~~~~~~~~~~~~~~~~
+>
+> Maybe because of a stagged local change in your tree? (to confirm)
 
-cheers,
-  Gerd
+
+Right, it's the conversion from int to bool done by Philippe :)
+
+I will fix the conflict after Qiang tests it.
+
+Thanks
+
+
+>
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
