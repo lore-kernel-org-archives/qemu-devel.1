@@ -2,81 +2,77 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 195C8C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 184A8C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8604206C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF82920753
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:04:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFyMBpKm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8604206C3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPyEYCng"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF82920753
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGUuw-0002JL-1R
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 17:47:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39114)
+	id 1jGVBN-00088f-SO
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 18:04:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dnbrdsky@gmail.com>) id 1jGUuG-0001Ts-9P
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:46:49 -0400
+ (envelope-from <mansourweb@gmail.com>) id 1jGVAd-0007iu-T5
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:03:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dnbrdsky@gmail.com>) id 1jGUuF-0000SL-6k
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:46:48 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:42726)
+ (envelope-from <mansourweb@gmail.com>) id 1jGVAc-000050-RO
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:03:43 -0400
+Received: from mail-lf1-x12b.google.com ([2a00:1450:4864:20::12b]:37931)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dnbrdsky@gmail.com>) id 1jGUuE-0000R1-KI
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:46:47 -0400
-Received: by mail-pl1-x641.google.com with SMTP id e1so1477422plt.9
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 14:46:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mansourweb@gmail.com>)
+ id 1jGVAc-0008WB-HX
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:03:42 -0400
+Received: by mail-lf1-x12b.google.com with SMTP id c5so6088003lfp.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 15:03:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lOhU+P5/z3iIKb3J+KQwVAO/9UpQ/XIqujgmXd1fkSM=;
- b=IFyMBpKmE5NC6eDj6M1e04bVd6fpo+OCPUOeadd7JrWkWTxzvnNYKZyygByIHZmdZ0
- 6qvPa7apUurxaWis7BKjK0T+5UpoiMTY+nwSO0OOeiZiuUs2nxowC+QpzCqT8wKgLsaO
- v+NNTQaLxN4CI+D63Em02dRFRTDL2TJsoh1E4wrIKWKTICfbOYuv6IqPaQf5qUYolyZt
- +RT11SCMMSHcRBU3O5+ihI2dmx4TFGALbVgChKEPE//ryBuYD3igkB7WrsQkQyxo1Hoo
- b45c5iowRm2DgfrWAioYCOu3qekvMAVcBHILyLmZqNPCHC7mVUiDEy80FJJTHrKHHGUP
- gTfQ==
+ h=mime-version:from:date:message-id:subject:to;
+ bh=iTYrqTTpZwGkynOZXc/7kcL4LXpv4DFfmgYXXebSOo4=;
+ b=iPyEYCngETY60SBOpfT8M5kFYQS5vhOoMcMnh0UzPWHx3UKpeGj+v3rhqhIOhazy7K
+ OHJXqf3ZAwROzHTuEFN2YoqdYpoTtG3Il7SjYEecfU+NxiBib2R50VT/btfvuJXUgLID
+ RulaF1jOn8v3YP0oN5xrMrfsuB3QGEcP/ymIQ0MCP+lEB677EudpSjw/uh4yYeiNNFBS
+ F8LO62ogX20frx3YffDQHFef7ixkZ+sju2N6/BUg6BQzvQwbMZ0SUT+Kz8U8g6GAd/pT
+ cbRcD31SkDA4A3Ah4lzFaI35BX3Q6pV+rSDDmE6rvauWX1qrWKx0Q4xZnFlRcvxKrQTq
+ d8rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lOhU+P5/z3iIKb3J+KQwVAO/9UpQ/XIqujgmXd1fkSM=;
- b=Z1N3IagGdBzmadb0A+o+1hLCZE+km2ggEGp3IEga52YX+nhCNpyqc9wLl6nt4QpcQN
- qFAUnRbh+5DW2fvdAkwtxu0Jgax4kZ/yzbaNyh3Ub9JXDBp0btBnYo7nJNX3zmK5vuAV
- MC+1WEpgliYCPvXQujZYKEoTku3huzX2hGDlK2DbCmLMahi9B0b8v1TzpGTmj9xteCTv
- ztXoVuyF7R8lkrDPOT4AI6bU2YTGYhgxMJzMdfNvbsY4ZrfurnlBXaFyGSxPhE9N3uj9
- eS9wMxqAtgcCMMaFz4wf3Az9FjE8BkCD1oFvzfTK1yk3g3BckeCn73s2jEq6qr9l8bE/
- qa4Q==
-X-Gm-Message-State: ANhLgQ3gxAhmfmNzyNOD/j6HdnuYJsvWxxHa7P4gQbkojAWHAOLKL8vy
- eeGYlG4iUFFy/CUBIfko4nw95L5hCDYkQi6pzpE=
-X-Google-Smtp-Source: ADFU+vux+EzvDodg5md6jCMDjPqvsckEf43W1mSxUCT5AddVZKPUbJvFJHRZ6TmMwjIKn2xoAjQtIL2v/JadTBwWjic=
-X-Received: by 2002:a17:902:7e05:: with SMTP id
- b5mr21402281plm.253.1585000004754; 
- Mon, 23 Mar 2020 14:46:44 -0700 (PDT)
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=iTYrqTTpZwGkynOZXc/7kcL4LXpv4DFfmgYXXebSOo4=;
+ b=TBp+2+Efg99m9urHazUjxAaPfJpT/SuGtb/xv6gpReVfv2gLcNOUW9s5+i8s3MHQo2
+ vQL98XVqSVp+RDn1LG3/Sy2lGqwkWKU7md0kegcdCOG103vn0+GQSVd+Dy1qdRn6n+nz
+ yzCLxTo/NLuY2RTFhaAxvEHbIRzuF2cpRiM3E9qunyprMZJG5ZBFlZO22Rbn9mn5E2ON
+ p0Dv9piXZs8ywYGr7USoIylSbaFos9s2SiGXqkCDJ3TKFv+jSU8RWLXbLlu1S3UrjAiJ
+ FqQytRVFfYE2RKq6QMiKgtSmNW+ca26/de5hvQ3OTkzBw73ia8hK3a7ReibcygfUD4Kq
+ SKaQ==
+X-Gm-Message-State: ANhLgQ2136y9EiXvaE0rh9GPdrPkT9YnmdndCPlYwo1bP1taZJNmb1d0
+ iCS4LEx5e4IKahqU6c/7/Xa3KIc28lSFt7wJku7idJAHYQM=
+X-Google-Smtp-Source: ADFU+vu80OJeZqX+72p085Y6svZw5QPki2GCq0Puub/LiRN/gWcqSJNLtRFYy63Eah4XowIIx3BDwpBN7jgevPk5ROs=
+X-Received: by 2002:a19:6445:: with SMTP id b5mr13946456lfj.187.1585001020046; 
+ Mon, 23 Mar 2020 15:03:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200320123137.1937091-1-dnbrdsky@gmail.com>
- <158471180295.15515.1369533827289907154@39012742ff91>
- <20200323132556.GG261260@stefanha-x1.localdomain>
-In-Reply-To: <20200323132556.GG261260@stefanha-x1.localdomain>
-From: Daniel Brodsky <dnbrdsky@gmail.com>
-Date: Mon, 23 Mar 2020 14:46:34 -0700
-Message-ID: <CA+ZmoZUFojqmMxNQ1bhGMzjML7OFgDt1GNbogGTw5rte5LD4iw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] Replaced locks with lock guard macros
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Mansour Ahmadi <ManSoSec@gmail.com>
+Date: Mon, 23 Mar 2020 18:03:29 -0400
+Message-ID: <CAGT9xrDKJQW6HV6OWDDck=H0bGzk=7ZTVn6tTfNnv=tH0sr1nA@mail.gmail.com>
+Subject: Potential missing checks
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="000000000000c4c3b705a18cce42"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2a00:1450:4864:20::12b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,44 +84,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 23, 2020 at 6:25 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Fri, Mar 20, 2020 at 06:43:23AM -0700, no-reply@patchew.org wrote:
-> > /tmp/qemu-test/src/util/thread-pool.c:213:5: error: unused variable 'qemu_lockable_auto1' [-Werror,-Wunused-variable]
-> >     QEMU_LOCK_GUARD(&pool->lock);
-> >     ^
-> > /tmp/qemu-test/src/include/qemu/lockable.h:173:29: note: expanded from macro 'QEMU_LOCK_GUARD'
->
-> Apparently gcc suppresses "unused variable" warnings with g_autoptr() so
-> we didn't see this warning before.
->
-> clang does report them so let's silence the warning manually.  Please
-> add G_GNUC_UNUSED onto the g_autoptr variable definition in the
-> QEMU_LOCK_GUARD() macro:
->
->   #define QEMU_LOCK_GUARD(x) \
->       g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ G_GNUC_UNUSED = \
->               qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE((x)))
->
-> The WITH_*_LOCK_GUARD() macros should not require changes because the
-> variable is both read and written.
->
-> You can test locally by building with clang (llvm) instead of gcc:
->
->   ./configure --cc=clang
+--000000000000c4c3b705a18cce42
+Content-Type: text/plain; charset="UTF-8"
 
-Using --cc=clang is causing the following error in several different places:
-qemu/target/ppc/translate.c:1894:18: error: result of comparison
-'target_ulong' (aka 'unsigned int') <= 4294967295
-is always true [-Werror,-Wtautological-type-limit-compare]
-        if (mask <= 0xffffffffu) {
-            ~~~~ ^  ~~~~~~~~~~~
+Hi QEMU developers,
 
-these errors don't come up when building with gcc. Any idea how to fix
-this? Or should I just suppress it?
+I noticed the following two potential missing checks by static analysis and
+detecting inconsistencies on the source code of QEMU. here is the result:
+
+1)
+Missing check on offset:
+https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/disas/arm.c#L2728-L2733
+
+While it is checked here:
+https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/disas/arm.c#L1748-L1752
+
+2)
+Missing check on bmds->dirty_bitmap:
+https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/migration/block.c#L377-L378
+
+While it is checked here:
+https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/migration/block.c#L363-L365
+
+Thanks,
+Mansour
+
+--000000000000c4c3b705a18cce42
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div class=3D"gmail_default" style=3D"font-family:garamond=
+,serif;font-size:large">Hi QEMU developers,</div><div class=3D"gmail_defaul=
+t" style=3D"font-family:garamond,serif;font-size:large"><br></div><div clas=
+s=3D"gmail_default" style=3D"font-family:garamond,serif;font-size:large">I =
+noticed the following two potential missing checks by static analysis and d=
+etecting inconsistencies on the source code of QEMU. here is the result:</d=
+iv><div class=3D"gmail_default" style=3D"font-family:garamond,serif;font-si=
+ze:large"><br></div><div class=3D"gmail_default" style=3D"font-family:garam=
+ond,serif;font-size:large">1)</div><div class=3D"gmail_default" style=3D"fo=
+nt-family:garamond,serif;font-size:large">Missing check on offset:</div><di=
+v class=3D"gmail_default" style=3D"font-family:garamond,serif;font-size:lar=
+ge"><a href=3D"https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f=
+75f1b95bd4df76/disas/arm.c#L2728-L2733">https://github.com/qemu/qemu/blob/c=
+532b954d96f96d361ca31308f75f1b95bd4df76/disas/arm.c#L2728-L2733</a><br></di=
+v><div class=3D"gmail_default" style=3D"font-family:garamond,serif;font-siz=
+e:large"><br></div><div class=3D"gmail_default" style=3D"font-family:garamo=
+nd,serif;font-size:large">While it is checked here:</div><div class=3D"gmai=
+l_default" style=3D"font-family:garamond,serif;font-size:large"><a href=3D"=
+https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/=
+disas/arm.c#L1748-L1752">https://github.com/qemu/qemu/blob/c532b954d96f96d3=
+61ca31308f75f1b95bd4df76/disas/arm.c#L1748-L1752</a><br></div><div class=3D=
+"gmail_default" style=3D"font-family:garamond,serif;font-size:large"><br></=
+div><div class=3D"gmail_default" style=3D"font-family:garamond,serif;font-s=
+ize:large">2)</div><div class=3D"gmail_default" style=3D"font-family:garamo=
+nd,serif;font-size:large">Missing check on bmds-&gt;dirty_bitmap:</div><div=
+ class=3D"gmail_default" style=3D"font-family:garamond,serif;font-size:larg=
+e"><a href=3D"https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f7=
+5f1b95bd4df76/migration/block.c#L377-L378">https://github.com/qemu/qemu/blo=
+b/c532b954d96f96d361ca31308f75f1b95bd4df76/migration/block.c#L377-L378</a><=
+br></div><div class=3D"gmail_default" style=3D"font-family:garamond,serif;f=
+ont-size:large"><br></div><div class=3D"gmail_default" style=3D"font-family=
+:garamond,serif;font-size:large">While it is checked here:</div><div class=
+=3D"gmail_default" style=3D"font-family:garamond,serif;font-size:large"><a =
+href=3D"https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95=
+bd4df76/migration/block.c#L363-L365">https://github.com/qemu/qemu/blob/c532=
+b954d96f96d361ca31308f75f1b95bd4df76/migration/block.c#L363-L365</a><br></d=
+iv><div class=3D"gmail_default" style=3D"font-family:garamond,serif;font-si=
+ze:large"><br></div><div class=3D"gmail_default" style=3D"font-family:garam=
+ond,serif;font-size:large">Thanks,</div><div class=3D"gmail_default" style=
+=3D"font-family:garamond,serif;font-size:large">Mansour</div><div class=3D"=
+gmail_default" style=3D"font-family:garamond,serif;font-size:large"><br></d=
+iv></div>
+
+--000000000000c4c3b705a18cce42--
 
