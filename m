@@ -2,86 +2,81 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C42CC54FCF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAAEC54FCE
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7277B2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A560220722
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ScG0nRMu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7277B2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KX9cbGAR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A560220722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGR5A-00062Q-DR
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52229)
+	id 1jGR6h-00013w-S0
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:43:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jGR3h-0004Ob-UE
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:19 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jGR4j-0005m6-L6
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jGR3g-0003hM-IG
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:17 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:54994)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jGR3g-0003d2-5t
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:16 -0400
-Received: by mail-wm1-x335.google.com with SMTP id c81so301468wmd.4
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 10:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+sdCGXZ0IH39nXvNC2u1iOLChVbNjxfhaAdkIpUlxus=;
- b=ScG0nRMunN6UkHbL6ofwZGgl7PqEr+TpHwO3MZLIDEDykB0XrNU6JTAxrpgVOQOjCR
- jgcXMJVvsJ2Cj7i4ZEBmTMc9x8xpLMbwqMqo4ouqeZnxzi8Cbg9iayl7jHvPTVXTOii1
- ObYEqhratblHuedkRZdjwo1t9Ylqzbi99/8sp+NVjxwfHpmAxo3i8xhfi2hgRADk5RJ/
- DWuJpkimojmgdDJ/kWdo9GSTUUKOE1c6WiF03Kk95VEpOS7TfG8g33Wc20KhXmzMq5hW
- TbgtfYsNey1V3/AJnagr+lNmCXhUplGtJA9734N8TxXb5Sxm4mniFebo+wHvSa97hnp0
- 4OdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+sdCGXZ0IH39nXvNC2u1iOLChVbNjxfhaAdkIpUlxus=;
- b=djFq9ryczRksS0p9yL8MoNHQeoGg/voftoyhLHhgeLUEz6GNv1fgYxMGqqdViQWLNP
- Rxbl7PaZrEAFofB30Fj0AFZ5JJU+8vs35+VUl9hdX6qXfJixyXUOaR5V1ksGoYBYcV09
- JPO0/8P/0uTR1nXG5Yln/s2LXz1sJ3AOjxThhFHvMXt/2EwgtmrEF9/gHBjHuCaaOBFG
- bv0FtBmtzBe0eERs399Ks4AwER6C5MgV+bMuaU5yK/lu957RR18QcCWyJt1HOXDGhzxh
- 7C26Dg13PbXX3DiYBtoGzjYT2ryAhRkWRclRY4aJfMrClKtWOgONB+UwwHJzYVduP8ee
- lnQQ==
-X-Gm-Message-State: ANhLgQ3lmgjFbcux+HX23uWj5rsrHRq7FLS/pVJM8EA+I4z1audhotuG
- vsxqSkLAK1rcxm+WSGxOHJV8H7ZYRYzvFQ==
-X-Google-Smtp-Source: ADFU+vuFwQIj2laXeTCHAHOPYo1adea0RF/SDU9+nSlTxIV/IZiljXAoi94jVJ3sOCrs5uDwRCKGPQ==
-X-Received: by 2002:a05:600c:21d2:: with SMTP id
- x18mr396725wmj.75.1584985209739; 
- Mon, 23 Mar 2020 10:40:09 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o9sm25145282wrw.20.2020.03.23.10.40.08
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 10:40:08 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 0/5] target-arm queue
-Date: Mon, 23 Mar 2020 17:40:01 +0000
-Message-Id: <20200323174006.8468-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <kwolf@redhat.com>) id 1jGR4h-0004jQ-C8
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:41:20 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60640)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jGR4h-0004hl-0t
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:41:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584985278;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HphUaKrtUqOxdbT9Ia8tkqJHdcS2my5hGgZmindu1AE=;
+ b=KX9cbGARIYmci2MK1NSQnQKe+blXqf+TuYojkF3fckVJZ4Q8OBv20Cx9OZoJRlLLEQ/aNw
+ 2tmVkj7ZEGnRmunDx+/ht6nUheApfd8TwUBiYwFABuEIJ/I4GVXrtDrGSsMoYLgFnp9hMM
+ wutF90zvFd3NZpXSWKSJRs/I9MJGKR0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-LsjM0ydUOX-PU_1e9IB41A-1; Mon, 23 Mar 2020 13:41:13 -0400
+X-MC-Unique: LsjM0ydUOX-PU_1e9IB41A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E817496F01;
+ Mon, 23 Mar 2020 17:41:10 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-85.ams2.redhat.com [10.36.114.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E9E235C1AD;
+ Mon, 23 Mar 2020 17:41:09 +0000 (UTC)
+Date: Mon, 23 Mar 2020 18:41:08 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v5 3/4] qmp: Move dispatcher to a coroutine
+Message-ID: <20200323174108.GD8049@linux.fritz.box>
+References: <20200218154036.28562-1-kwolf@redhat.com>
+ <20200218154036.28562-4-kwolf@redhat.com>
+ <87d09965g3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::335
+In-Reply-To: <87d09965g3.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,70 +88,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just a few minor bugfixes, but we might as well get them in
-for rc0 tomorrow.
+Am 18.03.2020 um 16:36 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+> > This moves the QMP dispatcher to a coroutine and runs all QMP command
+> > handlers that declare 'coroutine': true in coroutine context so they
+> > can avoid blocking the main loop while doing I/O or waiting for other
+> > events.
+> >
+> > For commands that are not declared safe to run in a coroutine, the
+> > dispatcher drops out of coroutine context by calling the QMP command
+> > handler from a bottom half.
+> >
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>=20
+> Uh, what about @cur_mon?
+>=20
+> @cur_mon points to the current monitor while a command executes.
+> Initial value is null.  It is set in three places (not counting unit
+> tests), and all three save, set, do something that may use @cur_mon,
+> restore:
+>=20
+> * monitor_qmp_dispatch(), for use within qmp_dispatch()
+> * monitor_read(), for use within handle_hmp_command()
+> * qmp_human_monitor_command(), also for use within handle_hmp_command()
+>=20
+> Therefore, @cur_mon is null unless we're running within qmp_dispatch()
+> or handle_hmp_command().
 
--- PMM
+Can we make it NULL for coroutine-enabled handlers?
 
-The following changes since commit 787f82407c5056a8b1097e39e53d01dd1abe406b:
+> Example of use: error_report() & friends print "to current monitor if we
+> have one, else to stderr."  Makes sharing code between HMP and CLI
+> easier.  Uses @cur_mon under the hood.
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200323' into staging (2020-03-23 15:38:30 +0000)
+error_report() eventually prints to stderr both for cur_mon =3D=3D NULL and
+for QMP monitors. Is there an important difference between both cases?
 
-are available in the Git repository at:
+There is error_vprintf_unless_qmp(), which behaves differently for both
+cases. However, it is only used in VNC code, so that code would have to
+keep coroutines disabled.
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200323
+Is cur_mon used much in other functions called by QMP handlers?
 
-for you to fetch changes up to 550a04893c2bd4442211b353680b9a6408d94dba:
+> @cur_mon is thread-local.
+>=20
+> I'm afraid we have to save, clear and restore @cur_mon around a yield.
 
-  target/arm: Move computation of index in handle_simd_dupe (2020-03-23 17:22:30 +0000)
+That sounds painful enough that I'd rather avoid it.
 
-----------------------------------------------------------------
-target-arm queue:
- * target/arm: avoid undefined behaviour shift in watchpoint code
- * target/arm: avoid undefined behaviour shift in handle_simd_dupe()
- * target/arm: add assert that immh != 0 in disas_simd_shift_imm()
- * aspeed/smc: Fix DMA support for AST2600
- * hw/arm/bcm283x: Correct the license text ('and' vs 'or')
+Kevin
 
-----------------------------------------------------------------
-Cédric Le Goater (1):
-      aspeed/smc: Fix DMA support for AST2600
-
-Philippe Mathieu-Daudé (1):
-      hw/arm/bcm283x: Correct the license text
-
-Richard Henderson (3):
-      target/arm: Rearrange disabled check for watchpoints
-      target/arm: Assert immh != 0 in disas_simd_shift_imm
-      target/arm: Move computation of index in handle_simd_dupe
-
- include/hw/arm/bcm2835_peripherals.h |  3 ++-
- include/hw/arm/bcm2836.h             |  3 ++-
- include/hw/char/bcm2835_aux.h        |  3 ++-
- include/hw/display/bcm2835_fb.h      |  3 ++-
- include/hw/dma/bcm2835_dma.h         |  4 +++-
- include/hw/intc/bcm2835_ic.h         |  4 +++-
- include/hw/intc/bcm2836_control.h    |  3 ++-
- include/hw/misc/bcm2835_mbox.h       |  4 +++-
- include/hw/misc/bcm2835_mbox_defs.h  |  4 +++-
- include/hw/misc/bcm2835_property.h   |  4 +++-
- hw/arm/aspeed_ast2600.c              |  6 ++++++
- hw/arm/bcm2835_peripherals.c         |  3 ++-
- hw/arm/bcm2836.c                     |  3 ++-
- hw/arm/raspi.c                       |  3 ++-
- hw/display/bcm2835_fb.c              |  1 -
- hw/dma/bcm2835_dma.c                 |  4 +++-
- hw/intc/bcm2835_ic.c                 |  4 ++--
- hw/intc/bcm2836_control.c            |  4 +++-
- hw/misc/bcm2835_mbox.c               |  4 +++-
- hw/misc/bcm2835_property.c           |  4 +++-
- hw/ssi/aspeed_smc.c                  | 15 +++++++++++++--
- target/arm/helper.c                  | 11 ++++++-----
- target/arm/translate-a64.c           |  6 +++++-
- hw/ssi/trace-events                  |  1 +
- 24 files changed, 76 insertions(+), 28 deletions(-)
 
