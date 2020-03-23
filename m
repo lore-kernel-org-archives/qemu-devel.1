@@ -7,58 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1527BC4332E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CDF4C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:52:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D433220736
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:50:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47B3820736
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:52:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="xPsIXPFZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D433220736
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IxKd0egv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47B3820736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGInH-0004aY-0e
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 04:50:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48437)
+	id 1jGIoT-0006zf-FB
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 04:52:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48500)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=2351ca747f=bbhushan2@marvell.com>)
- id 1jGIja-0008T2-4M
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:46:59 -0400
+ id 1jGIjn-00009P-JQ
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=2351ca747f=bbhushan2@marvell.com>)
- id 1jGIjY-00039U-U9
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:46:57 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:35584)
+ id 1jGIjm-0003F4-BD
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:47:11 -0400
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:10634)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=2351ca747f=bbhushan2@marvell.com>)
- id 1jGIjY-00039L-PN; Mon, 23 Mar 2020 04:46:56 -0400
+ id 1jGIji-0003CP-Jq; Mon, 23 Mar 2020 04:47:06 -0400
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
  by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02N8eL99013746; Mon, 23 Mar 2020 01:46:52 -0700
+ 02N8ePfP013763; Mon, 23 Mar 2020 01:47:04 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0818; bh=RiNtP0lrtaA2ZggFVaFqGet0PIqt/tlcLob6DvD3BIo=;
- b=xPsIXPFZH1oBDFsmhrf4vd1qjKM+gRvSsYTpuGTLutwgM7aCvKuU1+Lgutt5N4zcrJgQ
- yUSMhQ4PRW97XYPXqfG73NELAFSyBEYLViw0AkZfNfPtCUy4N6+m9YainsvFkgoXz2Dr
- Z2jFZQBkzfhznDLi/LPGD+sDv7w5ogXuAYimPhC0Ks7sXiOQoRGxOoUlQMUhQg2dzf5Q
- 5C7yXBz+6rvKilU8ualk7AGCRU0NDwY9sX7kqNFCEbA59cFYHNEO0YOxXgRS8ZHiSZcP
- faM5/b9Z7OU2PnCBpkzbINye+E/KKOd9YhAFXHW6p5/A8BDaiRvJICJ2H+qVBO41t6g7 RA== 
-Received: from sc-exch03.marvell.com ([199.233.58.183])
- by mx0b-0016f401.pphosted.com with ESMTP id 2ywvkqkxcc-1
+ content-type; s=pfpt0818; bh=6uTNrZsOxWL293QbnMDHDEcZhVh+4bvO0bI5PoXuaQw=;
+ b=IxKd0egvumpqD+jjivEF0CZQiDPWXIU5qb2XL+zYpDUwtN2m4q8tQHcTbHztHx2fQ0gw
+ DN8DBbZKzU5962T9kqfPxj61B0ob78zzdcc2M+Dl+fDAB/gukga9LTeWdA5i541adS/0
+ 6vdkFpsPmP+zPcsKp+4CXX8zTrb8h8vmpApaXt+HfZkvPs39iGpp8u5y7hv7JCxMHNm+
+ gGzrHk4YJ8rvEfrl4YfZjzat3XFLjK6+RsdxU1fz5mzL6syuHeGJv5lfPOD5x52cDGM1
+ KdvIPSOn+f9VnaVYQLD3ONfXSUvg9qhriQRAm8PdpHoKfIHf6JN1wKshZznjREh5w6tQ Gg== 
+Received: from sc-exch04.marvell.com ([199.233.58.184])
+ by mx0b-0016f401.pphosted.com with ESMTP id 2ywvkqkxcm-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Mon, 23 Mar 2020 01:46:51 -0700
-Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 23 Mar
- 2020 01:46:49 -0700
+ Mon, 23 Mar 2020 01:47:04 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH04.marvell.com
+ (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+ Mon, 23 Mar 2020 01:47:01 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+ Mon, 23 Mar 2020 01:47:01 -0700
 Received: from bbhushan2.marvell.com (10.93.176.43) by SC-EXCH03.marvell.com
  (10.93.176.83) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Mon, 23 Mar 2020 01:46:45 -0700
+ Transport; Mon, 23 Mar 2020 01:46:56 -0700
 From: Bharat Bhushan <bbhushan2@marvell.com>
 To: <peter.maydell@linaro.org>, <peterx@redhat.com>,
  <eric.auger.pro@gmail.com>, <alex.williamson@redhat.com>,
@@ -67,9 +70,9 @@ To: <peter.maydell@linaro.org>, <peterx@redhat.com>,
  <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
  <bharatb.linux@gmail.com>, <jean-philippe@linaro.org>,
  <yang.zhong@intel.com>
-Subject: [PATCH v9 4/9] virtio-iommu: set supported page size mask
-Date: Mon, 23 Mar 2020 14:16:12 +0530
-Message-ID: <20200323084617.1782-5-bbhushan2@marvell.com>
+Subject: [PATCH v9 6/9] virtio-iommu: Call iommu notifier for attach/detach
+Date: Mon, 23 Mar 2020 14:16:14 +0530
+Message-ID: <20200323084617.1782-7-bbhushan2@marvell.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200323084617.1782-1-bbhushan2@marvell.com>
 References: <20200323084617.1782-1-bbhushan2@marvell.com>
@@ -96,55 +99,115 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add optional interface to set page size mask.
-Currently this is set global configuration and not
-per endpoint.
+iommu-notifier are called when a device is attached
+or detached to as address-space.
+This is needed for VFIO.
 
 Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
 ---
- include/hw/virtio/virtio-iommu.h | 1 +
- hw/virtio/virtio-iommu.c         | 9 +++++++++
- 2 files changed, 10 insertions(+)
+ hw/virtio/virtio-iommu.c | 49 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-index 6f67f1020a..4efa09610a 100644
---- a/include/hw/virtio/virtio-iommu.h
-+++ b/include/hw/virtio/virtio-iommu.h
-@@ -35,6 +35,7 @@ typedef struct IOMMUDevice {
-     void         *viommu;
-     PCIBus       *bus;
-     int           devfn;
-+    uint64_t      page_size_mask;
-     IOMMUMemoryRegion  iommu_mr;
-     AddressSpace  as;
- } IOMMUDevice;
 diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 4cee8083bc..a28818202c 100644
+index bd464d4fb3..88849aa7b9 100644
 --- a/hw/virtio/virtio-iommu.c
 +++ b/hw/virtio/virtio-iommu.c
-@@ -650,6 +650,14 @@ static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
-     return (ua > ub) - (ua < ub);
+@@ -49,6 +49,7 @@ typedef struct VirtIOIOMMUEndpoint {
+     uint32_t id;
+     VirtIOIOMMUDomain *domain;
+     QLIST_ENTRY(VirtIOIOMMUEndpoint) next;
++    VirtIOIOMMU *viommu;
+ } VirtIOIOMMUEndpoint;
+ 
+ typedef struct VirtIOIOMMUInterval {
+@@ -155,11 +156,48 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
+     memory_region_notify_iommu(mr, 0, entry);
  }
  
-+static void virtio_iommu_set_page_size_mask(IOMMUMemoryRegion *mr,
-+                                            uint64_t page_size_mask)
++static gboolean virtio_iommu_mapping_unmap(gpointer key, gpointer value,
++                                           gpointer data)
 +{
-+    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
++    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
++    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
 +
-+    sdev->page_size_mask = page_size_mask;
++    virtio_iommu_notify_unmap(mr, interval->low,
++                              interval->high - interval->low + 1);
++
++    return false;
 +}
 +
- static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
++static gboolean virtio_iommu_mapping_map(gpointer key, gpointer value,
++                                         gpointer data)
++{
++    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
++    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
++    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
++
++    virtio_iommu_notify_map(mr, interval->low, mapping->phys_addr,
++                            interval->high - interval->low + 1);
++
++    return false;
++}
++
+ static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
  {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -865,6 +873,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
-     IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
++    VirtIOIOMMU *s = ep->viommu;
++    VirtIOIOMMUDomain *domain = ep->domain;
++    IOMMUDevice *sdev;
++
+     if (!ep->domain) {
+         return;
+     }
++
++    QLIST_FOREACH(sdev, &s->notifiers_list, next) {
++        if (ep->id == sdev->devfn) {
++            g_tree_foreach(domain->mappings, virtio_iommu_mapping_unmap,
++                           &sdev->iommu_mr);
++        }
++    }
++
+     QLIST_REMOVE(ep, next);
+     ep->domain = NULL;
+ }
+@@ -178,6 +216,7 @@ static VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
+     }
+     ep = g_malloc0(sizeof(*ep));
+     ep->id = ep_id;
++    ep->viommu = s;
+     trace_virtio_iommu_get_endpoint(ep_id);
+     g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
+     return ep;
+@@ -274,6 +313,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+     uint32_t ep_id = le32_to_cpu(req->endpoint);
+     VirtIOIOMMUDomain *domain;
+     VirtIOIOMMUEndpoint *ep;
++    IOMMUDevice *sdev;
  
-     imrc->translate = virtio_iommu_translate;
-+    imrc->iommu_set_page_size_mask = virtio_iommu_set_page_size_mask;
+     trace_virtio_iommu_attach(domain_id, ep_id);
+ 
+@@ -299,6 +339,14 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+ 
+     ep->domain = domain;
+ 
++    /* Replay domain mappings on the associated memory region */
++    QLIST_FOREACH(sdev, &s->notifiers_list, next) {
++        if (ep_id == sdev->devfn) {
++            g_tree_foreach(domain->mappings, virtio_iommu_mapping_map,
++                           &sdev->iommu_mr);
++        }
++    }
++
+     return VIRTIO_IOMMU_S_OK;
  }
  
- static const TypeInfo virtio_iommu_info = {
+@@ -872,6 +920,7 @@ static gboolean reconstruct_endpoints(gpointer key, gpointer value,
+ 
+     QLIST_FOREACH(iter, &d->endpoint_list, next) {
+         iter->domain = d;
++        iter->viommu = s;
+         g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
+     }
+     return false; /* continue the domain traversal */
 -- 
 2.17.1
 
