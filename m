@@ -2,90 +2,93 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D504AC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D654C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A61FE2073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:28:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61FE2073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 28EB92073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:33:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vJoevMRv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28EB92073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGVYT-0007NC-QF
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 18:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43945)
+	id 1jGVde-0000P6-6q
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 18:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jGVXs-0006su-Jj
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:27:45 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jGVcl-0008Mz-Or
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jGVXr-0005k5-FN
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:27:44 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46108
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jGVXp-0005hW-0U; Mon, 23 Mar 2020 18:27:41 -0400
-Received: from host86-130-37-163.range86-130.btcentralplus.com
- ([86.130.37.163] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jGVYD-0000WZ-Hm; Mon, 23 Mar 2020 22:28:10 +0000
-To: John Snow <jsnow@redhat.com>
-References: <20200317232329.22362-1-jsnow@redhat.com>
- <CAFEAcA_7p_B8U3W4gV2rT5JE3djE=gy_vs5vUcWVjqYiVan3dw@mail.gmail.com>
- <35a905a9-e781-5727-1395-0155f368afbd@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <10077813-5077-79b3-3602-388f146951f0@ilande.co.uk>
-Date: Mon, 23 Mar 2020 22:27:30 +0000
+ (envelope-from <richard.henderson@linaro.org>) id 1jGVcj-0008UT-Ie
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:32:47 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44105)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jGVcg-0008TJ-8S
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:32:43 -0400
+Received: by mail-pf1-x444.google.com with SMTP id b72so8232696pfb.11
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 15:32:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=B1oZ3xJQlrTnwzdoP0iQy9GJ+m+WfSwOXkbFFTIIFrw=;
+ b=vJoevMRvgz4Kub1jCXQAxSKRHjwQybzSdNl2GIxDt6xYJx1fcqN6BC7X2wNnpXH/IQ
+ 2qyG89RlZkRjDBdIHSD9ueqwGcezcRBUZ5BIZixWdHJotLFrQWgQs9kvM+VPwDKJ1Y+P
+ vmwExlhl5KRaw2bPan/ddHZjUBfP2LN1SaPcNCJyqFmwpJ6IEdlnAj7NWz4PnmUx5rhz
+ ItFGDzYrcYGRYMmc0HAGi2XAv/lCxzJdpy6EoWt8jrrJKu39/U7b04/v3Ks860frFYJ4
+ VayBxcFiD4cLpna1Oj977g9Vh9rmk0Fphht3lzLwTg0i/ZuHR/lhZRnVARekPr4qAKoF
+ qf5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=B1oZ3xJQlrTnwzdoP0iQy9GJ+m+WfSwOXkbFFTIIFrw=;
+ b=UDgFUtHz6QwqfH55G87AtFqejQDVwYZy2jm0G6NOzphXepVelC0/2VM8X7yu33pM8j
+ nPfVOLDeS9WcP+j3TtQvkzIRrfs5umiKHW+BcOHoPyg0KFtb05dIyXXGQPgCdjB6IKH+
+ 22ZVGdbVR23NSRbPF+dfEwIv5vrbPQb+cQ/DuLQmglQyypOnDnMWqq1mytzlbLPU52fe
+ gslqzwT0VipE+jG7YvVfXmJ3/OJR3aEsVFeUG+PIS95Ubzj2AwQO016YWVO8+eC2mheH
+ 10YyxqPRleAvah1YKu2sNajMzfoAx6gUJVHMptQDHF2HPO1f8jSva3tm8yPVR+9/9+lp
+ djsg==
+X-Gm-Message-State: ANhLgQ2hZWj9f3olO9Y6aI0dg4jw7ujJarEwEchzBMMmrI77+cWhMw7t
+ 7Vn/RNHsIkjIghqIoV7CesWfdu7urOM=
+X-Google-Smtp-Source: ADFU+vs12ITDrvyKCdEnDq7oq5vOufSHjna5i3zY8ww4MjfweETIzGYxSAavfP/x1hecjGuhcsr2+A==
+X-Received: by 2002:a63:ca0f:: with SMTP id n15mr22650091pgi.311.1585002760618; 
+ Mon, 23 Mar 2020 15:32:40 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ f8sm14113610pfn.2.2020.03.23.15.32.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 15:32:39 -0700 (PDT)
+Subject: Re: [PATCH v4 0/2] Replaced locks with lock guard macros
+To: Daniel Brodsky <dnbrdsky@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+References: <20200320123137.1937091-1-dnbrdsky@gmail.com>
+ <158471180295.15515.1369533827289907154@39012742ff91>
+ <20200323132556.GG261260@stefanha-x1.localdomain>
+ <CA+ZmoZUFojqmMxNQ1bhGMzjML7OFgDt1GNbogGTw5rte5LD4iw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1b0fa063-6fe4-ad40-06b2-9c3f2f955a06@linaro.org>
+Date: Mon, 23 Mar 2020 15:32:38 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <35a905a9-e781-5727-1395-0155f368afbd@redhat.com>
+In-Reply-To: <CA+ZmoZUFojqmMxNQ1bhGMzjML7OFgDt1GNbogGTw5rte5LD4iw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.130.37.163
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PULL 00/20] Ide patches
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,53 +100,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/03/2020 18:02, John Snow wrote:
-
-> On 3/19/20 8:33 AM, Peter Maydell wrote:
->> On Tue, 17 Mar 2020 at 23:23, John Snow <jsnow@redhat.com> wrote:
->>>
->>> The following changes since commit 373c7068dd610e97f0b551b5a6d0a27cd6da4506:
->>>
->>>   qemu.nsi: Install Sphinx documentation (2020-03-09 16:45:00 +0000)
->>>
->>> are available in the Git repository at:
->>>
->>>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->>>
->>> for you to fetch changes up to 7d0776ca7f853d466b6174d96daa5c8afc43d1a4:
->>>
->>>   hw/ide: Remove unneeded inclusion of hw/ide.h (2020-03-17 12:22:36 -0400)
->>>
->>> ----------------------------------------------------------------
->>> Pull request
->>>
->>> ----------------------------------------------------------------
->>>
+On 3/23/20 2:46 PM, Daniel Brodsky wrote:
+> On Mon, Mar 23, 2020 at 6:25 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
 >>
+>> On Fri, Mar 20, 2020 at 06:43:23AM -0700, no-reply@patchew.org wrote:
+>>> /tmp/qemu-test/src/util/thread-pool.c:213:5: error: unused variable 'qemu_lockable_auto1' [-Werror,-Wunused-variable]
+>>>     QEMU_LOCK_GUARD(&pool->lock);
+>>>     ^
+>>> /tmp/qemu-test/src/include/qemu/lockable.h:173:29: note: expanded from macro 'QEMU_LOCK_GUARD'
 >>
->> Applied, thanks.
+>> Apparently gcc suppresses "unused variable" warnings with g_autoptr() so
+>> we didn't see this warning before.
 >>
->> Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
->> for any user-visible changes.
+>> clang does report them so let's silence the warning manually.  Please
+>> add G_GNUC_UNUSED onto the g_autoptr variable definition in the
+>> QEMU_LOCK_GUARD() macro:
 >>
->> -- PMM
+>>   #define QEMU_LOCK_GUARD(x) \
+>>       g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ G_GNUC_UNUSED = \
+>>               qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE((x)))
 >>
+>> The WITH_*_LOCK_GUARD() macros should not require changes because the
+>> variable is both read and written.
+>>
+>> You can test locally by building with clang (llvm) instead of gcc:
+>>
+>>   ./configure --cc=clang
 > 
-> Mark, I'm sorry to foist this on you, but would you mind updating the
-> changelog?
+> Using --cc=clang is causing the following error in several different places:
+> qemu/target/ppc/translate.c:1894:18: error: result of comparison
+> 'target_ulong' (aka 'unsigned int') <= 4294967295
+> is always true [-Werror,-Wtautological-type-limit-compare]
+>         if (mask <= 0xffffffffu) {
+>             ~~~~ ^  ~~~~~~~~~~~
 > 
-> --js
+> these errors don't come up when building with gcc. Any idea how to fix
+> this? Or should I just suppress it?
 
-Done. I've added them under https://wiki.qemu.org/ChangeLog/5.0#Block_devices since
-there doesn't seem to be a dedicated IDE section.
+I'm of the opinion that it should be suppressed.
+
+This is the *correct* test for ppc64, and the warning for ppc32 is simply
+because target_ulong == uint32_t.  True is the correct result for ppc32.
+
+We simply want the compiler to DTRT: simplify this test and remove the else as
+unreachable.
 
 
-ATB,
-
-Mark.
+r~
 
