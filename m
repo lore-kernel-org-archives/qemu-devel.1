@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDD8C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 866D6C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:21:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65BA820722
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:21:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55B5E20722
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:21:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KuzNJvRY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65BA820722
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ucQMyWeF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B5E20722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGPpJ-00012b-HC
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:21:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35389)
+	id 1jGPpM-0001A1-ET
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:21:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35448)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jGPjd-0000xD-9B
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:30 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jGPjj-00016R-5V
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jGPjc-0002TL-63
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:29 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34365)
+ (envelope-from <alex.bennee@linaro.org>) id 1jGPjh-0002VR-Q4
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:35 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:35567)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jGPjc-0002T6-0L
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:28 -0400
-Received: by mail-wr1-x434.google.com with SMTP id 65so1130943wrl.1
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:15:27 -0700 (PDT)
+ id 1jGPjh-0002Ut-HD
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:33 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id m3so142358wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:15:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=a+eVpTg0MHn6LPO3owiIyrC48R6QnWbQHBq+aT77u9Q=;
- b=KuzNJvRY8aDQksVDqXpFWMFM/qqc8ok5YONYmRLmZ0UIxCVoIX2UGDm9QS6HMJ2tIn
- lkTL7tuFlTxXTEKTAlP3kdAYfaZzNlRAjSMOQYg4aph0MHjZ7U0sAKuQ5VUnkTPYkIm0
- T47Xt0qfSQYSc4iUcqgl1ilk0XWXWu2T/0cSzi3+deOefYimf5TuoZP/xzIHtEX8eiTv
- u9OmGSReb4e7tfMuRT1GBPR5wsWaVAN4/U0bMvE6qVlGTgNmcVC79kmmhYA9Ig2nm5nt
- axM+OXLuTtH66iRd0QxgxGBHfZnS1ZMFdA1QUy/WXWsJbh5DTBkDZgIc2/PlMWr1ahbl
- jHlA==
+ bh=RvjIJhPsdKWWNXjYUSDeq/ngJaUqsOKcgImX80kKZUM=;
+ b=ucQMyWeFRcD4yd5Vj4eRVneYa750CMSWIRXfWumPLv//Xp2PISDOOEUU2hurpTMmnu
+ 1zDUt/LCHi668suhM4807Cd0xh9+DFPoWoZdCZny60BB9xxwQTMFE9KCmvUaMIOFrbTJ
+ ILmX2NBxFQExlknsFT2dUJ5TlBPq2ZDviVlPbMCotrIBkyJkfwZvuOmXpTHhMm7oJlr9
+ Uj3lTKXRm5ivGDHCBfLOQEteRs/tnAznNNgI3GkdH4A80eaDYvZfQFbGtlz8/49jo/xu
+ X/5ugeyJlou6FsZBT6GI3Hkw4bQy6WTrbN16LktdrjNUcaz1zfvpY2S8u51sdnff5j+c
+ A7ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=a+eVpTg0MHn6LPO3owiIyrC48R6QnWbQHBq+aT77u9Q=;
- b=T4+3KDe5WLWoCO3+NJc8OLWWXCQCybfuzg1g3F6Xq7+6Bb1l0oQywPfr5zmz4W45UL
- 6NwjvVRBQa9LGgsjjlzwj2cm0LW/jFfFjdAKJpwXTKOsEVUK4s+e3CdXdGij+6NHLAh7
- UZOdVeOJG9CZMo6Ltw7Y/3wJcsDUpGqrBlEw8HLUB7qzUKyaZcJ8N17UphaWjHTQRmbw
- 9QNfIDhNLCRGYzfXQXsf4ZIatFYvBYe17yACtY7P3hOdyGCV6dRngU1qQ0YR6sJnAuKD
- 3rY4Q0rXr7SwTQwQiz03r9zRkZyUyES8PHG0OR6E3cLoGjfokroJ+zAB9qkL+46LL9mK
- d3nQ==
-X-Gm-Message-State: ANhLgQ2BkKbzax58Jma4joFXV9Qm7ED22l+sd/L/tpqCkN1P+djjlkrC
- VNYb+bT8Zi2+6Gk2gm2PFJQbFQ==
-X-Google-Smtp-Source: ADFU+vuxodmO3BYlh3ycQKxNxKHH3PUgE0BZyDccF3+bojAJEygiRCq7B4ITC99n/MnUtG7V8vF9sA==
-X-Received: by 2002:adf:dfce:: with SMTP id q14mr32067901wrn.326.1584980126935; 
- Mon, 23 Mar 2020 09:15:26 -0700 (PDT)
+ bh=RvjIJhPsdKWWNXjYUSDeq/ngJaUqsOKcgImX80kKZUM=;
+ b=g2vWIbLhAR8pRMPCrG+a/KTdvaeA7lXyTJbs6IfzcRxr8tb8u9oHgNrbqtdWIaQhCb
+ nV30BTRI3RZ8GcW9+d4ElRRULdy+mqenoMKQc7+XwtY8C9d8M3EGch88l1HT27DL3t17
+ 2G6O6jgc5MPTIJJOTDfMs6G7Yk+3U5HqanU9ENKzMj6uwfCy4y8L7UsoXWUmVHEWbGeh
+ CQmYuXeIc7Zfw6YafGVxiXVF+sQokIdHSBStIcOCVEmyRuei+w2JwuVFWtCcUkSOYj6/
+ G9LHJRz18eXL1YdX5AHAK7UvXsVwH5jGA2/4QtRJsY2nO6mQNJrdPp7qHRoNqhNAhPxl
+ B9xw==
+X-Gm-Message-State: ANhLgQ3AXuUzdwkCVXRuuft1o89wTlAwstT6lc2d9AXSEZQ0IiQzBku5
+ etnfXpxcJux4H3ic3LhZJQOjEw==
+X-Google-Smtp-Source: ADFU+vvTXPuAW62P0H+70cobdY+W8/40wMhg7xPRQHAFlKfrjvwdr53Llo3qRY5k3SV8oGoLERWpDQ==
+X-Received: by 2002:a1c:c3c3:: with SMTP id t186mr20546wmf.118.1584980132418; 
+ Mon, 23 Mar 2020 09:15:32 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j2sm7899703wrs.64.2020.03.23.09.15.18
+ by smtp.gmail.com with ESMTPSA id k84sm101549wmk.2.2020.03.23.09.15.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Mon, 23 Mar 2020 09:15:24 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2D9671FF96;
+ by zen.linaroharston (Postfix) with ESMTP id B1A151FF7E;
  Mon, 23 Mar 2020 16:15:16 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 08/11] tests/docker: Install gcrypt devel package in Debian
- image
-Date: Mon, 23 Mar 2020 16:15:11 +0000
-Message-Id: <20200323161514.23952-9-alex.bennee@linaro.org>
+Subject: [PATCH  v1 11/11] .travis.yml: Add a KVM-only s390x job
+Date: Mon, 23 Mar 2020 16:15:14 +0000
+Message-Id: <20200323161514.23952-12-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200323161514.23952-1-alex.bennee@linaro.org>
 References: <20200323161514.23952-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,6 +98,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ "open list:S390 general arch..." <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -106,41 +107,73 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-In commit 6f8bbb374be we enabled building with the gcrypt library
-on the the Debian 'x86 host', which was based on Debian Stretch.
-Later in commit 698a71edbed we upgraded the Debian base image to
-Buster.
+Add a job to build QEMU on s390x with TCG disabled, so
+this configuration won't bitrot over time.
 
-Apparently Debian Stretch was listing gcrypt as a QEMU dependency,
-but this is not the case anymore in Buster, so we need to install
-it manually (it it not listed by 'apt-get -s build-dep qemu' in
-the common debian10.docker anymore). This fixes:
+This job is quick, running check-unit: Ran for 5 min 30 sec
+https://travis-ci.org/github/philmd/qemu/jobs/665456423
 
- $ ../configure $QEMU_CONFIGURE_OPTS
-
-  ERROR: User requested feature gcrypt
-         configure was not able to find it.
-         Install gcrypt devel >= 1.5.0
-
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200322120104.21267-3-philmd@redhat.com>
+Message-Id: <20200322154015.25358-1-philmd@redhat.com>
 ---
- tests/docker/dockerfiles/debian-amd64.docker | 1 +
- 1 file changed, 1 insertion(+)
+ .travis.yml | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index d4849f509f4..957f0bc2e79 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -16,6 +16,7 @@ RUN apt update && \
-     apt install -y --no-install-recommends \
-         libbz2-dev \
-         liblzo2-dev \
-+        libgcrypt20-dev \
-         librdmacm-dev \
-         libsasl2-dev \
-         libsnappy-dev \
+diff --git a/.travis.yml b/.travis.yml
+index 5672d129ec6..e0c72210b7a 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -525,6 +525,48 @@ jobs:
+               $(exit $BUILD_RC);
+           fi
+ 
++    - name: "[s390x] GCC check (KVM)"
++      arch: s390x
++      dist: bionic
++      addons:
++        apt_packages:
++          - libaio-dev
++          - libattr1-dev
++          - libbrlapi-dev
++          - libcap-ng-dev
++          - libgcrypt20-dev
++          - libgnutls28-dev
++          - libgtk-3-dev
++          - libiscsi-dev
++          - liblttng-ust-dev
++          - libncurses5-dev
++          - libnfs-dev
++          - libnss3-dev
++          - libpixman-1-dev
++          - libpng-dev
++          - librados-dev
++          - libsdl2-dev
++          - libseccomp-dev
++          - liburcu-dev
++          - libusb-1.0-0-dev
++          - libvdeplug-dev
++          - libvte-2.91-dev
++          # Tests dependencies
++          - genisoimage
++      env:
++        - TEST_CMD="make check-unit"
++        - CONFIG="--disable-containers --disable-tcg --enable-kvm --disable-tools"
++      script:
++        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
++        - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
++        - |
++          if [ "$BUILD_RC" -eq 0 ] ; then
++              mv pc-bios/s390-ccw/*.img pc-bios/ ;
++              ${TEST_CMD} ;
++          else
++              $(exit $BUILD_RC);
++          fi
++
+     # Release builds
+     # The make-release script expect a QEMU version, so our tag must start with a 'v'.
+     # This is the case when release candidate tags are created.
 -- 
 2.20.1
 
