@@ -2,98 +2,87 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2062CC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0689AC54EEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:34:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF27F20409
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6EFB20409
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:34:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XneQwzy8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF27F20409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ao+4PJOL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6EFB20409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGP5n-0002j2-04
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:34:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53062)
+	id 1jGP6I-0003Kz-V0
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:34:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jGP4j-0001jS-SR
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:33:14 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGP51-00020v-C4
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:33:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jGP4h-0000Hp-SB
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:33:13 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58803)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGP4g-0000FY-70
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:33:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584977589;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5zxq2uDXOchcB2EyfBH+hK//n+GwLZI7tvnMEbLIc14=;
- b=XneQwzy8693ZSR20wHotYjq400+RvzdnM0yqLMTwW5POu5MT+4SpjYkJRbtCqkWvSjB/RR
- O3xxl3y5mjgTCApX6MyoHCsVzBUp2TmREPepLPSOwjGQyDgxnxLkQQdg76lUwN0UuID/S0
- nVVY3LHFGyKuOw5zjbRkKvTtJ79v1QQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-IbJk5qb6PKWXODgoLbETOw-1; Mon, 23 Mar 2020 11:33:07 -0400
-X-MC-Unique: IbJk5qb6PKWXODgoLbETOw-1
-Received: by mail-wr1-f71.google.com with SMTP id p2so7528555wrw.8
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 08:33:07 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jGP50-0000RC-93
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:33:31 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:46776)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGP50-0000Qd-2l
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:33:30 -0400
+Received: by mail-ot1-x333.google.com with SMTP id 111so13727468oth.13
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 08:33:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=wOwiXVcWEnQr1I8cyA7hdB4GB74HWZl3DfCIlkn0V3c=;
+ b=ao+4PJOLhmX9BqIGGdGkwSVffJ7p+evLpSvP3l2vjTD0oWVR1kI8YJWef3VRcWkG5K
+ gMifFAxP7aTjdSZN31DbSw6ZUq8ekkqwDnAGRomZzvFMwpN9zNictyUvx6ZJ4jTIwPvk
+ tGGini4boScRs5k4MqlcmWmh7e6b0v933dkcgoWohks2Mvus1/NfwwVLiUBuqAACaTK5
+ ZTSfuwp/f0eqodqbDocSYVQ0sD9FEWUtQdgyEtpjK4+zeqpHdV+S4C1J4K5pcg4SeKp7
+ zUysQmPAMBWy1AsFj+5BvF1/KCYxcxlvoHqvp8r3IwyRCg4jHn4jC+wxFnvjSlwET2Bg
+ 3VIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Sm9MnJe0GlJLEWT6P5emqU1WVVMIOH+0ks2LO/DY2eE=;
- b=Mf6yDJIRfDoViA52y+KFSM+yKk+gms0ODgRKpBPwZRrgAxoCkVUrYIz8gPaFxk3HQt
- nQh+6//X6cUyjP7h2m5DkUKj0snmebv02nCvDUTo3y2Au4wNX5JLNYY/Ypm4s41d4zZW
- GL/SlLZVcQ4H2abqVbBWkMigiq8bkfaWLHPARtTBHp0+V8/J+auHHf0++WJF2cWYPQef
- iDXbiMFYICFWlpp7KsMK5yaVhOE+rbiC/9MX09tfmmVFJN+AovhL74ucyg6H8bXsmgPn
- GgEaB8IIM7bq7dogjw3vdnMWQhuT+eBYY7SiHH9LqBBGqFuCAo42FfexTEDYYd+egd+8
- dMUg==
-X-Gm-Message-State: ANhLgQ17papBM62H9/uJxNQGz2y2GMGIgDi/e59x6kniEXaEze9rasmg
- VV7XfGWj7b0+REMkVpFrQ+R/EEPOC/1AVOVTE+scF2pwu985CUInY97IA7mj8N7e5p8jm5NhEew
- MG/TBd++CFvPxCCs=
-X-Received: by 2002:a1c:3b89:: with SMTP id i131mr27900503wma.35.1584977586145; 
- Mon, 23 Mar 2020 08:33:06 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuLwNQ3KKvzIoP9Xoa8XheZxORyoyNJ5gtU2qPbD9kwqnb/uTgMxk/9wdzi9e72o6NTrOeEqQ==
-X-Received: by 2002:a1c:3b89:: with SMTP id i131mr27900484wma.35.1584977585900; 
- Mon, 23 Mar 2020 08:33:05 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id n1sm24047059wrj.77.2020.03.23.08.33.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 23 Mar 2020 08:33:05 -0700 (PDT)
-Subject: Re: [PATCH] hw/ide/sii3112: Use qdev gpio rather than
- qemu_allocate_irqs()
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200323151715.29454-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <aa15d4e2-2d69-540f-ff60-5e538bd10232@redhat.com>
-Date: Mon, 23 Mar 2020 16:33:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=wOwiXVcWEnQr1I8cyA7hdB4GB74HWZl3DfCIlkn0V3c=;
+ b=rymSER0I2Frz0CkjLjWcV0MVDjD99VAOqAPPyznHvYAv7F7/St0x74aOTGwEqhYkFx
+ esxOG+1WvbbWrww5Hd1kWAQGj208uwrVzeD9NvMgb2F/HI2+dJBEcl3WskSzF3/HnHO/
+ qkGAsl+3VkfGsGv5OnnSBU/ef0hGN38BsRt+bLnNHrCmDwAWb9ns+NMPcaSBf+Oz7VBx
+ 5bjXqpi0cd6bLwG2W+s9om/vjHbo8CjeYM4exYv8VrxbfOTcYbmGTLvxBGfzZ8aoPN0i
+ CkBC48ltn5HX3w7bWvkuTgS1DKRO+3h3lrQZ2grvOoNq7kKL1jGmUGekyhLYee+dWTP+
+ xfzQ==
+X-Gm-Message-State: ANhLgQ0tYfNmENT4ryhUamm49SCFovY5C+XeXqmJwHGkvO5MZZreP6kS
+ uJbnAdOEpmhQG4Swo84dkdVV/r2nFiNXQocZqIHsAQ==
+X-Google-Smtp-Source: ADFU+vtasJvfB+jfzlIU3dglQhztl62M+cKkVRbZnammOfGhQA7TActeDKaU8qqF5V8wpdu98C/ldFdbLxw4WLm4PeY=
+X-Received: by 2002:a05:6830:1f39:: with SMTP id
+ e25mr3400360oth.135.1584977608926; 
+ Mon, 23 Mar 2020 08:33:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200323151715.29454-1-peter.maydell@linaro.org>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <d9b7d8d8-1640-7d69-cd16-66e6d9cef3d1@redhat.com>
+ <88618db3-cb48-12bd-6152-b642b25a0287@redhat.com>
+ <alpine.BSF.2.22.395.2003231359420.14974@zero.eik.bme.hu>
+ <CAFEAcA9+WPxGYqk5_-v=oXPK=UcvngXGaOLY3njM5iNN2CFh2g@mail.gmail.com>
+ <alpine.BSF.2.22.395.2003231459410.34482@zero.eik.bme.hu>
+ <CAFEAcA9Ubue9Lk2jXJyZ+OUmk0j58ZKKnER1RxMi0b05FaN4QQ@mail.gmail.com>
+ <alpine.BSF.2.22.395.2003231539160.47226@zero.eik.bme.hu>
+ <CAFEAcA_R1i2L5Vgmq1frGbQQxggLtEfMwHa8V=+K2Wje2mkVVA@mail.gmail.com>
+ <alpine.BSF.2.22.395.2003231619510.61044@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.22.395.2003231619510.61044@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Mar 2020 15:33:17 +0000
+Message-ID: <CAFEAcA8HgxbvN+GL-nELonDQkfBcpq=789RUTfA41NQAdKrLvA@mail.gmail.com>
+Subject: Re: Coverity CID 1421984
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,58 +94,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, qemu-ppc@nongnu.org, qemu-block@nongnu.org
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/23/20 4:17 PM, Peter Maydell wrote:
-> Coverity points out (CID 1421984) that we are leaking the
-> memory returned by qemu_allocate_irqs(). We can avoid this
-> leak by switching to using qdev_init_gpio_in(); the base
-> class finalize will free the irqs that this allocates under
-> the hood.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This is how the 'use qdev gpio' approach to fixing the leak looks.
-> Disclaimer: I have only tested this with "make check", nothing more.
->=20
->   hw/ide/sii3112.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-> index 06605d7af2b..2ae6f5d9df6 100644
-> --- a/hw/ide/sii3112.c
-> +++ b/hw/ide/sii3112.c
-> @@ -251,8 +251,8 @@ static void sii3112_pci_realize(PCIDevice *dev, Error=
- **errp)
->   {
->       SiI3112PCIState *d =3D SII3112_PCI(dev);
->       PCIIDEState *s =3D PCI_IDE(dev);
-> +    DeviceState *ds =3D DEVICE(dev);
->       MemoryRegion *mr;
-> -    qemu_irq *irq;
->       int i;
->  =20
->       pci_config_set_interrupt_pin(dev->config, 1);
-> @@ -280,10 +280,10 @@ static void sii3112_pci_realize(PCIDevice *dev, Err=
-or **errp)
->       memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0=
-, 16);
->       pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
->  =20
-> -    irq =3D qemu_allocate_irqs(sii3112_set_irq, d, 2);
-> +    qdev_init_gpio_in(ds, sii3112_set_irq, 2);
->       for (i =3D 0; i < 2; i++) {
->           ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
-> -        ide_init2(&s->bus[i], irq[i]);
-> +        ide_init2(&s->bus[i], qdev_get_gpio_in(ds, i));
->  =20
->           bmdma_init(&s->bus[i], &s->bmdma[i], s);
->           s->bmdma[i].bus =3D &s->bus[i];
->=20
+On Mon, 23 Mar 2020 at 15:28, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> Is this documented anywhere?
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Unfortunately not. You're quite right that we should document this
+(I hadn't realized/had forgotten that the qdev gpio APIs are
+entirely undocumented -- they date from a time when we were
+much less strict about asking for at least a doc-comment documentation
+of new globally visible functions.)
 
+thanks
+-- PMM
 
