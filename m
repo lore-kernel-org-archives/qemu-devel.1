@@ -2,58 +2,100 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A76C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3FBC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:56:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9C1B20409
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:42:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9C1B20409
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 7B79720722
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:56:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MB2CTn2U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B79720722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGPDx-0000Yo-Vo
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:42:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55674)
+	id 1jGPR7-0006jy-Mq
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:56:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59115)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jGPDN-0008UP-Ti
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:42:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGPQX-0006EO-0F
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jGPDM-0005bT-SA
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:42:09 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:15593)
+ (envelope-from <philmd@redhat.com>) id 1jGPQV-0003BV-0w
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:55:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44223)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jGPDH-0005XF-MQ; Mon, 23 Mar 2020 11:42:05 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id AE4B1746381;
- Mon, 23 Mar 2020 16:42:01 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 8874974637F; Mon, 23 Mar 2020 16:42:01 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 86B8C74637E;
- Mon, 23 Mar 2020 16:42:01 +0100 (CET)
-Date: Mon, 23 Mar 2020 16:42:01 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] ide/sii3112: Avoid leaking irqs array
-In-Reply-To: <9dd18e5b-d1f1-7c3b-428f-0e549616a9d6@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003231635490.61044@zero.eik.bme.hu>
-References: <20200323143514.DB3B4747E04@zero.eik.bme.hu>
- <9dd18e5b-d1f1-7c3b-428f-0e549616a9d6@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGPQU-0003AF-Q4
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:55:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584978941;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=H/Y0evudWYrHa3KtaSn/ya9VSReCg6vvubaw4Jr/GoQ=;
+ b=MB2CTn2UMLZ+Q98sac1hfh9xxMWg5bgiOAyVdR64FoOCXnA1DxOyqB4mCGerzqATcodOJA
+ i3SGYbxGfnSHcWmvnMQqBQicKF5+Y9F+vERNNl7H5YX2eDERwIQzfGuugz7x1Tu5C3iV2E
+ lkf5KfGZigSJYs9flshDtyWE018hVTI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-DhjTdMuMNlWGQjHFYWjG0Q-1; Mon, 23 Mar 2020 11:55:38 -0400
+X-MC-Unique: DhjTdMuMNlWGQjHFYWjG0Q-1
+Received: by mail-wr1-f72.google.com with SMTP id e10so4808140wrm.2
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 08:55:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8Lszoxw25lP2CnL45qZpGSMh6SN2SwIybyVXjEvDtpY=;
+ b=l2X80mi5Kh30GMiN7Y18WBBPRj8c/wVplKtanOU9H9wnldjny0Zq4rH1Bu7zfMoD06
+ 0t0G662Ve8gUaDsXehT8yC3cVeZLqsNh8e1Ox9E3nLkEWAkcJ7mCLfZcY2kECRH14TPa
+ HIwW9ftnulBo0zVd6lqqRWTgU+zw2vK3qt1KCRsuR7K1s5aAsDvHPgo7ybgBJxP8Td+F
+ U1A1spX7yWETfeszXv2jpMngklpHjwvdqFHVOA6O3cI0LYw+eiC0GdCQR6t40V0ALTyt
+ EhZ6Xp2+UpvnvA7nLHKccBK99yoCe149gRMBiTboXW/oGrIJ9MW2vOajhvxtD4gXd4p8
+ nd6g==
+X-Gm-Message-State: ANhLgQ0nO+EqYX1NRrK0lElWeqjvVa7ttuzaoqKUG0I2ee0hHTh9dJH6
+ 8OZ5DKPckRecY/DP3jtUKnBZvdlXI3LabNvSjC1roQ83knDLYtKurUytwLdafS8RHo50rdrJKUZ
+ SSC40YDzMVs4nSfA=
+X-Received: by 2002:a5d:4b09:: with SMTP id v9mr29696179wrq.85.1584978937174; 
+ Mon, 23 Mar 2020 08:55:37 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vu8zbCuhMkaBK8yqmUnj8Wus46w4qa9LkWGkHYgSHS8L+eu2GlSWgrNERH0I2mcEuVYG6bETw==
+X-Received: by 2002:a5d:4b09:: with SMTP id v9mr29696150wrq.85.1584978936885; 
+ Mon, 23 Mar 2020 08:55:36 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id k3sm3399405wro.39.2020.03.23.08.55.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 08:55:36 -0700 (PDT)
+Subject: Re: [PATCH v41 01/21] target/avr: Add outward facing interfaces and
+ core CPU logic
+To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+References: <20200118191416.19934-1-mrolnik@gmail.com>
+ <20200118191416.19934-2-mrolnik@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <80141c57-7fb7-6e95-4070-54f7cc23e166@redhat.com>
+Date: Mon, 23 Mar 2020 16:55:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1599095249-1584978121=:61044"
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <20200118191416.19934-2-mrolnik@gmail.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,98 +107,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: thuth@redhat.com, me@xcancerberox.com.ar, richard.henderson@linaro.org,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, dovgaluk@ispras.ru, imammedo@redhat.com,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hi Michael,
 
---3866299591-1599095249-1584978121=:61044
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+On 1/18/20 8:13 PM, Michael Rolnik wrote:
+> This includes:
+> - CPU data structures
+> - object model classes and functions
+> - migration functions
+> - GDB hooks
+>=20
+> Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+> Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>   target/avr/cpu-param.h |  37 ++
+>   target/avr/cpu-qom.h   |  54 +++
+>   target/avr/cpu.h       | 258 +++++++++++++
+>   target/avr/cpu.c       | 826 +++++++++++++++++++++++++++++++++++++++++
+>   target/avr/gdbstub.c   |  84 +++++
+>   target/avr/machine.c   | 121 ++++++
+>   gdb-xml/avr-cpu.xml    |  49 +++
+>   7 files changed, 1429 insertions(+)
+>   create mode 100644 target/avr/cpu-param.h
+>   create mode 100644 target/avr/cpu-qom.h
+>   create mode 100644 target/avr/cpu.h
+>   create mode 100644 target/avr/cpu.c
+>   create mode 100644 target/avr/gdbstub.c
+>   create mode 100644 target/avr/machine.c
+>   create mode 100644 gdb-xml/avr-cpu.xml
+>=20
+[...]> diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+> new file mode 100644
+> index 0000000000..c74c5106fe
+> --- /dev/null
+> +++ b/target/avr/cpu.c
+> @@ -0,0 +1,826 @@
+> +/*
+> + * QEMU AVR CPU
+> + *
+> + * Copyright (c) 2019 Michael Rolnik
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see
+> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu/qemu-print.h"
+> +#include "exec/exec-all.h"
+> +#include "cpu.h"
+> +#include "disas/dis-asm.h"
+> +
+> +static void avr_cpu_set_pc(CPUState *cs, vaddr value)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(cs);
+> +
+> +    cpu->env.pc_w =3D value / 2; /* internally PC points to words */
+> +}
+> +
+> +static bool avr_cpu_has_work(CPUState *cs)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(cs);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    return (cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_=
+RESET))
+> +            && cpu_interrupts_enabled(env);
+> +}
+> +
+> +static void avr_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *=
+tb)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(cs);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    env->pc_w =3D tb->pc / 2; /* internally PC points to words */
+> +}
+> +
+> +static void avr_cpu_reset(CPUState *cs)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(cs);
+> +    AVRCPUClass *mcc =3D AVR_CPU_GET_CLASS(cpu);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    mcc->parent_reset(cs);
+> +
+> +    env->pc_w =3D 0;
+> +    env->sregI =3D 1;
+> +    env->sregC =3D 0;
+> +    env->sregZ =3D 0;
+> +    env->sregN =3D 0;
+> +    env->sregV =3D 0;
+> +    env->sregS =3D 0;
+> +    env->sregH =3D 0;
+> +    env->sregT =3D 0;
+> +
+> +    env->rampD =3D 0;
+> +    env->rampX =3D 0;
+> +    env->rampY =3D 0;
+> +    env->rampZ =3D 0;
+> +    env->eind =3D 0;
+> +    env->sp =3D 0;
+> +
+> +    env->skip =3D 0;
+> +
+> +    memset(env->r, 0, sizeof(env->r));
+> +
+> +    tlb_flush(cs);
 
-On Mon, 23 Mar 2020, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 3/23/20 3:32 PM, BALATON Zoltan wrote:
->> Coverity CID 1421984 reports a leak in allocated irqs, this patch
->> attempts to plug that.
->>=20
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>   hw/ide/sii3112.c | 14 +++++++++++---
->>   1 file changed, 11 insertions(+), 3 deletions(-)
->>=20
->> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
->> index 06605d7af2..c886916873 100644
->> --- a/hw/ide/sii3112.c
->> +++ b/hw/ide/sii3112.c
->> @@ -31,6 +31,7 @@ typedef struct SiI3112Regs {
->>   typedef struct SiI3112PCIState {
->>       PCIIDEState i;
->>       MemoryRegion mmio;
->> +    qemu_irq *irqs;
->>       SiI3112Regs regs[2];
->>   } SiI3112PCIState;
->>   @@ -252,7 +253,6 @@ static void sii3112_pci_realize(PCIDevice *dev, =
-Error=20
->> **errp)
->>       SiI3112PCIState *d =3D SII3112_PCI(dev);
->>       PCIIDEState *s =3D PCI_IDE(dev);
->>       MemoryRegion *mr;
->> -    qemu_irq *irq;
->>       int i;
->>         pci_config_set_interrupt_pin(dev->config, 1);
->> @@ -280,10 +280,10 @@ static void sii3112_pci_realize(PCIDevice *dev, =
-Error=20
->> **errp)
->>       memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio=
-, 0,=20
->> 16);
->>       pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
->>   -    irq =3D qemu_allocate_irqs(sii3112_set_irq, d, 2);
->> +    d->irqs =3D qemu_allocate_irqs(sii3112_set_irq, d, 2);
->>       for (i =3D 0; i < 2; i++) {
->>           ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1=
-);
->> -        ide_init2(&s->bus[i], irq[i]);
->> +        ide_init2(&s->bus[i], d->irqs[i]);
->>             bmdma_init(&s->bus[i], &s->bmdma[i], s);
->>           s->bmdma[i].bus =3D &s->bus[i];
->> @@ -291,6 +291,13 @@ static void sii3112_pci_realize(PCIDevice *dev, E=
-rror=20
->> **errp)
->>       }
->>   }
->>   +static void sii3112_unrealize(DeviceState *dev, Error **errp)
->> +{
->> +    SiI3112PCIState *d =3D SII3112_PCI(dev);
->> +
->> +    qemu_free_irqs(d->irqs, 2);
->
-> You can't do that without calling unrealize() on all the devices in eac=
-h=20
-> IDEBus.
+Why are you calling tlb_flush() here?
 
-What? Those devices are not created in this object so whoever adds them=20
-later is supposed to free them before this object is unrelaized. Or is=20
-ownership of those devices silently passed to the the controller when=20
-adding devices? Anyway, Peter's patch is simpler and should also fix the=20
-issue so this does not matter any more (other than maybe showing we might=
-=20
-also leak the devices if their ownership is not clear).
+> +}
 
-> Apparently there is no code available to do that. Maybe easier to not=20
-> add any sii3112_unrealize(). Keeping a reference in the state should be=
-=20
-> enough to silent Coverity.
-
-The idea was to fix the problem not to hide it from Coverity so if it=20
-can't be fixed it's probably better to be reminded about it than hiding=20
-it.
-
-Regards,
-BALATON Zoltan
---3866299591-1599095249-1584978121=:61044--
 
