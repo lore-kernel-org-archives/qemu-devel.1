@@ -2,88 +2,92 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E98C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C05C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:31:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A23E206F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:30:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00FDC206F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:31:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M7ihXijJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A23E206F9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHhpb+19"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00FDC206F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGLI0-0006ob-Be
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42588)
+	id 1jGLIN-00075N-29
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:31:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42643)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jGLHD-0005z5-8v
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:29:53 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGLHO-0006BK-5A
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:30:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jGLHB-0005mj-SZ
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:29:50 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:37425)
+ (envelope-from <philmd@redhat.com>) id 1jGLHM-0005pq-Qh
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:30:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58021)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGLHB-0005mQ-PD
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:29:49 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGLHM-0005pk-MY
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:30:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584962988;
+ s=mimecast20190719; t=1584963000;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=fhwJZtBwYRaXFzRSpXf/3TnXWyCgxPyzLYcnsmKwQB0=;
- b=M7ihXijJQy+AvGqmlVzJZCK8JqPJ9qKVyL/sBA38RTjLpI7vvEhJRudID8LisgxJLb/C9Z
- Q2c3rzF5GC2NentovxhKKU5cav5ZBIyZTCfV4TyyS4FEms1AFtxw1R6oH9qHPgUhWAkaLu
- seLiDmXD/Q1IerOv9dLnEHfggQY6+hw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-cb-_RE3uMOicLWY9ZN7ggQ-1; Mon, 23 Mar 2020 07:29:47 -0400
-X-MC-Unique: cb-_RE3uMOicLWY9ZN7ggQ-1
-Received: by mail-wr1-f70.google.com with SMTP id p2so7217972wrw.8
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 04:29:46 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qPJne7T1WNZJs4ZdrbGHhh572lickvYuJNMVK+NQPnU=;
+ b=GHhpb+19BgMFNBz/bGBSHO+olLkNfPC+V8GHEJnn0UGCDoJlqSFPwfwMTzau+t6JY6uhrT
+ 0H1SJsQgKFSeQo7I+xCKbhirzRpJ23Cr8no/uVPiTdYyEq8o4rNor2Bp5K1eVs7KFtMAHh
+ 9go4ImU6DUsIuJr/2+RaBFeP9p52sEA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-0cnqywtgPCe95ckBqmkRfw-1; Mon, 23 Mar 2020 07:29:57 -0400
+X-MC-Unique: 0cnqywtgPCe95ckBqmkRfw-1
+Received: by mail-wr1-f72.google.com with SMTP id d17so7234111wrw.19
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 04:29:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=QE3YIhEKTc4mAtyc7f+TWuDURZezsFuVLw+5KrPb2pk=;
- b=HGYPsbvK27SVuqFLtt/tdOAq77kro6Sx0WgI0p6KL2yCZMrvkMolTiYU2P3rSDQpek
- 3UNp/5GTyZHlzop/xvg00aq8apoqLj6YNDIX+hXFwW5+hvqzOjpKvpxfZA16etKnheMA
- SmLAuaN8GwSTAwltRF2fH+9hBGx9M12A9HMV4hABfuG43oi+8ikXBwBMyRi3R4V1xQvL
- 5HeomYJbpYijHFiF2HA5pxoJr0e6Tt20Ie/h3UgELr78Juelr2AZka4egryohjfJVxML
- saHdFKYuWPjJ6tOFvgLyii/tY0+t4Vhedg5fkphes4N/0VHkRKyJTw4Z/YhHFqrwr2FG
- qUDA==
-X-Gm-Message-State: ANhLgQ142ZLB1X4wvwkS2P8Lfe6UgXXKb8cPhOaIIz9zTaksZpYT3uAj
- gbKutWHkH02sOnncL9nP5rUU3ArYlc4PSI9ShWN7Bb4KMdqpKQkQY+FtQSp4wcNXa/D0CvUhkos
- zghiwsDRibaBM89A=
-X-Received: by 2002:adf:ecc7:: with SMTP id s7mr30034804wro.386.1584962985763; 
- Mon, 23 Mar 2020 04:29:45 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtfTXtWyH6cpsUMviBjHZxkD6T+5CgBUIxZPwW1jvWGxCCuuROtgAhBv8qApvmta6GhlcZwIQ==
-X-Received: by 2002:adf:ecc7:: with SMTP id s7mr30034778wro.386.1584962985551; 
- Mon, 23 Mar 2020 04:29:45 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=CIpowIr4JfumkLzd2DtitMDVhlCsfUq7QdF+3HPa76w=;
+ b=HERiHQ2tvR1rfRp/yjuIFf2/EcGlnID45AV9VVn3OU8gS/zQBIMzpiTnTaAHjLTJfL
+ KiLLVSA7//pEap7RtCzPQOqidIKQAtNz0g3E8lWPnSp1JU5C7z14XuyW+xmLFXj32Cuq
+ cgQNovSFDxVFjVsPoXAnpX7SVJXPvrlbRQl2CwCTo6GrD7y+WVrTEaks/zkM075vyAmv
+ SCirZ63XYm5xqa0hx/LBi8JOACoz/CS5f32wChjvXsX7j0fviZx7faqXo1MbPPghS0Bo
+ aY/CDbjCbgmVOhv9/UIxU1UXi9Tttn9EZEeBFj6N2J0cq9X5ruqww4AIXiqkMT3Y2nlz
+ 1DAA==
+X-Gm-Message-State: ANhLgQ0ioR73DZpbpXa6CCP2n9Qf2vVjJpST7dZDZLkNdtyOuQ6aUFpA
+ RUmUY3k+ixVCjWFahlQj7JToq0dqU2rh0xv31MqJhWYY2YInm1oRPp1cQF5HMZgKYgbJexfMRVG
+ ny+9QAVyesEXLPOA=
+X-Received: by 2002:a1c:7c13:: with SMTP id x19mr4732361wmc.27.1584962996127; 
+ Mon, 23 Mar 2020 04:29:56 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvbiaNPng3Bz3jIx6AsQ7zih992PlLmauKj7QX7WqZnZ/87NqzP8GQ1BrG9p7AUL98ZyXo3cQ==
+X-Received: by 2002:a1c:7c13:: with SMTP id x19mr4732335wmc.27.1584962995895; 
+ Mon, 23 Mar 2020 04:29:55 -0700 (PDT)
 Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id w11sm23547796wrv.86.2020.03.23.04.29.44
+ by smtp.gmail.com with ESMTPSA id d13sm13644167wrv.34.2020.03.23.04.29.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 04:29:45 -0700 (PDT)
+ Mon, 23 Mar 2020 04:29:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 0/3] virtio,vhost-gpu: Release memory returned by
- malloc() with free()
-Date: Mon, 23 Mar 2020 12:29:40 +0100
-Message-Id: <20200323112943.12010-1-philmd@redhat.com>
+Subject: [PATCH-for-5.0 2/3] virtio: Document virtqueue_pop()
+Date: Mon, 23 Mar 2020 12:29:42 +0100
+Message-Id: <20200323112943.12010-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200323112943.12010-1-philmd@redhat.com>
+References: <20200323112943.12010-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
@@ -107,24 +111,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coverity reported a ALLOC_FREE_MISMATCH in vg_handle_cursor(),
-because the memory returned by vu_queue_pop() is allocated with
-malloc(). Fix it.
+Document that virtqueue_pop() returned memory must be released
+with free().
 
-Similar error occurs with virtio. Document and fix.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ include/hw/virtio/virtio.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Philippe Mathieu-Daud=C3=A9 (3):
-  vhost-user-gpu: Release memory returned by vu_queue_pop() with free()
-  virtio: Document virtqueue_pop()
-  virtio-gpu: Release memory returned by virtqueue_pop() with free()
-
- include/hw/virtio/virtio.h              | 8 ++++++++
- contrib/vhost-user-gpu/vhost-user-gpu.c | 4 ++--
- contrib/vhost-user-gpu/virgl.c          | 2 +-
- hw/display/virtio-gpu-3d.c              | 2 +-
- hw/display/virtio-gpu.c                 | 8 ++++----
- 5 files changed, 16 insertions(+), 8 deletions(-)
-
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index b69d517496..c6e3bfc500 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -199,6 +199,14 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElem=
+ent *elem,
+                     unsigned int len, unsigned int idx);
+=20
+ void virtqueue_map(VirtIODevice *vdev, VirtQueueElement *elem);
++/**
++ * virtqueue_pop:
++ * @vq: a VirtQueue queue
++ * @sz: the size of struct to return (must be >=3D VirtQueueElement)
++ *
++ * Returns: a VirtQueueElement filled from the queue or NULL.
++ * The returned element must be free()-d by the caller.
++ */
+ void *virtqueue_pop(VirtQueue *vq, size_t sz);
+ unsigned int virtqueue_drop_all(VirtQueue *vq);
+ void *qemu_get_virtqueue_element(VirtIODevice *vdev, QEMUFile *f, size_t s=
+z);
 --=20
 2.21.1
 
