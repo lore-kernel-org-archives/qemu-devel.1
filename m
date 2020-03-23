@@ -2,147 +2,119 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9A6C10F26
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F2CC10F26
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B655620736
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:38:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B655620736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4ABDC20732
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:01:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="bfEKX3fW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ABDC20732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGHfN-0004wE-S3
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 03:38:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40710)
+	id 1jGI1w-0000MV-DL
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 04:01:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jGHee-0004WM-2s
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:37:48 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jGI10-0008Ak-7x
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jGHec-0001Ot-T6
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:37:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37362
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jGI0y-0000ZV-Rq
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:00:54 -0400
+Received: from mail-eopbgr70128.outbound.protection.outlook.com
+ ([40.107.7.128]:61436 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jGHec-0001OL-OA
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:37:46 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02N7Xqvg151713
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:37:45 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yxnf6b9tc-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:37:45 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 23 Mar 2020 07:37:43 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 23 Mar 2020 07:37:40 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02N7bdM334078924
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 23 Mar 2020 07:37:39 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6E9F94C046;
- Mon, 23 Mar 2020 07:37:39 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 164944C040;
- Mon, 23 Mar 2020 07:37:39 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.169.7])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 23 Mar 2020 07:37:39 +0000 (GMT)
-Subject: Re: [PATCH v11 03/16] s390x: protvirt: Support unpack facility
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Bruce Rogers <brogers@suse.com>,
- "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20200319131921.2367-1-frankja@linux.ibm.com>
- <20200319131921.2367-4-frankja@linux.ibm.com>
- <85df56f2bc703e38a19150f51c9a6501dffefd16.camel@suse.com>
- <28dc03df-79ac-35f8-32af-4e793a3559b8@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Mon, 23 Mar 2020 08:37:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <28dc03df-79ac-35f8-32af-4e793a3559b8@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jGI0t-0000UV-MQ; Mon, 23 Mar 2020 04:00:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CGF89c4sPWxNtLBQPN8WqZB4W83xdyjEmzk37t69Raa/a9hXhiO3olqG6dKijwEw/P2KdApuY0uejZAYeYUPBYMCG3+6KEpBBpCD8KOzKBCWc7zMSSE2pk9FU3DZmlBz9ZL7eif2aCLq3Zu0dDQVrhOHjWgT0YoO+jYgaFhoAEWgNfH7alRgJ42yeewPhHjFE4BMV/Cb5znVlvq8XiXM4/3+AJCgkDzm4/OE+kam3BGgeubp7t0FVAguPSaxbdkJ2s5eiXSyspaQJ5NQ4sZ8zKwHIHP7b5x2Z3tH3/17L3WjXgIsExl/V8L0IbrTtwS4ePkja5RPluFOSdzraFdIpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j0cwV4w2ZjK0mwyzw6rLFxgcX6yvo9Q1NMsAb85r7kU=;
+ b=TMbjt1v6p6J0U9vq18BROVv7vwiW0eMVnbXfA3QA7baoSEd5icIyuNVlPt7YhjIgRssT6WFfgtcKXNvB0Mx461TPBOtSfg2e3xfdILCGIh8cxYYdZ2EP+py2nlYEUY6wSqn53motLQ6HJkBQvdvK9W2miBeWZO4SwPKE7FZUqnb7sFp1O+cISJRuMFrBCrHKWQlady2wrf/ElOLf3M90/V6yyv30N/M5hPqhHsPJ0Cbipq52MMLEP/tX0ESd3iKZplwNWURkKKBhmpTR95ZSTNVDn89VsOH+81ikCDpTAc/LSuZuK3f2OPkosoa8eRTSRd6J5ZAbGTK2AdZUCGrduw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j0cwV4w2ZjK0mwyzw6rLFxgcX6yvo9Q1NMsAb85r7kU=;
+ b=bfEKX3fW9Qds7gCnSO0KDB5Aj6VS4UlGEGh80Gs/ocMNgYv0Y/yby1i+h+u6ygHF1RRSeoI6t2SGfUKcJiGjgIpjAG1PJGO0wbfIvGOL0N5mvP8hlxqPllq+VhmMZp3vxRNhKV178prVzPvUQXnnTyYkvThsZzjRVbs4FdCkMyg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5432.eurprd08.prod.outlook.com (10.141.173.215) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2835.20; Mon, 23 Mar 2020 08:00:44 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::9057:6f5a:378c:7533]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::9057:6f5a:378c:7533%6]) with mapi id 15.20.2835.021; Mon, 23 Mar 2020
+ 08:00:44 +0000
+Subject: Re: [PATCH v8 1/4] qcow2: introduce compression type feature
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200321143431.19629-1-dplotnikov@virtuozzo.com>
+ <20200321143431.19629-2-dplotnikov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200323110042824
+Message-ID: <401c0627-a7ad-3434-a861-69f4a5d58d21@virtuozzo.com>
+Date: Mon, 23 Mar 2020 11:00:42 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200321143431.19629-2-dplotnikov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032307-0016-0000-0000-000002F60E87
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032307-0017-0000-0000-00003359A574
-Message-Id: <ea710b6b-3a8a-422e-ce67-1611eb0c970b@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-23_01:2020-03-21,
- 2020-03-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 malwarescore=0
- bulkscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
- adultscore=0 mlxlogscore=817 clxscore=1015 spamscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003230039
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-ClientProxiedBy: AM4PR0101CA0079.eurprd01.prod.exchangelabs.com
+ (2603:10a6:200:41::47) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.183) by
+ AM4PR0101CA0079.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::47) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.20 via Frontend
+ Transport; Mon, 23 Mar 2020 08:00:43 +0000
+X-Tagtoolbar-Keys: D20200323110042824
+X-Originating-IP: [185.215.60.183]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ddf90850-b995-4ebe-3ef7-08d7cf004a00
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5432:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5432AAA0C47DA4B9FE0A3181C1F00@AM7PR08MB5432.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-Forefront-PRVS: 0351D213B3
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(4636009)(376002)(366004)(346002)(39840400004)(396003)(136003)(199004)(16576012)(2616005)(316002)(31696002)(16526019)(2906002)(86362001)(956004)(186003)(4326008)(81166006)(81156014)(52116002)(478600001)(26005)(8936002)(31686004)(36756003)(8676002)(66946007)(6486002)(66476007)(66556008)(5660300002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM7PR08MB5432;
+ H:AM7PR08MB5494.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FHstwSLW1Wy6sMpv7OTXBmZbMJ7hbZTo0tA6EZ2CR69Swa62t65lhy1t6JiTjh6RTF+8ksG3VjQGbgvfvqh24EAXx3djQUkGrfCBI9Xq9O8uGrdX+YU900BK0IoKoOZr3Vear6+3/mWyGdIF+MI50b2Nv4LvJzwDyfX3pFG/C1q1oSIzP4ja4y4NyipQCHeE9JSFKszHs4mTYW8Z2sxuh9KEyb0iTEb20WF9MBKLIZvqqS/MQ20wn+BmMeJmvVfLJB+aNPS8AqQl3k3VuL+fxMz5i3kGg9j4E/FuR/d9pxrofHYA5jaFoJYCTgA75NmErb6XlvpENUTXq2yuEDsYLDdC5bxXHi+mF+SDYe2UYTNRDelb0VsBM4FZuOOh7tL6TZiGZQ4AbB2e7LJqZAZpTf/+LjmCR6kxxZ8LXdrdNIwXW27dsA0iNYi3C7OQPBXI
+X-MS-Exchange-AntiSpam-MessageData: BJDI9WGw5/K2NH3iyfd6btrbqDw+KEX45nLM9Yvik8if7jmcbObsk7s9P+arTY3owvR7bIgD2Fk8a0RmpIviK8n1UMhCsxQEJ9b9dM1RtvBIs1gbte+AVkH4Ry5W7zbN1r+Kl9XxPTOWqBrH0HmSGw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddf90850-b995-4ebe-3ef7-08d7cf004a00
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2020 08:00:44.6157 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iD4ViQjb4EvQEellGWTegFd14ErDsz3mwmLijYNPgkiKEHLYmHjN+TPOhXwdBssIqpMJ2Ekroihb6GY5j00yCTbwitG91vreaYmDuMLlu4A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5432
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.128
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,55 +126,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>, "david@redhat.com" <david@redhat.com>
+Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
+ armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+21.03.2020 17:34, Denis Plotnikov wrote:
+> The patch adds some preparation parts for incompatible compression type
+> feature to qcow2 allowing the use different compression methods for
+> image clusters (de)compressing.
+> 
+> It is implied that the compression type is set on the image creation and
+> can be changed only later by image conversion, thus compression type
+> defines the only compression algorithm used for the image, and thus,
+> for all image clusters.
+> 
+> The goal of the feature is to add support of other compression methods
+> to qcow2. For example, ZSTD which is more effective on compression than ZLIB.
+> 
+> The default compression is ZLIB. Images created with ZLIB compression type
+> are backward compatible with older qemu versions.
+> 
+> Adding of the compression type breaks a number of tests because now the
+> compression type is reported on image creation and there are some changes
+> in the qcow2 header in size and offsets.
+> 
+> The tests are fixed in the following ways:
+>      * filter out compression_type for many tests
+>      * fix header size, feature table size and backing file offset
+>        affected tests: 031, 036, 061, 080
+>        header_size +=8: 1 byte compression type
+>                         7 bytes padding
+>        feature_table += 48: incompatible feature compression type
+>        backing_file_offset += 56 (8 + 48 -> header_change + feature_table_change)
+>      * add "compression type" for test output matching when it isn't filtered
+>        affected tests: 049, 060, 061, 065, 144, 182, 242, 255
+> 
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+
+[...]
+
+> @@ -4859,6 +4949,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+>               .data_file          = g_strdup(s->image_data_file),
+>               .has_data_file_raw  = has_data_file(bs),
+>               .data_file_raw      = data_file_is_raw(bs),
+> +            .compression_type   = s->compression_type,
+>           };
+>       } else {
+>           /* if this assertion fails, this probably means a new version was
+> @@ -5248,6 +5339,22 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+>                                    "images");
+>                   return -EINVAL;
+>               }
+> +        } else if (!strcmp(desc->name, BLOCK_OPT_COMPRESSION_TYPE)) {
+> +            int compression_type =
+> +                qapi_enum_parse(&Qcow2CompressionType_lookup,
+> +                                qemu_opt_get(opts, BLOCK_OPT_COMPRESSION_TYPE),
+> +                                -1, errp);
+> +
+> +            if (compression_type == -EINVAL) {
+
+You should compare to -1, as qapi_enum_parse returns given default on error.
+
+> +                error_setg(errp, "Unknown compression type");
+
+and errp is already set (ofcourse, if qemu_opt_get returned non NULL, but I hope it is guaranteed by if (!strcmp(desc->name, BLOCK_OPT_COMPRESSION_TYPE)) condition
+
+> +                return -ENOTSUP;
+> +            }
+> +
+> +            if (compression_type != s->compression_type) {
+> +                error_setg(errp, "Changing the compression type "
+> +                                 "is not supported");
+> +                return -ENOTSUP;
+> +            }
+>           } else {
+>               /* if this point is reached, this probably means a new option was
+>                * added without having it covered here */
+> @@ -5516,6 +5623,12 @@ static QemuOptsList qcow2_create_opts = {
+>               .help = "Width of a reference count entry in bits",
+>               .def_value_str = "16"
+>           },
+> +        {
+> +            .name = BLOCK_OPT_COMPRESSION_TYPE,
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "Compression method used for image cluster compression",
+> +            .def_value_str = "zlib"
+> +        },
+>           { /* end of list */ }
+>       }
+>   };
 
 
-On 23.03.20 08:15, Christian Borntraeger wrote:
-> [...]
-> 
->>> +int s390_ipl_prepare_pv_header(void)
->>> +{
->>> +    IplParameterBlock *ipib = s390_ipl_get_iplb_pv();
->>> +    IPLBlockPV *ipib_pv = &ipib->pv;
->>> +    void *hdr = g_malloc(ipib_pv->pv_header_len);
->>> +    int rc;
->>> +
->>> +    cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
->>> +                             ipib_pv->pv_header_len);
->>> +    rc = s390_pv_set_sec_parms((uint64_t)hdr,
->>> +                               ipib_pv->pv_header_len);
->> This causes a compiler issue when building for 32 bit x86 as follows:
->>
->> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c: In function
->> 's390_ipl_prepare_pv_header':
->> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c:659:32: error:
->> cast from pointer to integer of different size [-Werror=pointer-to-int-
->> cast]
->>   659 |     rc = s390_pv_set_sec_parms((uint64_t)hdr,
->>       |                                ^
-> 
-> Interesting. It seems that there is no travis-ci coverage for this
-> case.
-> 
-> I guess we need something like this.
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 1d04cd5..01bdf81 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -656,7 +656,7 @@ int s390_ipl_prepare_pv_header(void)
->  
->      cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
->                               ipib_pv->pv_header_len);
-> -    rc = s390_pv_set_sec_parms((uint64_t)hdr,
-> +    rc = s390_pv_set_sec_parms((uint64_t)(unsigned long) hdr,
->                                 ipib_pv->pv_header_len);
+[...]
 
-uint_ptr instead of long is probably even better (for Windows).
 
+-- 
+Best regards,
+Vladimir
 
