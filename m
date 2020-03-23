@@ -2,71 +2,86 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C2CC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D7B5C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 847682072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:41:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 847682072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D9B012072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 08:44:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQZ9tHJI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9B012072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGIeP-00058k-NN
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 04:41:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47746)
+	id 1jGIh4-0006QT-3B
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 04:44:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jGIde-0004Bt-Nx
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:40:51 -0400
+ (envelope-from <bharatb.linux@gmail.com>) id 1jGIgA-0005qf-VR
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jGIdd-00012U-HU
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:40:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58160)
+ (envelope-from <bharatb.linux@gmail.com>) id 1jGIg9-0001pY-TP
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:43:26 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:35082)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jGIdd-00012A-C1
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 04:40:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jGIdb-0003Cm-Nk
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 08:40:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 95F192E807B
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 08:40:47 +0000 (UTC)
+ (Exim 4.71) (envelope-from <bharatb.linux@gmail.com>)
+ id 1jGIg9-0001pJ-Nn; Mon, 23 Mar 2020 04:43:25 -0400
+Received: by mail-qk1-x744.google.com with SMTP id k13so2673008qki.2;
+ Mon, 23 Mar 2020 01:43:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7OcFTB2KbnTgJqYJ3I8tRvFdDgVPyjMvLszgu2VeGrs=;
+ b=IQZ9tHJIGmF0j+AMfuxYyrsJRjRzWP4F7VDevtEw+vLOSk2iUL2nVOXD3oGV15cqlO
+ 9bdzu407oRhNnGZlpKb7DFcv6Htf3VtoZAPibDIcd1VqQVp6hlqwzwu6Ox1/Gj+NKTKm
+ hJAQPI/BODq264AVYCuBBoXdbO4F+M5qNTcxescM5vXq0ua2RQ/tOawv7nZK/l7v7ebn
+ 4jdlnrwNFTJUsPJGvvPQvqt6zmAfSS/+U7iXGbc4s6vFrB97t11+vatPvJjay3/buMk9
+ vwLL81ognxcRG9QRnld6jlyKR0HZyuksf0BgOFej3V0ckpU/RgjjJ/6pvuoI3H/ZtbN7
+ PuhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7OcFTB2KbnTgJqYJ3I8tRvFdDgVPyjMvLszgu2VeGrs=;
+ b=TeS9AaegVdLZGB/YToF46ipcS3I9lwj/Htm6sw0BOvZzumxAX1o6XBX7CXCpbT+OTz
+ nXANucoyt3X49/VBRziNm1wAGog6VadwQydzOX+DjN+EucFS35fhi2AQNpdPdlqaKuTF
+ paZB0JvVEx/0pctEcSsQIlqCNzEiJSoAd/5n1g4BkJPHWZO6QvyIGwN5koRx/GDT4VGN
+ IwrpkWwE27DWsapnFUyF1RpLjYgYn849jHMU4n9l7/5zidDBg3PRqVGVHXPEXtP/rD5t
+ jp1sggSOYMLsQ3KMOmG3yGv83QC1jlzPFcbwTm/m1GC8vXFemErH2Lxlmo2GJtStf7O2
+ IzAA==
+X-Gm-Message-State: ANhLgQ282do0+UwRAWU8jm5vVBbBEYtRvB3UDgLHGidIxLcVwsJxHTXM
+ 2gk7jRK81eX31Ou2WIuOUfEDCqkqG7jqXWCg4qA=
+X-Google-Smtp-Source: ADFU+vt1MNzfH4JqR3vuuY9tGjRzoz1gPvx9gJzBzRXXM3lqSkr3hZxJf2Fb3fjZOpCBjjLP2r0svYqpcRpksZnZ57s=
+X-Received: by 2002:a05:620a:7f8:: with SMTP id
+ k24mr19755001qkk.228.1584953004888; 
+ Mon, 23 Mar 2020 01:43:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Mar 2020 08:34:49 -0000
-From: Hansni Bu <1868527@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: hansni
-X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
-X-Launchpad-Bug-Modifier: Hansni Bu (hansni)
-Message-Id: <158495248924.11669.14742891693687812596.malonedeb@soybean.canonical.com>
-Subject: [Bug 1868527] [NEW] alignment may overlap the TLB flags
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 54d7d2feae81f3a051055cbe1599aefc992a8e64
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <20200318101159.8767-1-bbhushan2@marvell.com>
+ <20200318101159.8767-5-bbhushan2@marvell.com>
+ <3da60c1b-6897-7ab1-3a67-bec44fa00a54@redhat.com>
+ <CAAeCc_nVJXsvEw6iqcs9UEvLJNFyPmHnPnN0VUvzUFtVvjCQsQ@mail.gmail.com>
+In-Reply-To: <CAAeCc_nVJXsvEw6iqcs9UEvLJNFyPmHnPnN0VUvzUFtVvjCQsQ@mail.gmail.com>
+From: Bharat Bhushan <bharatb.linux@gmail.com>
+Date: Mon, 23 Mar 2020 14:13:13 +0530
+Message-ID: <CAAeCc_kyXE6SpYpv=yJWKtNaE=0_OvP-uH3gipEeNm7as8e1gw@mail.gmail.com>
+Subject: Re: [PATCH v8 4/8] virtio-iommu: set supported page size mask
+To: Auger Eric <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,70 +90,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1868527 <1868527@bugs.launchpad.net>
+Cc: "Zhong, Yang" <yang.zhong@intel.com>,
+ Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, drjones@redhat.com, peterx@redhat.com,
+ qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Bharat Bhushan <bbhushan2@marvell.com>, linuc.decode@gmail.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Hi Eric/Jean,
 
-Hi,
-In QEMU-4.2.0, or git-9b26a610936deaf436af9b7e39e4b7f0a35e4409, alignment m=
-ay overlap the TLB flags. =
+On Wed, Mar 18, 2020 at 8:05 PM Bharat Bhushan <bharatb.linux@gmail.com> wrote:
+>
+> Hi Eric,
+>
+> On Wed, Mar 18, 2020 at 4:58 PM Auger Eric <eric.auger@redhat.com> wrote:
+> >
+> > Hi Bharat,
+> >
+> > On 3/18/20 11:11 AM, Bharat Bhushan wrote:
+> > > Add optional interface to set page size mask.
+> > > Currently this is set global configuration and not
+> > > per endpoint.
+> > >
+> > > Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+> > > ---
+> > > v7->v8:
+> > >  - new patch
+> > >
+> > >  hw/virtio/virtio-iommu.c | 10 ++++++++++
+> > >  1 file changed, 10 insertions(+)
+> > >
+> > > diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+> > > index 4cee8083bc..c00a55348d 100644
+> > > --- a/hw/virtio/virtio-iommu.c
+> > > +++ b/hw/virtio/virtio-iommu.c
+> > > @@ -650,6 +650,15 @@ static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
+> > >      return (ua > ub) - (ua < ub);
+> > >  }
+> > >
+> > > +static void virtio_iommu_set_page_size_mask(IOMMUMemoryRegion *mr,
+> > > +                                            uint64_t page_size_mask)
+> > > +{
+> > > +    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
+> > > +    VirtIOIOMMU *s = sdev->viommu;
+> > > +
+> > > +    s->config.page_size_mask = page_size_mask;
+> > The problem is page_size_mask is global to the VIRTIO-IOMMU.
+> >
+> > - Can't different VFIO containers impose different/inconsistent settings?
+> > - VFIO devices can be hotplugged.
+>
+> This is possible if we different iommu's, which we support. correct?
+>
+> > So we may start with some default
+> > page_size_mask which is latter overriden by a host imposed one. Assume
+> > you first launch the VM with a virtio NIC. This uses 64K. Then you
+> > hotplug a VFIO device behind a physical IOMMU which only supports 4K
+> > pages. Isn't it a valid scenario?
+>
+> So we need to expose page_size_mask per endpoint?
 
-For example, the alignment: MO_ALIGN_32,
-    MO_ALIGN_32 =3D 5 << MO_ASHIFT,
-and the TLB flag: TLB_DISCARD_WRITE
-#define TLB_DISCARD_WRITE   (1 << (TARGET_PAGE_BITS_MIN - 6))
+Just sent Linux RFC patch to use page-size-mask per endpoint.
+QEMU changes are also ready, will share soon.
 
-then, in the function "get_alignment_bits", the assert may fail:
+Thanks
+-Bharat
 
-#if defined(CONFIG_SOFTMMU)
-    /* The requested alignment cannot overlap the TLB flags.  */
-    tcg_debug_assert((TLB_FLAGS_MASK & ((1 << a) - 1)) =3D=3D 0);
-#endif
-
-However, the alignment of MO_ALIGN_32 is not used for now, so the assert
-cannot be triggered in current version. Anyway it seems like a potential
-conflict.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1868527
-
-Title:
-  alignment may overlap the TLB flags
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-  In QEMU-4.2.0, or git-9b26a610936deaf436af9b7e39e4b7f0a35e4409, alignment=
- may overlap the TLB flags. =
-
-  For example, the alignment: MO_ALIGN_32,
-      MO_ALIGN_32 =3D 5 << MO_ASHIFT,
-  and the TLB flag: TLB_DISCARD_WRITE
-  #define TLB_DISCARD_WRITE   (1 << (TARGET_PAGE_BITS_MIN - 6))
-
-  then, in the function "get_alignment_bits", the assert may fail:
-
-  #if defined(CONFIG_SOFTMMU)
-      /* The requested alignment cannot overlap the TLB flags.  */
-      tcg_debug_assert((TLB_FLAGS_MASK & ((1 << a) - 1)) =3D=3D 0);
-  #endif
-
-  However, the alignment of MO_ALIGN_32 is not used for now, so the
-  assert cannot be triggered in current version. Anyway it seems like a
-  potential conflict.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1868527/+subscriptions
+>
+> Thanks
+> -Bharat
+>
+> >
+> > Thanks
+> >
+> > Eric
+> >
+> > > +}
+> > > +
+> > >  static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+> > >  {
+> > >      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> > > @@ -865,6 +874,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
+> > >      IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
+> > >
+> > >      imrc->translate = virtio_iommu_translate;
+> > > +    imrc->iommu_set_page_size_mask = virtio_iommu_set_page_size_mask;
+> > >  }
+> > >
+> > >  static const TypeInfo virtio_iommu_info = {
+> > >
+> >
 
