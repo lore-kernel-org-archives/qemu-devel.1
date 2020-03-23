@@ -2,104 +2,83 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0599AC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 035E4C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:37:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C46FC20735
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C29CB20735
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:37:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLkVhl/q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C46FC20735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GChcP3QV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C29CB20735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGNFG-0003SM-V7
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:35:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60104)
+	id 1jGNGJ-00056g-Vl
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jGNDE-0000K3-HQ
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:33:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGNFH-0003jg-3c
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jGNDB-0004wK-VX
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:33:51 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:22286)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGNDA-0004vW-1J
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:33:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584970426;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KV5sDWjEBqaZiIvMoaAVIDhz898up8t7py+Rw6BijCs=;
- b=RLkVhl/qh3QjU2OdKgC/Z/4tmwOTW3dsjYVIMBh9O8Ju9zahXRMfT3dF3KF11yh223BsfI
- Nsi2Sra1t0MLQ1NvfzglVAJj1TkVGom/jcq0UmPfoFSn5M83TeyoaWOhaypx/fghSclO2o
- sUAuP979ZGq6gqRm4cW/GkMVSnaKFEs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-satjfPK9PPe0tu7XPVCYPw-1; Mon, 23 Mar 2020 09:33:40 -0400
-X-MC-Unique: satjfPK9PPe0tu7XPVCYPw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C80D0477;
- Mon, 23 Mar 2020 13:33:38 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-242.ams2.redhat.com
- [10.36.114.242])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DFAE25C1C7;
- Mon, 23 Mar 2020 13:33:36 +0000 (UTC)
-Subject: Re: [PATCH] block: Avoid memleak on qcow2 image info failure
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200320183620.1112123-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c827e930-fa72-2bad-9261-8e7ceb809edb@redhat.com>
-Date: Mon, 23 Mar 2020 14:33:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <peter.maydell@linaro.org>) id 1jGNFF-0005lS-IY
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:35:58 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37061)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGNFF-0005l2-6l
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:35:57 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w13so14747741oih.4
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 06:35:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=sNAI7vhTY3M+NWHKMyKFOtI873Qmx3nYqb5BxKHWn5Q=;
+ b=GChcP3QV+waUxzhQP6epAUEUItuTa41b0U5hFiQ3dhX5WKx8Ju0c+cBm7e2KC4xCzh
+ DBby/EccIFamxcHL/UNfg1lu221UuFkqidzldyBCJByOMyVhqTKmmj+StaC5r1iApiPG
+ qgDcO5QCbTuaMnln9KFbDAgu9K8nyC8yMTDaI6IVrqipSVnFgi3v+n5bavbeuMg45gbQ
+ 0I1qNvoopCj8cbPa2UYHSCFN1jqg5/6nRBqYTMftzX/Mu5MPjcuiJuLPXcukkHA+T6dr
+ vASS6mMmzo4FSGBOfWJA/3l6Pxg0q1OWNDxIizKwxRkAxut0MosN8kQf6dRHXwk8fYrf
+ f3Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=sNAI7vhTY3M+NWHKMyKFOtI873Qmx3nYqb5BxKHWn5Q=;
+ b=R8lviyi963/55pJD6gc0idOowgOnU4l7fC9HtmjSTZ/DYkxJScFusscl8UAxeI4Y2p
+ WX3o98PIG9P+wNfCxmD36UXBncXnjLRSylMsL3BeEhizexnTf3a937kbKSriSx0Ekm0m
+ CB8bRD6r3EVlA5J07fUQ/Xxoc0Xg5NiGdPVDZaLCDgryy1jZCS0gXDJK5SW4Yr8m55VA
+ RiiGWI8vSVRFodFW7nrnj0jDexxB3VwvYM9Eo/5c613QdLxaIn9S608d7NxeQodNpDok
+ U/8CJvIzZLxcDtF4t9wsGZ/fNa+0laTPha8dPviQU8n8T3kIYWt5BpT8GXPHtnaH0dbk
+ LwtQ==
+X-Gm-Message-State: ANhLgQ0wTqy7pP2MTxWR2oIWPFhc/6TmEcdd32flermLYQidTiMR5yVU
+ 94SBBFKXKiksU34yQWgwOI0MSBu/DXokMTwiAqMbLw==
+X-Google-Smtp-Source: ADFU+vvU3fvpL+OHECtSngFahNXvNfI+GWRBK2UNxneNesBEHZiaCaqPsrwBdcP7RlnJ/wLtOuDmwnK2FjX2BdGOEvc=
+X-Received: by 2002:a05:6808:64c:: with SMTP id
+ z12mr6266094oih.146.1584970556043; 
+ Mon, 23 Mar 2020 06:35:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200320183620.1112123-1-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <d9b7d8d8-1640-7d69-cd16-66e6d9cef3d1@redhat.com>
+ <88618db3-cb48-12bd-6152-b642b25a0287@redhat.com>
+ <alpine.BSF.2.22.395.2003231359420.14974@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.22.395.2003231359420.14974@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Mar 2020 13:35:44 +0000
+Message-ID: <CAFEAcA9+WPxGYqk5_-v=oXPK=UcvngXGaOLY3njM5iNN2CFh2g@mail.gmail.com>
+Subject: Re: Coverity CID 1421984
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,57 +90,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org,
- "open list:qcow2" <qemu-block@nongnu.org>, andrey.shinkevich@virtuozzo.com
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX
-Content-Type: multipart/mixed; boundary="RXJS9tA9h937ZG6ydt1y41KfRTZFXLK1U"
+On Mon, 23 Mar 2020 at 13:12, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>
+> On Mon, 23 Mar 2020, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Cc'ing qemu-ppc since this is restricted to the aCube Sam460ex board.
+> > On 3/23/20 12:46 PM, Max Reitz wrote:
+> >> Hi,
+> >>
+> >> I was triaging new Coverity block layer reports today, and one that
+> >> seemed like a real bug was CID 1421984:
+> >>
+> >> It complains about a memleak in sii3112_pci_realize() in
+> >> hw/ide/sii3112.c, specifically about @irq being leaked (it=E2=80=99s a=
+llocated
+> >> by qemu_allocate_irqs(), but never put anywhere or freed).
+> >>
+> >> I=E2=80=99m not really well-versed in anything under hw/ide, so I was =
+wondering
+> >> whether you agree it=E2=80=99s a bug and whether you know the correct =
+way to fix
+> >> it.  (I assume it=E2=80=99s just a g_free(irqs), but maybe there=E2=80=
+=99s a more
+> >> specific way that=E2=80=99s applicable here.)
+> >
+> > What does other devices is hold a reference in the DeviceState
+> > (SiI3112PCIState) to make static analyzers happy.
+>
+> Other IDE devices such as ahci and cmd646 seem to free it at the end of
+> the init function after calling ide_init2 with it. However it's not clear
+> to me how all this is supposed to work.
 
---RXJS9tA9h937ZG6ydt1y41KfRTZFXLK1U
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Anything that uses qemu_allocate_irqs() is old pre-qom/qdev code.
+The qdev way of doing this kind of thing (ie "I am a device with
+some inbound lines and this is the handler function to call when
+the line is set") is to use qdev_init_gpio_in().
 
-On 20.03.20 19:36, Eric Blake wrote:
-> If we fail to get bitmap info, we must not leak the encryption info.
->=20
-> Fixes: b8968c875f403
-> Fixes: Coverity CID 1421894
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow2.c | 1 +
->  1 file changed, 1 insertion(+)
+Coverity has flagged up a lot of leaks involving qemu_allocate_irqs();
+most of them I've for the moment just set as "insignificant, fix
+required" because they're in called-once functions like board init.
+If this device can't be hot-unplugged and so we will only ever call
+realize once, it would fall in that category too. Otherwise I'd
+suggest conversion to qdev_init_gpio_in(). (This allocates arrays
+of IRQs under the hood too, but the device_finalize() function will
+automatically free them for you, so it's easier to use non-leakily.)
 
-Thanks, applied to my block branch:
+I think in the long term we should be thinking about getting rid
+of all uses of qemu_allocate_irqs(): they seem to generally be
+leaky.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+The right way to free something allocated with qemu_allocate_irqs()
+is to call qemu_free_irqs() on it, but that will free both the
+array and all the IRQs within it, so you can't do that until the
+device is destroyed. If the device can never be destroyed, we
+usually don't write the unrealize function for it, so it would just
+be a matter of storing the returned pointer from qemu_allocate_irqs()
+in the device struct for a theoretical unrealize to be able to use.
+If you just g_free() the pointer you got back then this leaves all
+the IRQs themselves allocated, so you still have a nominal leak,
+you've just swept it under the rug enough to stop Coverity seeing it :-)
 
-Max
-
-
---RXJS9tA9h937ZG6ydt1y41KfRTZFXLK1U--
-
---8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl54uq4ACgkQ9AfbAGHV
-z0AC2wgAn4ABPGJY36y3gSh/jVrSXjGKqA5G0J/hY23gUH073x7EaMK2rzXCK5CC
-T5xtLPJedVgEz5LDJGlkTEn4GbhNJBxMEz1hjf2eWqVM15cMO38Gg0IDcsJ+OOrd
-qo3Khd54w5wiYxqVm58vtVS8UxWJghqlzDa/fuYNI/Y62zHSMMa5bjPTe8OTqI/d
-Mn4HyVVL4kT9EW/+zXcKRnKq9Xxr0fpT67RQ0JuUPGvvwmpxb6XPM7kquG5NY0cR
-2t5A5VB8Xhomof48RoOxUrdnYPXAriWRUwt+VGB78vg0E+PXtqIiM6X7F81lV1Kg
-loIeZoMXp29OoKdweKloiw7skffAHQ==
-=sOik
------END PGP SIGNATURE-----
-
---8JgvpteqpcTPLf37UtCtm4KquaUfHDBLX--
-
+thanks
+-- PMM
 
