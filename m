@@ -2,83 +2,77 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13240C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B33BC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:24:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFEFE2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:18:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4657206F8
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 15:24:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i9/nCkaC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFEFE2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LtJ52ygZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4657206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGOqI-00010U-JO
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:18:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49687)
+	id 1jGOvt-0003JL-WF
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 11:24:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jGOpM-0000Pb-Ht
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:17:21 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jGOvB-0002nF-2X
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jGOpL-0006Ut-9Y
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:17:20 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55561)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jGOpL-0006UV-16
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:17:19 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 6so15066918wmi.5
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 08:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/HG/3zX/z7cZw8pN0b5jI6X9Kh6mm9bAalCe+PTT2Bg=;
- b=i9/nCkaCzjB7rmgVLWZ7DYA1ZWP3AE/gEzh4DpgZoMdzOyiG9T/uUA/37/8lQf5xYZ
- qe+pMUwawy3VS8ABXb8CSgVjpOC3Nx3OMoXhTeTCEuVTvsMKlELUQLLtFo+hhiMT/s5j
- eMbY0EyypzeQF6zf0Fu4f9x9fIrJGiF7rwqOZq6/SaynYoR1JvsxutM2/whQQ3qOW6/b
- MmFCTEqxZuzhVv2eAUvtt+1R6jn2T/VatAGyBs76aOkegBjtQ+T2nQMVvFFlPXsbpBMR
- FivsMuEh1XvR3ZKWIP1XSI/+JbYU1w2+2Y6I2hRv0KlOpnKPCi2CXDiDmInMy4auJiLh
- xAUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/HG/3zX/z7cZw8pN0b5jI6X9Kh6mm9bAalCe+PTT2Bg=;
- b=XS6s2PaYr5L24CHrfYElMudFZAcVBIwBw0AfzFW0AXTq2DGhAbc+Ka40Qtg2RoUpj3
- sy5z7UYeAh+WbkbKxezB/0JoRjjQYg5vkoxVUCZLuByaYwYdBco2tOFFJTcZ1CIcCX/M
- MfsRKcRjCLLfJYiB2IATtfF162gAo7f2V2xQRfpIklapWi031tpxUEf6lhqmM85MglyG
- r2WZT3RyrO0lD/ZeOIjw8Y1L5q0MhEYFHWOLylwcx3db4Y/Di6kQSzYqNzr6yrT//4mH
- K+dSm782fyxUIvTzrGmCjIe5Gvr5nBlkrddJuGeimOGpr3JuCDGWWlZQl2EvsBSBnSbz
- l+4g==
-X-Gm-Message-State: ANhLgQ1O2tmxK4hM1ZmijtjYt4MC/UFSGsv7OneqSa/EQCn1lHU7v0x0
- 9iN700QeoVoPJNHjeCKD0WkCru2HB4n+kw==
-X-Google-Smtp-Source: ADFU+vt3+WKpbMfvIG5k9EaN84Df3FdcIK90cvXDPjREPwV5FgDBN3aekZo8nxnfdOSSrZDzm6C7Jg==
-X-Received: by 2002:a1c:1904:: with SMTP id 4mr23159837wmz.21.1584976637394;
- Mon, 23 Mar 2020 08:17:17 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q8sm15710234wmj.22.2020.03.23.08.17.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 08:17:16 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/ide/sii3112: Use qdev gpio rather than qemu_allocate_irqs()
-Date: Mon, 23 Mar 2020 15:17:15 +0000
-Message-Id: <20200323151715.29454-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <imammedo@redhat.com>) id 1jGOv2-0002Xn-PV
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:23:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45807)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jGOv2-0002SY-M5
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 11:23:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584976991;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eLB+koY/nzkIGatIlw9Tknm3DRGakqlSWOy3P31GX9g=;
+ b=LtJ52ygZGHt66WzTZ11YAcJia+8Gl0OrUWiRHPqCne3biag+bmUPQ+FBjJKUjl62CAcicC
+ 79xQJ+hSFggp77UAeJm5+xsCEZgnNyJHTTOXFWfdj8aqER+DGPjSdZwgbEvZiRD4z8sxv+
+ NAcrT6YG7Tbp7z7X5dahVPP0az9teNs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-DskXZGD2Payv6cu47_idaA-1; Mon, 23 Mar 2020 11:23:07 -0400
+X-MC-Unique: DskXZGD2Payv6cu47_idaA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9F9C107ACC4;
+ Mon, 23 Mar 2020 15:23:05 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C65A419C70;
+ Mon, 23 Mar 2020 15:22:44 +0000 (UTC)
+Date: Mon, 23 Mar 2020 16:22:43 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v3 06/10] hw/arm/virt: Add nvdimm hot-plug infrastructure
+Message-ID: <20200323162243.4e1574c4@redhat.com>
+In-Reply-To: <20200311172014.33052-7-shameerali.kolothum.thodi@huawei.com>
+References: <20200311172014.33052-1-shameerali.kolothum.thodi@huawei.com>
+ <20200311172014.33052-7-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,55 +84,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-ppc@nongnu.org, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, david@redhat.com,
+ shannon.zhaosl@gmail.com, mst@redhat.com, qemu-devel@nongnu.org,
+ xuwei5@hisilicon.com, linuxarm@huawei.com, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coverity points out (CID 1421984) that we are leaking the
-memory returned by qemu_allocate_irqs(). We can avoid this
-leak by switching to using qdev_init_gpio_in(); the base
-class finalize will free the irqs that this allocates under
-the hood.
+On Wed, 11 Mar 2020 17:20:10 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This is how the 'use qdev gpio' approach to fixing the leak looks.
-Disclaimer: I have only tested this with "make check", nothing more.
+> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> 
+> This adds support to init nvdimm acpi state and build nvdimm acpi tables.
+> Please note nvdimm_support is not yet enabled.
+> 
+> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
- hw/ide/sii3112.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-index 06605d7af2b..2ae6f5d9df6 100644
---- a/hw/ide/sii3112.c
-+++ b/hw/ide/sii3112.c
-@@ -251,8 +251,8 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
- {
-     SiI3112PCIState *d = SII3112_PCI(dev);
-     PCIIDEState *s = PCI_IDE(dev);
-+    DeviceState *ds = DEVICE(dev);
-     MemoryRegion *mr;
--    qemu_irq *irq;
-     int i;
- 
-     pci_config_set_interrupt_pin(dev->config, 1);
-@@ -280,10 +280,10 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
-     memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
-     pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
- 
--    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
-+    qdev_init_gpio_in(ds, sii3112_set_irq, 2);
-     for (i = 0; i < 2; i++) {
-         ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
--        ide_init2(&s->bus[i], irq[i]);
-+        ide_init2(&s->bus[i], qdev_get_gpio_in(ds, i));
- 
-         bmdma_init(&s->bus[i], &s->bmdma[i], s);
-         s->bmdma[i].bus = &s->bus[i];
--- 
-2.20.1
+> ---
+> v2 -> v3
+>  -Modified commit log.
+> ---
+>  hw/arm/Kconfig           |  1 +
+>  hw/arm/virt-acpi-build.c |  6 ++++++
+>  hw/arm/virt.c            | 19 +++++++++++++++++++
+>  hw/mem/Kconfig           |  2 +-
+>  include/hw/arm/virt.h    |  1 +
+>  5 files changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index bc54fd61f9..b023c0ecd5 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -25,6 +25,7 @@ config ARM_VIRT
+>      select DIMM
+>      select ACPI_MEMORY_HOTPLUG
+>      select ACPI_HW_REDUCED
+> +    select ACPI_NVDIMM
+>  
+>  config CHEETAH
+>      bool
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index c13710b727..b7d666b7a4 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -44,6 +44,7 @@
+>  #include "hw/pci/pcie_host.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/arm/virt.h"
+> +#include "hw/mem/nvdimm.h"
+>  #include "sysemu/numa.h"
+>  #include "sysemu/reset.h"
+>  #include "kvm_arm.h"
+> @@ -826,6 +827,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>          }
+>      }
+>  
+> +    if (ms->nvdimms_state->is_enabled) {
+> +        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
+> +                          ms->nvdimms_state, ms->ram_slots);
+> +    }
+> +
+>      if (its_class_name() && !vmc->no_its) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_iort(tables_blob, tables->linker, vms);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 32d865a488..18178553fa 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -148,6 +148,7 @@ static const MemMapEntry base_memmap[] = {
+>      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+>      [VIRT_PCDIMM_ACPI] =        { 0x09070000, MEMORY_HOTPLUG_IO_LEN },
+>      [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_EVT_SEL_LEN },
+> +    [VIRT_NVDIMM_ACPI] =        { 0x09090000, NVDIMM_ACPI_IO_LEN},
+>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> @@ -1784,6 +1785,18 @@ static void machvirt_init(MachineState *machine)
+>  
+>      create_platform_bus(vms);
+>  
+> +    if (machine->nvdimms_state->is_enabled) {
+> +        const struct AcpiGenericAddress arm_virt_nvdimm_acpi_dsmio = {
+> +            .space_id = AML_AS_SYSTEM_MEMORY,
+> +            .address = vms->memmap[VIRT_NVDIMM_ACPI].base,
+> +            .bit_width = NVDIMM_ACPI_IO_LEN << 3
+> +        };
+> +
+> +        nvdimm_init_acpi_state(machine->nvdimms_state, sysmem,
+> +                               arm_virt_nvdimm_acpi_dsmio,
+> +                               vms->fw_cfg, OBJECT(vms));
+> +    }
+> +
+>      vms->bootinfo.ram_size = machine->ram_size;
+>      vms->bootinfo.nb_cpus = smp_cpus;
+>      vms->bootinfo.board_id = -1;
+> @@ -1970,6 +1983,8 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>                               DeviceState *dev, Error **errp)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    MachineState *ms = MACHINE(hotplug_dev);
+> +    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>      Error *local_err = NULL;
+>  
+>      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> @@ -1977,6 +1992,10 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>          goto out;
+>      }
+>  
+> +    if (is_nvdimm) {
+> +        nvdimm_plug(ms->nvdimms_state);
+> +    }
+> +
+>      hotplug_handler_plug(HOTPLUG_HANDLER(vms->acpi_dev),
+>                           dev, &error_abort);
+>  
+> diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
+> index 2ad052a536..c27844900d 100644
+> --- a/hw/mem/Kconfig
+> +++ b/hw/mem/Kconfig
+> @@ -8,4 +8,4 @@ config MEM_DEVICE
+>  config NVDIMM
+>      bool
+>      default y
+> -    depends on (PC || PSERIES)
+> +    depends on (PC || PSERIES || ARM_VIRT)
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 02f500cb8e..59588d18db 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -79,6 +79,7 @@ enum {
+>      VIRT_SECURE_MEM,
+>      VIRT_PCDIMM_ACPI,
+>      VIRT_ACPI_GED,
+> +    VIRT_NVDIMM_ACPI,
+>      VIRT_LOWMEMMAP_LAST,
+>  };
+>  
 
 
