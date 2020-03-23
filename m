@@ -2,80 +2,99 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D13C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5699AC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:34:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6976C2051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:34:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 181E020658
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bT0UswWv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6976C2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YSHCeEhS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 181E020658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGQ2A-0001wW-Ip
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:34:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39135)
+	id 1jGQ2N-0002HB-7s
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:34:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jGQ1Q-0001GY-0p
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:33:53 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGQ1c-0001R2-5L
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:34:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jGQ1O-0001S8-Lb
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:33:51 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:34211)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jGQ1O-0001RW-9W
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:33:50 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id j16so14041192otl.1
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:33:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5YK0//WvbzgkX6SCOX0YPT0E5BLnMoVfpyFFoC45tSE=;
- b=bT0UswWvwxHqTGM7w1D0L0P8kONnCdtxh7FQcG/KYMPTDW08JNFM8SGDitp1IflXyx
- VBAOzwKQ/HQUmSJUM3bNTComGvNnIfz5/G5ogXVEtk17gtQ2H8W6TCVBS4+FMtd03MGP
- 5ruz4h2Is6nuHc5v3SsOVXG+wKU7G5jhqX7oEFKINXGYSylrwydDC91GWBeUnO4ZOPOz
- s36f9GlRWe64a5tXBzIa7kbs3ZGwfWRYymBezaYCExvYav5mJe805V2HPYgOXVnWbFdB
- rSqP88UFbHxxSpWGnWooACencRIKxO6QIUAcqIIcdh3T9GMN10cXaNMvv3vcHItjzpiZ
- 4jMQ==
+ (envelope-from <philmd@redhat.com>) id 1jGQ1a-0001WP-Hy
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:34:04 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26783)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGQ1a-0001WC-EM
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:34:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584981241;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=K2HFL/LAearWFT+UIOAnbAKhnvPCwB7nQ9wuU226caM=;
+ b=YSHCeEhS78MU+jnI7+PCqJThji2lSCHzkHk19Ul60Om8F04kdj3vpgERFFYclwsGvL/hgO
+ qhUxS+EzNGYRLSVDkrTtv55tTXutrNshH1NpzOzAJ0Cz/BVKuyJaNCgL8mQVKGGQwBTt4p
+ NPBciSSI2E5c9NV2y2+3mYM7L7tg6O8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-SDX61lpGPh2NQO4t4nNDQQ-1; Mon, 23 Mar 2020 12:33:56 -0400
+X-MC-Unique: SDX61lpGPh2NQO4t4nNDQQ-1
+Received: by mail-wm1-f69.google.com with SMTP id g9so203865wmh.1
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:33:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5YK0//WvbzgkX6SCOX0YPT0E5BLnMoVfpyFFoC45tSE=;
- b=V2N0jayALtjRLcBDlA1dYqcpAV6niOPYxd0iHuuFp+BDzUKRjIBDclFkj79P23HiFE
- 5o1oExlNMMRRt2OgugHSs2RAJRhEaL+azw97UMj0g0lKG1NmepDfja5KafupnknxUDGs
- EaGyDeTBdU8dG8jmX1gGPlRzeQzsDq1+B29Aekpk3BYqHq6asVdyP5Mp3I7vmS+uEK91
- LzQwo8lk0jQTD7sYMYvwgiKkxKNFFjIKRqAe5h3SNvG8uqg66ai2xZFZA843XyAt5fwI
- DGskdFD4eMHHM83P4LgpEKb4ngzw5LqO/zinuYXgv0y+QHXXJ5iy5AxAmrjXlJh0wWlu
- TjsQ==
-X-Gm-Message-State: ANhLgQ36FvOTYTJNxV1FEGrhQ4tZMDZYjl89xeA05bHuYAIqw/4xAHoe
- gDMJFLq5IaAu7S3pYNdf0nNXyut2CTWW/8K1yxDX3g==
-X-Google-Smtp-Source: ADFU+vuOVGwnBHedUQIOmpO3o3BkTF3b9ahE8I3wZM8mXllFlQtBQUx+/oF6ZA+WRYgsaUxJK1Dyd11tSSsMcvae60o=
-X-Received: by 2002:a05:6830:1f39:: with SMTP id
- e25mr3629407oth.135.1584981229194; 
- Mon, 23 Mar 2020 09:33:49 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=P7OP4Cll5K5pf+M41Hm+cDHCK/8KBzWRtKdwP3rsVxQ=;
+ b=YIbA6We2us+JsgqW7NUaoaCdwt1OX1kK0bYxybp396FrD8Tcmz9BpNEWfUmMq6Ffz9
+ Q8dYi7z1YbUaahTNRMsR5/SWMh/whnzuT9xJe3+0YcJPq0Y/HiI4N7Szqijq2CFcF77U
+ qTLxdcP0frW1nvgGHh4hh66ZmUZsOpsnqn94QIl6SVAZkqBnhRt6eSTV78OjZBFRdZLi
+ HmKTcaajsTG31CguvDzzDmEBZEGJYAKOZSdaDX6smC79ub5CpqpR8HJ/F2zZeSCN2uKv
+ kly2Oy3WbN6K2GX5dHJzxTkgUXScyI6qcZHKwao6M70m9rJw9D19y71S/HJuDbxm/ZhA
+ TkLg==
+X-Gm-Message-State: ANhLgQ2EnwsAVucKzGqz2aQpkE+0vSTkzBiiuvRCthMF+0A4CFtKo7Wo
+ uAgp2YwG625a3Uz1XXwdce5MKHQfBm9HVwl2x6AWo/IUSGOp38CBOwLzNC0DbDEcBBaNdHeWW2i
+ CBLpPW+baUt2ysAQ=
+X-Received: by 2002:a1c:23c8:: with SMTP id j191mr64021wmj.117.1584981234894; 
+ Mon, 23 Mar 2020 09:33:54 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvaNO3QGRiiA/WswSJzA2yryDoDNmMN4MP0ZjfsEpHRxWf1/y31rDMPupZzkZQBIecrfBn0Nw==
+X-Received: by 2002:a1c:23c8:: with SMTP id j191mr64005wmj.117.1584981234681; 
+ Mon, 23 Mar 2020 09:33:54 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id d124sm111783wmd.37.2020.03.23.09.33.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 09:33:54 -0700 (PDT)
+Subject: Re: [PATCH v1 02/11] tests/vm: move vga setup
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200323161514.23952-1-alex.bennee@linaro.org>
+ <20200323161514.23952-3-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ad1b15f0-6ac9-27a6-7d85-1757d3fe8f67@redhat.com>
+Date: Mon, 23 Mar 2020 17:33:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200323124923.24014-1-cohuck@redhat.com>
-In-Reply-To: <20200323124923.24014-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Mar 2020 16:33:37 +0000
-Message-ID: <CAFEAcA_DKPVW-GGHuUf=Ai1OjLwr9yzeJ9hyPCymJuyFkeru5g@mail.gmail.com>
-Subject: Re: [PULL for-5.0 0/2] s390x fixes and documentation
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32e
+In-Reply-To: <20200323161514.23952-3-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,35 +106,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Mar 2020 at 12:49, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> The following changes since commit 29e0855c5af62bbb0b0b6fed792e004dad92ba95:
->
->   Merge remote-tracking branch 'remotes/elmarco/tags/slirp-pull-request' into staging (2020-03-22 21:00:38 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20200323
->
-> for you to fetch changes up to 7722837369eb1c7e808021d79da68afa0c01c26f:
->
->   s390/ipl: fix off-by-one in update_machine_ipl_properties() (2020-03-23 12:36:27 +0100)
->
-> ----------------------------------------------------------------
-> - fix an off-by-one in the ipl code
-> - s390x documentation reordering
+On 3/23/20 5:15 PM, Alex Benn=C3=A9e wrote:
+> From: Gerd Hoffmann <kraxel@redhat.com>
+>=20
+> Move '-device VGA' from basevm.py to the guests, so they have
+> the chance to opt out and run without display device.
+>=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Message-Id: <20200310083218.26355-3-kraxel@redhat.com>
 
+Already reviewed:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg686829.html
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+> ---
+>   tests/vm/basevm.py   | 1 -
+>   tests/vm/fedora      | 1 +
+>   tests/vm/freebsd     | 1 +
+>   tests/vm/netbsd      | 1 +
+>   tests/vm/openbsd     | 1 +
+>   tests/vm/ubuntu.i386 | 5 ++++-
+>   6 files changed, 8 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index c53fd354d95..cffe7c4600e 100644
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -179,7 +179,6 @@ class BaseVM(object):
+>  =20
+>       def boot(self, img, extra_args=3D[]):
+>           args =3D self._args + [
+> -            "-device", "VGA",
+>               "-drive", "file=3D%s,if=3Dnone,id=3Ddrive0,cache=3Dwritebac=
+k" % img,
+>               "-device", "virtio-blk,drive=3Ddrive0,bootindex=3D0"]
+>           args +=3D self._data_args + extra_args
+> diff --git a/tests/vm/fedora b/tests/vm/fedora
+> index 4843b4175e0..bd9c6cf295c 100755
+> --- a/tests/vm/fedora
+> +++ b/tests/vm/fedora
+> @@ -82,6 +82,7 @@ class FedoraVM(basevm.BaseVM):
+>           self.boot(img_tmp, extra_args =3D [
+>               "-bios", "pc-bios/bios-256k.bin",
+>               "-machine", "graphics=3Doff",
+> +            "-device", "VGA",
+>               "-cdrom", iso
+>           ])
+>           self.console_init(300)
+> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> index 86770878b67..58166766d91 100755
+> --- a/tests/vm/freebsd
+> +++ b/tests/vm/freebsd
+> @@ -92,6 +92,7 @@ class FreeBSDVM(basevm.BaseVM):
+>           self.boot(img_tmp, extra_args =3D [
+>               "-bios", "pc-bios/bios-256k.bin",
+>               "-machine", "graphics=3Doff",
+> +            "-device", "VGA",
+>               "-cdrom", iso
+>           ])
+>           self.console_init()
+> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+> index 55590f46015..f3257bc245a 100755
+> --- a/tests/vm/netbsd
+> +++ b/tests/vm/netbsd
+> @@ -86,6 +86,7 @@ class NetBSDVM(basevm.BaseVM):
+>           self.boot(img_tmp, extra_args =3D [
+>               "-bios", "pc-bios/bios-256k.bin",
+>               "-machine", "graphics=3Doff",
+> +            "-device", "VGA",
+>               "-cdrom", iso
+>           ])
+>           self.console_init()
+> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+> index ab6abbedab5..0b705f49452 100755
+> --- a/tests/vm/openbsd
+> +++ b/tests/vm/openbsd
+> @@ -82,6 +82,7 @@ class OpenBSDVM(basevm.BaseVM):
+>           self.boot(img_tmp, extra_args =3D [
+>               "-bios", "pc-bios/bios-256k.bin",
+>               "-machine", "graphics=3Doff",
+> +            "-device", "VGA",
+>               "-cdrom", iso
+>           ])
+>           self.console_init()
+> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+> index 3266038fbde..15707753353 100755
+> --- a/tests/vm/ubuntu.i386
+> +++ b/tests/vm/ubuntu.i386
+> @@ -36,7 +36,10 @@ class UbuntuX86VM(basevm.BaseVM):
+>           img_tmp =3D img + ".tmp"
+>           subprocess.check_call(["cp", "-f", cimg, img_tmp])
+>           self.exec_qemu_img("resize", img_tmp, "50G")
+> -        self.boot(img_tmp, extra_args =3D ["-cdrom", self.gen_cloud_init=
+_iso()])
+> +        self.boot(img_tmp, extra_args =3D [
+> +            "-device", "VGA",
+> +            "-cdrom", self.gen_cloud_init_iso()
+> +        ])
+>           self.wait_ssh()
+>           self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+>           self.ssh_root_check("apt-get update")
+>=20
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
