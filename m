@@ -2,95 +2,78 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F28FC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EEDC4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:31:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CF0020719
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BF6E20719
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:31:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aeedrW1m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF0020719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ig9QnXac"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF6E20719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGUeO-0004Ts-6I
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 17:30:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37414)
+	id 1jGUfa-0005TJ-Fk
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 17:31:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jGUdS-000447-Qv
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:29:28 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jGUeJ-0004ax-Vg
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:30:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jGUdO-0008Fo-UO
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:29:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46521)
+ (envelope-from <alex.williamson@redhat.com>) id 1jGUeI-0000Hr-Mt
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:30:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:52584)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jGUdO-0008Fc-Od
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:29:22 -0400
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jGUeI-0000Ff-9p
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:30:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584998961;
+ s=mimecast20190719; t=1584999017;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PJMjo2Rtjqhg+0BYwUyARJEnAY+ZSx+IpHcmv33Sm2E=;
- b=aeedrW1mA3hf9HfvcL5LTTA0bwxk9KpzuKO4gVu/909eFAcp5zK7MDggEX1enhLHgSkAZc
- hfxXsA5q3SHkFlFbncqa/8tmQUsIMfFuP91tFSHhh+dW9m65HxItSfepr6xuzoX36N6aMo
- RL/iR9uvrxq0UpTiWrxa2WrPEoQvMWw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113--0yRr61XOQKr4kHHVUiamQ-1; Mon, 23 Mar 2020 17:29:20 -0400
-X-MC-Unique: -0yRr61XOQKr4kHHVUiamQ-1
-Received: by mail-wm1-f69.google.com with SMTP id s15so466726wmc.0
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 14:29:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=7WWTe2Ledqtg2EV1DJLnUZw7ctgYMxsmuQiDXwMgqRg=;
- b=FhhCt/wHIxSbUPfh4UVXye0S3NVl4gBVNmVzPElcN/ikaV2GWcCicGApy0Q5yZxl5G
- Q7mQJHfR0E/mqnqZ9RChf5Uyw6sBrg+JWhb9dZhRdKdF/MIMFUOmPu8JO4pY8rku2l/i
- KramS2pa/4NXkWR3Jw3nV7GELhCTaQ1vlBSDFf6w/CGcxy1QQI8D5GU9JXcRis9mzB2t
- aJZRwevWqgD/alZIYMMRzeAdp1poJRzGFjnQrhpDTvyHZTSkaef4NfTJ4d27ynGig6lm
- Y4oGpCczqnpH/cfLR+h+layxnXLgQpnOAzbtrAl0cRernNFG9m1ntQAeTzKZ4WvZZivb
- Pwrg==
-X-Gm-Message-State: ANhLgQ3MAKAJVWfH9vapq906GhBOTSKogxcAxoQ+58MrrhCdTf8FlXlr
- ZjB3oL3MuBOGJ1krjOibYtXr2waWSsZf4A919OtpvokyH/mdgiCvZ0fRlLlbnlphIuz3XIrEJnD
- dBHsxKpOLxW5hTOI=
-X-Received: by 2002:a1c:41d6:: with SMTP id o205mr1459707wma.122.1584998956573; 
- Mon, 23 Mar 2020 14:29:16 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vssZHuLhIG36CGn4z9obg1vcL570yDxmFjr9wBkFe0tlIZ4dsIUqa/D1XE8Vasz2qGwGGZBFA==
-X-Received: by 2002:a1c:41d6:: with SMTP id o205mr1459672wma.122.1584998956241; 
- Mon, 23 Mar 2020 14:29:16 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id g7sm25817035wrq.21.2020.03.23.14.29.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 14:29:15 -0700 (PDT)
-Date: Mon, 23 Mar 2020 17:29:11 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [PATCH v1 07/22] intel_iommu: add set/unset_iommu_context callback
-Message-ID: <20200323212911.GQ127076@xz-x1>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-8-git-send-email-yi.l.liu@intel.com>
+ bh=ZVsEY6cNKMHIU4w2rXsM2TCIqoA6fSVNDl3M8SH4l6g=;
+ b=Ig9QnXacTN0CTNKpyzG6KykGjL0C2oA2/kLlkwhVT3ChGiOJ1yfO1rCA6HikBKZtjpZj3e
+ P8K5qSPwlIDsFooALbS9CvWIPh88Crn9bDaqHN9IkIE+n4Vvx/ceRWc7JFtxbVHY1eL2Av
+ V/yFwQPAAyKq08W9exBD0PoHXebiHKw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-426-suLvxhWCM16kHxyllzdYtw-1; Mon, 23 Mar 2020 17:30:15 -0400
+X-MC-Unique: suLvxhWCM16kHxyllzdYtw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E714A10CE782;
+ Mon, 23 Mar 2020 21:30:12 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 21B2F60BF3;
+ Mon, 23 Mar 2020 21:30:00 +0000 (UTC)
+Date: Mon, 23 Mar 2020 15:29:59 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v4 0/2] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200323152959.1c39e9a7@w520.home>
+In-Reply-To: <20190604003422.GA30229@joy-OptiPlex-7040>
+References: <20190531004438.24528-1-yan.y.zhao@intel.com>
+ <20190603132932.1b5dc7fe@x1.home>
+ <20190604003422.GA30229@joy-OptiPlex-7040>
 MIME-Version: 1.0
-In-Reply-To: <1584880579-12178-8-git-send-email-yi.l.liu@intel.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,222 +85,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, hao.wu@intel.com,
- yi.y.sun@intel.com, Richard Henderson <rth@twiddle.net>,
- david@gibson.dropbear.id.au
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "Yang, Ziye" <ziye.yang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "dinechin@redhat.com" <dinechin@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
+ Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 22, 2020 at 05:36:04AM -0700, Liu Yi L wrote:
-> This patch adds set/unset_iommu_context() impelementation in Intel
-> vIOMMU. For Intel platform, pass-through modules (e.g. VFIO) could
-> set HostIOMMUContext to Intel vIOMMU emulator.
->=20
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/i386/intel_iommu.c         | 70 +++++++++++++++++++++++++++++++++++++=
-++----
->  include/hw/i386/intel_iommu.h | 17 +++++++++--
->  2 files changed, 80 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 4b22910..8d9204f 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3354,23 +3354,35 @@ static const MemoryRegionOps vtd_mem_ir_ops =3D {
->      },
->  };
-> =20
-> -VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int de=
-vfn)
-> +/**
-> + * Fetch a VTDBus instance for given PCIBus. If no existing instance,
-> + * allocate one.
-> + */
-> +static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
->  {
->      uintptr_t key =3D (uintptr_t)bus;
->      VTDBus *vtd_bus =3D g_hash_table_lookup(s->vtd_as_by_busptr, &key);
-> -    VTDAddressSpace *vtd_dev_as;
-> -    char name[128];
-> =20
->      if (!vtd_bus) {
->          uintptr_t *new_key =3D g_malloc(sizeof(*new_key));
->          *new_key =3D (uintptr_t)bus;
->          /* No corresponding free() */
-> -        vtd_bus =3D g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *)=
- * \
-> -                            PCI_DEVFN_MAX);
-> +        vtd_bus =3D g_malloc0(sizeof(VTDBus) + PCI_DEVFN_MAX * \
-> +                            (sizeof(VTDAddressSpace *) + \
-> +                             sizeof(VTDHostIOMMUContext *)));
+On Mon, 3 Jun 2019 20:34:22 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-IIRC I commented on this before...  Shouldn't sizeof(VTDBus) be
-enough?
+> On Tue, Jun 04, 2019 at 03:29:32AM +0800, Alex Williamson wrote:
+> > On Thu, 30 May 2019 20:44:38 -0400
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >   
+> > > This patchset introduces a migration_version attribute under sysfs of VFIO
+> > > Mediated devices.
+> > > 
+> > > This migration_version attribute is used to check migration compatibility
+> > > between two mdev devices of the same mdev type.
+> > > 
+> > > Patch 1 defines migration_version attribute in
+> > > Documentation/vfio-mediated-device.txt
+> > > 
+> > > Patch 2 uses GVT as an example to show how to expose migration_version
+> > > attribute and check migration compatibility in vendor driver.  
+> > 
+> > Thanks for iterating through this, it looks like we've settled on
+> > something reasonable, but now what?  This is one piece of the puzzle to
+> > supporting mdev migration, but I don't think it makes sense to commit
+> > this upstream on its own without also defining the remainder of how we
+> > actually do migration, preferably with more than one working
+> > implementation and at least prototyped, if not final, QEMU support.  I
+> > hope that was the intent, and maybe it's now time to look at the next
+> > piece of the puzzle.  Thanks,
+> > 
+> > Alex  
+> 
+> Got it. 
+> Also thank you and all for discussing and guiding all along:)
+> We'll move to the next episode now.
 
->          vtd_bus->bus =3D bus;
->          g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
->      }
-> +    return vtd_bus;
-> +}
-> +
-> +VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int de=
-vfn)
-> +{
-> +    VTDBus *vtd_bus;
-> +    VTDAddressSpace *vtd_dev_as;
-> +    char name[128];
-> =20
-> +    vtd_bus =3D vtd_find_add_bus(s, bus);
->      vtd_dev_as =3D vtd_bus->dev_as[devfn];
-> =20
->      if (!vtd_dev_as) {
-> @@ -3436,6 +3448,52 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *=
-s, PCIBus *bus, int devfn)
->      return vtd_dev_as;
->  }
-> =20
-> +static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
-> +                                     int devfn,
-> +                                     HostIOMMUContext *host_icx)
-> +{
-> +    IntelIOMMUState *s =3D opaque;
-> +    VTDBus *vtd_bus;
-> +    VTDHostIOMMUContext *vtd_dev_icx;
-> +
-> +    assert(0 <=3D devfn && devfn < PCI_DEVFN_MAX);
-> +
-> +    vtd_bus =3D vtd_find_add_bus(s, bus);
-> +
-> +    vtd_iommu_lock(s);
-> +    vtd_dev_icx =3D vtd_bus->dev_icx[devfn];
-> +
-> +    if (!vtd_dev_icx) {
+Hi Yan,
 
-We can assert this directly I think, in case we accidentally set the
-context twice without notice.
+As we're hopefully moving towards a migration API, would it make sense
+to refresh this series at the same time?  I think we're still expecting
+a vendor driver implementing Kirti's migration API to also implement
+this sysfs interface for compatibility verification.  Thanks,
 
-> +        vtd_bus->dev_icx[devfn] =3D vtd_dev_icx =3D
-> +                    g_malloc0(sizeof(VTDHostIOMMUContext));
-> +        vtd_dev_icx->vtd_bus =3D vtd_bus;
-> +        vtd_dev_icx->devfn =3D (uint8_t)devfn;
-> +        vtd_dev_icx->iommu_state =3D s;
-> +        vtd_dev_icx->host_icx =3D host_icx;
-> +    }
-> +    vtd_iommu_unlock(s);
-> +
-> +    return 0;
-> +}
-> +
-> +static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int d=
-evfn)
-> +{
-> +    IntelIOMMUState *s =3D opaque;
-> +    VTDBus *vtd_bus;
-> +    VTDHostIOMMUContext *vtd_dev_icx;
-> +
-> +    assert(0 <=3D devfn && devfn < PCI_DEVFN_MAX);
-> +
-> +    vtd_bus =3D vtd_find_add_bus(s, bus);
-> +
-> +    vtd_iommu_lock(s);
-> +
-> +    vtd_dev_icx =3D vtd_bus->dev_icx[devfn];
-> +    g_free(vtd_dev_icx);
-
-Better set it as NULL, and can also drop vtd_dev_icx which seems
-meaningless..
-
-       g_free(vtd_bus->dev_icx[devfn]);
-       vtd_bus->dev_icx[devfn] =3D NULL;
-
-> +
-> +    vtd_iommu_unlock(s);
-> +}
-> +
->  static uint64_t get_naturally_aligned_size(uint64_t start,
->                                             uint64_t size, int gaw)
->  {
-> @@ -3731,6 +3789,8 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus=
-, void *opaque, int devfn)
-> =20
->  static PCIIOMMUOps vtd_iommu_ops =3D {
->      .get_address_space =3D vtd_host_dma_iommu,
-> +    .set_iommu_context =3D vtd_dev_set_iommu_context,
-> +    .unset_iommu_context =3D vtd_dev_unset_iommu_context,
->  };
-> =20
->  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.=
-h
-> index 3870052..9b4fc0a 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -64,6 +64,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
->  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
->  typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
->  typedef struct VTDPASIDEntry VTDPASIDEntry;
-> +typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
-> =20
->  /* Context-Entry */
->  struct VTDContextEntry {
-> @@ -112,10 +113,20 @@ struct VTDAddressSpace {
->      IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
->  };
-> =20
-> +struct VTDHostIOMMUContext {
-> +    VTDBus *vtd_bus;
-> +    uint8_t devfn;
-> +    HostIOMMUContext *host_icx;
-> +    IntelIOMMUState *iommu_state;
-> +};
-> +
->  struct VTDBus {
-> -    PCIBus* bus;=09=09/* A reference to the bus to provide translation f=
-or */
-> +    /* A reference to the bus to provide translation for */
-> +    PCIBus *bus;
->      /* A table of VTDAddressSpace objects indexed by devfn */
-> -    VTDAddressSpace *dev_as[];
-> +    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
-> +    /* A table of VTDHostIOMMUContext objects indexed by devfn */
-> +    VTDHostIOMMUContext *dev_icx[PCI_DEVFN_MAX];
->  };
-> =20
->  struct VTDIOTLBEntry {
-> @@ -271,6 +282,8 @@ struct IntelIOMMUState {
->      /*
->       * Protects IOMMU states in general.  Currently it protects the
->       * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace=
-.
-> +     * Protect the update/usage of HostIOMMUContext pointer cached in
-> +     * VTDBus->dev_icx array as array elements may be updated by hotplug
-
-I think the context update does not need to be updated, because they
-should always be with the BQL, right?
-
-Thanks,
-
->       */
->      QemuMutex iommu_lock;
->  };
-> --=20
-> 2.7.4
->=20
-
---=20
-Peter Xu
+Alex
 
 
