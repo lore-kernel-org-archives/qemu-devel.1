@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB0BC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB9BC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4271B20637
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:06:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9B8B20637
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fIta0b3W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4271B20637
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p2kvYCwk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B8B20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGPan-0004aC-A9
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:06:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60583)
+	id 1jGPb0-0004rH-Km
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:06:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jGPVp-0004aG-As
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:01:18 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jGPXn-0007aY-IY
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jGPVk-00063P-AW
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:01:13 -0400
-Received: from mail-vk1-xa41.google.com ([2607:f8b0:4864:20::a41]:38267)
+ (envelope-from <alistair23@gmail.com>) id 1jGPXk-0006fF-OL
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:03:15 -0400
+Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:37717)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jGPVj-00062g-HI; Mon, 23 Mar 2020 12:01:08 -0400
-Received: by mail-vk1-xa41.google.com with SMTP id n128so3933163vke.5;
- Mon, 23 Mar 2020 09:01:07 -0700 (PDT)
+ id 1jGPXk-0006dA-KV; Mon, 23 Mar 2020 12:03:12 -0400
+Received: by mail-ua1-x944.google.com with SMTP id l18so966748uak.4;
+ Mon, 23 Mar 2020 09:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=fsrpN92Ba+Aa9m7v+VX26eF17EC615gTnf9oEpSQUIo=;
- b=fIta0b3WQ2+spUBaLKMDjsMq+ianR0y/AIw+47jDyDVL6A/UGtUSbq8OkKQgtjFnQN
- 5AclorZoxpOXULKGAmLOZabYemG9EtaLb/JNxTaeB88Nw2Wy6Bc2OORWs5EVhsGH55k2
- gOh8cqIT/b1VnJnhNCRXW+bNVqwIZkY5Fji/T4sBBhZuuJpBYTI4jccp5nqmguMmyhL6
- OIcW4+2D2E8ITTHQ9Vj25x0VEgjZkIhxSzCVOGZAzSGhqC12Zkm8/MWdkp+AEO4HEMCY
- ShwcqgwNxSighXJKnfVznmXMr9q/cfLswgxB90neJHcW+FGm+4oB2T/NFFeS0mewVpOm
- 49Ag==
+ bh=JnyeopB+Gr3i1azSR4z83W38j2lgLgHE6PDpwzZJBB8=;
+ b=p2kvYCwkVukiiOQHNpOTZjXZ3qUhT2afJEgMCmV0WTjTzaqibkNcZdaUTtSLRN0J5C
+ 5blHrzibFGYcVx1aGlzOBkTIC/WY+Wyd1kBaVrr1VpE+tcR7+xRqwT6tQGDGSOF1aRZI
+ t31rf2eFACLhd9OxEZ73GD8R3v2mhKs3mxwa1/fi4KOAQAfOqlG/vhCRoERQpVeTAq0N
+ tViP7821FddrPWi0mOIl6Uh/QhXdlhecgVWvxjN6fR1oXV/g80k1wpdLjdx51o9PWPl5
+ nkAX/MyVJvglANyR+WW1A+vKlruZKNhUfs5W9EuH7X6JlHVw53O7UXX8gmNGvInMDBw3
+ rpxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=fsrpN92Ba+Aa9m7v+VX26eF17EC615gTnf9oEpSQUIo=;
- b=AfnOmTb5MxPvs9JMstEKRt0hA3gspk6JV1BPgxF5fI1xJoUlnL5+H8gog5opERcqjZ
- ACcr49WR/s0F8vIzcgNwQ/Gq539WKmewIJ7SAWDPgZrvcDfQ+q+xriTk2AqjTYj/yEbz
- EXsNZkM+uRiH59kFkAu6eeXixUsu/Virt8yTTmkzNdxLz3D3q9kPW1jrqF92Q2SN/yWQ
- YfiB0dlBAXYVe6eZecoqIvUVV0VvqfnoM+Gb6ayEqBo/EY6wX8Yf5BRfDz5aSqznj8fO
- k99qBJfL/Rghc5knXv6rG/8MVNCIa4BmWYCyOHI05pKAewZPMqYQ8PGdUnOY+j178sWI
- bZlw==
-X-Gm-Message-State: ANhLgQ3dpY2BCYITY4Sw0cTb7bqO13kRG7sohfBo2Cko2weGMVw8Xijo
- 7C24J6NrlkEvkG/9+ZatM+L4Qag7FvOtIxrrHJ8=
-X-Google-Smtp-Source: ADFU+vvmgAqeFxfO51+XVOIJHWhM18K01oT/e8McXwYN/dQtlYANxrD3hvHdmBvFqkWbi+Dpj/vS5A+58hiVSonUj0A=
-X-Received: by 2002:a1f:a2d0:: with SMTP id l199mr14863251vke.77.1584979266742; 
- Mon, 23 Mar 2020 09:01:06 -0700 (PDT)
+ bh=JnyeopB+Gr3i1azSR4z83W38j2lgLgHE6PDpwzZJBB8=;
+ b=uYRsWxQbNq/smPf/MRNth0LHrKkwY8EsJu8EKUCDjnPHD/uIjAaNwBSKPHwcE5RmWm
+ rzli1h/MFYMqUTVLhyCkZyivpR3OsfLbkvcOAwHXLcNUA6N5JbZahs9Yu1kchjiS3n50
+ rYiMCCl/iz+/YuurIUoDNs5jRIa0yZgYg8WyRJ6wop5K560wjoxPLA0ZCz0VoEvnAL19
+ rqJ27CdRgoRC+70eyziSdzaIk2MlcawSasPk3hBQ+JkZ++jZxlnOUxnKShmtxLw8qLI4
+ n+LnQTOHGp2qxrDuCjYR7L33TBi1UnDKuFkBNJIF9UerU/Kelg2BgPvhcxFfexQQCGWP
+ +aOQ==
+X-Gm-Message-State: ANhLgQ0E2PPRa4uAOITIqOCHau6tnlaEG/9oNurb9DRvS8fvJFRs5lSP
+ UWAFeZyeYV5fay8wq5tbz5TrYaHSC8nS0hKWgrg=
+X-Google-Smtp-Source: ADFU+vultXvB6mUVHmmwMfWDB+Ux8l9wUoYuTCjGAJKPULuO0JSO86/77/q+fLk3kmIqdWHMgtuDtFn1LpShSqoLDYc=
+X-Received: by 2002:a9f:2964:: with SMTP id t91mr7742050uat.21.1584979390662; 
+ Mon, 23 Mar 2020 09:03:10 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200321144110.5010-1-philmd@redhat.com>
- <20200321144110.5010-10-philmd@redhat.com>
-In-Reply-To: <20200321144110.5010-10-philmd@redhat.com>
+ <20200321144110.5010-11-philmd@redhat.com>
+In-Reply-To: <20200321144110.5010-11-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 23 Mar 2020 08:53:09 -0700
-Message-ID: <CAKmqyKPa-zc949L=G3gCdA50KQq0GbhE3zqoOTjTatPnsm5Oew@mail.gmail.com>
-Subject: Re: [PATCH-for-5.0 v2 09/11] hw/timer/stm32f2xx_timer: Remove dead
- assignment
+Date: Mon, 23 Mar 2020 08:55:08 -0700
+Message-ID: <CAKmqyKOt9+O8fYsSOabSP6kOqi879-qE-GBJqhVvW=EtH_2rmg@mail.gmail.com>
+Subject: Re: [PATCH-for-5.0 v2 10/11] hw/timer/pxa2xx_timer: Add assertion to
+ silent static analyzer warning
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::a41
+X-Received-From: 2607:f8b0:4864:20::944
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,16 +108,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Mar 21, 2020 at 7:52 AM Philippe Mathieu-Daud=C3=A9
+On Sat, Mar 21, 2020 at 7:50 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> Fix warning reported by Clang static code analyzer:
+> pxa2xx_timer_tick4() takes an opaque pointer, then calls
+> pxa2xx_timer_update4(), so the static analyzer can not
+> verify that the 'n < 8':
 >
->     CC      hw/timer/stm32f2xx_timer.o
->   hw/timer/stm32f2xx_timer.c:225:9: warning: Value stored to 'value' is n=
-ever read
->           value =3D timer_val;
->           ^       ~~~~~~~~~
+>   425 static void pxa2xx_timer_tick4(void *opaque)
+>   426 {
+>   427     PXA2xxTimer4 *t =3D (PXA2xxTimer4 *) opaque;
+>   428     PXA2xxTimerInfo *i =3D (PXA2xxTimerInfo *) t->tm.info;
+>   429
+>   430     pxa2xx_timer_tick(&t->tm);
+>   433     if (t->control & (1 << 6))
+>   434         pxa2xx_timer_update4(i, qemu_clock_get_ns(QEMU_CLOCK_VIRTUA=
+L), t->tm.num - 4);
+>
+>   135 static void pxa2xx_timer_update4(void *opaque, uint64_t now_qemu, i=
+nt n)
+>   136 {
+>   137     PXA2xxTimerInfo *s =3D (PXA2xxTimerInfo *) opaque;
+>   140     static const int counters[8] =3D { 0, 0, 0, 0, 4, 4, 6, 6 };
+>   142
+>   143     if (s->tm4[n].control & (1 << 7))
+>   144         counter =3D n;
+>   145     else
+>   146         counter =3D counters[n];
+>
+> Add an assert() to give the static analyzer a hint, this fixes a
+> warning reported by Clang static code analyzer:
+>
+>     CC      hw/timer/pxa2xx_timer.o
+>   hw/timer/pxa2xx_timer.c:146:17: warning: Assigned value is garbage or u=
+ndefined
+>           counter =3D counters[n];
+>                   ^ ~~~~~~~~~~~
 >
 > Reported-by: Clang Static Analyzer
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
@@ -127,22 +153,22 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/timer/stm32f2xx_timer.c | 1 -
->  1 file changed, 1 deletion(-)
+>  hw/timer/pxa2xx_timer.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/hw/timer/stm32f2xx_timer.c b/hw/timer/stm32f2xx_timer.c
-> index 06ec8a02c2..ba8694dcd3 100644
-> --- a/hw/timer/stm32f2xx_timer.c
-> +++ b/hw/timer/stm32f2xx_timer.c
-> @@ -222,7 +222,6 @@ static void stm32f2xx_timer_write(void *opaque, hwadd=
-r offset,
->      case TIM_PSC:
->          timer_val =3D stm32f2xx_ns_to_ticks(s, now) - s->tick_offset;
->          s->tim_psc =3D value & 0xFFFF;
-> -        value =3D timer_val;
->          break;
->      case TIM_CNT:
->          timer_val =3D value;
+> diff --git a/hw/timer/pxa2xx_timer.c b/hw/timer/pxa2xx_timer.c
+> index cd172cc1e9..944c165889 100644
+> --- a/hw/timer/pxa2xx_timer.c
+> +++ b/hw/timer/pxa2xx_timer.c
+> @@ -140,6 +140,7 @@ static void pxa2xx_timer_update4(void *opaque, uint64=
+_t now_qemu, int n)
+>      static const int counters[8] =3D { 0, 0, 0, 0, 4, 4, 6, 6 };
+>      int counter;
+>
+> +    assert(n < ARRAY_SIZE(counters));
+>      if (s->tm4[n].control & (1 << 7))
+>          counter =3D n;
+>      else
 > --
 > 2.21.1
 >
