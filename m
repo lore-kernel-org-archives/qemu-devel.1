@@ -2,76 +2,65 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D45E6C1975A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 01:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46304C1975A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 02:33:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B5F120722
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 01:53:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NQ85FxbA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5F120722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTPS id 170E920722
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 02:33:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 170E920722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGCHH-0000zw-Mc
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 21:53:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46254)
+	id 1jGCtu-0006uw-5A
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 22:33:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@chromium.org>) id 1jGCGO-0000Zo-2v
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 21:52:25 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1jGCtL-0006VI-Mk
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 22:32:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@chromium.org>) id 1jGCGM-00019F-LD
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 21:52:23 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:43114)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stevensd@chromium.org>)
- id 1jGCGM-00018r-F3
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 21:52:22 -0400
-Received: by mail-qt1-x842.google.com with SMTP id a5so3244674qtw.10
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 18:52:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=frX3aSnCvwMZYRYwhP/kfk1qsbj5tle094zp7qlON38=;
- b=NQ85FxbA9U5l5Ssf8mI7RFw4jUu8WtueIFxNaFqnl/woz9cGtlOFoQe60Sa92vagm3
- Fcgyirf30WxvE+i6AflMUDjZiq84Wx2wfHWvJIqr3YeVcSaKZPgf/QFr5acS1Kp4kl/d
- 6O5I3he6Sa1Zgs8+8qvkl1YaxF92rv9RSW0G8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=frX3aSnCvwMZYRYwhP/kfk1qsbj5tle094zp7qlON38=;
- b=eFlxPiEIoa1PsnCv592MJmsjh8FgsgEu1mpg38zcGq14mXMfZ/+AP52XBaGmd0g64P
- s0tWsHvE11iJvJiUgsmBvUSVl3dy9c+rNpCq2EyfrIUze8K+EMm/i4GMMYG0JvsYwlcZ
- 8HQ3wsZ09Kgzx7aqjVqeNhskXxi/lJJsAtYRn8/zeHCedLzCFk0Z0rUqKliIbZFM7AS+
- 0DbunNFzidMjgvxS6KRye+WnFFLl3GbcD9rPVGx1at1IysoyjPx+L1rIbxAT7IRYYp8v
- ggo5I7ktAj1H0OREOPOquWddG5K+3nMhIny5iuqBvoCpFFH99m9tZTOG+4O7TLg2kddd
- +j3w==
-X-Gm-Message-State: ANhLgQ3BLnUdCJoVmlYV/kNRMKKMFKxthzLdh+F+RhrcU6rz63pDsWpt
- 8gywBfKWBM83HXDmFtqfLW14c9x4bX8pmVB8cnS1eA==
-X-Google-Smtp-Source: ADFU+vsK11eSwW9pQKP54E3Rv6+fws/ZejMZbRqwR/vwnn0FZOuF6lMpAbLSnVfh4EDcsqNG0GwBaJt4aVnWYqZEXlw=
-X-Received: by 2002:ac8:7769:: with SMTP id h9mr294273qtu.234.1584928341110;
- Sun, 22 Mar 2020 18:52:21 -0700 (PDT)
+ (envelope-from <tao3.xu@intel.com>) id 1jGCtJ-0008H7-TC
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 22:32:38 -0400
+Received: from mga07.intel.com ([134.134.136.100]:53773)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1jGCtJ-0008Fq-M0
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 22:32:37 -0400
+IronPort-SDR: OgmDAOgyDJYUsS2djo2hbv+wh2QE0HZjNrjWsD4UW7r7Ea3JJaWmvOHBZhtG/bTNbcjbe0r8yC
+ 8xutF3rLGy5Q==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Mar 2020 19:32:28 -0700
+IronPort-SDR: QEijlKvknbxLgrGUFdwEMza2LPjsaA1kcKB0hkGoJNCbYj0fZvesMfFqO1mzjxSLngUkVDj8Cv
+ 6oczYYBF8VSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,294,1580803200"; d="scan'208";a="445648650"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.238.4.86])
+ ([10.238.4.86])
+ by fmsmga005.fm.intel.com with ESMTP; 22 Mar 2020 19:32:26 -0700
+Subject: Re: [PATCH v2] target/i386: Add ARCH_CAPABILITIES related bits into
+ Icelake-Server CPU model
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Eduardo Habkost <ehabkost@redhat.com>
+References: <20200316095605.12318-1-xiaoyao.li@intel.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <38253eb8-059c-5020-50cd-e90f7e8e4ae5@intel.com>
+Date: Mon, 23 Mar 2020 10:32:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200319021823.57219-1-stevensd@chromium.org>
- <20200320064143.4b2kyskr5clxsczs@sirius.home.kraxel.org>
-In-Reply-To: <20200320064143.4b2kyskr5clxsczs@sirius.home.kraxel.org>
-From: David Stevens <stevensd@chromium.org>
-Date: Mon, 23 Mar 2020 10:52:09 +0900
-Message-ID: <CAD=HUj4j7gEkHjQPt3aMy_X_m7pZ8CboDTjZtsO1RcfgN0JT5A@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] Cross-device resource sharing
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::842
+In-Reply-To: <20200316095605.12318-1-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,45 +72,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zach Reizner <zachr@chromium.org>,
- Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- virtio-comment@lists.oasis-open.org,
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for taking a look at this. I've opened a github issue.
+Hi Xiaoyao,
 
-Fixes: https://github.com/oasis-tcs/virtio-spec/issues/76
+May be you can add .note for this new version.
 
-Thanks,
-David
+for example:
 
-On Fri, Mar 20, 2020 at 3:41 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Thu, Mar 19, 2020 at 11:18:21AM +0900, David Stevens wrote:
-> > Hi all,
-> >
-> > This is the next iteration of patches for adding support for sharing
-> > resources between different virtio devices. The corresponding Linux
-> > implementation is [1].
-> >
-> > In addition to these patches, the most recent virtio-video patchset
-> > includes a patch for importing objects into that device [2].
->
-> Looks good to me.
->
-> So, open a github issue to kick the TC vote process and get this merged?
-> (see virtio-spec/.github/PULL_REQUEST_TEMPLATE.md).
->
-> cheers,
->   Gerd
->
++                .version = 3,
++                .note = "ARCH_CAPABILITIES",
++                .props = (PropValue[]) {
+
+On 3/16/2020 5:56 PM, Xiaoyao Li wrote:
+> Current Icelake-Server CPU model lacks all the features enumerated by
+> MSR_IA32_ARCH_CAPABILITIES.
+> 
+> Add them, so that guest of "Icelake-Server" can see all of them.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+> v2:
+>   - Add it as a new version.
+> ---
+>   target/i386/cpu.c | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 92fafa265914..5fba6a2ad6b3 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3496,6 +3496,19 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>                       { /* end of list */ }
+>                   },
+>               },
+> +            {
+> +                .version = 3,
+> +                .props = (PropValue[]) {
+> +                    { "arch-capabilities", "on" },
+> +                    { "rdctl-no", "on" },
+> +                    { "ibrs-all", "on" },
+> +                    { "skip-l1dfl-vmentry", "on" },
+> +                    { "mds-no", "on" },
+> +                    { "pschange-mc-no", "on" },
+> +                    { "taa-no", "on" },
+> +                    { /* end of list */ }
+> +                },
+> +            },
+>               { /* end of list */ }
+>           }
+>       },
+> --
+> 2.20.1
+> 
+> 
 
