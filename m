@@ -2,98 +2,116 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56285C54EEB
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E70B4C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2593120786
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:51:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dR2A0ky4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2593120786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA7EF2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 14:57:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7EF2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGOQa-0004GK-97
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 10:51:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44270)
+	id 1jGOW9-00071Q-Uw
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 10:57:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jGOPe-00030e-Oj
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:48 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jGOVQ-0006AG-3P
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jGOPd-0002dX-0R
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:46 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40186)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGOPc-0002dJ-TE
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:50:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584975044;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Xn4zrrLC0Aq9194Vkg3Ovqh1sYUadqtoQJs+dsnQp58=;
- b=dR2A0ky4T7d9/ZEteAThyOLZUdJw74j3EvljyWRUYm0QbTJUCIku/JwWDkriMsVmE7rSMu
- OOKSsYhUwL3FSXFMuAsmRLqKFkLBwvnhUaLgU7zUCtDyiT1NVbwHg/J7OSoeThQzq0DtHw
- U31GjOTsvqpshqMKAaHauNzIGPgkYkQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-q9Z5ZZTHP3qL4r1XJG76BQ-1; Mon, 23 Mar 2020 10:50:40 -0400
-X-MC-Unique: q9Z5ZZTHP3qL4r1XJG76BQ-1
-Received: by mail-wm1-f70.google.com with SMTP id s15so4098217wmc.0
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 07:50:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Xn4zrrLC0Aq9194Vkg3Ovqh1sYUadqtoQJs+dsnQp58=;
- b=LSnZzEpfopQqq6L5T1J2Mr+Ujm6eVMBPtjlbdMFQ71VHSqwGZay485yQD5lgLDErHB
- ainXFtYZP16tytaaxaBDSYQAlyUoY7zkASdx5GVWzTyDGh1IHTh1dyHQyXKJXwXjtcoG
- SiY5HF3VwalFPHvsfnVR7Y581fnnAx6GSHnv0JZADd9wOTqIeis33mvWMODUgj/QzFHK
- 1CWp+9qIh4VpniA5WEsSsSONDpBk6qy+U70TIUUi3UucwqRPkyxTdYOgI3ViK8t5DfwM
- 4V6XNvFoS0cYzPIJkVl4apyX11kxEkmSVPfQj4fopp6rBJdrBlotIVuwI/6B0y4pJhcc
- hTLg==
-X-Gm-Message-State: ANhLgQ1NkWI9WIHhweJjXlwnkm17+qXUkPaPwhAvhd9m1J9JrwvYfo5n
- HAcxVTI6BcSRrRBzvFiCZAxAyN8YkXMJO2mfaV92qmOfmLEPOJyEBPwpjc7vDjZJhOHPE3t6UoK
- wdqEMVS8DJqmMPyE=
-X-Received: by 2002:adf:ce8a:: with SMTP id r10mr9191674wrn.211.1584975039606; 
- Mon, 23 Mar 2020 07:50:39 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuhLWjUig3K7TOLx/TLXxPyrMkRe8U85ebG5z+mRyixQcDkPWfiiZur/2VWJPUJ94gONOVCKw==
-X-Received: by 2002:adf:ce8a:: with SMTP id r10mr9191650wrn.211.1584975039328; 
- Mon, 23 Mar 2020 07:50:39 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id q8sm15625734wmj.22.2020.03.23.07.50.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 23 Mar 2020 07:50:38 -0700 (PDT)
-Subject: Re: [PATCH] ide/sii3112: Avoid leaking irqs array
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <20200323143514.DB3B4747E04@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9dd18e5b-d1f1-7c3b-428f-0e549616a9d6@redhat.com>
-Date: Mon, 23 Mar 2020 15:50:37 +0100
+ (envelope-from <laurent@vivier.eu>) id 1jGOVO-0005Ks-PW
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 10:56:44 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:37211)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jGOVJ-0005G6-2A; Mon, 23 Mar 2020 10:56:37 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M2w8Y-1jFHVE1bpc-003JGd; Mon, 23 Mar 2020 15:56:00 +0100
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200321144110.5010-1-philmd@redhat.com>
+ <1c711740-6166-c730-ef67-d07511add1e6@vivier.eu>
+ <262f8318-1590-1c48-f4de-a6482fdc3071@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH-for-5.0 v2 00/11] misc: Trivial static code analyzer fixes
+Message-ID: <10431e44-880a-cbec-c35e-1d425064c40b@vivier.eu>
+Date: Mon, 23 Mar 2020 15:55:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200323143514.DB3B4747E04@zero.eik.bme.hu>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <262f8318-1590-1c48-f4de-a6482fdc3071@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:40GVz+W7NkMzKf2pJ241KL1TxtHoQ5690PSyBkrakagaTgBUHuz
+ QTHo7AelNkaeH1lBR1sgV/90kM5n02tWQF/zhpnvhJWtmg269OfP1hVyYK+ubjg6wMKdjvu
+ ihpJ558ivNf1wl9Qfei+D/8b0Jf6tyAmzh83Bp94cKgciKGDIl6oE20wdJmB/903iCxEL1k
+ 5guRTUeaXqAtqe+PGWe2Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Q4CMWtGpBYY=:wbi/4/B1kLULezcHy9u35V
+ UaSHd/xsWA23K/iBEbXYY7MZbVmjTFZC1t+RCwNjrJfVs9N9CoQyStqUv6pQaNGBYxS++Gy/L
+ 8ZCq+7U+2riCJzVtT0yT5O871SZFq3oJh0PAQIKW934SvMTv2qS8TGKU3n5Gn2xuUzZlT95wE
+ BUOU4NKE55TeuQxpzrIkSfn0TzwNgOrfvdNGXcJ06TtUcHARpFmYehdCZMKsyAZrwXMwSusiI
+ 26T8N7JEf+H+LKYBgxrA97V1n4F6lf+2jzFNA2jt5DOdJPZSwov7AuzeF/RaKHKJuBFqFBEWU
+ APi7KttBVhnLHb+RhRLCzLK/xEq6LFB6sVPeUAJp6jo/ONMV2kcLDrYD+5TdzOhgcaSwrX5By
+ P1bcjbCca2PQNPdF5BBWhUIDbE9YKChmdalKCp/1D8V0KxG3AL2tqWncjfiI9KFyfk1e+9OiM
+ Ob/ImnV95ZEP2d3YWwA80hPD1v8SGgJ3CdW5FCOdbPF8is0CvW62fZywbVegw+nra3q/cc/8Y
+ fxx1hbGcBH7Hu6X8402ysOgjAth1XzGwJgMxpFGRG6B/q08FAMX8iQHcCnkVFS/Dt9iStpSjp
+ tpn6pbMQ2J/IYO8J4XT2kjnnnG1+zogA1uo16m9xTsIu3XnqWsgO7wx4XGPqXoGhlnozMcJv+
+ R02/RPHzieBGslOoPVU1MlJNcPiWE55kzaK/qaW+icnxFinRjL7En72SqfpdDf3ybFg8n2zuk
+ PWa0LBAKzgBkzKfM/pDypDVF3M/f21GYHgopie0mndRXpo4eJNnPOLG5u1/RZLUKBNOAaYXNe
+ 5eM0hm3Gw1Zt0P1SyfS895/3yImRjPSW2CL37QbKlFNG8x89MWJOgLcvnDcEmkntBnLf7LV
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,82 +123,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Michael Tokarev <mjt@tls.msk.ru>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Max Reitz <mreitz@redhat.com>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/23/20 3:32 PM, BALATON Zoltan wrote:
-> Coverity CID 1421984 reports a leak in allocated irqs, this patch
-> attempts to plug that.
+Le 23/03/2020 à 15:45, Philippe Mathieu-Daudé a écrit :
+> On 3/23/20 3:32 PM, Laurent Vivier wrote:
+>> Le 21/03/2020 à 15:40, Philippe Mathieu-Daudé a écrit :
+>>> Fix trivial warnings reported by the Clang static code analyzer.
+>>>
+>>> Since v1:
+>>> - Addressed Markus/Zoltan/Aleksandar review comments
+>>>
+>>> Philippe Mathieu-Daudé (11):
+>>>    block: Avoid dead assignment
+>>>    blockdev: Remove dead assignment
+>>>    hw/i2c/pm_smbus: Remove dead assignment
+>>>    hw/input/adb-kbd: Remove dead assignment
+>>>    hw/ide/sii3112: Remove dead assignment
+>>>    hw/isa/i82378: Remove dead assignment
+>>>    hw/gpio/aspeed_gpio: Remove dead assignment
+>>>    hw/timer/exynos4210_mct: Remove dead assignments
+>>>    hw/timer/stm32f2xx_timer: Remove dead assignment
+>>>    hw/timer/pxa2xx_timer: Add assertion to silent static analyzer
+>>> warning
+>>>    hw/scsi/esp-pci: Remove dead assignment
+>>>
+>>>   block.c                    | 2 +-
+>>>   blockdev.c                 | 2 +-
+>>>   hw/gpio/aspeed_gpio.c      | 2 +-
+>>>   hw/i2c/pm_smbus.c          | 1 -
+>>>   hw/ide/sii3112.c           | 5 +++--
+>>>   hw/input/adb-kbd.c         | 6 +-----
+>>>   hw/isa/i82378.c            | 8 ++++----
+>>>   hw/scsi/esp-pci.c          | 1 -
+>>>   hw/timer/exynos4210_mct.c  | 3 ---
+>>>   hw/timer/pxa2xx_timer.c    | 1 +
+>>>   hw/timer/stm32f2xx_timer.c | 1 -
+>>>   11 files changed, 12 insertions(+), 20 deletions(-)
+>>>
+>>
+>> I think your series covers cases already covered by:
+>>
+>> [PATCH v3 00/12] redundant code: Fix warnings reported by Clang static
+>> code analyzer
+>> https://patchew.org/QEMU/20200302130715.29440-1-kuhn.ch
 > 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->   hw/ide/sii3112.c | 14 +++++++++++---
->   1 file changed, 11 insertions(+), 3 deletions(-)
+> Unfortunately [for me...] I don't have v3 in my INBOX... *sigh*
+> This was 3 weeks ago. *sigh*.
 > 
-> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-> index 06605d7af2..c886916873 100644
-> --- a/hw/ide/sii3112.c
-> +++ b/hw/ide/sii3112.c
-> @@ -31,6 +31,7 @@ typedef struct SiI3112Regs {
->   typedef struct SiI3112PCIState {
->       PCIIDEState i;
->       MemoryRegion mmio;
-> +    qemu_irq *irqs;
->       SiI3112Regs regs[2];
->   } SiI3112PCIState;
->   
-> @@ -252,7 +253,6 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
->       SiI3112PCIState *d = SII3112_PCI(dev);
->       PCIIDEState *s = PCI_IDE(dev);
->       MemoryRegion *mr;
-> -    qemu_irq *irq;
->       int i;
->   
->       pci_config_set_interrupt_pin(dev->config, 1);
-> @@ -280,10 +280,10 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
->       memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
->       pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
->   
-> -    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
-> +    d->irqs = qemu_allocate_irqs(sii3112_set_irq, d, 2);
->       for (i = 0; i < 2; i++) {
->           ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
-> -        ide_init2(&s->bus[i], irq[i]);
-> +        ide_init2(&s->bus[i], d->irqs[i]);
->   
->           bmdma_init(&s->bus[i], &s->bmdma[i], s);
->           s->bmdma[i].bus = &s->bus[i];
-> @@ -291,6 +291,13 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
->       }
->   }
->   
-> +static void sii3112_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    SiI3112PCIState *d = SII3112_PCI(dev);
-> +
-> +    qemu_free_irqs(d->irqs, 2);
+> I can see the series in the archives:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg00219.html
+> But I can't find the outcome, was it queued in the trivial tree?
+> Any idea when this will be merged in the master tree?
 
-You can't do that without calling unrealize() on all the devices in each 
-IDEBus. Apparently there is no code available to do that. Maybe easier 
-to not add any sii3112_unrealize(). Keeping a reference in the state 
-should be enough to silent Coverity.
+Some patches are already merged via trivial (1, 2 (should go by SCSI
+queue) 3, 5, 6, 7, 9, 11 (by USB queue), 12).
 
-> +}
-> +
->   static void sii3112_pci_class_init(ObjectClass *klass, void *data)
->   {
->       DeviceClass *dc = DEVICE_CLASS(klass);
-> @@ -301,6 +308,7 @@ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
->       pd->class_id = PCI_CLASS_STORAGE_RAID;
->       pd->revision = 1;
->       pd->realize = sii3112_pci_realize;
-> +    dc->unrealize = sii3112_unrealize;
->       dc->reset = sii3112_reset;
->       dc->desc = "SiI3112A SATA controller";
->       set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> 
+But others needed R-b tags or new version. I didn't check which of your
+patches are already covered by this series.
+
+I'm sorry to not have checked your series earlier...
+
+Thanks,
+Laurent
 
 
