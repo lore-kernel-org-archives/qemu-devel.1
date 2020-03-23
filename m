@@ -2,77 +2,102 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B279FC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:56:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0CFC4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:59:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 840D92076A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:56:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 840D92076A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 205B82072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:59:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWwsEmZO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 205B82072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGLhN-00027k-Mi
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:56:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45846)
+	id 1jGLkI-0003kC-0l
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:59:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46189)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jGLgR-0001Fu-Ph
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:55:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGLjT-00031o-93
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jGLgQ-0007ul-GX
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:55:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32846)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jGLgQ-0007th-9s
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:55:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jGLgN-0005f1-NI
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 11:55:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 79E132E80C0
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 11:55:51 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1jGLjS-0001Gr-79
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:59:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:37973)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGLjS-0001GK-2z
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:59:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584964741;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6Jtr+SrTZ4MtneIqpIbzEfHkTPd/POKT1GAxTxyrcs4=;
+ b=VWwsEmZOH8WDH+K1L7cJJioYhVBAzqmJ3aEif6iChS30Hgy8NfWTAwaPQ9nhKjqL3VTeXV
+ 3gN1uVUuQdADliR4fOPXrHQRO1keNXFgzHQYM1wP1Nhjvb8AQkpJjGFCmUF/Xls+2a3a33
+ w54K8Q5ThuPsWbecFTLms/wWeRpblgk=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-a8JJ8nn4PkmfqHcO-axq4A-1; Mon, 23 Mar 2020 07:59:00 -0400
+X-MC-Unique: a8JJ8nn4PkmfqHcO-axq4A-1
+Received: by mail-ed1-f70.google.com with SMTP id a32so11341599edf.17
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 04:59:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EOYX4xpk+QY4eUq3Zd49ycxvNXC8dFDfFPBPKwLGh70=;
+ b=MyqQ2qYRqjfergD9haqHKBLlhzHZ1rK97cbVhwFjyq/G3pmZlKUo2+ZSv2Ku9RjaBZ
+ qXAGhBDP5QdRw5CHhGIYGMcWe6g4pwvGnPz5qbRTKP7buKYnseHaiv7W7aeYqOfn6LxA
+ 6mRhD/m25LyuWwdNUDi1OCojvTVUBiBD79aC/6XSsFhpzcvhj1EmId6XkuDARumZ38NT
+ VcwNS4+fS0DE0g1EwK1qVIcxJAvUSnziiyFP86hzTG6B2mdyn9mli0oqN+9NvIhlrHyZ
+ pe0jmLJ/djC7vBc7mvtjbDS/Lyt4pSKo8WJVCMgjGQKpKhn9Mn/Vp7yxQRABPNBHVpCx
+ xizg==
+X-Gm-Message-State: ANhLgQ20vJVlbqQ/I6+eXwf1H4/SEj3y/h1z+Dn88cNrkVH9Ae8HlIed
+ jHJiOy3UFBxmCAfrPXT7fPj5DjBL0VvoLpGPU5dFWVJmEqpnT+bECvHQp15qJ484yo/A/xP9pYK
+ MNm409IZ4K5aJbQw=
+X-Received: by 2002:a17:906:6c91:: with SMTP id
+ s17mr4023313ejr.345.1584964738805; 
+ Mon, 23 Mar 2020 04:58:58 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsDmOY7/9pgovCV83g9SmaZurQ6UG++HLFVAoNPCcdhg6KaAIUeWbCN+CWV4YZ+zhjCtLKxmg==
+X-Received: by 2002:a17:906:6c91:: with SMTP id
+ s17mr4023298ejr.345.1584964738547; 
+ Mon, 23 Mar 2020 04:58:58 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id rl28sm869194ejb.28.2020.03.23.04.58.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 04:58:57 -0700 (PDT)
+Subject: Re: Coverity CID 1421984
+To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
+ BALATON Zoltan <balaton@eik.bme.hu>
+References: <d9b7d8d8-1640-7d69-cd16-66e6d9cef3d1@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <88618db3-cb48-12bd-6152-b642b25a0287@redhat.com>
+Date: Mon, 23 Mar 2020 12:58:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <d9b7d8d8-1640-7d69-cd16-66e6d9cef3d1@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Mar 2020 11:45:54 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1867519@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Tags: focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange janitor mohamadh paelzer
-X-Launchpad-Bug-Reporter: Mohammad Heib (mohamadh)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158428174672.11238.3583143675239092561.malonedeb@soybean.canonical.com>
-Message-Id: <158496395454.19913.329521551852074277.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1867519] Re: qemu 4.2 segfaults on VF detach
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b092334302f0a7e074aa57d4588a7a56f6ee7cf8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,82 +106,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1867519 <1867519@bugs.launchpad.net>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Merge proposal unlinked:
-   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
-/381033
+Cc'ing qemu-ppc since this is restricted to the aCube Sam460ex board.
 
--- =
+On 3/23/20 12:46 PM, Max Reitz wrote:
+> Hi,
+>=20
+> I was triaging new Coverity block layer reports today, and one that
+> seemed like a real bug was CID 1421984:
+>=20
+> It complains about a memleak in sii3112_pci_realize() in
+> hw/ide/sii3112.c, specifically about @irq being leaked (it=E2=80=99s allo=
+cated
+> by qemu_allocate_irqs(), but never put anywhere or freed).
+>=20
+> I=E2=80=99m not really well-versed in anything under hw/ide, so I was won=
+dering
+> whether you agree it=E2=80=99s a bug and whether you know the correct way=
+ to fix
+> it.  (I assume it=E2=80=99s just a g_free(irqs), but maybe there=E2=80=99=
+s a more
+> specific way that=E2=80=99s applicable here.)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1867519
+What does other devices is hold a reference in the DeviceState=20
+(SiI3112PCIState) to make static analyzers happy.
 
-Title:
-  qemu 4.2 segfaults on VF detach
+Ideally we should free such memory in the DeviceUnrealize handler, but=20
+we in the reality we only care for hotunpluggable devices.
+PCI devices usually are. There is a trick however, you can mark=20
+overwrite the DeviceClass::hotpluggable field in sii3112_pci_class_init:
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Fix Released
+   dc->hotpluggable =3D false;
 
-Bug description:
-  After updating Ubuntu 20.04 to the Beta version, we get the following
-  error and the virtual machines stucks when detaching PCI devices using
-  virsh command:
-
-  Error:
-  error: Failed to detach device from /tmp/vf_interface_attached.xml
-  error: internal error: End of file from qemu monitor
-
-  steps to reproduce:
-   1. create a VM over Ubuntu 20.04 (5.4.0-14-generic)
-   2. attach PCI device to this VM (Mellanox VF for example)
-   3. try to detaching  the PCI device using virsh command:
-     a. create a pci interface xml file:
-          =
-
-        <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
-        <driver name=3D'vfio'/>
-        <source>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x11' slot=3D'0x00' =
-function=3D'0x2' />
-        </source>
-        </hostdev>
-      =
-
-     b.  #virsh detach-device <VM-Doman-name> <pci interface xml file>
-
-
-  - Ubuntu release:
-    Description:    Ubuntu Focal Fossa (development branch)
-    Release:        20.04
-
-  - Package ver:
-    libvirt0:
-    Installed: 6.0.0-0ubuntu3
-    Candidate: 6.0.0-0ubuntu5
-    Version table:
-       6.0.0-0ubuntu5 500
-          500 http://il.archive.ubuntu.com/ubuntu focal/main amd64 Packages
-   *** 6.0.0-0ubuntu3 100
-          100 /var/lib/dpkg/status
-
-  - What you expected to happen: =
-
-    PCI device detached without any errors.
-
-  - What happened instead:
-    getting the errors above and he VM stuck
-
-  additional info:
-  after downgrading the libvirt0 package and all the dependent packages to =
-5.4 the previous, version, seems that the issue disappeared
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1867519/+subscriptions
 
