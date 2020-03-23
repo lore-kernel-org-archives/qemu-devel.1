@@ -2,78 +2,78 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BF8C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6C0C54FCF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21FC420722
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32BF120722
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cNa9iJOH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21FC420722
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vp+8G5hj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32BF120722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGR6h-00012y-At
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:43:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52235)
+	id 1jGR6i-00014d-BZ
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:43:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jGR3i-0004Oo-2I
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGR3i-0004Ow-Q5
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jGR3g-0003hk-JH
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:17 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40530)
+ (envelope-from <peter.maydell@linaro.org>) id 1jGR3g-0003hj-Iq
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:18 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39083)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jGR3g-0003fN-6G
+ id 1jGR3g-0003f9-6F
  for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:16 -0400
-Received: by mail-wm1-x331.google.com with SMTP id a81so359327wmf.5
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 10:40:13 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id a9so436315wmj.4
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 10:40:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Blca2M8WsWfCbkoVy34ezoOEGpYFuC8v0ZvsUkwATQw=;
- b=cNa9iJOHXRN3TsQN6ZdGDMLijkPX5US+Sy8j9En5JdOqdLGJ0gIdF3eO9Dhe74QY7U
- F8IwNBxz/PZcHK4nr5tDcYQVYMEoqvcOz+5C34blzVnuGQkUDhMbdIsKegj7B6JOkkBU
- oo7yIkoIqLkAJzfEiCX5/lN9CgIonLZ27soNIiPd6QCDJIfPhSTxUPx2pzCuvkp9DfRw
- iJJbFa0h//Wt/oMJMNN5jIjQnD/dMsGh72Q0UIp80bpuLwCp0WDNOcmd2oswXbKyUhF0
- 6gtZblm29t6EGneFskH8BbVIPvchedGzcL8ctl4EwsZaFMRhZhK9cLYOYWBuvmTMkgN5
- 7J2w==
+ bh=5a3auB4qdgqdR6eDWJTA8UcdAj8hCoHOLQiKnN1qJ3s=;
+ b=Vp+8G5hjhwcLmg45ndXc1a15tvj3fS3ERCXQleJKSJYnbG8CVmdi4abPiZGkGJrlR6
+ 0GBodwWFJkiBTcIuiKNj/puiJ7cW+uJ/vVs+cqlGZqjGEkXy1h3PxRNuxCGmgD7e1Yow
+ HAGg9MrpvRjEHoJOh7xkDfjmXL0Rd2r351ps9hefRzMRyQ+HoDjEmbs96jBhzCyJKeUq
+ 7gtgw3yovHq/mHJNeXYQqArpRCs2FxCMnmessaQV59tuERX+9iggVkX/G5FsCaTswGYT
+ Mnl1sIJp7v/2Tu/Fw99y8WNCbBqaXiQU7TqeAaY/728OKqJoCma2xEfY5ud3kfKtguLd
+ JrgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Blca2M8WsWfCbkoVy34ezoOEGpYFuC8v0ZvsUkwATQw=;
- b=LC0yMAj1FJ8rg2xOfURen0iB+bFEdHkJPkzUECZFFzuqKqiBKx4jqrlQ5mGHNFEj11
- twG1E+JX0JNWs6BtcTX7I6BVXlT89Z7YNpMCsLFQuwl4d7o9wnvfJgTALUtrVMn4zaeK
- 6iZM3m1vkdz5f3cXViMjmyA6MJcj2S07gd5vUevRMGA/ZX6A/SkqwnFBd0VVpDrrlvJS
- QQzliPx0yQdIA/0WA3AeXWf4QK1kz1WE7cwigR7Z83HUxQSBVZtBmNVVgEt4UUtdqI7D
- 4tz1Jfi/cYAfEBknBedG/hKYrZkdCo4OGZ0yiS0ud2xIyrJB2uv9CmfbZWe5/dKzH1Up
- v2DQ==
-X-Gm-Message-State: ANhLgQ02DoanUrvaE1KEucNkE3UGR6jD+xWQJK+MiOFRhGByiT7W7r4U
- aW776+baHv5lCMoQRnEo5n0zIOxdu17UYQ==
-X-Google-Smtp-Source: ADFU+vuSq3sh4a5EowREAtMW75K3DDLcZshYHQP3J/XXGU1LTJcAXrnOHJ5SA9Cd12TTpOyTVinzPA==
-X-Received: by 2002:a1c:e109:: with SMTP id y9mr441847wmg.62.1584985211923;
- Mon, 23 Mar 2020 10:40:11 -0700 (PDT)
+ bh=5a3auB4qdgqdR6eDWJTA8UcdAj8hCoHOLQiKnN1qJ3s=;
+ b=s7qUbOf4lpWANMGKT1HLilKcFvRmEyuiHDdhjSfnl0sdlKm0AleymnkRWT6Q8AdXMt
+ 0M0UhtxQlqeeU9frpT96ak4anwBWjsxyJbZzHR2l/sMyAYJ2EPC1C4C4p1+tE2P8KtgN
+ AXOsd4/NNIP0JOwxRQ/2ojEpBc8CJwXE1KdqFT6Tn+M5hyzgfLT4AL6Mv8SeCq29uwHZ
+ PUL9/tMoBytquZD1xeezHkN4DmGc+qf4JYDbA9ILt/6qWe0NixYbwGBF7sxl/X98pNmQ
+ Fe5Bp0H+18+w589OJyPGxE+lLx/CSlTtrfBQEBZqrFiSUroG89nme8jFEx218N0eME8Z
+ 6REw==
+X-Gm-Message-State: ANhLgQ2WnL6mhPm1xy9mJzLh1Jy+OdJfPWqH1dO2S1wQe8bwCXafcoHc
+ +jV1WgaV2+YZV9NB6tDUaz1/iqV2mGujQw==
+X-Google-Smtp-Source: ADFU+vsGssyD+5BkntBb/TNcIbgdPgxiqmuU/oiKD1RyBdNOU6IQDll7gPt0pXUtZFjGOj1QuTU8CQ==
+X-Received: by 2002:a7b:cb42:: with SMTP id v2mr440975wmj.170.1584985210885;
+ Mon, 23 Mar 2020 10:40:10 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o9sm25145282wrw.20.2020.03.23.10.40.11
+ by smtp.gmail.com with ESMTPSA id o9sm25145282wrw.20.2020.03.23.10.40.09
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 10:40:11 -0700 (PDT)
+ Mon, 23 Mar 2020 10:40:10 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/5] aspeed/smc: Fix DMA support for AST2600
-Date: Mon, 23 Mar 2020 17:40:03 +0000
-Message-Id: <20200323174006.8468-3-peter.maydell@linaro.org>
+Subject: [PULL 1/5] hw/arm/bcm283x: Correct the license text
+Date: Mon, 23 Mar 2020 17:40:02 +0000
+Message-Id: <20200323174006.8468-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200323174006.8468-1-peter.maydell@linaro.org>
 References: <20200323174006.8468-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,100 +98,329 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Recent firmwares uses SPI DMA transfers in U-Boot to load the
-different images (kernel, initrd, dtb) in the SoC DRAM. The AST2600
-FMC model is missing the masks to be applied on the DMA registers
-which resulted in incorrect values. Fix that and wire the SPI
-controllers which have DMA support on the AST2600.
+The license is the 'GNU General Public License v2.0 or later',
+not 'and':
 
-Fixes: bcaa8ddd081c ("aspeed/smc: Add AST2600 support")
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-id: 20200320053923.20565-1-clg@kaod.org
+  This program is free software; you can redistribute it and/ori
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2 of
+  the License, or (at your option) any later version.
+
+Fix the license comment.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200312213455.15854-1-philmd@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/aspeed_ast2600.c |  6 ++++++
- hw/ssi/aspeed_smc.c     | 15 +++++++++++++--
- hw/ssi/trace-events     |  1 +
- 3 files changed, 20 insertions(+), 2 deletions(-)
+ include/hw/arm/bcm2835_peripherals.h | 3 ++-
+ include/hw/arm/bcm2836.h             | 3 ++-
+ include/hw/char/bcm2835_aux.h        | 3 ++-
+ include/hw/display/bcm2835_fb.h      | 3 ++-
+ include/hw/dma/bcm2835_dma.h         | 4 +++-
+ include/hw/intc/bcm2835_ic.h         | 4 +++-
+ include/hw/intc/bcm2836_control.h    | 3 ++-
+ include/hw/misc/bcm2835_mbox.h       | 4 +++-
+ include/hw/misc/bcm2835_mbox_defs.h  | 4 +++-
+ include/hw/misc/bcm2835_property.h   | 4 +++-
+ hw/arm/bcm2835_peripherals.c         | 3 ++-
+ hw/arm/bcm2836.c                     | 3 ++-
+ hw/arm/raspi.c                       | 3 ++-
+ hw/display/bcm2835_fb.c              | 1 -
+ hw/dma/bcm2835_dma.c                 | 4 +++-
+ hw/intc/bcm2835_ic.c                 | 4 ++--
+ hw/intc/bcm2836_control.c            | 4 +++-
+ hw/misc/bcm2835_mbox.c               | 4 +++-
+ hw/misc/bcm2835_property.c           | 4 +++-
+ 19 files changed, 45 insertions(+), 20 deletions(-)
 
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index 446b44d31cf..1a869e09b96 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -411,6 +411,12 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index 7859281e11b..2e8655a7c2d 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
  
-     /* SPI */
-     for (i = 0; i < sc->spis_num; i++) {
-+        object_property_set_link(OBJECT(&s->spi[i]), OBJECT(s->dram_mr),
-+                                 "dram", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs", &err);
-         object_property_set_bool(OBJECT(&s->spi[i]), true, "realized",
-                                  &local_err);
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 9d5c696d5a1..2edccef2d54 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -364,6 +364,8 @@ static const AspeedSMCController controllers[] = {
-         .flash_window_base = ASPEED26_SOC_FMC_FLASH_BASE,
-         .flash_window_size = 0x10000000,
-         .has_dma           = true,
-+        .dma_flash_mask    = 0x0FFFFFFC,
-+        .dma_dram_mask     = 0x3FFFFFFC,
-         .nregs             = ASPEED_SMC_R_MAX,
-         .segment_to_reg    = aspeed_2600_smc_segment_to_reg,
-         .reg_to_segment    = aspeed_2600_smc_reg_to_segment,
-@@ -379,7 +381,9 @@ static const AspeedSMCController controllers[] = {
-         .segments          = aspeed_segments_ast2600_spi1,
-         .flash_window_base = ASPEED26_SOC_SPI_FLASH_BASE,
-         .flash_window_size = 0x10000000,
--        .has_dma           = false,
-+        .has_dma           = true,
-+        .dma_flash_mask    = 0x0FFFFFFC,
-+        .dma_dram_mask     = 0x3FFFFFFC,
-         .nregs             = ASPEED_SMC_R_MAX,
-         .segment_to_reg    = aspeed_2600_smc_segment_to_reg,
-         .reg_to_segment    = aspeed_2600_smc_reg_to_segment,
-@@ -395,7 +399,9 @@ static const AspeedSMCController controllers[] = {
-         .segments          = aspeed_segments_ast2600_spi2,
-         .flash_window_base = ASPEED26_SOC_SPI2_FLASH_BASE,
-         .flash_window_size = 0x10000000,
--        .has_dma           = false,
-+        .has_dma           = true,
-+        .dma_flash_mask    = 0x0FFFFFFC,
-+        .dma_dram_mask     = 0x3FFFFFFC,
-         .nregs             = ASPEED_SMC_R_MAX,
-         .segment_to_reg    = aspeed_2600_smc_segment_to_reg,
-         .reg_to_segment    = aspeed_2600_smc_reg_to_segment,
-@@ -1135,6 +1141,11 @@ static void aspeed_smc_dma_rw(AspeedSMCState *s)
-     MemTxResult result;
-     uint32_t data;
+ #ifndef BCM2835_PERIPHERALS_H
+diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+index 92a6544816b..024af8aae4f 100644
+--- a/include/hw/arm/bcm2836.h
++++ b/include/hw/arm/bcm2836.h
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
  
-+    trace_aspeed_smc_dma_rw(s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE ?
-+                            "write" : "read",
-+                            s->regs[R_DMA_FLASH_ADDR],
-+                            s->regs[R_DMA_DRAM_ADDR],
-+                            s->regs[R_DMA_LEN]);
-     while (s->regs[R_DMA_LEN]) {
-         if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
-             data = address_space_ldl_le(&s->dram_as, s->regs[R_DMA_DRAM_ADDR],
-diff --git a/hw/ssi/trace-events b/hw/ssi/trace-events
-index 0a70629801a..0ea498de910 100644
---- a/hw/ssi/trace-events
-+++ b/hw/ssi/trace-events
-@@ -6,5 +6,6 @@ aspeed_smc_do_snoop(int cs, int index, int dummies, int data) "CS%d index:0x%x d
- aspeed_smc_flash_write(int cs, uint64_t addr,  uint32_t size, uint64_t data, int mode) "CS%d @0x%" PRIx64 " size %u: 0x%" PRIx64" mode:%d"
- aspeed_smc_read(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRIx64 " size %u: 0x%" PRIx64
- aspeed_smc_dma_checksum(uint32_t addr, uint32_t data) "0x%08x: 0x%08x"
-+aspeed_smc_dma_rw(const char *dir, uint32_t flash_addr, uint32_t dram_addr, uint32_t size) "%s flash:@0x%08x dram:@0x%08x size:0x%08x"
- aspeed_smc_write(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRIx64 " size %u: 0x%" PRIx64
- aspeed_smc_flash_select(int cs, const char *prefix) "CS%d %sselect"
+ #ifndef BCM2836_H
+diff --git a/include/hw/char/bcm2835_aux.h b/include/hw/char/bcm2835_aux.h
+index cdbf7e3e37e..934acf9c813 100644
+--- a/include/hw/char/bcm2835_aux.h
++++ b/include/hw/char/bcm2835_aux.h
+@@ -2,7 +2,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2835_AUX_H
+diff --git a/include/hw/display/bcm2835_fb.h b/include/hw/display/bcm2835_fb.h
+index 228988ba056..2246be74d83 100644
+--- a/include/hw/display/bcm2835_fb.h
++++ b/include/hw/display/bcm2835_fb.h
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2835_FB_H
+diff --git a/include/hw/dma/bcm2835_dma.h b/include/hw/dma/bcm2835_dma.h
+index 91ed8d05d16..a6747842b76 100644
+--- a/include/hw/dma/bcm2835_dma.h
++++ b/include/hw/dma/bcm2835_dma.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2835_DMA_H
+diff --git a/include/hw/intc/bcm2835_ic.h b/include/hw/intc/bcm2835_ic.h
+index fb75fa0064e..392ded1cb33 100644
+--- a/include/hw/intc/bcm2835_ic.h
++++ b/include/hw/intc/bcm2835_ic.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2835_IC_H
+diff --git a/include/hw/intc/bcm2836_control.h b/include/hw/intc/bcm2836_control.h
+index de061b8929a..2c22405686b 100644
+--- a/include/hw/intc/bcm2836_control.h
++++ b/include/hw/intc/bcm2836_control.h
+@@ -8,7 +8,8 @@
+  * ARM Local Timer IRQ Copyright (c) 2019. Zoltán Baldaszti
+  * Added basic IRQ_TIMER interrupt support
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2836_CONTROL_H
+diff --git a/include/hw/misc/bcm2835_mbox.h b/include/hw/misc/bcm2835_mbox.h
+index 7e8f3ce86de..57f95cc35ea 100644
+--- a/include/hw/misc/bcm2835_mbox.h
++++ b/include/hw/misc/bcm2835_mbox.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2835_MBOX_H
+diff --git a/include/hw/misc/bcm2835_mbox_defs.h b/include/hw/misc/bcm2835_mbox_defs.h
+index a18e520b22f..9670bf33a03 100644
+--- a/include/hw/misc/bcm2835_mbox_defs.h
++++ b/include/hw/misc/bcm2835_mbox_defs.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2835_MBOX_DEFS_H
+diff --git a/include/hw/misc/bcm2835_property.h b/include/hw/misc/bcm2835_property.h
+index 11be0dbeac7..b321f224990 100644
+--- a/include/hw/misc/bcm2835_property.h
++++ b/include/hw/misc/bcm2835_property.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #ifndef BCM2835_PROPERTY_H
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 17207ae07e3..edcaa4916d0 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+index 38e2941baba..43022b83f5f 100644
+--- a/hw/arm/bcm2836.c
++++ b/hw/arm/bcm2836.c
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index acd2bb794d1..fe3b9bc78bb 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -8,7 +8,8 @@
+  * Raspberry Pi 3 emulation Copyright (c) 2018 Zoltán Baldaszti
+  * Upstream code cleanup (c) 2018 Pekka Enberg
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
+index d6bf3374a67..c6263808a27 100644
+--- a/hw/display/bcm2835_fb.c
++++ b/hw/display/bcm2835_fb.c
+@@ -1,7 +1,6 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+  * Refactoring for Pi2 Copyright (c) 2015, Microsoft. Written by Andrew Baumann.
+- * This code is licensed under the GNU GPLv2 and later.
+  *
+  * Heavily based on milkymist-vgafb.c, copyright terms below:
+  *  QEMU model of the Milkymist VGA framebuffer.
+diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
+index ccff5ed55b2..4cd9dab745a 100644
+--- a/hw/dma/bcm2835_dma.c
++++ b/hw/dma/bcm2835_dma.c
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/hw/intc/bcm2835_ic.c b/hw/intc/bcm2835_ic.c
+index 05bd28e4f9d..53ab8f58810 100644
+--- a/hw/intc/bcm2835_ic.c
++++ b/hw/intc/bcm2835_ic.c
+@@ -1,7 +1,6 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+  * Refactoring for Pi2 Copyright (c) 2015, Microsoft. Written by Andrew Baumann.
+- * This code is licensed under the GNU GPLv2 and later.
+  * Heavily based on pl190.c, copyright terms below:
+  *
+  * Arm PrimeCell PL190 Vector Interrupt Controller
+@@ -9,7 +8,8 @@
+  * Copyright (c) 2006 CodeSourcery.
+  * Written by Paul Brook
+  *
+- * This code is licensed under the GPL.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/hw/intc/bcm2836_control.c b/hw/intc/bcm2836_control.c
+index 61f884ff9e7..53dba0080ca 100644
+--- a/hw/intc/bcm2836_control.c
++++ b/hw/intc/bcm2836_control.c
+@@ -4,7 +4,6 @@
+  * Written by Andrew Baumann
+  *
+  * Based on bcm2835_ic.c (Raspberry Pi emulation) (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
+  *
+  * At present, only implements interrupt routing, and mailboxes (i.e.,
+  * not PMU interrupt, or AXI counters).
+@@ -13,6 +12,9 @@
+  *
+  * Ref:
+  * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/QA7_rev3.4.pdf
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
+index 77d2d80706c..2afa06a7464 100644
+--- a/hw/misc/bcm2835_mbox.c
++++ b/hw/misc/bcm2835_mbox.c
+@@ -1,11 +1,13 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
+  *
+  * This file models the system mailboxes, which are used for
+  * communication with low-bandwidth GPU peripherals. Refs:
+  *   https://github.com/raspberrypi/firmware/wiki/Mailboxes
+  *   https://github.com/raspberrypi/firmware/wiki/Accessing-mailboxes
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
+index df91280dfcc..3e228ca0ae4 100644
+--- a/hw/misc/bcm2835_property.c
++++ b/hw/misc/bcm2835_property.c
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
+  */
+ 
+ #include "qemu/osdep.h"
 -- 
 2.20.1
 
