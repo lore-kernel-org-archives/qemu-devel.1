@@ -2,79 +2,98 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772AEC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5517C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CCBB20719
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:08:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 922F92074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:11:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MNMage4m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CCBB20719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="JBg+N/QM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 922F92074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGQYS-0004Vv-Ep
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:08:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46057)
+	id 1jGQbp-0006Ao-N9
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:11:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46633)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jGQXm-0003rZ-SM
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:07:19 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1jGQbB-0005fN-M0
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jGQXl-00034S-Cl
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:07:18 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35105)
+ (envelope-from <anthony.perard@citrix.com>) id 1jGQbA-0004AX-K9
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:10:49 -0400
+Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:58478)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jGQXl-000348-8l
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:07:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584983236;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v/GNtnYzpcdInh4HKoiPcTDYvGRKsdOFSM+QjXdaJyk=;
- b=MNMage4mCxsXV8xggdMrFuVaQJrfy+OFsQEgB/kim6jaguYRcMvR6KpMkDCCQCBY0f78rw
- xBRkCD2iQvGeiyj3bL5uu3KAWZzE52GAMayx7gUAi1iecuBPAbarab/8don3nOEBPxdtkj
- 3m6Ubo11EY4M/3vuVwuZA1UW3WcPAOA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-KAhxuRG0OPuRseD-ZUZDFw-1; Mon, 23 Mar 2020 13:07:14 -0400
-X-MC-Unique: KAhxuRG0OPuRseD-ZUZDFw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C1B68018B5;
- Mon, 23 Mar 2020 17:07:13 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-85.ams2.redhat.com [10.36.114.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 707F592D2F;
- Mon, 23 Mar 2020 17:07:12 +0000 (UTC)
-Date: Mon, 23 Mar 2020 18:07:10 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Dietmar Maurer <dietmar@proxmox.com>
-Subject: Re: aio-context question
-Message-ID: <20200323170710.GC8049@linux.fritz.box>
-References: <1577640273.5.1584605618249@webmail.proxmox.com>
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1jGQbA-00049S-9h
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:10:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1584983448;
+ h=date:from:to:cc:subject:message-id:mime-version;
+ bh=A38MAQ3I2EyDQePj2T0FhplyZEEph7yCewgtimy3gRk=;
+ b=JBg+N/QM0z8+EaEvAQ2+vk3xuvVAKZ886ys7EDBR6GSmLXEgfgftglnt
+ FmELnZythgoHZJBj3AWW4HPz+5/dp0URY1UGjnT/vxrIHyRVLDiFnnVbZ
+ NqxCj9mmZSiYLrIwIo4j0kGKMOw7wmK2M9Xr5L6O6zZmHwAUw/WYayT/Z U=;
+Authentication-Results: esa3.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+ ip4:168.245.78.127 ~all"
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: QY1m6jcB82mrUgfXw8am1h+ZgoyadE6ol2jMC+dCxeXXCh9XblH+ZoYwytNrKRgJILqWoEpCvI
+ EYl/TzG1VZSYL2oAiIEJYtYa7qOi7hCZmyPvBHe15BoMT+Z4smYgEcIaPvMozVM3n6E89h6buV
+ wrIhQ0O596ZQ8qGALfJRLmDF0JRFB1lB5IlXzGMTDdTawe0jM+uQUEI/kRZ3aSye29q3yQoSpr
+ lf1DY/QD1gFUMn+Uzniwe5phCkEfL3eDDWSeqVSHxPPjoQO/PlfSG8vb3ni4YoK4rH6MTSfETs
+ 6B0=
+X-SBRS: 2.7
+X-MesageID: 14465110
+X-Ironport-Server: esa3.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.72,297,1580792400"; d="scan'208";a="14465110"
+Date: Mon, 23 Mar 2020 17:10:39 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: <qemu-devel@nongnu.org>
+Subject: Xen guest broken following "use memdev for RAM" patch
+Message-ID: <20200323171039.GI4088@perard.uk.xensource.com>
 MIME-Version: 1.0
-In-Reply-To: <1577640273.5.1584605618249@webmail.proxmox.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.145.155
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,38 +105,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 19.03.2020 um 09:13 hat Dietmar Maurer geschrieben:
-> I just saw commit 30dd65f307b647eef8156c4a33bd007823ef85cb, and noticed t=
-hat=20
-> a similar pattern in drive_backup_prepare() and blockdev_backup_prepare()=
-.
->=20
-> The calls to bdrv_try_set_aio_context() seems useless, because we already=
- do
-> that later in backup_job_create/brdv_attach.
->=20
-> But I am not 100%& sure?
+Hi,
 
-I'm aware that this is a common pattern (and I thought it was more than
-just two additional places), but we would have to check for each place
-individually whether it can be removed.
+Since bd457782b3b0 ("x86/pc: use memdev for RAM") it isn't possible to
+start Xen guest anymore.
 
-If it doesn't have any effect because it just does what will be done
-later anyway, it can be removed, but that doesn't buy us much.
+The error from qemu:
+    qemu-system-i386: xen: failed to populate ram at 0
+that comes from xen_ram_alloc() in hw/i386/xen/xen-hvm.c
 
-If it results in preventing some case (like the one fixed by 30dd65f3),
-we need to check whether this case is actually safe. If it is safe, we
-can remove the lines and get a new feature from it.
+xen_ram_alloc() is used to populate ram for PCI rom devices for example,
+but it is also called for the guest RAM. We try to detect when the call
+is for the ram by comparing the memory region with the one we created
+during initialisation.
 
-In both cases, I think a test case should be written together with the
-removal of the code. And if we find out that it's unsafe, we should even
-more write a test case that makes sure that the operation fails.
+During initialisation of QEMU  for a Xen guest, we create a memory
+region for the RAM by calling memory_region_init_ram() in
+xen_ram_init(). But that memory region isn't used by QEMU anymore (since
+mc->default_ram_id is set).
 
-Kevin
+For Xen, we don't want QEMU to allocate the RAM, so using the memdev
+won't work.
 
+Do you have a suggestion on
+- how we can bypass the generic code that allocate ram?
+- keep using something similar to what we have now with
+  memory_region_init_ram()?
+(with accel=xen)
+
+Maybe we need a new hostmem backend which don't allocate any memory but
+creates a memory region, to be used by Xen?
+
+Thanks,
+
+-- 
+Anthony PERARD
 
