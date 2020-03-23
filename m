@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD50C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A25C54EEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:19:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C7662051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:19:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B03922051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:19:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QMUQxSP1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C7662051A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ovsw7vOH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B03922051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGPnH-0006Ls-IK
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:19:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35350)
+	id 1jGPnK-0006RE-Sp
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:19:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35368)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jGPjZ-0000vW-9a
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jGPjb-0000wa-Bm
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jGPjY-0002SC-7x
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:25 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:39704)
+ (envelope-from <alex.bennee@linaro.org>) id 1jGPja-0002Sm-43
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:27 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38651)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jGPjY-0002Rt-1u
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:24 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id p10so5412847wrt.6
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:15:23 -0700 (PDT)
+ id 1jGPjZ-0002Sb-UZ
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:26 -0400
+Received: by mail-wm1-x342.google.com with SMTP id l20so119861wmi.3
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:15:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=B6Cb7slCEdWoBAd5Has3ct+kMqek/eNqCVLXoAvsZ6M=;
- b=QMUQxSP1lGsY5JR+R2zFZvtr0BT8yIU1XiKrNxtuZ86JYAtkAZxQParrCOX7esYBP+
- SOWfdfemEtVNuP+R/ueJ+pLT4ZVOjedidQMnhc5l8HcHiZY5c5q//kb68aad/YDCrjdE
- Ayo2U+0ar2affRuy3RFdLnXMhp/tkV2iMseF85/MDlLCLzswHaR+BE4znXjkXiAk0oNj
- 0Plj1NIoBmMYSxZgkf9mzp+CIclgze2nmeL5yA7vrceTjkBYwZXkf/BwqkAl3uQVPh/n
- FihS8VyHtupgUZ5/JcAMcysqMhkFte4im1JzuCSRDAy5siLl9sf+iqhAdL/THMpnc3tx
- pLog==
+ bh=8P3sGDqi30dQIBWbHsRxQdWnqMEvDzwadX4cKsMTRfY=;
+ b=ovsw7vOHGD5shxJ0DRvENojIpEzGgZBYCTE1rxOd2eRPgq3mSZ7QhuJPmYghFHBjVn
+ 1+YXOP9w0NnZaXHmDviOj3rz37h3VPC8rEVCC8VuqhRXX9rLQMsD+eJQirWSbHRW1fgn
+ hOr1FLoCtMbjplKnyrKLbLvyxSNBJULGylYFnsq4Vr9j8Col46UcWNGnqocKKAVJmSet
+ 6YxRgRDqgahYX9sWAUvmqt2CmSALpcHaSN/5UfPUliwoUBscE/mHN4XVJ0VO94IOHIVh
+ BYTNBY0p3z20iGu4z5521mg79jCBhNwAfayokkpOFn8cSGlm4nXzeY1weP5PCnHVq5Ck
+ GNaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=B6Cb7slCEdWoBAd5Has3ct+kMqek/eNqCVLXoAvsZ6M=;
- b=nFDO5Bruc4vd5RFq2aj2NaEQgCTBdEkqFsMlIEJs5OrpPcdNxzVBKsngSR2bbZk2Ci
- V3HPB1Nc5U3Is3092BQJq+5EqiPygVrhy5i32vCwTD/Vlu2YS5EUn5/z+X/UxpXgkgsg
- YNO1BwLurlFgTfVg+ER+X6SGWHvSwxj98btzVfI3p74uKn2FQ4afwq9cw7AeUoddZfC9
- BR5h/vk7OPj2+kWQfALbRjWt42EPvKRzsmQBQZ1WyvzGW+iEHQ4JX5/EcmpVubWmjAJt
- czYq0G1vYkqAeDuU8OBNFr/QAzbUJWrCv8mwQzQVFXY53tIuzrvPOND+FDcEBbwy0vgg
- +3Iw==
-X-Gm-Message-State: ANhLgQ0GDNPjqx08UlIiztpmJiGxid/FDJ33FwCwfrv+iT9cH7KJ7/9c
- dtdy+LszGw0lug3qCGulcyJE3w==
-X-Google-Smtp-Source: ADFU+vsUN+PlbFKx1Hsm25tzZ9nVygtSCVMVTuhr0N6HR0G/HDq1JniSpsKrcWm9d7Z/4LWOh8E0dg==
-X-Received: by 2002:adf:a2d8:: with SMTP id t24mr27297625wra.366.1584980123083; 
- Mon, 23 Mar 2020 09:15:23 -0700 (PDT)
+ bh=8P3sGDqi30dQIBWbHsRxQdWnqMEvDzwadX4cKsMTRfY=;
+ b=tfuCnbKW/4wTRTqm9bDURTaL6CR8Pw8yShNOt01bzn1iEviKWi01eeZlzvYRCiw8Zy
+ tKs7/6Fx9NLhuWOqL0+E5Cw7CC+4AN6SvbB/8VSIvsxujTe2f7DyA6l3masEAtA6AW9J
+ KopELP6toOGYPOP94v2hncstKJ8vQ5AVqor7uNub406HyulHSxgJM+JTCsCr/AbMtJEe
+ 70f1yE2/+1BEbS0nbmm3tRNQzPaF7oIMqG/+oMd7QwEJjKWA9aIhnCKaeBNOC3fC+Uir
+ mefbgazskcWEiTNFl6ngbB/c4QJ+uKd0B6BhL+jm7v63Ye4HluI23BlpZPy7D3IoU7yO
+ 6TVA==
+X-Gm-Message-State: ANhLgQ23RkUEtCECI0oNWpBmaRFivPucegkGks2Umj9l5qVJ2C8Fl49U
+ 6t1gj4rG1EYR9rgapJ1PaWKPLw==
+X-Google-Smtp-Source: ADFU+vsQHgpKM1jaKhc/J8UomdFBd0g4fTNMI8xSUSs4byCOwFCderP7fmxwsE5rhOomr2Ul7Gj9Ag==
+X-Received: by 2002:a05:600c:2193:: with SMTP id
+ e19mr17151wme.142.1584980124816; 
+ Mon, 23 Mar 2020 09:15:24 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g2sm25320882wrs.42.2020.03.23.09.15.15
+ by smtp.gmail.com with ESMTPSA id s15sm25633956wrr.45.2020.03.23.09.15.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Mon, 23 Mar 2020 09:15:17 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4574C1FF8F;
+ by zen.linaroharston (Postfix) with ESMTP id CEFF11FF92;
  Mon, 23 Mar 2020 16:15:15 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 03/11] tests/vm: update FreeBSD to 12.1
-Date: Mon, 23 Mar 2020 16:15:06 +0000
-Message-Id: <20200323161514.23952-4-alex.bennee@linaro.org>
+Subject: [PATCH  v1 06/11] configure: disable MTTCG for MIPS guests
+Date: Mon, 23 Mar 2020 16:15:09 +0000
+Message-Id: <20200323161514.23952-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200323161514.23952-1-alex.bennee@linaro.org>
 References: <20200323161514.23952-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,38 +97,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+While debugging check-acceptance failures I found an instability in
+the mips64el test case. Briefly the test case:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+  retry.py -n 100 -c -- ./mips64el-softmmu/qemu-system-mips64el \
+    -display none -vga none -serial mon:stdio \
+    -machine malta -kernel ./vmlinux-4.7.0-rc1.I6400 \
+    -cpu I6400 -smp 8 -vga std \
+    -append "printk.time=0 clocksource=GIC console=tty0 console=ttyS0 panic=-1" \
+    --no-reboot
+
+Reports about a 9% failure rate:
+
+  Results summary:
+  0: 91 times (91.00%), avg time 5.547 (0.45 varience/0.67 deviation)
+  -6: 9 times (9.00%), avg time 3.394 (0.02 varience/0.13 deviation)
+  Ran command 100 times, 91 passes
+
+When re-run with "--accel tcg,thread=single" the instability goes
+away.
+
+  Results summary:
+  0: 100 times (100.00%), avg time 17.318 (249.76 varience/15.80 deviation)
+  Ran command 100 times, 100 passes
+
+Which seems to indicate there is some aspect of the MIPS MTTCG fixes
+that has been missed. Ideally we would fix that but I'm afraid I don't
+have time to investigate and am not super familiar with the
+architecture anyway. In lieu of someone tracking down the failure lets
+disable it for now.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200310083218.26355-4-kraxel@redhat.com>
----
- tests/vm/freebsd | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
 
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index 58166766d91..298967fe9cf 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -24,8 +24,8 @@ class FreeBSDVM(basevm.BaseVM):
-     name = "freebsd"
-     arch = "x86_64"
- 
--    link = "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.0/FreeBSD-12.0-RELEASE-amd64-disc1.iso.xz"
--    csum = "1d40015bea89d05b8bd13e2ed80c40b522a9ec1abd8e7c8b80954fb485fb99db"
-+    link = "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.1/FreeBSD-12.1-RELEASE-amd64-disc1.iso.xz"
-+    csum = "7394c3f60a1e236e7bd3a05809cf43ae39a3b8e5d42d782004cf2f26b1cfcd88"
-     size = "20G"
-     pkgs = [
-         # build tools
+---
+v2
+  - only drop mip64le
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 4f12cd01777..a83c6450840 100755
+--- a/configure
++++ b/configure
+@@ -7885,7 +7885,7 @@ case "$target_name" in
+     TARGET_SYSTBL_ABI=n32
+   ;;
+   mips64|mips64el)
+-    mttcg="yes"
++    mttcg="no"
+     TARGET_ARCH=mips64
+     TARGET_BASE_ARCH=mips
+     echo "TARGET_ABI_MIPSN64=y" >> $config_target_mak
 -- 
 2.20.1
 
