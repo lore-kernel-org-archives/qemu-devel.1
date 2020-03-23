@@ -2,63 +2,63 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5767AC1975A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 03:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0709C54FCE
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 03:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 288C6206F8
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 03:16:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 288C6206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDFFC20724
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 03:22:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZKb0gly2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDFFC20724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGDaA-0000aq-Bt
-	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 23:16:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51059)
+	id 1jGDfQ-0002pZ-Ss
+	for qemu-devel@archiver.kernel.org; Sun, 22 Mar 2020 23:22:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51707)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <xiaoyao.li@intel.com>) id 1jGDY5-0005ih-IK
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 23:14:46 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jGDeX-0001m1-4o
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 23:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <xiaoyao.li@intel.com>) id 1jGDY4-0003gC-90
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 23:14:45 -0400
-Received: from mga07.intel.com ([134.134.136.100]:56660)
+ (envelope-from <dgibson@ozlabs.org>) id 1jGDeV-0005q4-SQ
+ for qemu-devel@nongnu.org; Sun, 22 Mar 2020 23:21:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44375 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <xiaoyao.li@intel.com>)
- id 1jGDY3-0003fq-UT
- for qemu-devel@nongnu.org; Sun, 22 Mar 2020 23:14:44 -0400
-IronPort-SDR: 8xGx7k2Ccaj7baqWqXbHRmzmnf3/2x1kgF6QWfU4WHxLaJiStsYBLXHaTbzWr3r14tXJOmgcL6
- yMFF8T9L0fKg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Mar 2020 20:14:42 -0700
-IronPort-SDR: Gg+QmSZ8XLK3JGiAcInv8v2C/jGZtEXMFOu8gL1rc12E5hYuMeikfstiUIPjnpYrAk6dz6rqwo
- ULjSfFlndTVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,294,1580803200"; d="scan'208";a="292453684"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.43.161])
- by FMSMGA003.fm.intel.com with ESMTP; 22 Mar 2020 20:14:40 -0700
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH 2/3] target/i386: Add support for TEST_CTRL MSR
-Date: Mon, 23 Mar 2020 10:56:57 +0800
-Message-Id: <20200323025658.4540-3-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200323025658.4540-1-xiaoyao.li@intel.com>
-References: <20200323025658.4540-1-xiaoyao.li@intel.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jGDeV-0005op-2v; Sun, 22 Mar 2020 23:21:23 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48m05q0Bbzz9sR4; Mon, 23 Mar 2020 14:21:18 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1584933679;
+ bh=k/cpSl3hBGwY9eKjU2UwtGFRBxzWB6/1VLumGcR7Sx8=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZKb0gly2s7cFQuRjHOm2RRycmE87p9D1Y037IhX9GIe3jQ7CWV8NB+ZN5I8h2P/Nk
+ Ghu3zI9kyzdHNnz0MFB1PC8LyiZi5WDErCaj/zoaf5XccxBv6xi7ghVq5/SZXVct2P
+ xeC/+QOYtKh7PIoiLTzPoe1qSGA9ZX6wffuqSEss=
+Date: Mon, 23 Mar 2020 13:34:24 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] ppc/ppc405_boards: Remove unnecessary NULL check
+Message-ID: <20200323023424.GB2213@umbus.fritz.box>
+References: <20200320155740.5342-1-philmd@redhat.com>
+ <20200322084608.GI781112@umbus.fritz.box>
+ <CAFEAcA-TPqVN98T=tYAOyQ4JPj8iu+eB3Zi-txgV+GUgcHNjCQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.100
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="3lcZGd9BuhuYXNfi"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-TPqVN98T=tYAOyQ4JPj8iu+eB3Zi-txgV+GUgcHNjCQ@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,134 +70,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xiaoyao Li <xiaoyao.li@linux.intel.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xiaoyao Li <xiaoyao.li@linux.intel.com>
 
-MSR_TEST_CTRL is needed and accessed by feature split lock detection.
+--3lcZGd9BuhuYXNfi
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
----
- target/i386/cpu.h     |  2 ++
- target/i386/kvm.c     | 13 +++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 3 files changed, 35 insertions(+)
+On Sun, Mar 22, 2020 at 10:06:13AM +0000, Peter Maydell wrote:
+> On Sun, 22 Mar 2020 at 08:50, David Gibson <david@gibson.dropbear.id.au> =
+wrote:
+> >
+> > On Fri, Mar 20, 2020 at 04:57:40PM +0100, Philippe Mathieu-Daud=E9 wrot=
+e:
+> > > This code is inside the "if (dinfo)" condition, so testing
+> > > again here whether it is NULL is unnecessary.
+> > >
+> > > Fixes: dd59bcae7 (Don't size flash memory to match backing image)
+> > > Reported-by: Coverity (CID 1421917)
+> > > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> > > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> >
+> > Applied to ppc-for-5.1.
+>=20
+> This would be OK for 5.0 too at this stage.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f6c54412ba5e..177732ad19da 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -343,6 +343,7 @@ typedef enum X86Seg {
- #define MSR_IA32_APICBASE_ENABLE        (1<<11)
- #define MSR_IA32_APICBASE_EXTD          (1 << 10)
- #define MSR_IA32_APICBASE_BASE          (0xfffffU<<12)
-+#define MSR_TEST_CTRL                   0x33
- #define MSR_IA32_FEATURE_CONTROL        0x0000003a
- #define MSR_TSC_ADJUST                  0x0000003b
- #define MSR_IA32_SPEC_CTRL              0x48
-@@ -1466,6 +1467,7 @@ typedef struct CPUX86State {
- 
-     uint64_t spec_ctrl;
-     uint64_t virt_ssbd;
-+    uint64_t msr_test_ctrl;
- 
-     /* End of state preserved by INIT (dummy marker).  */
-     struct {} end_init_save;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 6888cb7caeae..411402aa29fa 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -101,6 +101,7 @@ static bool has_msr_umwait;
- static bool has_msr_spec_ctrl;
- static bool has_msr_tsx_ctrl;
- static bool has_msr_virt_ssbd;
-+static bool has_msr_test_ctrl;
- static bool has_msr_smi_count;
- static bool has_msr_arch_capabs;
- static bool has_msr_core_capabs;
-@@ -2048,6 +2049,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_VIRT_SSBD:
-                 has_msr_virt_ssbd = true;
-                 break;
-+            case MSR_TEST_CTRL:
-+                has_msr_test_ctrl = true;
-+                break;
-             case MSR_IA32_ARCH_CAPABILITIES:
-                 has_msr_arch_capabs = true;
-                 break;
-@@ -2766,6 +2770,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_virt_ssbd) {
-         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, env->virt_ssbd);
-     }
-+    if (has_msr_test_ctrl) {
-+        kvm_msr_entry_add(cpu, MSR_TEST_CTRL, env->msr_test_ctrl);
-+    }
- 
- #ifdef TARGET_X86_64
-     if (lm_capable_kernel) {
-@@ -3154,6 +3161,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_virt_ssbd) {
-         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, 0);
-     }
-+    if (has_msr_test_ctrl) {
-+        kvm_msr_entry_add(cpu, MSR_TEST_CTRL, 0);
-+    }
-     if (!env->tsc_valid) {
-         kvm_msr_entry_add(cpu, MSR_IA32_TSC, 0);
-         env->tsc_valid = !runstate_is_running();
-@@ -3549,6 +3559,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_VIRT_SSBD:
-             env->virt_ssbd = msrs[i].data;
-             break;
-+        case MSR_TEST_CTRL:
-+            env->msr_test_ctrl = msrs[i].data;
-+            break;
-         case MSR_IA32_RTIT_CTL:
-             env->msr_rtit_ctrl = msrs[i].data;
-             break;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 0c96531a56f0..a23c6687d5ba 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1252,6 +1252,25 @@ static const VMStateDescription vmstate_msr_virt_ssbd = {
-     }
- };
- 
-+static bool msr_test_ctrl_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->msr_test_ctrl != 0;
-+}
-+
-+static const VMStateDescription vmstate_msr_test_ctrl = {
-+    .name = "cpu/msr_test_ctrl",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = msr_test_ctrl_needed,
-+    .fields = (VMStateField[]){
-+        VMSTATE_UINT64(env.msr_test_ctrl, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static bool svm_npt_needed(void *opaque)
- {
-     X86CPU *cpu = opaque;
-@@ -1439,6 +1458,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_mcg_ext_ctl,
-         &vmstate_msr_intel_pt,
-         &vmstate_msr_virt_ssbd,
-+        &vmstate_msr_test_ctrl,
-         &vmstate_svm_npt,
- #ifndef TARGET_X86_64
-         &vmstate_efer32,
--- 
-2.20.1
+Understood, I've moved this into the ppc-for-5.0 tree.
 
+>=20
+> thanks
+> -- PMM
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--3lcZGd9BuhuYXNfi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl54IC8ACgkQbDjKyiDZ
+s5KfUhAAkV39fJ+5/pJVof+FcfX2TJXBlY8rT1atyWMaclkjKaKwb4+ZZMwa1ZWV
+Qq3adQMfyaq9dHTHu4FrOobqI4UcHnOVM1/T3DLGmXa0Ib3ncwzlywQXunfKGi7k
+Pv5Dx9v15TZei9M6RgHRxNDMB5ssip+/zB6orA1gZCRYnx08p3HYg1aQ267Shx+t
+FWubQzt+peYS+3lHN+OYAmP9ubIHNjpDpVHefux8S8M/mh7CeHOyvGptOYlSsoql
+90dbt+Qf9ymABls2QmOp5USxyKe8VLfgeSSEhWprHn+FFDz4OuKtc/hZ/mx+mBjO
+0IjlnBJHwsND7mUvozFpZpUMCkaahVhSVCwMi6sr6QevTrEIpPgyhlmqWwpZVosF
+PGU0VCm/C0FBstEUzygEnZMs6mxgAY7Lyt9aShhglJ/qzZP5FpB9QfhNZn87bnVJ
+YMG4J50mSMY4a7J0XY1Lqf6cHb9m9oNlS/K9Wh+k+syYtgRAdIe4fxGbHpZ4pdHM
+4Cav3tMZENbNJQTs9QKtZ7SC0D09qNmmIhmjWlkIHDaZk6/MOhcgnci8FQ4Wji9w
+QBphUXxW/1+s3p/G6cFg0ka9WdkM7YqCiYmFtXJJ5gqbgXt3+F3lZa9mxboekGMO
+3H2ie48QiJY4dhlDHQ6A8Zi6u0svs0Hf4LFrID6+y6tYUNtflTg=
+=nHHQ
+-----END PGP SIGNATURE-----
+
+--3lcZGd9BuhuYXNfi--
 
