@@ -2,89 +2,86 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807CAC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C967DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C38A20735
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:34:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91EF020735
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="B9kLgXi3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C38A20735
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kL35UxJz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91EF020735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGNDp-0000Os-B7
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:34:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59258)
+	id 1jGNF9-0003GH-PV
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:35:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengli@smartx.com>) id 1jGFe4-0007jz-Vs
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 01:29:06 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jGNCD-00075V-Ci
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengli@smartx.com>) id 1jGFe3-0001UJ-IP
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 01:29:04 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33594)
+ (envelope-from <stefanha@gmail.com>) id 1jGNCC-0004UM-5d
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:32:49 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36683)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <fengli@smartx.com>) id 1jGFe3-0001TS-6K
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 01:29:03 -0400
-Received: by mail-pg1-x544.google.com with SMTP id d17so6049883pgo.0
- for <qemu-devel@nongnu.org>; Sun, 22 Mar 2020 22:29:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=smartx-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:from:to:cc:subject:date:message-id
- :content-transfer-encoding;
- bh=rn1rzPyZjU/1uasX4nLAsRBp6Z3yrACVS7w/C5ZCX9E=;
- b=B9kLgXi3vNJYNNkLfWhZnzynGcZLN8KTTOi8S+uISLsDOJcRwitaSnkEzROIMMeoLG
- 58xy7wUshKtDWX0p3yk9rEFKtVu5tpJ6BANPa/D7Mxg9uDZce6unDBjZsxeRgr17ZmOu
- KmV7mLqlJLXMRbzmbgSR9gILYafA3hHaoxYmR5g5/w4UHDEM06P2ekTmi+xfxg9BdFmF
- NTx8fYak39FQyEcLGEV8F9X5/gUjkgikmgZyoXSQYhHUwXXZmH+cwKezXB3t/lDZj+1E
- 0sJRbXvJy79ovmcsYirW4KiOYN10y+A5A7jQxr18/Am1cps9juRk/ZRP50aazcjJJ6NQ
- sWSg==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jGNCB-0004Ts-Tg
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:32:48 -0400
+Received: by mail-wr1-x442.google.com with SMTP id 31so11070879wrs.3
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 06:32:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=mHsnQRz3LMbpYVZDpWDu0mqozYVRPCHGwQl6OjHiHO0=;
+ b=kL35UxJzOzZIKNojXQmwtbrRV4m9t0jTDeZKo6ozXpIesbptE9B1UYeuGStrxpscjc
+ KzfIL4LkDyRD3wgYrw+QsUHohAR9WU4bXT5wi08xqPMMUQUvoEJ4aucaPn626OMgN54R
+ trqzKo2AQ+8n5ZbwlIvyAW5oYHGspt5lktpgDc1uiJ6Tvh/ZNaPkR1bxgp3P7ZKG+NXN
+ zVvua2n1pGoZ3H81mXrIRRQaJZW2k/wVafK10XloJwIXnEBFHOBLfBboD+9vzrQ5IXkv
+ 0OUljKInfFPg5JuLrSHlyMCQPLzxe5CKO7CKcugHG/c31XSSkZqls6Nml+Dh3GRfaXVO
+ uJXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
- :content-transfer-encoding;
- bh=rn1rzPyZjU/1uasX4nLAsRBp6Z3yrACVS7w/C5ZCX9E=;
- b=gD8qNpjyNB3a9xyA7D5EizXFF7KPkEphL1EaO6eh7akbMiKhViIbeYhwCRaq+GPP7J
- KwaLX4NInBFJuSHHkgeuXxJPuvu39nuphWBO8SHSCXZxWfm9yujdSiZLnR9/h0Qsxy2U
- iD5tZclcLk2u3QgSdpPCaBGsliJc1T7tfpKY2gcLq/XgzM/O/hDdcXMXDJ7JnCcWmWlZ
- +VGr6C3NOSZZeKSI2HmwYTQnOL4G8EwRmR8mcTUnKcVmh0YQTvgagTW9FAEqeTTus4nR
- jyo8+3KVJNC5REZsxGnj77/YgVHOpsWccNtBU0Y6ameGLsaImtVt9h1aPhKtJ5dgommG
- vI8A==
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=mHsnQRz3LMbpYVZDpWDu0mqozYVRPCHGwQl6OjHiHO0=;
+ b=l1PsjiBQOddCJgdPNPuhx2n4Hf6mG43c8J+2+YbluLuXK4pBcBmsdkwT0y80X2El3L
+ 4wWxI6de+UTbT283DPKYTR6axX94tBDSIFgk8A3KWHMf0Cpjr0Ti2aaRKSZ+XBSc0d+7
+ /XhkwhNcg/rStMNIbd43YzRdFOf2D9sK4Mq0Tx2nshDNjluPnXa2b0YvhdNwQw+nbcVL
+ OtG84ndmk19nJPxtmd25qr0nIVVcDce+QwGEB/Z4y93h0RsdqDVW7gjPL4tRK6SKG7WA
+ ltDrle/HszxTd/+cCXiRYhuV/ACqJexiV5XaOeQCP3IDeJaNqcat4SP/RPPJxwLnPeZZ
+ lqlg==
+X-Gm-Message-State: ANhLgQ1e5jFLxjTH2BTo4EbcuaPrrecYBGqwhQdWML0A2XZO8uWJDiwb
+ 8O8ZclupWBdW8WVosPwH8dI=
+X-Google-Smtp-Source: ADFU+vtxRlV+360PLUuoqs/OW2ozBYfv7a/ogfc2mh/WWYXjpfiHn0HQYYHTWd6r1IwZjzBfT49Q6Q==
+X-Received: by 2002:a5d:674f:: with SMTP id l15mr11453484wrw.196.1584970366641; 
+ Mon, 23 Mar 2020 06:32:46 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id 71sm8197989wrc.53.2020.03.23.06.32.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Mar 2020 06:32:45 -0700 (PDT)
+Date: Mon, 23 Mar 2020 13:32:44 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: deprecation of in-tree builds
+Message-ID: <20200323133244.GK261260@stefanha-x1.localdomain>
+References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+ <alpine.BSF.2.22.395.2003212338020.36211@zero.eik.bme.hu>
 MIME-Version: 1.0
-X-Gm-Message-State: ANhLgQ20QCZKqtRCMMJrkdFsGnAFoUieAbfHgi2em7nUzf8t8PGvEKmn
- +FluWJPE3aGpnhPbRbn41Ya9aYQdPIhv39Q9mOzpwr/VOYShGGOr/ZsnJmsRxgRkkuMjpcg8JbH
- OCRXduEEW
-X-Google-Smtp-Source: ADFU+vv8MuenS8R5ry2qx46wBcwxJrWPxc3S3Nn2FVeAf73oMUwG6iP99FeBCSokK4B8UY/nHoPA8A==
-X-Received: by 2002:aa7:8f3a:: with SMTP id y26mr22191464pfr.180.1584941341253; 
- Sun, 22 Mar 2020 22:29:01 -0700 (PDT)
-Received: from 31_216.localdomain ([47.75.244.237])
- by smtp.gmail.com with ESMTPSA id o14sm7905195pfh.147.2020.03.22.22.28.59
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 22 Mar 2020 22:29:00 -0700 (PDT)
-From: Li Feng <fengli@smartx.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org (open list:Block layer core),
- qemu-devel@nongnu.org (open list:All patches CC here)
-Subject: [PATCH] fix vhost_user_blk_watch crash
-Date: Mon, 23 Mar 2020 13:29:24 +0800
-Message-Id: <20200323052924.29286-1-fengli@smartx.com>
-X-Mailer: git-send-email 2.11.0
-Content-Type: text/plain; charset="GB2312"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="6K2R/cS9K4qvcBNq"
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.22.395.2003212338020.36211@zero.eik.bme.hu>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-X-Mailman-Approved-At: Mon, 23 Mar 2020 09:32:41 -0400
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,98 +93,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Feng <fengli@smartx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-the G_IO_HUP is watched in tcp_chr_connect, and the callback
-vhost_user_blk_watch is not needed, because tcp_chr_hup is registered as
-callback. And it will close the tcp link.
 
-Signed-off-by: Li Feng <fengli@smartx.com>
----
- hw/block/vhost-user-blk.c          | 19 -------------------
- include/hw/virtio/vhost-user-blk.h |  1 -
- 2 files changed, 20 deletions(-)
+--6K2R/cS9K4qvcBNq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 12925a47ec..17df5338e7 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -349,18 +349,6 @@ static void vhost_user_blk_disconnect(DeviceState *dev=
-)
-     vhost_dev_cleanup(&s->dev);
- }
-=20
--static gboolean vhost_user_blk_watch(GIOChannel *chan, GIOCondition cond,
--                                     void *opaque)
--{
--    DeviceState *dev =3D opaque;
--    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
--    VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
--
--    qemu_chr_fe_disconnect(&s->chardev);
--
--    return true;
--}
--
- static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
- {
-     DeviceState *dev =3D opaque;
-@@ -373,15 +361,9 @@ static void vhost_user_blk_event(void *opaque, QEMUChr=
-Event event)
-             qemu_chr_fe_disconnect(&s->chardev);
-             return;
-         }
--        s->watch =3D qemu_chr_fe_add_watch(&s->chardev, G_IO_HUP,
--                                         vhost_user_blk_watch, dev);
-         break;
-     case CHR_EVENT_CLOSED:
-         vhost_user_blk_disconnect(dev);
--        if (s->watch) {
--            g_source_remove(s->watch);
--            s->watch =3D 0;
--        }
-         break;
-     case CHR_EVENT_BREAK:
-     case CHR_EVENT_MUX_IN:
-@@ -428,7 +410,6 @@ static void vhost_user_blk_device_realize(DeviceState *=
-dev, Error **errp)
-=20
-     s->inflight =3D g_new0(struct vhost_inflight, 1);
-     s->vhost_vqs =3D g_new0(struct vhost_virtqueue, s->num_queues);
--    s->watch =3D 0;
-     s->connected =3D false;
-=20
-     qemu_chr_fe_set_handlers(&s->chardev,  NULL, NULL, vhost_user_blk_even=
-t,
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-u=
-ser-blk.h
-index 05ea0ad183..34ad6f0c0e 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -38,7 +38,6 @@ typedef struct VHostUserBlk {
-     VhostUserState vhost_user;
-     struct vhost_virtqueue *vhost_vqs;
-     VirtQueue **virtqs;
--    guint watch;
-     bool connected;
- } VHostUserBlk;
-=20
---=20
-2.11.0
+On Sat, Mar 21, 2020 at 11:50:23PM +0100, BALATON Zoltan wrote:
+> On Sat, 21 Mar 2020, Peter Maydell wrote:
+> > AIUI from Paolo, the intention is to deprecate and eventually
+> > stop supporting "in-tree" builds, so that the only option is
+> > building in a separate build directory. I thought we should
+> > probably mention that in the 5.0 changelog, so I wrote up some
+> > text:
+> >=20
+> > https://wiki.qemu.org/ChangeLog/5.0#Build_Information
+> >=20
+> > Suggestions for changes/comments etc welcome.
+> >=20
+> > (One thing we will need to fix before we can do separate build
+> > tree is the Coverity Scan build process, which (a) does an
+> > in-tree build (b) can't be easily switched to a builddir because
+> > all the source paths get baked into the scan results and moving
+> > to a builddir changes them all...)
+> >=20
+> > We could also make configure actively warn if used in
+> > the source tree.
+>=20
+> This was discussed before. I think instead of annoying people with a
+> warning, rather configure should be changed to create a build dir if run
+> from source and have a Makefile in top dir that runs make -C builddir so
+> people don't have to care about this or change their ways and can continue
+> to run configure && make from source dir but you don't have to support
+> in-tree build. Then you can deprecate in-tree builds but supporting only
+> out-of-tree without this convenience would not just unnecessarily annoy
+> those who prefer working in a single tree but people (and apparently some
+> tools) expect sources to build with usual configure; make; make install so
+> that should be the minimum to support.
 
+Yes, please!  I use in-tree builds and find it tedious to cd into a
+build dir manually.
 
---=20
-The SmartX email address is only for business purpose. Any sent message=20
-that is not related to the business is not authorized or permitted by=20
-SmartX.
-=B1=BE=D3=CA=CF=E4=CE=AA=B1=B1=BE=A9=D6=BE=C1=E8=BA=A3=C4=C9=BF=C6=BC=BC=D3=
-=D0=CF=DE=B9=AB=CB=BE=A3=A8SmartX=A3=A9=B9=A4=D7=F7=D3=CA=CF=E4. =C8=E7=B1=
-=BE=D3=CA=CF=E4=B7=A2=B3=F6=B5=C4=D3=CA=BC=FE=D3=EB=B9=A4=D7=F7=CE=DE=B9=D8=
-,=B8=C3=D3=CA=BC=FE=CE=B4=B5=C3=B5=BD=B1=BE=B9=AB=CB=BE=C8=CE=BA=CE=B5=C4=
-=C3=F7=CA=BE=BB=F2=C4=AC=CA=BE=B5=C4=CA=DA=C8=A8.
+Also, many build scripts (packaging, etc) we'll break if we simply
+remove in-tree builds.  I think make && make install should continue to
+work.
 
+Stefan
 
+--6K2R/cS9K4qvcBNq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl54unwACgkQnKSrs4Gr
+c8g+bgf+MA7k4g2GRpZ5d/oKJ0yon3OW6MawALyFawsagDlKyECtvBQO2fD2z9o6
+CnYkz4OwUxJ+8pKZ02YawyUAyisksbJim/7lVW/hkq63f4d19qOrphpmCmoBIKq8
+NSj2/sUoycdz6Ou7RWlm2ljiYcFeLLKY7EWvR5R8VksmFFvRLZLJrOjlq20rc+st
+guSZnL3JWOPj6LXZKWy575Ks0/9Y8frzvFXtMi0HSSXqY6P/Jn2eu1tQIEiBlirg
+XwtE12vtTh/afp5hB3gN5iwhDBpWIO++oqgn1xoUsTUHi3Z2U7Rxc1Z0W3VQ3D/o
+yEqr+2kNG4MfhBPdk93mzU0pDynY9w==
+=Al1e
+-----END PGP SIGNATURE-----
+
+--6K2R/cS9K4qvcBNq--
 
