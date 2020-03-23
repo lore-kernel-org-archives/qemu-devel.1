@@ -2,74 +2,80 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD4ECC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D55C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:32:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84CEF2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9054F2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 10:32:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MMECCYQ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84CEF2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FuooSzc8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9054F2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGKN4-0005wO-Jx
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 06:31:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33871)
+	id 1jGKNc-0006iC-MH
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 06:32:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ovoshcha@redhat.com>) id 1jGKLt-00051M-Ta
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:30:38 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGKMA-0005DT-8u
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ovoshcha@redhat.com>) id 1jGKLs-0004oX-SA
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:30:37 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48777)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1jGKLs-0004oR-Ok
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:30:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584959436;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=+RNSUjcFFKuWQEOtA83hIY6VVubmayotqtO3Z8WUOvQ=;
- b=MMECCYQ9V8QL387hVdaSIhd8t7vSykEf238h3imC+xixZE6vhTJr2TrpTMBj/X6/MGGC1n
- 8Sg5pEnLvI+KzprjFgv74NwceBGRSkgACpzZwbCG7h4vQKqnBJMFnX3XST8L8WjNt4cFpd
- Wf1NfCQqh/uAYYvYQakomeK+6s+isCE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-3As8mgv0NHm0SE31lqzTsQ-1; Mon, 23 Mar 2020 06:30:34 -0400
-X-MC-Unique: 3As8mgv0NHm0SE31lqzTsQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E448F8018C0
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 10:30:33 +0000 (UTC)
-Received: from kh066.redhat.com (ovpn-112-254.ams2.redhat.com [10.36.112.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B09665DDAB;
- Mon, 23 Mar 2020 10:30:17 +0000 (UTC)
-From: Oksana Vohchana <ovoshcha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/3] Acceptance test: Extension of migration tests
-Date: Mon, 23 Mar 2020 12:30:13 +0200
-Message-Id: <20200323103016.17368-1-ovoshcha@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jGKM8-0004wu-9L
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:30:53 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33497)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGKM8-0004wV-3V
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 06:30:52 -0400
+Received: by mail-oi1-x241.google.com with SMTP id r7so14283887oij.0
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:30:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TxV1bllHGMDtSULJerTixPBu/ImXQfX3UQSx7CB+vBk=;
+ b=FuooSzc8TzNI/+Dgo3+9yoBiUt4qQOym+TB5D2PVP0Xq9z5nG4JIuaSSbfz8UYXPTq
+ nYLBITvz7suyxm7+/3xD2YS9C5qUj2df3LWMvGPib+x0I4bDO1a8QCOTkUPilLG/Kvu3
+ eElTEMCkJxGpZcSMflMDvmnQz3oBbup52jG0r13yrnqPrqFcdsHW9v6jxpefWjug+Z3a
+ UP+/FXose/ztgjLxEn6lQKlsOsRvGcYTSIoc2Q7QS8w0/ADHq22KcFUkNxf49w8s0hfB
+ WvMwFG0GQuyHqJPlNFZUhLJwJxAFb/9DkBNl2RFtR+qDvLMGBye7xRkHE0k1NTIrRbqA
+ SpFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TxV1bllHGMDtSULJerTixPBu/ImXQfX3UQSx7CB+vBk=;
+ b=otlMXKez4CUz2SXbn0stNTDGAqYvNLtM7pWrv2NJVlByf9dAmrGp7GijA76LE5+4Ip
+ WEAdCn80xdo68K680YgqWin4kHLWCqlw4J4hIos1xHohT2XZOV8fn2iDfSW/TwH0xGCU
+ 1uG70X84POJJozHF/LKqhHZCRjVoRBlbhvVp86GYqaD2zGWKnkeWvbwlk1j5nF9pOulK
+ g3WQURQK4GC6/QCbfuL6dw56TIF4Z2yGtdvM9a8ECg26CrvX5p4DO8GtnkJhpMaFtzz1
+ 8hyPcnHORbUI528m0vlDtJnMPt02LDZktAAKtsnzwIIyuHUfR0mmu6fq1cAKggMzrdvP
+ tFMw==
+X-Gm-Message-State: ANhLgQ37Gm739Ync0OBgRxvV4fvUkyFZwLtNMyz8FX/f5VPmXB6zfdIr
+ Bsy6IG4mC7w1Hj5Jil9EWG9V9d2B2kNnzqe7Mwkzjg==
+X-Google-Smtp-Source: ADFU+vssP6QiP7VmDZbV8L2+viS9+3vHlPUcmTXnjfGiwwOf5b7ZSNsNy033IWXic0MO9yQNgZueVlKz/5cYLXotjwI=
+X-Received: by 2002:a54:4614:: with SMTP id p20mr1949510oip.48.1584959451236; 
+ Mon, 23 Mar 2020 03:30:51 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20190310084610.23077-1-yuval.shaia@oracle.com>
+ <20190310084610.23077-8-yuval.shaia@oracle.com>
+In-Reply-To: <20190310084610.23077-8-yuval.shaia@oracle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Mar 2020 10:30:40 +0000
+Message-ID: <CAFEAcA86hGnX5MfZjzfR0486qNOXfLmC+YSfc7GOc7d9jakrFQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 07/10] hw/rdma: Free all receive buffers
+ when QP is destroyed
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,41 +87,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, crosa@redhat.com, wainersm@redhat.com,
- wrampazz@redhat.com, ovoshcha@redhat.com, philmd@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds a new migration test through RDMA.
-To correct uses of migration need to add a new function to work
-with RDMA service.
-And as a part of migration tests, the series makes small updates to EXEC
-migration and to _get_free_port function
+On Sun, 10 Mar 2019 at 09:25, Yuval Shaia <yuval.shaia@oracle.com> wrote:
+>
+> When QP is destroyed the backend QP is destroyed as well. This ensures
+> we clean all received buffer we posted to it.
+> However, a contexts of these buffers are still remain in the device.
+> Fix it by maintaining a list of buffer's context and free them when QP
+> is destroyed.
+>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-V2:
- - improves commit message in Acceptance test: adds param 'address'
-   in _get_free_port
- - provides import check for netifaces library
- - makes fix to _get_ip_rdma function
- - adds skip to test if not upload python module
+Hi; Coverity has just raised an issue on this code (CID 1421951):
 
-V3:
- - removes unrelated changes
- - updates functions with new avocado features
+> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
+> index 0a8abe572d..73f279104c 100644
+> --- a/hw/rdma/rdma_utils.c
+> +++ b/hw/rdma/rdma_utils.c
+> @@ -90,3 +90,32 @@ int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
+>
+>      return qnum_get_uint(qobject_to(QNum, obj));
+>  }
+> +
+> +void rdma_protected_gslist_init(RdmaProtectedGSList *list)
+> +{
+> +    qemu_mutex_init(&list->lock);
+> +}
+> +
+> +void rdma_protected_gslist_destroy(RdmaProtectedGSList *list)
+> +{
+> +    if (list->list) {
+> +        g_slist_free(list->list);
+> +        list->list = NULL;
+> +    }
 
-V4:
- - moves RDMA's functions outside the Migration class
+Coverity wonders whether this function should take the list->lock
+before freeing the list, because the other places which manipulate
+list->list take the lock.
 
-Oksana Vohchana (3):
-  Acceptance test: adds param 'address' in _get_free_port
-  Acceptance test: provides new functions
-  Acceptance test: provides to use RDMA transport for migration test
+> +}
 
- tests/acceptance/migration.py | 48 +++++++++++++++++++++++++++++++++--
- 1 file changed, 46 insertions(+), 2 deletions(-)
+This is one of those Coverity checks which is quite prone to
+false positives because it's just heuristically saying "you
+look like you take the lock when you modify this field elsewhere,
+maybe this place should take the lock too". Does this function
+need to take a lock, or does the code that uses it guarantee
+that it's never possible for another thread to be running
+with access to the structure once we decide to destroy it?
 
---=20
-2.21.1
-
+thanks
+-- PMM
 
