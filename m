@@ -2,80 +2,90 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FCE5C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 19:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8410C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 20:00:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA23B2070A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 19:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 840F6206F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 20:00:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NDufmMM5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA23B2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U6lEYMWu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 840F6206F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGTE3-0007mT-TN
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 15:59:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51521)
+	id 1jGTFL-0000UZ-NQ
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 16:00:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51629)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jGTDM-00079h-5y
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:58:25 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jGTDp-0007YY-0F
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jGTDL-0001kA-2A
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:58:24 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40555)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jGTDK-0001jm-V3
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:58:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584993502;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=u9kIzDXXtlINe/+Atp6GUjlV5OCetXDIKJYJB1tDydw=;
- b=NDufmMM5sqQAlr8bzhEUtp7uYqyQdTbYfS7o4ZBDx/v0Vm1OVox+o+z2GBeNuZg/rYhwxW
- yiiLaruQM8nKBzg/WMbHAX3tMp0ccoRG4XKquWVIPgQAhETkO3KCbZUZ9qygkH9YYT0LAY
- AsfRBO8/EOAejxCtMMl+txZk/ewmOwc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-8TqyEUwOPJCzcLxRS7ZgdQ-1; Mon, 23 Mar 2020 15:58:18 -0400
-X-MC-Unique: 8TqyEUwOPJCzcLxRS7ZgdQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69C1BA0CC0;
- Mon, 23 Mar 2020 19:58:17 +0000 (UTC)
-Received: from work-vm (ovpn-112-29.ams2.redhat.com [10.36.112.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 932FA9B932;
- Mon, 23 Mar 2020 19:58:12 +0000 (UTC)
-Date: Mon, 23 Mar 2020 19:58:10 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.0 v3] tests/migration: Reduce autoconverge initial
- bandwidth
-Message-ID: <20200323195810.GI3017@work-vm>
-References: <20200323184015.11565-1-philmd@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1jGTDn-0001wi-LB
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:58:52 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35984)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jGTDn-0001uy-53
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 15:58:51 -0400
+Received: by mail-pf1-x442.google.com with SMTP id i13so8053901pfe.3
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 12:58:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=iJ3FK28d85aYDqI9PVYlE3XqQqXopes7u6G/mfDiM+k=;
+ b=U6lEYMWuOtMoW5rm1WLjobLU3vaAKMxo0AnFlQeGmb6L1KAgSsx6EVsz2Tu6+hFM+4
+ kR7Q9Qds52xjeI9eJyYsv0crLZA94VXdEqv5mx+V60PzXK/ffWwNKFQWpaJ4kn/FzQSx
+ zDVNmQ19PfHgqZtvExrqXq8+o0c3oMK+pF/7YVmm/SrC0tE/C4KcWA+7iwahjy2RI5Wt
+ axDx/SvyXdA5BAFCMUm6h4gYfaKbs/Gx7CX3xvcbWDtO0DcmmiUbzgPNeFLv1jmOPzwW
+ 87nkSCc/Z8hUBNIle2knZ8plo3S/aCjTt2aft5O4RJp+VRFtz5tNsVaULY0gFOJmlH5k
+ nCOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iJ3FK28d85aYDqI9PVYlE3XqQqXopes7u6G/mfDiM+k=;
+ b=JObgSomQTuGlME/viYlNxMUb4Dg12RaHxGF3ycrG7pviNHwlZ/a7ZjhiditmfLst1w
+ YOB5V7dlAk3YYEq10/FMt+SfAGbipo1Be08hLOmhzx9/2jiLg6RjV65t1DvCJbpTIKZW
+ BvbvHcEGN9yuS4VweYUf7aa9gmK7NddUjh8zPsP8hg7MzKwvuJBWIm+Os+AVbRGsFrbg
+ lep19uV0ns1upj8Bw62lfRoMUlPxwvh5Mo6qA4/6V8dtD8ZSF42hVWeb6eNVhLhaZDjg
+ kDQTh7dak7mvDLHSsll8yx5fUGY5FuW2p1tdgUoqdjWXsY4Xvis7/CT97JpQRP6SPPOS
+ 5CKA==
+X-Gm-Message-State: ANhLgQ1TPD/y5OCEte/vizV9TEyuJPFUkdHfYggKXFd8M34XJ6jKQP7R
+ z3ZxnHnvdRSPJAZBHFOGnVrdtHWidE8=
+X-Google-Smtp-Source: ADFU+vuOqC3DS7vfgnCyK7q6hmTPlFVWwkcAyQkqpnDlqhnoUgM2Xtaa+JTQhXDaGcRLJd7uVEX7Nw==
+X-Received: by 2002:a63:778e:: with SMTP id s136mr6109329pgc.155.1584993529229; 
+ Mon, 23 Mar 2020 12:58:49 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ t4sm2667523pfb.156.2020.03.23.12.58.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 12:58:47 -0700 (PDT)
+Subject: Re: [PATCH v1 for 5.0 00/11] testing/next
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200323161514.23952-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <409671dd-7684-c95d-f9d4-a94e8b6fe2ce@linaro.org>
+Date: Mon, 23 Mar 2020 12:58:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200323184015.11565-1-philmd@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <20200323161514.23952-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,83 +97,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> When using max-bandwidth=3D~100Mb/s, this test fails on Travis-CI
-> s390x when configured with --disable-tcg:
->=20
->   $ make check-qtest
->     TEST    check-qtest-s390x: tests/qtest/boot-serial-test
->   qemu-system-s390x: -accel tcg: invalid accelerator tcg
->   qemu-system-s390x: falling back to KVM
->     TEST    check-qtest-s390x: tests/qtest/pxe-test
->     TEST    check-qtest-s390x: tests/qtest/test-netfilter
->     TEST    check-qtest-s390x: tests/qtest/test-filter-mirror
->     TEST    check-qtest-s390x: tests/qtest/test-filter-redirector
->     TEST    check-qtest-s390x: tests/qtest/drive_del-test
->     TEST    check-qtest-s390x: tests/qtest/device-plug-test
->     TEST    check-qtest-s390x: tests/qtest/virtio-ccw-test
->     TEST    check-qtest-s390x: tests/qtest/cpu-plug-test
->     TEST    check-qtest-s390x: tests/qtest/migration-test
->   **
->   ERROR:tests/qtest/migration-test.c:1229:test_migrate_auto_converge: 'go=
-t_stop' should be FALSE
->   ERROR - Bail out! ERROR:tests/qtest/migration-test.c:1229:test_migrate_=
-auto_converge: 'got_stop' should be FALSE
->   make: *** [tests/Makefile.include:633: check-qtest-s390x] Error 1
->=20
-> Per David Gilbert, "it could just be the writing is slow on s390
-> and the migration thread fast; in which case the autocomplete
-> wouldn't be needed. Perhaps we just need to reduce the bandwidth
-> limit."
->=20
-> Tuning the threshold by reducing the initial bandwidth makes the
-> autoconverge test pass.
->=20
-> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+On 3/23/20 9:15 AM, Alex Bennée wrote:
+> Alex Bennée (2):
+>   tests/vm: fix basevm config
+>   configure: disable MTTCG for MIPS guests
+> 
+> Gerd Hoffmann (4):
+>   tests/vm: write raw console log
+>   tests/vm: move vga setup
+>   tests/vm: update FreeBSD to 12.1
+>   tests/vm: update NetBSD to 9.0
+> 
+> Philippe Mathieu-Daudé (5):
+>   tests/docker: Keep package list sorted
+>   tests/docker: Install gcrypt devel package in Debian image
+>   tests/docker: Use Python3 PyYAML in the Fedora image
+>   tests/docker: Add libepoxy and libudev packages to the Fedora image
+>   .travis.yml: Add a KVM-only s390x job
 
-This is what I'm expecting to help, so if it passes testing lets try it.
+Whole series:
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
 
-'got_stop' being true just indicates the migration managed to complete.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
-> v3: really reduce =3D)
-> ---
->  tests/qtest/migration-test.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-> index 3d6cc83b88..2568c9529c 100644
-> --- a/tests/qtest/migration-test.c
-> +++ b/tests/qtest/migration-test.c
-> @@ -1211,7 +1211,7 @@ static void test_migrate_auto_converge(void)
->       * without throttling.
->       */
->      migrate_set_parameter_int(from, "downtime-limit", 1);
-> -    migrate_set_parameter_int(from, "max-bandwidth", 100000000); /* ~100=
-Mb/s */
-> +    migrate_set_parameter_int(from, "max-bandwidth", 1000000); /* ~1Mb/s=
- */
-> =20
->      /* To check remaining size after precopy */
->      migrate_set_capability(from, "pause-before-switchover", true);
-> --=20
-> 2.21.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+r~
 
 
