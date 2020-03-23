@@ -2,88 +2,81 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD13EC4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DD4C4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:20:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A33B120663
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:19:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B55620663
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 11:20:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EwYSdz8Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A33B120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bp1olLUb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B55620663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGL7M-0001Ze-Qv
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:19:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41167)
+	id 1jGL8N-0002YG-Pr
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 07:20:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41274)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mtosatti@redhat.com>) id 1jGL6n-0001B9-Le
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:19:06 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jGL7Y-0001ug-6A
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mtosatti@redhat.com>) id 1jGL6m-0001XB-Jc
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:19:05 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:58743)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1jGL6m-0001X3-FU
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:19:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584962344;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=I6iz++xDyWIMkLvemm1M+2robOQPUjlgI3SUvSgLd7o=;
- b=EwYSdz8ZWZEGk5SgUgcUVDnEav+YQaHvMqO/s+Ap8N+K/wTAW4rSEGspaYFEewLutvc/5S
- Wvk6UWQ84vFcZMmB4XdOJcrTsV+BBMWX7Dyvt8xxeSw315PplQDRjXEqtwHm+5waO5w6aX
- EwaUv2S3V7MAhETVzrMCAolPM0p2pOI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-dywiY5z6ONeRnMNNQgVxNg-1; Mon, 23 Mar 2020 07:17:57 -0400
-X-MC-Unique: dywiY5z6ONeRnMNNQgVxNg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6420010CE78A;
- Mon, 23 Mar 2020 11:17:56 +0000 (UTC)
-Received: from fuller.cnet (ovpn-116-9.gru2.redhat.com [10.97.116.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D9B3810027AF;
- Mon, 23 Mar 2020 11:17:52 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
- id 7EE8F418CC0C; Mon, 23 Mar 2020 08:04:52 -0300 (-03)
-Date: Mon, 23 Mar 2020 08:04:52 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH-for-5.0 1/2] hw/acpi/piix4: Add 'system-hotplug-support'
- property
-Message-ID: <20200323110452.GA14031@fuller.cnet>
-References: <20200318221531.22910-1-philmd@redhat.com>
- <20200318221531.22910-2-philmd@redhat.com>
- <20200319114424.5723e777@office.mammed.net>
- <4d42697e-ba84-e5af-3a17-a2cc52cf0dbc@redhat.com>
- <20200319160800.614de5fb@redhat.com>
- <d6c0dc2f-5b0f-2e34-6c12-e9d9cd7402c6@redhat.com>
- <3f70d63d-e9ae-6676-edd5-20613b4b8856@redhat.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jGL7X-0001oZ-2k
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:19:52 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40494)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jGL7W-0001o4-Sg
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 07:19:51 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a81so8576015wmf.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 04:19:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=EuieIyc6tTCmsECeaubnyZnEEhvgWS00+SrOLT8Gg1A=;
+ b=bp1olLUbjPPN/trbMavs5zN/8N+WZkLnW/IWMM67jys981TCnzlbw3T0Le+P844WmB
+ 9c42Vyhp5DLM7O5OsQYqu+MxjCtDf0hUuFC4ojT5TELqNuLlGc3yvMaz3l/1MHni3Dr5
+ aTgArwAG65OI5FwbdLFPETIIByq/hoNAH4Xh0Dxkc3ioAPzE6VypQqrn38BKsUfUxT+o
+ lRDv5hsk8T1w9tNLvB9W/HY1Rid2aMnHwb/KNsRCLF/okqDCs9CNkxkpHHJX36XQlsy7
+ 6uLluHLCMB/Wj4pW3Cl9QYveEWD0L2JrlPuYlUucoTLi6Aa1QP4ZKHGe/aNV+hm9P6J0
+ ZaTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=EuieIyc6tTCmsECeaubnyZnEEhvgWS00+SrOLT8Gg1A=;
+ b=GdNGnmilvGIjWEK9/7t27oLhaJTfCV4D2ymi4n/PTVB0sfX2EmJ5CMIDWnK6IHCFii
+ Xp8Ru/MjCfZsOYWRvKiVXPNaUAi/wMno8sCImix5t+uSpj+smAnz49xd6ZRLE8SSeTPn
+ tC+VgHhrQiK7PoW4eaZOORkgNjQKMsmyUwG2EyZreGptTd/tG+2zISHGjfhFTeKYhWL6
+ 8o5UdGN+1ZbFpywB+oKzINMj/byZn0tEOGelFOULsuHifnuhqKZEtPJ6Gz7gAvAP76sF
+ n7PYouEcpNo5mD9HtbfngAqsF5FMkm4PCQEzSOMWJYtnqAQ3MdbYvncB1uoZnSBrIN+Q
+ RlCQ==
+X-Gm-Message-State: ANhLgQ2GklFYsXoMsoKFfxyXdSgro/ZiHUp2GsyUB12jethKzkvmbgaa
+ mOLp01nQGX93K31f2Ddzprvl9uuDup/mxJ7VfMM=
+X-Google-Smtp-Source: ADFU+vsoJiDQK1Sf1kWrCMh2ZgxNwoXXhZEHkKXuH+SDYRmq3WoYAhOaqc97yyFazw81FVeYf+UYQJR0dwyd/T3Diu4=
+X-Received: by 2002:a1c:6a1a:: with SMTP id f26mr1511253wmc.55.1584962389383; 
+ Mon, 23 Mar 2020 04:19:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3f70d63d-e9ae-6676-edd5-20613b4b8856@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+References: <20200323110408.309111-1-stefanha@redhat.com>
+In-Reply-To: <20200323110408.309111-1-stefanha@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 23 Mar 2020 12:19:37 +0100
+Message-ID: <CAJ+F1C+hUXUQiCsj6Gu6E_kWbu5y6d+NxXq4Ztt8GytjHC-gCw@mail.gmail.com>
+Subject: Re: [PATCH] qemu-ga: document vsock-listen in the man page
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,35 +88,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- Igor Mammedov <imammedo@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 23, 2020 at 09:05:06AM +0100, Paolo Bonzini wrote:
-> On 22/03/20 17:27, Philippe Mathieu-Daud=E9 wrote:
-> >>>
-> >> That 'ugly' is typically used within QEMU to deal with such things
-> >> probably due to its low complexity.
-> >=20
-> > OK. Can you point me to the documentation for this feature? I can find
-> > reference of GPE in the ICH9, but I can't find where this IO address on
-> > the PIIX4 comes from:
-> >=20
-> > #define GPE_BASE 0xafe0
->=20
-> It's made up.  The implementation is placed in PIIX4_PM because it is
-> referenced by the ACPI tables.  Real hardware would probably place this
-> in the ACPI embedded controller or in the BMC.
->=20
-> Paolo
+Hi
 
-Yes, there was nothing at 0xafe0 at the time ACPI support was written.
+On Mon, Mar 23, 2020 at 12:04 PM Stefan Hajnoczi <stefanha@redhat.com> wrot=
+e:
+>
+> Although qemu-ga has supported vsock since 2016 it was not documented on
+> the man page.
+>
+> Also add the socket address representation to the qga --help output.
+>
+> Fixes: 586ef5dee77180fc32e33bc08051600030630239
+>        ("qga: add vsock-listen method")
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+> ---
+>  docs/interop/qemu-ga.rst | 5 +++--
+>  qga/main.c               | 4 +++-
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/docs/interop/qemu-ga.rst b/docs/interop/qemu-ga.rst
+> index 1313a4ae1c..3063357bb5 100644
+> --- a/docs/interop/qemu-ga.rst
+> +++ b/docs/interop/qemu-ga.rst
+> @@ -36,13 +36,14 @@ Options
+>  .. option:: -m, --method=3DMETHOD
+>
+>    Transport method: one of ``unix-listen``, ``virtio-serial``, or
+> -  ``isa-serial`` (``virtio-serial`` is the default).
+> +  ``isa-serial``, or ``vsock-listen`` (``virtio-serial`` is the default)=
+.
+>
+>  .. option:: -p, --path=3DPATH
+>
+>    Device/socket path (the default for virtio-serial is
+>    ``/dev/virtio-ports/org.qemu.guest_agent.0``,
+> -  the default for isa-serial is ``/dev/ttyS0``)
+> +  the default for isa-serial is ``/dev/ttyS0``). Socket addresses for
+> +  vsock-listen are written as ``<cid>:<port>``.
+>
+>  .. option:: -l, --logfile=3DPATH
+>
+> diff --git a/qga/main.c b/qga/main.c
+> index 8ee2736f8e..f0e454f28d 100644
+> --- a/qga/main.c
+> +++ b/qga/main.c
+> @@ -234,7 +234,9 @@ QEMU_COPYRIGHT "\n"
+>  "  -p, --path        device/socket path (the default for virtio-serial i=
+s:\n"
+>  "                    %s,\n"
+>  "                    the default for isa-serial is:\n"
+> -"                    %s)\n"
+> +"                    %s).\n"
+> +"                    Socket addresses for vsock-listen are written as\n"
+> +"                    <cid>:<port>.\n"
+>  "  -l, --logfile     set logfile path, logs to stderr by default\n"
+>  "  -f, --pidfile     specify pidfile (default is %s)\n"
+>  #ifdef CONFIG_FSFREEZE
+> --
+> 2.24.1
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
