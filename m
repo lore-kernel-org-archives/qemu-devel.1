@@ -2,101 +2,84 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA2EC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4D4C54EEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:44:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C86EF20722
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AB8720722
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:44:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/5pdna/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86EF20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NRxjntSK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AB8720722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGQA2-0007d3-0W
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:42:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40746)
+	id 1jGQBG-0000Fj-II
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:44:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jGQ99-0006zV-Pg
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:41:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGQAe-0008EI-V2
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jGQ93-0004qn-Sr
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:41:50 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:53422)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGQ93-0004pI-LA
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:41:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584981701;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iy+iNCXUADmBfZUgch6yPqIvM3blAnxbQchNqk7McEE=;
- b=N/5pdna/UYJ1a7VhEoG2zIl5r5dUfbs2FoBz8MVzjnD+6G85eXc0vvsXlFqFWsQFj52sUq
- d8D1IPSmkcE90iy86N4JY4/pnXh55qiY2laynlVKqCJu1fDN0zCRkKAkgTPpXRW3Rov6O8
- wfo3qE1pxnZ2Yi6y9UDyRFDk17zMWMs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-N7dmeu1zPxS5lfQQm8FfLQ-1; Mon, 23 Mar 2020 12:41:37 -0400
-X-MC-Unique: N7dmeu1zPxS5lfQQm8FfLQ-1
-Received: by mail-wr1-f71.google.com with SMTP id m15so3207327wrb.0
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:41:37 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jGQAd-0005lz-Ju
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:43:24 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39079)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGQAc-0005lF-RD
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:43:23 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p10so5532509wrt.6
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:43:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/n6IqjRnzQwn9OgJiIphU3qnPEgngPDRG3PtfiwJ4qk=;
+ b=NRxjntSKnhh9cuYpICqvqbe+5VDzXuLAOjYJ5Vb/FaXOe+Vntbb+vKct0kXsLg6Tv0
+ QWkBpP3UmWolQDRckN3ukCTsNnKo08mHxum4mzpw6tG/JjH7/LDftIBFpx9gM2ZorH5x
+ Mhe1Rv4a53jXiRby8HHP5xNaiXInzhaCpfJyRDe/zH2bhfYRPp0O+7Do7+RNINvhajV5
+ dljhVMYNAYdqpn2s5o4oWBMNnyXftom+ctI5zzNztzh2yuuO2fC6axL35HhzsAMMar7c
+ 1bu6pvUhIFN5uPeItM6P1li2m7hzTC6m9bXE1vX5VZiray6gPwTUrU5N4X4H9ora+9He
+ l/iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=jWGe4Ycu+MlbFjTNP3eQMsxASowbHhOqUH2maPS766s=;
- b=BoojEPNBWkYieURKeEUiDKgs/97QXgeY51u9eHHObFwPyHY5X3nMiC0bDLfYyxW79i
- 2Zsb5/gtq3sDlTOFqXQJtKK5YfbG4SJcVOrdVHxg+KPuks/NouygTJkjCaFdCowrRSj1
- pb1PCIwF4YRkxJymyUL6rQlaPPP2ZKjN9GPxXnPuec3FUOON7d/m60GHb4CC7Qcztc4I
- MdYGzgyCbRNTCum99XMZ023q7yyJViQTvcYrjLFDV2RS5ukw9z2gWt09gWC9T9qPVVJg
- QwRL9I/gLQE/6WNAULj5XkBwr6PmgTSR4e2umyOtJAmIBAuZ+foyZ9RaaJPrjYNuh4+9
- YtUA==
-X-Gm-Message-State: ANhLgQ2vEMXhl0YODV/h65dqCueVv7y2D5ugs6lYWttBJQPo3GRZcWVs
- w2hWKd2DEeDoLeHqSgzN3HumWwzt92NecBo056QRn8xA2X4rJhEMqXv3McwD6dJp4Bd7tnCipk6
- KeUPCR2t5Zy74H+w=
-X-Received: by 2002:adf:9346:: with SMTP id 64mr22204379wro.174.1584981696161; 
- Mon, 23 Mar 2020 09:41:36 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vt4bO9u4mUlX5mtM5wXMiUBc6KARY/aLgGQ8+Eqx1qhjNduxVR+NWVpar5xiSOVapIV381aaw==
-X-Received: by 2002:adf:9346:: with SMTP id 64mr22204346wro.174.1584981695903; 
- Mon, 23 Mar 2020 09:41:35 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id l64sm145266wmf.30.2020.03.23.09.41.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 23 Mar 2020 09:41:35 -0700 (PDT)
-Subject: Re: [PATCH v1] mips/mips_malta: Allow more than 2G RAM
-To: Aurelien Jarno <aurelien@aurel32.net>
-References: <20200228032613.1049955-1-jiaxun.yang@flygoat.com>
- <20200303004137.1099502-1-jiaxun.yang@flygoat.com>
- <6b4a7564-eac6-7bd3-b1c0-e9c7ac4e0c80@redhat.com>
- <CAL1e-=gEtCtAnsnkO4_E8rqje=n1bHXY_+BXC5P2h5Ld0umNtQ@mail.gmail.com>
- <d9f08408-9c1e-36d9-869b-bac250c6f027@redhat.com>
- <20200323163545.GA19598@aurel32.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7ec6be5f-06c8-b179-f059-1b6024d22d7f@redhat.com>
-Date: Mon, 23 Mar 2020 17:41:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=/n6IqjRnzQwn9OgJiIphU3qnPEgngPDRG3PtfiwJ4qk=;
+ b=EWd+Uxu5Yyh9kc4WYFDTY7Cvrdh7ujVxUG+6a9nvkp3RNqSkPLpDiXcQ7XfOwBa5ar
+ O4+hH7UbztH2HsXLCgOtGLNPdI3wnvUtOh6Cnb1C3d709j/YGfLR6qByIlcfqh8PzMrZ
+ s6ZTNqbY4/1A6LPyXuWt94qVJ1PwTbk0h0C5gJWfiVVN679aZ0mIDMvet8CxhAnzhSMk
+ cI6d9ekcnlVIRc46x3W8YDLUR2tuRj1LA/nTRDA7fRnHMpHWXWsPQpCroIk/bN9gf0qQ
+ 0TXNYbyyjcgaRy8hXfse/JXsJMlGcB2xhsH8+3rtpoXfpICFA1Qi9jPaPTlnVusMxoUe
+ d2vw==
+X-Gm-Message-State: ANhLgQ3Yud5Vg8Ai6/a3qwKpi5RThwHnxTcCWnAYPw2pBEQ5D+/Tpk1U
+ RamdmGCQ/a7owOa+UXimJOKI5HczgQNY1g==
+X-Google-Smtp-Source: ADFU+vuKOy8jajjJhmhzqHPvB3MT8/sixoy6pVIJWxEIeLGqaKFXu7CbBFTVuUuDcyuYaC4GIyK2Qg==
+X-Received: by 2002:adf:e98b:: with SMTP id h11mr11516307wrm.409.1584981800964; 
+ Mon, 23 Mar 2020 09:43:20 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id k3sm167767wmf.16.2020.03.23.09.43.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Mar 2020 09:43:20 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC] hw/usb/xen-usb.c: Pass struct usbback_req* to
+ usbback_packet_complete()
+Date: Mon, 23 Mar 2020 16:43:18 +0000
+Message-Id: <20200323164318.26567-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200323163545.GA19598@aurel32.net>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,89 +91,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
- Peter Maydell <peter.maydell@linaro.org>, Yunqiang Su <ysu@wavecomp.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Paul Burton <paul.burton@mips.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paul Durrant <paul@xen.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/23/20 5:35 PM, Aurelien Jarno wrote:
-> Hi,
->=20
-> Sorry for the delay, I just want to give some more details about the
-> Debian.
->=20
-> On 2020-03-14 10:09, Philippe Mathieu-Daud=E9 wrote:
->> IIUC today all distributions supporting MIPS ports are building their MI=
-PS
->> packages on QEMU instances because it is faster than the native MIPS
->> hardware they have.
->=20
-> Actually Debian requires that packages are built on real hardware. We
-> have a mix of Loongson 3 and Octeon 3 based build daemons. They all have
-> 8GiB of RAM.
->=20
->> Since one (or two?) years, some binaries (Linux kernel? QEMU?) are faili=
-ng
->> to link because the amount of guest memory is restricted to 2GB (probabl=
-y
->> advance of linker techniques, now linkers use more memory).
->=20
-> The problem happens with big packages (e.g. ceph which is a dependency
-> of QEMU). The problem is not the physical memory issue, but the virtual
-> address space, which is limited to 2GB for 32-bit processes. That's why
-> we do not have the issue for the 64-bit ports.
->=20
->> YunQiang, is this why you suggested this change?
->>
->> See:
->> - https://www.mail-archive.com/debian-mips@lists.debian.org/msg10912.htm=
-l
->> - https://alioth-lists.debian.net/pipermail/pkg-rust-maintainers/2019-Ja=
-nuary/004844.html
->>
->> I believe most of the QEMU Malta board users don't care it is a Malta bo=
-ard,
->> they only care it is a fast emulated MIPS machine.
->> Unfortunately it is the default board.
->>
->> However 32-bit MIPS port is being dropped on Debian:
->> https://lists.debian.org/debian-mips/2019/07/msg00010.html
->=20
-> The 32-bit big endian port has been dropped after the Buster (10)
-> release and won't be available for the Bullseye release (11). The
-> 32-bit little endian port is still available, but it's difficult to keep
-> it alive given the 2GB limit.
->=20
->> Maybe we can sync with the Malta users, ask them to switch to the Boston
->> machines to build 64-bit packages, then later reduce the Malta board to =
-1GB.
->> (The Boston board is more recent, but was not available at the time user=
-s
->> started to use QEMU to build 64-bit packages).
->>
->> Might it be easier starting introducing a malta-5.0 machine restricted t=
-o
->> 1GB?
->=20
-> In any case having an easy way to simulate machines with more than 2GB
-> of RAM in QEMU would be great.
+The function usbback_packet_complete() currently takes a USBPacket*,
+which must be a pointer to the packet field within a struct
+usbback_req; the function uses container_of() to get the struct
+usbback_req* given the USBPacket*.
 
-You mean on MIPS64, right?
+This is unnecessarily confusing (and in particular it confuses the
+Coverity Scan analysis, resulting in the false positive CID 1421919
+where it thinks that we write off the end of the structure). Since
+both callsites already have the pointer to the struct usbback_req,
+just pass that in directly.
 
-I see the Boston is limited to 1/2GB, probably due to code started=20
-copy/pasted on the Malta. I don't know (without having to refer to=20
-datasheets) the maximum amount of DRAM the Boston board can handle, but=20
-it should be more than 2GB.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This is an RFC because:
+ * I'm not very familiar with the Xen bits of QEMU
+ * the main rationale here is to change something that's
+   confusing Coverity -- the code as it stands isn't wrong
+ * the only testing I've done is "make check"
+Still, the change seems like a good thing to me as a human reader...
 
->=20
-> Cheers,
-> Aurelien
->=20
+PS: QEMU's MAINTAINERS file stanza for Xen doesn't pick up
+that this file is Xen related, so it could use an extra F: line.
+
+ hw/usb/xen-usb.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
+index 1fc2f32ce93..961190d0f78 100644
+--- a/hw/usb/xen-usb.c
++++ b/hw/usb/xen-usb.c
+@@ -347,13 +347,11 @@ static int32_t usbback_xlat_status(int status)
+     return -ESHUTDOWN;
+ }
+ 
+-static void usbback_packet_complete(USBPacket *packet)
++static void usbback_packet_complete(struct usbback_req *usbback_req)
+ {
+-    struct usbback_req *usbback_req;
++    USBPacket *packet = &usbback_req->packet;
+     int32_t status;
+ 
+-    usbback_req = container_of(packet, struct usbback_req, packet);
+-
+     QTAILQ_REMOVE(&usbback_req->stub->submit_q, usbback_req, q);
+ 
+     status = usbback_xlat_status(packet->status);
+@@ -566,7 +564,7 @@ static void usbback_dispatch(struct usbback_req *usbback_req)
+ 
+     usb_handle_packet(usbback_req->stub->dev, &usbback_req->packet);
+     if (usbback_req->packet.status != USB_RET_ASYNC) {
+-        usbback_packet_complete(&usbback_req->packet);
++        usbback_packet_complete(usbback_req);
+     }
+     return;
+ 
+@@ -993,7 +991,7 @@ static void xen_bus_complete(USBPort *port, USBPacket *packet)
+ 
+     usbif = usbback_req->usbif;
+     TR_REQ(&usbif->xendev, "\n");
+-    usbback_packet_complete(packet);
++    usbback_packet_complete(usbback_req);
+ }
+ 
+ static USBPortOps xen_usb_port_ops = {
+-- 
+2.20.1
 
 
