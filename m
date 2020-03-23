@@ -6,71 +6,76 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BA6C10F26
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9A6C10F26
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:38:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B38120732
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:17:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B38120732
+	by mail.kernel.org (Postfix) with ESMTPS id B655620736
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 07:38:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B655620736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGHKe-0000vK-Gc
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 03:17:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37421)
+	id 1jGHfN-0004wE-S3
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 03:38:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40710)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jGHJi-0000U0-By
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:16:11 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jGHee-0004WM-2s
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:37:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jGHJg-0002WT-Gp
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:16:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48308)
+ (envelope-from <borntraeger@de.ibm.com>) id 1jGHec-0001Ot-T6
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:37:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37362
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jGHJf-0002VP-Fn
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:16:08 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02N73j8j009482
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:16:03 -0400
+ id 1jGHec-0001OL-OA
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 03:37:46 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02N7Xqvg151713
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:37:45 -0400
 Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ywd8b1vqv-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yxnf6b9tc-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:16:03 -0400
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 03:37:45 -0400
 Received: from localhost
  by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 23 Mar 2020 07:16:01 -0000
+ Mon, 23 Mar 2020 07:37:43 -0000
 Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
  by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 23 Mar 2020 07:15:58 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
+ Mon, 23 Mar 2020 07:37:40 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
  by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02N7FvAJ49938472
+ 02N7bdM334078924
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 23 Mar 2020 07:15:57 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5BE9D52054;
- Mon, 23 Mar 2020 07:15:57 +0000 (GMT)
+ Mon, 23 Mar 2020 07:37:39 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6E9F94C046;
+ Mon, 23 Mar 2020 07:37:39 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 164944C040;
+ Mon, 23 Mar 2020 07:37:39 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.169.7])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1703A52073;
- Mon, 23 Mar 2020 07:15:55 +0000 (GMT)
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 23 Mar 2020 07:37:39 +0000 (GMT)
 Subject: Re: [PATCH v11 03/16] s390x: protvirt: Support unpack facility
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 To: Bruce Rogers <brogers@suse.com>,
  "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <20200319131921.2367-1-frankja@linux.ibm.com>
  <20200319131921.2367-4-frankja@linux.ibm.com>
  <85df56f2bc703e38a19150f51c9a6501dffefd16.camel@suse.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+ <28dc03df-79ac-35f8-32af-4e793a3559b8@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
  J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
@@ -114,30 +119,30 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Mon, 23 Mar 2020 08:15:55 +0100
+Date: Mon, 23 Mar 2020 08:37:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <85df56f2bc703e38a19150f51c9a6501dffefd16.camel@suse.com>
+In-Reply-To: <28dc03df-79ac-35f8-32af-4e793a3559b8@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20032307-0016-0000-0000-000002F60C44
+x-cbid: 20032307-0016-0000-0000-000002F60E87
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032307-0017-0000-0000-00003359A31E
-Message-Id: <28dc03df-79ac-35f8-32af-4e793a3559b8@de.ibm.com>
+x-cbparentid: 20032307-0017-0000-0000-00003359A574
+Message-Id: <ea710b6b-3a8a-422e-ce67-1611eb0c970b@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
  definitions=2020-03-23_01:2020-03-21,
  2020-03-23 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 suspectscore=2
- malwarescore=0 mlxlogscore=856 spamscore=0 lowpriorityscore=0 phishscore=0
- adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 clxscore=1015
+ mlxscore=0 malwarescore=0
+ bulkscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
+ adultscore=0 mlxlogscore=817 clxscore=1015 spamscore=0 priorityscore=1501
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003230042
+ definitions=main-2003230039
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,46 +160,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[...]
 
->> +int s390_ipl_prepare_pv_header(void)
->> +{
->> +    IplParameterBlock *ipib = s390_ipl_get_iplb_pv();
->> +    IPLBlockPV *ipib_pv = &ipib->pv;
->> +    void *hdr = g_malloc(ipib_pv->pv_header_len);
->> +    int rc;
->> +
->> +    cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
->> +                             ipib_pv->pv_header_len);
->> +    rc = s390_pv_set_sec_parms((uint64_t)hdr,
->> +                               ipib_pv->pv_header_len);
-> This causes a compiler issue when building for 32 bit x86 as follows:
+
+On 23.03.20 08:15, Christian Borntraeger wrote:
+> [...]
 > 
-> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c: In function
-> 's390_ipl_prepare_pv_header':
-> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c:659:32: error:
-> cast from pointer to integer of different size [-Werror=pointer-to-int-
-> cast]
->   659 |     rc = s390_pv_set_sec_parms((uint64_t)hdr,
->       |                                ^
+>>> +int s390_ipl_prepare_pv_header(void)
+>>> +{
+>>> +    IplParameterBlock *ipib = s390_ipl_get_iplb_pv();
+>>> +    IPLBlockPV *ipib_pv = &ipib->pv;
+>>> +    void *hdr = g_malloc(ipib_pv->pv_header_len);
+>>> +    int rc;
+>>> +
+>>> +    cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
+>>> +                             ipib_pv->pv_header_len);
+>>> +    rc = s390_pv_set_sec_parms((uint64_t)hdr,
+>>> +                               ipib_pv->pv_header_len);
+>> This causes a compiler issue when building for 32 bit x86 as follows:
+>>
+>> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c: In function
+>> 's390_ipl_prepare_pv_header':
+>> /home/abuild/rpmbuild/BUILD/qemu-4.2.0/hw/s390x/ipl.c:659:32: error:
+>> cast from pointer to integer of different size [-Werror=pointer-to-int-
+>> cast]
+>>   659 |     rc = s390_pv_set_sec_parms((uint64_t)hdr,
+>>       |                                ^
+> 
+> Interesting. It seems that there is no travis-ci coverage for this
+> case.
+> 
+> I guess we need something like this.
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 1d04cd5..01bdf81 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -656,7 +656,7 @@ int s390_ipl_prepare_pv_header(void)
+>  
+>      cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
+>                               ipib_pv->pv_header_len);
+> -    rc = s390_pv_set_sec_parms((uint64_t)hdr,
+> +    rc = s390_pv_set_sec_parms((uint64_t)(unsigned long) hdr,
+>                                 ipib_pv->pv_header_len);
 
-Interesting. It seems that there is no travis-ci coverage for this
-case.
-
-I guess we need something like this.
-
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 1d04cd5..01bdf81 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -656,7 +656,7 @@ int s390_ipl_prepare_pv_header(void)
- 
-     cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
-                              ipib_pv->pv_header_len);
--    rc = s390_pv_set_sec_parms((uint64_t)hdr,
-+    rc = s390_pv_set_sec_parms((uint64_t)(unsigned long) hdr,
-                                ipib_pv->pv_header_len);
-     g_free(hdr);
-     return rc;
+uint_ptr instead of long is probably even better (for Windows).
 
 
