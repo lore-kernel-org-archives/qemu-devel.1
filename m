@@ -2,81 +2,87 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAAEC54FCE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BF8C3F2CD
 	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A560220722
+	by mail.kernel.org (Postfix) with ESMTPS id 21FC420722
 	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 17:43:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KX9cbGAR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A560220722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cNa9iJOH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21FC420722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGR6h-00013w-S0
+	id 1jGR6h-00012y-At
 	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 13:43:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52693)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jGR4j-0005m6-L6
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:41:22 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGR3i-0004Oo-2I
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jGR4h-0004jQ-C8
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:41:20 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60640)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jGR4h-0004hl-0t
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:41:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584985278;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HphUaKrtUqOxdbT9Ia8tkqJHdcS2my5hGgZmindu1AE=;
- b=KX9cbGARIYmci2MK1NSQnQKe+blXqf+TuYojkF3fckVJZ4Q8OBv20Cx9OZoJRlLLEQ/aNw
- 2tmVkj7ZEGnRmunDx+/ht6nUheApfd8TwUBiYwFABuEIJ/I4GVXrtDrGSsMoYLgFnp9hMM
- wutF90zvFd3NZpXSWKSJRs/I9MJGKR0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-LsjM0ydUOX-PU_1e9IB41A-1; Mon, 23 Mar 2020 13:41:13 -0400
-X-MC-Unique: LsjM0ydUOX-PU_1e9IB41A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E817496F01;
- Mon, 23 Mar 2020 17:41:10 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-85.ams2.redhat.com [10.36.114.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E9E235C1AD;
- Mon, 23 Mar 2020 17:41:09 +0000 (UTC)
-Date: Mon, 23 Mar 2020 18:41:08 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v5 3/4] qmp: Move dispatcher to a coroutine
-Message-ID: <20200323174108.GD8049@linux.fritz.box>
-References: <20200218154036.28562-1-kwolf@redhat.com>
- <20200218154036.28562-4-kwolf@redhat.com>
- <87d09965g3.fsf@dusky.pond.sub.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1jGR3g-0003hk-JH
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:17 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40530)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGR3g-0003fN-6G
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 13:40:16 -0400
+Received: by mail-wm1-x331.google.com with SMTP id a81so359327wmf.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 10:40:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=Blca2M8WsWfCbkoVy34ezoOEGpYFuC8v0ZvsUkwATQw=;
+ b=cNa9iJOHXRN3TsQN6ZdGDMLijkPX5US+Sy8j9En5JdOqdLGJ0gIdF3eO9Dhe74QY7U
+ F8IwNBxz/PZcHK4nr5tDcYQVYMEoqvcOz+5C34blzVnuGQkUDhMbdIsKegj7B6JOkkBU
+ oo7yIkoIqLkAJzfEiCX5/lN9CgIonLZ27soNIiPd6QCDJIfPhSTxUPx2pzCuvkp9DfRw
+ iJJbFa0h//Wt/oMJMNN5jIjQnD/dMsGh72Q0UIp80bpuLwCp0WDNOcmd2oswXbKyUhF0
+ 6gtZblm29t6EGneFskH8BbVIPvchedGzcL8ctl4EwsZaFMRhZhK9cLYOYWBuvmTMkgN5
+ 7J2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Blca2M8WsWfCbkoVy34ezoOEGpYFuC8v0ZvsUkwATQw=;
+ b=LC0yMAj1FJ8rg2xOfURen0iB+bFEdHkJPkzUECZFFzuqKqiBKx4jqrlQ5mGHNFEj11
+ twG1E+JX0JNWs6BtcTX7I6BVXlT89Z7YNpMCsLFQuwl4d7o9wnvfJgTALUtrVMn4zaeK
+ 6iZM3m1vkdz5f3cXViMjmyA6MJcj2S07gd5vUevRMGA/ZX6A/SkqwnFBd0VVpDrrlvJS
+ QQzliPx0yQdIA/0WA3AeXWf4QK1kz1WE7cwigR7Z83HUxQSBVZtBmNVVgEt4UUtdqI7D
+ 4tz1Jfi/cYAfEBknBedG/hKYrZkdCo4OGZ0yiS0ud2xIyrJB2uv9CmfbZWe5/dKzH1Up
+ v2DQ==
+X-Gm-Message-State: ANhLgQ02DoanUrvaE1KEucNkE3UGR6jD+xWQJK+MiOFRhGByiT7W7r4U
+ aW776+baHv5lCMoQRnEo5n0zIOxdu17UYQ==
+X-Google-Smtp-Source: ADFU+vuSq3sh4a5EowREAtMW75K3DDLcZshYHQP3J/XXGU1LTJcAXrnOHJ5SA9Cd12TTpOyTVinzPA==
+X-Received: by 2002:a1c:e109:: with SMTP id y9mr441847wmg.62.1584985211923;
+ Mon, 23 Mar 2020 10:40:11 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o9sm25145282wrw.20.2020.03.23.10.40.11
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Mar 2020 10:40:11 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 2/5] aspeed/smc: Fix DMA support for AST2600
+Date: Mon, 23 Mar 2020 17:40:03 +0000
+Message-Id: <20200323174006.8468-3-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200323174006.8468-1-peter.maydell@linaro.org>
+References: <20200323174006.8468-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87d09965g3.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,60 +94,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.03.2020 um 16:36 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
->=20
-> > This moves the QMP dispatcher to a coroutine and runs all QMP command
-> > handlers that declare 'coroutine': true in coroutine context so they
-> > can avoid blocking the main loop while doing I/O or waiting for other
-> > events.
-> >
-> > For commands that are not declared safe to run in a coroutine, the
-> > dispatcher drops out of coroutine context by calling the QMP command
-> > handler from a bottom half.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->=20
-> Uh, what about @cur_mon?
->=20
-> @cur_mon points to the current monitor while a command executes.
-> Initial value is null.  It is set in three places (not counting unit
-> tests), and all three save, set, do something that may use @cur_mon,
-> restore:
->=20
-> * monitor_qmp_dispatch(), for use within qmp_dispatch()
-> * monitor_read(), for use within handle_hmp_command()
-> * qmp_human_monitor_command(), also for use within handle_hmp_command()
->=20
-> Therefore, @cur_mon is null unless we're running within qmp_dispatch()
-> or handle_hmp_command().
+From: Cédric Le Goater <clg@kaod.org>
 
-Can we make it NULL for coroutine-enabled handlers?
+Recent firmwares uses SPI DMA transfers in U-Boot to load the
+different images (kernel, initrd, dtb) in the SoC DRAM. The AST2600
+FMC model is missing the masks to be applied on the DMA registers
+which resulted in incorrect values. Fix that and wire the SPI
+controllers which have DMA support on the AST2600.
 
-> Example of use: error_report() & friends print "to current monitor if we
-> have one, else to stderr."  Makes sharing code between HMP and CLI
-> easier.  Uses @cur_mon under the hood.
+Fixes: bcaa8ddd081c ("aspeed/smc: Add AST2600 support")
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Message-id: 20200320053923.20565-1-clg@kaod.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/aspeed_ast2600.c |  6 ++++++
+ hw/ssi/aspeed_smc.c     | 15 +++++++++++++--
+ hw/ssi/trace-events     |  1 +
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
-error_report() eventually prints to stderr both for cur_mon =3D=3D NULL and
-for QMP monitors. Is there an important difference between both cases?
-
-There is error_vprintf_unless_qmp(), which behaves differently for both
-cases. However, it is only used in VNC code, so that code would have to
-keep coroutines disabled.
-
-Is cur_mon used much in other functions called by QMP handlers?
-
-> @cur_mon is thread-local.
->=20
-> I'm afraid we have to save, clear and restore @cur_mon around a yield.
-
-That sounds painful enough that I'd rather avoid it.
-
-Kevin
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index 446b44d31cf..1a869e09b96 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -411,6 +411,12 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+ 
+     /* SPI */
+     for (i = 0; i < sc->spis_num; i++) {
++        object_property_set_link(OBJECT(&s->spi[i]), OBJECT(s->dram_mr),
++                                 "dram", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+         object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs", &err);
+         object_property_set_bool(OBJECT(&s->spi[i]), true, "realized",
+                                  &local_err);
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 9d5c696d5a1..2edccef2d54 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -364,6 +364,8 @@ static const AspeedSMCController controllers[] = {
+         .flash_window_base = ASPEED26_SOC_FMC_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+         .has_dma           = true,
++        .dma_flash_mask    = 0x0FFFFFFC,
++        .dma_dram_mask     = 0x3FFFFFFC,
+         .nregs             = ASPEED_SMC_R_MAX,
+         .segment_to_reg    = aspeed_2600_smc_segment_to_reg,
+         .reg_to_segment    = aspeed_2600_smc_reg_to_segment,
+@@ -379,7 +381,9 @@ static const AspeedSMCController controllers[] = {
+         .segments          = aspeed_segments_ast2600_spi1,
+         .flash_window_base = ASPEED26_SOC_SPI_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+-        .has_dma           = false,
++        .has_dma           = true,
++        .dma_flash_mask    = 0x0FFFFFFC,
++        .dma_dram_mask     = 0x3FFFFFFC,
+         .nregs             = ASPEED_SMC_R_MAX,
+         .segment_to_reg    = aspeed_2600_smc_segment_to_reg,
+         .reg_to_segment    = aspeed_2600_smc_reg_to_segment,
+@@ -395,7 +399,9 @@ static const AspeedSMCController controllers[] = {
+         .segments          = aspeed_segments_ast2600_spi2,
+         .flash_window_base = ASPEED26_SOC_SPI2_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+-        .has_dma           = false,
++        .has_dma           = true,
++        .dma_flash_mask    = 0x0FFFFFFC,
++        .dma_dram_mask     = 0x3FFFFFFC,
+         .nregs             = ASPEED_SMC_R_MAX,
+         .segment_to_reg    = aspeed_2600_smc_segment_to_reg,
+         .reg_to_segment    = aspeed_2600_smc_reg_to_segment,
+@@ -1135,6 +1141,11 @@ static void aspeed_smc_dma_rw(AspeedSMCState *s)
+     MemTxResult result;
+     uint32_t data;
+ 
++    trace_aspeed_smc_dma_rw(s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE ?
++                            "write" : "read",
++                            s->regs[R_DMA_FLASH_ADDR],
++                            s->regs[R_DMA_DRAM_ADDR],
++                            s->regs[R_DMA_LEN]);
+     while (s->regs[R_DMA_LEN]) {
+         if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
+             data = address_space_ldl_le(&s->dram_as, s->regs[R_DMA_DRAM_ADDR],
+diff --git a/hw/ssi/trace-events b/hw/ssi/trace-events
+index 0a70629801a..0ea498de910 100644
+--- a/hw/ssi/trace-events
++++ b/hw/ssi/trace-events
+@@ -6,5 +6,6 @@ aspeed_smc_do_snoop(int cs, int index, int dummies, int data) "CS%d index:0x%x d
+ aspeed_smc_flash_write(int cs, uint64_t addr,  uint32_t size, uint64_t data, int mode) "CS%d @0x%" PRIx64 " size %u: 0x%" PRIx64" mode:%d"
+ aspeed_smc_read(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRIx64 " size %u: 0x%" PRIx64
+ aspeed_smc_dma_checksum(uint32_t addr, uint32_t data) "0x%08x: 0x%08x"
++aspeed_smc_dma_rw(const char *dir, uint32_t flash_addr, uint32_t dram_addr, uint32_t size) "%s flash:@0x%08x dram:@0x%08x size:0x%08x"
+ aspeed_smc_write(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRIx64 " size %u: 0x%" PRIx64
+ aspeed_smc_flash_select(int cs, const char *prefix) "CS%d %sselect"
+-- 
+2.20.1
 
 
