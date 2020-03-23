@@ -2,80 +2,92 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A83C1C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0DCEC10DCE
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:16:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72B90206C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:12:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69D2B2070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 21:16:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BNmiC3qR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B90206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KrpL+xPN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D2B2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGUNF-0005J5-Il
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 17:12:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35262)
+	id 1jGUR3-00079H-JQ
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 17:16:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35792)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jGUMS-0004u3-61
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:11:53 -0400
+ (envelope-from <peterx@redhat.com>) id 1jGUPn-0006UK-Th
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jGUMP-0001ec-VI
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:11:51 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41799)
+ (envelope-from <peterx@redhat.com>) id 1jGUPl-0002td-Pc
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:15:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46790)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jGUMP-0001eQ-OE
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:11:49 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jGUPl-0002t6-M8
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 17:15:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584997909;
+ s=mimecast20190719; t=1584998117;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=G4jxkOGkxX4sSb0SR5BuCRAmRA16c3eLjFmjSDZcPB4=;
- b=BNmiC3qRH1JtvpSiHicLE5gntb+pR9lKHsghq/S3F1AfzAYaHHRVL+TYTdxVhUmb0cJpn4
- +aEQQ44fZs3VQB3NFUrnMexGbVxUPZuM9WEYOhT0/OcBOnNO3tRksxG/AXd8ZSHYTQ/SNt
- 71wYJbctB6Y/3gwGY7Q0YUJxZnvtUW4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-z4OB08HLNgmyuHKWU1fQsg-1; Mon, 23 Mar 2020 17:11:41 -0400
-X-MC-Unique: z4OB08HLNgmyuHKWU1fQsg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09FA8DBE5;
- Mon, 23 Mar 2020 21:11:39 +0000 (UTC)
-Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A473D5C1B5;
- Mon, 23 Mar 2020 21:11:30 +0000 (UTC)
-Subject: Re: [PATCH v15 Kernel 3/7] vfio iommu: Add ioctl definition for dirty
- pages tracking.
-To: Kirti Wankhede <kwankhede@nvidia.com>, alex.williamson@redhat.com,
- cjia@nvidia.com
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
- <1584649004-8285-4-git-send-email-kwankhede@nvidia.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6c58c249-9dc8-77bd-454e-9418216cdf92@redhat.com>
-Date: Mon, 23 Mar 2020 22:11:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ bh=zGbQgAQPzvtdnu3KVl+qv+4VeoEOezAcBEU3LZxKrOI=;
+ b=KrpL+xPNpnIvb/FhYIt3zztXx/6uBQaKC2i3FMCtYiPjPp/maNiukvYWyURbM6IFT+gCMp
+ daFYgHFS960w2fPVfpprdu5Udpb0PHd0ruqY+SIafFjwyDZOK5O/aiY8PRoSPPLNoyUjrY
+ zqyI/1k3c3xOTg/5mOSTU8uoPGJ5/00=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-GLThB7asMga9fF5fMuPFTg-1; Mon, 23 Mar 2020 17:15:15 -0400
+X-MC-Unique: GLThB7asMga9fF5fMuPFTg-1
+Received: by mail-wm1-f69.google.com with SMTP id m4so437214wmi.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 14:15:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=DC8AvxEzNplngpy9CnmfYZ+2jV5WDw9rMwFeaQnkgB0=;
+ b=EP3crWqAQKXx8FUikKCW/emtBMvEFzxC/kEmRjHm+S/J0GvOSIbp3AhxdEhuWkb3xM
+ XeCyKilb/Bu9QCUApdVrrF8k8HIjdbVmH9UE9mhbD9WTWpH1FeW9u1eg+xLKsRCgMCu5
+ U6m2icCnApO7iE5H0hnT5KEXeZkqgLVUfHy7E0iaB5YkNcDdn/+UOvie38Y9B1Gk4AD3
+ TulD20YEhxK8szSmzTncBr7FFyvgaqBWEN/r/YQK1AqCOqBt1cWvUHEJ+X+AfF0908eW
+ IVVBh6EWTKzXd0U4sMe3476b0xzL4mveKap+EtYNNAbRHW6OTiP4MCoRYF0K4b2VlP5/
+ 91Nw==
+X-Gm-Message-State: ANhLgQ0gfVODkisfj+kRvgcSxtUt8l7KwRSyiLU8EIwzlgMud2Ur519m
+ F5a+2g7zVXCTT6cd4ClwDn0uQkkaJB0rsPCnMGEcOQv/VmDVtaHGDDFehWYtIZeWrd0ZZV6ojVo
+ rPLJD2nvz5rg+ZEk=
+X-Received: by 2002:a5d:624f:: with SMTP id m15mr21578882wrv.56.1584998114436; 
+ Mon, 23 Mar 2020 14:15:14 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvj6ocWHkvYJUnrAJtCrEuf/EChbCJZzzpvia6Dum9XkjCe45SBbAHrLXix0dsiy235hO6/CA==
+X-Received: by 2002:a5d:624f:: with SMTP id m15mr21578857wrv.56.1584998114240; 
+ Mon, 23 Mar 2020 14:15:14 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id t81sm1135196wmb.15.2020.03.23.14.15.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Mar 2020 14:15:13 -0700 (PDT)
+Date: Mon, 23 Mar 2020 17:15:09 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH v1 06/22] hw/pci: introduce
+ pci_device_set/unset_iommu_context()
+Message-ID: <20200323211509.GP127076@xz-x1>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-7-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1584649004-8285-4-git-send-email-kwankhede@nvidia.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <1584880579-12178-7-git-send-email-yi.l.liu@intel.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 216.205.24.74
@@ -90,117 +102,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
- ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
- felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ qemu-devel@nongnu.org, eric.auger@redhat.com, alex.williamson@redhat.com,
+ pbonzini@redhat.com, hao.wu@intel.com, yi.y.sun@intel.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Kirti,
+On Sun, Mar 22, 2020 at 05:36:03AM -0700, Liu Yi L wrote:
 
-On 3/19/20 9:16 PM, Kirti Wankhede wrote:
-> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
-> All pages pinned by vendor driver through this API should be considered as
-> dirty during migration. When container consists of IOMMU capable device and
-> all pages are pinned and mapped, then all pages are marked dirty.
-> Added support to start/stop dirtied pages tracking and to get bitmap of all
-> dirtied pages for requested IO virtual address range.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 55 insertions(+)
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index d0021467af53..8138f94cac15 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -995,6 +995,12 @@ struct vfio_iommu_type1_dma_map {
->  
->  #define VFIO_IOMMU_MAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 13)
->  
-> +struct vfio_bitmap {
-> +	__u64        pgsize;	/* page size for bitmap */
-in bytes as well
-> +	__u64        size;	/* in bytes */
-> +	__u64 __user *data;	/* one bit per page */
-> +};
-> +
->  /**
->   * VFIO_IOMMU_UNMAP_DMA - _IOWR(VFIO_TYPE, VFIO_BASE + 14,
->   *							struct vfio_dma_unmap)
-> @@ -1021,6 +1027,55 @@ struct vfio_iommu_type1_dma_unmap {
->  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
->  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
->  
-> +/**
-> + * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
-> + *                                     struct vfio_iommu_type1_dirty_bitmap)
-> + * IOCTL is used for dirty pages tracking. Caller sets argsz, which is size of> + * struct vfio_iommu_type1_dirty_bitmap.
-nit: This may become outdated when adding new fields. argz use mode is
-documented at the beginning of the file.
+[...]
 
- Caller set flag depend on which
-> + * operation to perform, details as below:
-> + *
-> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_START set, indicates
-> + * migration is active and IOMMU module should track pages which are dirtied or
-> + * potentially dirtied by device.
-> + * Dirty pages are tracked until tracking is stopped by user application by
-> + * setting VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
-> + *
-> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP set, indicates
-> + * IOMMU should stop tracking dirtied pages.
-> + *
-> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
-> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
-> + * given IOVA range. User must provide data[] as the structure
-> + * vfio_iommu_type1_dirty_bitmap_get through which user provides IOVA range
-I think the fact the IOVA range must match the vfio dma_size must be
-documented.
- and
-> + * pgsize. This interface supports to get bitmap of smallest supported pgsize
-> + * only and can be modified in future to get bitmap of specified pgsize.
-> + * User must allocate memory for bitmap, zero the bitmap memory and set size
-> + * of allocated memory in bitmap_size field. One bit is used to represent one
-> + * page consecutively starting from iova offset. User should provide page size
-> + * in 'pgsize'. Bit set in bitmap indicates page at that offset from iova is
-> + * dirty. Caller must set argsz including size of structure
-> + * vfio_iommu_type1_dirty_bitmap_get.
-nit: ditto
-> + *
-> + * Only one of the flags _START, STOP and _GET may be specified at a time.
-> + *
-> + */
-> +struct vfio_iommu_type1_dirty_bitmap {
-> +	__u32        argsz;
-> +	__u32        flags;
-> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
-> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
-> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
-> +	__u8         data[];
-> +};
+> +AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
+> +{
+> +    PCIBus *bus;
+> +    uint8_t devfn;
 > +
-> +struct vfio_iommu_type1_dirty_bitmap_get {
-> +	__u64              iova;	/* IO virtual address */
-> +	__u64              size;	/* Size of iova range */
-> +	struct vfio_bitmap bitmap;
-> +};
-> +
-> +#define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
-> 
-Thanks
+> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
+> +    if (bus && bus->iommu_ops &&
+> +                     bus->iommu_ops->get_address_space) {
 
-Eric
+Nit: Since we're moving it around, maybe re-align it to left bracket?
+Same to below two places.
+
+With the indent fixed:
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+> +        return bus->iommu_ops->get_address_space(bus,
+> +                                bus->iommu_opaque, devfn);
+>      }
+>      return &address_space_memory;
+>  }
+
+--=20
+Peter Xu
 
 
