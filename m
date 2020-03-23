@@ -2,92 +2,90 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FE3C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D504AC4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 143F120753
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:08:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143F120753
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A61FE2073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 22:28:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61FE2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGVFX-0002Ms-7u
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 18:08:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41634)
+	id 1jGVYT-0007NC-QF
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 18:28:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <leonardo@linux.ibm.com>) id 1jGVEm-0001jU-O8
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:08:02 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jGVXs-0006su-Jj
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <leonardo@linux.ibm.com>) id 1jGVEl-0003LJ-HM
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:08:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53812)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jGVXr-0005k5-FN
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 18:27:44 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46108
+ helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <leonardo@linux.ibm.com>)
- id 1jGVEi-0003Je-Qf; Mon, 23 Mar 2020 18:07:57 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02NM45JI130738; Mon, 23 Mar 2020 18:07:51 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ywf3eb0n6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 23 Mar 2020 18:07:51 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02NM0jm9025446;
- Mon, 23 Mar 2020 22:07:50 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma03wdc.us.ibm.com with ESMTP id 2ywaw9knjs-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 23 Mar 2020 22:07:50 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02NM7nX260162494
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 23 Mar 2020 22:07:49 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1155FBE077;
- Mon, 23 Mar 2020 22:07:49 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B5998BE061;
- Mon, 23 Mar 2020 22:07:32 +0000 (GMT)
-Received: from LeoBras (unknown [9.85.202.245])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Mon, 23 Mar 2020 22:07:32 +0000 (GMT)
-Message-ID: <53408dd722b86c69e8b44ba1881bc2053f4ec36f.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] spapr/rtas: Add MinMem to ibm,get-system-parameter
- RTAS call
-From: Leonardo Bras <leonardo@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 23 Mar 2020 19:07:21 -0300
-In-Reply-To: <20200323032457.GE2213@umbus.fritz.box>
-References: <20200321003921.434620-1-leonardo@linux.ibm.com>
- <20200323032457.GE2213@umbus.fritz.box>
-Content-Type: multipart/signed; micalg="pgp-sha256";
- protocol="application/pgp-signature"; boundary="=-N/RsFC0ovajWWil0mjW1"
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jGVXp-0005hW-0U; Mon, 23 Mar 2020 18:27:41 -0400
+Received: from host86-130-37-163.range86-130.btcentralplus.com
+ ([86.130.37.163] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jGVYD-0000WZ-Hm; Mon, 23 Mar 2020 22:28:10 +0000
+To: John Snow <jsnow@redhat.com>
+References: <20200317232329.22362-1-jsnow@redhat.com>
+ <CAFEAcA_7p_B8U3W4gV2rT5JE3djE=gy_vs5vUcWVjqYiVan3dw@mail.gmail.com>
+ <35a905a9-e781-5727-1395-0155f368afbd@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <10077813-5077-79b3-3602-388f146951f0@ilande.co.uk>
+Date: Mon, 23 Mar 2020 22:27:30 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-23_09:2020-03-23,
- 2020-03-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 phishscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999 impostorscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003230107
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <35a905a9-e781-5727-1395-0155f368afbd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.130.37.163
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PULL 00/20] Ide patches
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,85 +97,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ricardom@linux.ibm.com, danielhb@linux.ibm.com, lagarcia@linux.ibm.com,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 19/03/2020 18:02, John Snow wrote:
 
---=-N/RsFC0ovajWWil0mjW1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> On 3/19/20 8:33 AM, Peter Maydell wrote:
+>> On Tue, 17 Mar 2020 at 23:23, John Snow <jsnow@redhat.com> wrote:
+>>>
+>>> The following changes since commit 373c7068dd610e97f0b551b5a6d0a27cd6da4506:
+>>>
+>>>   qemu.nsi: Install Sphinx documentation (2020-03-09 16:45:00 +0000)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
+>>>
+>>> for you to fetch changes up to 7d0776ca7f853d466b6174d96daa5c8afc43d1a4:
+>>>
+>>>   hw/ide: Remove unneeded inclusion of hw/ide.h (2020-03-17 12:22:36 -0400)
+>>>
+>>> ----------------------------------------------------------------
+>>> Pull request
+>>>
+>>> ----------------------------------------------------------------
+>>>
+>>
+>>
+>> Applied, thanks.
+>>
+>> Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+>> for any user-visible changes.
+>>
+>> -- PMM
+>>
+> 
+> Mark, I'm sorry to foist this on you, but would you mind updating the
+> changelog?
+> 
+> --js
 
-On Mon, 2020-03-23 at 14:24 +1100, David Gibson wrote:
-> On Fri, Mar 20, 2020 at 09:39:22PM -0300, Leonardo Bras wrote:
-> > Add support for MinMem SPLPAR Characteristic on emulated
-> > RTAS call ibm,get-system-parameter.
-> >=20
-> > MinMem represents Minimum Memory, that is described in LOPAPR as:
-> > The minimum amount of main store that is needed to power on the
-> > partition. Minimum memory is expressed in MB of storage.
->=20
-> Where exactly does LoPAPR say that?  The version I'm looking at
-> doesn't describe MinMem all that clearly, other than to say it must be
-> <=3D DesMem, which currently has the same value here.
-
-Please look for "Minimum Memory". It's on Table 237. SPLPAR Terms.=20
-
-> > This  provides a way for the OS to discern hotplugged LMBs and
-> > LMBs that have started with the VM, allowing it to better provide
-> > a way for memory hot-removal.
->=20
-> This seems a bit dubious.  Surely we should have this information from
-> the dynamic-reconfiguration-memory stuff already?  Trying to discern
-> this from purely a number seems very fragile - wouldn't that mean
-> making assumptions about how qemu / the host is laying out it's fixed
-> and dynamic memory which might not be justified?
-
-I agree.=20
-I previously sent a RFC proposing the usage of a new flag for this same
-reason [1], which I thank you for positive feedback.
-
-Even though I think using a flag is a better solution, I am also
-working in this other option (MinMem), that would use parameter already
-available on the platform, in case the new flag don't get approved.
-
-So far, using MinMem looks like a very complex solution on kernel side,
-and I think it's a poor solution.
-
-I decided to send this patch because it's a simple change to the
-platform support, that should cause no harm and could even be useful to
-other OSes.
+Done. I've added them under https://wiki.qemu.org/ChangeLog/5.0#Block_devices since
+there doesn't seem to be a dedicated IDE section.
 
 
-Best regards,
-Leonardo
+ATB,
 
-[1] http://patchwork.ozlabs.org/patch/1249931/
-
---=-N/RsFC0ovajWWil0mjW1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl55MxkACgkQlQYWtz9S
-ttSrvw//WnLOFIPdQzoEyE8ZA9wFZh1+QPpcFzRqSVo8SFD0IrPp5gHjulsVD0hK
-Am99Jsun5lIBrdHVbK8kp0lqrM7lMUk7Ja0MeS6vqlF3NgAYLcR+vFKlr2h4QMUW
-XQ++Xck57VweNipk1aPRZlgvWBVaqxAx2xbQzTETQ0NeH3mNXY/kUksjixwGfqNg
-7mbNvaMMMbviQ2V2KnF0bAemKbf2evBYsnUr6Oen9BhhrDY8FsreofK0BZvlK8z9
-90xQb1fkcNmtSsO4g/Rs8kGeoty926OCFUWhMr9bhwbYM4ka6P+7BSXjmgL1GIm1
-uUuYCAzPTCIQQuRMy5D2rIMVcO4NgOFZBWw7HFL3fhJ55wiEbnLVp+0E6PHl2wWK
-Clv6Z2TIM5n1EwpqajHaS7JDu3OyNCTD0Yz/z5Z7norvgn3cDoPa52kLVZ8nFkpy
-IqIjRmvvzS02ocx/HxPn+YolfjmCpr0Bj5q3t5eqCTp5MgOwUkhhN/tmh59pRF9d
-bbYfGQfaVeYwfL/Qp5tm7mMLJ1b9azmeBaRGKBp85qOVCLz99vt+6vkcYkLRPbQp
-afCU2/z3fv4vXb1EIjM8YEq6IiHhw8S3UVPObyT8uyHcREocnRNpEloUFKFMG30K
-XnRqH/q0OQsET7TQ7XB5oV3o/pa23zT+n2M3O27rFsXRN5aWeTs=
-=VmZi
------END PGP SIGNATURE-----
-
---=-N/RsFC0ovajWWil0mjW1--
-
+Mark.
 
