@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA1DC54FCF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFEE9C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:22:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC3CD20722
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:21:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77CAB2051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 16:22:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fNZHTZXn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3CD20722
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HGatRUUi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77CAB2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGPpN-0001Be-RG
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:21:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35413)
+	id 1jGPqa-0003PG-NH
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 12:22:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jGPjg-00011s-3y
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:34 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jGPji-00015e-M3
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jGPje-0002UH-UX
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:32 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42040)
+ (envelope-from <alex.bennee@linaro.org>) id 1jGPjh-0002VH-Ex
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:34 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:38880)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jGPje-0002Tt-An
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:30 -0400
-Received: by mail-wr1-x433.google.com with SMTP id h15so5618468wrx.9
- for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:15:30 -0700 (PDT)
+ id 1jGPjh-0002UO-7J
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 12:15:33 -0400
+Received: by mail-wr1-x431.google.com with SMTP id s1so17841407wrv.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 09:15:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uu/UhD38gJ6eW0AaVvw7CVG5JlfdO8i7Z1wsvr8hc94=;
- b=fNZHTZXnMy/JrT6BLwdIimu3nt9xL7jagfb8fftKM1ueESt6l8mdbzS4d48NE014r4
- mnw72RzUjBYgvzW8OmETDKPvwKSXAvzzs7pP/ZpenXwV+lKFDOWhESME4Vjn2m/klAYA
- L1sp1vPFmOrnnD2O85cNBXvFyKfQbvU1SQVQzvHI4DHtIExXHVPtLM+ET6gdnd0jkQmP
- pxJylmV6BQBbnv1UOB9YIpySpDU77vlFBZ7PmykrPxwjWtwMPIwKOs33lIP92nqNLu90
- Tenz+QiTSTR/vhY5TRQAzOwAJzK2cp5FjGwYc1qr4+yAui0eEBOdGa/7y8qxsf7qiywo
- s6bA==
+ bh=GWpaGgJBBKHI2u82TdJ05zR+bPFqQ/v/yXnHLn6lLAk=;
+ b=HGatRUUi424vxqWstzhFt4pEox7tInipvJjE0U5Bi2fobsaU2Rwasw9e3gLw9R7dgW
+ nPwTI2oqR0BGjeW1WYD3F2NIBKcNDFqje7i7f0PrmQiTITFUr6Kyp+ao2vJkGucKX0ZD
+ gKB71wLeCoEjP+1Cz0eHjU/tI1JT9fsG61urZQS3vyQuGX54QKQBOSTMy5wO8c0BjAG8
+ ESQjG+muQV9f7EXFgN3PUF+9J29FOrm2S6kK6OglDsQCDALLrl4wo129TomlOSYrMuve
+ fWg63fQyFlBT/77Olb0RmzhXuG7XUE/Ooqv5l7dUlv2huYVklv3+EN2BhAnLiHMAY3un
+ QXGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uu/UhD38gJ6eW0AaVvw7CVG5JlfdO8i7Z1wsvr8hc94=;
- b=ejrRfcSWeAWDOx4t2xAWUN0msACpZbzCeevH9lYRQCmMAaAvRTHLXfF2XhQDM0Oa1d
- 56/IPD7rAvvJHYRPIvtOQQlqfKaUD7QkpX7+cFP9sEhWgPo4EgcCLN8/o74a7Oejmakp
- ipSLKJeo67sU/hVNljXgbhtKEdKyViRrY4VuvSASCX6dY1U+j44fPBOHtTZHNN4+on7p
- MU0mZYo7Qhi07Q6y/mr5koxWLHwh9JNDC6yFpjoaNLJYm0vjjsB2cioSgciDgKOWRASG
- RLprVa7SnlyNP/xGJtj3aM/NdZnIlI8CTUBjv7eqzLa06M5JOwcBGfj4IFCqa8edfckc
- yQVw==
-X-Gm-Message-State: ANhLgQ3h6BIVpK7uG8m/bVKGcR+fivZhizW+ijFaaSbcOK4Y0FF8TFKh
- /RYmYVMa6WDs4eKGWFkqRE4+hw==
-X-Google-Smtp-Source: ADFU+vs/xfnEisHn846jdbqBQ4vnfDIPp2erOFAhZkr1eYuSItYtU6/vFFj7XaDmZ5STGqx53KLd1w==
-X-Received: by 2002:a5d:6045:: with SMTP id j5mr29286186wrt.401.1584980129312; 
- Mon, 23 Mar 2020 09:15:29 -0700 (PDT)
+ bh=GWpaGgJBBKHI2u82TdJ05zR+bPFqQ/v/yXnHLn6lLAk=;
+ b=ToXEmJ9qofooK1lNlLDunixELtOGD6jCililrRVi5kweWrGKeF4iatI6QEJupCY6zz
+ Nyd4ST2zAiHjuGJtYu3S40Dujp1FhXbPERIaXVuoiqlL/xAqn+YC+VPibZaCWwIq19Cd
+ xelUyIC+2jtnKoKlzkNQ4XwMPBbidlELMnUa21gclBode+JyhcjGRAZXhS1H1ZV5CSk0
+ HhrtzD3Y1kLVrS+iykG5c6rCozH0BzhNGgkdFrlpCG/8UJxpXOUrPu52ZmH1cKKrTbH7
+ TvqeiVLFLC+h3lQUKmc1XxMrs4Dd2Mkx4XG67rSCcIY+DewjY7DY79HMXsNLkEc6wxdr
+ rVhA==
+X-Gm-Message-State: ANhLgQ1aau78960WMoC4yi8kTBHTqBTZ4f+BYb8OEjr6ngiDu3NcFhdm
+ xFF4e8yeBHjayE5l+KAeUbbWVAQABos=
+X-Google-Smtp-Source: ADFU+vsWoc7N33ut8AjYWF9aXG2mJzsmQiKTRJIPnaVy2Z3cbIL4FSi25nAjxckJIUrL2GUHwt3Kmg==
+X-Received: by 2002:a5d:4e05:: with SMTP id p5mr31005646wrt.59.1584980131129; 
+ Mon, 23 Mar 2020 09:15:31 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q8sm25217708wrc.8.2020.03.23.09.15.20
+ by smtp.gmail.com with ESMTPSA id i67sm25000775wri.50.2020.03.23.09.15.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Mon, 23 Mar 2020 09:15:24 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 87FD11FF99;
+ by zen.linaroharston (Postfix) with ESMTP id 03C151FF93;
  Mon, 23 Mar 2020 16:15:16 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 10/11] tests/docker: Add libepoxy and libudev packages to
- the Fedora image
-Date: Mon, 23 Mar 2020 16:15:13 +0000
-Message-Id: <20200323161514.23952-11-alex.bennee@linaro.org>
+Subject: [PATCH  v1 07/11] tests/docker: Keep package list sorted
+Date: Mon, 23 Mar 2020 16:15:10 +0000
+Message-Id: <20200323161514.23952-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200323161514.23952-1-alex.bennee@linaro.org>
 References: <20200323161514.23952-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,8 +96,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <fam@euphon.net>,
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -106,36 +105,76 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Install optional dependencies of QEMU to get better coverage.
+Keep package list sorted, this eases rebase/cherry-pick.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: 3a6784813
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200322120104.21267-5-philmd@redhat.com>
+Message-Id: <20200322120104.21267-2-philmd@redhat.com>
 ---
- tests/docker/dockerfiles/fedora.docker | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/docker/dockerfiles/centos7.docker | 6 ++++--
+ tests/docker/dockerfiles/fedora.docker  | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
+index cdd72de7ebf..9a2a2e515d7 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -2,6 +2,8 @@ FROM centos:7
+ RUN yum install -y epel-release centos-release-xen-48
+ 
+ RUN yum -y update
++
++# Please keep this list sorted alphabetically
+ ENV PACKAGES \
+     bison \
+     bzip2 \
+@@ -19,6 +21,7 @@ ENV PACKAGES \
+     libepoxy-devel \
+     libfdt-devel \
+     librdmacm-devel \
++    libzstd-devel \
+     lzo-devel \
+     make \
+     mesa-libEGL-devel \
+@@ -33,7 +36,6 @@ ENV PACKAGES \
+     tar \
+     vte-devel \
+     xen-devel \
+-    zlib-devel \
+-    libzstd-devel
++    zlib-devel
+ RUN yum install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
 diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 174979c7af4..4bd2c953af8 100644
+index a6522228c02..019eb12dcb1 100644
 --- a/tests/docker/dockerfiles/fedora.docker
 +++ b/tests/docker/dockerfiles/fedora.docker
-@@ -29,6 +29,7 @@ ENV PACKAGES \
-     libblockdev-mpath-devel \
-     libcap-ng-devel \
-     libcurl-devel \
-+    libepoxy-devel \
-     libfdt-devel \
-     libiscsi-devel \
-     libjpeg-devel \
-@@ -38,6 +39,7 @@ ENV PACKAGES \
-     libseccomp-devel \
-     libssh-devel \
+@@ -1,4 +1,6 @@
+ FROM fedora:30
++
++# Please keep this list sorted alphabetically
+ ENV PACKAGES \
+     bc \
+     bison \
+@@ -38,6 +40,7 @@ ENV PACKAGES \
      libubsan \
-+    libudev-devel \
      libusbx-devel \
      libxml2-devel \
-     libzstd-devel \
++    libzstd-devel \
+     llvm \
+     lzo-devel \
+     make \
+@@ -92,8 +95,7 @@ ENV PACKAGES \
+     vte291-devel \
+     which \
+     xen-devel \
+-    zlib-devel \
+-    libzstd-devel
++    zlib-devel
+ ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
+ 
+ RUN dnf install -y $PACKAGES
 -- 
 2.20.1
 
