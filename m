@@ -2,59 +2,87 @@ Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 831C1C4332B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A7DC4332B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:26:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56FE52072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:12:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56FE52072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 55FFA2070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 13:26:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BF5YBBFA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55FFA2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGMsQ-000634-Hr
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:12:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56851)
+	id 1jGN6R-0001kv-HE
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 09:26:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jGMrq-0005Sa-7z
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:11:47 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jGN5d-00012f-Hl
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jGMro-0004DM-UI
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:11:46 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:55980)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jGMrm-0004C3-2p; Mon, 23 Mar 2020 09:11:42 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id A8AEB746381;
- Mon, 23 Mar 2020 14:11:38 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 847C97461AE; Mon, 23 Mar 2020 14:11:38 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 8245B745953;
- Mon, 23 Mar 2020 14:11:38 +0100 (CET)
-Date: Mon, 23 Mar 2020 14:11:38 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: Coverity CID 1421984
-In-Reply-To: <88618db3-cb48-12bd-6152-b642b25a0287@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003231359420.14974@zero.eik.bme.hu>
-References: <d9b7d8d8-1640-7d69-cd16-66e6d9cef3d1@redhat.com>
- <88618db3-cb48-12bd-6152-b642b25a0287@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <stefanha@gmail.com>) id 1jGN5c-00026D-FO
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:26:01 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:47063)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jGN5c-000264-91
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 09:26:00 -0400
+Received: by mail-wr1-x443.google.com with SMTP id j17so13651957wru.13
+ for <qemu-devel@nongnu.org>; Mon, 23 Mar 2020 06:26:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=+U3k//tRnKAvz6cyP6MqawOsw/SfHGOeBaKQbLPZeCg=;
+ b=BF5YBBFA/Wkqm60F4OQYBbkdImJCEE0IFiYqOYdVWvmOSJqL9wsiakgB9kaNR4Z1eb
+ yDS96W7yMpiS1AI62Bd9guEUZglaQGwtluqSiG9ioKGRxcbjdSIo6izcr3Gggi5xTYzl
+ shqW8Tj6u5UE5CpM1wCn++0PHr0Xf7J2X3x6H97sOcpi2QT6JXQXk+/ojEGGI/LSTuQR
+ 6Ug2lTLeD5zzmyJC1pFj4M7OdO/6g0v3xaek+cadfEp0jZCHuCGEvfM0rFcTyYm9dR5r
+ wfHRVFGH30U3QBt+eazwDdyjJGP+6H5HsPRGIM/TELl91evoE+WE4pmCrLrz4uMB+iv9
+ kV6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=+U3k//tRnKAvz6cyP6MqawOsw/SfHGOeBaKQbLPZeCg=;
+ b=HPk3U/uN8y7GV/DanuhPKNJHNd6LxAJbYnmCe6BTtPTRaTWAdobAEQtwiW2YoZ/6g4
+ 72xdVZw8k/tUOkpNkexXzFMSk83KR4UIe25f2OqP6xTtkcxhqJP2H351C6rrKfJ5tiMb
+ oq4X6Twn3MQv2DHrnLbQFFqfHLxsph1PN7AOohXg46LEP09gto0HSIC0WAei6T+P4itu
+ NLXSZ49oQgJvMMMw1Diju8AAgXC5vWbehZaGHfPNLGe21l4ee0WJECacz83ct5Q43yPW
+ kuQXKcvh4NqgEg+TrVtzEVAOd2L20SwiK2s/tto0QkEVFA6DGx2dA/H/X8BKTHsp71gi
+ AFFQ==
+X-Gm-Message-State: ANhLgQ1VCMRivwHuI7Jf6XCNWkJhsGQi4OJHV0JbK8NcNHw3NvM2YJth
+ aU7xtaiK3Wb3Uzjs8EiJugRpPSRCESA=
+X-Google-Smtp-Source: ADFU+vvOa3wPM7saT1L3TFBa/zJpZHh+HppyJwufkG8fF3VRSQHQrtPAI5rSqsI94pvb7//ZDwjKvw==
+X-Received: by 2002:a05:6000:114f:: with SMTP id
+ d15mr30886553wrx.143.1584969958578; 
+ Mon, 23 Mar 2020 06:25:58 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id t12sm7210107wrm.0.2020.03.23.06.25.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Mar 2020 06:25:57 -0700 (PDT)
+Date: Mon, 23 Mar 2020 13:25:56 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v4 0/2] Replaced locks with lock guard macros
+Message-ID: <20200323132556.GG261260@stefanha-x1.localdomain>
+References: <20200320123137.1937091-1-dnbrdsky@gmail.com>
+ <158471180295.15515.1369533827289907154@39012742ff91>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-389342008-1584969098=:14974"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="EDJsL2R9iCFAt7IV"
+Content-Disposition: inline
+In-Reply-To: <158471180295.15515.1369533827289907154@39012742ff91>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,76 +94,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu-block <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, John Snow <jsnow@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: dnbrdsky@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
---3866299591-389342008-1584969098=:14974
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+--EDJsL2R9iCFAt7IV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Mon, 23 Mar 2020, Philippe Mathieu-Daud=C3=A9 wrote:
-> Cc'ing qemu-ppc since this is restricted to the aCube Sam460ex board.
-> On 3/23/20 12:46 PM, Max Reitz wrote:
->> Hi,
->>=20
->> I was triaging new Coverity block layer reports today, and one that
->> seemed like a real bug was CID 1421984:
->>=20
->> It complains about a memleak in sii3112_pci_realize() in
->> hw/ide/sii3112.c, specifically about @irq being leaked (it=E2=80=99s a=
-llocated
->> by qemu_allocate_irqs(), but never put anywhere or freed).
->>=20
->> I=E2=80=99m not really well-versed in anything under hw/ide, so I was =
-wondering
->> whether you agree it=E2=80=99s a bug and whether you know the correct =
-way to fix
->> it.  (I assume it=E2=80=99s just a g_free(irqs), but maybe there=E2=80=
-=99s a more
->> specific way that=E2=80=99s applicable here.)
->
-> What does other devices is hold a reference in the DeviceState=20
-> (SiI3112PCIState) to make static analyzers happy.
+On Fri, Mar 20, 2020 at 06:43:23AM -0700, no-reply@patchew.org wrote:
+> /tmp/qemu-test/src/util/thread-pool.c:213:5: error: unused variable 'qemu_lockable_auto1' [-Werror,-Wunused-variable]
+>     QEMU_LOCK_GUARD(&pool->lock);
+>     ^
+> /tmp/qemu-test/src/include/qemu/lockable.h:173:29: note: expanded from macro 'QEMU_LOCK_GUARD'
 
-Other IDE devices such as ahci and cmd646 seem to free it at the end of=20
-the init function after calling ide_init2 with it. However it's not clear=
-=20
-to me how all this is supposed to work. Ahci does for example:
+Apparently gcc suppresses "unused variable" warnings with g_autoptr() so
+we didn't see this warning before.
 
-qemu_irq *irqs =3D qemu_allocate_irqs(ahci_irq_set, s, s->ports);
-for (i =3D 0; i < s->ports; i++) {
-     ide_init2(&ad->port, irqs[i]);
-}
-g_free(irqs);
+clang does report them so let's silence the warning manually.  Please
+add G_GNUC_UNUSED onto the g_autoptr variable definition in the
+QEMU_LOCK_GUARD() macro:
 
-So it allocates an array of s->ports irqs then only frees a single=20
-element? Also aren't these needed after ide_init2 to actually raise the=20
-irq or are these end up copied to the irq field of the BMDMAState sonehow=
-?=20
-Where will that be freed?
+  #define QEMU_LOCK_GUARD(x) \
+      g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ G_GNUC_UNUSED = \
+              qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE((x)))
 
-> Ideally we should free such memory in the DeviceUnrealize handler, but =
-we in=20
-> the reality we only care for hotunpluggable devices.
-> PCI devices usually are. There is a trick however, you can mark overwri=
-te the=20
-> DeviceClass::hotpluggable field in sii3112_pci_class_init:
->
->  dc->hotpluggable =3D false;
+The WITH_*_LOCK_GUARD() macros should not require changes because the
+variable is both read and written.
 
-If the above is correct then simply adding g_free(irq) after the loop at=20
-end of sii3112_pci_realize should be enough but I can't tell if that's=20
-correct. Setting hotpluggable to false does not seem to be a good fix.
+You can test locally by building with clang (llvm) instead of gcc:
 
-Regards,
-BALATON Zoltan
---3866299591-389342008-1584969098=:14974--
+  ./configure --cc=clang
+
+--EDJsL2R9iCFAt7IV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl54uOQACgkQnKSrs4Gr
+c8gVpgf9E/kkDZp9Dw8MEwUhKoVRpJV5y4QsZ8cb9aSjfzUEBcwLNf/IEUBUBXTX
+7epsRxB8Go3Q2TTyntWWNbyA2a9528k/SKAylLAlwIS/8jwLgYWJXu55atMhAUrJ
+TPZi/H4yG9kuT8jReqAuLK9iAEnqK4qzAxbEHbL2YcfsienOXX+aTaeaXrSPakNf
+9POMbdS6VikX0YZMVPw1tKmq1RqgW2rcWbzpqE3iz2MjEAtq2XvI3FOTJI0IEOn/
+pySWtFLmALBgTeji3WB9wAX7y+y8jxU2uFu1YrXb+GsDgKaUvjraT+jcTDIzF24L
+6iMxv1Sb4qjhQAT8Ar/PDJfrCFbPpg==
+=lsut
+-----END PGP SIGNATURE-----
+
+--EDJsL2R9iCFAt7IV--
 
