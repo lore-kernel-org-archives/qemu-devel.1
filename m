@@ -2,61 +2,60 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAFAC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D01C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:01:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C335E205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:01:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C335E205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C8A3205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:01:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8A3205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGk7L-0006i5-Ok
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:01:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53883)
+	id 1jGk7x-0007lI-Ns
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:01:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53307)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jGk6D-0005H1-Pq
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:00:10 -0400
+ (envelope-from <geert@linux-m68k.org>) id 1jGk3K-000060-Uh
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jGk6C-00026G-NM
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:00:09 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:28781)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>) id 1jGk6C-00020g-Ei
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:00:08 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 70635418B4;
- Tue, 24 Mar 2020 15:00:04 +0100 (CET)
-Date: Tue, 24 Mar 2020 15:00:02 +0100 (CET)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: John Snow <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
-Message-ID: <540921286.62.1585058402983@webmail.proxmox.com>
-In-Reply-To: <446da3ef-3141-4c77-cb30-352a16a4e9be@redhat.com>
-References: <2007060575.48.1585048408879@webmail.proxmox.com>
- <1512602350.59.1585056617632@webmail.proxmox.com>
- <1806708761.60.1585056799652@webmail.proxmox.com>
- <446da3ef-3141-4c77-cb30-352a16a4e9be@redhat.com>
-Subject: Re: backup transaction with io-thread core dumps
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev22
-X-Originating-Client: open-xchange-appsuite
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.186.127.180
+ (envelope-from <geert@linux-m68k.org>) id 1jGk3J-0006HO-Ah
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:10 -0400
+Received: from laurent.telenet-ops.be ([2a02:1800:110:4::f00:19]:56794)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
+ id 1jGk3J-0006Eu-45
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:09 -0400
+Received: from ramsan ([84.195.182.253]) by laurent.telenet-ops.be with bizsmtp
+ id JDwu2200E5USYZQ01Dwult; Tue, 24 Mar 2020 14:57:07 +0100
+Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1jGk34-0006Oe-He; Tue, 24 Mar 2020 14:56:54 +0100
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1jGk34-0001kY-Ft; Tue, 24 Mar 2020 14:56:54 +0100
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
+Subject: [PATCH v6 2/8] i2c: i801: Use GPIO_LOOKUP() helper macro
+Date: Tue, 24 Mar 2020 14:56:47 +0100
+Message-Id: <20200324135653.6676-2-geert+renesas@glider.be>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200324135653.6676-1-geert+renesas@glider.be>
+References: <20200324135328.5796-1-geert+renesas@glider.be>
+ <20200324135653.6676-1-geert+renesas@glider.be>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:1800:110:4::f00:19
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,25 +67,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Jean Delvare <jdelvare@suse.com>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ linux-doc@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
+ Rob Herring <robh+dt@kernel.org>, Alexander Graf <graf@amazon.com>,
+ linux-i2c@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Phil Reid <preid@electromag.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+i801_add_mux() fills in the GPIO lookup table by manually populating an
+array of gpiod_lookup structures.  Use the existing GPIO_LOOKUP() helper
+macro instead, to relax a dependency on the gpiod_lookup structure's
+member names.
 
-> What version of QEMU are you running? Sergio contributed a lot of AIO
-> context (and iothread) fixes this release; this looks (at a glance) to
-> be similar and related.
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Jean Delvare <jdelvare@suse.com>
+Cc: linux-i2c@vger.kernel.org
+---
+While this patch is a dependency for "[PATCH v6 4/8] gpiolib: Add
+support for GPIO lookup by line name", it can be applied independently.
+But an Acked-by would be nice, too.
 
-I test with latest code from git
+Cover letter and full series at
+https://lore.kernel.org/r/20200324135328.5796-1-geert+renesas@glider.be/
 
-commit 09a98dd988c715157c0b80af16fa5baa80101eed 
-Merge: f1e748d279 1583794b9b
-Author: Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue Mar 24 09:50:46 2020 +0000
+v6:
+  - New.
+---
+ drivers/i2c/busses/i2c-i801.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-    Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200324' into staging
-    
-    ppc patch queue for 2020-03-24
+diff --git a/drivers/i2c/busses/i2c-i801.c b/drivers/i2c/busses/i2c-i801.c
+index ca4f096fef749302..8e64a71bea684cc7 100644
+--- a/drivers/i2c/busses/i2c-i801.c
++++ b/drivers/i2c/busses/i2c-i801.c
+@@ -1444,9 +1444,9 @@ static int i801_add_mux(struct i801_priv *priv)
+ 		return -ENOMEM;
+ 	lookup->dev_id = "i2c-mux-gpio";
+ 	for (i = 0; i < mux_config->n_gpios; i++) {
+-		lookup->table[i].chip_label = mux_config->gpio_chip;
+-		lookup->table[i].chip_hwnum = mux_config->gpios[i];
+-		lookup->table[i].con_id = "mux";
++		lookup->table[i] = (struct gpiod_lookup)
++			GPIO_LOOKUP(mux_config->gpio_chip,
++				    mux_config->gpios[i], "mux", 0);
+ 	}
+ 	gpiod_add_lookup_table(lookup);
+ 	priv->lookup = lookup;
+-- 
+2.17.1
 
 
