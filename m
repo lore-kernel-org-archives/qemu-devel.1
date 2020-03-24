@@ -6,70 +6,65 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D71DC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 01:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F53AC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 01:41:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 694C020714
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 01:36:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694C020714
+	by mail.kernel.org (Postfix) with ESMTPS id 31D4E20722
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 01:41:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31D4E20722
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGYUJ-0006fH-G5
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 21:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37600)
+	id 1jGYZU-0008Sv-E5
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 21:41:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38346)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jGYTj-0006Fa-1e
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 21:35:40 -0400
+ (envelope-from <bounces@canonical.com>) id 1jGYYn-000847-5V
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 21:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jGYTh-0006iE-N8
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 21:35:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51832)
+ (envelope-from <bounces@canonical.com>) id 1jGYYm-00028P-1M
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 21:40:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52022)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jGYTh-0006gR-Hf
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 21:35:37 -0400
+ id 1jGYYl-00027c-SR
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 21:40:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jGYTf-00005U-Jo
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 01:35:35 +0000
+ id 1jGYYk-0000IK-P3
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 01:40:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8ECB32E807D
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 01:35:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id BB8F82E8075
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 01:40:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Mar 2020 01:27:58 -0000
-From: tstrike <1866870@bugs.launchpad.net>
+Date: Tue, 24 Mar 2020 01:32:16 -0000
+From: Hansni Bu <1868527@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Invalid; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=seabios; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h janitor paelzer
- tstrike34
-X-Launchpad-Bug-Reporter: tstrike (tstrike34)
-X-Launchpad-Bug-Modifier: tstrike (tstrike34)
-References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
-Message-Id: <158501327845.19673.4994855554532565035.malone@chaenomeles.canonical.com>
-Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
+X-Launchpad-Bug-Commenters: hansni rth
+X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
+X-Launchpad-Bug-Modifier: Hansni Bu (hansni)
+References: <158495248924.11669.14742891693687812596.malonedeb@soybean.canonical.com>
+Message-Id: <158501353630.11238.11266307220217966602.malone@soybean.canonical.com>
+Subject: [Bug 1868527] Re: alignment may overlap the TLB flags
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ace7979e62d49b53f43fd59ec041776cf25fc7fb
+X-Launchpad-Hash: c7c86160c1cb3781921fc2d571d562be60e61ceb
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,78 +77,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
+Reply-To: Bug 1868527 <1868527@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I can confirm that this bug has been fixed (zapped). Thank you all for
-your hard work and determination. A job well done indeed! As a former
-programmer I love you all's zeal for attacking this bug.
-
-As a side note, knowing what you all go through, I always look things
-up, walk through at least level 1 stuff and provide logfiles. I hope
-what little I did, help you all resolve this.
-
-Again my thanks, and I believe is this is where we say, "Please close
-the bug marked SOLVED".
+This is an inspection yet.
+For ARM SMMU simulation, TARGET_PAGE_BITS_MIN is 10. All low bits of the TL=
+B virtual address are used up by TLB flags and alignment flags. It's a litt=
+le crowded.
+/*
+ * ARMv7 and later CPUs have 4K pages minimum, but ARMv5 and v6
+ * have to support 1K tiny pages.
+ */
+# define TARGET_PAGE_BITS_VARY
+# define TARGET_PAGE_BITS_MIN  10
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1866870
+https://bugs.launchpad.net/bugs/1868527
 
 Title:
-  KVM Guest pauses after upgrade to Ubuntu 20.04
+  alignment may overlap the TLB flags
 
 Status in QEMU:
-  Invalid
-Status in qemu package in Ubuntu:
-  Invalid
-Status in seabios package in Ubuntu:
-  Fix Released
+  Incomplete
 
 Bug description:
-  Symptom:
-  Error unpausing domain: internal error: unable to execute QEMU command 'c=
-ont': Resetting the Virtual Machine is required
+  Hi,
+  In QEMU-4.2.0, or git-9b26a610936deaf436af9b7e39e4b7f0a35e4409, alignment=
+ may overlap the TLB flags. =
 
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
-e 66, in newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
- in resume
-      self._backend.resume()
-    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
-      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
-=3Dself)
-  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
-t': Resetting the Virtual Machine is required
+  For example, the alignment: MO_ALIGN_32,
+      MO_ALIGN_32 =3D 5 << MO_ASHIFT,
+  and the TLB flag: TLB_DISCARD_WRITE
+  #define TLB_DISCARD_WRITE   (1 << (TARGET_PAGE_BITS_MIN - 6))
 
-  =
+  then, in the function "get_alignment_bits", the assert may fail:
 
-  ---
+  #if defined(CONFIG_SOFTMMU)
+      /* The requested alignment cannot overlap the TLB flags.  */
+      tcg_debug_assert((TLB_FLAGS_MASK & ((1 << a) - 1)) =3D=3D 0);
+  #endif
 
-  As outlined here:
-  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
-
-  After upgrade, all KVM guests are in a default pause state. Even after
-  forcing them off via virsh, and restarting them the guests are paused.
-
-  These Guests are not nested.
-
-  A lot of diganostic information are outlined in the previous bug
-  report link provided. The solution mentioned in previous report had
-  been allegedly integrated into the downstream updates.
+  However, the alignment of MO_ALIGN_32 is not used for now, so the
+  assert cannot be triggered in current version. Anyway it seems like a
+  potential conflict.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1868527/+subscriptions
 
