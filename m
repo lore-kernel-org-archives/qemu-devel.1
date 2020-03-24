@@ -2,76 +2,88 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9741FC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AACDC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:30:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 666E42076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:30:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCCB1208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:30:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UMjlLs3d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 666E42076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnvckj4e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCCB1208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGnNX-0001IG-FV
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:30:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56773)
+	id 1jGnNh-0001dC-VA
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:30:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jGnLW-0006pI-M4
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:28:11 -0400
+ (envelope-from <flukshun@gmail.com>) id 1jGmoK-00064o-Ob
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jGnLV-0001oy-KS
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:28:10 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:54363)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGnLV-0001od-Go
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:28:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585070888;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Pzq0uCC0Zx30OcgNRelJ2/QIZziXegkzQygD1miRr34=;
- b=UMjlLs3dQPrUgC7hvdmC64TC/+0FRzQyIRoTE1BlV0pffaYcXM8VHAv1+vd8z/5PHGj06l
- tF2WIDCpgx0SSjNouuCOUfqofxItDDpnAaxYQt33txrQa9amWWWFcNalMJ96XkNoGQ62nZ
- mEbKgfn8YicHhNfaTNHZcmUzY3Pymcs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-7g4ylRZdMva_0n7spOW8Bw-1; Tue, 24 Mar 2020 13:28:06 -0400
-X-MC-Unique: 7g4ylRZdMva_0n7spOW8Bw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A4361005509;
- Tue, 24 Mar 2020 17:28:06 +0000 (UTC)
-Received: from localhost (ovpn-114-213.ams2.redhat.com [10.36.114.213])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 75A5A60C05;
- Tue, 24 Mar 2020 17:28:05 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH for-5.0 v2 2/3] iotests: Add poke_file_[bl]e functions
-Date: Tue, 24 Mar 2020 18:27:56 +0100
-Message-Id: <20200324172757.1173824-3-mreitz@redhat.com>
-In-Reply-To: <20200324172757.1173824-1-mreitz@redhat.com>
-References: <20200324172757.1173824-1-mreitz@redhat.com>
+ (envelope-from <flukshun@gmail.com>) id 1jGmoJ-0002eo-QA
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:53:52 -0400
+Received: from mail-yb1-xb33.google.com ([2607:f8b0:4864:20::b33]:35487)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1jGmoJ-0002eU-MI
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:53:51 -0400
+Received: by mail-yb1-xb33.google.com with SMTP id x63so9530376ybx.2
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 09:53:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=4ZGYIL2rqF2T6FtQL+8Y3D7X7iQJLL9+ey7r6yaKFq4=;
+ b=bnvckj4eijjAchZuVR2iwSPdNl+Na2EGXQ7USWzj1MlJsmWerWntSp4uTTN/bzMXo5
+ XcwWYMBur3xbprhRceR2Pz3U6hBDEfs222HgZhbOL9M4Jb+0JuF+5J+alGbYWOpjklqY
+ 5rQb/GK4UTibLS+udVVrttFvDgvLLUxABQyByN85W35rEy8uNU/KwlrE4OSleiZh7+e8
+ gm+pMO1KNsDTMGD8ukriztvalvXMMbgf9NCDFiOkM/d2rCd9eAdKe3yXVKcGS6KWEszD
+ VPyrwWw/91+CJ8RFQ0Mf1hTMkhJ6QD4n1PnA5BKwjqZHlX5yRgFM7zj5trRuseSQkov0
+ Y+2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=4ZGYIL2rqF2T6FtQL+8Y3D7X7iQJLL9+ey7r6yaKFq4=;
+ b=J+5NDuisF6fkw0P4C/0ZKxE8f8T6rriM7BhEDsJ/BSN49MNEGFOqEs6Rbj6lm+aXn6
+ sz1JvOH1zoOUd+wUJgfpKspsCuMuOFhlra3W3eDCgzjljEgsj5n9FcwYj0u7nCJt5Jbr
+ auz/k3/ZrQreCGaKZFqrP2O5GhQiREU/ITtYv7mRRpPVz4uq7Kg3kLWpkxQr0vFF/BZT
+ eysMx6s5jepC6dxITlVckHgd8YOV04JPvkdKEVcqivmSUDfMxlxNUllf5ZukXK2VGjCk
+ HJ3bq1W2mcmRd7zf2g8WeMdX14xoXJ0pL64M/u/4ZLhn7ZmV864ozp+I5na+apgTv8Ip
+ kBFg==
+X-Gm-Message-State: ANhLgQ2xUdQ6Wt7b45Jn9PVP02/JJZ0CjTT71vC4mJTOC9cDbqs03ZYM
+ jsgwN6CdowB2fcieW29pY2pkoVsI4Rg=
+X-Google-Smtp-Source: ADFU+vv3MsaBfr6KUtBVatPkxA9nAtP39hB0fboEoLwTU5jFqfSQrFElksaelS5yFKySqiIdqwIguQ==
+X-Received: by 2002:a05:6830:1d95:: with SMTP id
+ y21mr6324574oti.180.1585068461964; 
+ Tue, 24 Mar 2020 09:47:41 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id z22sm339615oog.45.2020.03.24.09.47.40
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 24 Mar 2020 09:47:40 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL for-5.0 1/5] qga: Installer: Wait for installation to finish
+Date: Tue, 24 Mar 2020 11:46:49 -0500
+Message-Id: <20200324164653.19449-2-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200324164653.19449-1-mdroth@linux.vnet.ibm.com>
+References: <20200324164653.19449-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b33
+X-Mailman-Approved-At: Tue, 24 Mar 2020 13:24:24 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,61 +95,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Sameeh Jubran <sjubran@redhat.com>, peter.maydell@linaro.org,
+ Basil Salman <basil@daynix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similarly to peek_file_[bl]e, we may want to write binary integers into
-a file.  Currently, this often means messing around with poke_file and
-raw binary strings.  I hope these functions make it a bit more
-comfortable.
+From: Basil Salman <basil@daynix.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Code-suggested-by: Eric Blake <eblake@redhat.com>
+Installation might fail if we don't wait for the provider
+unregisteration process to finish.
+
+Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+Signed-off-by: Basil Salman <basil@daynix.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/common.rc | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ qga/installer/qemu-ga.wxs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 4c246c0450..bf3b9fdea0 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -53,6 +53,30 @@ poke_file()
-     printf "$3" | dd "of=3D$1" bs=3D1 "seek=3D$2" conv=3Dnotrunc &>/dev/nu=
-ll
- }
-=20
-+# poke_file_le $img_filename $offset $byte_width $value
-+# Example: poke_file_le "$TEST_IMG" 512 2 65534
-+poke_file_le()
-+{
-+    local img=3D$1 ofs=3D$2 len=3D$3 val=3D$4 str=3D''
-+
-+    while ((len--)); do
-+        str+=3D$(printf '\\x%02x' $((val & 0xff)))
-+        val=3D$((val >> 8))
-+    done
-+
-+    poke_file "$img" "$ofs" "$str"
-+}
-+
-+# poke_file_be $img_filename $offset $byte_width $value
-+# Example: poke_file_be "$TEST_IMG" 512 2 65279
-+poke_file_be()
-+{
-+    local img=3D$1 ofs=3D$2 len=3D$3 val=3D$4
-+    local str=3D$(printf "%0$((len * 2))x\n" $val | sed 's/\(..\)/\\x\1/g'=
-)
-+
-+    poke_file "$img" "$ofs" "$str"
-+}
-+
- # peek_file_le 'test.img' 512 2 =3D> 65534
- peek_file_le()
- {
---=20
-2.25.1
+diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
+index 64bf90bd85..f6781752e6 100644
+--- a/qga/installer/qemu-ga.wxs
++++ b/qga/installer/qemu-ga.wxs
+@@ -81,7 +81,7 @@
+               Arguments="-d --retry-path"
+               >
+             </ServiceInstall>
+-            <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="QEMU-GA" Wait="no" />
++            <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="QEMU-GA" Wait="yes" />
+           </Component>
+           <?ifdef var.InstallVss?>
+           <Component Id="qga_vss_dll" Guid="{CB19C453-FABB-4BB1-ABAB-6B74F687BFBB}">
+-- 
+2.17.1
 
 
