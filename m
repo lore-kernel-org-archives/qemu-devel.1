@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F563C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 23:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D2EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 23:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3367920409
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 23:26:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 304B920409
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 23:26:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1uVIVcX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3367920409
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MuOpLZqF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 304B920409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGswK-0000BF-BO
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 19:26:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51623)
+	id 1jGswa-0000XI-Bg
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 19:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jGssL-0008Di-WB
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 19:22:27 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jGsrz-0007OL-Fa
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 19:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jGssK-00024y-Uj
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 19:22:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39976)
+ (envelope-from <jsnow@redhat.com>) id 1jGsry-0001um-Ez
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 19:22:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35141)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jGssK-00024j-Rj
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 19:22:24 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jGsry-0001uN-BB
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 19:22:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585092144;
+ s=mimecast20190719; t=1585092122;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Xv6o6f8b1Q4FefHhXsxFTjQdb4skVJt1N5hqGDVXzJE=;
- b=e1uVIVcXAr8Hf43bw93iUakph4DHFTwNS9rhEVWir2fVeWDQg5WQJs5eDfvf8mx2TK9xKT
- Eg6ZSSahYcoJ0m5TBsSe+tdyLmgjbLQVTUcoCghfeiceB+H0eaSdbEinX6pVFZTLxdNWua
- oZzWlh1nc9Cy9OCQTPOU5iQHtKVqYtE=
+ bh=6th2KXUCkzQob2JQhRnRr1jEfvNjxfK+wSIvI61wEd4=;
+ b=MuOpLZqF7ZNMj8S93CtLeIsZbJ4HRV2El02Bdm3iWH4hIRnYkvtecJ4CkwUd3q6/aH2+ju
+ 3DG9pLh7TqmzV9KooQHBPz50AwPaWIEW4qUr4GV0Bd7OU/53H1HhbO5dxYACKclRJ8Ng9X
+ MjrSEk5uY+ATrqfN7kRXLAzNAQUJ69Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-TgjPqOwgP3OnvCK052rhtQ-1; Tue, 24 Mar 2020 19:22:21 -0400
-X-MC-Unique: TgjPqOwgP3OnvCK052rhtQ-1
+ us-mta-194-zMaBxFDnNVyawznrXGs11w-1; Tue, 24 Mar 2020 19:21:58 -0400
+X-MC-Unique: zMaBxFDnNVyawznrXGs11w-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C00A8C799B;
- Tue, 24 Mar 2020 23:22:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD832801F76;
+ Tue, 24 Mar 2020 23:21:48 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 98C605DA7C;
- Tue, 24 Mar 2020 23:22:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F1E205D9C5;
+ Tue, 24 Mar 2020 23:21:40 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 12/14] iotest 258: use script_main
-Date: Tue, 24 Mar 2020 19:21:01 -0400
-Message-Id: <20200324232103.4195-13-jsnow@redhat.com>
+Subject: [PATCH v9 05/14] iotests: add pylintrc file
+Date: Tue, 24 Mar 2020 19:20:54 -0400
+Message-Id: <20200324232103.4195-6-jsnow@redhat.com>
 In-Reply-To: <20200324232103.4195-1-jsnow@redhat.com>
 References: <20200324232103.4195-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,42 +90,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since this one is nicely factored to use a single entry point,
-use script_main to run the tests.
+This allows others to get repeatable results with pylint. If you run
+`pylint iotests.py`, you should see a 100% pass.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/258 | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/pylintrc | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 tests/qemu-iotests/pylintrc
 
-diff --git a/tests/qemu-iotests/258 b/tests/qemu-iotests/258
-index a65151dda6..e305a1502f 100755
---- a/tests/qemu-iotests/258
-+++ b/tests/qemu-iotests/258
-@@ -23,12 +23,6 @@ import iotests
- from iotests import log, qemu_img, qemu_io_silent, \
-         filter_qmp_testfiles, filter_qmp_imgfmt
-=20
--# Need backing file and change-backing-file support
--iotests.script_initialize(
--    supported_fmts=3D['qcow2', 'qed'],
--    supported_platforms=3D['linux'],
--)
--
- # Returns a node for blockdev-add
- def node(node_name, path, backing=3DNone, fmt=3DNone, throttle=3DNone):
-     if fmt is None:
-@@ -161,4 +155,7 @@ def main():
-     test_concurrent_finish(False)
-=20
- if __name__ =3D=3D '__main__':
--    main()
-+    # Need backing file and change-backing-file support
-+    iotests.script_main(main,
-+                        supported_fmts=3D['qcow2', 'qed'],
-+                        supported_platforms=3D['linux'])
+diff --git a/tests/qemu-iotests/pylintrc b/tests/qemu-iotests/pylintrc
+new file mode 100644
+index 0000000000..8720b6a0de
+--- /dev/null
++++ b/tests/qemu-iotests/pylintrc
+@@ -0,0 +1,22 @@
++[MESSAGES CONTROL]
++
++# Disable the message, report, category or checker with the given id(s). Y=
+ou
++# can either give multiple identifiers separated by comma (,) or put this
++# option multiple times (only on the command line, not in the configuratio=
+n
++# file where it should appear only once). You can also use "--disable=3Dal=
+l" to
++# disable everything first and then reenable specific checks. For example,=
+ if
++# you want to run only the similarities checker, you can use "--disable=3D=
+all
++# --enable=3Dsimilarities". If you want to run only the classes checker, b=
+ut have
++# no Warning level messages displayed, use "--disable=3Dall --enable=3Dcla=
+sses
++# --disable=3DW".
++disable=3Dinvalid-name,
++        no-else-return,
++        too-many-lines,
++        too-few-public-methods,
++        too-many-arguments,
++        too-many-locals,
++        too-many-branches,
++        too-many-public-methods,
++        # These are temporary, and should be removed:
++        missing-docstring,
++        line-too-long,
 --=20
 2.21.1
 
