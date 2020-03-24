@@ -2,79 +2,80 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBD7C41621
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82487C4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:25:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64FD2208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AAE9208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:25:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IvJMcW1E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64FD2208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wBg4Lzin"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AAE9208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGfnh-0007jX-N4
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 05:24:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44621)
+	id 1jGfoM-0008PK-FJ
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 05:25:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jGfms-0006X4-Oa
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:23:55 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGfnL-0007PR-Kx
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:24:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jGfmr-00012v-HV
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:23:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24503)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jGfmr-00012l-BM
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:23:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585041832;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=rxSCaZCXJ96hzA7wzkiPyP7I+uQlkEYIo0ZxkJvFYKs=;
- b=IvJMcW1EmcrY0187zW4YKDEYznHdQOQT/sL5OVrdffgc3quAw+I7+18SQ2c66zqCS60gQQ
- nKOsqNz1KWxWV3JALP8y25yY+PwsCqX41SwYt1Rcr4/Maoo7vnYovU8ml0Pesy3qC9piPi
- VuR69R5cEhNtlWohIqwr18FZeqeikvo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-lpHPdBoCMjeuvmAaPQvy0g-1; Tue, 24 Mar 2020 05:23:51 -0400
-X-MC-Unique: lpHPdBoCMjeuvmAaPQvy0g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5623D1B2C980;
- Tue, 24 Mar 2020 09:23:48 +0000 (UTC)
-Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 953BB5DA66;
- Tue, 24 Mar 2020 09:23:37 +0000 (UTC)
-Date: Tue, 24 Mar 2020 09:23:31 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v4 0/2] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200324092331.GA2645@work-vm>
-References: <20190531004438.24528-1-yan.y.zhao@intel.com>
- <20190603132932.1b5dc7fe@x1.home>
- <20190604003422.GA30229@joy-OptiPlex-7040>
- <20200323152959.1c39e9a7@w520.home>
- <20200324035316.GE5456@joy-OptiPlex-7040>
+ (envelope-from <peter.maydell@linaro.org>) id 1jGfnK-0001Dh-5i
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:24:23 -0400
+Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:39423)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGfnK-0001D5-01
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:24:22 -0400
+Received: by mail-oi1-x229.google.com with SMTP id d63so17806114oig.6
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 02:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=P+FTYtYCc0v//9HpuIDWmTomo5tHnV/rR+WSEamstoo=;
+ b=wBg4LzinFeZfmLerO7pWIIbp9XWYmERKRxJ4m3LmrKpQgaMjMytCqVyngeRBwPrZXS
+ /8WJTwty05swnER3wsuvcmHfB5Om+ZseNM0raade55a1jYXvpWPeM8HVjvGtNM47ledK
+ eDgiuWgklCLVOYmL+IS4EIW3ac1AdVjGTWYLovwjuetbPtC9b/er8eyxzOdWAOw9KIYk
+ hgVKNlHiuLl4QcAmurcIIJeFPVTtOsomxvIP9ZhB9ell3U1QxahLi+r4WkSRFGKxIBTe
+ k7E3Jpe8Ky9ApAN8DQV33ITob30uSKtnnbrU0TNLExH/AEhI6pK/eQ0yjG1GgLOutDQu
+ vJJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=P+FTYtYCc0v//9HpuIDWmTomo5tHnV/rR+WSEamstoo=;
+ b=bzgkOualjwT96PesmWiJuQ40w9wItgwhv/VUtRH6PM6npD36+Wnib2QYOjbt/ZQgYs
+ JeeJOB53F8x3Go1NWLusI+9tS0LO3PfmuWeLoyoHc3Lvmqn14MXz8gBFy33UCyHFpci1
+ z525XhHiHgDfk4DCsdctPQcxtRQF4gyAFqZm73NugIXEFPdJL24ILB7dG8akoZ7kspLM
+ /YVyb3OS8O+PpJgFUinnHQo2hzRr8RKVhlZ3CJ8SljxjbqeNksSJ9Mew/xECV6hEu5q2
+ K7+8qm3Ik4I7ftXRWpP5sC4VpX/7H71uL9iMu6iD94Njoa8m5adskF5OUKcVmloQGia8
+ 3IvQ==
+X-Gm-Message-State: ANhLgQ12rq7rkgDimTKqIV7GpBJkk+dmlCYIG/0z5cRNrAkPoT5wMZC7
+ zQwMsai8XHPC1Uxjtpekmdc2tDN8h10v8dWDrDwZPw==
+X-Google-Smtp-Source: ADFU+vuuuJrZq3grNap1obDAokaMnz4hjL2WubsN7kiZvngg1EfoSylIlUkKr42ElZRSvMS4xpCxEnYsmuTs+Hc743w=
+X-Received: by 2002:a05:6808:64c:: with SMTP id
+ z12mr2593317oih.146.1585041860763; 
+ Tue, 24 Mar 2020 02:24:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200324035316.GE5456@joy-OptiPlex-7040>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <CAGT9xrDKJQW6HV6OWDDck=H0bGzk=7ZTVn6tTfNnv=tH0sr1nA@mail.gmail.com>
+In-Reply-To: <CAGT9xrDKJQW6HV6OWDDck=H0bGzk=7ZTVn6tTfNnv=tH0sr1nA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Mar 2020 09:24:09 +0000
+Message-ID: <CAFEAcA-sY_H5s6j4ZEZ+SMvQgyENF+w+v5ajiJOhHDrn_zfjrA@mail.gmail.com>
+Subject: Re: Potential missing checks
+To: Mansour Ahmadi <ManSoSec@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,98 +87,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "Yang, Ziye" <ziye.yang@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Tian, Kevin" <kevin.tian@intel.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "dinechin@redhat.com" <dinechin@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- "Liu, Changpeng" <changpeng.liu@intel.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
- Shaopeng" <shaopeng.he@intel.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> On Tue, Mar 24, 2020 at 05:29:59AM +0800, Alex Williamson wrote:
-> > On Mon, 3 Jun 2019 20:34:22 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > 
-> > > On Tue, Jun 04, 2019 at 03:29:32AM +0800, Alex Williamson wrote:
-> > > > On Thu, 30 May 2019 20:44:38 -0400
-> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > >   
-> > > > > This patchset introduces a migration_version attribute under sysfs of VFIO
-> > > > > Mediated devices.
-> > > > > 
-> > > > > This migration_version attribute is used to check migration compatibility
-> > > > > between two mdev devices of the same mdev type.
-> > > > > 
-> > > > > Patch 1 defines migration_version attribute in
-> > > > > Documentation/vfio-mediated-device.txt
-> > > > > 
-> > > > > Patch 2 uses GVT as an example to show how to expose migration_version
-> > > > > attribute and check migration compatibility in vendor driver.  
-> > > > 
-> > > > Thanks for iterating through this, it looks like we've settled on
-> > > > something reasonable, but now what?  This is one piece of the puzzle to
-> > > > supporting mdev migration, but I don't think it makes sense to commit
-> > > > this upstream on its own without also defining the remainder of how we
-> > > > actually do migration, preferably with more than one working
-> > > > implementation and at least prototyped, if not final, QEMU support.  I
-> > > > hope that was the intent, and maybe it's now time to look at the next
-> > > > piece of the puzzle.  Thanks,
-> > > > 
-> > > > Alex  
-> > > 
-> > > Got it. 
-> > > Also thank you and all for discussing and guiding all along:)
-> > > We'll move to the next episode now.
-> > 
-> > Hi Yan,
-> > 
-> > As we're hopefully moving towards a migration API, would it make sense
-> > to refresh this series at the same time?  I think we're still expecting
-> > a vendor driver implementing Kirti's migration API to also implement
-> > this sysfs interface for compatibility verification.  Thanks,
-> >
-> Hi Alex
-> Got it!
-> Thanks for reminding of this. And as now we have vfio-pci implementing
-> vendor ops to allow live migration of pass-through devices, is it
-> necessary to implement similar sysfs node for those devices?
-> or do you think just PCI IDs of those devices are enough for libvirt to
-> know device compatibility ?
+On Mon, 23 Mar 2020 at 22:04, Mansour Ahmadi <ManSoSec@gmail.com> wrote:
+>
+> Hi QEMU developers,
+>
+> I noticed the following two potential missing checks by static analysis and detecting inconsistencies on the source code of QEMU. here is the result:
 
-Wasn't the problem that we'd have to know how to check for things like:
-  a) Whether different firmware versions in the device were actually
-compatible
-  b) Whether minor hardware differences were compatible - e.g. some
-hardware might let you migrate to the next version of hardware up.
+Hi. Can you provide more details of your analysis, please? "Maybe
+there's an issue
+at this line" is not terribly helpful, especially if one has to follow
+a bunch of URLs
+to even find out which code is being discussed. All static analysers are prone
+to false positives, and so the value is in analysing the possible issues, not
+in simply dumping raw output with no details onto the mailing list.
 
-Dave
+> 1)
+> Missing check on offset:
+> https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/disas/arm.c#L2728-L2733
+>
+> While it is checked here:
+> https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/disas/arm.c#L1748-L1752
 
-> Thanks
-> Yan
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+What in particular do you think should be being checked that is not?
 
+> 2)
+> Missing check on bmds->dirty_bitmap:
+> https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/migration/block.c#L377-L378
+>
+> While it is checked here:
+> https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df76/migration/block.c#L363-L365
+
+This one looks correct to me -- the second case is the error handling
+path for "failure halfway through creating the list of dirty bitmaps",
+and so it must handle "this one wasn't created yet". The first
+case will only run on data structures where set_dirty_tracking()
+succeeded, and so we know that there can't be any NULL pointers.
+Why do you think it is incorrect?
+
+thanks
+-- PMM
 
