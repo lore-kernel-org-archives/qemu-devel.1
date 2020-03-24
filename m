@@ -2,81 +2,156 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E32C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62768C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D715206F6
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:57:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3029B206F6
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:58:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMhCKgKa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D715206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PBt5nMnU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3029B206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGmsI-0007U1-5Q
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 12:57:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52559)
+	id 1jGmsc-0007yM-BK
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 12:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52595)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGmrN-0006fG-Al
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:57:02 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jGmrd-0006vd-UK
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:57:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGmrK-0004CP-5p
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:57:01 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41109)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jGmrJ-0004Bu-VI
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:56:58 -0400
-Received: by mail-wr1-x442.google.com with SMTP id h9so22399382wrc.8
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 09:56:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=juE1iX6pm63a8Xwsl0yYhG6KRK/o7uYwSBa2P/Ngj24=;
- b=hMhCKgKaj0n0mKn6OfTNd2+wywpH9CUsNZjPcdbAjDEl8rRNZ7IB8PMoAvyX36m3oM
- FJteGuQj0a+jkvxHQQ6xDoTwG1eaEtg1K7De/MxHetIce19fGh/hHzaqt4mVr4TGRMi7
- 7/X12+tduaTV+CJSD8if+z8+kR47s0kVlm9xku8gI/+78rEa4MIFZaL1QqTY+oV/pIqI
- yOWUpATBNpqAjqQyQLjrw1z4ASwpb5yEpDsg/ZFea87iiUTHzzMrGOVnQBaSi1/6nooE
- /kfVuAk9By1oDkL2jVEFkZwzQ2NHAG8AyNchtRFJZo4mzKG8W3oQHu43E0+DQs+CVQYu
- FWsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=juE1iX6pm63a8Xwsl0yYhG6KRK/o7uYwSBa2P/Ngj24=;
- b=rnbO7O1+uTP7x6zgjgCkIUtMyGLKO/I0DK4MN6Y0IwKS5t0SzlE8WiL9lTnZKIgFJ4
- WiDnjdSXW4vwmQ4pXDL/uxABLF1P9FeRL8curd710uKN+B2AFbkF9mcQomkQN38ZQTwz
- Tr/BCTSvNf5DqZUpLOLu3hbti6SUg3FbbZm7bqs/xLSKOsis9AjGMwQ/eplewoX86FM0
- Ndmlh713MCPY1SlwjTq0sQrQlDIQUaGo64SovOyQNDj5jYJb+3OelGPDrRddlyoTxACh
- 6DJja7SwC5RmHzLRdKzns3KtgHutlPw7pRz5UIN0VeahtH/uN9ojoImpkKcc+YSJUtyc
- v+tQ==
-X-Gm-Message-State: ANhLgQ2xnx4gO3BL2cPT6qlFXopd8QyFEXC0Fu1PttPHcDWgfE7HBk+p
- hbQ/oHUaJgYVmrmiQAPzCnKzydJdzKUruIN0Ar0=
-X-Google-Smtp-Source: ADFU+vv26nnrWUx9FgTl1ILdAKCIaObBDbR88fn/QB2VY4I1R6sRHWI46wpI+n7wcYKNSVaHgajvkY1VkNHCMC81WuU=
-X-Received: by 2002:adf:f24c:: with SMTP id b12mr25244745wrp.162.1585069016045; 
- Tue, 24 Mar 2020 09:56:56 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1jGmrb-0004HP-JW
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:57:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27116)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jGmrb-0004HC-Ax
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:57:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585069034;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=uaKPK8fw85scEWAHRLe5GeUFj8TRR/X6oFqhvL0wJrs=;
+ b=PBt5nMnU/hYoceFODnjC1nsv0HuOe0MqHmIrxQdRgy33TS8sJS/+kyUOakjkslqVVwkT81
+ Z3tdShDCprdasW/qyTubwUODo0vqrzHugbE7YnmDk77i1GrcexHMm+VEhX7LKuC9D9mIcs
+ ERc/mpVyafR6xYTEHAO5wqBINJA+RUE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-OETjnqbRPoqSk36h-SQg7g-1; Tue, 24 Mar 2020 12:57:13 -0400
+X-MC-Unique: OETjnqbRPoqSk36h-SQg7g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06B061137850;
+ Tue, 24 Mar 2020 16:57:12 +0000 (UTC)
+Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A72A94B24;
+ Tue, 24 Mar 2020 16:57:09 +0000 (UTC)
+Subject: Re: [PATCH v8 06/11] iotests: drop Python 3.4 compatibility code
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20200317004105.27059-1-jsnow@redhat.com>
+ <20200317004105.27059-7-jsnow@redhat.com>
+ <688928bc-a5d5-ada4-d7ae-78551274eec1@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <fc5458c9-480e-a887-0e2e-e29d087269ee@redhat.com>
+Date: Tue, 24 Mar 2020 12:57:09 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
-In-Reply-To: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 24 Mar 2020 18:56:41 +0200
-Message-ID: <CAHiYmc7MN8pUg7FJ=wcn1h0pr2A05nv4SQaOZmL47NCnNzUJRA@mail.gmail.com>
-Subject: Re: [PATCH for-5.0,
- v1] target/mips: Fix loongson multimedia condition instructions
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: multipart/alternative; boundary="000000000000a55cc005a19ca323"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <688928bc-a5d5-ada4-d7ae-78551274eec1@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,233 +163,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.rikalo@rt-rk.com,
- richard.henderson@linaro.org, QEMU Developers <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ philmd@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a55cc005a19ca323
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-14:23 Uto, 24.03.2020. Jiaxun Yang <jiaxun.yang@flygoat.com> =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Loongson multimedia condition instructions were previously implemented as
-> write 0 to rd due to lack of documentation. So I just confirmed with
-Loongson
-> about their encoding and implemented them correctly.
->
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> Acked-by: Huacai Chen <chenhc@lemote.com>
-> ---
-> v1: Use deposit opreations according to Richard's suggestion.
-> ---
 
-Thanks, Jiaxun!
+On 3/24/20 10:54 AM, Max Reitz wrote:
+> On 17.03.20 01:41, John Snow wrote:
+>> We no longer need to accommodate 3.4, drop this code.
+>=20
+> Pre-3.4, actually.
+>=20
+>> (Also, the line is over 79 characters, so drop it.)
+>>
+>> Touch up the docstring a little bit while we're here.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/iotests.py | 14 +++++++-------
+>>  1 file changed, 7 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.=
+py
+>> index 7cd74e7cb1..3d90fb157d 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -22,6 +22,7 @@
+>>  import unittest
+>>  import sys
+>>  import struct
+>> +from typing import Optional
+>>  import json
+>>  import signal
+>>  import logging
+>> @@ -350,18 +351,17 @@ def _filter(_key, value):
+>>          return value
+>>      return filter_qmp(qmsg, _filter)
+>> =20
+>> -def log(msg, filters=3D(), indent=3DNone):
+>> -    '''Logs either a string message or a JSON serializable message (lik=
+e QMP).
+>> -    If indent is provided, JSON serializable messages are pretty-printe=
+d.'''
+>> +def log(msg, filters=3D(), indent: Optional[int] =3D None) -> None:
+>> +    """
+>> +    Logs either a string message or a JSON serializable message (like Q=
+MP).
+>> +    If indent is provided, JSON serializable messages are pretty-printe=
+d.
+>> +    """
+>=20
+> I feel like I should complain about this unrelated (I think?) change,
+> but I won=E2=80=99t.
+>=20
 
-But, your numeration of patches is wrong. The first version of the patch
-should be sent with prefix [PATCH]
-and the second (this) version of the patch with prefix [PATCH v2]. This is
-the second time you make the same mistake. Please make sure that you have
-the correct numeration in future. But, anyhow, thanks for this version.
+It just seemed like so little to have in its own little patch, and I
+wasn't prepared to fix the docstrings in the whole file ...
 
-Yours,
-Aleksandar
+... It will be a future patch that tidies up this whole file and drops
+the missing-docstring ignore from pylintrc.
 
->  target/mips/translate.c | 35 +++++++++++++++++++++++++++++++----
->  1 file changed, 31 insertions(+), 4 deletions(-)
->
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index d745bd2803..25b595a17d 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -5529,6 +5529,7 @@ static void gen_loongson_multimedia(DisasContext
-*ctx, int rd, int rs, int rt)
->  {
->      uint32_t opc, shift_max;
->      TCGv_i64 t0, t1;
-> +    TCGCond cond;
->
->      opc =3D MASK_LMI(ctx->opcode);
->      switch (opc) {
-> @@ -5862,14 +5863,39 @@ static void gen_loongson_multimedia(DisasContext
-*ctx, int rd, int rs, int rt)
->
->      case OPC_SEQU_CP2:
->      case OPC_SEQ_CP2:
-> +        cond =3D TCG_COND_EQ;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLTU_CP2:
-> +        cond =3D TCG_COND_LTU;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLT_CP2:
-> +        cond =3D TCG_COND_LT;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLEU_CP2:
-> +        cond =3D TCG_COND_LEU;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLE_CP2:
-> -        /*
-> -         * ??? Document is unclear: Set FCC[CC].  Does that mean the
-> -         * FD field is the CC field?
-> -         */
-> +        cond =3D TCG_COND_LE;
-> +    do_cc_cond:
-> +        {
-> +            int cc =3D (ctx->opcode >> 8) & 0x7;
-> +            TCGv_i64 t64 =3D tcg_temp_new_i64();
-> +            TCGv_i32 t32 =3D tcg_temp_new_i32();
-> +
-> +            tcg_gen_setcond_i64(cond, t64, t0, t1);
-> +            tcg_gen_extrl_i64_i32(t32, t64);
-> +            tcg_gen_deposit_i32(fpu_fcr31, fpu_fcr31, t32,
-> +                                get_fp_bit(cc), 1);
-> +
-> +            tcg_temp_free_i32(t32);
-> +            tcg_temp_free_i64(t64);
-> +        }
-> +        goto no_rd;
-> +        break;
->      default:
->          MIPS_INVAL("loongson_cp2");
->          generate_exception_end(ctx, EXCP_RI);
-> @@ -5878,6 +5904,7 @@ static void gen_loongson_multimedia(DisasContext
-*ctx, int rd, int rs, int rt)
->
->      gen_store_fpr64(ctx, t0, rd);
->
-> +no_rd:
->      tcg_temp_free_i64(t0);
->      tcg_temp_free_i64(t1);
->  }
-> --
-> 2.26.0.rc2
->
->
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
 
---000000000000a55cc005a19ca323
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Thanks.
 
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">14:23 Uto, 24.03.2020. Jiaxun Yang &lt;<a href=3D"mailto:jia=
-xun.yang@flygoat.com">jiaxun.yang@flygoat.com</a>&gt; =D1=98=D0=B5 =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; Loongson multimedia condition instructions were previously implemented=
- as<br>
-&gt; write 0 to rd due to lack of documentation. So I just confirmed with L=
-oongson<br>
-&gt; about their encoding and implemented them correctly.<br>
-&gt;<br>
-&gt; Signed-off-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.c=
-om">jiaxun.yang@flygoat.com</a>&gt;<br>
-&gt; Acked-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com">chenhc@=
-lemote.com</a>&gt;<br>
-&gt; ---<br>
-&gt; v1: Use deposit opreations according to Richard&#39;s suggestion.<br>
-&gt; ---</p>
-<p dir=3D"ltr">Thanks, Jiaxun!</p>
-<p dir=3D"ltr">But, your numeration of patches is wrong. The first version =
-of the patch should be sent with prefix [PATCH]<br>
-and the second (this) version of the patch with prefix [PATCH v2]. This is =
-the second time you make the same mistake. Please make sure that you have t=
-he correct numeration in future. But, anyhow, thanks for this version.</p>
-<p dir=3D"ltr">Yours,<br>
-Aleksandar<br></p>
-<p dir=3D"ltr">&gt; =C2=A0target/mips/translate.c | 35 ++++++++++++++++++++=
-+++++++++++----<br>
-&gt; =C2=A01 file changed, 31 insertions(+), 4 deletions(-)<br>
-&gt;<br>
-&gt; diff --git a/target/mips/translate.c b/target/mips/translate.c<br>
-&gt; index d745bd2803..25b595a17d 100644<br>
-&gt; --- a/target/mips/translate.c<br>
-&gt; +++ b/target/mips/translate.c<br>
-&gt; @@ -5529,6 +5529,7 @@ static void gen_loongson_multimedia(DisasContext=
- *ctx, int rd, int rs, int rt)<br>
-&gt; =C2=A0{<br>
-&gt; =C2=A0 =C2=A0 =C2=A0uint32_t opc, shift_max;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0TCGv_i64 t0, t1;<br>
-&gt; +=C2=A0 =C2=A0 TCGCond cond;<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0opc =3D MASK_LMI(ctx-&gt;opcode);<br>
-&gt; =C2=A0 =C2=A0 =C2=A0switch (opc) {<br>
-&gt; @@ -5862,14 +5863,39 @@ static void gen_loongson_multimedia(DisasConte=
-xt *ctx, int rd, int rs, int rt)<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SEQU_CP2:<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SEQ_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_EQ;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLTU_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LTU;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLT_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LT;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLEU_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LEU;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLE_CP2:<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ??? Document is unclear: Set FCC[=
-CC].=C2=A0 Does that mean the<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* FD field is the CC field?<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LE;<br>
-&gt; +=C2=A0 =C2=A0 do_cc_cond:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int cc =3D (ctx-&gt;opcode =
-&gt;&gt; 8) &amp; 0x7;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t64 =3D tcg_temp_n=
-ew_i64();<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i32 t32 =3D tcg_temp_n=
-ew_i32();<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_setcond_i64(cond, t=
-64, t0, t1);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_extrl_i64_i32(t32, =
-t64);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i32(fpu_fcr=
-31, fpu_fcr31, t32,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_fp_bit(cc), 1);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i32(t32);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t64);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto no_rd;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0default:<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_INVAL(&quot;loongson_cp2&quot;)=
-;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0generate_exception_end(ctx, EXCP_RI)=
-;<br>
-&gt; @@ -5878,6 +5904,7 @@ static void gen_loongson_multimedia(DisasContext=
- *ctx, int rd, int rs, int rt)<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0gen_store_fpr64(ctx, t0, rd);<br>
-&gt;<br>
-&gt; +no_rd:<br>
-&gt; =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t0);<br>
-&gt; =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t1);<br>
-&gt; =C2=A0}<br>
-&gt; -- <br>
-&gt; 2.26.0.rc2<br>
-&gt;<br>
-&gt;<br>
-</p>
+>>      for flt in filters:
+>>          msg =3D flt(msg)
+>>      if isinstance(msg, (dict, list)):
+>> -        # Python < 3.4 needs to know not to add whitespace when pretty-=
+printing:
+>> -        separators =3D (', ', ': ') if indent is None else (',', ': ')
+>>          # Don't sort if it's already sorted
+>>          do_sort =3D not isinstance(msg, OrderedDict)
+>> -        print(json.dumps(msg, sort_keys=3Ddo_sort,
+>> -                         indent=3Dindent, separators=3Dseparators))
+>> +        print(json.dumps(msg, sort_keys=3Ddo_sort, indent=3Dindent))
+>>      else:
+>>          print(msg)
+>> =20
+>>
+>=20
+>=20
 
---000000000000a55cc005a19ca323--
 
