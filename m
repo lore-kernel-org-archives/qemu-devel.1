@@ -2,78 +2,91 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 591CBC54EEB
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC21C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:49:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28B202076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:42:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06C7E20753
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:49:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UeYpWhxl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28B202076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2rrHY9P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06C7E20753
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGpRu-00089g-CH
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:42:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49972)
+	id 1jGpYF-0001lt-1f
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:49:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51091)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jGpR9-0007Zw-6Z
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:42:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGpXY-00015k-GY
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jGpR8-0001P3-5Y
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:42:07 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:53448)
+ (envelope-from <philmd@redhat.com>) id 1jGpXX-0004Pt-DN
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:48:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:53560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jGpR8-0001Oh-2Z
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:42:06 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGpXX-0004Pf-Am
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:48:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585078925;
+ s=mimecast20190719; t=1585079323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3pYW3f5VhgZPxaNnMEssHpC8KYoVeutBROU2Z2/M9i0=;
- b=UeYpWhxl1M/FglphEMiE9bfLAoJMYJAkhW0nbzjpQZfYDRj6kzwU3CCih7yN3L4GG+cYOY
- KyWWFTwwqQFnbdvcikrEgkP6tB88h3Lfeq1If0w08l5lLrM94yezoLJ98oxD42QKElYUzB
- YiN5wGCV0FNDwU6jcCVYjpXz8Sbn7so=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-wQpNKm1zNKCWGmE4A-uEFw-1; Tue, 24 Mar 2020 15:42:04 -0400
-X-MC-Unique: wQpNKm1zNKCWGmE4A-uEFw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A621A1922020;
- Tue, 24 Mar 2020 19:42:02 +0000 (UTC)
-Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4530510027A3;
- Tue, 24 Mar 2020 19:41:56 +0000 (UTC)
-Date: Tue, 24 Mar 2020 19:41:54 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 5/6] migration/ram: fix use after free of local_err
-Message-ID: <20200324194154.GG2645@work-vm>
-References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
- <20200324153630.11882-6-vsementsov@virtuozzo.com>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=fQpQWlGEevylLVzzOus2xrHbH7b95lvZ5rhLQuOzdWA=;
+ b=Y2rrHY9PW6PGW8yG/chW+Y5EMthI2Q4bAAKHzyvT5GDzrUKyIyNdUqpEzEEjcD7Qvcb0HX
+ xBNKNiSYABuSLYiqQtWF4H1+bd8dDLXxEIp/bBWuMMC7Ap0SkzLexFwQYFLt0ShD3jJNlM
+ ZuvBJjqMJ/fXCAxCPv1YIaJkNazFwfY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-5SOgzeM-MwqwH7znt7qNyw-1; Tue, 24 Mar 2020 15:48:41 -0400
+X-MC-Unique: 5SOgzeM-MwqwH7znt7qNyw-1
+Received: by mail-wr1-f69.google.com with SMTP id d17so9736693wrw.19
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 12:48:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=HUCsr8+QDfcKRBXcL3ItOGncj3i21qbJvqFsGhi9mwo=;
+ b=AHzpQ+s6I19WxocODb0CFdv649Zw1yw/V20CU1gAjgrwDb2lep0o/9n7HmUYct2tyk
+ 5VMkrrRR3qp0gDXtp26fe2aBe+FJN4McgsFnt134K2wUZ6T5oZyWowdMQ+6xz+6Uw53W
+ z6YuYZn9Kqwko0A0DOz8kWgVA/ZDL6zW3fE2rENJ8mmN/ilztqEfphoVIXBU5DhLOX+B
+ m/8aueCWHH89avvtmt8bUHn28qkgLi3cEScRI8pcEAQvO024fQOWhnVmP4XriD8u1kRc
+ 8xO2LMSAP4D+O9Z7BczIT9jxLMzZSUYvUS5sJpqqT6l4Rz+96PrpNW2TvvyXCMJPT6pD
+ RUIg==
+X-Gm-Message-State: ANhLgQ2xi53nsmxNGwB0Rpm9ZV/ykquNSZct7WEDtVRqlICOecXUMPqm
+ E/DvXO3h8f03zle3on6jZ+xvrm83ORUHIFI+vueCV3IZLElrgTxE68Ler5gomju1vzc6FyybsJK
+ YUmMUaOfax2uer94=
+X-Received: by 2002:adf:f544:: with SMTP id j4mr37050315wrp.183.1585079319861; 
+ Tue, 24 Mar 2020 12:48:39 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsZtk/7FxKipYvMh4Rs8YWEI2e7o6IucE6NnNl3FURQUAR2IkDVtxN+uEPJOQm3yr64/t/l0w==
+X-Received: by 2002:adf:f544:: with SMTP id j4mr37050288wrp.183.1585079319518; 
+ Tue, 24 Mar 2020 12:48:39 -0700 (PDT)
+Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id h5sm4998811wro.83.2020.03.24.12.48.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Mar 2020 12:48:39 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.0] qga-posix: Avoid crashing process when failing to
+ allocate memory
+Date: Tue, 24 Mar 2020 20:48:36 +0100
+Message-Id: <20200324194836.21539-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200324153630.11882-6-vsementsov@virtuozzo.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 216.205.24.74
@@ -88,47 +101,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- quintela@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, den@openvz.org, marcandre.lureau@redhat.com,
- jsnow@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>, qemu-stable@nongnu.org,
+ Sameeh Jubran <sjubran@redhat.com>, Basil Salman <basil@daynix.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> local_err is used again in migration_bitmap_sync_precopy() after
-> precopy_notify(), so we must zero it. Otherwise try to set
-> non-NULL local_err will crash.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  migration/ram.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/migration/ram.c b/migration/ram.c
-> index c12cfdbe26..04f13feb2e 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -980,6 +980,7 @@ static void migration_bitmap_sync_precopy(RAMState *r=
-s)
->       */
->      if (precopy_notify(PRECOPY_NOTIFY_BEFORE_BITMAP_SYNC, &local_err)) {
->          error_report_err(local_err);
-> +        local_err =3D NULL;
+Similarly to commit 807e2b6fce0 for Windows, kindly return a
+QMP error message instead of crashing the whole process.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: qemu-stable@nongnu.org
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
+Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ qga/commands-posix.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-and queued.
-
-
->      }
-> =20
->      migration_bitmap_sync(rs);
-> --=20
-> 2.21.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 93474ff770..8f127788e6 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -493,7 +493,13 @@ struct GuestFileRead *qmp_guest_file_read(int64_t hand=
+le, bool has_count,
+         gfh->state =3D RW_STATE_NEW;
+     }
+=20
+-    buf =3D g_malloc0(count+1);
++    buf =3D g_try_malloc0(count + 1);
++    if (!buf) {
++        error_setg(errp,
++                   "failed to allocate sufficient memory "
++                   "to complete the requested service");
++        return NULL;
++    }
+     read_count =3D fread(buf, 1, count, fh);
+     if (ferror(fh)) {
+         error_setg_errno(errp, errno, "failed to read file");
+--=20
+2.21.1
 
 
