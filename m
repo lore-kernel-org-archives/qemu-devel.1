@@ -6,91 +6,90 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D83C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9A5C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:14:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C987C20719
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA3420658
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:14:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQOo2+hk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C987C20719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HsHtd1iO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA3420658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGnyz-0002aj-0o
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 14:08:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35326)
+	id 1jGo4C-0003sr-Fe
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 14:14:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36109)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jGnyB-0001tF-Qn
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:08:08 -0400
+ (envelope-from <peterx@redhat.com>) id 1jGo3b-0003Ss-MZ
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:13:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jGnyA-00031q-NH
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:08:07 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33946)
+ (envelope-from <peterx@redhat.com>) id 1jGo3a-00082G-6k
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:13:43 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49377)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jGnyA-00031D-JM
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:08:06 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jGo3a-00081T-2r
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:13:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585073285;
+ s=mimecast20190719; t=1585073621;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xrKfyg5oMPNpy7yv6AdN5alZpEBjIbcSXjVq0DUO+j8=;
- b=fQOo2+hkWp/DcTcJFOho7llkpu0p09HtgdzhQn1mLP9HHyqS4AE6BjcgKfuWHPaIufTv+j
- a1mznKqHB5E5+Trvkm5ZjATKpCFVJf1obRWWg28Qf+hj79RVcq4nEZ1X8a3yJBKiXDv9i6
- ecn9D7c9y9I9rISyn3u1WspJQICM2Tk=
+ bh=WIq0hAueNaw2xaBzJhuVrKwYaJVaIT0bXwreTSpjy7s=;
+ b=HsHtd1iO2LzRMLugmrECT0sC2CIy0OKYuYwo1jcfFdcEEO16b767BTN0KdGoaHTthd5Nua
+ HGrk9kso31WYrdRZwwsnyXkhhBtGTF5N/a4RtF+WDDsiREluGZ/BZijN/RqwPDg1RVPp7D
+ ybXgssnWH+bevkGhhZ/ufs6Y+NIjZP0=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-ZEaiif0ZNOGk66evOS-zsw-1; Tue, 24 Mar 2020 14:08:03 -0400
-X-MC-Unique: ZEaiif0ZNOGk66evOS-zsw-1
-Received: by mail-wr1-f71.google.com with SMTP id w11so9592613wrp.20
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 11:08:03 -0700 (PDT)
+ us-mta-236-Rqx2ebosPJOx-eVXUniLvQ-1; Tue, 24 Mar 2020 14:13:35 -0400
+X-MC-Unique: Rqx2ebosPJOx-eVXUniLvQ-1
+Received: by mail-wr1-f71.google.com with SMTP id w11so9599243wrp.20
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 11:13:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=o9VfLtJGvU0fUYHvZhFRdklkTco3oGHxaMAk7MxTBnM=;
- b=tgAYGWN8zTEMAYA/Y5gglIYwyOMsnk3JO6PC2Bk/u11TzRP6TEjZ45gpnyEAio8p7b
- LpbBA/ElMiD4csRE+PBqg+6JqnNtqYYaGUYDTsrkAzQVH8JkYBWoujErDer/cfJBLvs2
- IR3+wpabf3MQ5EWnPw+/NMSN8WUP+DaZcotNZAwpxaIofGVduB2B2qWWteiKXSGpxbk9
- itvYJkDGCH8MSdesw2tdDdaoIMSegN1cQDcG8KNZh/5D2Yk95YCJTd5v54SXz9dSovfX
- f8d3udy6jXHRUi1k3q3DJprM2FPzTkF1U5NUNYVnPnFra4pAja6/DJ+eo8gJU4F7LvJa
- ubWw==
-X-Gm-Message-State: ANhLgQ2tgHqXvxebewWeHIw3vjH+aWJ6hUgls5peTL/88mWPQPsrHHDp
- sD+QD3+PL/WrKFahfftEC9ygD0R410tqw2rY6GVshmddgS4jI46YVeFqL6PI8LZoLI6nYnrCY6m
- umr9ZhYFY8v3sAQM=
-X-Received: by 2002:adf:e98a:: with SMTP id h10mr27948333wrm.370.1585073282528; 
- Tue, 24 Mar 2020 11:08:02 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvE8lDc4aoctvV5poB+k76p6FHaiGufJuqzX/crtbLgsKOF//dAt/qo48ojBqgwBugtg6Du9g==
-X-Received: by 2002:adf:e98a:: with SMTP id h10mr27948305wrm.370.1585073282349; 
- Tue, 24 Mar 2020 11:08:02 -0700 (PDT)
+ bh=Z6QLK33i849af4hEmu/J5wDSq8WslN7JUyycX0ysPho=;
+ b=e2kMJINny4O+Hnxw4uPepOPQBHEjqDzuA/2nL/hxwkmJ3Ei5XN/3l9ltf9ekbb4p4G
+ VulUiiQj3kLIhzjiA9Z79c/GEln4Gbewgh/r7VWHAizQw2CHV0cFGqSXotWsfWePmCk/
+ gLuOa+P517W5fZHXfLfIux6mqc7XXefKwx++PzabbrB1JFOzHZD9G6R0mM7kdywDyvaG
+ xj7G2GE9xan9mTqFadPiqJ2CIjUKYFXQgC62Hl/ywYPum6ycBeaR5sFXGL0sXQnGLqJr
+ CehYRwkBDf1DJ7hRTndT5zZcCQrbZmcvTut5DQes13WdxrRkDTRrXsxQleF5kt3FLr+C
+ OamA==
+X-Gm-Message-State: ANhLgQ0r5X+640S20Ilv+focHQ0Pi6xmStsBSCEd6oYgqXQPSMoSgsjn
+ 07/UaKYcpUflCLopFSEu09/8oHVKgsCAz0a6Kha9vJZAz+S69CV89yXH9NEZOqwtGWH7jL4UzQu
+ KiKvNeMS7mjufY20=
+X-Received: by 2002:a5d:5447:: with SMTP id w7mr9724213wrv.299.1585073613835; 
+ Tue, 24 Mar 2020 11:13:33 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vutjFibWsKyOpF1Og+qU3JJjjdCrScHYPPtGzcpKNpj4B7DycBDMcVXBCXiqossd0yd7z0fGQ==
+X-Received: by 2002:a5d:5447:: with SMTP id w7mr9724175wrv.299.1585073613529; 
+ Tue, 24 Mar 2020 11:13:33 -0700 (PDT)
 Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id c18sm28384987wrx.5.2020.03.24.11.07.57
+ by smtp.gmail.com with ESMTPSA id k204sm5490292wma.17.2020.03.24.11.13.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Mar 2020 11:08:01 -0700 (PDT)
-Date: Tue, 24 Mar 2020 14:07:55 -0400
+ Tue, 24 Mar 2020 11:13:32 -0700 (PDT)
+Date: Tue, 24 Mar 2020 14:13:26 -0400
 From: Peter Xu <peterx@redhat.com>
 To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [PATCH v1 16/22] intel_iommu: replay pasid binds after context
- cache invalidation
-Message-ID: <20200324180755.GA127076@xz-x1>
+Subject: Re: [PATCH v1 17/22] intel_iommu: do not pass down pasid bind for
+ PASID #0
+Message-ID: <20200324181326.GB127076@xz-x1>
 References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-17-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-18-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1584880579-12178-17-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880579-12178-18-git-send-email-yi.l.liu@intel.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,11 +112,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 22, 2020 at 05:36:13AM -0700, Liu Yi L wrote:
-> This patch replays guest pasid bindings after context cache
-> invalidation. This is a behavior to ensure safety. Actually,
-> programmer should issue pasid cache invalidation with proper
-> granularity after issuing a context cache invalidation.
+On Sun, Mar 22, 2020 at 05:36:14AM -0700, Liu Yi L wrote:
+> RID_PASID field was introduced in VT-d 3.0 spec, it is used
+> for DMA requests w/o PASID in scalable mode VT-d. It is also
+> known as IOVA. And in VT-d 3.1 spec, there is definition on it:
+>=20
+> "Implementations not supporting RID_PASID capability
+> (ECAP_REG.RPS is 0b), use a PASID value of 0 to perform
+> address translation for requests without PASID."
+>=20
+> This patch adds a check against the PASIDs which are going to be
+> bound to device. For PASID #0, it is not necessary to pass down
+> pasid bind request for it since PASID #0 is used as RID_PASID for
+> DMA requests without pasid. Further reason is current Intel vIOMMU
+> supports gIOVA by shadowing guest 2nd level page table. However,
+> in future, if guest IOMMU driver uses 1st level page table to store
+> IOVA mappings, then guest IOVA support will also be done via nested
+> translation. When gIOVA is over FLPT, then vIOMMU should pass down
+> the pasid bind request for PASID #0 to host, host needs to bind the
+> guest IOVA page table to a proper PASID. e.g PASID value in RID_PASID
+> field for PF/VF if ECAP_REG.RPS is clear or default PASID for ADI
+> (Assignable Device Interface in Scalable IOV solution).
+>=20
+> IOVA over FLPT support on Intel VT-d:
+> https://lkml.org/lkml/2019/9/23/297
 >=20
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -128,41 +146,40 @@ On Sun, Mar 22, 2020 at 05:36:13AM -0700, Liu Yi L wrote:
 > Cc: Eduardo Habkost <ehabkost@redhat.com>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 > ---
->  hw/i386/intel_iommu.c          | 68 ++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/i386/intel_iommu_internal.h |  6 +++-
->  hw/i386/trace-events           |  1 +
->  3 files changed, 74 insertions(+), 1 deletion(-)
+>  hw/i386/intel_iommu.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >=20
 > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 8ec638f..1e0ccde 100644
+> index 1e0ccde..b007715 100644
 > --- a/hw/i386/intel_iommu.c
 > +++ b/hw/i386/intel_iommu.c
-> @@ -68,6 +68,10 @@ static void vtd_address_space_refresh_all(IntelIOMMUSt=
-ate *s);
->  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *=
-n);
+> @@ -1886,6 +1886,16 @@ static int vtd_bind_guest_pasid(IntelIOMMUState *s=
+, VTDBus *vtd_bus,
+>      struct iommu_gpasid_bind_data *g_bind_data;
+>      int ret =3D -1;
 > =20
->  static void vtd_pasid_cache_reset(IntelIOMMUState *s);
-> +static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
-> +                                           uint16_t *did, bool is_dsi);
-> +static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
-> +                                  VTDBus *vtd_bus, uint16_t devfn);
-> =20
->  static void vtd_panic_require_caching_mode(void)
->  {
-> @@ -1865,6 +1869,8 @@ static void vtd_context_global_invalidate(IntelIOMM=
-UState *s)
->       * VT-d emulation codes.
->       */
->      vtd_iommu_replay_all(s);
-> +
-> +    vtd_replay_guest_pasid_bindings(s, NULL, false);
+> +    if (pasid < VTD_MIN_HPASID) {
+> +        /*
+> +         * If pasid < VTD_HPASID_MIN, this pasid is not allocated
 
-I think the only uncertain thing is whether you still want to rework
-the vtd_replay_guest_pasid_bindings() interface.  It'll depend on the
-future discussion of previous patches.  Besides that this patch looks
-good to me.
+s/VTD_HPASID_MIN/VTD_MIN_HPASID/.
+
+> +         * from host. No need to pass down the changes on it to host.
+> +         * TODO: when IOVA over FLPT is ready, this switch should be
+> +         * refined.
+
+What will happen if without this patch?  Is it a must?
+
+> +         */
+> +        return 0;
+> +    }
+> +
+>      vtd_dev_icx =3D vtd_bus->dev_icx[devfn];
+>      if (!vtd_dev_icx) {
+>          return -EINVAL;
+> --=20
+> 2.7.4
+>=20
 
 --=20
 Peter Xu
