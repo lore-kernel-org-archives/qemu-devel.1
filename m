@@ -2,83 +2,77 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA65C2BAEE
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87F1C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:29:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD0F920774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83F362080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:29:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJUqmdcl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0F920774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFvIY88O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F362080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGnLj-0006qM-Oj
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:28:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51107)
+	id 1jGnMq-0000IF-ME
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:29:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <flukshun@gmail.com>) id 1jGmiV-0003Sj-6H
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:47:52 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGnLc-00073I-SO
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <flukshun@gmail.com>) id 1jGmiU-0007wE-7T
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:47:51 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:32786)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1jGmiU-0007vz-2U
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:47:50 -0400
-Received: by mail-ot1-x341.google.com with SMTP id 22so12193604otf.0
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 09:47:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=i4y/hjStADTs4XYJUMM2HizGinURYTHFuzvbnc9AFAQ=;
- b=XJUqmdcldOcsxSNkBke8bWVrJmbn3fi+FeDOzYeQJvIeHcz98XbS3R/a0L/1MFMCDi
- Y8OQQe4KVWX108QauVKsKswEkObYeYcrM2JgkOl+j879YUBnUC7RbBu5IVe7Pp5wRPo/
- KNZ07AaiAGktO685JMO9qxuTpGap/c9j+reSiLev5a2FZnSIEhbU6mQSjIoSe7LPrjr1
- IHqP9sniZJoEiuc+zawbA7UB9GD46559ZcUFDV3doF45UldS/Wpc6w8gLweAhxJA+MQS
- doClOfmSMwbGLGkcZ38KkFa8fD+33hs0InluDiyA5xXYzw+QRDTnST7p3vkqDfoDAwFk
- V6nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=i4y/hjStADTs4XYJUMM2HizGinURYTHFuzvbnc9AFAQ=;
- b=iw/MduJFHuIRgILBWngvyyiAvqoZzvz1TRI3m3eg3w1M3Hjni2ScBGrCyjCRDmMovh
- 8DB+heBlXt8/IC7wIgwepZwFXK/R/Gjq/NFRva/8EwzJE0mz2Em07MvGh1u96nmTlOE+
- vi4RzdppLbt/1H0E2brhfKU9CQ7DMyaQrdIcbxDY2B1DVtm7H4HBl2f8Sotu9GHgMIAa
- wzLLkwh3wP6E3SVp1kjR81Yr7kk9qF6K95QfbyV/gtc9tq2nx1g4bbopU++Uw/mtLUHz
- A/vsVRp62CysO6KlycgTwsAfzHWYJVEldPfL5ONh6Triy1BTRjTY9XGcMZ8P9uYZRE6/
- KPxQ==
-X-Gm-Message-State: ANhLgQ07WUNEE7Q8Cg5Fbs9o+Sw1vVDt8+jT6Eo0wXPi2GLX6FT+1VBG
- 0tDS/R3T9Mbg8sAgx3MZS1t5XQM9R4w=
-X-Google-Smtp-Source: ADFU+vufdZL/MRyTRsbOoGVRuzOO7vJb2ijvo/hqDzC+mgRSKjLTs2Vo70F14nJLmrEgxo48L/I0Ow==
-X-Received: by 2002:a9d:754e:: with SMTP id b14mr14718276otl.293.1585068468879; 
- Tue, 24 Mar 2020 09:47:48 -0700 (PDT)
-Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
- [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id h3sm6152625otr.4.2020.03.24.09.47.47
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 24 Mar 2020 09:47:47 -0700 (PDT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL for-5.0 4/5] qga: Fix undefined C behavior
-Date: Tue, 24 Mar 2020 11:46:52 -0500
-Message-Id: <20200324164653.19449-5-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200324164653.19449-1-mdroth@linux.vnet.ibm.com>
-References: <20200324164653.19449-1-mdroth@linux.vnet.ibm.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-X-Mailman-Approved-At: Tue, 24 Mar 2020 13:24:20 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGnLb-0001sc-I0
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:28:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49809)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGnLb-0001sT-Ep
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:28:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585070895;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tDh5AnBi394dc0OQ1xFpArEvKtii6yUcCmmawJSM3Gc=;
+ b=OFvIY88Oeekpi9BI1oCYp2eKMZgi1c7hPAvsEVwN5xQacsYtTV1O7eQbiLXOQDN2U+Foxa
+ R+tJ3YutngdevM0BkDty3gBcOzH7fGBci6TXhXstWOgJJzUs9EpnHscdiVU+oGO8VpuIaj
+ qIpwo6t3JqL8Bw0Wv+bTCGZUy2IeQP4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-HSkvzE4lPL63SftXAuAQ1Q-1; Tue, 24 Mar 2020 13:28:11 -0400
+X-MC-Unique: HSkvzE4lPL63SftXAuAQ1Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A7A3107ACC7;
+ Tue, 24 Mar 2020 17:28:10 +0000 (UTC)
+Received: from localhost (ovpn-114-213.ams2.redhat.com [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A44D75DA7B;
+ Tue, 24 Mar 2020 17:28:08 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH for-5.0 v2 3/3] iotests/138: Test leaks/corruptions fixed
+ report
+Date: Tue, 24 Mar 2020 18:27:57 +0100
+Message-Id: <20200324172757.1173824-4-mreitz@redhat.com>
+In-Reply-To: <20200324172757.1173824-1-mreitz@redhat.com>
+References: <20200324172757.1173824-1-mreitz@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,52 +84,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Blake <eblake@redhat.com>
+Test that qemu-img check reports the number of leaks and corruptions
+fixed in its JSON report (after a successful run).
 
-The QAPI struct GuestFileWhence has a comment about how we are
-exploiting equivalent values between two different integer types
-shared in a union. But C says behavior is undefined on assignments to
-overlapping storage when the two types are not the same width, and
-indeed, 'int64_t value' and 'enum QGASeek name' are very likely to be
-different in width.  Utilize a temporary variable to fix things.
+While touching the _unsupported_imgopts line, adjust the note on why
+data_file does not work with this test: The current comment sounds a bit
+like it is a mistake for qemu-img check not to check external data
+files' refcounts.  But there are no such refcounts, so it is no mistake.
+Just say that qemu-img check does not do much for external data files,
+and this is why this test does not work with them.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Fixes: 0b4b49387
-Fixes: Coverity CID 1421990
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qga/commands.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/138     | 41 ++++++++++++++++++++++++++++++++++++--
+ tests/qemu-iotests/138.out | 14 +++++++++++++
+ 2 files changed, 53 insertions(+), 2 deletions(-)
 
-diff --git a/qga/commands.c b/qga/commands.c
-index f8852beb9c..4471a9f08d 100644
---- a/qga/commands.c
-+++ b/qga/commands.c
-@@ -482,10 +482,15 @@ done:
-  * the guest's SEEK_ constants.  */
- int ga_parse_whence(GuestFileWhence *whence, Error **errp)
- {
--    /* Exploit the fact that we picked values to match QGA_SEEK_*. */
-+    /*
-+     * Exploit the fact that we picked values to match QGA_SEEK_*;
-+     * however, we have to use a temporary variable since the union
-+     * members may have different size.
-+     */
-     if (whence->type == QTYPE_QSTRING) {
-+        int value = whence->u.name;
-         whence->type = QTYPE_QNUM;
--        whence->u.value = whence->u.name;
-+        whence->u.value = value;
-     }
-     switch (whence->u.value) {
-     case QGA_SEEK_SET:
--- 
-2.17.1
+diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
+index 54b01046ad..1d5b0bed6d 100755
+--- a/tests/qemu-iotests/138
++++ b/tests/qemu-iotests/138
+@@ -41,8 +41,10 @@ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
+ # With an external data file, data clusters are not refcounted
+-# (and so qemu-img check does not check their refcount)
+-_unsupported_imgopts data_file
++# (so qemu-img check would not do much);
++# we want to modify the refcounts, so we need them to have a specific
++# format (namely u16)
++_unsupported_imgopts data_file 'refcount_bits=3D\([^1]\|.\([^6]\|$\)\)'
+=20
+ echo
+ echo '=3D=3D=3D Check on an image with a multiple of 2^32 clusters =3D=3D=
+=3D'
+@@ -65,6 +67,41 @@ poke_file "$TEST_IMG" $((2048 + 8)) "\x00\x80\x00\x00\x0=
+0\x00\x00\x00"
+ # allocate memory", we have an error showing that l2 entry is invalid.
+ _check_test_img
+=20
++echo
++echo '=3D=3D=3D Check leaks-fixed/corruptions-fixed report'
++echo
++
++# After leaks and corruptions were fixed, those numbers should be
++# reported by qemu-img check
++_make_test_img 64k
++
++# Allocate data cluster
++$QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
++
++reftable_ofs=3D$(peek_file_be "$TEST_IMG" 48 8)
++refblock_ofs=3D$(peek_file_be "$TEST_IMG" $reftable_ofs 8)
++
++# Introduce a leak: Make the image header's refcount 2
++poke_file_be "$TEST_IMG" "$refblock_ofs" 2 2
++
++l1_ofs=3D$(peek_file_be "$TEST_IMG" 40 8)
++
++# Introduce a corruption: Drop the COPIED flag from the (first) L1 entry
++l1_entry=3D$(peek_file_be "$TEST_IMG" $l1_ofs 8)
++l1_entry=3D$((l1_entry & ~(1 << 63)))
++poke_file_be "$TEST_IMG" $l1_ofs 8 $l1_entry
++
++echo
++# Should print the number of corruptions and leaks fixed
++# (Filter out all JSON fields (recognizable by their four-space
++# indentation), but keep the "-fixed" fields (by removing two spaces
++# from their indentation))
++# (Also filter out the L1 entry, because why not)
++_check_test_img -r all --output=3Djson \
++    | sed -e 's/^  \(.*\)-fixed"/\1-fixed"/' \
++          -e '/^    /d' \
++          -e "s/\\([^0-9a-f]\\)$(printf %x $l1_entry)\\([^0-9a-f]\\)/\1L1_=
+ENTRY_VALUE\2/"
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/138.out b/tests/qemu-iotests/138.out
+index aca7d47a80..79681e7cc9 100644
+--- a/tests/qemu-iotests/138.out
++++ b/tests/qemu-iotests/138.out
+@@ -9,4 +9,18 @@ ERROR: counting reference for region exceeding the end of =
+the file by one cluste
+=20
+ 1 errors were found on the image.
+ Data may be corrupted, or further writes to the image may corrupt it.
++
++=3D=3D=3D Check leaks-fixed/corruptions-fixed report
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D65536
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++Leaked cluster 0 refcount=3D2 reference=3D1
++Repairing cluster 0 refcount=3D2 reference=3D1
++Repairing OFLAG_COPIED L2 cluster: l1_index=3D0 l1_entry=3DL1_ENTRY_VALUE =
+refcount=3D1
++{
++  "corruptions-fixed": 1,
++  "leaks-fixed": 1,
++}
+ *** done
+--=20
+2.25.1
 
 
