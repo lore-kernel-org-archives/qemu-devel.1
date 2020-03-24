@@ -2,79 +2,81 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CCBC4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35CA7C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:52:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12B412070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:51:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 003AC2070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 09:52:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f/oFNrjd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12B412070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eh7YWSkz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 003AC2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGgDP-0006sl-6X
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 05:51:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47940)
+	id 1jGgEB-00082d-2n
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 05:52:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jGgCe-0006JN-Ru
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:50:33 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jGgDD-0006vX-B1
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jGgCd-0002dL-Cy
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:50:32 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40813)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jGgCd-0002cx-6u
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:50:31 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e19so16412973otj.7
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 02:50:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5VEIpMtipvlbuv1Erzq9tq7G4W0ZFxUarGFy3vKLJqI=;
- b=f/oFNrjdGknlhc581KIPH1PSoOoaujhFIuvucFTaNnzOS/6q/z1pIbY3HbEgM9o5J0
- z3YG2ztLxQBydw+V+vnNN5qltTA0HEKVqcgszJzlMTvSV1Cr2fVWwcsKR5MjuVCeO4yd
- ZNDAhOValw7mveXgznxN501SUT+Tlc4yff2se2b6Ao/NyWNqxd+qHOc6o8qxnaEArLT0
- IAaZacWmlkeFwWnbDS9uSzYLW76Lie03ue90C8sm/F03/deHSK2Puw+0g8tX9yO/dFtg
- 0qIX8PIlK4aSW0p+eK5xdcMm0DlwcZTu6f4epoOOgaWcvecRh16MoJBkyBI2qjyo61ww
- SAoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5VEIpMtipvlbuv1Erzq9tq7G4W0ZFxUarGFy3vKLJqI=;
- b=hrd9+PS8tfmTt06nsvdzCmPrZTPv8xl1VQDfspKtxfrPwDwEzSjvUP2VsNf0gfNOJH
- em3gKkyZeS4AJ19g5rNln3QfoxKSxG2X9JhR6AqMZHS3R+zEWv5NGRZDBH5niNlukhCX
- NvS8rlnlhS2wpS0X4s7aL1w7BNbGPNM+FRQOPzKhDtnQ9wvq9+0V0U/JXne+3khgoPX1
- Kezz0Y5FWfCJ5PTpPBoTw3lVf5JE/V7VYbjumu2Pk+Of3JbgQJSNIP+BHFxybBqBLHcR
- rXdwkmUjrju6LSecmPA0IFPbuTDa2nkULFIJBuj0eyhjiUWqmbkIgvZotgF8W2Z4h17S
- XXlA==
-X-Gm-Message-State: ANhLgQ3uhv4wIeNtO5b5WAFMzCJ4/nMHJMRK3BhbwF2iZLfL7CnqgEvr
- w/gYajJmNlW7K05rTFBpSchTHW91l9C3nftMYcQqOw==
-X-Google-Smtp-Source: ADFU+vtwANQauXuJZIRim2g1Tqye+4FikijDRHEEYNsXd5XOqSJKbbuKZ4/HNNZU9x968X9ErqGnwg1jlyWOrC8qgGU=
-X-Received: by 2002:a9d:1920:: with SMTP id j32mr20125516ota.221.1585043430418; 
- Tue, 24 Mar 2020 02:50:30 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1jGgDC-0003AB-05
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:51:06 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:24480)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jGgDB-00039Y-MU
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 05:51:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585043464;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zGzcgyRrkPXX1UqYxTHYZKQRBdLGgo/Z3XISfhaZu84=;
+ b=eh7YWSkzL6EcVaW+uX6V3p+dAk7L7fM+BwAkvOEZRf9tQiDCgZbPig0Nvkenm0drGkT7Jg
+ 3f92Bv8fRm3MIWyHX5tBf+oH271midOVniS4N/2U1tRzisbE0zgIu7vFH7Oa8aVt6/WSaI
+ Cm8otu/mGDcg7U9R1eEfPcFJSFuhvlo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-P6z3yG8ZOE-lwLc52j5V0A-1; Tue, 24 Mar 2020 05:51:01 -0400
+X-MC-Unique: P6z3yG8ZOE-lwLc52j5V0A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF53EA1362;
+ Tue, 24 Mar 2020 09:50:59 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-119.ams2.redhat.com [10.36.113.119])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 73AD160BE0;
+ Tue, 24 Mar 2020 09:50:58 +0000 (UTC)
+Date: Tue, 24 Mar 2020 10:50:56 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: Potential Null dereference
+Message-ID: <20200324095056.GD5417@linux.fritz.box>
+References: <CAGT9xrCJSy6yQ48p3hCRuwgV7t8vPS7eo+83_pOiPp0gDOfvvQ@mail.gmail.com>
+ <336bbdf8-140a-e884-d5d1-0610a9b1c6a6@redhat.com>
 MIME-Version: 1.0
-References: <20200323192411.325247-1-stefanha@redhat.com>
-In-Reply-To: <20200323192411.325247-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Mar 2020 09:50:19 +0000
-Message-ID: <CAFEAcA_ggRgiHhote35=ttWAi+siZPSWGojA-YdfqWsQZ65gOg@mail.gmail.com>
-Subject: Re: [PULL for-5.0 0/1] Block patches
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <336bbdf8-140a-e884-d5d1-0610a9b1c6a6@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +88,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: vsementsov@virtuozzo.com, Mansour Ahmadi <ManSoSec@gmail.com>,
+ qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Mar 2020 at 19:24, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> The following changes since commit 29e0855c5af62bbb0b0b6fed792e004dad92ba95:
->
->   Merge remote-tracking branch 'remotes/elmarco/tags/slirp-pull-request' into staging (2020-03-22 21:00:38 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to ff807d559205a434fd37d3343f01a0ab128bd190:
->
->   aio-posix: fix io_uring with external events (2020-03-23 11:05:44 +0000)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> ----------------------------------------------------------------
->
-> Stefan Hajnoczi (1):
->   aio-posix: fix io_uring with external events
->
->  util/fdmon-io_uring.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+Am 24.03.2020 um 08:14 hat Philippe Mathieu-Daud=E9 geschrieben:
+> On 3/24/20 4:05 AM, Mansour Ahmadi wrote:
+> > Hi,
+> >=20
+> > Nullness of=A0 needs to be checked here:
+> > https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4d=
+f76/block/commit.c#L221
+> >=20
+> > pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),...
 
+Do you have a reproducer? It's not obvious to me how bs->backing could
+be NULL here.
 
-Applied, thanks.
+> >=20
+> > While it is done at 2 other locations:
+> > https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4d=
+f76/block/backup-top.c#L113
+> > https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4d=
+f76/block/mirror.c#L1477
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Commit 18775ff3269 made the change for mirror, however its commit
+message is terse and doesn't say anything about the scenario where it
+would happen. We also didn't add a test case for it. I would have
+expected that failure to add the backing file would immediately error
+out and not try to refresh the filename first.
 
--- PMM
+backup-top.c has the check from the beginning. I assume it just copied
+it from mirror.
+
+Vladimir, do you remember the details?
+
+Kevin
+
 
