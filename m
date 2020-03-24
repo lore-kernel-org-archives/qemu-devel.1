@@ -2,60 +2,104 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 800EBC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7053DC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4395E20775
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:05:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4395E20775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+	by mail.kernel.org (Postfix) with ESMTPS id 3AC7520775
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:06:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ht69S4cA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AC7520775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGkBq-0006WC-Bn
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:05:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53335)
+	id 1jGkCR-0007nn-DX
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:06:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1jGk3M-00006r-3E
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGk8L-0000Mu-1z
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert@linux-m68k.org>) id 1jGk3J-0006H6-9u
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:12 -0400
-Received: from albert.telenet-ops.be ([2a02:1800:110:4::f00:1a]:55112)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
- id 1jGk3I-0006CT-My
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:09 -0400
-Received: from ramsan ([84.195.182.253]) by albert.telenet-ops.be with bizsmtp
- id JDwu2200R5USYZQ06DwuaA; Tue, 24 Mar 2020 14:57:06 +0100
-Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jGk34-0006Oq-N4; Tue, 24 Mar 2020 14:56:54 +0100
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jGk34-0001kl-LB; Tue, 24 Mar 2020 14:56:54 +0100
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- Eugeniu Rosca <erosca@de.adit-jv.com>
-Subject: [PATCH v6 6/8] gpio: Add GPIO Aggregator
-Date: Tue, 24 Mar 2020 14:56:51 +0100
-Message-Id: <20200324135653.6676-6-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200324135653.6676-1-geert+renesas@glider.be>
-References: <20200324135328.5796-1-geert+renesas@glider.be>
- <20200324135653.6676-1-geert+renesas@glider.be>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:1800:110:4::f00:1a
+ (envelope-from <mreitz@redhat.com>) id 1jGk8I-0005Ob-Sl
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:02:20 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23313)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGk8I-0005Nq-LX
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:02:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585058538;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=NCoXEHzY6kCmbyLoB2dQ66xoEUWF4IpJrEBPOfTFRP8=;
+ b=Ht69S4cAjuOE5M/6pNi6VVVSMFN9uj/vqwClJ6Hv6NmL/3NgBj3p5AxbUt2Q/5kNT8bmzt
+ QYqenNxRWdgKB2p+FmkEUlP5rpvdNTx7QE0q+ALbT3UJ/OH49utwDgF57zpeFzrUK78lvg
+ UjH8KHa8zTCvRQCE0/2Ekt1VWV0p1A8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-oR6AF7tTO-GG-stVLSaL-g-1; Tue, 24 Mar 2020 10:02:16 -0400
+X-MC-Unique: oR6AF7tTO-GG-stVLSaL-g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 363D3107ACC4;
+ Tue, 24 Mar 2020 14:02:15 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-213.ams2.redhat.com
+ [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D0461001938;
+ Tue, 24 Mar 2020 14:02:11 +0000 (UTC)
+Subject: Re: [PATCH v8 03/11] iotests: ignore import warnings from pylint
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200317004105.27059-1-jsnow@redhat.com>
+ <20200317004105.27059-4-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <043894bb-93e1-94af-64ce-e803d0f6c9f5@redhat.com>
+Date: Tue, 24 Mar 2020 15:02:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200317004105.27059-4-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="PGBmoSw19mFkZ97Ibm0C9kbhSjeYJTZFW"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,716 +111,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Geert Uytterhoeven <geert+renesas@glider.be>, linux-doc@vger.kernel.org,
- Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- Rob Herring <robh+dt@kernel.org>, Alexander Graf <graf@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Phil Reid <preid@electromag.com.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ philmd@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-GPIO controllers are exported to userspace using /dev/gpiochip*
-character devices.  Access control to these devices is provided by
-standard UNIX file system permissions, on an all-or-nothing basis:
-either a GPIO controller is accessible for a user, or it is not.
-Currently no mechanism exists to control access to individual GPIOs.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PGBmoSw19mFkZ97Ibm0C9kbhSjeYJTZFW
+Content-Type: multipart/mixed; boundary="do4Q2M8o1uHSmnaTGUsBUCvz7jeeSXK5x"
 
-Hence add a GPIO driver to aggregate existing GPIOs, and expose them as
-a new gpiochip.
+--do4Q2M8o1uHSmnaTGUsBUCvz7jeeSXK5x
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-This supports the following use cases:
-  - Aggregating GPIOs using Sysfs
-    This is useful for implementing access control, and assigning a set
-    of GPIOs to a specific user or virtual machine.
-  - Generic GPIO Driver
-    This is useful for industrial control, where it can provide
-    userspace access to a simple GPIO-operated device described in DT,
-    cfr. e.g. spidev for SPI-operated devices.
+On 17.03.20 01:40, John Snow wrote:
+> The right way to solve this is to come up with a virtual environment
+> infrastructure that sets all the paths correctly, and/or to create
+> installable python modules that can be imported normally.
+>=20
+> That's hard, so just silence this error for now.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 1 +
+>  1 file changed, 1 insertion(+)
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
-Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
----
-v6:
-  - Use gpiod_to_chip() instead of open-coding,
-  - Drop debug print of gpio_desc.label, as it usually just points to
-    the GPIO Aggregator itself,
-  - Drop no longer needed #include "gpiolib.h",
-  - Fix missing offset translation in gpio_fwd_set_config(),
-  - Use GPIO_LOOKUP_IDX() to populate struct gpiod_lookup,
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-v5:
-  - Add Reviewed-by, Tested-by,
 
-v4:
-  - Remove unused assignment to n in isrange(),
-  - Check correct pointer after aggr->lookups->dev_id allocation,
-  - Preinitialize flags to 0 in gpio_fwd_[gs]et_multiple() to avoid
-    may-be-used-uninitialized warning,
-  - Drop controversial GPIO repeater,
-  - Update for gpiod_lookup.chip_label rename,
-  - Use %pe to format error pointers,
-  - Use U16_MAX instead of (u16)-1,
-  - Correct comment indentation,
-  - Use skip_spaces() helper,
-  - Rename a and b to first_index resp. last_index,
-  - Add comment to tmp[] use,
-  - Improve Kconfig help text,
-  - Include <linux/gpio/consumer.h> for gpiod_[gs]et_*(),
-  - Drop unneeded valid_mask handling,
-  - Add comment about sleeping and .set_config() support,
+--do4Q2M8o1uHSmnaTGUsBUCvz7jeeSXK5x--
 
-v3:
-  - Absorb GPIO forwarder,
-  - Integrate GPIO Repeater and Generic GPIO driver functionality,
-  - Use the aggregator parameters to create a GPIO lookup table instead
-    of an array of GPIO descriptors, which allows to simplify the code:
-      1. This removes the need for calling gpio_name_to_desc(),
-         gpiochip_find(), gpiochip_get_desc(), and gpiod_request(),
-      2. This allows the platform device to always use
-         devm_gpiod_get_index(), regardless of the origin of the GPIOs,
-  - Move parameter parsing from platform device probe to sysfs attribute
-    store, removing the need for platform data passing,
-  - Use more devm_*() functions to simplify cleanup,
-  - Add pr_fmt(),
-  - General refactoring,
+--PGBmoSw19mFkZ97Ibm0C9kbhSjeYJTZFW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-v2:
-  - Add missing initialization of i in gpio_virt_agg_probe(),
-  - Update for removed .need_valid_mask field and changed
-    .init_valid_mask() signature,
-  - Drop "virtual", rename to gpio-aggregator,
-  - Drop bogus FIXME related to gpiod_set_transitory() expectations,
-  - Use new GPIO Forwarder Helper,
-  - Lift limit on the maximum number of GPIOs,
-  - Improve parsing:
-      - add support for specifying GPIOs by line name,
-      - add support for specifying GPIO chips by ID,
-      - add support for GPIO offset ranges,
-      - names and offset specifiers must be separated by whitespace,
-      - GPIO offsets must separated by spaces,
-  - Use str_has_prefix() and kstrtouint().
----
- drivers/gpio/Kconfig           |  12 +
- drivers/gpio/Makefile          |   1 +
- drivers/gpio/gpio-aggregator.c | 568 +++++++++++++++++++++++++++++++++
- 3 files changed, 581 insertions(+)
- create mode 100644 drivers/gpio/gpio-aggregator.c
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
-index 6234ccc90e7eb4a1..6ddc7353a46afdf6 100644
---- a/drivers/gpio/Kconfig
-+++ b/drivers/gpio/Kconfig
-@@ -1541,6 +1541,18 @@ config GPIO_VIPERBOARD
- 
- endmenu
- 
-+config GPIO_AGGREGATOR
-+	tristate "GPIO Aggregator"
-+	help
-+	  Say yes here to enable the GPIO Aggregator, which provides a way to
-+	  aggregate existing GPIO lines into a new virtual GPIO chip.
-+	  This can serve the following purposes:
-+	    - Assign permissions for a collection of GPIO lines to a user,
-+	    - Export a collection of GPIO lines to a virtual machine,
-+	    - Provide a generic driver for a GPIO-operated device in an
-+	      industrial control context, to be operated from userspace using
-+	      the GPIO chardev interface.
-+
- config GPIO_MOCKUP
- 	tristate "GPIO Testing Driver"
- 	select IRQ_SIM
-diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
-index b2cfc21a97f3e52b..65bf3940e33cf734 100644
---- a/drivers/gpio/Makefile
-+++ b/drivers/gpio/Makefile
-@@ -25,6 +25,7 @@ obj-$(CONFIG_GPIO_74XX_MMIO)		+= gpio-74xx-mmio.o
- obj-$(CONFIG_GPIO_ADNP)			+= gpio-adnp.o
- obj-$(CONFIG_GPIO_ADP5520)		+= gpio-adp5520.o
- obj-$(CONFIG_GPIO_ADP5588)		+= gpio-adp5588.o
-+obj-$(CONFIG_GPIO_AGGREGATOR)		+= gpio-aggregator.o
- obj-$(CONFIG_GPIO_ALTERA_A10SR)		+= gpio-altera-a10sr.o
- obj-$(CONFIG_GPIO_ALTERA)  		+= gpio-altera.o
- obj-$(CONFIG_GPIO_AMD8111)		+= gpio-amd8111.o
-diff --git a/drivers/gpio/gpio-aggregator.c b/drivers/gpio/gpio-aggregator.c
-new file mode 100644
-index 0000000000000000..9b0adbdddbfccb30
---- /dev/null
-+++ b/drivers/gpio/gpio-aggregator.c
-@@ -0,0 +1,568 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+//
-+// GPIO Aggregator
-+//
-+// Copyright (C) 2019-2020 Glider bv
-+
-+#define DRV_NAME       "gpio-aggregator"
-+#define pr_fmt(fmt)	DRV_NAME ": " fmt
-+
-+#include <linux/bitmap.h>
-+#include <linux/bitops.h>
-+#include <linux/ctype.h>
-+#include <linux/gpio/consumer.h>
-+#include <linux/gpio/driver.h>
-+#include <linux/gpio/machine.h>
-+#include <linux/idr.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/overflow.h>
-+#include <linux/platform_device.h>
-+#include <linux/spinlock.h>
-+#include <linux/string.h>
-+
-+
-+/*
-+ * GPIO Aggregator sysfs interface
-+ */
-+
-+struct gpio_aggregator {
-+	struct gpiod_lookup_table *lookups;
-+	struct platform_device *pdev;
-+	char args[];
-+};
-+
-+static DEFINE_MUTEX(gpio_aggregator_lock);	/* protects idr */
-+static DEFINE_IDR(gpio_aggregator_idr);
-+
-+static char *get_arg(char **args)
-+{
-+	char *start = *args, *end;
-+
-+	start = skip_spaces(start);
-+	if (!*start)
-+		return NULL;
-+
-+	if (*start == '"') {
-+		/* Quoted arg */
-+		end = strchr(++start, '"');
-+		if (!end)
-+			return ERR_PTR(-EINVAL);
-+	} else {
-+		/* Unquoted arg */
-+		for (end = start; *end && !isspace(*end); end++) ;
-+	}
-+
-+	if (*end)
-+		*end++ = '\0';
-+
-+	*args = end;
-+	return start;
-+}
-+
-+static bool isrange(const char *s)
-+{
-+	size_t n;
-+
-+	if (IS_ERR_OR_NULL(s))
-+		return false;
-+
-+	while (1) {
-+		n = strspn(s, "0123456789");
-+		if (!n)
-+			return false;
-+
-+		s += n;
-+
-+		switch (*s++) {
-+		case '\0':
-+			return true;
-+
-+		case '-':
-+		case ',':
-+			break;
-+
-+		default:
-+			return false;
-+		}
-+	}
-+}
-+
-+static int aggr_add_gpio(struct gpio_aggregator *aggr, const char *key,
-+			 int hwnum, unsigned int *n)
-+{
-+	struct gpiod_lookup_table *lookups;
-+
-+	lookups = krealloc(aggr->lookups, struct_size(lookups, table, *n + 2),
-+			   GFP_KERNEL);
-+	if (!lookups)
-+		return -ENOMEM;
-+
-+	lookups->table[*n] =
-+		(struct gpiod_lookup)GPIO_LOOKUP_IDX(key, hwnum, NULL, *n, 0);
-+
-+	(*n)++;
-+	memset(&lookups->table[*n], 0, sizeof(lookups->table[*n]));
-+
-+	aggr->lookups = lookups;
-+	return 0;
-+}
-+
-+static int aggr_parse(struct gpio_aggregator *aggr)
-+{
-+	unsigned int first_index, last_index, i, n = 0;
-+	char *name, *offsets, *first, *last, *next;
-+	char *args = aggr->args;
-+	int error;
-+
-+	for (name = get_arg(&args), offsets = get_arg(&args); name;
-+	     offsets = get_arg(&args)) {
-+		if (IS_ERR(name)) {
-+			pr_err("Cannot get GPIO specifier: %pe\n", name);
-+			return PTR_ERR(name);
-+		}
-+
-+		if (!isrange(offsets)) {
-+			/* Named GPIO line */
-+			error = aggr_add_gpio(aggr, name, U16_MAX, &n);
-+			if (error)
-+				return error;
-+
-+			name = offsets;
-+			continue;
-+		}
-+
-+		/* GPIO chip + offset(s) */
-+		for (first = offsets; *first; first = next) {
-+			next = strchrnul(first, ',');
-+			if (*next)
-+				*next++ = '\0';
-+
-+			last = strchr(first, '-');
-+			if (last)
-+				*last++ = '\0';
-+
-+			if (kstrtouint(first, 10, &first_index)) {
-+				pr_err("Cannot parse GPIO index %s\n", first);
-+				return -EINVAL;
-+			}
-+
-+			if (!last) {
-+				last_index = first_index;
-+			} else if (kstrtouint(last, 10, &last_index)) {
-+				pr_err("Cannot parse GPIO index %s\n", last);
-+				return -EINVAL;
-+			}
-+
-+			for (i = first_index; i <= last_index; i++) {
-+				error = aggr_add_gpio(aggr, name, i, &n);
-+				if (error)
-+					return error;
-+			}
-+		}
-+
-+		name = get_arg(&args);
-+	}
-+
-+	if (!n) {
-+		pr_err("No GPIOs specified\n");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static ssize_t new_device_store(struct device_driver *driver, const char *buf,
-+				size_t count)
-+{
-+	struct gpio_aggregator *aggr;
-+	struct platform_device *pdev;
-+	int res, id;
-+
-+	/* kernfs guarantees string termination, so count + 1 is safe */
-+	aggr = kzalloc(sizeof(*aggr) + count + 1, GFP_KERNEL);
-+	if (!aggr)
-+		return -ENOMEM;
-+
-+	memcpy(aggr->args, buf, count + 1);
-+
-+	aggr->lookups = kzalloc(struct_size(aggr->lookups, table, 1),
-+				GFP_KERNEL);
-+	if (!aggr->lookups) {
-+		res = -ENOMEM;
-+		goto free_ga;
-+	}
-+
-+	mutex_lock(&gpio_aggregator_lock);
-+	id = idr_alloc(&gpio_aggregator_idr, aggr, 0, 0, GFP_KERNEL);
-+	mutex_unlock(&gpio_aggregator_lock);
-+
-+	if (id < 0) {
-+		res = id;
-+		goto free_table;
-+	}
-+
-+	aggr->lookups->dev_id = kasprintf(GFP_KERNEL, "%s.%d", DRV_NAME, id);
-+	if (!aggr->lookups->dev_id) {
-+		res = -ENOMEM;
-+		goto remove_idr;
-+	}
-+
-+	res = aggr_parse(aggr);
-+	if (res)
-+		goto free_dev_id;
-+
-+	gpiod_add_lookup_table(aggr->lookups);
-+
-+	pdev = platform_device_register_simple(DRV_NAME, id, NULL, 0);
-+	if (IS_ERR(pdev)) {
-+		res = PTR_ERR(pdev);
-+		goto remove_table;
-+	}
-+
-+	aggr->pdev = pdev;
-+	return count;
-+
-+remove_table:
-+	gpiod_remove_lookup_table(aggr->lookups);
-+free_dev_id:
-+	kfree(aggr->lookups->dev_id);
-+remove_idr:
-+	mutex_lock(&gpio_aggregator_lock);
-+	idr_remove(&gpio_aggregator_idr, id);
-+	mutex_unlock(&gpio_aggregator_lock);
-+free_table:
-+	kfree(aggr->lookups);
-+free_ga:
-+	kfree(aggr);
-+	return res;
-+}
-+
-+static DRIVER_ATTR_WO(new_device);
-+
-+static void gpio_aggregator_free(struct gpio_aggregator *aggr)
-+{
-+	platform_device_unregister(aggr->pdev);
-+	gpiod_remove_lookup_table(aggr->lookups);
-+	kfree(aggr->lookups->dev_id);
-+	kfree(aggr->lookups);
-+	kfree(aggr);
-+}
-+
-+static ssize_t delete_device_store(struct device_driver *driver,
-+				   const char *buf, size_t count)
-+{
-+	struct gpio_aggregator *aggr;
-+	unsigned int id;
-+	int error;
-+
-+	if (!str_has_prefix(buf, DRV_NAME "."))
-+		return -EINVAL;
-+
-+	error = kstrtouint(buf + strlen(DRV_NAME "."), 10, &id);
-+	if (error)
-+		return error;
-+
-+	mutex_lock(&gpio_aggregator_lock);
-+	aggr = idr_remove(&gpio_aggregator_idr, id);
-+	mutex_unlock(&gpio_aggregator_lock);
-+	if (!aggr)
-+		return -ENOENT;
-+
-+	gpio_aggregator_free(aggr);
-+	return count;
-+}
-+static DRIVER_ATTR_WO(delete_device);
-+
-+static struct attribute *gpio_aggregator_attrs[] = {
-+	&driver_attr_new_device.attr,
-+	&driver_attr_delete_device.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(gpio_aggregator);
-+
-+static int __exit gpio_aggregator_idr_remove(int id, void *p, void *data)
-+{
-+	gpio_aggregator_free(p);
-+	return 0;
-+}
-+
-+static void __exit gpio_aggregator_remove_all(void)
-+{
-+	mutex_lock(&gpio_aggregator_lock);
-+	idr_for_each(&gpio_aggregator_idr, gpio_aggregator_idr_remove, NULL);
-+	idr_destroy(&gpio_aggregator_idr);
-+	mutex_unlock(&gpio_aggregator_lock);
-+}
-+
-+
-+/*
-+ *  GPIO Forwarder
-+ */
-+
-+struct gpiochip_fwd {
-+	struct gpio_chip chip;
-+	struct gpio_desc **descs;
-+	union {
-+		struct mutex mlock;	/* protects tmp[] if can_sleep */
-+		spinlock_t slock;	/* protects tmp[] if !can_sleep */
-+	};
-+	unsigned long tmp[];		/* values and descs for multiple ops */
-+};
-+
-+static int gpio_fwd_get_direction(struct gpio_chip *chip, unsigned int offset)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_get_direction(fwd->descs[offset]);
-+}
-+
-+static int gpio_fwd_direction_input(struct gpio_chip *chip, unsigned int offset)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_direction_input(fwd->descs[offset]);
-+}
-+
-+static int gpio_fwd_direction_output(struct gpio_chip *chip,
-+				     unsigned int offset, int value)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_direction_output(fwd->descs[offset], value);
-+}
-+
-+static int gpio_fwd_get(struct gpio_chip *chip, unsigned int offset)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_get_value(fwd->descs[offset]);
-+}
-+
-+static int gpio_fwd_get_multiple(struct gpio_chip *chip, unsigned long *mask,
-+				 unsigned long *bits)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+	unsigned long *values, flags = 0;
-+	struct gpio_desc **descs;
-+	unsigned int i, j = 0;
-+	int error;
-+
-+	if (chip->can_sleep)
-+		mutex_lock(&fwd->mlock);
-+	else
-+		spin_lock_irqsave(&fwd->slock, flags);
-+
-+	/* Both values bitmap and desc pointers are stored in tmp[] */
-+	values = &fwd->tmp[0];
-+	descs = (void *)&fwd->tmp[BITS_TO_LONGS(fwd->chip.ngpio)];
-+
-+	bitmap_clear(values, 0, fwd->chip.ngpio);
-+	for_each_set_bit(i, mask, fwd->chip.ngpio)
-+		descs[j++] = fwd->descs[i];
-+
-+	error = gpiod_get_array_value(j, descs, NULL, values);
-+	if (!error) {
-+		j = 0;
-+		for_each_set_bit(i, mask, fwd->chip.ngpio)
-+			__assign_bit(i, bits, test_bit(j++, values));
-+	}
-+
-+	if (chip->can_sleep)
-+		mutex_unlock(&fwd->mlock);
-+	else
-+		spin_unlock_irqrestore(&fwd->slock, flags);
-+
-+	return error;
-+}
-+
-+static void gpio_fwd_set(struct gpio_chip *chip, unsigned int offset, int value)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	gpiod_set_value(fwd->descs[offset], value);
-+}
-+
-+static void gpio_fwd_set_multiple(struct gpio_chip *chip, unsigned long *mask,
-+				  unsigned long *bits)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+	unsigned long *values, flags = 0;
-+	struct gpio_desc **descs;
-+	unsigned int i, j = 0;
-+
-+	if (chip->can_sleep)
-+		mutex_lock(&fwd->mlock);
-+	else
-+		spin_lock_irqsave(&fwd->slock, flags);
-+
-+	/* Both values bitmap and desc pointers are stored in tmp[] */
-+	values = &fwd->tmp[0];
-+	descs = (void *)&fwd->tmp[BITS_TO_LONGS(fwd->chip.ngpio)];
-+
-+	for_each_set_bit(i, mask, fwd->chip.ngpio) {
-+		__assign_bit(j, values, test_bit(i, bits));
-+		descs[j++] = fwd->descs[i];
-+	}
-+
-+	gpiod_set_array_value(j, descs, NULL, values);
-+
-+	if (chip->can_sleep)
-+		mutex_unlock(&fwd->mlock);
-+	else
-+		spin_unlock_irqrestore(&fwd->slock, flags);
-+}
-+
-+static int gpio_fwd_set_config(struct gpio_chip *chip, unsigned int offset,
-+			       unsigned long config)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_set_config(fwd->descs[offset], config);
-+}
-+
-+/**
-+ * gpiochip_fwd_create() - Create a new GPIO forwarder
-+ * @dev: Parent device pointer
-+ * @ngpios: Number of GPIOs in the forwarder.
-+ * @descs: Array containing the GPIO descriptors to forward to.
-+ *         This array must contain @ngpios entries, and must not be deallocated
-+ *         before the forwarder has been destroyed again.
-+ *
-+ * This function creates a new gpiochip, which forwards all GPIO operations to
-+ * the passed GPIO descriptors.
-+ *
-+ * Return: An opaque object pointer, or an ERR_PTR()-encoded negative error
-+ *         code on failure.
-+ */
-+static struct gpiochip_fwd *gpiochip_fwd_create(struct device *dev,
-+						unsigned int ngpios,
-+						struct gpio_desc *descs[])
-+{
-+	const char *label = dev_name(dev);
-+	struct gpiochip_fwd *fwd;
-+	struct gpio_chip *chip;
-+	unsigned int i;
-+	int error;
-+
-+	fwd = devm_kzalloc(dev, struct_size(fwd, tmp,
-+			   BITS_TO_LONGS(ngpios) + ngpios), GFP_KERNEL);
-+	if (!fwd)
-+		return ERR_PTR(-ENOMEM);
-+
-+	chip = &fwd->chip;
-+
-+	/*
-+	 * If any of the GPIO lines are sleeping, then the entire forwarder
-+	 * will be sleeping.
-+	 * If any of the chips support .set_config(), then the forwarder will
-+	 * support setting configs.
-+	 */
-+	for (i = 0; i < ngpios; i++) {
-+		struct gpio_chip *parent = gpiod_to_chip(descs[i]);
-+
-+		dev_dbg(dev, "%u => gpio-%d\n", i, desc_to_gpio(descs[i]));
-+
-+		if (gpiod_cansleep(descs[i]))
-+			chip->can_sleep = true;
-+		if (parent && parent->set_config)
-+			chip->set_config = gpio_fwd_set_config;
-+	}
-+
-+	chip->label = label;
-+	chip->parent = dev;
-+	chip->owner = THIS_MODULE;
-+	chip->get_direction = gpio_fwd_get_direction;
-+	chip->direction_input = gpio_fwd_direction_input;
-+	chip->direction_output = gpio_fwd_direction_output;
-+	chip->get = gpio_fwd_get;
-+	chip->get_multiple = gpio_fwd_get_multiple;
-+	chip->set = gpio_fwd_set;
-+	chip->set_multiple = gpio_fwd_set_multiple;
-+	chip->base = -1;
-+	chip->ngpio = ngpios;
-+	fwd->descs = descs;
-+
-+	if (chip->can_sleep)
-+		mutex_init(&fwd->mlock);
-+	else
-+		spin_lock_init(&fwd->slock);
-+
-+	error = devm_gpiochip_add_data(dev, chip, fwd);
-+	if (error)
-+		return ERR_PTR(error);
-+
-+	return fwd;
-+}
-+
-+
-+/*
-+ *  GPIO Aggregator platform device
-+ */
-+
-+static int gpio_aggregator_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct gpio_desc **descs;
-+	struct gpiochip_fwd *fwd;
-+	int i, n;
-+
-+	n = gpiod_count(dev, NULL);
-+	if (n < 0)
-+		return n;
-+
-+	descs = devm_kmalloc_array(dev, n, sizeof(*descs), GFP_KERNEL);
-+	if (!descs)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < n; i++) {
-+		descs[i] = devm_gpiod_get_index(dev, NULL, i, GPIOD_ASIS);
-+		if (IS_ERR(descs[i]))
-+			return PTR_ERR(descs[i]);
-+	}
-+
-+	fwd = gpiochip_fwd_create(dev, n, descs);
-+	if (IS_ERR(fwd))
-+		return PTR_ERR(fwd);
-+
-+	platform_set_drvdata(pdev, fwd);
-+	return 0;
-+}
-+
-+#ifdef CONFIG_OF
-+static const struct of_device_id gpio_aggregator_dt_ids[] = {
-+	/*
-+	 * Add GPIO-operated devices controlled from userspace below,
-+	 * or use "driver_override" in sysfs
-+	 */
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, gpio_aggregator_dt_ids);
-+#endif
-+
-+static struct platform_driver gpio_aggregator_driver = {
-+	.probe = gpio_aggregator_probe,
-+	.driver = {
-+		.name = DRV_NAME,
-+		.groups = gpio_aggregator_groups,
-+		.of_match_table = of_match_ptr(gpio_aggregator_dt_ids),
-+	},
-+};
-+
-+static int __init gpio_aggregator_init(void)
-+{
-+	return platform_driver_register(&gpio_aggregator_driver);
-+}
-+module_init(gpio_aggregator_init);
-+
-+static void __exit gpio_aggregator_exit(void)
-+{
-+	gpio_aggregator_remove_all();
-+	platform_driver_unregister(&gpio_aggregator_driver);
-+}
-+module_exit(gpio_aggregator_exit);
-+
-+MODULE_AUTHOR("Geert Uytterhoeven <geert+renesas@glider.be>");
-+MODULE_DESCRIPTION("GPIO Aggregator");
-+MODULE_LICENSE("GPL v2");
--- 
-2.17.1
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl56EuEACgkQ9AfbAGHV
+z0BLjAf9E7Bk3DkMfEKVd4l621so8I7nYA6R04uWsAF77JyYkkN5AoepsY1S25XJ
+H1fQfnl3z6HyRh5Mm+Ej3nyKvQChyq8+3Xn5cmENZilsTg2p8qACD1kr2RUbhMZY
+/KZPJtW2CNKJL8RmTWLxRSLEyEDe3jndFu0DP6Zy76ktfavoV3WTbJ/hImsnWYCQ
+we26OZgxzw99T2GWJskZThJskrOvgPy0LIw1p9fWzcn52hoaGDBzjzs/zpoB6Biq
+2YgyogkT9IUBrn0/2dU+dj28SSq5J4hIduFKxgFHG97oaO3k1JcWvQrTloJv410k
+d9ffUtjFvsx51ePVIiSnnnJQFsz4NQ==
+=IkZy
+-----END PGP SIGNATURE-----
+
+--PGBmoSw19mFkZ97Ibm0C9kbhSjeYJTZFW--
 
 
