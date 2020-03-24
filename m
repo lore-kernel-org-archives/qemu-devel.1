@@ -2,104 +2,102 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C52AC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97572C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13F2A20774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6316520774
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYLRqyWQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13F2A20774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rfewv+Vx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6316520774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGkrl-0001Ia-7T
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:49:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60962)
+	id 1jGkrx-0001XW-Jy
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:49:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jGkqg-0000P1-Cl
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:48:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGkqI-0008RQ-UJ
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jGkqf-00077e-FL
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:48:10 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:53079)
+ (envelope-from <philmd@redhat.com>) id 1jGkqH-0006hC-RJ
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:47:46 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36821)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGkqf-00077D-Bl
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:48:09 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGkqH-0006gu-OP
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:47:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585061289;
+ s=mimecast20190719; t=1585061265;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=uF8d/Bf7NlDz3rD2n4ZdQFSZcntZJY9AgYeEq2AMMo0=;
- b=LYLRqyWQlmUQF4+StVent8RHEaYhlor0l/oEjxIWjMzEwLbukCZMCZJXVa4Uf4oiySOgpn
- Dk+TYCuFj7gCbYPKUBLMWCh9gRdGD2oaVZVoz2+VEhY/QzqOD3S/q7YTxu8ppLY0HY7/OR
- eJ58ZDp0XLNOwLs7pomN8b5gfSK31Is=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-J7-JNoo-PrmzjhpRzRfHGg-1; Tue, 24 Mar 2020 10:48:04 -0400
-X-MC-Unique: J7-JNoo-PrmzjhpRzRfHGg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E8391005510;
- Tue, 24 Mar 2020 14:48:03 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-213.ams2.redhat.com
- [10.36.114.213])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BBF2F9B934;
- Tue, 24 Mar 2020 14:48:00 +0000 (UTC)
-Subject: Re: [PATCH v8 05/11] iotests: add pylintrc file
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200317004105.27059-1-jsnow@redhat.com>
- <20200317004105.27059-6-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <2913909d-3411-04cf-9cc4-47ea1e7e6749@redhat.com>
-Date: Tue, 24 Mar 2020 15:47:58 +0100
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qsIoL5Z7PY4kuzINEbb/UeqJn6DCaDPZ0HHRFWRsDUA=;
+ b=Rfewv+Vxl8m/lySx6pvBEHg6guSmPP7GJCVlF9BAfKDvrM4Hd/TdQ/qo8lSrkJYbrvjFAD
+ NwD6TItjovaSp+8G/NQx7lOD/QYIAjN2rgIvvWXDe9zdzXinvj4yvGaRgQCGa6v7G/EFQJ
+ fe2AL6rO7AGc0k4tLtrjMEBtbr+KdoQ=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-4ocLme_bMeWBhegO8uJGGQ-1; Tue, 24 Mar 2020 10:47:43 -0400
+X-MC-Unique: 4ocLme_bMeWBhegO8uJGGQ-1
+Received: by mail-ed1-f71.google.com with SMTP id b12so12036430edy.7
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 07:47:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=k70VFiKfJdi6EgI9uJjnXPafsgQGBusNt9dgFGjtg1k=;
+ b=VLUOyoX08S1F2RSfiFLOWrUN+oW7eiFgs/j6Uhm9cpvt2BPyG/2DH+wvML+QuTqZST
+ i5QWQzsRelC+w3Gyt+0gj16HEStZFTKvTy1PIByJMATslYuBHrRdYeem1dYlnATizSCR
+ 9D8KsoaSXgoufn86+n5qv9VU6omWtJPyYQWxCE6BQXgrRWJbrdKtnkibw8k2oq3i+1J0
+ pgtWiVfRUUN02azSIijSxhNxnfssOqWYQmMr5qNVJhwi5kvCvpevuphNi3+cW1XjanMR
+ /7fg1Yz0qH/MF7fTspVOHtzLxa1YUT5c/VAOHrQM5/OQxnEvjJUTzq6aUAXXUQGhha5z
+ 0k1Q==
+X-Gm-Message-State: ANhLgQ26G08rwfU96+CTQ32UwcmibHXwiL5A0dDMf2JgNOOo1n39dPsE
+ i/XJV/N6UBEHdXDuvqe4cM/dvBlpNqgS8bHYq8c7cA02neKikx3gHKLruyjq2YCwcxLdpP1TGOD
+ 1Y8ptFfCY4/QRvFw=
+X-Received: by 2002:a17:906:e259:: with SMTP id
+ gq25mr23737028ejb.262.1585061262619; 
+ Tue, 24 Mar 2020 07:47:42 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvu0wuqtV2op571eXBajAf8Bi8MGnh8prBpXVaVEkIcpj8GJ/pfrOu/lLL/yPzljoNI1Wfvaw==
+X-Received: by 2002:a17:906:e259:: with SMTP id
+ gq25mr23737012ejb.262.1585061262279; 
+ Tue, 24 Mar 2020 07:47:42 -0700 (PDT)
+Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.37])
+ by smtp.gmail.com with ESMTPSA id t13sm1308714edj.8.2020.03.24.07.47.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Mar 2020 07:47:41 -0700 (PDT)
+Subject: Re: [PATCH qemu] vfio/spapr: Fix page size calculation
+To: Greg Kurz <groug@kaod.org>
+References: <20200324063912.25063-1-aik@ozlabs.ru>
+ <87ddd733-8498-57a5-2fe2-8f1a3e60e0c9@redhat.com>
+ <20200324153017.01c45ec0@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <357712a6-2e9e-b3e1-549c-de73bad4ec6e@redhat.com>
+Date: Tue, 24 Mar 2020 15:47:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200317004105.27059-6-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200324153017.01c45ec0@bahia.lan>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,53 +109,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
- philmd@redhat.com, armbru@redhat.com
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or
-Content-Type: multipart/mixed; boundary="POMmOI39VqP96LeCKHjUOSqPlwhlgvRBr"
-
---POMmOI39VqP96LeCKHjUOSqPlwhlgvRBr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 17.03.20 01:40, John Snow wrote:
-> This allows others to get repeatable results with pylint. If you run
-> `pylint iotests.py`, you should see a 100% pass.
+On 3/24/20 3:30 PM, Greg Kurz wrote:
+> On Tue, 24 Mar 2020 14:27:35 +0100
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 >=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/pylintrc | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
->  create mode 100644 tests/qemu-iotests/pylintrc
+>>
+>>
+>> On 3/24/20 7:39 AM, Alexey Kardashevskiy wrote:
+>>> Coverity detected an issue (CID 1421903) with potential call of clz64(0=
+)
+>>> which returns 64 which make it do "<<" with a negative number.
+>>>
+>>> This checks the mask and avoids undefined behaviour.
+>>>
+>>> In practice pgsizes and memory_region_iommu_get_min_page_size() always
+>>> have some common page sizes and even if they did not, the resulting pag=
+e
+>>> size would be 0x8000.0000.0000.0000 (gcc 9.2) and
+>>> ioctl(VFIO_IOMMU_SPAPR_TCE_CREATE) would fail anyway.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>>    hw/vfio/spapr.c | 6 +++---
+>>>    1 file changed, 3 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+>>> index 33692fc86fd6..2900bd19417a 100644
+>>> --- a/hw/vfio/spapr.c
+>>> +++ b/hw/vfio/spapr.c
+>>> @@ -147,7 +147,7 @@ int vfio_spapr_create_window(VFIOContainer *contain=
+er,
+>>>    {
+>>>        int ret =3D 0;
+>>>        IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr)=
+;
+>>> -    uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_=
+mr);
+>>> +    uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_=
+mr), pgmask;
+>>>        unsigned entries, bits_total, bits_per_level, max_levels;
+>>>        struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeo=
+f(create) };
+>>>        long rampagesize =3D qemu_minrampagesize();
+>>> @@ -159,8 +159,8 @@ int vfio_spapr_create_window(VFIOContainer *contain=
+er,
+>>>        if (pagesize > rampagesize) {
+>>>            pagesize =3D rampagesize;
+>>>        }
+>>> -    pagesize =3D 1ULL << (63 - clz64(container->pgsizes &
+>>> -                                   (pagesize | (pagesize - 1))));
+>>> +    pgmask =3D container->pgsizes & (pagesize | (pagesize - 1));
+>>
+>> Is that ROUND_UP(container->pgsizes, pagesize)?
+>>
+>=20
+> This means we clip all page sizes greater than pagesize from
+> container->pgsizes... It doesn't look like ROUND_UP() semantics
+> to me.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Ah. Extracting it as a new function with meaningful name would help code=20
+review :)
 
-
---POMmOI39VqP96LeCKHjUOSqPlwhlgvRBr--
-
---WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl56HZ4ACgkQ9AfbAGHV
-z0AAzQgAitk2GjB2K/hsHN+0e77uplBO/F9KfuVtLr9iQzUfueDCYwFPNckyVZcY
-ZXYbS9hgGJU2D0KrM8UhtAin171DmZ6gQtiwo3bT6q7I9bYVRsKu5jRnD3prL42w
-K9JUUdwa7S5RCGUaf0DNuttveh2R8YACBGyO6lup1HA6QjkX4INloSrarVQFHBic
-IHB5i0WLxlWo7LTecraRr74po+vhd38HiQvnRgmCRtiApWMQnR+vi1sztKQxD2n2
-SsjS31MbTX/VZEqTrCe74YS0oBbPKWwrkhPdK306ceCDX3hD4KbXyqawBQqweaIV
-yE/n8A6vdj9Gz/t+tdkoCDvRJO8z3Q==
-=YHMc
------END PGP SIGNATURE-----
-
---WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or--
+>=20
+>>> +    pagesize =3D pgmask ? (1ULL << (63 - clz64(pgmask))) : 0;
+>>>        if (!pagesize) {
+>>>            error_report("Host doesn't support page size 0x%"PRIx64
+>>>                         ", the supported mask is 0x%lx",
+>>>
+>>
+>>
+>=20
 
 
