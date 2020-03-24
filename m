@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D7AC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E057C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:11:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54624206F6
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:10:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57810206F6
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:11:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="daf56wJt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54624206F6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PqhB3viL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57810206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGn4i-0006pj-FN
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:10:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54479)
+	id 1jGn5d-00087S-Gd
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:11:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54607)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jGn3v-0005os-Td
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:10:01 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jGn4n-0007Ev-89
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jGn3t-0002NZ-MB
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:09:59 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:57488)
+ (envelope-from <jsnow@redhat.com>) id 1jGn4m-0003EK-5y
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:10:53 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:32656)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jGn3t-0002N3-DB
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:09:57 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jGn4m-0003E2-2I
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:10:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585069796;
+ s=mimecast20190719; t=1585069851;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=PqSQN7+dzusuZdAZpXoisALJjFX2AVOZruUZGt2nSx8=;
- b=daf56wJtDmWy27n/Hx/ewARcpHQYJ9/fdMySVYWVxf/up5XHBzma4XYlRsNNN2ky0Ds/4N
- QJOFxxtLJThgGmBffJvYMcVOeAUOX1fqCoxuBbZI/p+s3vPDnaE61jU2w9dnSi7/6LXs++
- WRYDOF63dlR4dETU7vnK1Go6VaPFfIg=
+ bh=6nZwQyraofxKGwRL3G7woPbkN4xQba+1aCxyXDztlxw=;
+ b=PqhB3viLS7I0EkZNp1YXlNBpmZAygEtSmta+MDcHDhVOGUfozWpyEddRTp4mSEAlfeU0aS
+ WkLMchi728C4V1n+X3uI2YjjJdpzTVu7FWap0hW5rraVBz3QA0BeV7ZNbB+pXRc6ry4Ztj
+ 10lW8YXXoCfmH513tDRxkYMppXCHD9Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-jDyUv-UBO6qwlZMuJJlbag-1; Tue, 24 Mar 2020 13:09:51 -0400
-X-MC-Unique: jDyUv-UBO6qwlZMuJJlbag-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-199-xRPt7ssuMy-2FE2IwgiyqQ-1; Tue, 24 Mar 2020 13:10:49 -0400
+X-MC-Unique: xRPt7ssuMy-2FE2IwgiyqQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 212BE800D50;
- Tue, 24 Mar 2020 17:09:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3782A8017DF;
+ Tue, 24 Mar 2020 17:10:47 +0000 (UTC)
 Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8AA4A60BE0;
- Tue, 24 Mar 2020 17:09:46 +0000 (UTC)
-Subject: Re: [PATCH v8 07/11] iotests: limit line length to 79 chars
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20200317004105.27059-1-jsnow@redhat.com>
- <20200317004105.27059-8-jsnow@redhat.com>
- <dcc1f8fa-2916-4241-b213-5ddf0ed62c34@redhat.com>
- <2f230c22-bd4b-ded5-27a9-1971efea0ec3@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6C5CB5C1B2;
+ Tue, 24 Mar 2020 17:10:41 +0000 (UTC)
+Subject: Re: [PATCH 2/6] block/mirror: fix use after free of local_err
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+ <20200324153630.11882-3-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -139,20 +138,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <bdff3fe8-fb51-51b1-f9b1-a111c2fcd04b@redhat.com>
-Date: Tue, 24 Mar 2020 13:09:45 -0400
+Message-ID: <a34a7f16-cca9-c551-af78-53b673aea0cf@redhat.com>
+Date: Tue, 24 Mar 2020 13:10:40 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <2f230c22-bd4b-ded5-27a9-1971efea0ec3@redhat.com>
+In-Reply-To: <20200324153630.11882-3-vsementsov@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -164,107 +164,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
- philmd@redhat.com, armbru@redhat.com
+Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com,
+ den@openvz.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 3/24/20 11:12 AM, Max Reitz wrote:
-> On 24.03.20 16:02, Max Reitz wrote:
->> On 17.03.20 01:41, John Snow wrote:
->>> 79 is the PEP8 recommendation. This recommendation works well for
->>> reading patch diffs in TUI email clients.
->>
->> Also for my very GUI-y diff program (kompare).
->>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  tests/qemu-iotests/iotests.py | 64 +++++++++++++++++++++++------------
->>>  tests/qemu-iotests/pylintrc   |  6 +++-
->>>  2 files changed, 47 insertions(+), 23 deletions(-)
->>>
->>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
-.py
->>> index 3d90fb157d..75fd697d77 100644
->>> --- a/tests/qemu-iotests/iotests.py
->>> +++ b/tests/qemu-iotests/iotests.py
->>
->> [...]
->>
->>> @@ -529,11 +539,13 @@ def pause_drive(self, drive, event=3DNone):
->>>              self.pause_drive(drive, "write_aio")
->>>              return
->>>          self.qmp('human-monitor-command',
->>> -                 command_line=3D'qemu-io %s "break %s bp_%s"' % (drive=
-, event, drive))
->>> +                 command_line=3D'qemu-io %s "break %s bp_%s"'
->>> +                 % (drive, event, drive))
->>
->> Can we put this value in a variable instead?  I don=E2=80=99t like the %
->> aligning with the parameter name instead of the string value.  (I also
->> don=E2=80=99t like how there are no spaces around the assignment =3D, bu=
-t around
->> the %, even though the % binds more strongly.)
->>
->>> =20
+On 3/24/20 11:36 AM, Vladimir Sementsov-Ogievskiy wrote:
+> local_err is used again in mirror_exit_common() after
+> bdrv_set_backing_hd(), so we must zero it. Otherwise try to set
+> non-NULL local_err will crash.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/mirror.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 447051dbc6..6203e5946e 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -678,6 +678,7 @@ static int mirror_exit_common(Job *job)
+>              bdrv_set_backing_hd(target_bs, backing, &local_err);
+>              if (local_err) {
+>                  error_report_err(local_err);
+> +                local_err = NULL;
+>                  ret = -EPERM;
+>              }
+>          }
+> 
 
-I think I had another patch somewhere that added an HMP helper that
-fixes this issue for this particular instance.
-
-I can send that separately as a follow-up. I think otherwise,
-unfortunately, "we" "decided" that this indent style is "best".
-
-So I think that this patch is "correct".
-
-
-(All of the other options for indent styles seemed to be worse visually,
-or actively go against PEP8. While PEP8 is not a bible, every conscious
-choice to disregard it generally means you will be fighting a CQA tool
-at some other point in time. I have therefore adopted a "When in Rome"
-policy to reduce friction wherever possible with pylint, flake8, mypy,
-pycharm, and so on.)
-
-
-((I would prefer we begin to deprecate uses of % and begin using
-.format() and f-strings wherever possible to help alleviate this kind of
-syntax, too -- but I must insist that's for another series.))
-
-
->>>      def resume_drive(self, drive):
->>>          self.qmp('human-monitor-command',
->>> -                 command_line=3D'qemu-io %s "remove_break bp_%s"' % (d=
-rive, drive))
->>> +                 command_line=3D'qemu-io %s "remove_break bp_%s"'
->>> +                 % (drive, drive))
->>> =20
->>>      def hmp_qemu_io(self, drive, cmd):
->>>          '''Write to a given drive using an HMP command'''
->>> @@ -793,16 +805,18 @@ def dictpath(self, d, path):
->>>                  idx =3D int(idx)
->>> =20
->>>              if not isinstance(d, dict) or component not in d:
->>> -                self.fail('failed path traversal for "%s" in "%s"' % (=
-path, str(d)))
->>> +                self.fail(f'failed path traversal for "{path}" in "{d}=
-"')
->>
->> Do we require 3.6 so that f-strings are guaranteed to work?  (I thought
->> we didn=E2=80=99t.  I=E2=80=99d be happy to use them.)
->=20
-> Oh.  Of course we do.  It says so in this file that this whole series is
-> about.
->=20
-
-Yup. I didn't like the idea of iotests using a newer version of python
-than our build system, but my concern was not shared, so we get to use
-f-strings for non-buildtime tools.
-
-End of support for Python 3.5 will be 2020-09-13; so we'll get to use
-f-strings everywhere else soon, too.
-
---js
+Reviewed-by: John Snow <jsnow@redhat.com>
 
 
