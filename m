@@ -1,84 +1,84 @@
 Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7E7C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC3BC4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7D3920870
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:58:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95B5B2080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mmDmRb/0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7D3920870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LeI681sO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B5B2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGj8C-0001so-5U
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:58:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45441)
+	id 1jGj9H-0003W9-Oa
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:59:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45594)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jGj7a-0001UA-IB
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:57:31 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jGj8Z-0002Li-CR
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:58:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jGj7Z-0008SQ-Fn
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:57:30 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46173)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuval.shaia.ml@gmail.com>)
- id 1jGj7Z-0008SA-At
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:57:29 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 111so16817980oth.13
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 05:57:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CkJZNrjmhfk/y88Op3KJ2RkjcBGbLJ/wD41EaDCXZuk=;
- b=mmDmRb/01N8r2xrug2Ois6fXJRD7d5YihbpGLFywChReOPHpFjO78CY+4i7tHO/FX7
- 8/5KRYu5B8ADjQfGvNz45Rj+UyuqQsqCQGFcMPhbDsiaRCWZhvQaozMt9rh6XdBNwXCn
- jFiU00K0aLRqUXE/xcULZkrdbXRNABspfHy5FsbL0llw18aes2GQCsGaL08hRCUo1GNW
- 0FcyQEAPwtvfJJJdAxlmsTyYu2SUbWvpv/Lb0eDgyDshQCsKbKqN7os2hmD/rANATB0I
- ofRqLqmpgjY/RGsRxEBUEs0l3xF8/4XFD/k8wDernhWq27jch3+363T/u8ecLSJ+Dia/
- LjAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CkJZNrjmhfk/y88Op3KJ2RkjcBGbLJ/wD41EaDCXZuk=;
- b=HpxrFzz+HufIyekDxuAFe8mx8DyXKEis7rx7IRRUKyWsm5wTj0YvnQqVJq2MIP78kr
- Ving+CnrtYLjTMuzdnM8AcXohgMaBYBDN8GjZSk7LXu6MBHgDMmmwHnQCia6665D4Xqc
- S4x6O7NXhvwgU0ETd7OJwGvUM4NZtMie8uduMRZluTDE5gNdbr7JokbOOmRR3u0Wtgt6
- JVZ2y4eMx0tGP6R7nroyBmgmysE7EDo15Keeof7zDWZYW7Z0JmzZcqEsFgGTtgePYsTT
- /oKQPfoRxTCVICIGsfosTzx1vGj1/h0HQ+/lr4TRQZF7acNLlbwndv1F/CXuAQMDHB6x
- RepQ==
-X-Gm-Message-State: ANhLgQ0lbCNShlvNvqq27hGIRtOTLXlS/f1Ylhr3Jj8Y4j6ojgGLerwV
- TPz6vypO2r3t11N5TzQzQR9uvcOldTBnD4XSvD0=
-X-Google-Smtp-Source: ADFU+vu1KJm//QXrF0Ru4rEclVGWLtllMNFUlyD/GLx3UY0el6LYRMKgq/3jO7VCHqsDA4TgTfCzxkpXfaXZ0/OfySE=
-X-Received: by 2002:a4a:a286:: with SMTP id h6mr1893507ool.47.1585054648429;
- Tue, 24 Mar 2020 05:57:28 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1jGj8X-0000Pk-W2
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:58:31 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:32542)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jGj8X-0000PO-SZ
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:58:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585054709;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oWoxJwkSaxdZJFzu2c9akVSWs0RILOzoA63VYFffJlQ=;
+ b=LeI681sO5TgWx1acQzcVuCxZLu6RweQVqXiEVAICAzivjElZib7VcOWxqyrpK/hFtY8xAp
+ 4PYJoRSlU1ZUBCzYT18hT2x3OA8mNPuXyF1987L2PysPO7whPsWCaruNS7tdxI8oj0LjfI
+ o3BH91vPjPtlAs+BqcwTU/dFrBAXh2c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-D-W_7vCQOPid7B7ezRf_Vw-1; Tue, 24 Mar 2020 08:58:27 -0400
+X-MC-Unique: D-W_7vCQOPid7B7ezRf_Vw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A98B51005510;
+ Tue, 24 Mar 2020 12:58:26 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-119.ams2.redhat.com [10.36.113.119])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 85C411001B3F;
+ Tue, 24 Mar 2020 12:58:25 +0000 (UTC)
+Date: Tue, 24 Mar 2020 13:58:24 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: Potential Null dereference
+Message-ID: <20200324125824.GH5417@linux.fritz.box>
+References: <CAGT9xrCJSy6yQ48p3hCRuwgV7t8vPS7eo+83_pOiPp0gDOfvvQ@mail.gmail.com>
+ <336bbdf8-140a-e884-d5d1-0610a9b1c6a6@redhat.com>
+ <20200324095056.GD5417@linux.fritz.box>
+ <b432626a-49c9-255e-5e26-b296490a52cd@virtuozzo.com>
+ <c99b61b9-08eb-92cc-5590-e28076b23e43@virtuozzo.com>
 MIME-Version: 1.0
-References: <20200324105356.7998-1-yuval.shaia.ml@gmail.com>
- <CAFEAcA_D3ykX2mJwtJhvdQg3psCX9NdcG0xq4qmP3CkqHtnY8Q@mail.gmail.com>
- <72691a5a-8992-ec54-f2de-6209cafcc426@gmail.com>
- <CAMPkWoNqKpn22Y70vZizFqd3BQjVJaSwjE25KwHOcMJaZsY17w@mail.gmail.com>
- <CAFEAcA9=AGgYAxjixjau8KDet-of4=Vg9a_2k-hV54h=1gbrSA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9=AGgYAxjixjau8KDet-of4=Vg9a_2k-hV54h=1gbrSA@mail.gmail.com>
-From: Yuval Shaia <yuval.shaia.ml@gmail.com>
-Date: Tue, 24 Mar 2020 14:57:17 +0200
-Message-ID: <CAMPkWoNh_ZX+kUoEkMndY_ShQ0qKNTvYoq9aVM7G1pFLW2CdCg@mail.gmail.com>
-Subject: Re: [PATCH] hw/rdma: Lock before destroy
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000044f1d505a1994b34"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <c99b61b9-08eb-92cc-5590-e28076b23e43@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,80 +90,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Mansour Ahmadi <ManSoSec@gmail.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000044f1d505a1994b34
-Content-Type: text/plain; charset="UTF-8"
+Am 24.03.2020 um 13:37 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 24.03.2020 14:59, Vladimir Sementsov-Ogievskiy wrote:
+> > Aha, new crashes! Let's look at them.
+> >=20
+> > 41 and 155 failed with crash, 141 without but I see "+{"error": {"class=
+": "GenericError", "desc": "Block device drv0 is in use"}}" in its output.
+> >=20
+> > Hmm, but all crashes are because of assert(QTAILQ_EMPTY(&all_bdrv_state=
+s)); in bdrv_close_all..
+> >=20
+> > So, we have a problem, but another one..
+>=20
+> Investigate it a bit more.
+>=20
+> Accordingly to comment, bdrv_attach_child unrefs child bs even on failure=
+, so let's do
+>=20
+> --- a/block.c
+> +++ b/block.c
+> @@ -2768,6 +2768,7 @@ void bdrv_set_backing_hd_ex(BlockDriverState *bs, B=
+lockDriverState *backing_hd,
+>=20
+>      if (bdrv_attach_child_fail) {
+>          bs->backing =3D NULL;
+> +        bdrv_unref(backing_hd);
+>          error_setg(errp, "Unpredicted failure :)");
+>      } else {
+>          bs->backing =3D bdrv_attach_child(bs, backing_hd, "backing", &ch=
+ild_backing,
+>=20
+>=20
+> - then, all three tests fails, but without crashes. OK.
+>=20
+> The only interesting thing is that, it seems that bdrv_attach_child doesn=
+'t unref child on all failure paths.
+>=20
+> It calls bdrv_root_attach_child..
+>=20
+> which doesn't unref child on the path
+>=20
+> if (bdrv_get_aio_context(child_bs) !=3D ctx) {
+>   ...
+>    if (ret < 0) {
+>          error_propagate(errp, local_err);
+>          g_free(child);
+>          bdrv_abort_perm_update(child_bs);
+>          return NULL;
+>    }
+> }
+>=20
+> or am I wrong?
 
-On Tue, 24 Mar 2020 at 13:55, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+I think you're right, we need a bdrv_unref() there. The function comment
+makes it clear that bdrv_root_attach_child() is supposed to consume the
+reference both in success and error cases.
 
-> On Tue, 24 Mar 2020 at 11:25, Yuval Shaia <yuval.shaia.ml@gmail.com>
-> wrote:
-> > As i already said, current code makes sure it will not happen
-> > however it better that API will ensure this and will not trust callers.
->
-> I agree with the principle, but I think that here there is no
-> way to do it -- if you are literally destroying an object
-> then it is invalid to use it after destruction and there
-> is no way to have a lock that protects against that kind
-> of bug, unless the lock is at a higher level (ie the
-> thing that owns the destroyed-object has a lock and
-> doesn't allow access to it outside the lock or without
-> a check for has-been-destroyed). Just throwing an extra
-> mutex-lock into the destroy function doesn't add any
-> protection.
->
+Kevin
 
-Make sense.
-So what i can do is to check list->list at every API since destroy
-functions sets it to NULL.
-
-Does it make sense?
-
-
->
-> thanks
-> -- PMM
->
-
---00000000000044f1d505a1994b34
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, 24 Mar 2020 at 13:55, Peter M=
-aydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linaro=
-.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
-ex">On Tue, 24 Mar 2020 at 11:25, Yuval Shaia &lt;<a href=3D"mailto:yuval.s=
-haia.ml@gmail.com" target=3D"_blank">yuval.shaia.ml@gmail.com</a>&gt; wrote=
-:<br>
-&gt; As i already said, current code makes sure it will not happen<br>
-&gt; however it better that API will ensure this and will not trust callers=
-.<br>
-<br>
-I agree with the principle, but I think that here there is no<br>
-way to do it -- if you are literally destroying an object<br>
-then it is invalid to use it after destruction and there<br>
-is no way to have a lock that protects against that kind<br>
-of bug, unless the lock is at a higher level (ie the<br>
-thing that owns the destroyed-object has a lock and<br>
-doesn&#39;t allow access to it outside the lock or without<br>
-a check for has-been-destroyed). Just throwing an extra<br>
-mutex-lock into the destroy function doesn&#39;t add any<br>
-protection.<br></blockquote><div><br></div><div>Make sense.</div><div>So wh=
-at i can do is to check list-&gt;list at every API since destroy functions =
-sets it to NULL.</div><div><br></div><div>Does it make sense?</div><div>=C2=
-=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
-x;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-thanks<br>
--- PMM<br>
-</blockquote></div></div>
-
---00000000000044f1d505a1994b34--
 
