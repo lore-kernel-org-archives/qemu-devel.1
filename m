@@ -2,79 +2,89 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9048EC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC26EC4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:20:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E40820786
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:13:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9971120870
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:20:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bs0Og1Hp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E40820786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BZFTuAGh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9971120870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGgZA-0003Cl-IR
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 06:13:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50231)
+	id 1jGgfT-0005bO-Qt
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 06:20:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jGgUF-0004LK-IT
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:08:44 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jGgeY-00055N-Gb
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jGgU9-0003b7-Id
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:08:42 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26195)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jGgU9-0003aT-At
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:08:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585044516;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AyHe0M8kHT+p3dI5Gi4VZ6mu2KuPIyvLLCims2QpujQ=;
- b=bs0Og1HpYe79iTxeqWjhXaHCb2snvpDrqIYrPKJtFPtepDfqnsiwf8DtRlZJeI0BL2jPOO
- tqfACIl80HFsBsWllSLWmg4Ikdem9xAxyEj2oP6/JadaU0jGAAQyQshkh3s4F70/GPclUS
- P9k1I5nc8uUs8eSRG1olCPAoKbSBixQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-jPs4E31FOV-PjijfFi1kXA-1; Tue, 24 Mar 2020 06:08:34 -0400
-X-MC-Unique: jPs4E31FOV-PjijfFi1kXA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C3C18017DF;
- Tue, 24 Mar 2020 10:08:28 +0000 (UTC)
-Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 45CB9194BB;
- Tue, 24 Mar 2020 10:08:25 +0000 (UTC)
-Date: Tue, 24 Mar 2020 10:08:23 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Subject: Re: [PATCH v2] migration: use "" instead of (null) for tls-authz
-Message-ID: <20200324100823.GB2645@work-vm>
-References: <0a9dc2fcb78da13eb326992384bc4e57de83d9f9.1584797648.git.maozhongyi@cmss.chinamobile.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1jGgeR-0004cX-5K
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:19:20 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38585)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jGgeP-0004YR-Qq
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:19:15 -0400
+Received: by mail-wr1-x442.google.com with SMTP id s1so20681036wrv.5
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 03:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=jNTB9UiCOvEmZjdiIH1rwukYdAv+6PN2ItTLYIoQp10=;
+ b=BZFTuAGhrPosqNHtG2ThFLUKrJxn1iphk2I9uBufgX9715CyWvkWclFXFwjKFUBpUC
+ XXR2vFMmN+rMpUCeI1rZynm1HlCWLwt1HrrvS1/X2GTjJme8ogdtZ1HffjIMVnKB+LmP
+ ngOh51KctMLiewVGCknh4sVmHGmgtrGSN75IIn3Ag9oePsg4iTWZOllCbcE94vJWKgEp
+ HJhE/Z5BBdc6YfkDK2Wx9COpjbbHI24U9UvkcELc1vONa0hwTZFPcz50/E3n6ivfgKc+
+ 5gU3GtcKtwPWRul4K0gurOzbPj1Rs68SLCzByOtdDL6/aLBycS5RVoOT4HXe+FzJCGxT
+ FxXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=jNTB9UiCOvEmZjdiIH1rwukYdAv+6PN2ItTLYIoQp10=;
+ b=ErpaLKyTZFwuWi17qD9cEax0x02duOMNQm5QFdab5GqIA9rwHrowu1b4lBxIxgUqCo
+ NfgdsstQqlpyIHjjzW3pfKvcapEPo3JXhgqEyQEMWz56pwvg+ZetOkK0PBoyjW89/3BA
+ o1NU0ZpWTEMZH4ZvWWM38D7Karz6eTA9k6HUa3gSi//PhQbVXKLParTyzSOthQMJfduY
+ gZTVSPX/DsVVVtOJhgLcg6Rc+qxSp9hiCuZ/7cYXjr3VZ58XNp5ZI8fdOV63HSyhsAU1
+ 6W32ztf06YuCd0Jc+ntK2g68nGTcfMfPioSd72qArBUpV114e0Hg2Vx+SNQ4Mg/DkoSS
+ /jhw==
+X-Gm-Message-State: ANhLgQ2lTO5cuP3TdqI3bDtWkSt4/w6V42t4GTAr0IvXNM6uyysef4RT
+ B8H49QnX/GKHeXBwscnCkLPtIQ==
+X-Google-Smtp-Source: ADFU+vv/B74lHFDdcqb1FElgKEv/8dK7Vt4iGG0rHUCyaQVT8JMJDur/53v+0aFjl3b5b50jwyj3WA==
+X-Received: by 2002:adf:f310:: with SMTP id i16mr35512055wro.100.1585045152301; 
+ Tue, 24 Mar 2020 03:19:12 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j39sm29471981wre.11.2020.03.24.03.19.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Mar 2020 03:19:11 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2C1211FF7E;
+ Tue, 24 Mar 2020 10:19:10 +0000 (GMT)
+References: <20200130163232.10446-1-philmd@redhat.com>
+ <20200130163232.10446-8-philmd@redhat.com>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 07/12] tests/acceptance: Remove shebang header
+In-reply-to: <20200130163232.10446-8-philmd@redhat.com>
+Date: Tue, 24 Mar 2020 10:19:10 +0000
+Message-ID: <87369yawdd.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <0a9dc2fcb78da13eb326992384bc4e57de83d9f9.1584797648.git.maozhongyi@cmss.chinamobile.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,87 +96,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- quintela@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ =?utf-8?Q?Dan?= =?utf-8?Q?iel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Mao Zhongyi (maozhongyi@cmss.chinamobile.com) wrote:
-> run:
-> (qemu) info migrate_parameters
-> announce-initial: 50 ms
-> ...
-> announce-max: 550 ms
-> multifd-compression: none
-> xbzrle-cache-size: 4194304
-> max-postcopy-bandwidth: 0
->  tls-authz: '(null)'
->=20
-> Migration parameter 'tls-authz' is used to provide the QOM ID
-> of a QAuthZ subclass instance that provides the access control
-> check, default is NULL. But the empty string is not a valid
-> object ID, so use "" instead of the default. Although it will
-> fail when lookup an object with ID "", it is harmless, just
-> consistent with tls_creds.
 
-Yes, it's probably the best we can do given Dan's explanation that
-we can't change tls_authz to be non-null.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Also fixed the bad indentation on the last line.
->=20
-> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Patch created mechanically by running:
+>
+>   $ chmod 644 $(git grep -lF '#!/usr/bin/env python' \
+>       | xargs grep -L 'if __name__.*__main__')
+>   $ sed -i "/^#\!\/usr\/bin\/\(env\ \)\?python.\?$/d" \
+>       $(git grep -lF '#!/usr/bin/env python' \
+>       | xargs grep -L 'if __name__.*__main__')
+
+OK, but my question is why? Aren't shebangs considered good practice for
+finding the executable for a script?
+
+If the acceptance scripts are special in this regard we should say why
+in the commit message.
+
+>
+> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  migration/migration.c | 3 ++-
->  monitor/hmp-cmds.c    | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index c1d88ace7f..b060153ef7 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -790,7 +790,8 @@ MigrationParameters *qmp_query_migrate_parameters(Err=
-or **errp)
->      params->has_tls_hostname =3D true;
->      params->tls_hostname =3D g_strdup(s->parameters.tls_hostname);
->      params->has_tls_authz =3D true;
-> -    params->tls_authz =3D g_strdup(s->parameters.tls_authz);
-> +    params->tls_authz =3D s->parameters.tls_authz ? \
-> +                        g_strdup(s->parameters.tls_authz) : g_strdup("")=
-;
+>  tests/acceptance/virtio_seg_max_adjust.py  | 1 -
+>  tests/acceptance/x86_cpu_model_versions.py | 1 -
+>  2 files changed, 2 deletions(-)
+>  mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust.py
+>
+> diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance=
+/virtio_seg_max_adjust.py
+> old mode 100755
+> new mode 100644
+> index 5458573138..8d4f24da49
+> --- a/tests/acceptance/virtio_seg_max_adjust.py
+> +++ b/tests/acceptance/virtio_seg_max_adjust.py
+> @@ -1,4 +1,3 @@
+> -#!/usr/bin/env python
+>  #
+>  # Test virtio-scsi and virtio-blk queue settings for all machine types
+>  #
+> diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
+e/x86_cpu_model_versions.py
+> index 90558d9a71..01ff614ec2 100644
+> --- a/tests/acceptance/x86_cpu_model_versions.py
+> +++ b/tests/acceptance/x86_cpu_model_versions.py
+> @@ -1,4 +1,3 @@
+> -#!/usr/bin/env python
+>  #
+>  # Basic validation of x86 versioned CPU models and CPU model aliases
+>  #
 
-The \ is unneeded; this isn't a macro; it's also a little shorter to do
-it as:
-    params->tls_authz =3D g_strdup(s->parameters.tls_authz ?
-                                 s->parameters.tls_authz : "");
 
-Dave
-
-
->      params->has_max_bandwidth =3D true;
->      params->max_bandwidth =3D s->parameters.max_bandwidth;
->      params->has_downtime_limit =3D true;
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 58724031ea..f8be6bbb16 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -459,7 +459,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const =
-QDict *qdict)
->          monitor_printf(mon, "%s: %" PRIu64 "\n",
->              MigrationParameter_str(MIGRATION_PARAMETER_MAX_POSTCOPY_BAND=
-WIDTH),
->              params->max_postcopy_bandwidth);
-> -        monitor_printf(mon, " %s: '%s'\n",
-> +        monitor_printf(mon, "%s: '%s'\n",
->              MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
->              params->has_tls_authz ? params->tls_authz : "");
->      }
-> --=20
-> 2.17.1
->=20
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+--=20
+Alex Benn=C3=A9e
 
