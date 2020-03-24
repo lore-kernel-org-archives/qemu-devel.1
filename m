@@ -2,156 +2,86 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A765C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C18C4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:36:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0762C20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:35:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D238520714
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:36:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dgh+Hs5b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0762C20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="gbO5Pwjk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D238520714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGpKU-0004jy-7l
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:35:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48880)
+	id 1jGpLG-0005io-2M
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:36:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jGpJR-0003yq-8P
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:34:10 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jGpKL-0004nt-Ur
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jGpJQ-00073l-3t
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:34:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:37548)
+ (envelope-from <kwankhede@nvidia.com>) id 1jGpKK-0007Le-SZ
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:35:05 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:11784)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jGpJP-00073S-VP
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:34:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585078447;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=beeLMPQ2YxzPX9+XiE3Ks+w9sKMAHHSdmSWhcc4ApwQ=;
- b=Dgh+Hs5bwGJj4TxuZZ5Cl0xc9F6Cu3IPDZMIeVWm+F9iTGeeQA4+hutvSG9jvCcVXGZzW2
- FeUVY6uQjPw2yLy7BOAd9I+bj33JQntSqTehpMUlYqDzgiZr7ddDLjwOpeVX5u+g/aEEtr
- ldEBKB+E3fELRknegUAQnZDQraBbH1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-Dypj2FdBNEmPlSn8XG2H9Q-1; Tue, 24 Mar 2020 15:34:05 -0400
-X-MC-Unique: Dypj2FdBNEmPlSn8XG2H9Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BAEEA1373;
- Tue, 24 Mar 2020 19:34:04 +0000 (UTC)
-Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A193F19C6A;
- Tue, 24 Mar 2020 19:34:00 +0000 (UTC)
-Subject: Re: [PATCH v2 4/4] sheepdog: Consistently set
- bdrv_has_zero_init_truncate
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200324174233.1622067-1-eblake@redhat.com>
- <20200324174233.1622067-5-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <ac395fd2-9a17-4c38-49e4-4d3e2495f789@redhat.com>
-Date: Tue, 24 Mar 2020 15:33:59 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1jGpKK-0007KO-MS
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:35:04 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e7a608c0000>; Tue, 24 Mar 2020 12:33:32 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Tue, 24 Mar 2020 12:35:03 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Tue, 24 Mar 2020 12:35:03 -0700
+Received: from [10.40.103.72] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 24 Mar
+ 2020 19:34:54 +0000
+Subject: Re: [PATCH v15 Kernel 2/7] vfio iommu: Remove atomicity of ref_count
+ of pinned pages
+To: Auger Eric <eric.auger@redhat.com>, <alex.williamson@redhat.com>,
+ <cjia@nvidia.com>
+References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
+ <1584649004-8285-3-git-send-email-kwankhede@nvidia.com>
+ <b2e791ee-e55a-3142-119c-c2f4300fabd5@redhat.com>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <ae258072-89db-8c88-ad6a-8084781a0205@nvidia.com>
+Date: Wed, 25 Mar 2020 01:04:50 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200324174233.1622067-5-eblake@redhat.com>
+In-Reply-To: <b2e791ee-e55a-3142-119c-c2f4300fabd5@redhat.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1585078412; bh=40wVc0Yor8YTosJnEQ2TGgBM6wIvNiRWDsFVZ7Q/Fjg=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=gbO5PwjkX/gKB+EUSCsbtRqYcPexTnIjStcBsnRgvqlKBBhAReRViuGL9KGrip2k0
+ alwsjRbBM3RM08beJomQv/L1sQqapeflSlKBP2U+VkH9scY8iV7pdV6urcQ4Go+bww
+ MW62nZnfwjKBCykW750YUNfwjjAl3bVvAQvxYERWtHJhJzidFA2u49f4x/DRHET9sx
+ Cb6MFYQRuZA+XurNLS8nB5k5kbhTNXqsADBAQ4nHW8jRIm24QmAKjYKmD7VUJsYDtb
+ vdd5yOFWZSRBADJA/J85Z9VxOpuJ/6GHI4uaOEzp6BBGykCT7ekkE0uXNqYw3AsezB
+ WmNRW9IEqjy8w==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,50 +93,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Liu Yuan <namei.unix@gmail.com>,
- "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
+ felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 3/24/20 1:42 PM, Eric Blake wrote:
-> block_int.h claims that .bdrv_has_zero_init must return 0 if
-> .bdrv_has_zero_init_truncate does likewise; but this is violated if
-> only the former callback is provided if .bdrv_co_truncate also exists.
-> When adding the latter callback, it was mistakenly added to only one
-> of the three possible sheepdog instantiations.
+On 3/24/2020 2:00 AM, Auger Eric wrote:
+> Hi Kirti,
 > 
-> Fixes: 1dcaf527
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/sheepdog.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/block/sheepdog.c b/block/sheepdog.c
-> index cfa84338a2d6..522c16a93676 100644
-> --- a/block/sheepdog.c
-> +++ b/block/sheepdog.c
-> @@ -3269,6 +3269,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
->      .bdrv_co_create               = sd_co_create,
->      .bdrv_co_create_opts          = sd_co_create_opts,
->      .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-> +    .bdrv_has_zero_init_truncate  = bdrv_has_zero_init_1,
->      .bdrv_getlength               = sd_getlength,
->      .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
->      .bdrv_co_truncate             = sd_co_truncate,
-> @@ -3307,6 +3308,7 @@ static BlockDriver bdrv_sheepdog_unix = {
->      .bdrv_co_create               = sd_co_create,
->      .bdrv_co_create_opts          = sd_co_create_opts,
->      .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-> +    .bdrv_has_zero_init_truncate  = bdrv_has_zero_init_1,
->      .bdrv_getlength               = sd_getlength,
->      .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
->      .bdrv_co_truncate             = sd_co_truncate,
+> On 3/19/20 9:16 PM, Kirti Wankhede wrote:
+>> vfio_pfn.ref_count is always updated by holding iommu->lock, using atomic
+>> variable is overkill.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > 
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Thanks.
 
+Kirti.
+
+> Thanks
+> 
+> Eric
+>> ---
+>>   drivers/vfio/vfio_iommu_type1.c | 9 +++++----
+>>   1 file changed, 5 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 9fdfae1cb17a..70aeab921d0f 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -112,7 +112,7 @@ struct vfio_pfn {
+>>   	struct rb_node		node;
+>>   	dma_addr_t		iova;		/* Device address */
+>>   	unsigned long		pfn;		/* Host pfn */
+>> -	atomic_t		ref_count;
+>> +	unsigned int		ref_count;
+>>   };
+>>   
+>>   struct vfio_regions {
+>> @@ -233,7 +233,7 @@ static int vfio_add_to_pfn_list(struct vfio_dma *dma, dma_addr_t iova,
+>>   
+>>   	vpfn->iova = iova;
+>>   	vpfn->pfn = pfn;
+>> -	atomic_set(&vpfn->ref_count, 1);
+>> +	vpfn->ref_count = 1;
+>>   	vfio_link_pfn(dma, vpfn);
+>>   	return 0;
+>>   }
+>> @@ -251,7 +251,7 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+>>   	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
+>>   
+>>   	if (vpfn)
+>> -		atomic_inc(&vpfn->ref_count);
+>> +		vpfn->ref_count++;
+>>   	return vpfn;
+>>   }
+>>   
+>> @@ -259,7 +259,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+>>   {
+>>   	int ret = 0;
+>>   
+>> -	if (atomic_dec_and_test(&vpfn->ref_count)) {
+>> +	vpfn->ref_count--;
+>> +	if (!vpfn->ref_count) {
+>>   		ret = put_pfn(vpfn->pfn, dma->prot);
+>>   		vfio_remove_from_pfn_list(dma, vpfn);
+>>   	}
+>>
+> 
 
