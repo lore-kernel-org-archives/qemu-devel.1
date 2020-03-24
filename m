@@ -2,105 +2,82 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFA8C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7026EC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:55:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27EC220774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:55:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 268DD20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:55:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QcWksWFd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27EC220774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jv7Dw2F1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 268DD20774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGkxf-00076B-B6
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:55:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33682)
+	id 1jGky7-00080W-7X
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:55:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jGkwv-0006Bg-Qb
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:54:38 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1jGkxH-0006lk-8O
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:55:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jGkwu-0004yE-Lr
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:54:37 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50869)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGkwu-0004x0-GU
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:54:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585061675;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hLkRz7Bb6L5M18zYXIfMHV0CZScVvyrKDlbUbo0m0As=;
- b=QcWksWFdEo1eH33wT8eVAg0SZXC1RD2BFYCN1AYB4R56QXuvoZTcqI6ALSE7xPQIsLGO9F
- jgSe5/9uava9FaYyEWd7IKSb4/JuLsqxF3bqquN9k9btcnbSPXcHeMTOLElatm85AG8oev
- 37nGxuyAY0LV7SrHSL8QU+KxxIGExpo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-bYlGHsReOqC6bjYf3ikUcQ-1; Tue, 24 Mar 2020 10:54:33 -0400
-X-MC-Unique: bYlGHsReOqC6bjYf3ikUcQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA87B190A7A7;
- Tue, 24 Mar 2020 14:54:32 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-213.ams2.redhat.com
- [10.36.114.213])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 363491BC6D;
- Tue, 24 Mar 2020 14:54:29 +0000 (UTC)
-Subject: Re: [PATCH v8 06/11] iotests: drop Python 3.4 compatibility code
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200317004105.27059-1-jsnow@redhat.com>
- <20200317004105.27059-7-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <688928bc-a5d5-ada4-d7ae-78551274eec1@redhat.com>
-Date: Tue, 24 Mar 2020 15:54:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <liq3ea@gmail.com>) id 1jGkxE-0005Fu-Bf
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:54:59 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41630)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1jGkxE-0005Eo-3v
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:54:56 -0400
+Received: by mail-oi1-x241.google.com with SMTP id k9so6082633oia.8
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 07:54:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=AaNT5i4Ku7iQhTd9k9EqGn5XEW1qeFDkPm39ClB8CxA=;
+ b=jv7Dw2F1TPrr3eGA3OMU3T8o49kDgtpOtfLJ60PNMY/MeBCvgiEqvtggNXnFjRKyGe
+ yNq83YgmukzHAWFJC4iqEH0c7sxVGqyIR3UWG1NIWiowDT4nqtkhcIaUB3x5WoaS88u/
+ 2qZ20bAvTEQvnzd67v21yKNM+vDQu9BgRhCa5blb+df1pbTRQm8JX2BdxyN01t2yombo
+ /bzCtP93tc96eOgQmSwV5YkrCnkzQ9GNu93rM5UYKSEFp8gwdd7NgByQduHYqsKeq5Wp
+ Z6KamhCOSa9+SnBAkD/yYjklOAZxW1gADW/OIBfsAtRW7OKD89epdj0PwkUmpnuwmMw1
+ 6A4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=AaNT5i4Ku7iQhTd9k9EqGn5XEW1qeFDkPm39ClB8CxA=;
+ b=i41xRNcyzcFHaEhnbf1E/7eTrCFqCN0gXGKCDzkv4X2NdbzjwFf97I+HUhkF0EIKfP
+ t0V6YX+WAy6wdIt8CsiqM86LvAvwcPiQOYAOCb27pl5pSJbEV6rLKSWki0O9JozjhF30
+ IMU940vvS/+lYxNSkBNpm4VaAS+nppXhsM8gQ9FxxqGMB94CTCWjhNGhEi2Bp8EjpzHe
+ PsQU8NaAh1/rVqgpdbhZnDpgKrPHf3Ia1hrXMgeOWn6y1r2V5oNKfuJ0Yx1CRf1qjggK
+ uqYxBUY0450DM7xXLY7ghM9pBtmh/EQYCyHCcm42sxJrRdQBKdM4bPjkO3EYaT9hi4+h
+ gS1A==
+X-Gm-Message-State: ANhLgQ2mQiEkQdcltN5FS8ph3fqKTXf8S7bOhJ6h47R3C/UImGPm1xo0
+ ZewetUvK3oRauRn1oWZX2YIDnXtr2nqUZvk3Pb8=
+X-Google-Smtp-Source: ADFU+vsguIOQniwWpDJsIttLls+tLrYa1XAjsw5W0G+d1ldfR2MTLJOcAI28eRGG0ETXCuOxVSmWeum9mGTCwGsP+ag=
+X-Received: by 2002:aca:a895:: with SMTP id r143mr3599896oie.150.1585061695090; 
+ Tue, 24 Mar 2020 07:54:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200317004105.27059-7-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZPMPXmLaxNtv4Qoq0sJ4NSDYa4VJ4ieSY"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <20200323122100.893417-1-ppandit@redhat.com>
+ <20200323122100.893417-2-ppandit@redhat.com>
+ <CAKXe6SKtuk7qr1dFVJoHm3LZ40OG8Nfhanj1zqdBVzAQ+Smc0w@mail.gmail.com>
+ <a72da97b-dc0f-99d4-1d59-aba9da2760c9@redhat.com>
+In-Reply-To: <a72da97b-dc0f-99d4-1d59-aba9da2760c9@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 24 Mar 2020 22:54:18 +0800
+Message-ID: <CAKXe6SJMc0jinC-aWqhSp=ZH3Es0rHLbV-nwq1p0_hPY_vBTDA@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] net: tulip: check frame size and r/w data length
+To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000004874ef05a19aefbd"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,107 +89,645 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
- philmd@redhat.com, armbru@redhat.com
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Li Qiang <pangpei.lq@antfin.com>, Sven Schnelle <svens@stackframe.org>,
+ Ziming Zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZPMPXmLaxNtv4Qoq0sJ4NSDYa4VJ4ieSY
-Content-Type: multipart/mixed; boundary="kC2XdkCXcWHjU49YMOBph5AO9l45Qj0aY"
-
---kC2XdkCXcWHjU49YMOBph5AO9l45Qj0aY
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--0000000000004874ef05a19aefbd
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 17.03.20 01:41, John Snow wrote:
-> We no longer need to accommodate 3.4, drop this code.
+Jason Wang <jasowang@redhat.com> =E4=BA=8E2020=E5=B9=B43=E6=9C=8824=E6=97=
+=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=881:45=E5=86=99=E9=81=93=EF=BC=9A
 
-Pre-3.4, actually.
+>
+> On 2020/3/24 =E4=B8=8A=E5=8D=889:29, Li Qiang wrote:
+> >
+> >
+> > P J P <ppandit@redhat.com <mailto:ppandit@redhat.com>> =E4=BA=8E2020=E5=
+=B9=B43=E6=9C=8823=E6=97=A5=E5=91=A8=E4=B8=80
+> > =E4=B8=8B=E5=8D=888:24=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >     From: Prasad J Pandit <pjp@fedoraproject.org
+> >     <mailto:pjp@fedoraproject.org>>
+> >
+> >     Tulip network driver while copying tx/rx buffers does not check
+> >     frame size against r/w data length. This may lead to OOB buffer
+> >     access. Add check to avoid it.
+> >
+> >     Limit iterations over descriptors to avoid potential infinite
+> >     loop issue in tulip_xmit_list_update.
+> >
+> >     Reported-by: Li Qiang <pangpei.lq@antfin.com
+> >     <mailto:pangpei.lq@antfin.com>>
+> >     Reported-by: Ziming Zhang <ezrakiez@gmail.com
+> >     <mailto:ezrakiez@gmail.com>>
+> >     Reported-by: Jason Wang <jasowang@redhat.com
+> >     <mailto:jasowang@redhat.com>>
+> >     Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org
+> >     <mailto:pjp@fedoraproject.org>>
+> >
+> >
+> >
+> > Tested-by: Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>>
+> > But I have a minor question....
+> >
+> >     ---
+> >      hw/net/tulip.c | 36 +++++++++++++++++++++++++++---------
+> >      1 file changed, 27 insertions(+), 9 deletions(-)
+> >
+> >     Update v3: return a value from tulip_copy_tx_buffers() and avoid
+> >     infinite loop
+> >       ->
+> >     https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg06275.html
+> >
+> >     diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+> >     index cfac2719d3..fbe40095da 100644
+> >     --- a/hw/net/tulip.c
+> >     +++ b/hw/net/tulip.c
+> >     @@ -170,6 +170,10 @@ static void tulip_copy_rx_bytes(TULIPState
+> >     *s, struct tulip_descriptor *desc)
+> >              } else {
+> >                  len =3D s->rx_frame_len;
+> >              }
+> >     +
+> >     +        if (s->rx_frame_len + len >=3D sizeof(s->rx_frame)) {
+> >     +            return;
+> >     +        }
+> >
+> >
+> >
+> > Why here is '>=3D' instead of '>'.
+> > IIUC the total sending length can reach to sizeof(s->rx_frame).
+> > Same in the other place in this patch.
+>
+>
+> Yes, this need to be fixed.
+>
+>
+> >
+> > PS: I have planned to write a qtest case. But my personal qemu dev
+> > environment is broken.
+> > I will try to write it tonight or tomorrow night.
+>
+>
+> Cool, good to know this.
+>
+>
+Hi all,
+I have countered an interesting issue. Let's look at the definition of
+TULIPState.
 
-> (Also, the line is over 79 characters, so drop it.)
->=20
-> Touch up the docstring a little bit while we're here.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/iotests.py | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-> index 7cd74e7cb1..3d90fb157d 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -22,6 +22,7 @@
->  import unittest
->  import sys
->  import struct
-> +from typing import Optional
->  import json
->  import signal
->  import logging
-> @@ -350,18 +351,17 @@ def _filter(_key, value):
->          return value
->      return filter_qmp(qmsg, _filter)
-> =20
-> -def log(msg, filters=3D(), indent=3DNone):
-> -    '''Logs either a string message or a JSON serializable message (like=
- QMP).
-> -    If indent is provided, JSON serializable messages are pretty-printed=
-.'''
-> +def log(msg, filters=3D(), indent: Optional[int] =3D None) -> None:
-> +    """
-> +    Logs either a string message or a JSON serializable message (like QM=
-P).
-> +    If indent is provided, JSON serializable messages are pretty-printed=
-.
-> +    """
+  21 typedef struct TULIPState {
+  22     PCIDevice dev;
+  23     MemoryRegion io;
+  24     MemoryRegion memory;
+  25     NICConf c;
+  26     qemu_irq irq;
+  27     NICState *nic;
+  28     eeprom_t *eeprom;
+  29     uint32_t csr[16];
+  30
+  31     /* state for MII */
+  32     uint32_t old_csr9;
+  33     uint32_t mii_word;
+  34     uint32_t mii_bitcnt;
+  35
+  36     hwaddr current_rx_desc;
+  37     hwaddr current_tx_desc;
+  38
+  39     uint8_t rx_frame[2048];
+  40     uint8_t tx_frame[2048];
+  41     uint16_t tx_frame_len;
+  42     uint16_t rx_frame_len;
+  43     uint16_t rx_frame_size;
+  44
+  45     uint32_t rx_status;
+  46     uint8_t filter[16][6];
+  47 } TULIPState;
 
-I feel like I should complain about this unrelated (I think?) change,
-but I won=E2=80=99t.
+Here we can see the overflow is occured after 'tx_frame'.
+In my quest, I have see the overflow(the s->tx_frame_len is big).
+However here doesn't cause SEGV in qtest.
+In real case, the qemu process will access the data after TULIPState in
+heap and trigger segv.
+However in qtest mode I don't know how to trigger this.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+The core code like this:
 
->      for flt in filters:
->          msg =3D flt(msg)
->      if isinstance(msg, (dict, list)):
-> -        # Python < 3.4 needs to know not to add whitespace when pretty-p=
-rinting:
-> -        separators =3D (', ', ': ') if indent is None else (',', ': ')
->          # Don't sort if it's already sorted
->          do_sort =3D not isinstance(msg, OrderedDict)
-> -        print(json.dumps(msg, sort_keys=3Ddo_sort,
-> -                         indent=3Dindent, separators=3Dseparators))
-> +        print(json.dumps(msg, sort_keys=3Ddo_sort, indent=3Dindent))
->      else:
->          print(msg)
-> =20
->=20
+ qpci_device_enable(dev);
+bar =3D qpci_iomap(dev, 0, NULL);
+    context_pa =3D guest_alloc(alloc, sizeof(context));
+    guest_pa =3D guest_alloc(alloc, 4096);
+memset(guest_data, 'A', sizeof(guest_data));
+    context[0].status =3D 1 << 31;
+context[0].control =3D 0x7ff << 11 | 0x7ff;
+context[0].buf_addr2 =3D context_pa + sizeof(struct tulip_descriptor);
+context[0].buf_addr1 =3D guest_pa;
+    for (i =3D 1; i < ARRAY_SIZE(context); ++i) {
+        context_pa +=3D sizeof(struct tulip_descriptor);
+        context[i].status =3D 1 << 31;
+context[i].control =3D 0x7ff << 11 | 0x7ff;
+context[i].buf_addr2 =3D context_pa + sizeof(struct tulip_descriptor);
+context[i].buf_addr1 =3D guest_pa;
+}
+
+qtest_memwrite(dev->bus->qts, context_pa, context, sizeof(context));
+qtest_memwrite(dev->bus->qts, guest_pa, guest_data, sizeof(guest_data));
+qpci_io_writel(dev, bar, 0x20, context_pa);
+qpci_io_writel(dev, bar, 0x30, 1 << 13);
+
+Paolo may give some hints?
+
+Thanks,
+Li Qiang
 
 
 
---kC2XdkCXcWHjU49YMOBph5AO9l45Qj0aY--
+> Thanks
+>
+>
+> >
+> > Thanks,
+> > Li Qiang
+> >
+> >
+> >
+> >
+> >              pci_dma_write(&s->dev, desc->buf_addr1, s->rx_frame +
+> >                  (s->rx_frame_size - s->rx_frame_len), len);
+> >              s->rx_frame_len -=3D len;
+> >     @@ -181,6 +185,10 @@ static void tulip_copy_rx_bytes(TULIPState
+> >     *s, struct tulip_descriptor *desc)
+> >              } else {
+> >                  len =3D s->rx_frame_len;
+> >              }
+> >     +
+> >     +        if (s->rx_frame_len + len >=3D sizeof(s->rx_frame)) {
+> >     +            return;
+> >     +        }
+> >              pci_dma_write(&s->dev, desc->buf_addr2, s->rx_frame +
+> >                  (s->rx_frame_size - s->rx_frame_len), len);
+> >              s->rx_frame_len -=3D len;
+> >     @@ -227,7 +235,8 @@ static ssize_t tulip_receive(TULIPState *s,
+> >     const uint8_t *buf, size_t size)
+> >
+> >          trace_tulip_receive(buf, size);
+> >
+> >     -    if (size < 14 || size > 2048 || s->rx_frame_len ||
+> >     tulip_rx_stopped(s)) {
+> >     +    if (size < 14 || size > sizeof(s->rx_frame) - 4
+> >     +        || s->rx_frame_len || tulip_rx_stopped(s)) {
+> >              return 0;
+> >          }
+> >
+> >     @@ -275,7 +284,6 @@ static ssize_t tulip_receive_nc(NetClientState
+> >     *nc,
+> >          return tulip_receive(qemu_get_nic_opaque(nc), buf, size);
+> >      }
+> >
+> >     -
+> >      static NetClientInfo net_tulip_info =3D {
+> >          .type =3D NET_CLIENT_DRIVER_NIC,
+> >          .size =3D sizeof(NICState),
+> >     @@ -558,7 +566,7 @@ static void tulip_tx(TULIPState *s, struct
+> >     tulip_descriptor *desc)
+> >              if ((s->csr[6] >> CSR6_OM_SHIFT) & CSR6_OM_MASK) {
+> >                  /* Internal or external Loopback */
+> >                  tulip_receive(s, s->tx_frame, s->tx_frame_len);
+> >     -        } else {
+> >     +        } else if (s->tx_frame_len <=3D sizeof(s->tx_frame)) {
+> >                  qemu_send_packet(qemu_get_queue(s->nic),
+> >                      s->tx_frame, s->tx_frame_len);
+> >              }
+> >     @@ -570,23 +578,31 @@ static void tulip_tx(TULIPState *s, struct
+> >     tulip_descriptor *desc)
+> >          }
+> >      }
+> >
+> >     -static void tulip_copy_tx_buffers(TULIPState *s, struct
+> >     tulip_descriptor *desc)
+> >     +static int tulip_copy_tx_buffers(TULIPState *s, struct
+> >     tulip_descriptor *desc)
+> >      {
+> >          int len1 =3D (desc->control >> TDES1_BUF1_SIZE_SHIFT) &
+> >     TDES1_BUF1_SIZE_MASK;
+> >          int len2 =3D (desc->control >> TDES1_BUF2_SIZE_SHIFT) &
+> >     TDES1_BUF2_SIZE_MASK;
+> >
+> >     +    if (s->tx_frame_len + len1 >=3D sizeof(s->tx_frame)) {
+> >     +        return -1;
+> >     +    }
+> >          if (len1) {
+> >              pci_dma_read(&s->dev, desc->buf_addr1,
+> >                  s->tx_frame + s->tx_frame_len, len1);
+> >              s->tx_frame_len +=3D len1;
+> >          }
+> >
+> >     +    if (s->tx_frame_len + len2 >=3D sizeof(s->tx_frame)) {
+> >     +        return -1;
+> >     +    }
+> >          if (len2) {
+> >              pci_dma_read(&s->dev, desc->buf_addr2,
+> >                  s->tx_frame + s->tx_frame_len, len2);
+> >              s->tx_frame_len +=3D len2;
+> >          }
+> >          desc->status =3D (len1 + len2) ? 0 : 0x7fffffff;
+> >     +
+> >     +    return 0;
+> >      }
+> >
+> >      static void tulip_setup_filter_addr(TULIPState *s, uint8_t *buf,
+> >     int n)
+> >     @@ -651,13 +667,15 @@ static uint32_t tulip_ts(TULIPState *s)
+> >
+> >      static void tulip_xmit_list_update(TULIPState *s)
+> >      {
+> >     +#define TULIP_DESC_MAX 128
+> >     +    uint8_t i =3D 0;
+> >          struct tulip_descriptor desc;
+> >
+> >          if (tulip_ts(s) !=3D CSR5_TS_SUSPENDED) {
+> >              return;
+> >          }
+> >
+> >     -    for (;;) {
+> >     +    for (i =3D 0; i < TULIP_DESC_MAX; i++) {
+> >              tulip_desc_read(s, s->current_tx_desc, &desc);
+> >              tulip_dump_tx_descriptor(s, &desc);
+> >
+> >     @@ -675,10 +693,10 @@ static void
+> >     tulip_xmit_list_update(TULIPState *s)
+> >                      s->tx_frame_len =3D 0;
+> >                  }
+> >
+> >     -            tulip_copy_tx_buffers(s, &desc);
+> >     -
+> >     -            if (desc.control & TDES1_LS) {
+> >     -                tulip_tx(s, &desc);
+> >     +            if (!tulip_copy_tx_buffers(s, &desc)) {
+> >     +                if (desc.control & TDES1_LS) {
+> >     +                    tulip_tx(s, &desc);
+> >     +                }
+> >                  }
+> >              }
+> >              tulip_desc_write(s, s->current_tx_desc, &desc);
+> >     --
+> >     2.25.1
+> >
+> >
+>
+>
 
---ZPMPXmLaxNtv4Qoq0sJ4NSDYa4VJ4ieSY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+--0000000000004874ef05a19aefbd
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP SIGNATURE-----
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">Jason Wang &lt;<a href=3D"mailto:jaso=
+wang@redhat.com">jasowang@redhat.com</a>&gt; =E4=BA=8E2020=E5=B9=B43=E6=9C=
+=8824=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=881:45=E5=86=99=E9=81=93=
+=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
+x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
+On 2020/3/24 =E4=B8=8A=E5=8D=889:29, Li Qiang wrote:<br>
+&gt;<br>
+&gt;<br>
+&gt; P J P &lt;<a href=3D"mailto:ppandit@redhat.com" target=3D"_blank">ppan=
+dit@redhat.com</a> &lt;mailto:<a href=3D"mailto:ppandit@redhat.com" target=
+=3D"_blank">ppandit@redhat.com</a>&gt;&gt; =E4=BA=8E2020=E5=B9=B43=E6=9C=88=
+23=E6=97=A5=E5=91=A8=E4=B8=80 <br>
+&gt; =E4=B8=8B=E5=8D=888:24=E5=86=99=E9=81=93=EF=BC=9A<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0From: Prasad J Pandit &lt;<a href=3D"mailto:pjp@fed=
+oraproject.org" target=3D"_blank">pjp@fedoraproject.org</a><br>
+&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:pjp@fedoraproject.org"=
+ target=3D"_blank">pjp@fedoraproject.org</a>&gt;&gt;<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Tulip network driver while copying tx/rx buffers do=
+es not check<br>
+&gt;=C2=A0 =C2=A0 =C2=A0frame size against r/w data length. This may lead t=
+o OOB buffer<br>
+&gt;=C2=A0 =C2=A0 =C2=A0access. Add check to avoid it.<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Limit iterations over descriptors to avoid potentia=
+l infinite<br>
+&gt;=C2=A0 =C2=A0 =C2=A0loop issue in tulip_xmit_list_update.<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Reported-by: Li Qiang &lt;<a href=3D"mailto:pangpei=
+.lq@antfin.com" target=3D"_blank">pangpei.lq@antfin.com</a><br>
+&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:pangpei.lq@antfin.com"=
+ target=3D"_blank">pangpei.lq@antfin.com</a>&gt;&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Reported-by: Ziming Zhang &lt;<a href=3D"mailto:ezr=
+akiez@gmail.com" target=3D"_blank">ezrakiez@gmail.com</a><br>
+&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:ezrakiez@gmail.com" ta=
+rget=3D"_blank">ezrakiez@gmail.com</a>&gt;&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Reported-by: Jason Wang &lt;<a href=3D"mailto:jasow=
+ang@redhat.com" target=3D"_blank">jasowang@redhat.com</a><br>
+&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:jasowang@redhat.com" t=
+arget=3D"_blank">jasowang@redhat.com</a>&gt;&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Signed-off-by: Prasad J Pandit &lt;<a href=3D"mailt=
+o:pjp@fedoraproject.org" target=3D"_blank">pjp@fedoraproject.org</a><br>
+&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:pjp@fedoraproject.org"=
+ target=3D"_blank">pjp@fedoraproject.org</a>&gt;&gt;<br>
+&gt;<br>
+&gt;<br>
+&gt;<br>
+&gt; Tested-by: Li Qiang &lt;<a href=3D"mailto:liq3ea@gmail.com" target=3D"=
+_blank">liq3ea@gmail.com</a> &lt;mailto:<a href=3D"mailto:liq3ea@gmail.com"=
+ target=3D"_blank">liq3ea@gmail.com</a>&gt;&gt;<br>
+&gt; But I have a minor question....<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0---<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0hw/net/tulip.c | 36 +++++++++++++++++++++++++=
+++---------<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A01 file changed, 27 insertions(+), 9 deletions=
+(-)<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Update v3: return a value from tulip_copy_tx_buffer=
+s() and avoid<br>
+&gt;=C2=A0 =C2=A0 =C2=A0infinite loop<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 -&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0<a href=3D"https://lists.gnu.org/archive/html/qemu-=
+devel/2020-02/msg06275.html" rel=3D"noreferrer" target=3D"_blank">https://l=
+ists.gnu.org/archive/html/qemu-devel/2020-02/msg06275.html</a><br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0diff --git a/hw/net/tulip.c b/hw/net/tulip.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0index cfac2719d3..fbe40095da 100644<br>
+&gt;=C2=A0 =C2=A0 =C2=A0--- a/hw/net/tulip.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+++ b/hw/net/tulip.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -170,6 +170,10 @@ static void tulip_copy_rx_byte=
+s(TULIPState<br>
+&gt;=C2=A0 =C2=A0 =C2=A0*s, struct tulip_descriptor *desc)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0len=
+ =3D s-&gt;rx_frame_len;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (s-&gt;rx_frame_len=
+ + len &gt;=3D sizeof(s-&gt;rx_frame)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;<br>
+&gt;<br>
+&gt;<br>
+&gt; Why here is &#39;&gt;=3D&#39; instead of &#39;&gt;&#39;.<br>
+&gt; IIUC the total sending length can reach to sizeof(s-&gt;rx_frame).<br>
+&gt; Same in the other place in this patch.<br>
+<br>
+<br>
+Yes, this need to be fixed.<br>
+<br>
+<br>
+&gt;<br>
+&gt; PS: I have planned to write a qtest case. But my personal qemu dev <br=
+>
+&gt; environment is broken.<br>
+&gt; I will try to write it tonight or=C2=A0tomorrow night.<br>
+<br>
+<br>
+Cool, good to know this.<br>
+<br></blockquote><div><br></div><div>Hi all,</div><div>I have countered an =
+interesting issue. Let&#39;s look at the definition of TULIPState.</div><di=
+v><br></div><div>=C2=A0 21 typedef struct TULIPState {<br>=C2=A0 22 =C2=A0 =
+=C2=A0 PCIDevice dev;<br>=C2=A0 23 =C2=A0 =C2=A0 MemoryRegion io;<br>=C2=A0=
+ 24 =C2=A0 =C2=A0 MemoryRegion memory;<br>=C2=A0 25 =C2=A0 =C2=A0 NICConf c=
+;<br>=C2=A0 26 =C2=A0 =C2=A0 qemu_irq irq;<br>=C2=A0 27 =C2=A0 =C2=A0 NICSt=
+ate *nic;<br>=C2=A0 28 =C2=A0 =C2=A0 eeprom_t *eeprom;<br>=C2=A0 29 =C2=A0 =
+=C2=A0 uint32_t csr[16];<br>=C2=A0 30 <br>=C2=A0 31 =C2=A0 =C2=A0 /* state =
+for MII */<br>=C2=A0 32 =C2=A0 =C2=A0 uint32_t old_csr9;<br>=C2=A0 33 =C2=
+=A0 =C2=A0 uint32_t mii_word;<br>=C2=A0 34 =C2=A0 =C2=A0 uint32_t mii_bitcn=
+t;<br>=C2=A0 35 <br>=C2=A0 36 =C2=A0 =C2=A0 hwaddr current_rx_desc;<br>=C2=
+=A0 37 =C2=A0 =C2=A0 hwaddr current_tx_desc;<br>=C2=A0 38 <br>=C2=A0 39 =C2=
+=A0 =C2=A0 uint8_t rx_frame[2048];<br>=C2=A0 40 =C2=A0 =C2=A0 uint8_t tx_fr=
+ame[2048];<br>=C2=A0 41 =C2=A0 =C2=A0 uint16_t tx_frame_len;<br>=C2=A0 42 =
+=C2=A0 =C2=A0 uint16_t rx_frame_len;<br>=C2=A0 43 =C2=A0 =C2=A0 uint16_t rx=
+_frame_size;<br>=C2=A0 44 <br>=C2=A0 45 =C2=A0 =C2=A0 uint32_t rx_status;<b=
+r>=C2=A0 46 =C2=A0 =C2=A0 uint8_t filter[16][6];<br>=C2=A0 47 } TULIPState;=
+<br></div><div><br></div><div>Here we can see the overflow is occured after=
+ &#39;tx_frame&#39;.</div><div>In my quest, I have see the overflow(the s-&=
+gt;tx_frame_len is big).</div><div>However here doesn&#39;t cause SEGV in q=
+test.=C2=A0</div><div>In real case, the qemu process will access the data a=
+fter TULIPState in heap and trigger segv.</div><div>However in qtest mode I=
+ don&#39;t know how to trigger this.</div><div><br></div><div>The core code=
+ like this:</div><div><br></div><div>=C2=A0qpci_device_enable(dev);<br>	bar=
+ =3D qpci_iomap(dev, 0, NULL);<br>=C2=A0 =C2=A0 context_pa =3D guest_alloc(=
+alloc, sizeof(context));<br>=C2=A0 =C2=A0 guest_pa =3D guest_alloc(alloc, 4=
+096);<br>	memset(guest_data, &#39;A&#39;, sizeof(guest_data));<br>=C2=A0 =
+=C2=A0 context[0].status =3D 1 &lt;&lt; 31;<br>	context[0].control =3D 0x7f=
+f &lt;&lt; 11 | 0x7ff;<br>	context[0].buf_addr2 =3D context_pa + sizeof(str=
+uct tulip_descriptor);<br>	context[0].buf_addr1 =3D guest_pa;<br>=C2=A0 =C2=
+=A0 for (i =3D 1; i &lt; ARRAY_SIZE(context); ++i) {<br>=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 context_pa +=3D sizeof(struct tulip_descriptor);<br>=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 context[i].status =3D 1 &lt;&lt; 31;<br>		context[i].cont=
+rol =3D 0x7ff &lt;&lt; 11 | 0x7ff;<br>		context[i].buf_addr2 =3D context_pa=
+ + sizeof(struct tulip_descriptor);<br>		context[i].buf_addr1 =3D guest_pa;=
+<br>	}<br><br>	qtest_memwrite(dev-&gt;bus-&gt;qts, context_pa, context, siz=
+eof(context));<br>	qtest_memwrite(dev-&gt;bus-&gt;qts, guest_pa, guest_data=
+, sizeof(guest_data));<br>	qpci_io_writel(dev, bar, 0x20, context_pa);<br>	=
+qpci_io_writel(dev, bar, 0x30, 1 &lt;&lt; 13);<br></div><div><br></div><div=
+>Paolo may give some hints?</div><div><br></div><div>Thanks,</div><div>Li Q=
+iang</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote"=
+ style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
+adding-left:1ex">
+Thanks<br>
+<br>
+<br>
+&gt;<br>
+&gt; Thanks,<br>
+&gt; Li Qiang<br>
+&gt;<br>
+&gt;<br>
+&gt;<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_write(&am=
+p;s-&gt;dev, desc-&gt;buf_addr1, s-&gt;rx_frame +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(s-=
+&gt;rx_frame_size - s-&gt;rx_frame_len), len);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;rx_frame_le=
+n -=3D len;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -181,6 +185,10 @@ static void tulip_copy_rx_byte=
+s(TULIPState<br>
+&gt;=C2=A0 =C2=A0 =C2=A0*s, struct tulip_descriptor *desc)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0len=
+ =3D s-&gt;rx_frame_len;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (s-&gt;rx_frame_len=
+ + len &gt;=3D sizeof(s-&gt;rx_frame)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_write(&am=
+p;s-&gt;dev, desc-&gt;buf_addr2, s-&gt;rx_frame +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(s-=
+&gt;rx_frame_size - s-&gt;rx_frame_len), len);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;rx_frame_le=
+n -=3D len;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -227,7 +235,8 @@ static ssize_t tulip_receive(TU=
+LIPState *s,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0const uint8_t *buf, size_t size)<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0trace_tulip_receive(buf, size);=
+<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 if (size &lt; 14 || size &gt; 2048 |=
+| s-&gt;rx_frame_len ||<br>
+&gt;=C2=A0 =C2=A0 =C2=A0tulip_rx_stopped(s)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (size &lt; 14 || size &gt; sizeof=
+(s-&gt;rx_frame) - 4<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 || s-&gt;rx_frame_len =
+|| tulip_rx_stopped(s)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0}<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -275,7 +284,6 @@ static ssize_t tulip_receive_nc=
+(NetClientState<br>
+&gt;=C2=A0 =C2=A0 =C2=A0*nc,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0return tulip_receive(qemu_get_n=
+ic_opaque(nc), buf, size);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0}<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0static NetClientInfo net_tulip_info =3D {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0.type =3D NET_CLIENT_DRIVER_NIC=
+,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0.size =3D sizeof(NICState),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -558,7 +566,7 @@ static void tulip_tx(TULIPState=
+ *s, struct<br>
+&gt;=C2=A0 =C2=A0 =C2=A0tulip_descriptor *desc)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if ((s-&gt;csr[6]=
+ &gt;&gt; CSR6_OM_SHIFT) &amp; CSR6_OM_MASK) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* =
+Internal or external Loopback */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tul=
+ip_receive(s, s-&gt;tx_frame, s-&gt;tx_frame_len);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (s-&gt;tx_fr=
+ame_len &lt;=3D sizeof(s-&gt;tx_frame)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qem=
+u_send_packet(qemu_get_queue(s-&gt;nic),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0s-&gt;tx_frame, s-&gt;tx_frame_len);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -570,23 +578,31 @@ static void tulip_tx(TULIPSta=
+te *s, struct<br>
+&gt;=C2=A0 =C2=A0 =C2=A0tulip_descriptor *desc)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0}<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-static void tulip_copy_tx_buffers(TULIPState *s, s=
+truct<br>
+&gt;=C2=A0 =C2=A0 =C2=A0tulip_descriptor *desc)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+static int tulip_copy_tx_buffers(TULIPState *s, st=
+ruct<br>
+&gt;=C2=A0 =C2=A0 =C2=A0tulip_descriptor *desc)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0{<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0int len1 =3D (desc-&gt;control =
+&gt;&gt; TDES1_BUF1_SIZE_SHIFT) &amp;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0TDES1_BUF1_SIZE_MASK;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0int len2 =3D (desc-&gt;control =
+&gt;&gt; TDES1_BUF2_SIZE_SHIFT) &amp;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0TDES1_BUF2_SIZE_MASK;<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (s-&gt;tx_frame_len + len1 &gt;=
+=3D sizeof(s-&gt;tx_frame)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0if (len1) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_read(&amp=
+;s-&gt;dev, desc-&gt;buf_addr1,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&=
+gt;tx_frame + s-&gt;tx_frame_len, len1);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_frame_le=
+n +=3D len1;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0}<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (s-&gt;tx_frame_len + len2 &gt;=
+=3D sizeof(s-&gt;tx_frame)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0if (len2) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_read(&amp=
+;s-&gt;dev, desc-&gt;buf_addr2,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&=
+gt;tx_frame + s-&gt;tx_frame_len, len2);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_frame_le=
+n +=3D len2;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0desc-&gt;status =3D (len1 + len=
+2) ? 0 : 0x7fffffff;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 return 0;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0}<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0static void tulip_setup_filter_addr(TULIPStat=
+e *s, uint8_t *buf,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0int n)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -651,13 +667,15 @@ static uint32_t tulip_ts(TULI=
+PState *s)<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0static void tulip_xmit_list_update(TULIPState=
+ *s)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0{<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+#define TULIP_DESC_MAX 128<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 uint8_t i =3D 0;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0struct tulip_descriptor desc;<b=
+r>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0if (tulip_ts(s) !=3D CSR5_TS_SU=
+SPENDED) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0}<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 for (;;) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 for (i =3D 0; i &lt; TULIP_DESC_MAX;=
+ i++) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tulip_desc_read(s=
+, s-&gt;current_tx_desc, &amp;desc);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tulip_dump_tx_des=
+criptor(s, &amp;desc);<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0@@ -675,10 +693,10 @@ static void<br>
+&gt;=C2=A0 =C2=A0 =C2=A0tulip_xmit_list_update(TULIPState *s)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0s-&gt;tx_frame_len =3D 0;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<b=
+r>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tulip_co=
+py_tx_buffers(s, &amp;desc);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (desc=
+.control &amp; TDES1_LS) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 tulip_tx(s, &amp;desc);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!tul=
+ip_copy_tx_buffers(s, &amp;desc)) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 if (desc.control &amp; TDES1_LS) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 tulip_tx(s, &amp;desc);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<b=
+r>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tulip_desc_write(=
+s, s-&gt;current_tx_desc, &amp;desc);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0-- <br>
+&gt;=C2=A0 =C2=A0 =C2=A02.25.1<br>
+&gt;<br>
+&gt;<br>
+<br>
+</blockquote></div></div>
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl56HyQACgkQ9AfbAGHV
-z0ADPAgAqTVR/b1UMLsJnyQBRY75r3CVpdFO3n9fO33PubzojSLkLvIarj05AR1M
-YE7o2NsGbbFgJ1GwfesTIalCL2ptRE9Hkhn/6PeCLyk8sLNxu06w6EHFomPtyIGR
-ZijPngD+Nja9PB+w1s2UB7s+cB/uRTqOBM6pnUH0hAKSlIt1qnJNbVBn2Q0NXu4M
-NJD/LDB6bret2sJZ3IIuBYSYr+EoZMnVOyQsnA2KchlQJ/x7In4YCsrQAyEuTWQF
-AlUlcDdnAKBvsOOedE3h2zHplEvVT5ZWXlRLfkcPd7gJh2GWW1+EzkHqGiXG8XNB
-C9AjdUsVYiT8ovLnmN+NGwD1mY4RlQ==
-=NDnN
------END PGP SIGNATURE-----
-
---ZPMPXmLaxNtv4Qoq0sJ4NSDYa4VJ4ieSY--
-
+--0000000000004874ef05a19aefbd--
 
