@@ -2,67 +2,157 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8863BC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D7AC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:10:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54445206F6
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:10:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54624206F6
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:10:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="XD4TUHpc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54445206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="daf56wJt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54624206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGn4Z-0006a3-GQ
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:10:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54450)
+	id 1jGn4i-0006pj-FN
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:10:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jGn3p-0005lJ-9b
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:09:54 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jGn3v-0005os-Td
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:10:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jGn3o-0002LX-4m
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:09:53 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17824)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jGn3n-0002Jh-4I
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:09:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1585069725; 
- s=mail; d=flygoat.com; i=jiaxun.yang@flygoat.com;
- h=Date:In-Reply-To:References:MIME-Version:Content-Type:Content-Transfer-Encoding:Subject:To:CC:From:Message-ID;
- bh=bVplZ+igSUO/7rPM614JndCdh7GRlZT7JtJc0rDrx4M=;
- b=XD4TUHpcYLTLqAVgxth+KLXKH0gf0FIXhJEiJWbbT1b9kRvPu2Q9wGANRDQI3ECh
- 5fndpzJlyA49Nw+30gFkzMSMSxvQfOjsNpmhnSxn2AxHh8YEEScIM7euvaY25Mvy0lE
- CKQnQmk69Vymcjn/rIY/fqd6zzU6Y/dXkYp0CW44=
-Received: from [10.233.233.252] (183.157.60.227 [183.157.60.227]) by
- mx.zoho.com.cn with SMTPS id 1585069723305683.1787165071842;
- Wed, 25 Mar 2020 01:08:43 +0800 (CST)
-Date: Wed, 25 Mar 2020 01:08:30 +0800
-User-Agent: K-9 Mail for Android
-In-Reply-To: <CAHiYmc7MN8pUg7FJ=wcn1h0pr2A05nv4SQaOZmL47NCnNzUJRA@mail.gmail.com>
-References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
- <CAHiYmc7MN8pUg7FJ=wcn1h0pr2A05nv4SQaOZmL47NCnNzUJRA@mail.gmail.com>
+ (envelope-from <jsnow@redhat.com>) id 1jGn3t-0002NZ-MB
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:09:59 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:57488)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jGn3t-0002N3-DB
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:09:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585069796;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=PqSQN7+dzusuZdAZpXoisALJjFX2AVOZruUZGt2nSx8=;
+ b=daf56wJtDmWy27n/Hx/ewARcpHQYJ9/fdMySVYWVxf/up5XHBzma4XYlRsNNN2ky0Ds/4N
+ QJOFxxtLJThgGmBffJvYMcVOeAUOX1fqCoxuBbZI/p+s3vPDnaE61jU2w9dnSi7/6LXs++
+ WRYDOF63dlR4dETU7vnK1Go6VaPFfIg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-jDyUv-UBO6qwlZMuJJlbag-1; Tue, 24 Mar 2020 13:09:51 -0400
+X-MC-Unique: jDyUv-UBO6qwlZMuJJlbag-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 212BE800D50;
+ Tue, 24 Mar 2020 17:09:50 +0000 (UTC)
+Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8AA4A60BE0;
+ Tue, 24 Mar 2020 17:09:46 +0000 (UTC)
+Subject: Re: [PATCH v8 07/11] iotests: limit line length to 79 chars
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20200317004105.27059-1-jsnow@redhat.com>
+ <20200317004105.27059-8-jsnow@redhat.com>
+ <dcc1f8fa-2916-4241-b213-5ddf0ed62c34@redhat.com>
+ <2f230c22-bd4b-ded5-27a9-1971efea0ec3@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <bdff3fe8-fb51-51b1-f9b1-a111c2fcd04b@redhat.com>
+Date: Tue, 24 Mar 2020 13:09:45 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+In-Reply-To: <2f230c22-bd4b-ded5-27a9-1971efea0ec3@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH for-5.0,
- v1] target/mips: Fix loongson multimedia condition instructions
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <623EF6C4-18D0-4A9C-B758-A3BE0B0AAF25@flygoat.com>
-X-ZohoCNMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 124.251.121.243
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,56 +164,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.rikalo@rt-rk.com,
- richard.henderson@linaro.org, QEMU Developers <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ philmd@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-=E4=BA=8E 2020=E5=B9=B43=E6=9C=8825=E6=97=A5 GMT+08:00 =E4=B8=8A=E5=8D=881=
-2:56:41, Aleksandar Markovic <aleksandar=2Eqemu=2Edevel@gmail=2Ecom> =E5=86=
-=99=E5=88=B0:
->14:23 Uto, 24=2E03=2E2020=2E Jiaxun Yang <jiaxun=2Eyang@flygoat=2Ecom> =
-=D1=98=D0=B5
->=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+On 3/24/20 11:12 AM, Max Reitz wrote:
+> On 24.03.20 16:02, Max Reitz wrote:
+>> On 17.03.20 01:41, John Snow wrote:
+>>> 79 is the PEP8 recommendation. This recommendation works well for
+>>> reading patch diffs in TUI email clients.
 >>
->> Loongson multimedia condition instructions were previously
->implemented as
->> write 0 to rd due to lack of documentation=2E So I just confirmed with
->Loongson
->> about their encoding and implemented them correctly=2E
+>> Also for my very GUI-y diff program (kompare).
 >>
->> Signed-off-by: Jiaxun Yang <jiaxun=2Eyang@flygoat=2Ecom>
->> Acked-by: Huacai Chen <chenhc@lemote=2Ecom>
->> ---
->> v1: Use deposit opreations according to Richard's suggestion=2E
->> ---
->
->Thanks, Jiaxun!
->
->But, your numeration of patches is wrong=2E The first version of the
->patch
->should be sent with prefix [PATCH]
->and the second (this) version of the patch with prefix [PATCH v2]=2E This
->is
->the second time you make the same mistake=2E Please make sure that you
->have
->the correct numeration in future=2E But, anyhow, thanks for this version=
-=2E
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>  tests/qemu-iotests/iotests.py | 64 +++++++++++++++++++++++------------
+>>>  tests/qemu-iotests/pylintrc   |  6 +++-
+>>>  2 files changed, 47 insertions(+), 23 deletions(-)
+>>>
+>>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
+.py
+>>> index 3d90fb157d..75fd697d77 100644
+>>> --- a/tests/qemu-iotests/iotests.py
+>>> +++ b/tests/qemu-iotests/iotests.py
+>>
+>> [...]
+>>
+>>> @@ -529,11 +539,13 @@ def pause_drive(self, drive, event=3DNone):
+>>>              self.pause_drive(drive, "write_aio")
+>>>              return
+>>>          self.qmp('human-monitor-command',
+>>> -                 command_line=3D'qemu-io %s "break %s bp_%s"' % (drive=
+, event, drive))
+>>> +                 command_line=3D'qemu-io %s "break %s bp_%s"'
+>>> +                 % (drive, event, drive))
+>>
+>> Can we put this value in a variable instead?  I don=E2=80=99t like the %
+>> aligning with the parameter name instead of the string value.  (I also
+>> don=E2=80=99t like how there are no spaces around the assignment =3D, bu=
+t around
+>> the %, even though the % binds more strongly.)
+>>
+>>> =20
 
-Sorry for that=2E
-I'm doing like this for years=2E
-I promise it won't happen in future=2E
+I think I had another patch somewhere that added an HMP helper that
+fixes this issue for this particular instance.
 
-Thanks=2E
+I can send that separately as a follow-up. I think otherwise,
+unfortunately, "we" "decided" that this indent style is "best".
 
->
->Yours,
->Aleksandar
->
---=20
-Jiaxun Yang
+So I think that this patch is "correct".
+
+
+(All of the other options for indent styles seemed to be worse visually,
+or actively go against PEP8. While PEP8 is not a bible, every conscious
+choice to disregard it generally means you will be fighting a CQA tool
+at some other point in time. I have therefore adopted a "When in Rome"
+policy to reduce friction wherever possible with pylint, flake8, mypy,
+pycharm, and so on.)
+
+
+((I would prefer we begin to deprecate uses of % and begin using
+.format() and f-strings wherever possible to help alleviate this kind of
+syntax, too -- but I must insist that's for another series.))
+
+
+>>>      def resume_drive(self, drive):
+>>>          self.qmp('human-monitor-command',
+>>> -                 command_line=3D'qemu-io %s "remove_break bp_%s"' % (d=
+rive, drive))
+>>> +                 command_line=3D'qemu-io %s "remove_break bp_%s"'
+>>> +                 % (drive, drive))
+>>> =20
+>>>      def hmp_qemu_io(self, drive, cmd):
+>>>          '''Write to a given drive using an HMP command'''
+>>> @@ -793,16 +805,18 @@ def dictpath(self, d, path):
+>>>                  idx =3D int(idx)
+>>> =20
+>>>              if not isinstance(d, dict) or component not in d:
+>>> -                self.fail('failed path traversal for "%s" in "%s"' % (=
+path, str(d)))
+>>> +                self.fail(f'failed path traversal for "{path}" in "{d}=
+"')
+>>
+>> Do we require 3.6 so that f-strings are guaranteed to work?  (I thought
+>> we didn=E2=80=99t.  I=E2=80=99d be happy to use them.)
+>=20
+> Oh.  Of course we do.  It says so in this file that this whole series is
+> about.
+>=20
+
+Yup. I didn't like the idea of iotests using a newer version of python
+than our build system, but my concern was not shared, so we get to use
+f-strings for non-buildtime tools.
+
+End of support for Python 3.5 will be 2020-09-13; so we'll get to use
+f-strings everywhere else soon, too.
+
+--js
+
 
