@@ -2,78 +2,70 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5945BC4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8F9C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:10:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28B3520786
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:09:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLFKxRms"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28B3520786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9193520786
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:10:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9193520786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGhQy-00052V-Ak
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 07:09:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60733)
+	id 1jGhSD-0006bx-Px
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 07:10:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jGhQG-0004Cc-A2
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:08:41 -0400
+ (envelope-from <yangke27@huawei.com>) id 1jGhQm-0004zQ-Of
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jGhQE-0004Lr-OX
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:08:40 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37818)
+ (envelope-from <yangke27@huawei.com>) id 1jGhQh-0004Sn-DW
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:09:12 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2512 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jGhQE-0004Ln-KY
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:08:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585048118;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zkoQRBj3lV6jpH15ep3eZIbfkH3eaitWhFn0iFTXMxc=;
- b=FLFKxRmsa5x1WjxAVGTZTGAuBpvSZ3qRvxfq5WqeXO7jHpmoonRmA+e8Ah46XcOc5yYeQQ
- luOEF18XTYJhGPO/ZreovSm+JLHb/u1XfHmpK8Zq495CCOCzUsSsYJGOEqPUEYmNIqvJS2
- 2HFTmZztiZmyEqlL6ERYmRyoMYJ2DIg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-1OEs5BH_NdW4dkUxzJe1yQ-1; Tue, 24 Mar 2020 07:08:34 -0400
-X-MC-Unique: 1OEs5BH_NdW4dkUxzJe1yQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D37D818C43C2;
- Tue, 24 Mar 2020 11:08:33 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 119F15D9C5;
- Tue, 24 Mar 2020 11:08:29 +0000 (UTC)
-Date: Tue, 24 Mar 2020 12:08:28 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Ani Sinha <ani.sinha@nutanix.com>
-Subject: Re: Hot unplug disabling on pci-pci bridge
-Message-ID: <20200324120828.2b50d41e@redhat.com>
-In-Reply-To: <BF9E6F48-E047-4D1B-BEF1-A58024DE0C6E@nutanix.com>
-References: <BF9E6F48-E047-4D1B-BEF1-A58024DE0C6E@nutanix.com>
+ (Exim 4.71) (envelope-from <yangke27@huawei.com>) id 1jGhQg-0004QI-RS
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:09:07 -0400
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id C92A1B319EC38950ECAC;
+ Tue, 24 Mar 2020 19:08:55 +0800 (CST)
+Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Tue, 24 Mar 2020 19:08:55 +0800
+Received: from DGGEMM532-MBS.china.huawei.com ([169.254.8.60]) by
+ dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0487.000;
+ Tue, 24 Mar 2020 19:08:47 +0800
+From: "yangke (J)" <yangke27@huawei.com>
+To: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: =?utf-8?B?562U5aSNOiBbcXVlc3Rpb25ddmhvc3QtdXNlcjogYXR1byBmaXggbmV0d29y?=
+ =?utf-8?Q?k_link_broken_during_migration?=
+Thread-Topic: [question]vhost-user: atuo fix network link broken during
+ migration
+Thread-Index: AdYA62Eje0lIFlEcTKSTWbnCiLhZ0AAcZrWAABvgYtA=
+Date: Tue, 24 Mar 2020 11:08:47 +0000
+Message-ID: <0CC1E03725E48D478F815032182740230A42C15B@DGGEMM532-MBS.china.huawei.com>
+References: <0CC1E03725E48D478F815032182740230A42A312@DGGEMM532-MBS.china.huawei.com>
+ <47abadbd-c559-1900-f3b1-3697f9e7c0b5@redhat.com>
+In-Reply-To: <47abadbd-c559-1900-f3b1-3697f9e7c0b5@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.210.146]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 45.249.212.188
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,128 +77,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laine Stump <laine@redhat.com>
+Cc: "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
+ "quintela@redhat.com" <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Mar 2020 10:06:00 +0000
-Ani Sinha <ani.sinha@nutanix.com> wrote:
-
-> Hi All :
-> 
-> I have been playing with Qemu trying to disable hot-unplug capability for conventional PCI. I have discussed this briefly on IRC and the plan is to have an option on the pci-pci bridge that would disable SHPC and ACPI hotplug capability for all the slots on that bus. I am _not_ trying to implement a per slot capability for conventional PCI as was previously posted for PCIE slots in this patch : https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg01833.html (we do not need this atm).
-> 
-> I am following the conversations which happened few weeks back here:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00985.html
-
-question is do you need to disable only unplug side both
-(plug+unplug) operations (like we did with PCIE)?
-
-> 
-> To that end, I have been experimenting with Qemu using the patch I attach below. I have attached the virtio balloon driver with bus 1 which is attached to the pci bridge. Following is the libvirt 4.5 xml snippet which I am using:
-> 
->    <controller type='pci' index='0' model='pci-root'>
->       <alias name='pci.0'/>
->    </controller>
->   <controller type='pci' index='1' model='pci-bridge'>
->       <model name='pci-bridge'/>
->       <target chassisNr='1'/>
->       <alias name='pci.1'/>
->       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
->    </controller>
->   <memballoon model='virtio'>
->       <stats period='30'/>
->       <alias name='balloon0'/>
->       <address type='pci' domain='0x0000' bus='0x02' slot='0x01' function='0x0'/>
->    </memballoon>
-> 
-> 
-> I am using a windows guest and from the guest I can see that the balloon driver is indeed attached to the pci bridge (see attached screenshot).
-> I still find Windows giving me an option to hot eject the pci balloon driver.
-> 
-> So what am I doing wrong here?
-> 
-> [cid:F2407B5B-BBB1-4A0C-91C4-975692E3BDE1]
-> 
-> 
-> 
-> The Qemu patch I am experimenting with (which is currently a hack) is attached below. It is based off Qemu 2.12 and not the latest mainline.
-> 
-> ---
-> hw/pci-bridge/pci_bridge_dev.c | 16 ++++++++--------
-> 1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-> index b2d861d..e706d49 100644
-> --- a/hw/pci-bridge/pci_bridge_dev.c
-> +++ b/hw/pci-bridge/pci_bridge_dev.c
-> @@ -58,7 +58,7 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
-> 
->     pci_bridge_initfn(dev, TYPE_PCI_BUS);
-> 
-> -    if (bridge_dev->flags & (1 << PCI_BRIDGE_DEV_F_SHPC_REQ)) {
-> +    if (0) {//bridge_dev->flags & (1 << PCI_BRIDGE_DEV_F_SHPC_REQ)) {
->         dev->config[PCI_INTERRUPT_PIN] = 0x1;
->         memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
->                            shpc_bar_size(dev));
-> @@ -161,7 +161,7 @@ static Property pci_bridge_dev_properties[] = {
->     DEFINE_PROP_ON_OFF_AUTO(PCI_BRIDGE_DEV_PROP_MSI, PCIBridgeDev, msi,
->                             ON_OFF_AUTO_AUTO),
->     DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
-> -                    PCI_BRIDGE_DEV_F_SHPC_REQ, true),
-> +                    PCI_BRIDGE_DEV_F_SHPC_REQ, false),
->     DEFINE_PROP_END_OF_LIST(),
-> };
-> 
-> @@ -181,7 +181,7 @@ static const VMStateDescription pci_bridge_dev_vmstate = {
->         VMSTATE_END_OF_LIST()
->     }
-> };
-> -
-> +#if 0
-> static void pci_bridge_dev_hotplug_cb(HotplugHandler *hotplug_dev,
->                                       DeviceState *dev, Error **errp)
-> {
-> @@ -208,12 +208,12 @@ static void pci_bridge_dev_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
->     }
->     shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
-> }
-> -
-> +#endif
-> static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
-> {
->     DeviceClass *dc = DEVICE_CLASS(klass);
->     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> -    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
-> +    //HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
-> 
->     k->realize = pci_bridge_dev_realize;
->     k->exit = pci_bridge_dev_exitfn;
-> @@ -227,8 +227,8 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
->     dc->props = pci_bridge_dev_properties;
->     dc->vmsd = &pci_bridge_dev_vmstate;
->     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> -    hc->plug = pci_bridge_dev_hotplug_cb;
-> -    hc->unplug_request = pci_bridge_dev_hot_unplug_request_cb;
-> +    //hc->plug = pci_bridge_dev_hotplug_cb;
-> +    //hc->unplug_request = pci_bridge_dev_hot_unplug_request_cb;
-> }
-> 
-> static const TypeInfo pci_bridge_dev_info = {
-> @@ -238,7 +238,7 @@ static const TypeInfo pci_bridge_dev_info = {
->     .class_init        = pci_bridge_dev_class_init,
->     .instance_finalize = pci_bridge_dev_instance_finalize,
->     .interfaces = (InterfaceInfo[]) {
-> -        { TYPE_HOTPLUG_HANDLER },
-> +        //{ TYPE_HOTPLUG_HANDLER },
->         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
->         { }
->     }
-> --
-> 1.9.4
-> 
-
+PiA+IFdlIGZpbmQgYW4gaXNzdWUgd2hlbiBob3N0IG1jZSB0cmlnZ2VyIG9wZW52c3dpdGNoKGRw
+ZGspIHJlc3RhcnQgaW4gDQo+ID4gc291cmNlIGhvc3QgZHVyaW5nIGd1ZXN0IG1pZ3JhdGlvbiwN
+Cj4NCj4NCj4gRGlkIHlvdSBtZWFuIHRoZSB2aG9zdC11c2VyIG5ldGV2IHdhcyBkZWxldGVkIGZy
+b20gdGhlIHNvdXJjZSBob3N0Pw0KDQoNClRoZSB2aG9zdC11c2VyIG5ldGV2IHdhcyBub3QgZGVs
+ZXRlZCBmcm9tIHRoZSBzb3VyY2UgaG9zdC4gSSBtZWFuIHRoYXTvvJoNCmluIG5vcm1hbCBzY2Vu
+YXJpbywgT1ZTKERQREspIGJlZ2luIHRvIHJlc3RhcnQsIHRoZW4gcWVtdV9jaHIgZGlzY29ubmVj
+dCB0byBPVlMgYW5kIGxpbmsgc3RhdHVzIGlzIHNldCB0byBsaW5rIGRvd247IE9WUyhEUERLKSBz
+dGFydGVkLCB0aGVuIHFlbXVfY2hyIHJlY29ubmVjdCB0byBPVlMgYW5kIGxpbmsgc3RhdHVzIGlz
+IHNldCB0byBsaW5rIHVwLiBCdXQgaW4gb3VyIHNjZW5hcmlvLCBiZWZvcmUgcWVtdV9jaHIgcmVj
+b25uZWN0IHRvIE9WUywgdGhlIFZNIG1pZ3JhdGUgaXMgZmluaXNoZWQuIFRoZSBsaW5rX2Rvd24g
+b2YgZnJvbnRlbmQgd2FzIGxvYWRlZCBmcm9tIG4tPnN0YXR1cyBpbiBkZXN0aW5hdGlvbiwgaXQg
+Y2F1c2UgdGhlIG5ldHdvcmsgaW4gZ3VzdCBuZXZlciBiZSB1cCBhZ2Fpbi4NCg0KcWVtdV9jaHIg
+ZGlzY29ubmVjdDoNCiMwICB2aG9zdF91c2VyX3dyaXRlIChtc2c9bXNnQGVudHJ5PTB4N2ZmZjU5
+ZWNiMmIwLCBmZHM9ZmRzQGVudHJ5PTB4MCwgZmRfbnVtPWZkX251bUBlbnRyeT0wLCBkZXY9MHgy
+OTVjNzMwLCBkZXY9MHgyOTVjNzMwKQ0KICAgIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUta3ZtLTIu
+OC4xL2h3L3ZpcnRpby92aG9zdF91c2VyLmM6MjM5DQojMSAgMHgwMDAwMDAwMDAwNGU2YmFkIGlu
+IHZob3N0X3VzZXJfZ2V0X3ZyaW5nX2Jhc2UgKGRldj0weDI5NWM3MzAsIHJpbmc9MHg3ZmZmNTll
+Y2I1MTApDQogICAgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS1rdm0tMi44LjEvaHcvdmlydGlvL3Zo
+b3N0X3VzZXIuYzo0OTcNCiMyICAweDAwMDAwMDAwMDA0ZTJlODggaW4gdmhvc3RfdmlydHF1ZXVl
+X3N0b3AgKGRldj1kZXZAZW50cnk9MHgyOTVjNzMwLCB2ZGV2PXZkZXZAZW50cnk9MHgyY2EzNmMw
+LCB2cT0weDI5NWM4OTgsIGlkeD0wKQ0KICAgIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUta3ZtLTIu
+OC4xL2h3L3ZpcnRpby92aG9zdC5jOjEwMzYNCiMzICAweDAwMDAwMDAwMDA0ZTQ1YWIgaW4gdmhv
+c3RfZGV2X3N0b3AgKGhkZXY9aGRldkBlbnRyeT0weDI5NWM3MzAsIHZkZXY9dmRldkBlbnRyeT0w
+eDJjYTM2YzApDQogICAgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS1rdm0tMi44LjEvaHcvdmlydGlv
+L3Zob3N0LmM6MTU1Ng0KIzQgIDB4MDAwMDAwMDAwMDRiYzU2YSBpbiB2aG9zdF9uZXRfc3RvcF9v
+bmUgKG5ldD0weDI5NWM3MzAsIGRldj1kZXZAZW50cnk9MHgyY2EzNmMwKQ0KICAgIGF0IC91c3Iv
+c3JjL2RlYnVnL3FlbXUta3ZtLTIuOC4xL2h3L25ldC92aG9zdF9uZXQuYzozMjYNCiM1ICAweDAw
+MDAwMDAwMDA0YmNjM2IgaW4gdmhvc3RfbmV0X3N0b3AgKGRldj1kZXZAZW50cnk9MHgyY2EzNmMw
+LCBuY3M9PG9wdGltaXplZCBvdXQ+LAl0b3RhbF9xdWV1ZXM9NCkNCiAgICBhdCAvdXNyL3NyYy9k
+ZWJ1Zy9xZW11LWt2bS0yLjguMS9ody9uZXQvdmhvc3RfbmV0LmM6NDA3DQojNiAgMHgwMDAwMDAw
+MDAwNGI4NWY2IGluIHZpcnRpb19uZXRfdmhvc3Rfc3RhdHVzIChuPW5AZW50cnk9MHgyY2EzNmMw
+LAlzdGF0dXM9c3RhdHVzQGVudHJ5PTcgJ1xhJykNCiAgICBhdCAvdXNyL3NyYy9kZWJ1Zy9xZW11
+LWt2bS0yLjguMS9ody9uZXQvdmlydGlvX25ldC5jOjE3Nw0KIzcgIDB4MDAwMDAwMDAwMDRiODY5
+ZiBpbiB2aXJ0aW9fbmV0X3NldF9zdGF0dXMgKHZkZXY9PG9wdGltaXplZCBvdXQ+LCBzdGF0dXM9
+PG9wdGltaXplZCBvdXQ+KQ0KICAgIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUta3ZtLTIuOC4xL2h3
+L25ldC92aXJ0aW9fbmV0LmM6MjQzDQojOCAgMHgwMDAwMDAwMDAwNzNkMDBkIGluIHFtcF9zZXRf
+bGluayAobmFtZT1uYW1lQGVudHJ5PTB4Mjk1NmQ0MCAiaG9zdG5ldDAiLCB1cD11cEBlbnRyeT1m
+YWxzZSwgZXJycD1lcnJwQGVudHJ5PTB4N2ZmZjU5ZWNkNzE4KQ0KICAgIGF0IG5ldC9uZXQuYzox
+NDM3DQojOSAgMHgwMDAwMDAwMDAwNzQ2MGMxIGluIG5ldF92aG9zdF91c2VyX2V2ZW50IChvcGFx
+dWU9MHgyOTU2ZDQwLCBldmVudD00KSBhdCBuZXQvdmhvc3RfdXNlci5jOjIxNy8vcWVtdV9jaHJf
+YmVfZXZlbnQNCiMxMCAweDAwMDAwMDAwMDA1NzRmMGQgaW4gdGNwX2Nocl9kaXNjb25uZWN0IChj
+aHI9MHgyOTUxYTQwKSBhdCBxZW11X2NoYXIuYzozMjIwDQojMTEgMHgwMDAwMDAwMDAwNTc1MTFm
+IGluIHRjcF9jaHJfaHVwIChjaGFubmVsPTxvcHRpbWl6ZWQgb3V0PiwJY29uZD08b3B0aW1pemVk
+IG91dD4sIG9wYXF1ZT08b3B0aW1pemVkIG91dD4pIGF0IHFlbXVfY2hhci5jOjMyNjUNCg0KDQo+
+DQo+DQo+ID4gVk0gaXMgc3RpbGwgbGluayBkb3duIGluIGZyb250ZW5kIGFmdGVyIG1pZ3JhdGlv
+biwgaXQgY2F1c2UgdGhlIG5ldHdvcmsgaW4gVk0gbmV2ZXIgYmUgdXAgYWdhaW4uDQo+ID4NCj4g
+PiB2aXJ0aW9fbmV0X2xvYWRfZGV2aWNlOg0KPiA+ICAgICAgLyogbmMubGlua19kb3duIGNhbid0
+IGJlIG1pZ3JhdGVkLCBzbyBpbmZlciBsaW5rX2Rvd24gYWNjb3JkaW5nDQo+ID4gICAgICAgKiB0
+byBsaW5rIHN0YXR1cyBiaXQgaW4gbi0+c3RhdHVzICovDQo+ID4gICAgICBsaW5rX2Rvd24gPSAo
+bi0+c3RhdHVzICYgVklSVElPX05FVF9TX0xJTktfVVApID09IDA7DQo+ID4gICAgICBmb3IgKGkg
+PSAwOyBpIDwgbi0+bWF4X3F1ZXVlczsgaSsrKSB7DQo+ID4gICAgICAgICAgcWVtdV9nZXRfc3Vi
+cXVldWUobi0+bmljLCBpKS0+bGlua19kb3duID0gbGlua19kb3duOw0KPiA+ICAgICAgfQ0KPiA+
+DQo+ID4gZ3VzZXQ6ICAgICAgICAgICAgICAgbWlncmF0ZSBiZWdpbiAtLS0tLT4gdkNQVSBwYXVz
+ZSAtLS0+IHZtc2F0ZSBsb2FkIC0tLT4gbWlncmF0ZSBmaW5pc2gNCj4gPiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXiAgICAgICAgICAgICAgICBeICAgICAgICAgICAgICAg
+IF4NCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICAgICAgICAg
+ICAgICB8ICAgICAgICAgICAgICAgIHwNCj4gPiBvcGVudnN3aXRjaCBpbiBzb3VyY2UgaG9zdDog
+ICBiZWdpbiB0byByZXN0YXJ0ICAgcmVzdGFydGluZyAgICAgICAgc3RhcnRlZA0KPiA+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeICAgICAgICAgICAgICAgIF4gICAgICAg
+ICAgICAgICAgXg0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAg
+ICAgICAgICAgICAgIHwgICAgICAgICAgICAgICAgfA0KPiA+IG5jIGluIGZyb250ZW5kIGluIHNv
+dXJjZTogICAgICAgIGxpbmsgZG93biAgICAgICAgbGluayBkb3duICAgICAgICBsaW5rIGRvd24N
+Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXiAgICAgICAgICAgICAg
+ICBeICAgICAgICAgICAgICAgIF4NCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgfCAgICAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgIHwNCj4gPiBuYyBpbiBmcm9u
+dGVuZCBpbiBkZXN0aW5hdGlvbjogICBsaW5rIHVwICAgICAgICAgIGxpbmsgdXAgICAgICAgICAg
+bGluayBkb3duDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4gICAg
+ICAgICAgICAgICAgXiAgICAgICAgICAgICAgICBeDQo+ID4gICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHwgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAgICB8DQo+ID4g
+Z3VzZXQgbmV0d29yazogICAgICAgICAgICAgICAgICAgIGJyb2tlbiAgICAgICAgICAgYnJva2Vu
+ICAgICAgICAgICBicm9rZW4NCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXiAgICAgICAgICAgICAgICBeICAgICAgICAgICAgICAgIF4NCj4gPiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAgICB8ICAgICAgICAgICAgICAg
+IHwNCj4gPiBuYyBpbiBiYWNrZW5kIGluIHNvdXJjZTogICAgICAgICBsaW5rIGRvd24gICAgICAg
+IGxpbmsgZG93biAgICAgICAgbGluayB1cA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBeICAgICAgICAgICAgICAgIF4gICAgICAgICAgICAgICAgXg0KPiA+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgIHwgICAgICAg
+ICAgICAgICAgfA0KPiA+IG5jIGluIGJhY2tlbmQgaW4gZGVzdGluYXRpb246ICAgIGxpbmsgdXAg
+ICAgICAgICAgbGluayB1cCAgICAgICAgICBsaW5rIHVwDQo+ID4NCj4gPiBUaGUgbGlua19kb3du
+IG9mIGZyb250ZW5kIHdhcyBsb2FkZWQgZnJvbSBuLT5zdGF0dXMsIG4tPnN0YXR1cyBpcyBsaW5r
+IA0KPiA+IGRvd24gaW4gc291cmNlLCBzbyB0aGUgbGlua19kb3duIG9mIGZyb250ZW5kIGlzIHRy
+dWUuIFRoZSBiYWNrZW5kIGluIA0KPiA+IGRlc3RpbmF0aW9uIGhvc3QgaXMgbGluayB1cCwgYnV0
+IHRoZSBmcm9udGVuZCBpbiBkZXN0aW5hdGlvbiBob3N0IGlzIGxpbmsgZG93biwgaXQgY2F1c2Ug
+dGhlIG5ldHdvcmsgaW4gZ3VzdCBuZXZlciBiZSB1cCBhZ2FpbiB1bnRpbCBhbiBndWVzdCBjb2xk
+IHJlYm9vdC4NCj4gPg0KPiA+IElzIHRoZXJlIGEgd2F5IHRvIGF1dG8gZml4IHRoZSBsaW5rIHN0
+YXR1cz8gb3IganVzdCBhYm9ydCB0aGUgbWlncmF0aW9uIGluIHZpcnRpbyBuZXQgZGV2aWNlIGxv
+YWQ/DQo+DQo+DQo+IE1heWJlIHdlIGNhbiB0cnkgdG8gc3luYyBsaW5rIHN0YXR1cyBhZnRlciBt
+aWdyYXRpb24/DQo+DQo+IFRoYW5rcw0KDQoNCkluIGV4dHJlbWUgc2NlbmFyaW8sIGFmdGVyIG1p
+Z3JhdGlvbiB0aGUgT1ZTKERQREspIGluIHNvdXJjZSBtYXkgYmUgc3RpbGwgbm90IHN0YXJ0ZWQu
+DQoNCg0KT3VyIHBsYW4gaXMgdG8gY2hlY2sgdGhlIGxpbmsgc3RhdGUgb2YgYmFja2VuZCB3aGVu
+IGxvYWQgdGhlIGxpbmtfZG93biBvZiBmcm9udGVuZC4NCiAgICAgLyogbmMubGlua19kb3duIGNh
+bid0IGJlIG1pZ3JhdGVkLCBzbyBpbmZlciBsaW5rX2Rvd24gYWNjb3JkaW5nDQogICAgICAqIHRv
+IGxpbmsgc3RhdHVzIGJpdCBpbiBuLT5zdGF0dXMgKi8NCi0gICAgbGlua19kb3duID0gKG4tPnN0
+YXR1cyAmIFZJUlRJT19ORVRfU19MSU5LX1VQKSA9PSAwOw0KKyAgICBpZiAocWVtdV9nZXRfcXVl
+dWUobi0+bmljKS0+cGVlci0+aW5mby0+dHlwZSA9PSBORVRfQ0xJRU5UX0RSSVZFUl9WSE9TVF9V
+U0VSKSB7DQorICAgICAgICBsaW5rX2Rvd24gPSAobi0+c3RhdHVzICYgVklSVElPX05FVF9TX0xJ
+TktfVVAgfCAhcWVtdV9nZXRfcXVldWUobi0+bmljKS0+cGVlci0+bGlua19kb3duKSA9PSAwOw0K
+KyAgICB9IGVsc2Ugew0KKyAgICAgICAgbGlua19kb3duID0gKG4tPnN0YXR1cyAmIFZJUlRJT19O
+RVRfU19MSU5LX1VQKSA9PSAwOw0KKyAgICB9DQogICAgIGZvciAoaSA9IDA7IGkgPCBuLT5tYXhf
+cXVldWVzOyBpKyspIHsNCiAgICAgICAgIHFlbXVfZ2V0X3N1YnF1ZXVlKG4tPm5pYywgaSktPmxp
+bmtfZG93biA9IGxpbmtfZG93bjsNCiAgICAgfQ0KDQpJcyBnb29kIGVub3VnaCB0byBhdXRvIGZp
+eCB0aGUgbGluayBzdGF0dXM/DQoNClRoYW5rcw0K
 
