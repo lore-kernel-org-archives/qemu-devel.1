@@ -1,81 +1,69 @@
-Return-Path: <SRS0=WkHy=5I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA06C10DCE
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 23:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D09D6C4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 00:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27B0720409
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Mar 2020 23:09:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jSbGY4XC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27B0720409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A751A20719
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 00:24:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A751A20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGWCQ-0001YT-Ah
-	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 19:09:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49417)
+	id 1jGXMs-0008RJ-NX
+	for qemu-devel@archiver.kernel.org; Mon, 23 Mar 2020 20:24:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1jGWBf-00013B-Nh
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 19:08:52 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1jGXME-00082i-IJ
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 20:23:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1jGWBd-0007v8-TA
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 19:08:50 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:57480)
+ (envelope-from <tao3.xu@intel.com>) id 1jGXMC-00008I-KS
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 20:23:49 -0400
+Received: from mga02.intel.com ([134.134.136.20]:8518)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1jGWBd-0007uc-J3
- for qemu-devel@nongnu.org; Mon, 23 Mar 2020 19:08:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585004928;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xplLJ56MVWTvyGrI32x6Qz4ZpXbqBjG9ojd3SDfNrrk=;
- b=jSbGY4XCeJK4IAVoTT2EoIqDYudwT5DN9XTBAIz37Msne6Jc1DWu7iusCvN3HB2VVhYaBk
- vwpiDrv12fSQG+EQ/b62A2ZvV/J7Vp7J/EptfcmNMlmnUlA9gF7/UJK/k+IMiS4MapTj8f
- b4agM+dr0OF/BRvtTVV+k5YS6VLFVeY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-GCRnyuOSNfygB1WgDMKLxw-1; Mon, 23 Mar 2020 19:08:47 -0400
-X-MC-Unique: GCRnyuOSNfygB1WgDMKLxw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44103800D5B;
- Mon, 23 Mar 2020 23:08:45 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1105619C4F;
- Mon, 23 Mar 2020 23:08:36 +0000 (UTC)
-Date: Mon, 23 Mar 2020 17:08:35 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Bharat Bhushan <bbhushan2@marvell.com>
-Subject: Re: [PATCH v9 1/9] hw/vfio/common: Remove error print on mmio
- region translation by viommu
-Message-ID: <20200323170835.5021f845@w520.home>
-In-Reply-To: <20200323084617.1782-2-bbhushan2@marvell.com>
-References: <20200323084617.1782-1-bbhushan2@marvell.com>
- <20200323084617.1782-2-bbhushan2@marvell.com>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1jGXMC-00006R-1M
+ for qemu-devel@nongnu.org; Mon, 23 Mar 2020 20:23:48 -0400
+IronPort-SDR: 1yxIDw8RpAspi4SlfC31jKDL+I+PYIBiz55HSRtMBqtzUgPrk5PPdtN01afJ6nqvkXI7C0zB+D
+ 0zxiHHxD99CQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Mar 2020 17:23:43 -0700
+IronPort-SDR: PvyGoWhzOTRr5mIVaiIOu/KAvNdYMZ7JdhVJNKrSaPbuylYVi2FTnh6Q+g7Xp86Hp7MnTR2i6Q
+ JSOkPX3SIcJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,298,1580803200"; d="scan'208";a="446017119"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.238.4.86])
+ ([10.238.4.86])
+ by fmsmga005.fm.intel.com with ESMTP; 23 Mar 2020 17:23:42 -0700
+Subject: Re: [PATCH v2] target/i386: Add ARCH_CAPABILITIES related bits into
+ Icelake-Server CPU model
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20200316095605.12318-1-xiaoyao.li@intel.com>
+ <38253eb8-059c-5020-50cd-e90f7e8e4ae5@intel.com>
+ <8324d641-4a1d-cf64-5da5-9410eddc983c@intel.com>
+ <20200323183936.GA3784@habkost.net>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <99e35e3c-c797-ea54-4a55-dfe628cb7d2f@intel.com>
+Date: Tue, 24 Mar 2020 08:23:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+In-Reply-To: <20200323183936.GA3784@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,60 +75,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
- tnowicki@marvell.com, mst@redhat.com, drjones@redhat.com, peterx@redhat.com,
- qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>,
- bharatb.linux@gmail.com, qemu-arm@nongnu.org, jean-philippe@linaro.org,
- linuc.decode@gmail.com, David Gibson <david@gibson.dropbear.id.au>,
- eric.auger.pro@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Cc +dwg who originated this warning]
 
-On Mon, 23 Mar 2020 14:16:09 +0530
-Bharat Bhushan <bbhushan2@marvell.com> wrote:
-
-> On ARM, the MSI doorbell is translated by the virtual IOMMU.
-> As such address_space_translate() returns the MSI controller
-> MMIO region and we get an "iommu map to non memory area"
-> message. Let's remove this latter.
+On 3/24/2020 2:39 AM, Eduardo Habkost wrote:
+> On Mon, Mar 23, 2020 at 10:58:16AM +0800, Xiaoyao Li wrote:
+>> On 3/23/2020 10:32 AM, Tao Xu wrote:
+>>> Hi Xiaoyao,
+>>>
+>>> May be you can add .note for this new version.
+>>>
+>>> for example:
+>>>
+>>> +                .version = 3,
+>>> +                .note = "ARCH_CAPABILITIES",
+>>> +                .props = (PropValue[]) {
+>>
+>> Hi Paolo and Eduardo,
+>>
+>> Need I spin a new version to add the .note ?
+>> Maybe you can add it when queue?
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> ---
->  hw/vfio/common.c | 2 --
->  1 file changed, 2 deletions(-)
+> Please send a follow up patch so we don't hold a bug fix because
+> of something that's just cosmetic.  I will queue this patch.  We
+> still need a new version of "target/i386: Add notes for versioned
+> CPU models"[1], don't we?
 > 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 5ca11488d6..c586edf47a 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -426,8 +426,6 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
->                                   &xlat, &len, writable,
->                                   MEMTXATTRS_UNSPECIFIED);
->      if (!memory_region_is_ram(mr)) {
-> -        error_report("iommu map to non memory area %"HWADDR_PRIx"",
-> -                     xlat);
->          return false;
->      }
->  
-
-I'm a bit confused here, I think we need more justification beyond "we
-hit this warning and we don't want to because it's ok in this one
-special case, therefore remove it".  I assume the special case is that
-the device MSI address is managed via the SET_IRQS ioctl and therefore
-we won't actually get DMAs to this range.  But I imagine the case that
-was in mind when adding this warning was general peer-to-peer between
-and assigned and emulated device.  Maybe there's an argument to be made
-that such a p2p mapping might also be used in a non-vIOMMU case.  We
-skip creating those mappings and drivers continue to work, maybe
-because nobody attempts to do p2p DMA with the types of devices we
-emulate, maybe because p2p DMA is not absolutely reliable on bare metal
-and drivers test it before using it.  Anyway, I need a better argument
-why this is ok.  Thanks,
-
-Alex
-
+> [1] https://lore.kernel.org/qemu-devel/20200228215253.GB494511@habkost.net/
+> 
+I am sorry for misunderstanding your comments in that patch[1]. I will 
+submit a new version of this patch.
 
