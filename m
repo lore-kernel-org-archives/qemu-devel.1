@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0F3C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C62D1C41621
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:32:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 019CF2074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:16:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 802B82076F
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:32:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="iXYxkPeX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 019CF2074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="UnPZTrjl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 802B82076F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGp2J-0008Ei-Rj
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:16:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46320)
+	id 1jGpHo-0003Ah-Iv
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:32:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jGp17-0007N2-Bj
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:15:15 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jGpGf-0002jm-H6
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:31:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jGp14-0006Gp-Ef
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:15:12 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:10356)
+ (envelope-from <kwankhede@nvidia.com>) id 1jGpGd-0005qx-1j
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:31:17 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11911)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jGp14-0006ET-3e
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:15:10 -0400
+ id 1jGpGc-0005qp-Nh
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:31:14 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e7a5be10000>; Tue, 24 Mar 2020 12:13:37 -0700
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e7a5fd40000>; Tue, 24 Mar 2020 12:30:28 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Tue, 24 Mar 2020 12:15:07 -0700
+ Tue, 24 Mar 2020 12:31:13 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Tue, 24 Mar 2020 12:15:07 -0700
+ by hqpgpgate101.nvidia.com on Tue, 24 Mar 2020 12:31:13 -0700
 Received: from [10.40.103.72] (172.20.13.39) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 24 Mar
- 2020 19:14:58 +0000
-Subject: Re: [PATCH v14 Kernel 1/7] vfio: KABI for migration interface for
+ 2020 19:31:04 +0000
+Subject: Re: [PATCH v15 Kernel 1/7] vfio: KABI for migration interface for
  device state
 To: Auger Eric <eric.auger@redhat.com>, <alex.williamson@redhat.com>,
  <cjia@nvidia.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-2-git-send-email-kwankhede@nvidia.com>
- <7c3b3433-c7a7-ee7f-8e11-deac623a3115@redhat.com>
+References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
+ <1584649004-8285-2-git-send-email-kwankhede@nvidia.com>
+ <b8ae8d8c-6277-5269-64c7-8609463d2d18@redhat.com>
 X-Nvconfidentiality: public
 From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <91f35b15-6851-d3c4-29d5-bf2dc1d83e2f@nvidia.com>
-Date: Wed, 25 Mar 2020 00:44:54 +0530
+Message-ID: <a3a79db5-1922-0eae-b25d-f1ad97087a5a@nvidia.com>
+Date: Wed, 25 Mar 2020 01:01:00 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <7c3b3433-c7a7-ee7f-8e11-deac623a3115@redhat.com>
+In-Reply-To: <b8ae8d8c-6277-5269-64c7-8609463d2d18@redhat.com>
 X-Originating-IP: [172.20.13.39]
 X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
  HQMAIL107.nvidia.com (172.20.187.13)
@@ -69,19 +69,19 @@ Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1585077217; bh=6wRgKLPl4Uqz1hkQ7zIPjR+Qrw2mU57lXn7oLn64yqA=;
+ t=1585078228; bh=ny+Zlb+V3k1gjMUjH4CT7S3czi8b+O51EQYK01crOu0=;
  h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
  Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
  X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
  Content-Transfer-Encoding;
- b=iXYxkPeXCocQdkWXzRe/RwPVDm0LcqQ8IIqV0Wy13I9bZ4Fl9BpJ5c1PsGmKzXaOA
- 5XuSuPp0YyeE6coPrlsVOLgPfClK6o+EjJnQbJIGmtWt7pJx7ykdeg70uUqrONH990
- wYsIsoDuIFQkWbepIDUIGPnQBCxU2qXmNwtOI95i7nxAwBqzqdmb/+B/NidlJceo+P
- 1Sjw29lCaJM8Jcc3D7lMmqIOVYq92+BCTvqhNFZZdwp211psi8A8HVmxx0Dt5VCvqr
- G2ctG11z4kfs5e3q5omHAw+9tfULV74EmsjO5aSOcjrZUkUJMizrTrTeLTISqpUZ9r
- 1KzIe6S+ueNGw==
+ b=UnPZTrjleoLeAczGArLWOhNn2dUiHgLCOJ4i8KnOBs0oza08VWcQ6A+iPEhHHklV/
+ OZkWtepme4BF0KAwq4v2xHxdFHyn9rpfeWQuANe64CenaUOCOhkyUORllBnnyrIhaJ
+ DfXUugbltxB9i0fV66sTVvNGm28G/dxA2BikJQA2PfZYCBdksbeaueh8/n0rbWiv4O
+ IiPJ+Xzx1d8u5SPCIJmY/y2T8a1MzCpPhFicZFFUDWMrnWeqTDZm0iQGq1alTDc0pR
+ 6TBizzW90UVOLMuSz3zUU5TIuVy4TugrMuuebHh7T51g/tcNLAvkpjxxtQK7CXlUYw
+ u4vtPgIcRg3cA==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+X-Received-From: 216.228.121.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,10 +106,10 @@ Sender: "Qemu-devel"
 
 
 
-On 3/23/2020 5:15 PM, Auger Eric wrote:
+On 3/24/2020 2:00 AM, Auger Eric wrote:
 > Hi Kirti,
 > 
-> On 3/18/20 8:41 PM, Kirti Wankhede wrote:
+> On 3/19/20 9:16 PM, Kirti Wankhede wrote:
 >> - Defined MIGRATION region type and sub-type.
 >>
 >> - Defined vfio_device_migration_info structure which will be placed at the
@@ -122,6 +122,12 @@ On 3/23/2020 5:15 PM, Auger Eric wrote:
 >>
 >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> 
+> Please forgive me, I have just discovered v15 was available.
+> 
+> hereafter, you will find the 2 main points I feel difficult to
+> understand when reading the documentation.
+> 
 >> ---
 >>   include/uapi/linux/vfio.h | 227 ++++++++++++++++++++++++++++++++++++++++++++++
 >>   1 file changed, 227 insertions(+)
@@ -262,28 +268,7 @@ On 3/23/2020 5:15 PM, Auger Eric wrote:
 >> + * data_offset: (read only)
 >> + *      The user application should read data_offset in the migration region
 >> + *      from where the user application should read the device data during the
->> + *      _SAVING state or write the device data during the _RESUMING state.
-> The sentence above is a bit complex to read and was not understandable
-> [to me] at first shot. Maybe something like:
-> offset of the saved data within the migration region. The data at this
-> offset gets read by the user application during the _SAVING transition
-> and written by this latter during the _RESUMING state.
-> 
-
-Changing it to:
-  * data_offset: (read only)
-  *      The user application should read data_offset field from the 
-migration
-  *      region. The user application should read the device data from this
-  *      offset within the migration region during the _SAVING state or 
-write
-  *      the device data during the _RESUMING state. See below for 
-details of
-  *      sequence to be followed.
-
-
-
->   See
+>> + *      _SAVING state or write the device data during the _RESUMING state. See
 >> + *      below for details of sequence to be followed.
 >> + *
 >> + * data_size: (read/write)
@@ -291,18 +276,6 @@ details of
 >> + *      the data copied in the migration region during the _SAVING state and
 >> + *      write the size in bytes of the data copied in the migration region
 >> + *      during the _RESUMING state.
-> any alignment constraints on the data_size when restoring data?
-
-Its mentioned at the end of this bit comment
-"The user application should write data in the same order as the data is 
-received and the data should be of same transaction size at the source."
-
-
-> when saving data, also the data_size should be properly aligned I guess.
-
-No, data size is in bytes. data_offset should be page aligned if data 
-section is mmaped.
-
 >> + *
 >> + * The format of the migration region is as follows:
 >> + *  ------------------------------------------------------------------
@@ -313,18 +286,11 @@ section is mmaped.
 >> + *  offset 0-trapped part        data_offset
 >> + *
 >> + * The structure vfio_device_migration_info is always followed by the data
->> + * section in the region, so data_offset will always be nonzero
-> maybe add, whatever the data content
-
-Sorry, I didn't understand this comment.
-
-> . The offset
+>> + * section in the region, so data_offset will always be nonzero. The offset
 >> + * from where the data is copied is decided by the kernel driver. The data
 >> + * section can be trapped, mapped, or partitioned, depending on how the kernel
-> nit: maybe use the mmap terminology everywhere
 >> + * driver defines the data section. The data section partition can be defined
 >> + * as mapped by the sparse mmap capability. If mmapped, data_offset should be
-> s/should/must
 >> + * page aligned, whereas initial section which contains the
 >> + * vfio_device_migration_info structure, might not end at the offset, which is
 >> + * page aligned. The user is not required to access through mmap regardless
@@ -332,30 +298,30 @@ Sorry, I didn't understand this comment.
 >> + * The vendor driver should determine whether and how to partition the data
 >> + * section. The vendor driver should return data_offset accordingly.
 >> + *
->> + * The sequence to be followed for the _SAVING|_RUNNING device state or> + * pre-copy phase and for the _SAVING device state or stop-and-copy
-> phase is as
+>> + * The sequence to be followed for the _SAVING|_RUNNING device state or
+>> + * pre-copy phase and for the _SAVING device state or stop-and-copy phase is as
 >> + * follows:
-> Could we only talk about states mentionned in state transition drawing?
-> I think it would be simpler to follow.
 >> + * a. Read pending_bytes, indicating the start of a new iteration to get device
 >> + *    data. Repeated read on pending_bytes at this stage should have no side
 >> + *    effects.
 >> + *    If pending_bytes == 0, the user application should not iterate to get data
 >> + *    for that device.
+> I do not feel comfortable with the above sentence. In pre-save state,
+> the device is running and I understand nothing prevents from getting new
+> state data even after the pending_bytes reached 0.
+
+If pending_bytes == 0 that means that vendor driver don't have device 
+data anymore. This sequence is for both, pre-copy and stop-and-copy state.
+During pre-copy state, there might be 2 cases:
+pending_bytes !=0 => vendor driver still has data, but user application 
+decides to transition to next state, stop-and-copy state.
+pending_bytes == 0 => vendor driver has collected data till some check 
+point and given to user application, so vendor driver doesn't have any 
+more data to transfer. Vendor driver can track data after that check 
+point for stop-and-copy state. Or vendor driver doesn't support pre-copy 
+state or doesn't want to send any data in pre-copy state.
+
 >> + *    If pending_bytes > 0, perform the following steps.
-> Does (!pending_bytes) really means that the pre-copy migration is over
-> and the user app should stop iterating? I understand the device still
-> runs. We may have completed the migration at some point (pending_bytes
-> == 0) but for some reason the device resumes some activity and updates
-> some new dirty bits? Or is there any auto-transition from pre-copy to
-> stopped?
-
-!pending_bytes means that vendor driver don't have any more data in 
-pre-copy state but that doesn't mean that user applications/QEMU's 
-pre-copy is over. Dirty pages are not part of this data, dirty pages are 
-tracked separately.
-There is auto transition from pre-copy to stopped state.
-
 >> + * b. Read data_offset, indicating that the vendor driver should make data
 >> + *    available through the data section. The vendor driver should return this
 >> + *    read operation only after data is available from (region + data_offset)
@@ -370,32 +336,11 @@ There is auto transition from pre-copy to stopped state.
 >> + * e. Process the data.
 >> + * f. Read pending_bytes, which indicates that the data from the previous
 >> + *    iteration has been read. If pending_bytes > 0, go to step b.
-> If I understand correctly this is a way for the userapp to ack the fact
-> it consumed the data_size, right? So only after f) pending_bytes -=
-> data_size, is that correct?
-> 
-
-That's right.
-
-> Sorry I am showing late on the review and have missed lots of
-> discussions. Just for my curiosity was a ring buffer considered at some
-> point with prod and cons index?
-
-What is ring buffer?
-
 >> + *
 >> + * If an error occurs during the above sequence, the vendor driver can return
 >> + * an error code for next read() or write() operation, which will terminate the
-> which write operation? I think write ops are detailed after in the
-> resume process, right?
-
-Right, this error handling is applicable to both sequences. moving this 
-comment below resume sequence.
-
-
 >> + * loop. The user application should then take the next necessary action, for
->> + * example, failing migration or terminating the user application.
->> + *
+>> + * example, failing migration or terminating the user application.> + *
 >> + * The user application can transition from the _SAVING|_RUNNING
 >> + * (pre-copy state) to the _SAVING (stop-and-copy) state regardless of the
 >> + * number of pending bytes. The user application should iterate in _SAVING
@@ -409,14 +354,29 @@ comment below resume sequence.
 >> + * c. Write data_size, which indicates to the vendor driver that data is
 >> + *    written in the migration region. Vendor driver should apply the
 >> + *    user-provided migration region data to the device resume state.
-> How does the userapp know when the data it wrote has been consumed by
-> the device?
+> This is not clear to me when the data gets consumed by the device. Is
+> the write data_size blocking?
 
-On write(data_size), vendor driver should return only after consuming data.
+Yes.
+As mentioned in my reply to v14 patch, on write(data_size), vendor 
+driver should return only after consuming data, Updating it as below:
+
+  * c. Write data_size, which indicates to the vendor driver that data is
+  *    written in the migration region. Vendor driver must return this write
+  *    operations on consuming data. Vendor driver should apply the
+  *    user-provided migration region data to the device resume state.
 
 Thanks,
 Kirti
 
+> Is the data offset moving to make sure the
+> user data will not be overriden? Can the the userapp refill immediately?
+> At least some hints about possible implementation would ease the
+> understanding.
+> 
+> Thanks
+> 
+> Eric
 >> + *
 >> + * For the user application, data is opaque. The user application should write
 >> + * data in the same order as the data is received and the data should be of
@@ -455,8 +415,5 @@ Kirti
 >>    * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
 >>    * which allows direct access to non-MSIX registers which happened to be within
 >>
-> Thanks
-> 
-> Eric
 > 
 
