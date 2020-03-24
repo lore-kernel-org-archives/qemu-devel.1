@@ -7,89 +7,89 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABCB4C4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CAD7C4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:54:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78FF7207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11132207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:54:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LXa2Hmdy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78FF7207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IleU1f1i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11132207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGj3w-0007sI-NC
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:53:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45011)
+	id 1jGj4u-0000OR-9R
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:54:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jGj3L-0007N3-4X
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:53:08 -0400
+ (envelope-from <philmd@redhat.com>) id 1jGj3a-0007Zb-Sb
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:53:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jGj3K-0007Ne-4i
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:53:07 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49703)
+ (envelope-from <philmd@redhat.com>) id 1jGj3Z-0007Rb-LN
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:53:22 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:25651)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGj3K-0007NW-1X
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:53:06 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGj3Z-0007RT-I0
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:53:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585054385;
+ s=mimecast20190719; t=1585054401;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=So1uRdUbBgE6MXcsrCTCnt6i7+RDqSHznSh4dy94gDg=;
- b=LXa2HmdyQoknBw/1ZZakGu0H1bqX+RZOzbPcQ2aVBM3TlUEFXBBr4AKX9Mewf93I+X+2QT
- 54x/e/3+Kw2oik4nVo0uWp7SMujdbdTA2xdehlX6GucG6PauuuJm8ghy7nys2m20xWVbvI
- nnCfqx2xDvHbNMZiEYqgt+6ogLxZn2k=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-vtUqm4jIN6qrVcZNyqkf2A-1; Tue, 24 Mar 2020 08:53:03 -0400
-X-MC-Unique: vtUqm4jIN6qrVcZNyqkf2A-1
-Received: by mail-ed1-f70.google.com with SMTP id b12so11760744edy.7
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 05:53:03 -0700 (PDT)
+ bh=+2NZ7DxN165nxt3Ld/2Dj1pHpLBcwyWWYgmoYn3tmrM=;
+ b=IleU1f1iMbjcYuX40Z9AVILrjJU9275Qu0lR0HrxTxnsaOwx3tIhfCNoRlo/XlhqkOM6z6
+ Z910yhcYJ+YleeQqd7zKNLhpnlet/bAc7urXIULQP8CrzMD2IO+5jJNky+BMuLfJfiY7o5
+ J1s0v6Uw6u3hDb6nDtLIFn6tESJ0j4g=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-488-CBVKkJN0OZqhnL_06Cn7Mw-1; Tue, 24 Mar 2020 08:53:19 -0400
+X-MC-Unique: CBVKkJN0OZqhnL_06Cn7Mw-1
+Received: by mail-ed1-f71.google.com with SMTP id b9so13670222edj.10
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 05:53:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=fs39/dnePH5M146xoQrUj96QduyvGI/j/GZD6HFso4U=;
- b=nnqcPvYwv28WaDzlvea0I8n4Vd4v12wcUuMh5piLhSlW4yZ67tlwpvwSczGmp9dJ61
- OJttnz+5VPJjn082W2sPPIf274GhdfjGZa7lQTajXUZsvfywfu+R0BVIaaqxFlTiIo3W
- PaQQcUcZ01wsM+pVPLIdi3pKnM8zANXQplgwpUrj9u9gifjV0keW504oo0RNnAmfD3qA
- twTHkF3J25Vb3c0AuJTykfcG/zmWgVOBuPdLc4n95uAdRBcd6E9u9fFvO7aR73kUThm8
- qBaNY12Y3/BY64gp8x+qDburdzUYzmjx7JERhOxxTGdss3K3tRFk9xh2tX/vq0GIAQKE
- /Pug==
-X-Gm-Message-State: ANhLgQ3ukF8ChDtHc6L+EJr+BbtDd6uqlPzuZa17stfDNK9pzGPvXkiu
- UgpwPZiPuJKLlg+6IjQVCJBwZeYxteplPJGyGHlBkzIyhRtP93b+y6k8sUHdCRn3wWiucemGnd1
- ZpJCkN/KmpKCRyvc=
-X-Received: by 2002:a05:6402:889:: with SMTP id
- e9mr26605779edy.204.1585054382332; 
- Tue, 24 Mar 2020 05:53:02 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsiSsmv8dQrOWqQELFbdGJloXQWAFr3+Na7k2mMdsUdG9/U//n/tAwaAMf5UDeY1+2bzQyTow==
-X-Received: by 2002:a05:6402:889:: with SMTP id
- e9mr26605763edy.204.1585054382104; 
- Tue, 24 Mar 2020 05:53:02 -0700 (PDT)
+ bh=iC7C9ezAbcbwQKTXyZO5oD6og3EO/2IfuRgori7ynII=;
+ b=s+Cx0BdH7Di1134x7SbKsvtE5evID7ahqvqYdU8yswo0dtgpvpPPtJUs20SsSXBlRp
+ xmp2SFyl9tKaXRsUHIVb8tU7lAX4CSR+3tdhqbW6ZfaP19IqtpMSqNJicGnKnLCvjtz6
+ KXlGp8i/DqNXNla+2lwScfSH7BNZFhkrnSB6Vvz/yWU9Qc633ehN4mdod2wCfbW1XDPl
+ xdTqALvAQrPxDQeeLLmFu3m7VhBKbv7krtaTJc5Xh0dUuT+qCih6QDC1AUgxteJoYTe5
+ hQvnJ6YLMlQPvAlDwxfAVQM0WcmcBXAyI9MaWtVnnIqfjZ+PyK2rxtACFfiu2VxVpJxh
+ iZCg==
+X-Gm-Message-State: ANhLgQ0nw3qh2v4lpSXm+gwcS9K8YZUn4K2TZ2V5DEVIQrgCF40mfsBI
+ tV0fffHRNzr6OCRE8CavbhISrwSA01Dat8yHjl1Y/fMfJFt/DlyD0zASv67JWD3kbFX6cfWc4pB
+ hcvKCDCfluqXphOk=
+X-Received: by 2002:a17:906:6987:: with SMTP id
+ i7mr24261124ejr.12.1585054398273; 
+ Tue, 24 Mar 2020 05:53:18 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsV6zuOSDCXlMKxsDYfJFAwKYMzwON7f615hKKeyRTyCsZ938GlnhWE459DxNrNWtkc7QooWg==
+X-Received: by 2002:a17:906:6987:: with SMTP id
+ i7mr24261104ejr.12.1585054397971; 
+ Tue, 24 Mar 2020 05:53:17 -0700 (PDT)
 Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id b11sm589582edj.20.2020.03.24.05.53.00
+ by smtp.gmail.com with ESMTPSA id m21sm1287117edb.90.2020.03.24.05.53.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Mar 2020 05:53:01 -0700 (PDT)
-Subject: Re: [PATCH v2 5/8] hw/arm/fsl-imx6: Connect watchdog interrupts
+ Tue, 24 Mar 2020 05:53:17 -0700 (PDT)
+Subject: Re: [PATCH v2 6/8] hw/arm/fsl-imx6ul: Connect watchdog interrupts
 To: Guenter Roeck <linux@roeck-us.net>,
  Peter Maydell <peter.maydell@linaro.org>
 References: <20200322211919.11335-1-linux@roeck-us.net>
- <20200322211919.11335-6-linux@roeck-us.net>
+ <20200322211919.11335-7-linux@roeck-us.net>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <56f5387f-5528-b602-2bd0-9e2d95749893@redhat.com>
-Date: Tue, 24 Mar 2020 13:53:00 +0100
+Message-ID: <9088952f-b594-9495-17c2-a33bab7655b2@redhat.com>
+Date: Tue, 24 Mar 2020 13:53:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200322211919.11335-6-linux@roeck-us.net>
+In-Reply-To: <20200322211919.11335-7-linux@roeck-us.net>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -116,28 +116,29 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/22/20 10:19 PM, Guenter Roeck wrote:
-> With this patch applied, the watchdog in the sabrelite emulation
-> is fully operational, including pretimeout support.
+> With this commit, the watchdog on mcimx6ul-evk is fully operational,
+> including pretimeout support.
 >=20
 > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 > ---
 > v2: No change
 >=20
->   hw/arm/fsl-imx6.c | 9 +++++++++
->   1 file changed, 9 insertions(+)
+>   hw/arm/fsl-imx6ul.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
 >=20
-> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-> index 13f1bf23a6..f58c85aa8c 100644
-> --- a/hw/arm/fsl-imx6.c
-> +++ b/hw/arm/fsl-imx6.c
-> @@ -433,11 +433,20 @@ static void fsl_imx6_realize(DeviceState *dev, Erro=
-r **errp)
->               FSL_IMX6_WDOG1_ADDR,
->               FSL_IMX6_WDOG2_ADDR,
+> diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+> index 56dfd7cecc..3ecb212da6 100644
+> --- a/hw/arm/fsl-imx6ul.c
+> +++ b/hw/arm/fsl-imx6ul.c
+> @@ -531,12 +531,22 @@ static void fsl_imx6ul_realize(DeviceState *dev, Er=
+ror **errp)
+>               FSL_IMX6UL_WDOG2_ADDR,
+>               FSL_IMX6UL_WDOG3_ADDR,
 >           };
-> +        static const int FSL_IMX6_WDOGn_IRQ[FSL_IMX6_NUM_WDTS] =3D {
-> +            FSL_IMX6_WDOG1_IRQ,
-> +            FSL_IMX6_WDOG2_IRQ,
+> +        static const int FSL_IMX6UL_WDOGn_IRQ[FSL_IMX6UL_NUM_WDTS] =3D {
+> +            FSL_IMX6UL_WDOG1_IRQ,
+> +            FSL_IMX6UL_WDOG2_IRQ,
+> +            FSL_IMX6UL_WDOG3_IRQ,
 > +        };
 >  =20
 > +        object_property_set_bool(OBJECT(&s->wdt[i]), true, "pretimeout-s=
@@ -146,14 +147,14 @@ upport",
 >           object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
 >                                    &error_abort);
 >  =20
->           sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0, FSL_IMX6_WDOGn_A=
-DDR[i]);
+>           sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0,
+>                           FSL_IMX6UL_WDOGn_ADDR[i]);
 > +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->wdt[i]), 0,
-> +                           qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-> +                                            FSL_IMX6_WDOGn_IRQ[i]));
+> +                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
+> +                                            FSL_IMX6UL_WDOGn_IRQ[i]));
 >       }
 >  =20
->       /* ROM memory */
+>       /*
 >=20
 
 Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
