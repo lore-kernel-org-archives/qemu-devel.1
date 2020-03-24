@@ -2,79 +2,80 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 411D3C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD24C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BEAD20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:40:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF37E20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:41:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KOUhjr4a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BEAD20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="awaZomRW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF37E20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGnXF-00020c-8L
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:40:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58240)
+	id 1jGnYM-0003Kz-1Q
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:41:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jGnVy-000120-Nl
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:39:00 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jGnXd-0002fm-Eb
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jGnVx-0006Ke-BV
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:38:58 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42215)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jGnVw-0006KR-W4
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:38:57 -0400
-Received: by mail-oi1-x242.google.com with SMTP id e4so5731653oig.9
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 10:38:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YTNlgKZGjTrkTDpb+XM6xbG1zTxAGD1mH3QOFM+84lk=;
- b=KOUhjr4a0DSVv8yiFgk7BxTFHcLqlP7srruXqR6+mHBU8fOOjF7R9bfHHyJB7a19Xa
- pdrdOiSSefh8RovLGq1IYjr5K0Lz60I/hW8dO4y1oSBE3CFuVvv1GnjUcb2dJRoJB9ob
- wzx3vZF9Mh3NvNo7ZqNlNbdxc5yc4jYk3KJeFMAfJT/oORnwhzoDZ8yqW1Ny/l6bUwDA
- Z09UCUYTJrQeGABPoMBrpDtdHQSqZurHsvGZCaOjOtINZBvSt5mzDoLOclq8bWx99EZV
- psJGzRZUDKgsXwEjFFPLewVwdJmXU5/w78Pi21op5VbLMfTGbPuhtsMLOKCujSQx75O4
- RCpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YTNlgKZGjTrkTDpb+XM6xbG1zTxAGD1mH3QOFM+84lk=;
- b=U+pv+Rm0uPqRcklKI6E8Nx/tj5crPBKNPRNY5Ksb/vSgKQzXHBNV2PFJ1uPB+hApyD
- GWn1sric1iDQM10YEZT7SKNfStCVdaz2YQhr0/feQo58Ev4+vywLjpFWcRCjAKpCE14l
- tNOh1tyJBC8/+Mu7pJnr2udqk8RgaGaStV41eZqYquAAg0Hvpo6EybyKVTXV75gn5Z94
- Zma8zZOf+SiwWIfYzUvSnE9Qa563ATS3hlnIO9+6dPNUAb4NvNnLZnbnmSO2Fp0VkJ3E
- 8bIQqHK/wTp2EdCMpGQijJAsorTWHOnqff+kmYDRvvIZl9iAku0Rkem+YY8VN/schxQ3
- Ludg==
-X-Gm-Message-State: ANhLgQ3sMTXxf1zByp1PQuFC+zgWzaHRI06zUOGHaswVN4XB/9OmMhIr
- 7PFpoAhal6mbFPsqklM0xxJDPnVwGhBEARJwPS2gNAPZtwU=
-X-Google-Smtp-Source: ADFU+vsOcdWxGFb8J3IDgODjpoJbg1uql5pnTXelmA1hnb8N7ICXPzy5QhdCBKZ9NAfEZakgsLYKtfNHuf6GxLjE6p8=
-X-Received: by 2002:aca:c608:: with SMTP id w8mr4348918oif.163.1585071535913; 
- Tue, 24 Mar 2020 10:38:55 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1jGnXc-0006zG-Dc
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:40:41 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:56286)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jGnXc-0006yz-A9
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:40:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585071639;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YqmX2cppPJPNb1vjz+eeMjOuJCrnm9QqTBVAPlWZIUM=;
+ b=awaZomRWf79ZZFpFsKDXfdKVCf5/LC4DRWerOZut19GEPd7jkv9WjBEm9nAek2KzyfBgx0
+ USfdop96lSHlWrdSiIpPXsIJF5N8BLi7tLaixbL8T8jCVCvnONdoDmHd2d3RE1hyIFNB6g
+ Vn9di8aWxVkKWwK6ypjVutAAZtjJhoA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-qxmsC6ZzN6iVnuxRmonDdg-1; Tue, 24 Mar 2020 13:40:37 -0400
+X-MC-Unique: qxmsC6ZzN6iVnuxRmonDdg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8C7D800D53;
+ Tue, 24 Mar 2020 17:40:36 +0000 (UTC)
+Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AC5319C6A;
+ Tue, 24 Mar 2020 17:40:34 +0000 (UTC)
+Date: Tue, 24 Mar 2020 17:40:32 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Subject: Re: [PATCH] hmp-cmd: fix a missing_break warning
+Message-ID: <20200324174032.GA17043@work-vm>
+References: <20200318071620.59748-1-pannengyuan@huawei.com>
+ <1a0d020b-3fe6-3575-1c2f-1af4a79cf080@huawei.com>
 MIME-Version: 1.0
-References: <20200324173630.12221-1-peter.maydell@linaro.org>
-In-Reply-To: <20200324173630.12221-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Mar 2020 17:38:44 +0000
-Message-ID: <CAFEAcA8epRWom-KVMA8D4JH5vq5h=zKOtON4q6tRUmE-wup=Qw@mail.gmail.com>
-Subject: Re: [PATCH for-5.0] dump: Fix writing of ELF section
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <1a0d020b-3fe6-3575-1c2f-1af4a79cf080@huawei.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,53 +87,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- qemu-stable <qemu-stable@nongnu.org>
+Cc: euler.robot@huawei.com, zhukeqian1@huawei.com, qemu-devel@nongnu.org,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Mar 2020 at 17:36, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> In write_elf_section() we set the 'shdr' pointer to point to local
-> structures shdr32 or shdr64, which we fill in to be written out to
-> the ELF dump.  Unfortunately the address we pass to fd_write_vmcore()
-> has a spurious '&' operator, so instead of writing out the section
-> header we write out the literal pointer value followed by whatever is
-> on the stack after the 'shdr' local variable.
->
-> Pass the correct address into fd_write_vmcore().
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> I have not tested this because I can't reproduce the conditions
-> under which we try to actually use write_elf_section() (they
-> must be rare, because currently we produce a bogus ELF file
-> for this code path). In dump_init() s->list.num must be
-> at least UINT16_MAX-1, which I think means it has to be a
-> paging-enabled dump and the guest's page table must be
-> extremely fragmented ?
-> ---
->  dump/dump.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/dump/dump.c b/dump/dump.c
-> index 6fb6e1245ad..22ed1d3b0d4 100644
-> --- a/dump/dump.c
-> +++ b/dump/dump.c
-> @@ -364,7 +364,7 @@ static void write_elf_section(DumpState *s, int type, Error **errp)
->          shdr = &shdr64;
->      }
->
-> -    ret = fd_write_vmcore(&shdr, shdr_size, s);
-> +    ret = fd_write_vmcore(shdr, shdr_size, s);
->      if (ret < 0) {
->          error_setg_errno(errp, -ret,
->                           "dump: failed to write section header table");
+* Pan Nengyuan (pannengyuan@huawei.com) wrote:
+> Correcting zhang hailiang's email.
 
-Just realized this probably merits
-Cc: qemu-stable@nongnu.org
+Queued
 
-thanks
--- PMM
+> On 3/18/2020 3:16 PM, Pan Nengyuan wrote:
+> > This fix coverity issues 94417686:
+> >     1260        break;
+> >     CID 94417686: (MISSING_BREAK)
+> >     1261. unterminated_case: The case for value "MIGRATION_PARAMETER_TH=
+ROTTLE_TRIGGER_THRESHOLD" is not terminated by a 'break' statement.
+> >     1261    case MIGRATION_PARAMETER_THROTTLE_TRIGGER_THRESHOLD:
+> >     1262        p->has_throttle_trigger_threshold =3D true;
+> >     1263        visit_type_int(v, param, &p->throttle_trigger_threshold=
+, &err);
+> >     1264    case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
+> >=20
+> > Fixes: dc14a470763c96fd9d360e1028ce38e8c3613a77
+> > Reported-by: Euler Robot <euler.robot@huawei.com>
+> > Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> > ---
+> > Cc: zhukeqian1@huawei.com
+> > ---
+> >  monitor/hmp-cmds.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >=20
+> > diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> > index 58724031ea..c882c9f3cc 100644
+> > --- a/monitor/hmp-cmds.c
+> > +++ b/monitor/hmp-cmds.c
+> > @@ -1261,6 +1261,7 @@ void hmp_migrate_set_parameter(Monitor *mon, cons=
+t QDict *qdict)
+> >      case MIGRATION_PARAMETER_THROTTLE_TRIGGER_THRESHOLD:
+> >          p->has_throttle_trigger_threshold =3D true;
+> >          visit_type_int(v, param, &p->throttle_trigger_threshold, &err)=
+;
+> > +        break;
+> >      case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
+> >          p->has_cpu_throttle_initial =3D true;
+> >          visit_type_int(v, param, &p->cpu_throttle_initial, &err);
+> >=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
