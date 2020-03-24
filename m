@@ -4,84 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C18C4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8809CC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:41:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D238520714
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:36:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5409120714
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 19:41:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="gbO5Pwjk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D238520714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bdD7k0eU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5409120714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGpLG-0005io-2M
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:36:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49031)
+	id 1jGpQs-0007AL-Ho
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 15:41:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49874)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jGpKL-0004nt-Ur
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:35:06 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jGpQ6-0006fz-5p
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jGpKK-0007Le-SZ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:35:05 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:11784)
+ (envelope-from <dgilbert@redhat.com>) id 1jGpQ5-00010j-7U
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:41:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35977)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jGpKK-0007KO-MS
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:35:04 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e7a608c0000>; Tue, 24 Mar 2020 12:33:32 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Tue, 24 Mar 2020 12:35:03 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Tue, 24 Mar 2020 12:35:03 -0700
-Received: from [10.40.103.72] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 24 Mar
- 2020 19:34:54 +0000
-Subject: Re: [PATCH v15 Kernel 2/7] vfio iommu: Remove atomicity of ref_count
- of pinned pages
-To: Auger Eric <eric.auger@redhat.com>, <alex.williamson@redhat.com>,
- <cjia@nvidia.com>
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
- <1584649004-8285-3-git-send-email-kwankhede@nvidia.com>
- <b2e791ee-e55a-3142-119c-c2f4300fabd5@redhat.com>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <ae258072-89db-8c88-ad6a-8084781a0205@nvidia.com>
-Date: Wed, 25 Mar 2020 01:04:50 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jGpQ5-00010a-3T
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 15:41:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585078860;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=N91IBJ0JRTdFYBM7U+8ufguVS/Id+MlH1tvP31JV1WM=;
+ b=bdD7k0eUmygCzeTHhTVdMQ4RHO4Xk5uEWNpM/MHIZjtm2Dh23U1/R4UpnU0m+vXGQtRocA
+ C5kq3X2JOKybPDD/mDmL+3z3marD1OWq5/xPOW4CeOuwRr44xKyAexuhvTFcPacMlgvBaO
+ sKItlDw3P5CsYqpehrgsrJc/obz8sRM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-Dx0pdq68NJm0SdEwyhVtpw-1; Tue, 24 Mar 2020 15:40:58 -0400
+X-MC-Unique: Dx0pdq68NJm0SdEwyhVtpw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78771107ACC9;
+ Tue, 24 Mar 2020 19:40:57 +0000 (UTC)
+Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 29DCC94B24;
+ Tue, 24 Mar 2020 19:40:51 +0000 (UTC)
+Date: Tue, 24 Mar 2020 19:40:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 4/6] migration/colo: fix use after free of local_err
+Message-ID: <20200324194049.GF2645@work-vm>
+References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+ <20200324153630.11882-5-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <b2e791ee-e55a-3142-119c-c2f4300fabd5@redhat.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1585078412; bh=40wVc0Yor8YTosJnEQ2TGgBM6wIvNiRWDsFVZ7Q/Fjg=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=gbO5PwjkX/gKB+EUSCsbtRqYcPexTnIjStcBsnRgvqlKBBhAReRViuGL9KGrip2k0
- alwsjRbBM3RM08beJomQv/L1sQqapeflSlKBP2U+VkH9scY8iV7pdV6urcQ4Go+bww
- MW62nZnfwjKBCykW750YUNfwjjAl3bVvAQvxYERWtHJhJzidFA2u49f4x/DRHET9sx
- Cb6MFYQRuZA+XurNLS8nB5k5kbhTNXqsADBAQ4nHW8jRIm24QmAKjYKmD7VUJsYDtb
- vdd5yOFWZSRBADJA/J85Z9VxOpuJ/6GHI4uaOEzp6BBGykCT7ekkE0uXNqYw3AsezB
- WmNRW9IEqjy8w==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+In-Reply-To: <20200324153630.11882-5-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,83 +87,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
- ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
- felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ quintela@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, den@openvz.org, marcandre.lureau@redhat.com,
+ jsnow@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> local_err is used again in secondary_vm_do_failover() after
+> replication_stop_all(), so we must zero it. Otherwise try to set
+> non-NULL local_err will crash.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-On 3/24/2020 2:00 AM, Auger Eric wrote:
-> Hi Kirti,
-> 
-> On 3/19/20 9:16 PM, Kirti Wankhede wrote:
->> vfio_pfn.ref_count is always updated by holding iommu->lock, using atomic
->> variable is overkill.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> 
+I'll queue this
 
-Thanks.
+> ---
+>  migration/colo.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 44942c4e23..a54ac84f41 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -93,6 +93,7 @@ static void secondary_vm_do_failover(void)
+>      replication_stop_all(true, &local_err);
+>      if (local_err) {
+>          error_report_err(local_err);
+> +        local_err =3D NULL;
+>      }
+> =20
+>      /* Notify all filters of all NIC to do checkpoint */
+> --=20
+> 2.21.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Kirti.
-
-> Thanks
-> 
-> Eric
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 9 +++++----
->>   1 file changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 9fdfae1cb17a..70aeab921d0f 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -112,7 +112,7 @@ struct vfio_pfn {
->>   	struct rb_node		node;
->>   	dma_addr_t		iova;		/* Device address */
->>   	unsigned long		pfn;		/* Host pfn */
->> -	atomic_t		ref_count;
->> +	unsigned int		ref_count;
->>   };
->>   
->>   struct vfio_regions {
->> @@ -233,7 +233,7 @@ static int vfio_add_to_pfn_list(struct vfio_dma *dma, dma_addr_t iova,
->>   
->>   	vpfn->iova = iova;
->>   	vpfn->pfn = pfn;
->> -	atomic_set(&vpfn->ref_count, 1);
->> +	vpfn->ref_count = 1;
->>   	vfio_link_pfn(dma, vpfn);
->>   	return 0;
->>   }
->> @@ -251,7 +251,7 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->>   	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
->>   
->>   	if (vpfn)
->> -		atomic_inc(&vpfn->ref_count);
->> +		vpfn->ref_count++;
->>   	return vpfn;
->>   }
->>   
->> @@ -259,7 +259,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
->>   {
->>   	int ret = 0;
->>   
->> -	if (atomic_dec_and_test(&vpfn->ref_count)) {
->> +	vpfn->ref_count--;
->> +	if (!vpfn->ref_count) {
->>   		ret = put_pfn(vpfn->pfn, dma->prot);
->>   		vfio_remove_from_pfn_list(dma, vpfn);
->>   	}
->>
-> 
 
