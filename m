@@ -2,64 +2,80 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68040C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FA2C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:55:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A7E820775
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:48:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7E820775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mit.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 9E8C42074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 18:55:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EFeAkVnb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E8C42074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGobb-0007tO-CI
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 14:48:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43098)
+	id 1jGohp-0001UZ-MG
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 14:55:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tytso@mit.edu>) id 1jGoaw-0007PY-LV
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:48:11 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jGohA-0000mM-Fd
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:54:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tytso@mit.edu>) id 1jGoav-0006pO-9W
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:48:10 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:55662
- helo=outgoing.mit.edu)
+ (envelope-from <dgilbert@redhat.com>) id 1jGoh8-0003Wr-NP
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:54:35 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:43390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tytso@mit.edu>) id 1jGoav-0006on-5D
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:48:09 -0400
-Received: from callcc.thunk.org (pool-72-93-95-157.bstnma.fios.verizon.net
- [72.93.95.157]) (authenticated bits=0)
- (User authenticated as tytso@ATHENA.MIT.EDU)
- by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 02OIlsE5019147
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 24 Mar 2020 14:47:54 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
- id 2B396420EBA; Tue, 24 Mar 2020 14:47:54 -0400 (EDT)
-Date: Tue, 24 Mar 2020 14:47:54 -0400
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] ext4: Give 32bit personalities 32bit hashes
-Message-ID: <20200324184754.GG53396@mit.edu>
-References: <20200317113153.7945-1-linus.walleij@linaro.org>
- <CAFEAcA9mXE+gPnvM6HZ-w0+BhbpeuH=osFH-9NUzCLv=w-c7HQ@mail.gmail.com>
- <CACRpkdZtLNUwiZEMiJEoB0ojOBckyGcZeyFkR6MC69qv-ry9EA@mail.gmail.com>
- <CAFEAcA-gdwi=KSW6LqVdEJWSo9VEL5abYQs9LoHd4mKE_-h=Aw@mail.gmail.com>
- <CACRpkdYuZgZUznVxt1AHCSJa_GAXy8N0SduE5OrjDnE1s_L7Zg@mail.gmail.com>
- <20200324023431.GD53396@mit.edu>
- <CAFEAcA_6RY1XFVNJCo5=tTkv2GQpXZRqh_Zz4dYadq-8MJZgTQ@mail.gmail.com>
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jGoh8-0003Vt-Iw
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 14:54:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585076073;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cy/KeuZy/dXv7BaYtH1itI04Gh8570R5tn5KNjIF9u4=;
+ b=EFeAkVnbhm0iFMgWGjIISDRIMZz1N5QnqEMMkn3QrmcuvIdgLaeyu7Q1uaNkyNvbK1Igyq
+ 13e2KvjwZ3g7/SWyw0aKd0jwlq1w7tILC/5CtkrcFsmSrVO39UPnJj1EpRWMKt1OWLKDxz
+ Aeobb6hhRZc3ydedNWiV9tkFxyZpGkA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-ApVRB7npPDONiGyOCXNDVA-1; Tue, 24 Mar 2020 14:54:29 -0400
+X-MC-Unique: ApVRB7npPDONiGyOCXNDVA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00284800D50;
+ Tue, 24 Mar 2020 18:54:28 +0000 (UTC)
+Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F6C5BBBCE;
+ Tue, 24 Mar 2020 18:54:24 +0000 (UTC)
+Date: Tue, 24 Mar 2020 18:54:21 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Subject: Re: [PATCH] hmp/vnc: Fix info vnc list leak
+Message-ID: <20200324185421.GD17043@work-vm>
+References: <20200323120822.51266-1-dgilbert@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20200323120822.51266-1-dgilbert@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_6RY1XFVNJCo5=tTkv2GQpXZRqh_Zz4dYadq-8MJZgTQ@mail.gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 18.9.28.11
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,34 +87,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Suzuki K. Poulose" <suzuki.poulose@arm.com>,
- Linux API <linux-api@vger.kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, stable <stable@vger.kernel.org>,
- Florian Weimer <fw@deneb.enyo.de>, Andreas Dilger <adilger.kernel@dilger.ca>,
- Andy Lutomirski <luto@kernel.org>,
- linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- Ext4 Developers List <linux-ext4@vger.kernel.org>
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 24, 2020 at 09:29:58AM +0000, Peter Maydell wrote:
-> 
-> On the contrary, that would be a much better interface for QEMU.
-> We always know when we're doing an open-syscall on behalf
-> of the guest, and it would be trivial to make the fcntl() call then.
-> That would ensure that we don't accidentally get the
-> '32-bit semantics' on file descriptors QEMU opens for its own
-> purposes, and wouldn't leave us open to the risk in future that
-> setting the PER_LINUX32 flag for all of QEMU causes
-> unexpected extra behaviour in future kernels that would be correct
-> for the guest binary but wrong/broken for QEMU's own internals.
+* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> We're iterating the list, and then freeing the iteration pointer rather
+> than the list head.
+>=20
+> Fixes: 0a9667ecdb6d ("hmp: Update info vnc")
+> Reported-by: Coverity (CID 1421932)
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-If using a flag set by fcntl is better for qemu, then by all means
-let's go with that instead of using a personality flag/number.
+Queued
 
-Linus, do you have what you need to do a respin of the patch?
+> ---
+>  monitor/hmp-cmds.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index a00248527c..1d473e809c 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -527,10 +527,11 @@ static void hmp_info_vnc_servers(Monitor *mon, VncS=
+erverInfo2List *server)
+> =20
+>  void hmp_info_vnc(Monitor *mon, const QDict *qdict)
+>  {
+> -    VncInfo2List *info2l;
+> +    VncInfo2List *info2l, *info2l_head;
+>      Error *err =3D NULL;
+> =20
+>      info2l =3D qmp_query_vnc_servers(&err);
+> +    info2l_head =3D info2l;
+>      if (err) {
+>          hmp_handle_error(mon, err);
+>          return;
+> @@ -559,7 +560,7 @@ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
+>          info2l =3D info2l->next;
+>      }
+> =20
+> -    qapi_free_VncInfo2List(info2l);
+> +    qapi_free_VncInfo2List(info2l_head);
+> =20
+>  }
+>  #endif
+> --=20
+> 2.25.1
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-       	         	      	   	    	 - Ted
 
