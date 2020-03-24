@@ -2,77 +2,62 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92EA5C4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E1EC4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A8BE20658
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9134F20658
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:18:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1JboTib"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A8BE20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="W6yzLopj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9134F20658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGiTH-0001VG-Gp
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:15:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40092)
+	id 1jGiVW-0002om-Kn
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:18:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40342)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jGiST-00010z-QC
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:15:03 -0400
+ (envelope-from <berto@igalia.com>) id 1jGiUV-0002OP-6v
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jGiSR-0005N2-R2
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:15:00 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48724)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jGiSR-0005Mk-MB
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:14:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585052099;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FmtkdimwptA9CggzbTCNyo+vtWvyCwZHaDIYy+TeQjw=;
- b=S1JboTibyaoYf4QDBo7FQtXqE318MPMrZSPx0Yp55NYaqMIvdCHOJjaZSPOpSWg7seU0yw
- /35qAebdN+dJkrOBpZDpFinqcBSVuM6K07S9PKsRNZpEz47Vr31Ef7Q20xZ4TNtQkEB2tP
- qkxrMGwQ3z7xq6cRiUU3ADzsCGNE124=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-CfU_cG4WP8mtmKms9mJa-g-1; Tue, 24 Mar 2020 08:14:55 -0400
-X-MC-Unique: CfU_cG4WP8mtmKms9mJa-g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43B2CDBAE;
- Tue, 24 Mar 2020 12:14:54 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2EC705C1C7;
- Tue, 24 Mar 2020 12:14:49 +0000 (UTC)
-Date: Tue, 24 Mar 2020 13:14:48 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Subject: Re: Xen guest broken following "use memdev for RAM" patch
-Message-ID: <20200324131448.05074f3f@redhat.com>
-In-Reply-To: <20200323171039.GI4088@perard.uk.xensource.com>
-References: <20200323171039.GI4088@perard.uk.xensource.com>
+ (envelope-from <berto@igalia.com>) id 1jGiUP-0005rV-DD
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:17:06 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:54019)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jGiUO-0005r7-MV; Tue, 24 Mar 2020 08:17:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
+ bh=corN7QtY/PIWx4sQzkWkQQBD7GR/ZaQwpJ+Zz0folQU=; 
+ b=W6yzLopji3F1ic2xoB9yg4+SLRpWoCBOrRuKeCNgqGNuY6h6gS9ORBMJSoWX1wbosXs6nnbdVM1iFBfRHJEl1+D8j8czjj+Q1/l8BVuM/GjXU1sbOO3cWbRowOvhjOXeYfnnigLGmgcGCyAuk2+DdGfpsol99CsIdEfa+/o/5uj88FTMnU4v1K+SxiqglOY70pu2/d+4E6nBoAaIPdbkG89j4Vvk3RfOtvcxHm+pCJmUrhk+7B2fyL7t/3G+GJ+2a+w0ev7AIJIbHhB+2uPsj/67p6qKoHPaT3wWqn+LBbpy+eWLNeYKor6vseZa+tFq2heGlLr0Oh8GqvRLi6Zhkg==;
+Received: from static.113.35.0.81.ibercom.com ([81.0.35.113]
+ helo=perseus.local) by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1jGiUL-0005iz-W6; Tue, 24 Mar 2020 13:16:58 +0100
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1jGiU7-0006I5-G5; Tue, 24 Mar 2020 13:16:43 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] qcow2: Forbid discard in qcow2 v2 images with backing files
+Date: Tue, 24 Mar 2020 13:16:36 +0100
+Message-Id: <20200324121636.24136-1-berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,81 +69,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Mar 2020 17:10:39 +0000
-Anthony PERARD <anthony.perard@citrix.com> wrote:
+A discard request deallocates the selected clusters so they read back
+as zeroes. This is done by clearing the cluster offset field and
+setting QCOW_OFLAG_ZERO in the L2 entry.
 
-> Hi,
-> 
-> Since bd457782b3b0 ("x86/pc: use memdev for RAM") it isn't possible to
-> start Xen guest anymore.
-> 
-> The error from qemu:
->     qemu-system-i386: xen: failed to populate ram at 0
-> that comes from xen_ram_alloc() in hw/i386/xen/xen-hvm.c
-> 
-> xen_ram_alloc() is used to populate ram for PCI rom devices for example,
-> but it is also called for the guest RAM. We try to detect when the call
-> is for the ram by comparing the memory region with the one we created
-> during initialisation.
-> 
-> During initialisation of QEMU  for a Xen guest, we create a memory
-> region for the RAM by calling memory_region_init_ram() in
-> xen_ram_init(). But that memory region isn't used by QEMU anymore (since
-> mc->default_ram_id is set).
-> 
-> For Xen, we don't want QEMU to allocate the RAM, so using the memdev
-> won't work.
-> 
-> Do you have a suggestion on
-> - how we can bypass the generic code that allocate ram?
-> - keep using something similar to what we have now with
->   memory_region_init_ram()?
-> (with accel=xen)
+This flag is however only supported when qcow_version >= 3. In older
+images the cluster is simply deallocated, exposing any possible stale
+data from the backing file.
 
-Not that I like it but as a quick fix, does following work for you?
+Since discard is an advisory operation it's safer to simply forbid it
+in this scenario.
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index e2d98243bc..bbca43bf33 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -953,6 +953,10 @@ static void xenfv_machine_options(MachineClass *m)
-     m->desc = "Xen Fully-virtualized PC";
-     m->max_cpus = HVM_MAX_VCPUS;
-     m->default_machine_opts = "accel=xen";
-+    /*
-+     * opt out of system RAM being allocated by generic code
-+     */
-+    m->default_ram_id = NULL;
- }
+Note that we are adding this check to qcow2_co_pdiscard() and not to
+qcow2_cluster_discard() or discard_in_l2_slice() because the last
+two are also used by qcow2_snapshot_create() to discard the clusters
+used by the VM state. In this case there's no risk of exposing stale
+data to the guest and we really want that the clusters are always
+discarded.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+v2:
+
+- Don't create the image with compat=0.10 in iotest 060 [Max]
+- Use $TEST_IMG.base for the backing image name in iotest 289 [Max]
+- Add list of unsupported options to iotest 289 [Max]
+
+ block/qcow2.c              |  6 +++
+ tests/qemu-iotests/060     | 10 ++---
+ tests/qemu-iotests/060.out |  2 -
+ tests/qemu-iotests/289     | 91 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/289.out | 52 ++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 6 files changed, 154 insertions(+), 8 deletions(-)
+ create mode 100755 tests/qemu-iotests/289
+ create mode 100644 tests/qemu-iotests/289.out
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index d44b45633d..7bb7e392e1 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3763,6 +3763,12 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
+     int ret;
+     BDRVQcow2State *s = bs->opaque;
  
- DEFINE_PC_MACHINE(xenfv, "xenfv", pc_xen_hvm_init,
-
-
-> 
-> Maybe we need a new hostmem backend which don't allocate any memory but
-> creates a memory region, to be used by Xen?
-
-Maybe, but I don't know about Xen enough so it's hard to make a suggestion,
-so lets try to think out of the way to figure out how to approach it.
-
-(In general, I'd prefer to get rid of dependency on 'accel' in memory_region_init_ram())
-
-adapting xen code to use memdev isn't straightforward, since xen_ram_init()
-fixes up memory_region size, it could be user provided
-  ram_size
-or
-  4G + ram_size - HVM_BELOW_4G_RAM_END
-
-question is why do you need to use memory_region_init_ram() at all if you are not actually
-doing any allocation?
++    /* If the image does not support QCOW_OFLAG_ZERO then discarding
++     * clusters could expose stale data from the backing file. */
++    if (s->qcow_version < 3 && bs->backing) {
++        return -ENOTSUP;
++    }
++
+     if (!QEMU_IS_ALIGNED(offset | bytes, s->cluster_size)) {
+         assert(bytes < s->cluster_size);
+         /* Ignore partial clusters, except for the special case of the
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 043f12904a..8820290be6 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -160,16 +160,14 @@ TEST_IMG=$BACKING_IMG _make_test_img 1G
  
-> Thanks,
-> 
+ $QEMU_IO -c 'write 0k 64k' "$BACKING_IMG" | _filter_qemu_io
+ 
+-# compat=0.10 is required in order to make the following discard actually
+-# unallocate the sector rather than make it a zero sector - we want COW, after
+-# all.
+-_make_test_img -o 'compat=0.10' -b "$BACKING_IMG" 1G
++_make_test_img -b "$BACKING_IMG" 1G
+ # Write two clusters, the second one enforces creation of an L2 table after
+ # the first data cluster.
+ $QEMU_IO -c 'write 0k 64k' -c 'write 512M 64k' "$TEST_IMG" | _filter_qemu_io
+-# Discard the first cluster. This cluster will soon enough be reallocated and
++# Free the first cluster. This cluster will soon enough be reallocated and
+ # used for COW.
+-$QEMU_IO -c 'discard 0k 64k' "$TEST_IMG" | _filter_qemu_io
++poke_file "$TEST_IMG" '262144' "\x00\x00\x00\x00\x00\x00\x00\x00" # 0x40000 - L2 entry
++poke_file "$TEST_IMG" '131082' "\x00\x00" # 0x2000a - Refcount entry
+ # Now, corrupt the image by marking the second L2 table cluster as free.
+ poke_file "$TEST_IMG" '131084' "\x00\x00" # 0x2000c
+ # Start a write operation requiring COW on the image stopping it right before
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index d27692a33c..09caaea865 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -105,8 +105,6 @@ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 65536/65536 bytes at offset 536870912
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-discard 65536/65536 bytes at offset 0
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qcow2: Marking image as corrupt: Preventing invalid write on metadata (overlaps with active L2 table); further corruption events will be suppressed
+ blkdebug: Suspended request '0'
+ write failed: Input/output error
+diff --git a/tests/qemu-iotests/289 b/tests/qemu-iotests/289
+new file mode 100755
+index 0000000000..629c992d79
+--- /dev/null
++++ b/tests/qemu-iotests/289
+@@ -0,0 +1,91 @@
++#!/usr/bin/env bash
++#
++# Test how 'qemu-io -c discard' behaves on v2 and v3 qcow2 images
++#
++# Copyright (C) 2020 Igalia, S.L.
++# Author: Alberto Garcia <berto@igalia.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berto@igalia.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++status=1    # failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++_unsupported_imgopts 'compat=0.10' refcount_bits data_file
++
++echo
++echo "### Test 'qemu-io -c discard' on a QCOW2 image without a backing file"
++echo
++for qcow2_compat in 0.10 1.1; do
++    echo "# Create an image with compat=$qcow2_compat without a backing file"
++    _make_test_img -o "compat=$qcow2_compat" 128k
++
++    echo "# Fill all clusters with data and then discard them"
++    $QEMU_IO -c 'write -P 0x01 0 128k' "$TEST_IMG" | _filter_qemu_io
++    $QEMU_IO -c 'discard 0 128k' "$TEST_IMG" | _filter_qemu_io
++
++    echo "# Read the data from the discarded clusters"
++    $QEMU_IO -c 'read -P 0x00 0 128k' "$TEST_IMG" | _filter_qemu_io
++done
++
++echo
++echo "### Test 'qemu-io -c discard' on a QCOW2 image with a backing file"
++echo
++
++echo "# Create a backing image and fill it with data"
++BACKING_IMG="$TEST_IMG.base"
++TEST_IMG="$BACKING_IMG" _make_test_img 128k
++$QEMU_IO -c 'write -P 0xff 0 128k' "$BACKING_IMG" | _filter_qemu_io
++
++for qcow2_compat in 0.10 1.1; do
++    echo "# Create an image with compat=$qcow2_compat and a backing file"
++    _make_test_img -o "compat=$qcow2_compat" -b "$BACKING_IMG"
++
++    echo "# Fill all clusters with data and then discard them"
++    $QEMU_IO -c 'write -P 0x01 0 128k' "$TEST_IMG" | _filter_qemu_io
++    $QEMU_IO -c 'discard 0 128k' "$TEST_IMG" | _filter_qemu_io
++
++    echo "# Read the data from the discarded clusters"
++    if [ "$qcow2_compat" = "1.1" ]; then
++        # In qcow2 v3 clusters are zeroed (with QCOW_OFLAG_ZERO)
++        $QEMU_IO -c 'read -P 0x00 0 128k' "$TEST_IMG" | _filter_qemu_io
++    else
++        # In qcow2 v2 if there's a backing image we cannot zero the clusters
++        # without exposing the backing file data so discard does nothing
++        $QEMU_IO -c 'read -P 0x01 0 128k' "$TEST_IMG" | _filter_qemu_io
++    fi
++done
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/289.out b/tests/qemu-iotests/289.out
+new file mode 100644
+index 0000000000..9ded8ef552
+--- /dev/null
++++ b/tests/qemu-iotests/289.out
+@@ -0,0 +1,52 @@
++QA output created by 289
++
++### Test 'qemu-io -c discard' on a QCOW2 image without a backing file
++
++# Create an image with compat=0.10 without a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Create an image with compat=1.1 without a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++### Test 'qemu-io -c discard' on a QCOW2 image with a backing file
++
++# Create a backing image and fill it with data
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=131072
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Create an image with compat=0.10 and a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.base
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Create an image with compat=1.1 and a backing file
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.base
++# Fill all clusters with data and then discard them
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++# Read the data from the discarded clusters
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index ec2b2302e5..891b3ce858 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -295,3 +295,4 @@
+ 284 rw
+ 286 rw quick
+ 288 quick
++289 rw auto quick
+-- 
+2.20.1
 
 
