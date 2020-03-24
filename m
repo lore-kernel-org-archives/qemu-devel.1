@@ -2,83 +2,91 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D810C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB8BC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 676D920774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C9DA20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:28:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aj23k3oq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 676D920774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nZvPmg6H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C9DA20774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGnLc-0006bA-IU
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:28:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56655)
+	id 1jGnLh-0006lp-Mh
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:28:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGnKJ-0005GM-Vx
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:26:57 -0400
+ (envelope-from <flukshun@gmail.com>) id 1jGmk5-0003ir-1c
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:49:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGnKI-0001SE-NE
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:26:55 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35595)
+ (envelope-from <flukshun@gmail.com>) id 1jGmk3-0000Ao-Nj
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:49:28 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41983)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jGnKI-0001Rm-GF
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:26:54 -0400
-Received: by mail-wm1-x343.google.com with SMTP id m3so4478618wmi.0
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 10:26:54 -0700 (PDT)
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1jGmk3-0000AT-Iu
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:49:27 -0400
+Received: by mail-oi1-x241.google.com with SMTP id k9so6482656oia.8
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 09:49:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Wgku7mgkwd4sWjtrh+2QA8zgsUalxMb0JO3B4/P//Dg=;
- b=aj23k3oqlxGW/sF2C605/Rt4n6/jzqSu9HFuWFS90qa9tViPZUbKmebkMC4sOX4roB
- Zc66AAmnuWGS3bxdd/cncGQKJGNIJuoF9ic4l61raBeZTQtUUM1bluWSb/s2WG8Ocpg6
- dRuCRnibg8JbbSTU2msx6E443SLzM9u4ehzl1CLI6q3/34zShD0FACn6Zlr/6n+7+TVs
- zjcowssQ90LaYKbtZPsrp+tMDDRNuduWIT6uu+R3+3e4bSzsjbc2cplVDWjX8zKA7j7Q
- naEvz6VYpXvmyvSluPdfBEaxCAivUioC7QZcu+D9STRkXtOiO6Xn9jGA18YJVxD6kmEd
- fNyA==
+ h=sender:mime-version:content-transfer-encoding:to:from:in-reply-to
+ :cc:references:message-id:user-agent:subject:date;
+ bh=oSfO1qLsq96fdnHxziThSKvm71PA9NH3NBPy8A4Fbao=;
+ b=nZvPmg6HxNfgSwE9PhS/6RqsP4Vj+0gK5I9MZVQE91wWsGCeYjdAXKE7x8iayr7DcA
+ ofh2M8gq5PxQ1jO7Eewsl0VMpdglIXULnQksYffdSqDUQk0xJLgO6kh1FEX1BPE71gpp
+ mNfouKQAoPEr8c3ik+iFuUqdpDnpHONLtmBYUiF3EH5jfSpugIgUecDcFl4jvhpE+ISM
+ vtldqGeLJckycZTWZC8n3strbT26qFiru+5J2KjR37QNcd7pFNO5KSGkSoGptmwbcIaA
+ hJQt6lr3T9IlTlOyG22YsxIDZHHbtp15LFNKnfV1SZ7/ZxNoPhlxqXSS3LDtPz/jItCg
+ iSaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Wgku7mgkwd4sWjtrh+2QA8zgsUalxMb0JO3B4/P//Dg=;
- b=iziqL7OpAsJHECkMButZAmLb0lUisaGy2t563DZ4aeuxLDHvdJYzsHPXkrRmlAYHsK
- 7ajkAa7QXgayGt+veXkA+qgQ4dscph0r9/9XpqQ69PoAOm783LrZd1B1JUJ8rCDjjfkV
- wYcAwYe8tu8JhRciQAnKuFl7YTQ6b2KJShmjJ1b+nRYg+zrGQUHeANbwdz6RgE5A7Xe4
- ozydprJduDLvBEhv8AMj1q79j8ypKhx8lzploTBu83YItA2Z9WrrOUVT6YEW0bjzJziH
- EQKvuDYBn6KFYp4gF62q3ZApJ4vC6bcO09Y6kcsewEYwqqRrdKt6psUGx5Qj+LVGBq+X
- aKxQ==
-X-Gm-Message-State: ANhLgQ1YO3bL2WmbNz4Wed7eCACeFMdjFLW8Dinjt8rNXftnQerpnoxt
- tQn72sohZ3nb/v0ftcTjBF+toqzum2RQWopo8eo=
-X-Google-Smtp-Source: ADFU+vvGxNP4I73USrXhGXSAcHGxMJnDmUHwMrJ7cPNPwTYT7kggI1uNaqaO6pHz8IorAEz/vhDx5ejsOG/7e0evmTs=
-X-Received: by 2002:a05:600c:2dd7:: with SMTP id
- e23mr6585945wmh.159.1585070813237; 
- Tue, 24 Mar 2020 10:26:53 -0700 (PDT)
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding:to
+ :from:in-reply-to:cc:references:message-id:user-agent:subject:date;
+ bh=oSfO1qLsq96fdnHxziThSKvm71PA9NH3NBPy8A4Fbao=;
+ b=WOahi4oNm0380Qe9EjtaqM/G+QoTc2YkpvcUkwxaPfgZB/QuJ6UNISgpHU/wR/Yp5B
+ 1gq4w2V2fBkFrYFgZI4hGpYrCXeYilfKH0Sv5GqvapQp55u0jTR8L2fLs9BvHZGd2gym
+ iY051vmuJ2qm0lUn9kMFOtMTXQWbJyUrU1wzgIFrY6KFf4nCp3mZC9BaMDu6QqtM08ay
+ HeWzK2MQd4n/oeW4RLWFfj/eoBWeaVgJyh7ECzTVDpAKlKD2X9hrhWsbxR3I4AaqIZCs
+ PKv9Xe5Hi7/zN36T6TgvY5vC9TMYduWHIE9hqEpOhWr7pBy2bsyFPCFWaQRLqI2U0+fw
+ xSCQ==
+X-Gm-Message-State: ANhLgQ36AssgCZc9FoV0Tg7gVT0UiqYVj4QcJdbAvDBN8oAGErOeT45I
+ SIqBChgMxy5GRoCQC3v1awo=
+X-Google-Smtp-Source: ADFU+vskYqIrpw0zhyYJ3U1iNDnDi8W/JImsR5l6Vchp/x3opSVuPjHQ+QhuuYiJIVS+h+NMFFD+Mw==
+X-Received: by 2002:aca:b756:: with SMTP id h83mr4203940oif.4.1585068566596;
+ Tue, 24 Mar 2020 09:49:26 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id s23sm4311421otd.12.2020.03.24.09.49.24
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 24 Mar 2020 09:49:24 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
- <CAHiYmc7MN8pUg7FJ=wcn1h0pr2A05nv4SQaOZmL47NCnNzUJRA@mail.gmail.com>
- <623EF6C4-18D0-4A9C-B758-A3BE0B0AAF25@flygoat.com>
-In-Reply-To: <623EF6C4-18D0-4A9C-B758-A3BE0B0AAF25@flygoat.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 24 Mar 2020 19:26:38 +0200
-Message-ID: <CAHiYmc64tjG7cpB0HF=dAAPXOovtR9CnoLLO2-pF8fBa2R_T=w@mail.gmail.com>
-Subject: Re: [PATCH for-5.0,
- v1] target/mips: Fix loongson multimedia condition instructions
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: multipart/alternative; boundary="000000000000c4578b05a19d0ec0"
+Content-Transfer-Encoding: quoted-printable
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Basil Salman <basil@daynix.com>, qemu-devel@nongnu.org
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <75a7f7f7-c0b5-a584-c117-fd1eb6218d6c@redhat.com>
+References: <20200311170417.13415-1-basil@daynix.com>
+ <20200311170417.13415-4-basil@daynix.com>
+ <26fa941f-b578-06e7-947e-34ab426097bc@redhat.com>
+ <75a7f7f7-c0b5-a584-c117-fd1eb6218d6c@redhat.com>
+Message-ID: <158506856039.3448.7584295753132980505@sif>
+User-Agent: alot/0.7
+Subject: Re: [PATCH v3 3/3] qga-win: prevent crash when executing
+ guest-file-read with large count
+Date: Tue, 24 Mar 2020 11:49:20 -0500
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::241
+X-Mailman-Approved-At: Tue, 24 Mar 2020 13:24:22 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,133 +98,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.rikalo@rt-rk.com,
- richard.henderson@linaro.org, QEMU Developers <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yan Vugenfirer <yan@daynix.com>,
+ Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c4578b05a19d0ec0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Quoting Philippe Mathieu-Daud=C3=A9 (2020-03-24 08:37:05)
+> On 3/24/20 2:20 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 3/11/20 6:04 PM, Basil Salman wrote:
+> >> BZ: #1594054
+> > =
 
-19:09 Uto, 24.03.2020. Jiaxun Yang <jiaxun.yang@flygoat.com> =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
->
->
-> =E4=BA=8E 2020=E5=B9=B43=E6=9C=8825=E6=97=A5 GMT+08:00 =E4=B8=8A=E5=8D=88=
-12:56:41, Aleksandar Markovic <
-aleksandar.qemu.devel@gmail.com> =E5=86=99=E5=88=B0:
-> >14:23 Uto, 24.03.2020. Jiaxun Yang <jiaxun.yang@flygoat.com> =D1=98=D0=
-=B5
-> >=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> > ^ This is not very helpful as it... (think to ppl with no knowledge of =
+
+> > 'BZ', what to do with this number). Instead ...
+> > =
+
+> >> guest-file-read command is currently implemented to read from a
+> >> file handle count number of bytes. when executed with a very large =
+
+> >> count number
+> >> qemu-ga crashes.
+> >> after some digging turns out that qemu-ga crashes after trying to =
+
+> >> allocate
+> >> a buffer large enough to save the data read in it, the buffer was =
+
+> >> allocated using
+> >> g_malloc0 which is not fail safe, and results a crash in case of failu=
+re.
+> >> g_malloc0 was replaced with g_try_malloc0() which returns NULL on =
+
+> >> failure,
+> >> A check was added for that case in order to prevent qemu-ga from crash=
+ing
+> >> and to send a response to the qemu-ga client accordingly.
 > >>
-> >> Loongson multimedia condition instructions were previously
-> >implemented as
-> >> write 0 to rd due to lack of documentation. So I just confirmed with
-> >Loongson
-> >> about their encoding and implemented them correctly.
+> > =
+
+> > ... add here (see =
+
+> > https://wiki.qemu.org/Contribute/SubmitAPatch#Write_a_meaningful_commit=
+_message): =
+
+> > =
+
+> > =
+
+> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
+> =
+
+> And per the BZ info, please also credit the reporter:
+> =
+
+> Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
+
+Since I had these queued for a pull already I went ahead and rolled your
+suggestions (minus the posix-side fix) into this patch.
+
+A seperate follow-up patch address the posix counterpart would still be
+appreciated though.
+
+> =
+
+> > =
+
+> > Also add:
+> > =
+
+> > Cc: qemu-stable@nongnu.org
+> > =
+
+> >> Signed-off-by: Basil Salman <basil@daynix.com>
+> >> ---
+> >> =C2=A0 qga/commands-win32.c | 8 +++++++-
+> >> =C2=A0 1 file changed, 7 insertions(+), 1 deletion(-)
 > >>
-> >> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> >> Acked-by: Huacai Chen <chenhc@lemote.com>
-> >> ---
-> >> v1: Use deposit opreations according to Richard's suggestion.
-> >> ---
-> >
-> >Thanks, Jiaxun!
-> >
-> >But, your numeration of patches is wrong. The first version of the
-> >patch
-> >should be sent with prefix [PATCH]
-> >and the second (this) version of the patch with prefix [PATCH v2]. This
-> >is
-> >the second time you make the same mistake. Please make sure that you
-> >have
-> >the correct numeration in future. But, anyhow, thanks for this version.
->
-> Sorry for that.
-> I'm doing like this for years.
-> I promise it won't happen in future.
->
+> >> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> >> index 9c744d6405..b49920e201 100644
+> >> --- a/qga/commands-win32.c
+> >> +++ b/qga/commands-win32.c
+> >> @@ -343,7 +343,13 @@ GuestFileRead *qmp_guest_file_read(int64_t =
 
-Cool, thanks again!
+> >> handle, bool has_count,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fh =3D gfh->fh;
+> >> -=C2=A0=C2=A0=C2=A0 buf =3D g_malloc0(count+1);
+> >> +=C2=A0=C2=A0=C2=A0 buf =3D g_try_malloc0(count + 1);
+> >> +=C2=A0=C2=A0=C2=A0 if (!buf) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp,
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "failed to allocate sufficient memo=
+ry "
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "to complete the requested service"=
+);
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+> >> +=C2=A0=C2=A0=C2=A0 }
+> > =
 
-> Thanks.
->
-> >
-> >Yours,
-> >Aleksandar
-> >
-> --
-> Jiaxun Yang
+> > Can you fix the equivalent problem in qga/commands-posix.c too please?
+> > =
 
---000000000000c4578b05a19d0ec0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> > Also use "PATCH-for-5.0" in the patch subject so we don't miss it for =
 
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">19:09 Uto, 24.03.2020. Jiaxun Yang &lt;<a href=3D"mailto:jia=
-xun.yang@flygoat.com">jiaxun.yang@flygoat.com</a>&gt; =D1=98=D0=B5 =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt;<br>
-&gt;<br>
-&gt; =E4=BA=8E 2020=E5=B9=B43=E6=9C=8825=E6=97=A5 GMT+08:00 =E4=B8=8A=E5=8D=
-=8812:56:41, Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.qemu.deve=
-l@gmail.com">aleksandar.qemu.devel@gmail.com</a>&gt; =E5=86=99=E5=88=B0:<br=
->
-&gt; &gt;14:23 Uto, 24.03.2020. Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.ya=
-ng@flygoat.com">jiaxun.yang@flygoat.com</a>&gt; =D1=98=D0=B5<br>
-&gt; &gt;=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; Loongson multimedia condition instructions were previously<br=
->
-&gt; &gt;implemented as<br>
-&gt; &gt;&gt; write 0 to rd due to lack of documentation. So I just confirm=
-ed with<br>
-&gt; &gt;Loongson<br>
-&gt; &gt;&gt; about their encoding and implemented them correctly.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; Signed-off-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@=
-flygoat.com">jiaxun.yang@flygoat.com</a>&gt;<br>
-&gt; &gt;&gt; Acked-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com=
-">chenhc@lemote.com</a>&gt;<br>
-&gt; &gt;&gt; ---<br>
-&gt; &gt;&gt; v1: Use deposit opreations according to Richard&#39;s suggest=
-ion.<br>
-&gt; &gt;&gt; ---<br>
-&gt; &gt;<br>
-&gt; &gt;Thanks, Jiaxun!<br>
-&gt; &gt;<br>
-&gt; &gt;But, your numeration of patches is wrong. The first version of the=
-<br>
-&gt; &gt;patch<br>
-&gt; &gt;should be sent with prefix [PATCH]<br>
-&gt; &gt;and the second (this) version of the patch with prefix [PATCH v2].=
- This<br>
-&gt; &gt;is<br>
-&gt; &gt;the second time you make the same mistake. Please make sure that y=
-ou<br>
-&gt; &gt;have<br>
-&gt; &gt;the correct numeration in future. But, anyhow, thanks for this ver=
-sion.<br>
-&gt;<br>
-&gt; Sorry for that.<br>
-&gt; I&#39;m doing like this for years.<br>
-&gt; I promise it won&#39;t happen in future.<br>
-&gt;</p>
-<p dir=3D"ltr">Cool, thanks again!</p>
-<p dir=3D"ltr">&gt; Thanks.<br>
-&gt;<br>
-&gt; &gt;<br>
-&gt; &gt;Yours,<br>
-&gt; &gt;Aleksandar<br>
-&gt; &gt;<br>
-&gt; -- <br>
-&gt; Jiaxun Yang<br>
-</p>
+> > the next release.
+> > =
 
---000000000000c4578b05a19d0ec0--
+> > Thanks!
+> > =
+
+> > Phil.
+> > =
+
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 is_ok =3D ReadFile(fh, buf, count, &rea=
+d_count, NULL);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!is_ok) {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_win3=
+2(errp, GetLastError(), "failed to read file");
+> >>
+>=20
 
