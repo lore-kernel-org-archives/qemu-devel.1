@@ -2,78 +2,83 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B9E9C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEEE0C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:37:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A21520714
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:34:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79E2D20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:37:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CTpATxU/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A21520714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o0DjZkk+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79E2D20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGnS0-0006Yt-5a
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:34:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57305)
+	id 1jGnUM-0008GG-Ly
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:37:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jGnPr-0004Ju-CQ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:32:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGnTg-0007qE-D1
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jGnPq-00030b-Dq
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:32:39 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24490)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jGnPl-0002zM-S7
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:32:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585071148;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qA/n4GSHPrWDEN+ZLloXGLFDiSXAwOCF4l9mdEhHKug=;
- b=CTpATxU/iYAJaJfXdXIkjYro8U0UUKzpMgs3uqwHC/FxobLKrxH5h7Fjcoo1iFplZd9jS8
- Ib5lR7DWinaOfF1hg5Sg0yB4cM+X8dxeO/XHqw0EN2ycOBk/dYshzR3R1e0DLjQiDEf+gx
- hba9aDC3ZSWzYd1UgMoElE7jPgKuYDQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-VkcELWSPPbiBygJ7EOaH-A-1; Tue, 24 Mar 2020 13:32:26 -0400
-X-MC-Unique: VkcELWSPPbiBygJ7EOaH-A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D547107ACC7;
- Tue, 24 Mar 2020 17:32:25 +0000 (UTC)
-Received: from gondolin (ovpn-113-109.ams2.redhat.com [10.36.113.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2C81BBBCE;
- Tue, 24 Mar 2020 17:32:23 +0000 (UTC)
-Date: Tue, 24 Mar 2020 18:32:20 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Farman <farman@linux.ibm.com>
-Subject: Re: [RFC PATCH v2 6/7] vfio-ccw: Refactor ccw irq handler
-Message-ID: <20200324183220.57c6514e.cohuck@redhat.com>
-In-Reply-To: <20200206214509.16434-7-farman@linux.ibm.com>
-References: <20200206214509.16434-1-farman@linux.ibm.com>
- <20200206214509.16434-7-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1jGnTf-0005ni-1j
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:36:35 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33517)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGnTe-0005na-RD
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:36:34 -0400
+Received: by mail-wr1-x444.google.com with SMTP id a25so22625924wrd.0
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 10:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yiqNo48ag7gzDCzI0XyjUFiLj55QYsYhRpvFKm1CEWI=;
+ b=o0DjZkk+hhuxUjCN5yOV2VvmcxJFxwxbgGf9+I18llUP4ooOHqXF7TlBwNrg8+jeul
+ OXvOjBfaTX+aXVthTCf3+Tqwyq6/qR+6jRTRtSIo/Z2wJuF7NVg6oTWFgvo7sYtjJT7K
+ 9CdNomLIeXTdJGbnJeEJpnOIAfJrk493cjCc6XHvUx2DfUl5rtvJv5sOyA//MkFycFAx
+ 4d+toq95EwzjOngTbzQGh+pyP0ioKJu+3I8EGZdTMlZaEiDO51btzUl2/vVu09DM3bjy
+ wPSPrMfHWGIKNPd9GeZR822AFRbkicQ6niFySjokQ2He0GKJVaue7ACO8vqCsr11t//1
+ oUxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yiqNo48ag7gzDCzI0XyjUFiLj55QYsYhRpvFKm1CEWI=;
+ b=CStZgKES4cJXa2VCZDPJEccNVtGipBTzsyngyPXLKasGTqE4RUEmt72/A5pkXtYtny
+ kWLNk2LBAhFBOMJNs1SIN/TS2UpDomgdkCktfVnTIs3afahUDEclMr74UCKTYJzqE9DR
+ N+pY5Tv7XxLrcBw/St1016wfosJkwibc/2w+krgIVGOUfVBe91Hs3gn2nXYbzllu1x/x
+ WbJ21LpuwfeTbi8KgEOXn/1dbYk3Pz/qsEFBH/Iw+7Pvlkvp17sFi4AKVKQOioAUAFgz
+ 8EdB+wT5o6mK6wxbIk9AMVnK0LfpOXko3JUaFFytylpzqKLr5izLq99QkGZP7mycLqkG
+ w0Ng==
+X-Gm-Message-State: ANhLgQ0yUk2vJbO2MlBaA/v8mFAYU3jY0V8WXZ98pcWemYsEEnQgFZox
+ SUZT6fYm3Bevhw7Leg3u72xBs4Zy45iANw==
+X-Google-Smtp-Source: ADFU+vsnen3VePkGEMtI9wONTAb9l4lyYVTFRMuAcpuHauIckFrhaVz0aJTSTSaSurfWz28YYjILHg==
+X-Received: by 2002:a5d:5286:: with SMTP id c6mr37564240wrv.418.1585071393075; 
+ Tue, 24 Mar 2020 10:36:33 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id g14sm5468763wme.32.2020.03.24.10.36.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Mar 2020 10:36:32 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.0] dump: Fix writing of ELF section
+Date: Tue, 24 Mar 2020 17:36:30 +0000
+Message-Id: <20200324173630.12221-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,29 +90,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
- qemu-s390x@nongnu.org, Jared Rossi <jrossi@linux.ibm.com>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  6 Feb 2020 22:45:08 +0100
-Eric Farman <farman@linux.ibm.com> wrote:
+In write_elf_section() we set the 'shdr' pointer to point to local
+structures shdr32 or shdr64, which we fill in to be written out to
+the ELF dump.  Unfortunately the address we pass to fd_write_vmcore()
+has a spurious '&' operator, so instead of writing out the section
+header we write out the literal pointer value followed by whatever is
+on the stack after the 'shdr' local variable.
 
-> Make it easier to add new ones in the future.
-> 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
-> 
-> Notes:
->     v1->v2:
->      - Make irq parameter unsigned [CH]
->      - Remove extraneous %m from error_report calls [CH]
-> 
->  hw/vfio/ccw.c | 57 ++++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 41 insertions(+), 16 deletions(-)
+Pass the correct address into fd_write_vmcore().
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I have not tested this because I can't reproduce the conditions
+under which we try to actually use write_elf_section() (they
+must be rare, because currently we produce a bogus ELF file
+for this code path). In dump_init() s->list.num must be
+at least UINT16_MAX-1, which I think means it has to be a
+paging-enabled dump and the guest's page table must be
+extremely fragmented ?
+---
+ dump/dump.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dump/dump.c b/dump/dump.c
+index 6fb6e1245ad..22ed1d3b0d4 100644
+--- a/dump/dump.c
++++ b/dump/dump.c
+@@ -364,7 +364,7 @@ static void write_elf_section(DumpState *s, int type, Error **errp)
+         shdr = &shdr64;
+     }
+ 
+-    ret = fd_write_vmcore(&shdr, shdr_size, s);
++    ret = fd_write_vmcore(shdr, shdr_size, s);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret,
+                          "dump: failed to write section header table");
+-- 
+2.20.1
 
 
