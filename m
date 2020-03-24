@@ -2,61 +2,81 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07904C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E32C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0CF320775
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:50:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0CF320775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0D715206F6
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 16:57:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMhCKgKa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D715206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGmkZ-00044j-Ry
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 12:49:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51350)
+	id 1jGmsI-0007U1-5Q
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 12:57:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52559)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jGmjz-0003fc-97
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:49:25 -0400
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGmrN-0006fG-Al
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:57:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jGmjx-00008w-5n
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:49:23 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:28142)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>) id 1jGmjw-00008T-RE
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:49:21 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 5471B40B89;
- Tue, 24 Mar 2020 17:49:18 +0100 (CET)
-Date: Tue, 24 Mar 2020 17:49:15 +0100 (CET)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: Max Reitz <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <1187924316.77.1585068555273@webmail.proxmox.com>
-In-Reply-To: <32c10c76-1c9f-3a6a-4410-09eebad0f6f3@redhat.com>
-References: <2007060575.48.1585048408879@webmail.proxmox.com>
- <1512602350.59.1585056617632@webmail.proxmox.com>
- <1806708761.60.1585056799652@webmail.proxmox.com>
- <32c10c76-1c9f-3a6a-4410-09eebad0f6f3@redhat.com>
-Subject: Re: backup transaction with io-thread core dumps
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGmrK-0004CP-5p
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:57:01 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41109)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jGmrJ-0004Bu-VI
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 12:56:58 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h9so22399382wrc.8
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 09:56:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=juE1iX6pm63a8Xwsl0yYhG6KRK/o7uYwSBa2P/Ngj24=;
+ b=hMhCKgKaj0n0mKn6OfTNd2+wywpH9CUsNZjPcdbAjDEl8rRNZ7IB8PMoAvyX36m3oM
+ FJteGuQj0a+jkvxHQQ6xDoTwG1eaEtg1K7De/MxHetIce19fGh/hHzaqt4mVr4TGRMi7
+ 7/X12+tduaTV+CJSD8if+z8+kR47s0kVlm9xku8gI/+78rEa4MIFZaL1QqTY+oV/pIqI
+ yOWUpATBNpqAjqQyQLjrw1z4ASwpb5yEpDsg/ZFea87iiUTHzzMrGOVnQBaSi1/6nooE
+ /kfVuAk9By1oDkL2jVEFkZwzQ2NHAG8AyNchtRFJZo4mzKG8W3oQHu43E0+DQs+CVQYu
+ FWsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=juE1iX6pm63a8Xwsl0yYhG6KRK/o7uYwSBa2P/Ngj24=;
+ b=rnbO7O1+uTP7x6zgjgCkIUtMyGLKO/I0DK4MN6Y0IwKS5t0SzlE8WiL9lTnZKIgFJ4
+ WiDnjdSXW4vwmQ4pXDL/uxABLF1P9FeRL8curd710uKN+B2AFbkF9mcQomkQN38ZQTwz
+ Tr/BCTSvNf5DqZUpLOLu3hbti6SUg3FbbZm7bqs/xLSKOsis9AjGMwQ/eplewoX86FM0
+ Ndmlh713MCPY1SlwjTq0sQrQlDIQUaGo64SovOyQNDj5jYJb+3OelGPDrRddlyoTxACh
+ 6DJja7SwC5RmHzLRdKzns3KtgHutlPw7pRz5UIN0VeahtH/uN9ojoImpkKcc+YSJUtyc
+ v+tQ==
+X-Gm-Message-State: ANhLgQ2xnx4gO3BL2cPT6qlFXopd8QyFEXC0Fu1PttPHcDWgfE7HBk+p
+ hbQ/oHUaJgYVmrmiQAPzCnKzydJdzKUruIN0Ar0=
+X-Google-Smtp-Source: ADFU+vv26nnrWUx9FgTl1ILdAKCIaObBDbR88fn/QB2VY4I1R6sRHWI46wpI+n7wcYKNSVaHgajvkY1VkNHCMC81WuU=
+X-Received: by 2002:adf:f24c:: with SMTP id b12mr25244745wrp.162.1585069016045; 
+ Tue, 24 Mar 2020 09:56:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev22
-X-Originating-Client: open-xchange-appsuite
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.186.127.180
+References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
+In-Reply-To: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 24 Mar 2020 18:56:41 +0200
+Message-ID: <CAHiYmc7MN8pUg7FJ=wcn1h0pr2A05nv4SQaOZmL47NCnNzUJRA@mail.gmail.com>
+Subject: Re: [PATCH for-5.0,
+ v1] target/mips: Fix loongson multimedia condition instructions
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: multipart/alternative; boundary="000000000000a55cc005a19ca323"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,231 +88,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
+Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.rikalo@rt-rk.com,
+ richard.henderson@linaro.org, QEMU Developers <qemu-devel@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A more serious issue is that I also get a hang inside the poll loop
-when the VM is under load. For example, running "stress -d 5" inside
-the VM (Debian Buster).
+--000000000000a55cc005a19ca323
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Then running a simply drive-backup like:
+14:23 Uto, 24.03.2020. Jiaxun Yang <jiaxun.yang@flygoat.com> =D1=98=D0=B5 =
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Loongson multimedia condition instructions were previously implemented as
+> write 0 to rd due to lack of documentation. So I just confirmed with
+Loongson
+> about their encoding and implemented them correctly.
+>
+> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Acked-by: Huacai Chen <chenhc@lemote.com>
+> ---
+> v1: Use deposit opreations according to Richard's suggestion.
+> ---
 
-{ "execute": "drive-backup", "arguments": { "device": "drive-scsi0", "sync"=
-: "full", "target": "backup-scsi0.raw" } }
+Thanks, Jiaxun!
 
-At the end of the backup, VM hangs, gdb says:
+But, your numeration of patches is wrong. The first version of the patch
+should be sent with prefix [PATCH]
+and the second (this) version of the patch with prefix [PATCH v2]. This is
+the second time you make the same mistake. Please make sure that you have
+the correct numeration in future. But, anyhow, thanks for this version.
 
-(gdb) bt
-#0  0x00007ffff5cb3916 in __GI_ppoll (fds=3D0x7fff63d35c40, nfds=3D2, timeo=
-ut=3D<optimized out>,=20
-    timeout@entry=3D0x0, sigmask=3Dsigmask@entry=3D0x0) at ../sysdeps/unix/=
-sysv/linux/ppoll.c:39
-#1  0x0000555555c5f2c9 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<opt=
-imized out>, __fds=3D<optimized out>)
-    at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
-#2  0x0000555555c5f2c9 in qemu_poll_ns (fds=3D<optimized out>, nfds=3D<opti=
-mized out>, timeout=3Dtimeout@entry=3D-1)
-    at util/qemu-timer.c:335
-#3  0x0000555555c61ab1 in fdmon_poll_wait (ctx=3D0x7fffe8905e80, ready_list=
-=3D0x7fffffffdc68, timeout=3D-1)
-    at util/fdmon-poll.c:79
-#4  0x0000555555c61097 in aio_poll (ctx=3D0x7fffe8905e80, blocking=3Dblocki=
-ng@entry=3Dtrue) at util/aio-posix.c:589
-#5  0x0000555555bc2243 in bdrv_do_drained_begin
-    (poll=3D<optimized out>, ignore_bds_parents=3Dfalse, parent=3D0x0, recu=
-rsive=3Dfalse, bs=3D0x7fff671c11c0) at block/io.c:429
-#6  0x0000555555bc2243 in bdrv_do_drained_begin
-    (bs=3D0x7fff671c11c0, recursive=3D<optimized out>, parent=3D0x0, ignore=
-_bds_parents=3D<optimized out>, poll=3D<optimized out>)
-    at block/io.c:395
-#7  0x0000555555bdd132 in bdrv_backup_top_drop (bs=3D0x7fff671c11c0) at blo=
-ck/backup-top.c:273
-#8  0x0000555555bd883c in backup_clean (job=3D0x7fffe5609a00) at block/back=
-up.c:114
-#9  0x0000555555b6d46d in job_clean (job=3D0x7fffe5609a00) at job.c:657
-#10 0x0000555555b6d46d in job_finalize_single (job=3D0x7fffe5609a00) at job=
-.c:673
-#11 0x0000555555b6d46d in job_finalize_single (job=3D0x7fffe5609a00) at job=
-.c:661
-#12 0x0000555555b6dedc in job_txn_apply (txn=3D<optimized out>, fn=3D0x5555=
-55b6d420 <job_finalize_single>) at job.c:145
-#13 0x0000555555b6dedc in job_do_finalize (job=3D0x7fffe5609a00) at job.c:7=
-82
-#14 0x0000555555b6e131 in job_completed_txn_success (job=3D0x7fffe5609a00) =
-at job.c:832
-#15 0x0000555555b6e131 in job_completed (job=3D0x7fffe5609a00) at job.c:845
-#16 0x0000555555b6e131 in job_completed (job=3D0x7fffe5609a00) at job.c:836
-#17 0x0000555555b6e190 in job_exit (opaque=3D0x7fffe5609a00) at job.c:864
-#18 0x0000555555c5d855 in aio_bh_call (bh=3D0x7fffe721a3c0) at util/async.c=
-:164
-#19 0x0000555555c5d855 in aio_bh_poll (ctx=3Dctx@entry=3D0x7fffe8905e80) at=
- util/async.c:164
-#20 0x0000555555c60ede in aio_dispatch (ctx=3D0x7fffe8905e80) at util/aio-p=
-osix.c:380
-#21 0x0000555555c5d73e in aio_ctx_dispatch (source=3D<optimized out>, callb=
-ack=3D<optimized out>, user_data=3D<optimized out>)
-    at util/async.c:298
-#22 0x00007ffff7c7ef2e in g_main_context_dispatch () at /usr/lib/x86_64-lin=
-ux-gnu/libglib-2.0.so.0
-#23 0x0000555555c60148 in glib_pollfds_poll () at util/main-loop.c:219
-#24 0x0000555555c60148 in os_host_main_loop_wait (timeout=3D<optimized out>=
-) at util/main-loop.c:242
-#25 0x0000555555c60148 in main_loop_wait (nonblocking=3Dnonblocking@entry=
-=3D0) at util/main-loop.c:518
-#26 0x00005555558fc579 in qemu_main_loop () at /home/dietmar/pve5-devel/mir=
-ror_qemu/softmmu/vl.c:1665
-#27 0x0000555555800c2e in main (argc=3D<optimized out>, argv=3D<optimized o=
-ut>, envp=3D<optimized out>)
-    at /home/dietmar/pve5-devel/mirror_qemu/softmmu/main.c:49
+Yours,
+Aleksandar
 
-The VM uses a similar hardware setup with io-threads as the previous=20
-example.
+>  target/mips/translate.c | 35 +++++++++++++++++++++++++++++++----
+>  1 file changed, 31 insertions(+), 4 deletions(-)
+>
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index d745bd2803..25b595a17d 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -5529,6 +5529,7 @@ static void gen_loongson_multimedia(DisasContext
+*ctx, int rd, int rs, int rt)
+>  {
+>      uint32_t opc, shift_max;
+>      TCGv_i64 t0, t1;
+> +    TCGCond cond;
+>
+>      opc =3D MASK_LMI(ctx->opcode);
+>      switch (opc) {
+> @@ -5862,14 +5863,39 @@ static void gen_loongson_multimedia(DisasContext
+*ctx, int rd, int rs, int rt)
+>
+>      case OPC_SEQU_CP2:
+>      case OPC_SEQ_CP2:
+> +        cond =3D TCG_COND_EQ;
+> +        goto do_cc_cond;
+> +        break;
+>      case OPC_SLTU_CP2:
+> +        cond =3D TCG_COND_LTU;
+> +        goto do_cc_cond;
+> +        break;
+>      case OPC_SLT_CP2:
+> +        cond =3D TCG_COND_LT;
+> +        goto do_cc_cond;
+> +        break;
+>      case OPC_SLEU_CP2:
+> +        cond =3D TCG_COND_LEU;
+> +        goto do_cc_cond;
+> +        break;
+>      case OPC_SLE_CP2:
+> -        /*
+> -         * ??? Document is unclear: Set FCC[CC].  Does that mean the
+> -         * FD field is the CC field?
+> -         */
+> +        cond =3D TCG_COND_LE;
+> +    do_cc_cond:
+> +        {
+> +            int cc =3D (ctx->opcode >> 8) & 0x7;
+> +            TCGv_i64 t64 =3D tcg_temp_new_i64();
+> +            TCGv_i32 t32 =3D tcg_temp_new_i32();
+> +
+> +            tcg_gen_setcond_i64(cond, t64, t0, t1);
+> +            tcg_gen_extrl_i64_i32(t32, t64);
+> +            tcg_gen_deposit_i32(fpu_fcr31, fpu_fcr31, t32,
+> +                                get_fp_bit(cc), 1);
+> +
+> +            tcg_temp_free_i32(t32);
+> +            tcg_temp_free_i64(t64);
+> +        }
+> +        goto no_rd;
+> +        break;
+>      default:
+>          MIPS_INVAL("loongson_cp2");
+>          generate_exception_end(ctx, EXCP_RI);
+> @@ -5878,6 +5904,7 @@ static void gen_loongson_multimedia(DisasContext
+*ctx, int rd, int rs, int rt)
+>
+>      gen_store_fpr64(ctx, t0, rd);
+>
+> +no_rd:
+>      tcg_temp_free_i64(t0);
+>      tcg_temp_free_i64(t1);
+>  }
+> --
+> 2.26.0.rc2
+>
+>
 
-Is somebody able to reproduce that? And ideas whats wrong here?
+--000000000000a55cc005a19ca323
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On March 24, 2020 2:47 PM Max Reitz <mreitz@redhat.com> wrote:
->=20
-> =20
-> Hi Dietmar,
->=20
-> I assume this is with master and has popped up only recently?
->=20
-> Maybe it has something to do with the recent mutex patches by Stefan, so
-> I=E2=80=99m Cc-ing him.
->=20
-> Max
->=20
-> On 24.03.20 14:33, Dietmar Maurer wrote:
-> > spoke too soon - the error is still there, sigh
-> > =20
-> >> This is fixed with this patch:
-> >>
-> >> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07249.html
-> >>
-> >> thanks!
-> >>
-> >>> On March 24, 2020 12:13 PM Dietmar Maurer <dietmar@proxmox.com> wrote=
-:
-> >>>
-> >>> =20
-> >>> I get a core dump with backup transactions when using io-threads.
-> >>>
-> >>> To reproduce, create and start a VM with:
-> >>>
-> >>> # qemu-img create disk1.raw 100M
-> >>> # qemu-img create disk2.raw 100M
-> >>> #./x86_64-softmmu/qemu-system-x86_64 -chardev 'socket,id=3Dqmp,path=
-=3D/var/run/qemu-test.qmp,server,nowait' -mon 'chardev=3Dqmp,mode=3Dcontrol=
-' -pidfile /var/run/qemu-server/108.pid  -m 512 -object 'iothread,id=3Dioth=
-read-virtioscsi0' -object 'iothread,id=3Diothread-virtioscsi1'  -device 'vi=
-rtio-scsi-pci,id=3Dvirtioscsi0,iothread=3Diothread-virtioscsi0' -drive 'fil=
-e=3Ddisk1.raw,if=3Dnone,id=3Ddrive-scsi0,format=3Draw,cache=3Dnone,aio=3Dna=
-tive,detect-zeroes=3Don' -device 'scsi-hd,bus=3Dvirtioscsi0.0,channel=3D0,s=
-csi-id=3D0,lun=3D0,drive=3Ddrive-scsi0,id=3Dscsi0' -device 'virtio-scsi-pci=
-,id=3Dvirtioscsi1,iothread=3Diothread-virtioscsi1' -drive 'file=3Ddisk2.raw=
-,if=3Dnone,id=3Ddrive-scsi1,format=3Draw,cache=3Dnone,aio=3Dnative,detect-z=
-eroes=3Don' -device 'scsi-hd,bus=3Dvirtioscsi1.0,channel=3D0,scsi-id=3D0,lu=
-n=3D1,drive=3Ddrive-scsi1,id=3Dscsi1'
-> >>>
-> >>> Then open socat to the qmp socket
-> >>> # socat /var/run/qemu-test.qmp -
-> >>>
-> >>> And run the following qmp command:
-> >>>
-> >>> { "execute": "qmp_capabilities", "arguments": {} }
-> >>> { "execute": "transaction", "arguments":  { "actions": [{ "type": "dr=
-ive-backup", "data": { "device": "drive-scsi0", "sync": "full", "target": "=
-backup-sysi0.raw" }}, { "type": "drive-backup", "data": { "device": "drive-=
-scsi1", "sync": "full", "target": "backup-scsi1.raw" }}], "properties": { "=
-completion-mode": "grouped" } } }
-> >>>
-> >>> The VM will core dump:
-> >>>
-> >>> qemu: qemu_mutex_unlock_impl: Operation not permitted
-> >>> Aborted (core dumped)
-> >>> (gdb) bt
-> >>> #0  0x00007f099d5037bb in __GI_raise (sig=3Dsig@entry=3D6) at ../sysd=
-eps/unix/sysv/linux/raise.c:50
-> >>> #1  0x00007f099d4ee535 in __GI_abort () at abort.c:79
-> >>> #2  0x000055c04e39525e in error_exit (err=3D<optimized out>, msg=3Dms=
-g@entry=3D0x55c04e5122e0 <__func__.16544> "qemu_mutex_unlock_impl") at util=
-/qemu-thread-posix.c:36
-> >>> #3  0x000055c04e395813 in qemu_mutex_unlock_impl (mutex=3Dmutex@entry=
-=3D0x7f09903154e0, file=3Dfile@entry=3D0x55c04e51129f "util/async.c", line=
-=3Dline@entry=3D601)
-> >>>     at util/qemu-thread-posix.c:108
-> >>> #4  0x000055c04e38f8e5 in aio_context_release (ctx=3Dctx@entry=3D0x7f=
-0990315480) at util/async.c:601
-> >>> #5  0x000055c04e299073 in bdrv_set_aio_context_ignore (bs=3D0x7f0929a=
-76500, new_context=3Dnew_context@entry=3D0x7f0990315000, ignore=3Dignore@en=
-try=3D0x7ffe08fa7400)
-> >>>     at block.c:6238
-> >>> #6  0x000055c04e2990cc in bdrv_set_aio_context_ignore (bs=3Dbs@entry=
-=3D0x7f092af47900, new_context=3Dnew_context@entry=3D0x7f0990315000, ignore=
-=3Dignore@entry=3D0x7ffe08fa7400)
-> >>>     at block.c:6211
-> >>> #7  0x000055c04e299443 in bdrv_child_try_set_aio_context (bs=3Dbs@ent=
-ry=3D0x7f092af47900, ctx=3D0x7f0990315000, ignore_child=3Dignore_child@entr=
-y=3D0x0, errp=3Derrp@entry=3D0x0)
-> >>>     at block.c:6324
-> >>> #8  0x000055c04e299576 in bdrv_try_set_aio_context (errp=3D0x0, ctx=
-=3D<optimized out>, bs=3D0x7f092af47900) at block.c:6333
-> >>> #9  0x000055c04e299576 in bdrv_replace_child (child=3Dchild@entry=3D0=
-x7f09902ef5e0, new_bs=3Dnew_bs@entry=3D0x0) at block.c:2551
-> >>> #10 0x000055c04e2995ff in bdrv_detach_child (child=3D0x7f09902ef5e0) =
-at block.c:2666
-> >>> #11 0x000055c04e299ec9 in bdrv_root_unref_child (child=3D<optimized o=
-ut>) at block.c:2677
-> >>> #12 0x000055c04e29f3fe in block_job_remove_all_bdrv (job=3Djob@entry=
-=3D0x7f0927c18800) at blockjob.c:191
-> >>> #13 0x000055c04e29f429 in block_job_free (job=3D0x7f0927c18800) at bl=
-ockjob.c:88
-> >>> #14 0x000055c04e2a0909 in job_unref (job=3D0x7f0927c18800) at job.c:3=
-59
-> >>> #15 0x000055c04e2a0909 in job_unref (job=3D0x7f0927c18800) at job.c:3=
-51
-> >>> #16 0x000055c04e2a0b68 in job_conclude (job=3D0x7f0927c18800) at job.=
-c:620
-> >>> #17 0x000055c04e2a0b68 in job_finalize_single (job=3D0x7f0927c18800) =
-at job.c:688
-> >>> #18 0x000055c04e2a0b68 in job_finalize_single (job=3D0x7f0927c18800) =
-at job.c:660
-> >>> #19 0x000055c04e2a14fc in job_txn_apply (txn=3D<optimized out>, fn=3D=
-0x55c04e2a0a50 <job_finalize_single>) at job.c:145
-> >>> #20 0x000055c04e2a14fc in job_do_finalize (job=3D0x7f0927c1c200) at j=
-ob.c:781
-> >>> #21 0x000055c04e2a1751 in job_completed_txn_success (job=3D0x7f0927c1=
-c200) at job.c:831
-> >>> #22 0x000055c04e2a1751 in job_completed (job=3D0x7f0927c1c200) at job=
-.c:844
-> >>> #23 0x000055c04e2a1751 in job_completed (job=3D0x7f0927c1c200) at job=
-.c:835
-> >>> #24 0x000055c04e2a17b0 in job_exit (opaque=3D0x7f0927c1c200) at job.c=
-:863
-> >>> #25 0x000055c04e38ee75 in aio_bh_call (bh=3D0x7f098ec52000) at util/a=
-sync.c:164
-> >>> #26 0x000055c04e38ee75 in aio_bh_poll (ctx=3Dctx@entry=3D0x7f09903150=
-00) at util/async.c:164
-> >>> #27 0x000055c04e3924fe in aio_dispatch (ctx=3D0x7f0990315000) at util=
-/aio-posix.c:380
-> >>> #28 0x000055c04e38ed5e in aio_ctx_dispatch (source=3D<optimized out>,=
- callback=3D<optimized out>, user_data=3D<optimized out>) at util/async.c:2=
-98
-> >>> #29 0x00007f099f020f2e in g_main_context_dispatch () at /usr/lib/x86_=
-64-linux-gnu/libglib-2.0.so.0
-> >>> #30 0x000055c04e391768 in glib_pollfds_poll () at util/main-loop.c:21=
-9
-> >>> #31 0x000055c04e391768 in os_host_main_loop_wait (timeout=3D<optimize=
-d out>) at util/main-loop.c:242
-> >>> #32 0x000055c04e391768 in main_loop_wait (nonblocking=3Dnonblocking@e=
-ntry=3D0) at util/main-loop.c:518
-> >>> #33 0x000055c04e032329 in qemu_main_loop () at /home/dietmar/pve5-dev=
-el/mirror_qemu/softmmu/vl.c:1665
-> >>> #34 0x000055c04df36a8e in main (argc=3D<optimized out>, argv=3D<optim=
-ized out>, envp=3D<optimized out>) at /home/dietmar/pve5-devel/mirror_qemu/=
-softmmu/main.c:49
-> >
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">14:23 Uto, 24.03.2020. Jiaxun Yang &lt;<a href=3D"mailto:jia=
+xun.yang@flygoat.com">jiaxun.yang@flygoat.com</a>&gt; =D1=98=D0=B5 =D0=BD=
+=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; Loongson multimedia condition instructions were previously implemented=
+ as<br>
+&gt; write 0 to rd due to lack of documentation. So I just confirmed with L=
+oongson<br>
+&gt; about their encoding and implemented them correctly.<br>
+&gt;<br>
+&gt; Signed-off-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.c=
+om">jiaxun.yang@flygoat.com</a>&gt;<br>
+&gt; Acked-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com">chenhc@=
+lemote.com</a>&gt;<br>
+&gt; ---<br>
+&gt; v1: Use deposit opreations according to Richard&#39;s suggestion.<br>
+&gt; ---</p>
+<p dir=3D"ltr">Thanks, Jiaxun!</p>
+<p dir=3D"ltr">But, your numeration of patches is wrong. The first version =
+of the patch should be sent with prefix [PATCH]<br>
+and the second (this) version of the patch with prefix [PATCH v2]. This is =
+the second time you make the same mistake. Please make sure that you have t=
+he correct numeration in future. But, anyhow, thanks for this version.</p>
+<p dir=3D"ltr">Yours,<br>
+Aleksandar<br></p>
+<p dir=3D"ltr">&gt; =C2=A0target/mips/translate.c | 35 ++++++++++++++++++++=
++++++++++++----<br>
+&gt; =C2=A01 file changed, 31 insertions(+), 4 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/target/mips/translate.c b/target/mips/translate.c<br>
+&gt; index d745bd2803..25b595a17d 100644<br>
+&gt; --- a/target/mips/translate.c<br>
+&gt; +++ b/target/mips/translate.c<br>
+&gt; @@ -5529,6 +5529,7 @@ static void gen_loongson_multimedia(DisasContext=
+ *ctx, int rd, int rs, int rt)<br>
+&gt; =C2=A0{<br>
+&gt; =C2=A0 =C2=A0 =C2=A0uint32_t opc, shift_max;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0TCGv_i64 t0, t1;<br>
+&gt; +=C2=A0 =C2=A0 TCGCond cond;<br>
+&gt;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0opc =3D MASK_LMI(ctx-&gt;opcode);<br>
+&gt; =C2=A0 =C2=A0 =C2=A0switch (opc) {<br>
+&gt; @@ -5862,14 +5863,39 @@ static void gen_loongson_multimedia(DisasConte=
+xt *ctx, int rd, int rs, int rt)<br>
+&gt;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SEQU_CP2:<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SEQ_CP2:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_EQ;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLTU_CP2:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LTU;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLT_CP2:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LT;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLEU_CP2:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LEU;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLE_CP2:<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ??? Document is unclear: Set FCC[=
+CC].=C2=A0 Does that mean the<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* FD field is the CC field?<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LE;<br>
+&gt; +=C2=A0 =C2=A0 do_cc_cond:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int cc =3D (ctx-&gt;opcode =
+&gt;&gt; 8) &amp; 0x7;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t64 =3D tcg_temp_n=
+ew_i64();<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i32 t32 =3D tcg_temp_n=
+ew_i32();<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_setcond_i64(cond, t=
+64, t0, t1);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_extrl_i64_i32(t32, =
+t64);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i32(fpu_fcr=
+31, fpu_fcr31, t32,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_fp_bit(cc), 1);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i32(t32);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t64);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto no_rd;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0default:<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_INVAL(&quot;loongson_cp2&quot;)=
+;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0generate_exception_end(ctx, EXCP_RI)=
+;<br>
+&gt; @@ -5878,6 +5904,7 @@ static void gen_loongson_multimedia(DisasContext=
+ *ctx, int rd, int rs, int rt)<br>
+&gt;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0gen_store_fpr64(ctx, t0, rd);<br>
+&gt;<br>
+&gt; +no_rd:<br>
+&gt; =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t0);<br>
+&gt; =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t1);<br>
+&gt; =C2=A0}<br>
+&gt; -- <br>
+&gt; 2.26.0.rc2<br>
+&gt;<br>
+&gt;<br>
+</p>
 
+--000000000000a55cc005a19ca323--
 
