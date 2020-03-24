@@ -2,83 +2,60 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D3EC2BAEE
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB32C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:04:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22960205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:03:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFp1VbCz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22960205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7716A2076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:04:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7716A2076E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGk9R-0001tj-8T
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:03:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53948)
+	id 1jGkA3-00036s-Fk
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:04:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jGk6t-0006OF-6w
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:00:52 -0400
+ (envelope-from <geert@linux-m68k.org>) id 1jGk3K-00005r-TE
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jGk6r-0003A3-Sn
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:00:51 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43164)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jGk6r-000378-Hy
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:00:49 -0400
-Received: by mail-wr1-x442.google.com with SMTP id b2so21536581wrj.10
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 07:00:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=oA87LdByI1t1kq/WX0xC589ZuYMC+J0mRq0TmiO06aI=;
- b=nFp1VbCzf4M0AiGMR3P1dI4DofN5Zj8RwsnW8+379fAhHhINB26OnboqxP08lzm9cU
- V5V+KcnO0QYBefZ7TTmjjd3caTE9ieMtzrCqfdTU3dWSRvg00VzmmENlxr8BJLFaBCWu
- IBgEph/iQFabu/cyZ413SfZ4AGgyfWmznJl7lzY/u2CI1jclaq5s+q9VVBwzS7t2cLF7
- 5efVYdzFcNw8z4kMQUwa/ekNlEsvx6bZBqlJjRUtZcxmaQwkBjmAjyP4Lw9qv2Y9Tw3I
- gp6NDr/h/HBZFy3MjGTwRx4OfTUDslZooLJw0/RhTKAXvqbquUan8MQaqPyLVKgYTDiT
- LVJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=oA87LdByI1t1kq/WX0xC589ZuYMC+J0mRq0TmiO06aI=;
- b=pgjLI4/G7VcgkZB2E1yda/bNOkUlRgb9Otz7t+7MrvKi1NlD8BMyRpumQsVoSCjnGx
- Sg2GVUzZeYGdvwyOP9Us8jUl3ab7YTufmkMcqk89t8bL7y5Ry3b35GZl2q6Jl6tAGWLa
- JHIKTL4TE7QLVKVP/evlmVkkUIf8QBARmWk8dVs2RIgkBBpL/pTXccnIgLuZ75OQ2hE5
- aFOAzytK9KxzSmV7Hto8IfDgz2Od6v5udufBEz2DGEWCv67uIiacDQKfUPCROWQaBWFv
- R1gX3ChHChThj5ufitMyLS776I/MkE1oFqrqGHItSw0r3m6C81aLaU8G4gqOfqN1ZTVy
- vNkg==
-X-Gm-Message-State: ANhLgQ2rYxw4n6KVFYyIW8IXAx40EvKKcLqm878v7FZh4RfQJ/0YHFdV
- rYDrqQ6HjCuNvQf/LwqxrH7Doi7jZOrnWt+2zTU=
-X-Google-Smtp-Source: ADFU+vvbtovOWhFLMaHEQQ1mOuM6n2eLsXU0JbbniHOfPIBEjZSV8wu5TIbbFSrpMPAQzDwN15EvHh/VyX8NbebKu1Y=
-X-Received: by 2002:a5d:62c9:: with SMTP id o9mr38041536wrv.2.1585058447716;
- Tue, 24 Mar 2020 07:00:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200311170417.13415-1-basil@daynix.com>
- <20200311170417.13415-2-basil@daynix.com>
- <7d6f3f43-73c6-8500-6680-05ec059fd5ed@redhat.com>
-In-Reply-To: <7d6f3f43-73c6-8500-6680-05ec059fd5ed@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 24 Mar 2020 15:00:35 +0100
-Message-ID: <CAJ+F1CJtMsXHGQAKS-FjFM-1i445uV7P0BfYCJ78d7TasUL+Ww@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] qga: Installer: Wait for installation to finish
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+ (envelope-from <geert@linux-m68k.org>) id 1jGk3J-0006GK-1n
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:10 -0400
+Received: from albert.telenet-ops.be ([2a02:1800:110:4::f00:1a]:55208)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
+ id 1jGk3I-0006E2-JD
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:08 -0400
+Received: from ramsan ([84.195.182.253]) by albert.telenet-ops.be with bizsmtp
+ id JDwu2200M5USYZQ06Dwua8; Tue, 24 Mar 2020 14:57:07 +0100
+Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1jGk34-0006Oi-JB; Tue, 24 Mar 2020 14:56:54 +0100
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1jGk34-0001kb-Gc; Tue, 24 Mar 2020 14:56:54 +0100
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
+Subject: [PATCH v6 3/8] mfd: sm501: Use GPIO_LOOKUP_IDX() helper macro
+Date: Tue, 24 Mar 2020 14:56:48 +0100
+Message-Id: <20200324135653.6676-3-geert+renesas@glider.be>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200324135653.6676-1-geert+renesas@glider.be>
+References: <20200324135328.5796-1-geert+renesas@glider.be>
+ <20200324135653.6676-1-geert+renesas@glider.be>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:1800:110:4::f00:1a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,59 +67,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, Basil Salman <basil@daynix.com>,
- QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Geert Uytterhoeven <geert+renesas@glider.be>, linux-doc@vger.kernel.org,
+ Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
+ Rob Herring <robh+dt@kernel.org>, Alexander Graf <graf@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Phil Reid <preid@electromag.com.au>,
+ Lee Jones <lee.jones@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+i801_add_mux() fills in the GPIO lookup table by manually populating an
+array of gpiod_lookup structures.  Use the existing GPIO_LOOKUP_IDX()
+helper macro instead, to relax a dependency on the gpiod_lookup
+structure's member names.
 
-On Tue, Mar 24, 2020 at 2:13 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Hi Basil,
->
-> On 3/11/20 6:04 PM, Basil Salman wrote:
-> > Installation might fail if we don't wait for the provider
-> > unregisteration process to finish.
-> >
-> > Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-> > Signed-off-by: Basil Salman <basil@daynix.com>
-> > ---
-> >   qga/installer/qemu-ga.wxs | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
-> > index 64bf90bd85..f6781752e6 100644
-> > --- a/qga/installer/qemu-ga.wxs
-> > +++ b/qga/installer/qemu-ga.wxs
-> > @@ -81,7 +81,7 @@
-> >                 Arguments=3D"-d --retry-path"
-> >                 >
-> >               </ServiceInstall>
-> > -            <ServiceControl Id=3D"StartService" Start=3D"install" Stop=
-=3D"both" Remove=3D"uninstall" Name=3D"QEMU-GA" Wait=3D"no" />
-> > +            <ServiceControl Id=3D"StartService" Start=3D"install" Stop=
-=3D"both" Remove=3D"uninstall" Name=3D"QEMU-GA" Wait=3D"yes" />
->
-> As 'yes' is the default, can you simply remove 'Wait=3D"no"'?
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Lee Jones <lee.jones@linaro.org>
+---
+While this patch is a dependency for "[PATCH v6 4/8] gpiolib: Add
+support for GPIO lookup by line name", it can be applied independently.
+But an Acked-by would be nice, too.
 
-It looks like wixl doesn't follow the WiX default value though.
+Cover letter and full series at
+https://lore.kernel.org/r/20200324135328.5796-1-geert+renesas@glider.be/
 
-tools/wixl/msi.vala:
-574                 (Wait !=3D null && !rec.set_int (5, Wait ? 1 : 0)) ||
+v6:
+  - New.
+---
+ drivers/mfd/sm501.c | 24 ++++++++----------------
+ 1 file changed, 8 insertions(+), 16 deletions(-)
 
->
-> >             </Component>
-> >             <?ifdef var.InstallVss?>
-> >             <Component Id=3D"qga_vss_dll" Guid=3D"{CB19C453-FABB-4BB1-A=
-BAB-6B74F687BFBB}">
-> >
->
->
+diff --git a/drivers/mfd/sm501.c b/drivers/mfd/sm501.c
+index e49787e6bb93e5c8..ccd62b963952814e 100644
+--- a/drivers/mfd/sm501.c
++++ b/drivers/mfd/sm501.c
+@@ -1145,22 +1145,14 @@ static int sm501_register_gpio_i2c_instance(struct sm501_devdata *sm,
+ 		return -ENOMEM;
+ 
+ 	lookup->dev_id = "i2c-gpio";
+-	if (iic->pin_sda < 32)
+-		lookup->table[0].chip_label = "SM501-LOW";
+-	else
+-		lookup->table[0].chip_label = "SM501-HIGH";
+-	lookup->table[0].chip_hwnum = iic->pin_sda % 32;
+-	lookup->table[0].con_id = NULL;
+-	lookup->table[0].idx = 0;
+-	lookup->table[0].flags = GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN;
+-	if (iic->pin_scl < 32)
+-		lookup->table[1].chip_label = "SM501-LOW";
+-	else
+-		lookup->table[1].chip_label = "SM501-HIGH";
+-	lookup->table[1].chip_hwnum = iic->pin_scl % 32;
+-	lookup->table[1].con_id = NULL;
+-	lookup->table[1].idx = 1;
+-	lookup->table[1].flags = GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN;
++	lookup->table[0] = (struct gpiod_lookup)
++		GPIO_LOOKUP_IDX(iic->pin_sda < 32 ? "SM501-LOW" : "SM501-HIGH",
++				iic->pin_sda % 32, NULL, 0,
++				GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN);
++	lookup->table[1] = (struct gpiod_lookup)
++		GPIO_LOOKUP_IDX(iic->pin_scl < 32 ? "SM501-LOW" : "SM501-HIGH",
++				iic->pin_scl % 32, NULL, 1,
++				GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN);
+ 	gpiod_add_lookup_table(lookup);
+ 
+ 	icd = dev_get_platdata(&pdev->dev);
+-- 
+2.17.1
 
-
---=20
-Marc-Andr=C3=A9 Lureau
 
