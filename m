@@ -2,81 +2,102 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C9B1C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A98FDC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:58:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22DE820714
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:56:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73EE020714
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:58:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="buGV1PBb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22DE820714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWjjKxwD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73EE020714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGk2L-0007bC-BG
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 09:56:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52943)
+	id 1jGk4H-00018S-Ik
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 09:58:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53227)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jGk0u-0006io-0i
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:54:42 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGk2k-00086C-CD
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jGk0s-0007rV-KJ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:54:39 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:29959)
+ (envelope-from <mreitz@redhat.com>) id 1jGk2i-0005nm-Cx
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:56:34 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:54646)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jGk0s-0007po-FZ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:54:38 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGk2i-0005nQ-7k
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:56:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585058077;
+ s=mimecast20190719; t=1585058191;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fufdrNrz463Hga0gUZ/DZxFc/5xi1JnQIXei1lf2JLk=;
- b=buGV1PBbrZNTbrh4oka02oVWeU36xZbCLTyvcr/Kschk+Dr7dRYID/BccEv3yUTwLQyu5w
- B15ITX/GQdktGT679SqW1ecLGQpTGB65Pan2viBekCqC2M7ftCq76yOhurbzECNnlcQCaq
- xB24Odfa/yaFGhv6jv/DjRzZawks5uQ=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=OA2G+rgSNMcMMKvEOLC+8auTAuuTRdKO0S2B0cGgKtE=;
+ b=iWjjKxwDztfZudw6mBvNQ244yISR1WNomG04kZdkT2UIUaWxP/dMFMFDVLA1rYTUXjV28c
+ PlpIJovv2c3xqfANlSve9eA9hwFmRyhkDW86nvQ1FHOoo07nCRcSMBllvxYnfpUnL4bwTV
+ eXlxPeSDQ86htZG1erlGPddkhxbQ/NY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-EM4d40jKNvekHwGbW6ubHA-1; Tue, 24 Mar 2020 09:54:33 -0400
-X-MC-Unique: EM4d40jKNvekHwGbW6ubHA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-300-DIQTflu5PB6PLVyNefKDnw-1; Tue, 24 Mar 2020 09:56:28 -0400
+X-MC-Unique: DIQTflu5PB6PLVyNefKDnw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D91358010F3;
- Tue, 24 Mar 2020 13:54:32 +0000 (UTC)
-Received: from [10.3.113.103] (ovpn-113-103.phx2.redhat.com [10.3.113.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 064FD19C6A;
- Tue, 24 Mar 2020 13:54:31 +0000 (UTC)
-Subject: Re: deprecation of in-tree builds
-To: Stefan Hajnoczi <stefanha@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>
-References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
- <alpine.BSF.2.22.395.2003212338020.36211@zero.eik.bme.hu>
- <20200323133244.GK261260@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <1407efec-2da8-3ab8-ca99-7a09b1d66ce2@redhat.com>
-Date: Tue, 24 Mar 2020 08:54:31 -0500
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 142ACDBA3;
+ Tue, 24 Mar 2020 13:56:27 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-213.ams2.redhat.com
+ [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F02FB5C3F8;
+ Tue, 24 Mar 2020 13:56:21 +0000 (UTC)
+Subject: Re: [PATCH v8 01/11] iotests: do a light delinting
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200317004105.27059-1-jsnow@redhat.com>
+ <20200317004105.27059-2-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <38908b9c-f359-c430-27cd-c658455270f4@redhat.com>
+Date: Tue, 24 Mar 2020 14:56:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200323133244.GK261260@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200317004105.27059-2-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="FPQqStiqjdCM5crgnLAR0obyMENXLtOIO"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -90,60 +111,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ philmd@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/23/20 8:32 AM, Stefan Hajnoczi wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FPQqStiqjdCM5crgnLAR0obyMENXLtOIO
+Content-Type: multipart/mixed; boundary="xiu1HxCPJYRkzTLKSlOt41g43iRn3lSmE"
 
->>> We could also make configure actively warn if used in
->>> the source tree.
->>
->> This was discussed before. I think instead of annoying people with a
->> warning, rather configure should be changed to create a build dir if run
->> from source and have a Makefile in top dir that runs make -C builddir so
->> people don't have to care about this or change their ways and can continue
->> to run configure && make from source dir but you don't have to support
->> in-tree build. Then you can deprecate in-tree builds but supporting only
->> out-of-tree without this convenience would not just unnecessarily annoy
->> those who prefer working in a single tree but people (and apparently some
->> tools) expect sources to build with usual configure; make; make install so
->> that should be the minimum to support.
-> 
-> Yes, please!  I use in-tree builds and find it tedious to cd into a
-> build dir manually.
-> 
-> Also, many build scripts (packaging, etc) we'll break if we simply
-> remove in-tree builds.  I think make && make install should continue to
-> work.
+--xiu1HxCPJYRkzTLKSlOt41g43iRn3lSmE
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Here's what I'm using locally to let my finger memory of building 
-in-tree work in spite of having done 'mkdir build; cd build; 
-../configure ...'.  We'd still need glue code in configure itself to 
-detect when it is being invoked in-tree to create a subdir build/ and 
-such a forwarding file, but if we want in-tree to FEEL like it works 
-(even though it uses a build dir under the hood), it's certainly worth 
-considering.
+On 17.03.20 01:40, John Snow wrote:
+> This doesn't fix everything in here, but it does help clean up the
+> pylint report considerably.
+>=20
+> This should be 100% style changes only; the intent is to make pylint
+> more useful by working on establishing a baseline for iotests that we
+> can gate against in the future.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 83 ++++++++++++++++++-----------------
+>  1 file changed, 43 insertions(+), 40 deletions(-)
 
-$ cat GNUmakefile
-# Hack for redirecting while reminding myself to use distinct builddir
-ifeq ($(MAKECMDGOALS),)
-recurse: all
-endif
-.NOTPARALLEL: %
-%: force
-	@echo 'changing dir to build for $(MAKE) "$(MAKECMDGOALS)"...'
-	@$(MAKE) -C build -f Makefile $(MAKECMDGOALS)
-force: ;
-.PHONY: force
-GNUmakefile: ;
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--xiu1HxCPJYRkzTLKSlOt41g43iRn3lSmE--
+
+--FPQqStiqjdCM5crgnLAR0obyMENXLtOIO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl56EYIACgkQ9AfbAGHV
+z0BQ5gf9HOTehQ62zOynZamp9wtzN6IlM0zSf2VHv2NR3lP5XMS3A5mSDtnzMnP8
+unoj1Twf5yQ0CNOUlylxHj8tOFexF+yaNq5rp5mpbnntpk5p0ul/5aAEJmGvM+MX
+ZT7v772EtMJqHvxJxC373C9JKAsQRWgGr98Q3yRuDet5cA3ky9spvrMKFnetUIE6
+x6LBQxpuCTqV6Dno4IHPcxDYKVw7mPBTtkFwYRdr0cPsuD9A+d4kCxx+5Njp0DPJ
+JyIMd5u0jgHH0slrPJmCR5h40kg/x+l25Ynp7DHKMIArbScW86hiQdcLP7wgMDd7
+bCU6zS/3yS0sJfjkSyiXNq7DY//nBg==
+=8rwR
+-----END PGP SIGNATURE-----
+
+--FPQqStiqjdCM5crgnLAR0obyMENXLtOIO--
 
 
