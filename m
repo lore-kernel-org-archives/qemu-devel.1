@@ -2,76 +2,75 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 937EBC4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 429F9C4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:26:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E09B20719
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:25:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 098EE20719
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 12:26:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RwkpU1AJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E09B20719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSJoGXTv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098EE20719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGicM-0001Dw-HH
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:25:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41288)
+	id 1jGidn-00037t-7F
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 08:26:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jGiYU-0004Sm-Ft
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:21:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGiZ5-00050l-PD
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jGiYS-00082m-Jq
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:21:14 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26131)
+ (envelope-from <mreitz@redhat.com>) id 1jGiZ3-0008GJ-UU
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:21:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:57255)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGiYS-00082c-Fb
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:21:12 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGiZ2-0008FR-Qq
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 08:21:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585052472;
+ s=mimecast20190719; t=1585052505;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ah8bOhnAqJ3nIIRfmGaTBRsQaL0HlDpJ9Py310uZSO4=;
- b=RwkpU1AJl5qZvwlyhM8EpumaHbg8v4Ey0R9cem9b2xqG5Py8QhK4RoyeJz472qo5uH8MWT
- hRGGT58gXXjLQIlDUfpX2EUoY1nPj/foXl7foMah3IP9bmc3emrnlf9bSwNoZaXT3TRw4F
- Ge/MqGIAKFE6QAcbuwQoIMr6EQVUDS8=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=B3kjy8ohvVygjtmlMo5608bl39AdOc5SHdkn12QMD1Y=;
+ b=ZSJoGXTvq8xPGVdHq/cvYOjllpNi5zibF8/hmvLb2mt6WNaoGxJZ18x1BlxDopW4+Bm82S
+ Nv2/f4UGBXpt/ggit7BM5kwWUptUFHxyjcrtAbp5wXMangm788Kcprp8KdoK2nf8dm/PGQ
+ 7AMIBd5Z1+PRwieZfjW0aNfET/QOka8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-6SJ05763MaS7xeNv8LIvjA-1; Tue, 24 Mar 2020 08:21:08 -0400
-X-MC-Unique: 6SJ05763MaS7xeNv8LIvjA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-213-pWgz4GC2OtODtbpEn4vPfQ-1; Tue, 24 Mar 2020 08:20:48 -0400
+X-MC-Unique: pWgz4GC2OtODtbpEn4vPfQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 938228017CC;
- Tue, 24 Mar 2020 12:21:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E8201005512;
+ Tue, 24 Mar 2020 12:20:47 +0000 (UTC)
 Received: from localhost (ovpn-114-213.ams2.redhat.com [10.36.114.213])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D8B7FBBBC2;
- Tue, 24 Mar 2020 12:21:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 17E6F5C1B2;
+ Tue, 24 Mar 2020 12:20:46 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 6/6] iotests/026: Move v3-exclusive test to new file
-Date: Tue, 24 Mar 2020 13:20:44 +0100
-Message-Id: <20200324122044.1131326-7-mreitz@redhat.com>
-In-Reply-To: <20200324122044.1131326-1-mreitz@redhat.com>
-References: <20200324122044.1131326-1-mreitz@redhat.com>
+Subject: [PULL 0/6] Block patches for 5.0-rc0
+Date: Tue, 24 Mar 2020 13:20:38 +0100
+Message-Id: <20200324122044.1131326-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,224 +88,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-data_file does not work with v2, and we probably want 026 to keep
-working for v2 images.  Thus, open a new file for v3-exclusive error
-path test cases.
+The following changes since commit f1e748d27996e0cd8269db837a32e453dd55930a=
+:
 
-Fixes: 81311255f217859413c94f2cd9cebf2684bbda94
-       (=E2=80=9Ciotests/026: Test EIO on allocation in a data-file=E2=80=
-=9D)
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200311140707.1243218-1-mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Tested-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' i=
+nto staging (2020-03-23 20:54:24 +0000)
+
+are available in the Git repository at:
+
+  https://github.com/XanClic/qemu.git tags/pull-block-2020-03-24
+
+for you to fetch changes up to c264e5d2f9f5d73977eac8e5d084f727b3d07ea9:
+
+  iotests/026: Move v3-exclusive test to new file (2020-03-24 12:05:31 +010=
+0)
+
+----------------------------------------------------------------
+Block patches for 5.0-rc0:
+- Use-after-free fix
+- Fix for a memleak in an error path
+- Preventative measures against other potential use-after-frees, and
+  against NULL deferences at runtime
+- iotest fixes
+
+----------------------------------------------------------------
+Eric Blake (1):
+  block: Avoid memleak on qcow2 image info failure
+
+Max Reitz (2):
+  iotests: Fix cleanup path in some tests
+  iotests/026: Move v3-exclusive test to new file
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  block: Assert BlockDriver::format_name is not NULL
+
+Vladimir Sementsov-Ogievskiy (2):
+  block: bdrv_set_backing_bs: fix use-after-free
+  block/qcow2: zero data_file child after free
+
+ block.c                            |  3 +-
+ block/qcow2.c                      |  3 +
  tests/qemu-iotests/026             | 31 -----------
  tests/qemu-iotests/026.out         |  6 --
  tests/qemu-iotests/026.out.nocache |  6 --
+ tests/qemu-iotests/085             |  1 +
+ tests/qemu-iotests/087             |  6 ++
+ tests/qemu-iotests/279             |  2 +-
  tests/qemu-iotests/289             | 89 ++++++++++++++++++++++++++++++
  tests/qemu-iotests/289.out         |  8 +++
  tests/qemu-iotests/group           |  1 +
- 6 files changed, 98 insertions(+), 43 deletions(-)
+ 11 files changed, 111 insertions(+), 45 deletions(-)
  create mode 100755 tests/qemu-iotests/289
  create mode 100644 tests/qemu-iotests/289.out
 
-diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-index b05a4692cf..b9713eb591 100755
---- a/tests/qemu-iotests/026
-+++ b/tests/qemu-iotests/026
-@@ -240,37 +240,6 @@ $QEMU_IO -c "write 0 $CLUSTER_SIZE" "$BLKDBG_TEST_IMG"=
- | _filter_qemu_io
-=20
- _check_test_img
-=20
--echo
--echo =3D=3D=3D Avoid freeing external data clusters on failure =3D=3D=3D
--echo
--
--# Similar test as the last one, except we test what happens when there
--# is an error when writing to an external data file instead of when
--# writing to a preallocated zero cluster
--_make_test_img -o "data_file=3D$TEST_IMG.data_file" $CLUSTER_SIZE
--
--# Put blkdebug above the data-file, and a raw node on top of that so
--# that blkdebug will see a write_aio event and emit an error
--$QEMU_IO -c "write 0 $CLUSTER_SIZE" \
--    "json:{
--         'driver': 'qcow2',
--         'file': { 'driver': 'file', 'filename': '$TEST_IMG' },
--         'data-file': {
--             'driver': 'raw',
--             'file': {
--                 'driver': 'blkdebug',
--                 'config': '$TEST_DIR/blkdebug.conf',
--                 'image': {
--                     'driver': 'file',
--                     'filename': '$TEST_IMG.data_file'
--                 }
--             }
--         }
--     }" \
--    | _filter_qemu_io
--
--_check_test_img
--
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
-index c1b3b58482..83989996ff 100644
---- a/tests/qemu-iotests/026.out
-+++ b/tests/qemu-iotests/026.out
-@@ -653,10 +653,4 @@ wrote 1024/1024 bytes at offset 0
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- write failed: Input/output error
- No errors were found on the image.
--
--=3D=3D=3D Avoid freeing external data clusters on failure =3D=3D=3D
--
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1024 data_file=3DTEST_=
-DIR/t.IMGFMT.data_file
--write failed: Input/output error
--No errors were found on the image.
- *** done
-diff --git a/tests/qemu-iotests/026.out.nocache b/tests/qemu-iotests/026.ou=
-t.nocache
-index 8d5001648a..9359d26d7e 100644
---- a/tests/qemu-iotests/026.out.nocache
-+++ b/tests/qemu-iotests/026.out.nocache
-@@ -661,10 +661,4 @@ wrote 1024/1024 bytes at offset 0
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- write failed: Input/output error
- No errors were found on the image.
--
--=3D=3D=3D Avoid freeing external data clusters on failure =3D=3D=3D
--
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1024 data_file=3DTEST_=
-DIR/t.IMGFMT.data_file
--write failed: Input/output error
--No errors were found on the image.
- *** done
-diff --git a/tests/qemu-iotests/289 b/tests/qemu-iotests/289
-new file mode 100755
-index 0000000000..1c11d4030e
---- /dev/null
-+++ b/tests/qemu-iotests/289
-@@ -0,0 +1,89 @@
-+#!/usr/bin/env bash
-+#
-+# qcow2 v3-exclusive error path testing
-+# (026 tests paths common to v2 and v3)
-+#
-+# Copyright (C) 2020 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=3D$(basename $0)
-+echo "QA output created by $seq"
-+
-+status=3D1=09# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    rm "$TEST_DIR/blkdebug.conf"
-+    rm -f "$TEST_IMG.data_file"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.pattern
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+# This is a v3-exclusive test;
-+# As for data_file, error paths often very much depend on whether
-+# there is an external data file or not; so we create one exactly when
-+# we want to test it
-+_unsupported_imgopts 'compat=3D0.10' data_file
-+
-+echo
-+echo =3D=3D=3D Avoid freeing external data clusters on failure =3D=3D=3D
-+echo
-+
-+cat > "$TEST_DIR/blkdebug.conf" <<EOF
-+[inject-error]
-+event =3D "write_aio"
-+errno =3D "5"
-+once =3D "on"
-+EOF
-+
-+# Test what happens when there is an error when writing to an external
-+# data file instead of when writing to a preallocated zero cluster
-+_make_test_img -o "data_file=3D$TEST_IMG.data_file" 64k
-+
-+# Put blkdebug above the data-file, and a raw node on top of that so
-+# that blkdebug will see a write_aio event and emit an error.  This
-+# will then trigger the alloc abort code, which we want to test here.
-+$QEMU_IO -c "write 0 64k" \
-+    "json:{
-+         'driver': 'qcow2',
-+         'file': { 'driver': 'file', 'filename': '$TEST_IMG' },
-+         'data-file': {
-+             'driver': 'raw',
-+             'file': {
-+                 'driver': 'blkdebug',
-+                 'config': '$TEST_DIR/blkdebug.conf',
-+                 'image': {
-+                     'driver': 'file',
-+                     'filename': '$TEST_IMG.data_file'
-+                 }
-+             }
-+         }
-+     }" \
-+    | _filter_qemu_io
-+
-+_check_test_img
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/289.out b/tests/qemu-iotests/289.out
-new file mode 100644
-index 0000000000..e54e2629d4
---- /dev/null
-+++ b/tests/qemu-iotests/289.out
-@@ -0,0 +1,8 @@
-+QA output created by 289
-+
-+=3D=3D=3D Avoid freeing external data clusters on failure =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D65536 data_file=3DTEST=
-_DIR/t.IMGFMT.data_file
-+write failed: Input/output error
-+No errors were found on the image.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index ec2b2302e5..79c6dfc85d 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -295,3 +295,4 @@
- 284 rw
- 286 rw quick
- 288 quick
-+289 rw quick
 --=20
 2.25.1
 
