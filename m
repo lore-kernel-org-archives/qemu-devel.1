@@ -2,99 +2,79 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97572C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A664C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:51:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6316520774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7A0F20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:51:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rfewv+Vx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6316520774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ekq2UcYP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7A0F20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGkrx-0001XW-Jy
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:49:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60865)
+	id 1jGktf-0003Fg-VZ
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:51:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jGkqI-0008RQ-UJ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:47:48 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jGksf-0002Vk-Pq
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jGkqH-0006hC-RJ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:47:46 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36821)
+ (envelope-from <alex.williamson@redhat.com>) id 1jGkse-0000dw-H6
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:50:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33951)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGkqH-0006gu-OP
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:47:45 -0400
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jGkse-0000dW-Co
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:50:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585061265;
+ s=mimecast20190719; t=1585061412;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qsIoL5Z7PY4kuzINEbb/UeqJn6DCaDPZ0HHRFWRsDUA=;
- b=Rfewv+Vxl8m/lySx6pvBEHg6guSmPP7GJCVlF9BAfKDvrM4Hd/TdQ/qo8lSrkJYbrvjFAD
- NwD6TItjovaSp+8G/NQx7lOD/QYIAjN2rgIvvWXDe9zdzXinvj4yvGaRgQCGa6v7G/EFQJ
- fe2AL6rO7AGc0k4tLtrjMEBtbr+KdoQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-4ocLme_bMeWBhegO8uJGGQ-1; Tue, 24 Mar 2020 10:47:43 -0400
-X-MC-Unique: 4ocLme_bMeWBhegO8uJGGQ-1
-Received: by mail-ed1-f71.google.com with SMTP id b12so12036430edy.7
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 07:47:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=k70VFiKfJdi6EgI9uJjnXPafsgQGBusNt9dgFGjtg1k=;
- b=VLUOyoX08S1F2RSfiFLOWrUN+oW7eiFgs/j6Uhm9cpvt2BPyG/2DH+wvML+QuTqZST
- i5QWQzsRelC+w3Gyt+0gj16HEStZFTKvTy1PIByJMATslYuBHrRdYeem1dYlnATizSCR
- 9D8KsoaSXgoufn86+n5qv9VU6omWtJPyYQWxCE6BQXgrRWJbrdKtnkibw8k2oq3i+1J0
- pgtWiVfRUUN02azSIijSxhNxnfssOqWYQmMr5qNVJhwi5kvCvpevuphNi3+cW1XjanMR
- /7fg1Yz0qH/MF7fTspVOHtzLxa1YUT5c/VAOHrQM5/OQxnEvjJUTzq6aUAXXUQGhha5z
- 0k1Q==
-X-Gm-Message-State: ANhLgQ26G08rwfU96+CTQ32UwcmibHXwiL5A0dDMf2JgNOOo1n39dPsE
- i/XJV/N6UBEHdXDuvqe4cM/dvBlpNqgS8bHYq8c7cA02neKikx3gHKLruyjq2YCwcxLdpP1TGOD
- 1Y8ptFfCY4/QRvFw=
-X-Received: by 2002:a17:906:e259:: with SMTP id
- gq25mr23737028ejb.262.1585061262619; 
- Tue, 24 Mar 2020 07:47:42 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvu0wuqtV2op571eXBajAf8Bi8MGnh8prBpXVaVEkIcpj8GJ/pfrOu/lLL/yPzljoNI1Wfvaw==
-X-Received: by 2002:a17:906:e259:: with SMTP id
- gq25mr23737012ejb.262.1585061262279; 
- Tue, 24 Mar 2020 07:47:42 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id t13sm1308714edj.8.2020.03.24.07.47.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Mar 2020 07:47:41 -0700 (PDT)
-Subject: Re: [PATCH qemu] vfio/spapr: Fix page size calculation
-To: Greg Kurz <groug@kaod.org>
-References: <20200324063912.25063-1-aik@ozlabs.ru>
- <87ddd733-8498-57a5-2fe2-8f1a3e60e0c9@redhat.com>
- <20200324153017.01c45ec0@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <357712a6-2e9e-b3e1-549c-de73bad4ec6e@redhat.com>
-Date: Tue, 24 Mar 2020 15:47:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=zI1iQYeYC9lt1kBrjAHropMSeNOxmOibl4mmPnXMvvM=;
+ b=ekq2UcYP+UPerQIq4lgF2ENtrMjxRPcI49yhNpx+yD0xmG0DyWFL+7WF6hEaYkwzVQPFAF
+ G5qiXLHQWdcwhUKLATWMkt9pzzH1EBubZhL9wcebnMSzjim1dNMVclR8/Q+UOENqlJDwr5
+ OtteiYk1fD3utmBepJswBqK1sR0lkoE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-dxBHpPlMMnKjecfa07nMQw-1; Tue, 24 Mar 2020 10:50:08 -0400
+X-MC-Unique: dxBHpPlMMnKjecfa07nMQw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41EB58018A2;
+ Tue, 24 Mar 2020 14:50:05 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A77B4171B1;
+ Tue, 24 Mar 2020 14:49:54 +0000 (UTC)
+Date: Tue, 24 Mar 2020 08:49:54 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v4 0/2] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200324084954.0dd835e2@w520.home>
+In-Reply-To: <20200324092331.GA2645@work-vm>
+References: <20190531004438.24528-1-yan.y.zhao@intel.com>
+ <20190603132932.1b5dc7fe@x1.home>
+ <20190604003422.GA30229@joy-OptiPlex-7040>
+ <20200323152959.1c39e9a7@w520.home>
+ <20200324035316.GE5456@joy-OptiPlex-7040>
+ <20200324092331.GA2645@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20200324153017.01c45ec0@bahia.lan>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 216.205.24.74
@@ -109,82 +89,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "Yang, Ziye" <ziye.yang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "dinechin@redhat.com" <dinechin@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
+ Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/24/20 3:30 PM, Greg Kurz wrote:
-> On Tue, 24 Mar 2020 14:27:35 +0100
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->=20
->>
->>
->> On 3/24/20 7:39 AM, Alexey Kardashevskiy wrote:
->>> Coverity detected an issue (CID 1421903) with potential call of clz64(0=
-)
->>> which returns 64 which make it do "<<" with a negative number.
->>>
->>> This checks the mask and avoids undefined behaviour.
->>>
->>> In practice pgsizes and memory_region_iommu_get_min_page_size() always
->>> have some common page sizes and even if they did not, the resulting pag=
-e
->>> size would be 0x8000.0000.0000.0000 (gcc 9.2) and
->>> ioctl(VFIO_IOMMU_SPAPR_TCE_CREATE) would fail anyway.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> ---
->>>    hw/vfio/spapr.c | 6 +++---
->>>    1 file changed, 3 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
->>> index 33692fc86fd6..2900bd19417a 100644
->>> --- a/hw/vfio/spapr.c
->>> +++ b/hw/vfio/spapr.c
->>> @@ -147,7 +147,7 @@ int vfio_spapr_create_window(VFIOContainer *contain=
-er,
->>>    {
->>>        int ret =3D 0;
->>>        IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr)=
-;
->>> -    uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_=
-mr);
->>> +    uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_=
-mr), pgmask;
->>>        unsigned entries, bits_total, bits_per_level, max_levels;
->>>        struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeo=
-f(create) };
->>>        long rampagesize =3D qemu_minrampagesize();
->>> @@ -159,8 +159,8 @@ int vfio_spapr_create_window(VFIOContainer *contain=
-er,
->>>        if (pagesize > rampagesize) {
->>>            pagesize =3D rampagesize;
->>>        }
->>> -    pagesize =3D 1ULL << (63 - clz64(container->pgsizes &
->>> -                                   (pagesize | (pagesize - 1))));
->>> +    pgmask =3D container->pgsizes & (pagesize | (pagesize - 1));
->>
->> Is that ROUND_UP(container->pgsizes, pagesize)?
->>
->=20
-> This means we clip all page sizes greater than pagesize from
-> container->pgsizes... It doesn't look like ROUND_UP() semantics
-> to me.
+On Tue, 24 Mar 2020 09:23:31 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-Ah. Extracting it as a new function with meaningful name would help code=20
-review :)
+> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > On Tue, Mar 24, 2020 at 05:29:59AM +0800, Alex Williamson wrote:  
+> > > On Mon, 3 Jun 2019 20:34:22 -0400
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >   
+> > > > On Tue, Jun 04, 2019 at 03:29:32AM +0800, Alex Williamson wrote:  
+> > > > > On Thu, 30 May 2019 20:44:38 -0400
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > >     
+> > > > > > This patchset introduces a migration_version attribute under sysfs of VFIO
+> > > > > > Mediated devices.
+> > > > > > 
+> > > > > > This migration_version attribute is used to check migration compatibility
+> > > > > > between two mdev devices of the same mdev type.
+> > > > > > 
+> > > > > > Patch 1 defines migration_version attribute in
+> > > > > > Documentation/vfio-mediated-device.txt
+> > > > > > 
+> > > > > > Patch 2 uses GVT as an example to show how to expose migration_version
+> > > > > > attribute and check migration compatibility in vendor driver.    
+> > > > > 
+> > > > > Thanks for iterating through this, it looks like we've settled on
+> > > > > something reasonable, but now what?  This is one piece of the puzzle to
+> > > > > supporting mdev migration, but I don't think it makes sense to commit
+> > > > > this upstream on its own without also defining the remainder of how we
+> > > > > actually do migration, preferably with more than one working
+> > > > > implementation and at least prototyped, if not final, QEMU support.  I
+> > > > > hope that was the intent, and maybe it's now time to look at the next
+> > > > > piece of the puzzle.  Thanks,
+> > > > > 
+> > > > > Alex    
+> > > > 
+> > > > Got it. 
+> > > > Also thank you and all for discussing and guiding all along:)
+> > > > We'll move to the next episode now.  
+> > > 
+> > > Hi Yan,
+> > > 
+> > > As we're hopefully moving towards a migration API, would it make sense
+> > > to refresh this series at the same time?  I think we're still expecting
+> > > a vendor driver implementing Kirti's migration API to also implement
+> > > this sysfs interface for compatibility verification.  Thanks,
+> > >  
+> > Hi Alex
+> > Got it!
+> > Thanks for reminding of this. And as now we have vfio-pci implementing
+> > vendor ops to allow live migration of pass-through devices, is it
+> > necessary to implement similar sysfs node for those devices?
+> > or do you think just PCI IDs of those devices are enough for libvirt to
+> > know device compatibility ?  
+> 
+> Wasn't the problem that we'd have to know how to check for things like:
+>   a) Whether different firmware versions in the device were actually
+> compatible
+>   b) Whether minor hardware differences were compatible - e.g. some
+> hardware might let you migrate to the next version of hardware up.
 
->=20
->>> +    pagesize =3D pgmask ? (1ULL << (63 - clz64(pgmask))) : 0;
->>>        if (!pagesize) {
->>>            error_report("Host doesn't support page size 0x%"PRIx64
->>>                         ", the supported mask is 0x%lx",
->>>
->>
->>
->=20
+Yes, minor changes in hardware or firmware that may not be represented
+in the device ID or hardware revision.  Also the version is as much for
+indicating the compatibility of the vendor defined migration protocol
+as it is for the hardware itself.  I certainly wouldn't be so bold as
+to create a protocol that is guaranteed compatible forever.  We'll need
+to expose the same sysfs attribute in some standard location for
+non-mdev devices.  I assume vfio-pci would provide the vendor ops some
+mechanism to expose these in a standard namespace of sysfs attributes
+under the device itself.  Perhaps that indicates we need to link the
+mdev type version under the mdev device as well to make this
+transparent to userspace tools like libvirt.  Thanks,
+
+Alex
 
 
