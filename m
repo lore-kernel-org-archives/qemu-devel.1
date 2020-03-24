@@ -1,85 +1,85 @@
 Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4E3C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6039DC54EEB
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:04:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6024E2074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:01:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A4CD20409
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:04:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nXpadyPe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6024E2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gDtWOCv4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4CD20409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGpju-0007U9-HQ
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 16:01:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52919)
+	id 1jGpmc-0000ei-Cj
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 16:04:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGpjE-00071i-TJ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:00:50 -0400
+ (envelope-from <eblake@redhat.com>) id 1jGplp-0000DU-Fe
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:03:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jGpjD-0006iU-27
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:00:48 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56082)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jGpjC-0006iM-Og
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:00:47 -0400
-Received: by mail-wm1-x344.google.com with SMTP id z5so480724wml.5
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 13:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FDkHIYjNug7IlGxTBO35q1+f7tNKUKYkuTBE5I4+dPE=;
- b=nXpadyPerqyLT+tJk8fzdyw0SANIAYI3d/iQvca0ceQacBDievF/V0vzAmmocPNf5e
- Hb1XEQunF/eFDS1MvhEDQIDp/8/sV3ckqTKQ+SRjjDlXYqoNJYUHapBZQ7dfua7pfFuB
- zPhbqYHFQXLI07E9tNqDH9OWyKCgepDNe0ZgBZgOf6sqPzWcF8+eiAbBkNKb5FgJPJL0
- L6wOJVXBlZ6v6SaoUbxUH/zX/446WRWesI0YuKZfOgr/lJzWmd1dJ1vnVZmBbAHyGHw1
- IIiS37uXdSSdTDZojN+JCSwIlSO314iVx047RI93GnHCnBZ6E1kmrsxFJexKkabnSIuF
- 1KAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=FDkHIYjNug7IlGxTBO35q1+f7tNKUKYkuTBE5I4+dPE=;
- b=hKvTwupEHZ7BJ9joDg8IJGi0pWIL/tA8NC92uClziZ/RRDdIQhPw0piORcXBhw866p
- NPgtGABsZHYe7HTsU5FUabyivBUtJH1FbDTTTc3TZNuo+VYU6LjfrUIZIZMIb6wPmeJ6
- 8xr4YVtXnjXAw6p6Kdwzbdex9hdQ3a/amK43AhzjunxlG636ARYWhTyg8QKL9B7/bZPZ
- 6Y2WgPAl2YcnT3KC/7KzEGz+UAKJ9bKoV4V4kaqSTNXnlas3UfJcMpRcBQMua37PEEJG
- mvKwOrK1/jmVC1CMZ3nS7Yvi98NllNI8AxrXEH/TcghRTrV5guHlrBNeD7vMV5IdXGaT
- hzLA==
-X-Gm-Message-State: ANhLgQ0FReV7jNXNUzUPVCLUpc3cWCKdvR3iOv2g6wHkcJUAOokRIKOh
- 7oz/Nkcx7vN+bStDFloYh+gnW1eevbpFzWuUFms=
-X-Google-Smtp-Source: ADFU+vtq5PdCsZCJ1Tkvts5u2neaWTor8KIJP1QvAeyL1+EzPSPSGvSATpQybla72qG87SAW6eIrBSoKE7WeJKCw6LA=
-X-Received: by 2002:a7b:c8d0:: with SMTP id f16mr7877736wml.50.1585080045794; 
- Tue, 24 Mar 2020 13:00:45 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1jGplo-0007f6-1T
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:03:29 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52219)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jGpln-0007eo-Rl
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:03:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585080207;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/8MNNRbg+bRwtci2pKFgzEsCe+hwl9dEwuw2oAOovR0=;
+ b=gDtWOCv4YUEZdigU1cJ/n0mzLTkudsfDSVZPRirfNrQ7fm2XBS5J1q9OkMORWeQTUU72li
+ k54QsWvL4v7dnzI2ysW2O5iSgW8PlVJKILCpiPlpuPu062F5DZ/7HlBTtSZejO6GBq0pza
+ EghExtYXwOrbN1ql/8bcNGZpNN+YKbE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-vQcBUbD8NHy1ZjVoM8Xq7A-1; Tue, 24 Mar 2020 16:03:23 -0400
+X-MC-Unique: vQcBUbD8NHy1ZjVoM8Xq7A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1794107ACC4;
+ Tue, 24 Mar 2020 20:03:21 +0000 (UTC)
+Received: from [10.3.113.103] (ovpn-113-103.phx2.redhat.com [10.3.113.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2628ABBBC2;
+ Tue, 24 Mar 2020 20:03:18 +0000 (UTC)
+Subject: Re: [PATCH 6/6] qga/commands-posix: fix use after free of local_err
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+ <20200324153630.11882-7-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <012d4cf0-e168-a9ea-273a-a683e50ef7a0@redhat.com>
+Date: Tue, 24 Mar 2020 15:03:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200228032613.1049955-1-jiaxun.yang@flygoat.com>
- <20200303004137.1099502-1-jiaxun.yang@flygoat.com>
- <6b4a7564-eac6-7bd3-b1c0-e9c7ac4e0c80@redhat.com>
- <CAL1e-=gEtCtAnsnkO4_E8rqje=n1bHXY_+BXC5P2h5Ld0umNtQ@mail.gmail.com>
- <d9f08408-9c1e-36d9-869b-bac250c6f027@redhat.com>
- <20200323163545.GA19598@aurel32.net>
-In-Reply-To: <20200323163545.GA19598@aurel32.net>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 24 Mar 2020 22:00:28 +0200
-Message-ID: <CAHiYmc4NzqRArtLtqCu8oUz9idrTD0_VdhL4fs0bX2u2pHYYkw@mail.gmail.com>
-Subject: Re: [PATCH v1] mips/mips_malta: Allow more than 2G RAM
-To: Aurelien Jarno <aurelien@aurel32.net>
-Content-Type: multipart/alternative; boundary="00000000000011fa1505a19f359c"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <20200324153630.11882-7-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,228 +91,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
- Peter Maydell <peter.maydell@linaro.org>, Yunqiang Su <ysu@wavecomp.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Paul Burton <paul.burton@mips.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com,
+ marcandre.lureau@redhat.com, den@openvz.org, mreitz@redhat.com,
+ jsnow@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000011fa1505a19f359c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 3/24/20 10:36 AM, Vladimir Sementsov-Ogievskiy wrote:
+> local_err is used several times in guest_suspend(). Setting non-NULL
+> local_err will crash, so let's zero it after freeing. Also fix possible
+> leak of local_err in final if().
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   qga/commands-posix.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 93474ff770..cc69b82704 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -1773,6 +1773,7 @@ static void guest_suspend(SuspendMode mode, Error **errp)
+>       }
+>   
+>       error_free(local_err);
+> +    local_err = NULL;
 
-18:38 Pon, 23.03.2020. Aurelien Jarno <aurelien@aurel32.net> =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Hi,
->
-> Sorry for the delay, I just want to give some more details about the
-> Debian.
->
-> On 2020-03-14 10:09, Philippe Mathieu-Daud=C3=A9 wrote:
-> > IIUC today all distributions supporting MIPS ports are building their
-MIPS
-> > packages on QEMU instances because it is faster than the native MIPS
-> > hardware they have.
->
-> Actually Debian requires that packages are built on real hardware. We
-> have a mix of Loongson 3 and Octeon 3 based build daemons. They all have
-> 8GiB of RAM.
->
-> > Since one (or two?) years, some binaries (Linux kernel? QEMU?) are
-failing
-> > to link because the amount of guest memory is restricted to 2GB
-(probably
-> > advance of linker techniques, now linkers use more memory).
->
-> The problem happens with big packages (e.g. ceph which is a dependency
-> of QEMU). The problem is not the physical memory issue, but the virtual
-> address space, which is limited to 2GB for 32-bit processes. That's why
-> we do not have the issue for the 64-bit ports.
->
-> > YunQiang, is this why you suggested this change?
-> >
-> > See:
-> > -
-https://www.mail-archive.com/debian-mips@lists.debian.org/msg10912.html
-> > -
-https://alioth-lists.debian.net/pipermail/pkg-rust-maintainers/2019-January=
-/004844.html
-> >
-> > I believe most of the QEMU Malta board users don't care it is a Malta
-board,
-> > they only care it is a fast emulated MIPS machine.
-> > Unfortunately it is the default board.
-> >
-> > However 32-bit MIPS port is being dropped on Debian:
-> > https://lists.debian.org/debian-mips/2019/07/msg00010.html
->
-> The 32-bit big endian port has been dropped after the Buster (10)
-> release and won't be available for the Bullseye release (11). The
-> 32-bit little endian port is still available, but it's difficult to keep
-> it alive given the 2GB limit.
->
-> > Maybe we can sync with the Malta users, ask them to switch to the Bosto=
-n
-> > machines to build 64-bit packages, then later reduce the Malta board to
-1GB.
-> > (The Boston board is more recent, but was not available at the time
-users
-> > started to use QEMU to build 64-bit packages).
-> >
-> > Might it be easier starting introducing a malta-5.0 machine restricted
-to
-> > 1GB?
->
-> In any case having an easy way to simulate machines with more than 2GB
-> of RAM in QEMU would be great.
->
+Let's show this with more context.
 
-In my company, we do have both Octeon (don't know at this moment what
-version) and Boston systems.
+> static void guest_suspend(SuspendMode mode, Error **errp)
+> {
+>     Error *local_err = NULL;
+>     bool mode_supported = false;
+> 
+>     if (systemd_supports_mode(mode, &local_err)) {
 
-Boston seems to me as a very good candidate for enabling RAM > 2GB. I never
-saw it phisically, since it is assigned to a different department, but just
-anectodaly I heard that it is designed as a desktop (or even server)
-machine, and, therefore, it almost certainly supports > 2GB.
+Hmm - we have an even earlier bug that needs fixing.  Note that 
+systemd_supports_mode() returns a bool AND conditionally sets errp.  But 
+it is inconsistent: it has the following table of actions based on the 
+results of run_process_child() on "systemctl status" coupled with the 
+man page on "systemctl status" return values:
+-1 (unable to run systemctl) -> errp set, return false
+0 (unit is active) -> errp left unchanged, return false
+1 (unit not failed) -> errp left unchanged, return true
+2 (unused) -> errp left unchanged, return true
+3 (unit not active) -> errp left unchanged, return true
+4 (no such unit) -> errp left unchanged, return false
+5+ (unexpected from systemctl) -> errp left unchanged, return false
 
-Given current circumstances of remote work for most of us, and limited
-movement, it may be somewhat difficult for me to access it, but it is not
-imposible.
+But the comments in systemd_supports_mode() claim that ANY status < 4 
+(other than -1, which means we did not run systemctl) should count as 
+the service existing, even though the most common status is 3.  If our 
+comment is to be believed, then we should return true, not false, for 
+status 0.
 
-Please take everything I said in this email with a grain of salt, since it
-is based more on hallway chats, rather than on facts.
+Now, back to _this_ function:
 
-I'll try to get more info, hopefully soon.
+>         mode_supported = true;
+>         systemd_suspend(mode, &local_err);
 
-Yours,
-Aleksandar
+Okay - if we get here (whether from status 1-3, or with 
+systemd_supports_mode fixed to support status 0-3), local_err is still 
+unset prior to calling systemd_suspend(), and we are guaranteed that 
+after the call, either we suspended successfully or local_err is now set.
 
+>     }
+> 
+>     if (!local_err) {
+>         return;
+>     }
 
-> Cheers,
-> Aurelien
->
-> --
-> Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-> aurelien@aurel32.net                 http://www.aurel32.net
->
+So if returned, we succeeded at systemd_suspend, and there is nothing 
+further to do; but if we get past that point, we don't know if it was 
+systemd_supports_mode that failed or systemd_suspend that failed, and we 
+don't know if local_err is set.
 
---00000000000011fa1505a19f359c
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> 
+>     error_free(local_err);
+> +    local_err = NULL;
 
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">18:38 Pon, 23.03.2020. Aurelien Jarno &lt;<a href=3D"mailto:=
-aurelien@aurel32.net">aurelien@aurel32.net</a>&gt; =D1=98=D0=B5 =D0=BD=D0=
-=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; Hi,<br>
-&gt;<br>
-&gt; Sorry for the delay, I just want to give some more details about the<b=
-r>
-&gt; Debian.<br>
-&gt;<br>
-&gt; On 2020-03-14 10:09, Philippe Mathieu-Daud=C3=A9 wrote:<br>
-&gt; &gt; IIUC today all distributions supporting MIPS ports are building t=
-heir MIPS<br>
-&gt; &gt; packages on QEMU instances because it is faster than the native M=
-IPS<br>
-&gt; &gt; hardware they have.<br>
-&gt;<br>
-&gt; Actually Debian requires that packages are built on real hardware. We<=
-br>
-&gt; have a mix of Loongson 3 and Octeon 3 based build daemons. They all ha=
-ve<br>
-&gt; 8GiB of RAM.<br>
-&gt;<br>
-&gt; &gt; Since one (or two?) years, some binaries (Linux kernel? QEMU?) ar=
-e failing<br>
-&gt; &gt; to link because the amount of guest memory is restricted to 2GB (=
-probably<br>
-&gt; &gt; advance of linker techniques, now linkers use more memory).<br>
-&gt;<br>
-&gt; The problem happens with big packages (e.g. ceph which is a dependency=
-<br>
-&gt; of QEMU). The problem is not the physical memory issue, but the virtua=
-l<br>
-&gt; address space, which is limited to 2GB for 32-bit processes. That&#39;=
-s why<br>
-&gt; we do not have the issue for the 64-bit ports.<br>
-&gt;<br>
-&gt; &gt; YunQiang, is this why you suggested this change?<br>
-&gt; &gt; <br>
-&gt; &gt; See:<br>
-&gt; &gt; - <a href=3D"https://www.mail-archive.com/debian-mips@lists.debia=
-n.org/msg10912.html">https://www.mail-archive.com/debian-mips@lists.debian.=
-org/msg10912.html</a><br>
-&gt; &gt; - <a href=3D"https://alioth-lists.debian.net/pipermail/pkg-rust-m=
-aintainers/2019-January/004844.html">https://alioth-lists.debian.net/piperm=
-ail/pkg-rust-maintainers/2019-January/004844.html</a><br>
-&gt; &gt; <br>
-&gt; &gt; I believe most of the QEMU Malta board users don&#39;t care it is=
- a Malta board,<br>
-&gt; &gt; they only care it is a fast emulated MIPS machine.<br>
-&gt; &gt; Unfortunately it is the default board.<br>
-&gt; &gt; <br>
-&gt; &gt; However 32-bit MIPS port is being dropped on Debian:<br>
-&gt; &gt; <a href=3D"https://lists.debian.org/debian-mips/2019/07/msg00010.=
-html">https://lists.debian.org/debian-mips/2019/07/msg00010.html</a><br>
-&gt;<br>
-&gt; The 32-bit big endian port has been dropped after the Buster (10)<br>
-&gt; release and won&#39;t be available for the Bullseye release (11). The<=
-br>
-&gt; 32-bit little endian port is still available, but it&#39;s difficult t=
-o keep<br>
-&gt; it alive given the 2GB limit.<br>
-&gt;<br>
-&gt; &gt; Maybe we can sync with the Malta users, ask them to switch to the=
- Boston<br>
-&gt; &gt; machines to build 64-bit packages, then later reduce the Malta bo=
-ard to 1GB.<br>
-&gt; &gt; (The Boston board is more recent, but was not available at the ti=
-me users<br>
-&gt; &gt; started to use QEMU to build 64-bit packages).<br>
-&gt; &gt; <br>
-&gt; &gt; Might it be easier starting introducing a malta-5.0 machine restr=
-icted to<br>
-&gt; &gt; 1GB?<br>
-&gt;<br>
-&gt; In any case having an easy way to simulate machines with more than 2GB=
-<br>
-&gt; of RAM in QEMU would be great.<br>
-&gt;</p>
-<p dir=3D"ltr">In my company, we do have both Octeon (don&#39;t know at thi=
-s moment what version) and Boston systems.</p>
-<p dir=3D"ltr">Boston seems to me as a very good candidate for enabling RAM=
- &gt; 2GB. I never saw it phisically, since it is assigned to a different d=
-epartment, but just anectodaly I heard that it is designed as a desktop (or=
- even server) machine, and, therefore, it almost certainly supports &gt; 2G=
-B.</p>
-<p dir=3D"ltr">Given current circumstances of remote work for most of us, a=
-nd limited movement, it may be somewhat difficult for me to access it, but =
-it is not imposible.</p>
-<p dir=3D"ltr">Please take everything I said in this email with a grain of =
-salt, since it is based more on hallway chats, rather than on facts.</p>
-<p dir=3D"ltr">I&#39;ll try to get more info, hopefully soon.</p>
-<p dir=3D"ltr">Yours,<br>
-Aleksandar<br><br><br></p>
-<p dir=3D"ltr">&gt; Cheers,<br>
-&gt; Aurelien<br>
-&gt;<br>
-&gt; -- <br>
-&gt; Aurelien Jarno=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 GPG: 4096R/1DDD8C9B<br>
-&gt; <a href=3D"mailto:aurelien@aurel32.net">aurelien@aurel32.net</a>=C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"http://w=
-ww.aurel32.net">http://www.aurel32.net</a><br>
-&gt;<br>
-</p>
+Yet, we blindly throw away local_err, without trying to report it.  If 
+that's the case, then WHY are we passing in local_err?  Wouldn't it be 
+better to pass in NULL (we really don't care about the error message), 
+and/or fix systemd_suspend() to return a bool just like 
+systemd_supports_mode, and/or fix systemd_supports_mode to guarantee 
+that it sets errp when returning false?
 
---00000000000011fa1505a19f359c--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
