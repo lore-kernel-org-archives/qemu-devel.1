@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46EE5C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B16C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:21:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CBB22080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:20:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CBB22080C
+	by mail.kernel.org (Postfix) with ESMTPS id 6CB372080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:21:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CB372080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGhbK-0006Ri-8I
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 07:20:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33416)
+	id 1jGhcf-0008HR-LW
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 07:21:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jGhYg-0002GH-Kn
+ (envelope-from <laurent@vivier.eu>) id 1jGhYg-0002GG-K1
  for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jGhYd-0007M8-PM
+ (envelope-from <laurent@vivier.eu>) id 1jGhYd-0007M2-Oj
  for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:17:22 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:55871)
+Received: from mout.kundenserver.de ([212.227.126.187]:58085)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jGhYd-0007Lh-HV
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jGhYd-0007Lb-GZ
  for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:17:19 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M2w4S-1jFaYw0i5c-003PmV; Tue, 24 Mar 2020 12:17:06 +0100
+ id 1MKKER-1iyCR33L8Z-00Lm0m; Tue, 24 Mar 2020 12:17:07 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 2/5] linux-user/i386: Split out gen_signal
-Date: Tue, 24 Mar 2020 12:16:57 +0100
-Message-Id: <20200324111700.595531-3-laurent@vivier.eu>
+Subject: [PULL v2 3/5] linux-user/i386: Emulate x86_64 vsyscalls
+Date: Tue, 24 Mar 2020 12:16:58 +0100
+Message-Id: <20200324111700.595531-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200324111700.595531-1-laurent@vivier.eu>
 References: <20200324111700.595531-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:VxCE7RwwZyD4HXt9FVuqM2pyJZNZ8hqs/H4L6BTFKFF5gVAh4RH
- 09o4ToLBxY96xrBdRtnBQ7KozaPqS4gXvZXYESjdBs+OCWNNOh7pRP9p9c+4ppMBZwHDafn
- JUVHU/Xz5u0jiJUxhqEWvEFMMFB9XtUM0Tas68TYGMuTSyEYh4idlKfLe/kEoDzWOFCGHwV
- uvrmcDhRXzdpcygdXU/WQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:iwzPQFpzSsc=:7Gl50LPpX2hTZ5nmL9nLeu
- X6qLqKfWRFPZ4jjn/i2I0jtq7FO6P6qEYVu3nN0ztSYlc2rMhwEpR4SbLVcFZRzi4Tg9UvEtb
- ynigiE99mpLX9cefN2cFfQfgybOSbRY83FVMuKgu4zk2jitKGXw1oYBL95ptvbmh2QVHXPJNy
- RMLRqliUsJV9thYR7yGrIvywueelmF+mdlzrzgmRFQYZ7obRwZ9KoQSIRJxmnxJytOxB8ij8N
- lGm2MeZcBtQu/mtDTaBEja66Y+uLaPqRKMp2oiVA3cDgF75fI0xPCvCueGYjoCj/nSwyjaYhl
- jDEnItF83kdwXT+r7SeIAGoyD8smmgXzG/c7v/AvWB7wJL3wkAsw8Dvq4nkFuiBzYxT3HhBWs
- MBNkhiHFzdq6Q/Ds5rhWMsiBZDWnLYMQuJog8WMZiibirwMVII3Z3ShXXdPGp4Wc/zLdGYxct
- 14AN5m+mwP//P4sTmEW3MBox4k/3+YQA3YXWNgqlkHqMWwFWfoOZj7sidqp5peARIwUZWH9B6
- 5xOkpPVal5rD/Iqrj92J9cDuVnykRaiVv71oSico5ADoxbaQxcIt4juNcI5xkOIav5/RPf2tR
- gG3TdMODv6690/FlUhYhO5K/XWBZRNtidj5iHE7iztloYpCsZEJzBvYT/O1xovbNhWQ3rhK/e
- zHB4oA0X/guAljoxjoUVy9OZOYvJS9vG4Gbxxb7rIiBRmSr9JJvoukQr0YDN3iGAnBXZ+FnJp
- bZBQAsqR8O5e77Fv3xI4GUwN1gsmpC+5q/F+KCMGWgcAC7OhSLWqtE/8Iijj8y2JvicaMiTg3
- njTU+9HNgXf3wj64nngVImg2S3wJmK6fpWDSLTTRbGbdmMkXQ89zwY+vteN59TQeaFZQMCl
+X-Provags-ID: V03:K1:r9JZFDzHesbtdtjjLFO5e8F/goXYNKkaI25sGWvvho31XKg365x
+ 1AS7MiJIEQrC+Y3yXUa+kBdVcdJy3ouC3IRNsm5hmi4t6p14diEGEvKGmSNm0z2rwxxIMzZ
+ H6MLWiQMZ2v//B6EOzSIQWI+O+wgnES490hop+LwHdetUH1wDjiqIqBT0GKb1X3tzJTm1bW
+ 6DLIY6Uo0eSHvZDexTYAg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:dnkYpM5ijW0=:eZphKNc94bqgjwwFsHSHsr
+ iau5gIhsrLDWh/Rr7ona2aXKH1PNINk/QrpxPPn3nd4RwmuAmFO5lPfvJ4a9Ch0ZwtoBxpzTi
+ UF1dJuMG3JP5osk5HBUuwoIuX7pu6f9UUYIbEnqzA5s2FygVWZKmH0dOr/bC3/dE5Za+J7BkI
+ xvVxkF9wz6S0JkBGILFhTpoofJ/O751ZSof1oav+SSX/yNvDUt+dGxLR6J79tVUY5HKk45IW5
+ hGEtqqFReRdO5vfyI/aP26r93h8O1wS0xna5sIRVLh7KJXDPVGjoUdAfYvK+HpDOYrxRpfrJ/
+ c7NH4YHre46Px1lpQczh980ungR7R5lOtLFo5ojW//fRY5TTKkLI8yDmeUWcuaRG7sQzkqWzF
+ UoIciW+BK/pufcqh9zAaQkIQ4DMThLJQKZAcq+8h/XIjOrhn4HRWI5TwqMhVJ+QcqWrPQM4Kv
+ QPP3VB2Pb01cc8MsNGxZwELoN/ySt65j2oJxwZRhi7r01wQcYCHIiZCmfUlz41hzrFYVVuEnS
+ PFjLWWGhagsEwVh1i1zV6UFTV8rNf6euMVuVYnfSzKnAVb53TMTvRGKMzyRAGSNL8rEc4b2WV
+ 5B5o3j4donOU/ZWnhc4S2g1OesuCabRnm/CscVoAXHKZk6vB0aAAvCy+xAvc5WoD6AiZ5HQ+e
+ rbNUZw0Jp9OcP5ng+ECs2E7+T8vr7lFgomwsVX8nU9hdPIPpSn6h/snLYvooVc22BUyevt/Df
+ 9+olJwF1Qo/lP3LbdgI9heXfll0tfl8t2KDxVbe0IfBqzWgdSqqiyD2gTQnhtRUJZK45mlB7S
+ VkUStpF5RABZbZBnPs1DLPiL2oNqrmT9828GZ2TDThU36E/PKdWTqK8qSEjZUi+ZZLM21FH
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,186 +75,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
  Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-This is a bit tidier than open-coding the 5 lines necessary
-to initialize the target_siginfo_t.  In addition, this zeros
-the remaining bytes of the target_siginfo_t, rather than
-passing in garbage.
+Notice the magic page during translate, much like we already
+do for the arm32 commpage.  At runtime, raise an exception to
+return cpu_loop for emulation.
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200213032223.14643-3-richard.henderson@linaro.org>
+Message-Id: <20200213032223.14643-4-richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/i386/cpu_loop.c | 93 ++++++++++++++------------------------
- 1 file changed, 33 insertions(+), 60 deletions(-)
+ linux-user/i386/cpu_loop.c | 108 +++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h          |   7 +++
+ target/i386/translate.c    |  14 ++++-
+ 3 files changed, 128 insertions(+), 1 deletion(-)
 
 diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
-index 024b6f4d588c..e217cca5ee1e 100644
+index e217cca5ee1e..70cde417e605 100644
 --- a/linux-user/i386/cpu_loop.c
 +++ b/linux-user/i386/cpu_loop.c
-@@ -81,13 +81,23 @@ static void set_idt(int n, unsigned int dpl)
+@@ -92,6 +92,109 @@ static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
+     queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
  }
- #endif
  
-+static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
++#ifdef TARGET_X86_64
++static bool write_ok_or_segv(CPUX86State *env, abi_ptr addr, size_t len)
 +{
-+    target_siginfo_t info = {
-+        .si_signo = sig,
-+        .si_code = code,
-+        ._sifields._sigfault._addr = addr
-+    };
++    /*
++     * For all the vsyscalls, NULL means "don't write anything" not
++     * "write it at address 0".
++     */
++    if (addr == 0 || access_ok(VERIFY_WRITE, addr, len)) {
++        return true;
++    }
 +
-+    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++    env->error_code = PG_ERROR_W_MASK | PG_ERROR_U_MASK;
++    gen_signal(env, TARGET_SIGSEGV, TARGET_SEGV_MAPERR, addr);
++    return false;
 +}
++
++/*
++ * Since v3.1, the kernel traps and emulates the vsyscall page.
++ * Entry points other than the official generate SIGSEGV.
++ */
++static void emulate_vsyscall(CPUX86State *env)
++{
++    int syscall;
++    abi_ulong ret;
++    uint64_t caller;
++
++    /*
++     * Validate the entry point.  We have already validated the page
++     * during translation to get here; now verify the offset.
++     */
++    switch (env->eip & ~TARGET_PAGE_MASK) {
++    case 0x000:
++        syscall = TARGET_NR_gettimeofday;
++        break;
++    case 0x400:
++        syscall = TARGET_NR_time;
++        break;
++    case 0x800:
++        syscall = TARGET_NR_getcpu;
++        break;
++    default:
++        goto sigsegv;
++    }
++
++    /*
++     * Validate the return address.
++     * Note that the kernel treats this the same as an invalid entry point.
++     */
++    if (get_user_u64(caller, env->regs[R_ESP])) {
++        goto sigsegv;
++    }
++
++    /*
++     * Validate the the pointer arguments.
++     */
++    switch (syscall) {
++    case TARGET_NR_gettimeofday:
++        if (!write_ok_or_segv(env, env->regs[R_EDI],
++                              sizeof(struct target_timeval)) ||
++            !write_ok_or_segv(env, env->regs[R_ESI],
++                              sizeof(struct target_timezone))) {
++            return;
++        }
++        break;
++    case TARGET_NR_time:
++        if (!write_ok_or_segv(env, env->regs[R_EDI], sizeof(abi_long))) {
++            return;
++        }
++        break;
++    case TARGET_NR_getcpu:
++        if (!write_ok_or_segv(env, env->regs[R_EDI], sizeof(uint32_t)) ||
++            !write_ok_or_segv(env, env->regs[R_ESI], sizeof(uint32_t))) {
++            return;
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    /*
++     * Perform the syscall.  None of the vsyscalls should need restarting.
++     */
++    ret = do_syscall(env, syscall, env->regs[R_EDI], env->regs[R_ESI],
++                     env->regs[R_EDX], env->regs[10], env->regs[8],
++                     env->regs[9], 0, 0);
++    g_assert(ret != -TARGET_ERESTARTSYS);
++    g_assert(ret != -TARGET_QEMU_ESIGRETURN);
++    if (ret == -TARGET_EFAULT) {
++        goto sigsegv;
++    }
++    env->regs[R_EAX] = ret;
++
++    /* Emulate a ret instruction to leave the vsyscall page.  */
++    env->eip = caller;
++    env->regs[R_ESP] += 8;
++    return;
++
++ sigsegv:
++    /* Like force_sig(SIGSEGV).  */
++    gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
++}
++#endif
 +
  void cpu_loop(CPUX86State *env)
  {
      CPUState *cs = env_cpu(env);
-     int trapnr;
-     abi_ulong pc;
-     abi_ulong ret;
--    target_siginfo_t info;
- 
-     for(;;) {
-         cpu_exec_start(cs);
-@@ -134,70 +144,45 @@ void cpu_loop(CPUX86State *env)
+@@ -141,6 +244,11 @@ void cpu_loop(CPUX86State *env)
+                 env->regs[R_EAX] = ret;
+             }
+             break;
++#endif
++#ifdef TARGET_X86_64
++        case EXCP_VSYSCALL:
++            emulate_vsyscall(env);
++            break;
  #endif
          case EXCP0B_NOSEG:
          case EXCP0C_STACK:
--            info.si_signo = TARGET_SIGBUS;
--            info.si_errno = 0;
--            info.si_code = TARGET_SI_KERNEL;
--            info._sifields._sigfault._addr = 0;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGBUS, TARGET_SI_KERNEL, 0);
-             break;
-         case EXCP0D_GPF:
-             /* XXX: potential problem if ABI32 */
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_fault(env);
--            } else
--#endif
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                info.si_code = TARGET_SI_KERNEL;
--                info._sifields._sigfault._addr = 0;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-             }
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 49ecc23104c9..9af1b0c12e8e 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1003,6 +1003,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ 
+ #define EXCP_VMEXIT     0x100 /* only for system emulation */
+ #define EXCP_SYSCALL    0x101 /* only for user emulation */
++#define EXCP_VSYSCALL   0x102 /* only for user emulation */
+ 
+ /* i386-specific interrupt pending bits.  */
+ #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
+@@ -2218,4 +2219,10 @@ static inline bool hyperv_feat_enabled(X86CPU *cpu, int feat)
+     return !!(cpu->hyperv_features & BIT(feat));
+ }
+ 
++#if defined(TARGET_X86_64) && \
++    defined(CONFIG_USER_ONLY) && \
++    defined(CONFIG_LINUX)
++# define TARGET_VSYSCALL_PAGE  (UINT64_C(-10) << 20)
 +#endif
-+            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
-             break;
-         case EXCP0E_PAGE:
--            info.si_signo = TARGET_SIGSEGV;
--            info.si_errno = 0;
--            if (!(env->error_code & 1))
--                info.si_code = TARGET_SEGV_MAPERR;
--            else
--                info.si_code = TARGET_SEGV_ACCERR;
--            info._sifields._sigfault._addr = env->cr[2];
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGSEGV,
-+                       (env->error_code & 1 ?
-+                        TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR),
-+                       env->cr[2]);
-             break;
-         case EXCP00_DIVZ:
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_trap(env, trapnr);
--            } else
--#endif
--            {
--                /* division by zero */
--                info.si_signo = TARGET_SIGFPE;
--                info.si_errno = 0;
--                info.si_code = TARGET_FPE_INTDIV;
--                info._sifields._sigfault._addr = env->eip;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-             }
++
+ #endif /* I386_CPU_H */
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index d9af8f4078b3..5e5dbb41b0ce 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8555,7 +8555,19 @@ static bool i386_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+ static void i386_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+-    target_ulong pc_next = disas_insn(dc, cpu);
++    target_ulong pc_next;
++
++#ifdef TARGET_VSYSCALL_PAGE
++    /*
++     * Detect entry into the vsyscall page and invoke the syscall.
++     */
++    if ((dc->base.pc_next & TARGET_PAGE_MASK) == TARGET_VSYSCALL_PAGE) {
++        gen_exception(dc, EXCP_VSYSCALL, dc->base.pc_next);
++        return;
++    }
 +#endif
-+            gen_signal(env, TARGET_SIGFPE, TARGET_FPE_INTDIV, env->eip);
-             break;
-         case EXCP01_DB:
-         case EXCP03_INT3:
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_trap(env, trapnr);
--            } else
-+                break;
-+            }
- #endif
--            {
--                info.si_signo = TARGET_SIGTRAP;
--                info.si_errno = 0;
--                if (trapnr == EXCP01_DB) {
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    info._sifields._sigfault._addr = env->eip;
--                } else {
--                    info.si_code = TARGET_SI_KERNEL;
--                    info._sifields._sigfault._addr = 0;
--                }
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            if (trapnr == EXCP01_DB) {
-+                gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, env->eip);
-+            } else {
-+                gen_signal(env, TARGET_SIGTRAP, TARGET_SI_KERNEL, 0);
-             }
-             break;
-         case EXCP04_INTO:
-@@ -205,31 +190,19 @@ void cpu_loop(CPUX86State *env)
- #ifndef TARGET_X86_64
-             if (env->eflags & VM_MASK) {
-                 handle_vm86_trap(env, trapnr);
--            } else
--#endif
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                info.si_code = TARGET_SI_KERNEL;
--                info._sifields._sigfault._addr = 0;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-             }
-+#endif
-+            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
-             break;
-         case EXCP06_ILLOP:
--            info.si_signo = TARGET_SIGILL;
--            info.si_errno = 0;
--            info.si_code = TARGET_ILL_ILLOPN;
--            info._sifields._sigfault._addr = env->eip;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGILL, TARGET_ILL_ILLOPN, env->eip);
-             break;
-         case EXCP_INTERRUPT:
-             /* just indicate that signals should be handled asap */
-             break;
-         case EXCP_DEBUG:
--            info.si_signo = TARGET_SIGTRAP;
--            info.si_errno = 0;
--            info.si_code = TARGET_TRAP_BRKPT;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, 0);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
++
++    pc_next = disas_insn(dc, cpu);
+ 
+     if (dc->tf || (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
+         /* if single step mode, we generate only one instruction and
 -- 
 2.25.1
 
