@@ -2,114 +2,90 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8CFC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34467C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:51:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78F262073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:40:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F073D20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:51:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Kmv9aW5f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78F262073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x5hXsmn/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F073D20774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGlfa-0008BL-Iw
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 11:40:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39606)
+	id 1jGlq1-0003o7-4F
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 11:51:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jGlbq-0000bW-Fp
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:36:55 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jGlpN-0003If-57
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jGlbp-0005ht-GT
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:36:54 -0400
-Received: from mail-eopbgr70132.outbound.protection.outlook.com
- ([40.107.7.132]:20336 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jGlbp-0005fj-8y; Tue, 24 Mar 2020 11:36:53 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AlwvjhpSs7bvGbHVUpc/V5OY4+FOCh/H3eU/1KmXuswciLED80QLty/JJxklysbSTrGZsMFNBw5r6qGvtm8RebYAEj0+wai7nXH7HkbAL6Vg1S7Ab4zeld+PlKY5RsDhPJUJhqPEeHC/kzoYHzVHB7uFJI5wpzxVbUbdceRsOEfSjBUzQyfIHk8u1TFsQ8orO6GcCwLWFBKStZ6TAO+WGv5P4vpFGcuSPUwc12EXlACnM73hrqtz6gWIdpHhtFvWr0bTXsbC+3o78Mbfxm4LFgce0/ozQEKlbL1IVFlS7qKqJpMS7YRH9+p9FQDac2offQTNeQtS4YCm8YiQCzPJXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0SlD7INHF2fuHGL8EHihFCP40LyPoL2LWIw1mPvnZH8=;
- b=G166tZNyo59PJImbcNdVsImwUQ8Xq7dkcmMq5nq+B7s+uTZzsqyfn02iJEEAGUGf4PHmcBlC3bHyeFYFtyAD7dPZFELoGIX2m6rom4l+QS1qxDjL2+Zp1yE7SGqE0oK6DP+fzdnTY4TOcw3She76VNABOdQSiVVXsPcy37IB7p0gy3MBQukMIVLbgI666YJtPBNXEYFj88taxdiWBaknWa05eRs5dmTCpNqceZcKlbPq4D3aVvDhvPcKOF6BH6Tv1dd68+FD5gj9YamsUac7CFp205+tJmIefkVVyuFXSfcBiUWB+OfKDFPqOPIM4wSiRdWivJnablYOwiML+hndNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0SlD7INHF2fuHGL8EHihFCP40LyPoL2LWIw1mPvnZH8=;
- b=Kmv9aW5foC/h8USrzcmykfcaUicvPRCvY0HZuI20ZQE2/o9wdcXKtZWlJHtYFdaH74dFgVu9uJHWBjpCGDV0UmE+2VPCgG5fv9Ggy6YEcbjLPxy8bNGNE/Ug0vEZ7oMM/GrjU7rDvNnhL4vYTln0+t1a86uh5ABQzqlnl5gU8Gk=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5336.eurprd08.prod.outlook.com (10.141.172.73) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2835.20; Tue, 24 Mar 2020 15:36:52 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::9057:6f5a:378c:7533]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::9057:6f5a:378c:7533%6]) with mapi id 15.20.2835.021; Tue, 24 Mar 2020
- 15:36:52 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/6] migration/colo: fix use after free of local_err
-Date: Tue, 24 Mar 2020 18:36:28 +0300
-Message-ID: <20200324153630.11882-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1jGlpL-0007nb-T5
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:50:52 -0400
+Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:36008)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jGlpL-0007mw-IM
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:50:51 -0400
+Received: by mail-pj1-x102a.google.com with SMTP id nu11so1619639pjb.1
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 08:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=eSVbIg6x3AEUYOba3BSh/q8fW0W+tNUPLoN4le5KbfI=;
+ b=x5hXsmn/uSL4L4BL7yV8j+di7L4pj9ae1zY/GaclSCU4XmrcGZp7jhvqs2McLfoREB
+ iido2AdxKanYnfK7z9fEki8i736WGEJFNqu2iu53UM5Gg1Oj3byQXiCSgeOILHgscgNC
+ KYsHcXr+O2qGN/VCBy4m0Ujrtrfo8GWbPNv1qZCrh0uqsFq3/Y7HizEUZF352v9Nht8c
+ sZYWcYTFwO+UZd8wj0HVntHD3fpMubVUu2JjAfR3FjgF9jIZSaf5pDiu6LCYkNMmBGF2
+ cpG8bFVA8eeNe6mo5fiTaJQjwSU2Qs89vFYkU2R8J4RiX+Q81MShJG3T2Z6lLDioVEDw
+ ZTFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eSVbIg6x3AEUYOba3BSh/q8fW0W+tNUPLoN4le5KbfI=;
+ b=LdjYLiiy5D3xWP0EWE9ohxZ3Z18tLC+BZ1KMA29QBNrG8q3YR5a4EUIAZdu0dLIoXM
+ QroZpR8pQ+Mk19dSQTAk2lstbcuftjbZZtWE8krXG2mumsrA48g28dMf9yunBD43B4Wn
+ ca8NAS9G3PK4ICzN1X5VCnYCQH/s8cFDiW++ZllKRSZL4kRRrtqxi+Wbto2TivWAuuDL
+ 69mwLmbfIkfDu1lKWsQ4mWzmPJUdGIH+h31HBmafGj6NdLx8v6zqRoNQx1VVXvZ4v0Cr
+ h8/fjIQfK9uNVJv+WBrsFdwq9q0VX2Y7WMjjBmO5t+hIfRyRPW0lG4z38kT2xI/rxY8N
+ 9Hmg==
+X-Gm-Message-State: ANhLgQ0VOvmwGq2OsIYGjez96u1BFsog1ZwalzzPPE10pPA5A2f3XZB6
+ TnAM2DAumvr4Ugei90dLYXSAag==
+X-Google-Smtp-Source: ADFU+vtI36Bel1rCSXvPXfi6o1Ov9T00BN8RcBscHZR76Kok1ru4QciJmiHW+cS4mItHDBldAi5lIQ==
+X-Received: by 2002:a17:90a:ad45:: with SMTP id
+ w5mr6147090pjv.179.1585065050032; 
+ Tue, 24 Mar 2020 08:50:50 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
+ by smtp.gmail.com with ESMTPSA id k5sm2496342pju.29.2020.03.24.08.50.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Mar 2020 08:50:49 -0700 (PDT)
+Subject: Re: [PATCH for-5.0 0/6] Several error use-after-free
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
 References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: HE1PR0401CA0062.eurprd04.prod.outlook.com
- (2603:10a6:3:19::30) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6aabd257-d9fd-7511-fd49-6e746a5fd43b@linaro.org>
+Date: Tue, 24 Mar 2020 08:50:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.15) by
- HE1PR0401CA0062.eurprd04.prod.outlook.com (2603:10a6:3:19::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2835.20 via Frontend Transport; Tue, 24 Mar 2020 15:36:50 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.15]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c8eb99ad-7b27-4d2b-dca2-08d7d0092c9b
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5336:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53369DFE62F6925A82A249ECC1F10@AM7PR08MB5336.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
-X-Forefront-PRVS: 03524FBD26
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(346002)(136003)(366004)(376002)(39850400004)(396003)(66946007)(81166006)(66556008)(5660300002)(4326008)(66476007)(2906002)(81156014)(8676002)(16526019)(6666004)(4744005)(107886003)(26005)(8936002)(186003)(316002)(6512007)(6486002)(52116002)(36756003)(6506007)(1076003)(478600001)(956004)(86362001)(6916009)(2616005)(7416002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM7PR08MB5336;
- H:AM7PR08MB5494.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hjt+QYJ4UwAEK/A/2dLyRY+ohKfA0mt4c5BkSF+jnB6sxMarSZ4dND5wVT0KXM2ms/CK6+e74Z4tFn0MC3vtnheZtS3972A9crRy7bjq+P1m6QVFIGbnukDu32ZUZkeCxqYpooGjZn6IWV3Z28yuUK0/csgLPae8Mu1RWF/xV8y3KjNeqXCbNtS8wcx83KGpD+cCbRD/6a4P6C/jwA/2SwBa6Hru1urzd8Qw5pE9KgaoTRjrIX2JFxCrXQZpmRnF1pd0PA1gL/EJB1bB0qmwUAVKWQZ7FhkKAOrtq2kMlHQw/rGMXGaicEHChBM0e5a3oCcUTPf4TQXgIQvMdyMZLW6fuilLDH5kWhznMb/1ROYOO7apwqPrY1NFhGFllJU8HC0ipLddCcTxUGcYXJSZqkiK8BhlJ3/EtzNRbkt57ltiQB3iwoufiHeAPbd0Htun
-X-MS-Exchange-AntiSpam-MessageData: ub9PlDHY0UkzBL8IODtRG0406M4elNTof15X39qUbHJtt28WhQgSjXmYgJ1GLI3tBTiLIDctiUIzfHcIUPnWUgWcmAjfmmtkQU+S9HYn5q58i3en+wYcJ3MAy0NM1QvMp2o4w4ct4JX3Jkz3U8ULKw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8eb99ad-7b27-4d2b-dca2-08d7d0092c9b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2020 15:36:51.9821 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XfrdLEUkI038cWm+sR01ow03c9D4KB+DoU5qZ3ETpiyjVbZNhWHvRq6SX1w9X/f+Bb3glGWmArfosfXeMYgldecU0n1zBopOJBARAnb6WUk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5336
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.132
+In-Reply-To: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::102a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,36 +97,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, zhang.zhanghailiang@huawei.com,
- qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com,
- dgilbert@redhat.com, mreitz@redhat.com, den@openvz.org,
- marcandre.lureau@redhat.com, jsnow@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com,
+ marcandre.lureau@redhat.com, den@openvz.org, mreitz@redhat.com,
+ jsnow@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-local_err is used again in secondary_vm_do_failover() after
-replication_stop_all(), so we must zero it. Otherwise try to set
-non-NULL local_err will crash.
+On 3/24/20 8:36 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Vladimir Sementsov-Ogievskiy (6):
+>   scripts/coccinelle: add error-use-after-free.cocci
+>   block/mirror: fix use after free of local_err
+>   dump/win_dump: fix use after free of err
+>   migration/colo: fix use after free of local_err
+>   migration/ram: fix use after free of local_err
+>   qga/commands-posix: fix use after free of local_err
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- migration/colo.c | 1 +
- 1 file changed, 1 insertion(+)
+Whole series:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 44942c4e23..a54ac84f41 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -93,6 +93,7 @@ static void secondary_vm_do_failover(void)
-     replication_stop_all(true, &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-+        local_err =3D NULL;
-     }
-=20
-     /* Notify all filters of all NIC to do checkpoint */
---=20
-2.21.0
 
+r~
 
