@@ -2,92 +2,69 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 207F5C4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 889F6C4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:20:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB2E220786
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:19:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cM5jDukN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB2E220786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D63D2080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 11:20:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D63D2080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGhav-0005c3-24
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 07:19:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33556)
+	id 1jGhbD-0006DL-II
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 07:19:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33414)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jGhZt-00042G-N7
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:18:39 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jGhYg-0002GF-KE
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jGhZs-0007jX-Ii
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:18:37 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35087)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1jGhZs-0007j5-C4
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:18:36 -0400
-Received: by mail-wm1-x343.google.com with SMTP id m3so3011123wmi.0
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 04:18:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=o5s5EIyLrX037d55YoY+iX0/oTthgCsh557JjKQoBqs=;
- b=cM5jDukNBqWIpVYXQ2xqvhWaUH/ZajJk58gqLxvgrjjTZyr6V/IP4JKwGi0cYmSJWS
- SuAPEokgr/9xm1m5VpbLYpsHdt08rjvhpxXKUdhe8uReWelNa1yGpdi+2LJ7Clqa3Bu1
- jzBNisEGPclzyNrFooGNDlM0PV2A18E0I6c1z21mERvosI4lLqWpZZFCAQpO6uJsN7RX
- MTzyX6lgz8uHcw5MIieTGItVWO9H8W8UxkqLNKsh6JyUY5QwbPN/uF0Xni6ic88hd3X3
- UEz42/8VKgMiQS+QqHrQ1etrqotFMxlgP49lD3LS2RtZZCijQXbOrm+Rg3dzStTbfqLH
- PTmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=o5s5EIyLrX037d55YoY+iX0/oTthgCsh557JjKQoBqs=;
- b=K+pwp3g9Dp8VzY9XDyfShZyENFN5qFfzZGl7H3p32Esta/SEvUg7nHdlRTeIxm5lNR
- K8oKPWpmvUrx/ht0ve7/7MHg4CYOuNxOINTAUSBwRbJEgN2jHlkusfZgk8klbwInSOCA
- WoJbt6T0AIPVlK10en61yeMxEa3huG9lKAECGbB+PFzUSHgBAthXfP0RibcNNym8ex3L
- WNtnrdlagD1Pnzds7YPadX2orIDmeQMs/9qte7OVgb/xfo2epw0seopa394YRcExoM35
- as4eqChz98emDjwXBRg5P3RN4csseN1ynCWCR27Hd/aBTDvnHWUv9p6QQLKQNPb3mLQG
- /rrg==
-X-Gm-Message-State: ANhLgQ2LLMYBq5fmrdaLdbv5Soj6zWQBouE6vuD4C17XNHD4jmQ/zkNi
- DtclK1tsUiZow7wpbCHmA8acnCAk
-X-Google-Smtp-Source: ADFU+vtBpSnESMjJZbtdyAD8b1cQnNaoimc9U/qqCEGU0Tz88b7hpQf9ZSY58m8Yu8Th5qlCEvL8Fw==
-X-Received: by 2002:a1c:51:: with SMTP id 78mr4850841wma.157.1585048714218;
- Tue, 24 Mar 2020 04:18:34 -0700 (PDT)
-Received: from [192.168.86.37] ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id y200sm3987176wmc.20.2020.03.24.04.18.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Mar 2020 04:18:33 -0700 (PDT)
-Subject: Re: [PATCH] hw/rdma: Lock before destroy
-To: Peter Maydell <peter.maydell@linaro.org>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>
-References: <20200324105356.7998-1-yuval.shaia.ml@gmail.com>
- <CAFEAcA_D3ykX2mJwtJhvdQg3psCX9NdcG0xq4qmP3CkqHtnY8Q@mail.gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <72691a5a-8992-ec54-f2de-6209cafcc426@gmail.com>
-Date: Tue, 24 Mar 2020 13:20:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <laurent@vivier.eu>) id 1jGhYd-0007Ls-Hp
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:17:22 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:53075)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jGhYb-0007L7-RN
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 07:17:19 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1Mz9lL-1jTzTW1qjb-00wDIK; Tue, 24 Mar 2020 12:17:05 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 1/5] target/i386: Renumber EXCP_SYSCALL
+Date: Tue, 24 Mar 2020 12:16:56 +0100
+Message-Id: <20200324111700.595531-2-laurent@vivier.eu>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200324111700.595531-1-laurent@vivier.eu>
+References: <20200324111700.595531-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_D3ykX2mJwtJhvdQg3psCX9NdcG0xq4qmP3CkqHtnY8Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:g2Fxb0GuhkTYvAajYGpmLlPs4e+ymKt2URFzBGmu2d6DmhoH3Ol
+ daC9J+Tw1v2vob3eQU0EAe5MGgfbuuO//uwUcETQb28GQbLDapznh8dInZpBSMzBjtdV0t0
+ Rjp32akl6j4Te5M8FDRkVHX/KLS9mWfEIMXTenFeY+1EQfGT+59hF2omCIRqYvimmwKfjuW
+ Nom86Jvsc9zgTdX6RY0xA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+vbHFAJH61I=:MqwAeJqI+2YJRqL2X7N2Z7
+ 4oc73e1VLASG3Lx9IrYIaY/N/KXFXtJ+pW6Q8fM7nWqrHmypi7H1R5VW5/GZ9imxr7ZPqsJ/b
+ QWY9ePriHVFNIolM8GpI0n4EFt2yQxpfKowYKP8ncJXZWwOFDmt3z01QVnIqn4p9lcQC7sE5p
+ offlu6PlisXXl2eytbhU/OyA5A26rP24OokMQvGBvnMKtMO1wmIrTrUWDob2LvvW2P07ayrPI
+ 2AoBQTvEypWYMhQ+Ho1ydCRIOwmkkHEXB6+9l0A3WNVcVBMoV6nuJewByno8+3y6KerBVJ3Zs
+ pyFh8kmoNQaeS1MkF4lgeXfZYR8YGxtuou5mxaXDg3wMT0sVf2TA5FqXoYI6k6hwKK28duN2G
+ p/q+9yNk/maHdceX2ciI6q1T4E7jw1bg/QGwrITA+/sfarRjX/E1JGIC7Hy2Y3zEAwmYbr+ud
+ g2dziIKhlBwG7vl3LLmVeoJFXWjVDoqv02r8xgheJgaZLctxcWg3P/0oID9iE+vCTA8ic0q7x
+ PpbXIbUgjeH+KlhXjDNE62tpWagdT3A/4X3lJZm+I5Ky7I2AdUayc6ms/CX9oMrIxjyPV1Y7n
+ W0ojlKgcl+hE2im1sV7HOlrDiNyUPT2kdUgMABLo/f0O0+WHT0RACvrQ9OgvKrrAp5CDIyqRn
+ QkcA7AhFLeg394XIWkkXBezdSf92amGt6639mJBCc927Kj2zCIBE0A/0VyG6SYEjXqNuYeupZ
+ Gs2478S2wqOhkq1HLOLsFrznym3/u4WR10MCeMBXixuIgE1Paug0v8cLSeBja+mXyjfYN8B1/
+ lvJteJV2QfNrH8ShrChUgXSdYfQwSa/X2Y+3Hl7lGvpGQqOMi9cVtCiLVyuXd+v3XSMP1Xp
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,58 +76,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,Yuval
+From: Richard Henderson <richard.henderson@linaro.org>
 
-On 3/24/20 1:05 PM, Peter Maydell wrote:
-> On Tue, 24 Mar 2020 at 10:54, Yuval Shaia <yuval.shaia.ml@gmail.com> wrote:
->> To protect from the case that users of the protected_qlist are still
->> using the qlist let's lock before detsroying it.
->>
->> Reported-by: Coverity (CID 1421951)
->> Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
->> ---
->>   hw/rdma/rdma_utils.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
->> index 73f279104c..55779cbef6 100644
->> --- a/hw/rdma/rdma_utils.c
->> +++ b/hw/rdma/rdma_utils.c
->> @@ -63,6 +63,7 @@ void rdma_protected_qlist_init(RdmaProtectedQList *list)
->>   void rdma_protected_qlist_destroy(RdmaProtectedQList *list)
->>   {
->>       if (list->list) {
->> +        qemu_mutex_lock(&list->lock);
->>           qlist_destroy_obj(QOBJECT(list->list));
->>           qemu_mutex_destroy(&list->lock);
->>           list->list = NULL;
-> Looking at the code a bit more closely, I don't think that taking
-> the lock here helps. If there really could be another thread
-> that might be calling eg rdma_protected_qlist_append_int64()
-> at the same time that we're calling rdma_protected_qlist_destroy()
-> then it's just as likely that the code calling destroy could
-> finish just before the append starts: in that case the append
-> will crash because the list has been freed and the mutex destroyed.
->
-> So I think we require that the user of a protected-qlist
-> ensures that there are no more users of it before it is
-> destroyed (which is fairly normal semantics), and the code
-> as it stands is correct (ie coverity false-positive).
+We are not short of numbers for EXCP_*.  There is no need to confuse things
+by having EXCP_VMEXIT and EXCP_SYSCALL overlap, even though the former is
+only used for system mode and the latter is only used for user mode.
 
-I agree is a false positive for our case.
-"rdma_protected_qlist_destroy" is called by "mad_fini" which in turn is 
-called by "rdma_backend_fini"
-*after* the VM shutdown, at this point there is no active lock user.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200213032223.14643-2-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/i386/cpu.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Thanks,
-Marcel
-
-> thanks
-> -- PMM
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 60d797d5941f..49ecc23104c9 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1001,9 +1001,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define EXCP11_ALGN	17
+ #define EXCP12_MCHK	18
+ 
+-#define EXCP_SYSCALL    0x100 /* only happens in user only emulation
+-                                 for syscall instruction */
+-#define EXCP_VMEXIT     0x100
++#define EXCP_VMEXIT     0x100 /* only for system emulation */
++#define EXCP_SYSCALL    0x101 /* only for user emulation */
+ 
+ /* i386-specific interrupt pending bits.  */
+ #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
+-- 
+2.25.1
 
 
