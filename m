@@ -2,85 +2,84 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3354EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 21:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 495FEC10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 21:22:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED3732070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 21:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1063F2070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 21:22:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r/73bErW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED3732070A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A4TQClT3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1063F2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGqwr-0007yu-4H
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 17:18:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35477)
+	id 1jGqzx-0001Ya-7n
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 17:22:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <linus.walleij@linaro.org>) id 1jGqvy-00078F-7P
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 17:18:03 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGqyy-00010W-PT
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 17:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <linus.walleij@linaro.org>) id 1jGqvx-0005eu-5m
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 17:18:02 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:41226)
+ (envelope-from <peter.maydell@linaro.org>) id 1jGqyx-0007hH-Lm
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 17:21:08 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55533)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
- id 1jGqvw-0005dn-Ud
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 17:18:01 -0400
-Received: by mail-lf1-x141.google.com with SMTP id z23so19849lfh.8
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 14:18:00 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGqyx-0007fw-6H
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 17:21:07 -0400
+Received: by mail-wm1-x343.google.com with SMTP id z5so140505wml.5
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 14:21:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nFWhs7FYWqUzfSLp89dUr9RqAyDvvxrGjpfFY3Xf6t0=;
- b=r/73bErWdHQvuSdWJNWD31sFM6sBzEI3plO5Ph0mnhTsKRC3h1QN3i7Fz3eKj47Yan
- BwWMNi7sdz1VngrNfJgVhs4otMGlVbKrH5Ojtg4qQyZl6c5KNhEt2puHDbfeP7zS1g9z
- 9sb9L8shr//a5jX0W9biM5R/XFXVss0aK7nJnFNfhT69yuJ3vEp20yhHEiPfGub2S0l3
- eAM6WE6onEd3buLeks9BWIX5O3wweUSmc37Ts60F6+qNm0gZUEZMEVw0o0nixNUSAlOc
- geZpCA4tpuURui/rTdFdYUk8MNAkScEJxAEUfyVK4GkLj/8d6IGrDaMTou75bMHoukIi
- C9DQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CHQaOdNNxZcPioBS4lbMYM+C10vqbguaMyMsuR9H7ho=;
+ b=A4TQClT3Jr1yYu94epxFZBwvGhI6RM39KuMrEIyeXucaHUwleisLFRVy3dCKcAu8XF
+ U4U1cieOBPFiu6wrE0doBIV8E8sPY7S3TWHgjV2g7tHWXfxn8vO8/lBTjLJfXWlNgJMC
+ GpA/92D2aX8xrnZVwoxr2pI97b99I5ZmxgT6Fg2O+NIrZbXr21af2oFS7r6wqq8AEQPU
+ g1YzBcDSHohOPyJoAA/uKbzvfKaFkTikDUy6BCU8/AzeinQXDSZ5pbeGzquFlLd6QZzL
+ 6p+XAJdz99Ql6DDzIlVmOXS/oKnHqjsLe9XsakvjdO8JT2RUZKV04quFH+QnuUjNj5/l
+ nQPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nFWhs7FYWqUzfSLp89dUr9RqAyDvvxrGjpfFY3Xf6t0=;
- b=SKTl6D4zbYWZieKG9NjSEXEEpfNf45gcTTCPBGoY8dGuHu/JLAnZwB86evWfPE3PDQ
- 4mOSWMI4jOy3PN65OADWHCkv2FO0yQro/i81PSwMVRPX4859iMZ556PvaQYOo5OIHskr
- 5n8U0gQrTrgolv0Hev08PJdrcTNMqfQmxMGA6eAlpVVjP786ZAo/xZ9DprbSMi4H3+7k
- ReK3Ex4+Jj4KWy8tslWTV6oShiwPgKHBpFJjg50/4HkP7WcN6zfMteyDkFQp/ievwQcc
- 314L3T4607vkqoM7/ct7/AkCgUcHKxtyJmcrFSKiejliNQUdcsL7IXT6OWVEp0L/Kz0R
- ojww==
-X-Gm-Message-State: ANhLgQ3i0tL+U+WssPunkv+GCGMxZA3iJayaaewBVypO2QUYrbCQRa9c
- QR7STEoeXqgD3IIKInzixjowdFxc8spgbnIoaP2WGg==
-X-Google-Smtp-Source: ADFU+vu/WFfI8+Ea0qixkispTE8M2IBdFmk3vOeBjdzg2fpI2YVxUN1mkgIfe3Rc2yqBnwLXF8WOfkInLMcS8iGWzNs=
-X-Received: by 2002:a19:6502:: with SMTP id z2mr23818lfb.47.1585084677811;
- Tue, 24 Mar 2020 14:17:57 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CHQaOdNNxZcPioBS4lbMYM+C10vqbguaMyMsuR9H7ho=;
+ b=KZNPgzoD3utEENrUup1pT5o+hV3l/8eaNyGFCEupNd0w+pN8IByPY6uGcsZocb3VPI
+ 1E7FUxcWdM8EduMFEaJEwGBkQEhfYt41MQ9c80HAu/nn557dK3REigj4R+QZm/v8Lc5i
+ hQumB1Av4jMm7XCslItXJr7/u/PuFIdcTdVpVmFcjrzGxQVifQsOOySN79G5jfKalaet
+ dcOV9BjWnRKqLWgprHG7RKyXEe93x5q4TeQb2DwIkWh6dx4ZIiuTOXsq1YAbyEExJG7B
+ 4MXC4TCACVPT63YWXAaC0Lp+TlPnb7cnNzigzTxZ9xAzjIkvLv1/xNbtOmmKu7UJDs21
+ ZBqA==
+X-Gm-Message-State: ANhLgQ0MkU2sn+gOD5Zq19LBDxnZWTkAdRhNbqW7nAWZX51yld5Nfpnm
+ jTFdZBI5frHxzJqurOkhMrZFAw==
+X-Google-Smtp-Source: ADFU+vunHkqKfVy00B6Ds2hN4VpGytkgjFm1UoblXDN+TwxM8XmuOat8Q3K38gJJLXDjwxwCXIVkEw==
+X-Received: by 2002:a1c:5419:: with SMTP id i25mr7764694wmb.89.1585084865736; 
+ Tue, 24 Mar 2020 14:21:05 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id k126sm6139942wme.4.2020.03.24.14.21.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Mar 2020 14:21:05 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] hw/net/allwinner-sun8i-emac.c: Fix REG_ADDR_HIGH/LOW reads
+Date: Tue, 24 Mar 2020 21:21:03 +0000
+Message-Id: <20200324212103.7616-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20200317113153.7945-1-linus.walleij@linaro.org>
- <CAFEAcA9mXE+gPnvM6HZ-w0+BhbpeuH=osFH-9NUzCLv=w-c7HQ@mail.gmail.com>
- <CACRpkdZtLNUwiZEMiJEoB0ojOBckyGcZeyFkR6MC69qv-ry9EA@mail.gmail.com>
- <CAFEAcA-gdwi=KSW6LqVdEJWSo9VEL5abYQs9LoHd4mKE_-h=Aw@mail.gmail.com>
- <CACRpkdYuZgZUznVxt1AHCSJa_GAXy8N0SduE5OrjDnE1s_L7Zg@mail.gmail.com>
- <20200324023431.GD53396@mit.edu>
- <CAFEAcA_6RY1XFVNJCo5=tTkv2GQpXZRqh_Zz4dYadq-8MJZgTQ@mail.gmail.com>
- <20200324184754.GG53396@mit.edu>
-In-Reply-To: <20200324184754.GG53396@mit.edu>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 24 Mar 2020 22:17:46 +0100
-Message-ID: <CACRpkdapsgkNbNNGz12tBQKh8GKgcUuwgLywM7CMghr94C-Fsg@mail.gmail.com>
-Subject: Re: [PATCH] ext4: Give 32bit personalities 32bit hashes
-To: "Theodore Y. Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::141
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,40 +91,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Suzuki K. Poulose" <suzuki.poulose@arm.com>,
- Linux API <linux-api@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- stable <stable@vger.kernel.org>, Florian Weimer <fw@deneb.enyo.de>,
- Andreas Dilger <adilger.kernel@dilger.ca>, Andy Lutomirski <luto@kernel.org>,
- linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- Ext4 Developers List <linux-ext4@vger.kernel.org>
+Cc: Beniamino Galvani <b.galvani@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 24, 2020 at 7:48 PM Theodore Y. Ts'o <tytso@mit.edu> wrote:
-> On Tue, Mar 24, 2020 at 09:29:58AM +0000, Peter Maydell wrote:
-> >
-> > On the contrary, that would be a much better interface for QEMU.
-> > We always know when we're doing an open-syscall on behalf
-> > of the guest, and it would be trivial to make the fcntl() call then.
-> > That would ensure that we don't accidentally get the
-> > '32-bit semantics' on file descriptors QEMU opens for its own
-> > purposes, and wouldn't leave us open to the risk in future that
-> > setting the PER_LINUX32 flag for all of QEMU causes
-> > unexpected extra behaviour in future kernels that would be correct
-> > for the guest binary but wrong/broken for QEMU's own internals.
->
-> If using a flag set by fcntl is better for qemu, then by all means
-> let's go with that instead of using a personality flag/number.
->
-> Linus, do you have what you need to do a respin of the patch?
+Coverity points out (CID 1421926) that the read code for
+REG_ADDR_HIGH reads off the end of the buffer, because it does a
+32-bit read from byte 4 of a 6-byte buffer.
 
-Absolutely, I'm a bit occupied this week but I will try to get to it
-early next week!
+The code also has an endianness issue for both REG_ADDR_HIGH and
+REG_ADDR_LOW, because it will do the wrong thing on a big-endian
+host.
 
-Thanks a lot for the directions here, it's highly valuable.
+Rewrite the read code to use ldl_le_p() and lduw_le_p() to fix this;
+the write code is not incorrect, but for consistency we make it use
+stl_le_p() and stw_le_p().
 
-Yours,
-Linus Walleij
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/net/allwinner-sun8i-emac.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/hw/net/allwinner-sun8i-emac.c b/hw/net/allwinner-sun8i-emac.c
+index 3fc5e346401..fc67a1be70a 100644
+--- a/hw/net/allwinner-sun8i-emac.c
++++ b/hw/net/allwinner-sun8i-emac.c
+@@ -611,10 +611,10 @@ static uint64_t allwinner_sun8i_emac_read(void *opaque, hwaddr offset,
+         value = s->mii_data;
+         break;
+     case REG_ADDR_HIGH:         /* MAC Address High */
+-        value = *(((uint32_t *) (s->conf.macaddr.a)) + 1);
++        value = lduw_le_p(s->conf.macaddr.a + 4);
+         break;
+     case REG_ADDR_LOW:          /* MAC Address Low */
+-        value = *(uint32_t *) (s->conf.macaddr.a);
++        value = ldl_le_p(s->conf.macaddr.a);
+         break;
+     case REG_TX_DMA_STA:        /* Transmit DMA Status */
+         break;
+@@ -728,14 +728,10 @@ static void allwinner_sun8i_emac_write(void *opaque, hwaddr offset,
+         s->mii_data = value;
+         break;
+     case REG_ADDR_HIGH:         /* MAC Address High */
+-        s->conf.macaddr.a[4] = (value & 0xff);
+-        s->conf.macaddr.a[5] = (value & 0xff00) >> 8;
++        stw_le_p(s->conf.macaddr.a + 4, value);
+         break;
+     case REG_ADDR_LOW:          /* MAC Address Low */
+-        s->conf.macaddr.a[0] = (value & 0xff);
+-        s->conf.macaddr.a[1] = (value & 0xff00) >> 8;
+-        s->conf.macaddr.a[2] = (value & 0xff0000) >> 16;
+-        s->conf.macaddr.a[3] = (value & 0xff000000) >> 24;
++        stl_le_p(s->conf.macaddr.a, value);
+         break;
+     case REG_TX_DMA_STA:        /* Transmit DMA Status */
+     case REG_TX_CUR_DESC:       /* Transmit Current Descriptor */
+-- 
+2.20.1
+
 
