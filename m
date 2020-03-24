@@ -2,60 +2,61 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB32C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3399C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:04:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7716A2076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7716A2076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+	by mail.kernel.org (Postfix) with ESMTPS id C890C20775
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:04:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C890C20775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGkA3-00036s-Fk
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:04:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53302)
+	id 1jGkAg-0004NT-SF
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:04:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1jGk3K-00005r-TE
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:13 -0400
+ (envelope-from <dietmar@proxmox.com>) id 1jGk88-0008SQ-Gk
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:02:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert@linux-m68k.org>) id 1jGk3J-0006GK-1n
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:10 -0400
-Received: from albert.telenet-ops.be ([2a02:1800:110:4::f00:1a]:55208)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
- id 1jGk3I-0006E2-JD
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:57:08 -0400
-Received: from ramsan ([84.195.182.253]) by albert.telenet-ops.be with bizsmtp
- id JDwu2200M5USYZQ06Dwua8; Tue, 24 Mar 2020 14:57:07 +0100
-Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jGk34-0006Oi-JB; Tue, 24 Mar 2020 14:56:54 +0100
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jGk34-0001kb-Gc; Tue, 24 Mar 2020 14:56:54 +0100
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- Eugeniu Rosca <erosca@de.adit-jv.com>
-Subject: [PATCH v6 3/8] mfd: sm501: Use GPIO_LOOKUP_IDX() helper macro
-Date: Tue, 24 Mar 2020 14:56:48 +0100
-Message-Id: <20200324135653.6676-3-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200324135653.6676-1-geert+renesas@glider.be>
-References: <20200324135328.5796-1-geert+renesas@glider.be>
- <20200324135653.6676-1-geert+renesas@glider.be>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:1800:110:4::f00:1a
+ (envelope-from <dietmar@proxmox.com>) id 1jGk87-00050j-82
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:02:08 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:34568)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dietmar@proxmox.com>) id 1jGk87-0004xZ-11
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:02:07 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 3DF9540D02;
+ Tue, 24 Mar 2020 15:02:05 +0100 (CET)
+Date: Tue, 24 Mar 2020 15:02:03 +0100 (CET)
+From: Dietmar Maurer <dietmar@proxmox.com>
+To: Max Reitz <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <1839684450.63.1585058523789@webmail.proxmox.com>
+In-Reply-To: <32c10c76-1c9f-3a6a-4410-09eebad0f6f3@redhat.com>
+References: <2007060575.48.1585048408879@webmail.proxmox.com>
+ <1512602350.59.1585056617632@webmail.proxmox.com>
+ <1806708761.60.1585056799652@webmail.proxmox.com>
+ <32c10c76-1c9f-3a6a-4410-09eebad0f6f3@redhat.com>
+Subject: Re: backup transaction with io-thread core dumps
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Priority: 3
+Importance: Normal
+X-Mailer: Open-Xchange Mailer v7.10.2-Rev22
+X-Originating-Client: open-xchange-appsuite
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.186.127.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,76 +68,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Geert Uytterhoeven <geert+renesas@glider.be>, linux-doc@vger.kernel.org,
- Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- Rob Herring <robh+dt@kernel.org>, Alexander Graf <graf@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Phil Reid <preid@electromag.com.au>,
- Lee Jones <lee.jones@linaro.org>
+Reply-To: Dietmar Maurer <dietmar@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-i801_add_mux() fills in the GPIO lookup table by manually populating an
-array of gpiod_lookup structures.  Use the existing GPIO_LOOKUP_IDX()
-helper macro instead, to relax a dependency on the gpiod_lookup
-structure's member names.
+> I assume this is with master and has popped up only recently?
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Lee Jones <lee.jones@linaro.org>
----
-While this patch is a dependency for "[PATCH v6 4/8] gpiolib: Add
-support for GPIO lookup by line name", it can be applied independently.
-But an Acked-by would be nice, too.
+sure
+=20
+> Maybe it has something to do with the recent mutex patches by Stefan, so
+> I=E2=80=99m Cc-ing him.
 
-Cover letter and full series at
-https://lore.kernel.org/r/20200324135328.5796-1-geert+renesas@glider.be/
-
-v6:
-  - New.
----
- drivers/mfd/sm501.c | 24 ++++++++----------------
- 1 file changed, 8 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/mfd/sm501.c b/drivers/mfd/sm501.c
-index e49787e6bb93e5c8..ccd62b963952814e 100644
---- a/drivers/mfd/sm501.c
-+++ b/drivers/mfd/sm501.c
-@@ -1145,22 +1145,14 @@ static int sm501_register_gpio_i2c_instance(struct sm501_devdata *sm,
- 		return -ENOMEM;
- 
- 	lookup->dev_id = "i2c-gpio";
--	if (iic->pin_sda < 32)
--		lookup->table[0].chip_label = "SM501-LOW";
--	else
--		lookup->table[0].chip_label = "SM501-HIGH";
--	lookup->table[0].chip_hwnum = iic->pin_sda % 32;
--	lookup->table[0].con_id = NULL;
--	lookup->table[0].idx = 0;
--	lookup->table[0].flags = GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN;
--	if (iic->pin_scl < 32)
--		lookup->table[1].chip_label = "SM501-LOW";
--	else
--		lookup->table[1].chip_label = "SM501-HIGH";
--	lookup->table[1].chip_hwnum = iic->pin_scl % 32;
--	lookup->table[1].con_id = NULL;
--	lookup->table[1].idx = 1;
--	lookup->table[1].flags = GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN;
-+	lookup->table[0] = (struct gpiod_lookup)
-+		GPIO_LOOKUP_IDX(iic->pin_sda < 32 ? "SM501-LOW" : "SM501-HIGH",
-+				iic->pin_sda % 32, NULL, 0,
-+				GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN);
-+	lookup->table[1] = (struct gpiod_lookup)
-+		GPIO_LOOKUP_IDX(iic->pin_scl < 32 ? "SM501-LOW" : "SM501-HIGH",
-+				iic->pin_scl % 32, NULL, 1,
-+				GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN);
- 	gpiod_add_lookup_table(lookup);
- 
- 	icd = dev_get_platdata(&pdev->dev);
--- 
-2.17.1
+Thanks.
 
 
