@@ -2,75 +2,66 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF59C4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B19C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:52:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1FAA20870
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:42:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1FAA20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40B3E20786
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:52:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B3E20786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGh0V-000790-5h
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 06:42:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55892)
+	id 1jGhAk-0002RW-Et
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 06:52:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57227)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jGgzs-0006ka-2q
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:41:25 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jGh9q-0001pB-3q
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:51:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jGgzq-0002sl-OY
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:41:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49906)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jGgzq-0002sD-Ix
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:41:22 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jGgzo-0000GC-W2
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 10:41:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F0A282E804C
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 10:41:20 +0000 (UTC)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jGh9o-0003PE-Fw
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:51:41 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:32826)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jGh9o-00039c-30; Tue, 24 Mar 2020 06:51:40 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0747145|-1; CH=green; DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.0111356-0.000973425-0.987891;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01l07381; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.H4Wkce9_1585047088; 
+Received: from 172.16.31.150(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H4Wkce9_1585047088)
+ by smtp.aliyun-inc.com(10.147.42.16); Tue, 24 Mar 2020 18:51:29 +0800
+Subject: Re: [PATCH v5 57/60] target/riscv: vector slide instructions
+To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-58-zhiwei_liu@c-sky.com>
+ <28063df7-bf38-d136-2d32-39651692c4c6@linaro.org>
+ <88b87d58-5387-9d0d-b1a0-5705171f2e83@c-sky.com>
+ <76b6c079-15b2-08f1-f8e2-570efb6cfae5@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <a99c100f-4b32-810a-97d7-ee54f5f65cda@c-sky.com>
+Date: Tue, 24 Mar 2020 18:51:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Mar 2020 10:35:08 -0000
-From: Bin Meng <bmeng.cn@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bmeng-cn rtos.pharos
-X-Launchpad-Bug-Reporter: RTOS Pharos (rtos.pharos)
-X-Launchpad-Bug-Modifier: Bin Meng (bmeng-cn)
-References: <155004342499.19242.14077661245921319117.malonedeb@soybean.canonical.com>
- <158503767628.19604.846014029546093014.malone@wampee.canonical.com>
-Message-Id:
- <CAEUhbmV8YECctHEnLACq_aD9JwqLpMixPAvC=UGFNwJKrb9_tA@mail.gmail.com>
-Subject: Re: [Bug 1815721] Re: RISC-V PLIC enable interrupt for multicore
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5012db36eeba85f520438547faf53e27b295c030
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <76b6c079-15b2-08f1-f8e2-570efb6cfae5@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,87 +70,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1815721 <1815721@bugs.launchpad.net>
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200324103508.rqGDb4d0qRSF_MWXWZ5BsULaLjl83UuPzW9B5usEh1Q@z>
 
-On Tue, Mar 24, 2020 at 4:20 PM RTOS Pharos <1815721@bugs.launchpad.net> wr=
-ote:
+
+
+On 2020/3/17 1:42, Richard Henderson wrote:
+> On 3/16/20 1:04 AM, LIU Zhiwei wrote:
+>>> As a preference, I think you can do away with this helper.
+>>> Simply use the slideup helper with argument 1, and then
+>>> afterwards store the integer register into element 0.  You should be able to
+>>> re-use code from vmv.s.x for that.
+>> When I try it, I find it is some difficult, because  vmv.s.x will clean
+>> the elements (0 < index < VLEN/SEW).
+> Well, two things about that:
 >
-> Hi,
+> (1) The 0.8 version of vmv.s.x does *not* zero the other elements, so we'll
+> want to be prepared for that.
 >
-> After some debugging (and luck), the problem (at least in the Virt
-> board) was that the PLIC code inside QEMU addresses the core x 2 instead
-> of just the core (core=3Dhart). That is why it worked for core 0 (0x2 =3D=
- 0)
-> but for core 1 it has to address the PLIC memory area for core 2.
+> (2) We have 8 insns that, in the end come down to a direct element access,
+> possibly with some other processing.
 >
-> For example, the interrupt enable address for core 1 starts at offset
-> 0x002080 (see https://github.com/riscv/riscv-plic-spec/blob/master
-> /riscv-plic.adoc) but we actually have to change the enable bit for core
-> 2 (at 0x002100) to make to work for core 1.
-
-
-https://github.com/riscv/riscv-plic-spec/blob/master/riscv-plic.adoc says:
-
-"base + 0x002080: Enable bits for sources 0-31 on context 1"
-
-This is context 1, not core 1.
-
-It looks to me you were running an image built for SiFive FU540.
-Please test your image against "sifive_u" machine instead.
-
+> So we'll want basic helper functions that can locate an element by immediate
+> offset and by variable offset:
 >
-> The same is true for the priority threshold and claim complete registers
-> (we need to multiply the core by 2)
+> /* Compute the offset of vreg[idx] relative to cpu_env.
+>     The index must be in range of VLMAX. */
+> int vec_element_ofsi(int vreg, int idx, int sew);
 >
-> Either the documentation at https://github.com/riscv/riscv-plic-
-> spec/blob/master/riscv-plic.adoc does not have the correct memory
-> addresses for qemu virt board, or qemu appears to be wrong.
+> /* Compute a pointer to vreg[idx].
+>     If need_bound is true, mask idx into VLMAX,
+>     Otherwise we know a-priori that idx is already in bounds. */
+> void vec_element_ofsx(DisasContext *s, TCGv_ptr base,
+>                        TCGv idx, int sew, bool need_bound);
 >
-> --
+> /* Load idx >= VLMAX ? 0 : vreg[idx] */
+> void vec_element_loadi(DisasContext *s, TCGv_i64 val,
+>                         int vreg, int idx, int sew);
+> void vec_element_loadx(DisasContext *s, TCGv_i64 val,
+>                         int vreg, TCGv idx, int sew);
+>
+> /* Store vreg[imm] = val.
+>     The index must be in range of VLMAX.  */
+> void vec_element_storei(DisasContext *s, int vreg, int imm,
+>                          TCGv_i64 val);
+> void vec_element_storex(DisasContext *s, int vreg,
+>                          TCGv idx, TCGv_i64 val);
+>
+> (3) It would be handy to have TCGv cpu_vl.
+Do you mean I should define cpu_vl as a global TCG varible like cpu_pc?
+So that I can check vl==0 in translation time.
 
-Regards,
-Bin
+Or just a temp variable?
+>
+> Then:
+>
+> vext.x.v:
+>      If rs1 == 0,
+>          Use vec_element_loadi(s, x[rd], vs2, 0, s->sew).
+>      else
+>          Use vec_element_loadx(s, x[rd], vs2, x[rs1], true).
+>
+> vmv.s.x:
+>      over = gen_new_label();
+>      tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+>      For 0.7.1:
+>          Use tcg_gen_dup8i to zero all VLMAX elements of vd.
+>          If rs1 == 0, goto done.
+>      Use vec_element_storei(s, vs2, 0, x[rs1]).
+>   done:
+>      gen_set_label(over);
+>
+> vfmv.f.s:
+>      Use vec_element_loadi(x, f[rd], vs2, 0).
+>      NaN-box f[rd] as necessary for SEW.
+>
+> vfmv.s.f:
+>      tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+>      For 0.7.1:
+>          Use tcg_gen_dup8i to zero all VLMAX elements of vd.
+>      Let tmp = f[rs1], nan-boxed as necessary for SEW.
+>      Use vec_element_storei(s, vs2, 0, tmp).
+>      gen_set_label(over);
+>
+> vslide1up.vx:
+>      Ho hum, I forgot about masking.  Some options:
+>      (1) Call a helper just as you did in your original patch.
+>      (2) Call a helper only for !vm, for vm as below.
 
--- =
+Sorry, I don't get it why I need a helper for !vm.
+I think I can  call vslideup w/1 whether !vm or vm, then a store to vd[0].
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815721
+Zhiwei
+>      (3) Call vslideup w/1.
+>          tcg_gen_brcondi(TCG_COND_EQ, cpu_vl, 0, over);
+>          If !vm,
+>              // inline test for v0[0]
+>              vec_element_loadi(s, tmp, 0, 0, MO_8);
+>              tcg_gen_andi_i64(tmp, tmp, 1);
+>              tcg_gen_brcondi(TCG_COND_EQ, tmp, 0, over);
+>          Use vec_element_store(s, vd, 0, x[rs1]).
+>          gen_set_label(over);
+>
+> vslide1down.vx:
+>      For !vm, this is complicated enough for a helper.
+>      If using option 3 for vslide1up, then the store becomes:
+>      tcg_gen_subi_tl(tmp, cpu_vl, 1);
+>      vec_element_storex(s, base, tmp, x[rs1]);
+>
+> vrgather.vx:
+>      If !vm or !vl_eq_vlmax, use helper.
+>      vec_element_loadx(s, tmp, vs2, x[rs1]);
+>      Use tcg_gen_gvec_dup_i64 to store to tmp to vd.
+>
+> vrgather.vi:
+>      If !vm or !vl_eq_vlmax, use helper.
+>      If imm >= vlmax,
+>          Use tcg_gen_dup8i to zero vd;
+>      else,
+>          ofs = vec_element_ofsi(s, vs2, imm, s->sew);
+>          tcg_gen_gvec_dup_mem(sew, vreg_ofs(vd),
+>                               ofs, vlmax, vlmax);
+>
+>
+> r~
 
-Title:
-  RISC-V PLIC enable interrupt for multicore
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello all,
-
-  There is a bug in Qemu related to the enabling of external interrupts
-  for multicores (Virt machine).
-
-  After correcting Qemu as described in #1815078
-  (https://bugs.launchpad.net/qemu/+bug/1815078), when we try to enable
-  interrupts for core 1 at address 0x0C00_2080 we don't seem to be able
-  to trigger an external interrupt  (e.g. UART0).
-
-  This works perfectly for core 0, but fore core 1 it does not work at
-  all. I assume that given bug #1815078 does not enable any external
-  interrupt then this feature has not been tested. I tried to look at
-  the qemu source code but with no luck so far.
-
-  I guess the problem is related to function parse_hart_config (in
-  sfive_plic.c) that initializes incorrectly the
-  plic->addr_config[addrid].hartid, which is later on read in
-  sifive_plic_update. But this is a guess.
-
-  Best regards,
-  Pharos team
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815721/+subscriptions
 
