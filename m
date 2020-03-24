@@ -2,67 +2,79 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68165C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA30C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:05:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E3C9206F6
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:03:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E3C9206F6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 32D52206F6
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 17:05:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBLoeyU1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32D52206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGmxy-0001oZ-FQ
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:03:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53292)
+	id 1jGmzl-0003Du-Ar
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 13:05:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53533)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jGmwy-00011u-3Q
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:02:49 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jGmym-0002NU-8a
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jGmww-0006l7-AR
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:02:47 -0400
-Resent-Date: Tue, 24 Mar 2020 13:02:47 -0400
-Resent-Message-Id: <E1jGmww-0006l7-AR@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21174)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jGmww-0006ki-4O; Tue, 24 Mar 2020 13:02:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1585069356; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=i3VmBAFngf1ir8EkYQ8OBLiCM1ey4p5AZ0Wa7UfqtqrdfTjzQE0wh9qx1+6zSWpjC0iD1jTYnbz9dVBLJsgQ2Gw9pYn4AhQqRdQ5xQGGF11so2SmqVuPkeBLaxvxbW9+agyQXKa2RGBufMo6hcWRQ55CIklJSVoPEzJ149LUDI8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1585069356;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=qUV6xrOneM72vQx37qIipXuoJ2RuQdvK/gwO7FzxCX4=; 
- b=UTcI7cYwJwKXOzW3tBWALKdQNH4AoFkMkng3q4YBZb9xwEEMfxnlELtwd3X3oinS5BpxK1HbDcwyavyK+q195Lm5BITNX7zkFiKizI6ZFSDk+ZX3Kmujkjg91WhM7VPDXtUCg3BPFUs4OyT3QL90pScliT0nbozpnnenexD+pXs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1585069350151152.34744957957753;
- Tue, 24 Mar 2020 10:02:30 -0700 (PDT)
-In-Reply-To: <20200324150847.10476-1-frankja@linux.ibm.com>
-Subject: Re: [PATCH 0/8] pc-bios: s390x: Cleanup part 1
-Message-ID: <158506934886.14921.18258673565346427437@39012742ff91>
+ (envelope-from <cohuck@redhat.com>) id 1jGmyl-0007NO-0B
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:04:40 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:21973)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jGmyk-0007Mo-S3
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 13:04:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585069477;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vIPLDkB9laSjEZg127wtUKAaW1CNgYEqjyQrqydKWgE=;
+ b=UBLoeyU1whg94Y6Jlk8xJ2rkNCabf3TgPnf6+4C+puZqMMfL8WIciSJWdlU5/EHXopoNzo
+ y3Zx1UlrBiTwVWdxI1HHWFW9geQSIrkJMwn9Kd4WSSigJX3FHvLSFq/mcEOnu0HFRzoafz
+ WOAQSjAF26i6QslO7kc5cF3S+1DG2As=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38-STW_N6h7M1ypyUURUPo8SA-1; Tue, 24 Mar 2020 13:04:36 -0400
+X-MC-Unique: STW_N6h7M1ypyUURUPo8SA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89342DBBC;
+ Tue, 24 Mar 2020 17:04:34 +0000 (UTC)
+Received: from gondolin (ovpn-113-109.ams2.redhat.com [10.36.113.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 259ECBBBE5;
+ Tue, 24 Mar 2020 17:04:32 +0000 (UTC)
+Date: Tue, 24 Mar 2020 18:04:30 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eric Farman <farman@linux.ibm.com>
+Subject: Re: [RFC PATCH v2 1/7] vfio-ccw: Return IOINST_CC_NOT_OPERATIONAL
+ for EIO
+Message-ID: <20200324180430.3597ca94.cohuck@redhat.com>
+In-Reply-To: <20200206214509.16434-2-farman@linux.ibm.com>
+References: <20200206214509.16434-1-farman@linux.ibm.com>
+ <20200206214509.16434-2-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: frankja@linux.ibm.com
-Date: Tue, 24 Mar 2020 10:02:30 -0700 (PDT)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,68 +86,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- qemu-devel@nongnu.org, david@redhat.com
+Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ qemu-s390x@nongnu.org, Jared Rossi <jrossi@linux.ibm.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyNDE1MDg0Ny4xMDQ3
-Ni0xLWZyYW5ramFAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIDAvOF0gcGMtYmlvczogczM5MHg6IENsZWFu
-dXAgcGFydCAxCk1lc3NhZ2UtaWQ6IDIwMjAwMzI0MTUwODQ3LjEwNDc2LTEtZnJhbmtqYUBsaW51
-eC5pYm0uY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjMxZjVmYiBwYy1iaW9zOiBzMzkw
-eDogTWFrZSB1MzIgcHRyIGNoZWNrIGV4cGxpY2l0CjMxYTc3YTIgcGMtYmlvczogczM5MHg6IFJl
-cGxhY2UgMHgwMCB3aXRoIDB4MCBvciAwCmU3YzMzMTQgcGMtYmlvczogczM5MHg6IFVzZSBlYmNk
-aWMyYXNjaWkgdGFibGUKNjdiZjZjYyBwYy1iaW9zOiBzMzkweDogTW92ZSBwYW5pYygpIGludG8g
-aGVhZGVyIGFuZCBhZGQgaW5maW5pdGUgbG9vcAowNDMwZDQ3IHBjLWJpb3M6IHMzOTB4OiBVc2Ug
-UFNXIG1hc2tzIHdoZXJlIHBvc3NpYmxlCjVkYzVmNTggcGMtYmlvczogczM5MHg6IFJlbmFtZSBh
-bmQgdXNlIFBTV19NQVNLX1pNT0RFIGNvbnN0YW50CjQ5ZGE4YWQgcGMtYmlvczogczM5MHg6IEdl
-dCByaWQgb2YgbWFnaWMgb2Zmc2V0cyBpbnRvIHRoZSBsb3djb3JlCjYxYThmZjEgcGMtYmlvczog
-czM5MHg6IENvbnNvbGlkYXRlIHRpbWluZyBmdW5jdGlvbnMgaW50byB0aW1lLmgKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CjEvOCBDaGVja2luZyBjb21taXQgNjFhOGZmMTQ5NWQ0IChwYy1iaW9zOiBz
-MzkweDogQ29uc29saWRhdGUgdGltaW5nIGZ1bmN0aW9ucyBpbnRvIHRpbWUuaCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMTAyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgMTY3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvOCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoyLzggQ2hlY2tpbmcgY29tbWl0IDQ5ZGE4YWQwMzdlYSAocGMtYmlvczogczM5MHg6
-IEdldCByaWQgb2YgbWFnaWMgb2Zmc2V0cyBpbnRvIHRoZSBsb3djb3JlKQpFUlJPUjogc3BhY2Vz
-IHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4VikKIzI5OiBGSUxFOiBwYy1iaW9zL3Mz
-OTAtY2N3L2Npby5oOjEyNzoKKyAgICAgICAgICAgIF9fdTE2IGNzc2lkOjg7CiAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzMwOiBGSUxFOiBwYy1iaW9zL3MzOTAtY2N3L2Npby5oOjEyODoKK15JICAgIF9fdTE2OjQ7JAoK
-RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMzMTogRklM
-RTogcGMtYmlvcy9zMzkwLWNjdy9jaW8uaDoxMjk6CisgICAgICAgICAgICBfX3UxNiBtOjE7CiAg
-ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
-OicgKGN0eDpWeFYpCiMzMjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9jaW8uaDoxMzA6CisgICAg
-ICAgICAgICBfX3UxNiBzc2lkOjI7CiAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
-YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMzMzogRklMRTogcGMtYmlv
-cy9zMzkwLWNjdy9jaW8uaDoxMzE6CisgICAgICAgICAgICBfX3UxNiBvbmU6MTsKICAgICAgICAg
-ICAgICAgICAgICAgIF4KCnRvdGFsOiA1IGVycm9ycywgMCB3YXJuaW5ncywgMzcgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggMi84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzggQ2hlY2tpbmcg
-Y29tbWl0IDVkYzVmNTg0MDE0OSAocGMtYmlvczogczM5MHg6IFJlbmFtZSBhbmQgdXNlIFBTV19N
-QVNLX1pNT0RFIGNvbnN0YW50KQo0LzggQ2hlY2tpbmcgY29tbWl0IDA0MzBkNDdkNTEyNSAocGMt
-YmlvczogczM5MHg6IFVzZSBQU1cgbWFza3Mgd2hlcmUgcG9zc2libGUpCjUvOCBDaGVja2luZyBj
-b21taXQgNjdiZjZjYzhjOTAxIChwYy1iaW9zOiBzMzkweDogTW92ZSBwYW5pYygpIGludG8gaGVh
-ZGVyIGFuZCBhZGQgaW5maW5pdGUgbG9vcCkKNi84IENoZWNraW5nIGNvbW1pdCBlN2MzMzE0MmE1
-NTAgKHBjLWJpb3M6IHMzOTB4OiBVc2UgZWJjZGljMmFzY2lpIHRhYmxlKQo3LzggQ2hlY2tpbmcg
-Y29tbWl0IDMxYTc3YTI4YjBmMyAocGMtYmlvczogczM5MHg6IFJlcGxhY2UgMHgwMCB3aXRoIDB4
-MCBvciAwKQo4LzggQ2hlY2tpbmcgY29tbWl0IDYzMWY1ZmIzNTQyNyAocGMtYmlvczogczM5MHg6
-IE1ha2UgdTMyIHB0ciBjaGVjayBleHBsaWNpdCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQK
-aHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMjQxNTA4NDcuMTA0NzYtMS1mcmFua2phQGxp
-bnV4LmlibS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Thu,  6 Feb 2020 22:45:03 +0100
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> From: Farhan Ali <alifm@linux.ibm.com>
+> 
+> EIO is returned by vfio-ccw mediated device when the backing
+> host subchannel is not operational anymore. So return cc=3
+> back to the guest, rather than returning a unit check.
+> This way the guest can take appropriate action such as
+> issue an 'stsch'.
+> 
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+> 
+> Notes:
+>     v1->v2: [EF]
+>      - Add s-o-b
+>      - [Seems the discussion on v1 centered on the return code
+>        set in the kernel, rather than anything that needs to
+>        change here, unless I've missed something.]
+
+I've stared at this and at the kernel code for some time again; and I'm
+not sure if "return -EIO == not operational" is even true. That said,
+I'm not sure a unit check is the right response, either. The only thing
+I'm sure about is that the kernel code needs some review of return
+codes and some documentation...
+
+> 
+>  hw/vfio/ccw.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 50cc2ec75c..19144ecfc7 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -114,6 +114,7 @@ again:
+>          return IOINST_CC_BUSY;
+>      case -ENODEV:
+>      case -EACCES:
+> +    case -EIO:
+>          return IOINST_CC_NOT_OPERATIONAL;
+>      case -EFAULT:
+>      default:
+
 
