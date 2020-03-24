@@ -2,100 +2,71 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E15C4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 07:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4CAC4332B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 07:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D3202076A
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 07:15:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOGD2a8K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D3202076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6809520735
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 07:34:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6809520735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGdm9-00042X-7G
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 03:15:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54645)
+	id 1jGe5O-0000Rd-Jm
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 03:34:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57671)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jGdlX-0003Xf-Fu
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 03:14:24 -0400
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jGe4c-0007rz-JV
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 03:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jGdlW-0003wA-2k
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 03:14:23 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:36709)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jGe4a-0004bZ-UX
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 03:34:06 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2079 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jGdlV-0003uF-Vr
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 03:14:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585034059;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Wz5kxioYiJxXtReqDV/jbjk589cDzk44WppcJVhUyIM=;
- b=FOGD2a8KheTOM7RxaIkLs3JK/3HwrN3rUdAQ2/uQm8/9LX+ZWCxtbCjJing+DdFr6lAfHd
- XJpYIIW1WMEAcEZjXF5zfQWyTE23mZgtWxPnNhjeVriTiau4wiB7xnJ0eJ4ohsXlmM6XQl
- Xv6y9dkAXAI7TCYzvj2nr85jXmoMyPE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-fXNvvHXBO9a9PTVaVwgQHA-1; Tue, 24 Mar 2020 03:14:15 -0400
-X-MC-Unique: fXNvvHXBO9a9PTVaVwgQHA-1
-Received: by mail-ed1-f72.google.com with SMTP id b7so14073407edz.9
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 00:14:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XY41nutp8rk2xlY3re0lENVVKZUUO+5VVrUHSgFeBbc=;
- b=sKP0msu5PLVEKe4Qqdzqm7ZaYFZ4AXlUnroSWBCTSFLYnPrIHXtsTh83/nFw+ufxWU
- Do4O3+iTydFVh+TC2cYyk+GOc6q9nCN2kwGU1nh8pwUNUPJqh2/o94adfVLkMfEaCdez
- M5u+jtDmvlXpcWF+4Po0hI+SBma7+szM71C3dwfwrLQlPN9tDibcQyWowvQpZgPRHpMD
- hphxw/XNQ0f6eNANSHxrfIks4oIEWcDWPBeGbEt+r4MPpwXqZSu5BhV72GSMOgD7bX9Z
- UHD+VIFf4kUTMeVLZFTkDmVFhmElfOl0NccwdB6cAxOQWBmVi395KB/7J2tg/ncOjcHZ
- a9Rw==
-X-Gm-Message-State: ANhLgQ0MwyRq2Dhcwfs8HBFlnKeIJPK/C6o/khtz0w73jiwsTD2XqCwm
- hqT3AUpYlkzRQX9POzPFHqq7kQ79zt0OTiNkpgV9BqWac3rzyfCfhWoi6G3qjt5Q8SN3LIpft0s
- 00g39I/xuxTFZSyM=
-X-Received: by 2002:a17:906:748f:: with SMTP id
- e15mr22158232ejl.319.1585034053968; 
- Tue, 24 Mar 2020 00:14:13 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvLZAaWAbjO+pLNqQ5+iGeF7mKa9+sWWxJxP0491PMV4Lgcwh+f9J3JPiQQTZa2+iq5izhVYg==
-X-Received: by 2002:a17:906:748f:: with SMTP id
- e15mr22158216ejl.319.1585034053721; 
- Tue, 24 Mar 2020 00:14:13 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id a32sm1198875edf.46.2020.03.24.00.14.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Mar 2020 00:14:12 -0700 (PDT)
-Subject: Re: Potential Null dereference
-To: Mansour Ahmadi <ManSoSec@gmail.com>, qemu-devel@nongnu.org,
- Qemu-block <qemu-block@nongnu.org>
-References: <CAGT9xrCJSy6yQ48p3hCRuwgV7t8vPS7eo+83_pOiPp0gDOfvvQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <336bbdf8-140a-e884-d5d1-0610a9b1c6a6@redhat.com>
-Date: Tue, 24 Mar 2020 08:14:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1jGe4U-0004Y0-5y; Tue, 24 Mar 2020 03:33:58 -0400
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 9AC82E6DE52D4E6F858D;
+ Tue, 24 Mar 2020 15:33:48 +0800 (CST)
+Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Tue, 24 Mar 2020 15:33:48 +0800
+Received: from DGGEMM511-MBX.china.huawei.com ([169.254.1.202]) by
+ dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0487.000;
+ Tue, 24 Mar 2020 15:33:47 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Laurent Vivier <laurent@vivier.eu>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: RE: [PATCH-for-5.0 v2 00/11] misc: Trivial static code analyzer fixes
+Thread-Topic: [PATCH-for-5.0 v2 00/11] misc: Trivial static code analyzer fixes
+Thread-Index: AQHV/48K2ZlJeIAEFEKXhkI1InUyf6hVun8AgAADyACAAALNgIABj56A
+Date: Tue, 24 Mar 2020 07:33:46 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B6BE8AD@dggemm511-mbx.china.huawei.com>
+References: <20200321144110.5010-1-philmd@redhat.com>
+ <1c711740-6166-c730-ef67-d07511add1e6@vivier.eu>
+ <262f8318-1590-1c48-f4de-a6482fdc3071@redhat.com>
+ <10431e44-880a-cbec-c35e-1d425064c40b@vivier.eu>
+In-Reply-To: <10431e44-880a-cbec-c35e-1d425064c40b@vivier.eu>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CAGT9xrCJSy6yQ48p3hCRuwgV7t8vPS7eo+83_pOiPp0gDOfvvQ@mail.gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 45.249.212.189
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,33 +78,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ =?utf-8?B?SGVydsOpIFBvdXNzaW5lYXU=?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
+ John Snow <jsnow@redhat.com>,
+ =?utf-8?B?Q8OpZHJpYyBMZSBHb2F0ZXI=?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/24/20 4:05 AM, Mansour Ahmadi wrote:
-> Hi,
->=20
-> Nullness of=C2=A0 needs to be checked here:
-> https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df7=
-6/block/commit.c#L221
->=20
-> pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),...
->=20
->=20
-> While it is done at 2 other locations:
-> https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df7=
-6/block/backup-top.c#L113
-> https://github.com/qemu/qemu/blob/c532b954d96f96d361ca31308f75f1b95bd4df7=
-6/block/mirror.c#L1477
->=20
-> if(bs->backing=3D=3D NULL) {return}
-
-Thanks for spotting this. Do you mind sending a patch?
-
->=20
-> Thanks,
-> Mansour
->=20
-
+Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogUWVtdS1kZXZlbCBbbWFpbHRvOnFl
+bXUtZGV2ZWwtDQo+Ym91bmNlcytrdWhuLmNoZW5xdW49aHVhd2VpLmNvbUBub25nbnUub3JnXSBP
+biBCZWhhbGYgT2YgTGF1cmVudCBWaXZpZXINCj5TZW50OiBNb25kYXksIE1hcmNoIDIzLCAyMDIw
+IDEwOjU2IFBNDQo+VG86IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNv
+bT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPkNjOiBGYW0gWmhlbmcgPGZhbUBldXBob24ubmV0
+PjsgUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPjsNCj5NaWNoYWVsIFMu
+IFRzaXJraW4gPG1zdEByZWRoYXQuY29tPjsgTWFyayBDYXZlLUF5bGFuZCA8bWFyay5jYXZlLQ0K
+PmF5bGFuZEBpbGFuZGUuY28udWs+OyBxZW11LWJsb2NrQG5vbmdudS5vcmc7IHFlbXUtdHJpdmlh
+bEBub25nbnUub3JnOw0KPk1hcmt1cyBBcm1icnVzdGVyIDxhcm1icnVAcmVkaGF0LmNvbT47IEhl
+cnbDqSBQb3Vzc2luZWF1DQo+PGhwb3Vzc2luQHJlYWN0b3Mub3JnPjsgSm9lbCBTdGFubGV5IDxq
+b2VsQGptcy5pZC5hdT47IE1pY2hhZWwgVG9rYXJldg0KPjxtanRAdGxzLm1zay5ydT47IEFsaXN0
+YWlyIEZyYW5jaXMgPGFsaXN0YWlyQGFsaXN0YWlyMjMubWU+OyBxZW11LQ0KPmFybUBub25nbnUu
+b3JnOyBDw6lkcmljIExlIEdvYXRlciA8Y2xnQGthb2Qub3JnPjsgSm9obiBTbm93DQo+PGpzbm93
+QHJlZGhhdC5jb20+OyBEYXZpZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT47
+IEtldmluIFdvbGYNCj48a3dvbGZAcmVkaGF0LmNvbT47IEFuZHJldyBKZWZmZXJ5IDxhbmRyZXdA
+YWouaWQuYXU+OyBNYXggUmVpdHoNCj48bXJlaXR6QHJlZGhhdC5jb20+OyBJZ29yIE1pdHN5YW5r
+byA8aS5taXRzeWFua29AZ21haWwuY29tPjsgcWVtdS0NCj5wcGNAbm9uZ251Lm9yZzsgUGFvbG8g
+Qm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj5TdWJqZWN0OiBSZTogW1BBVENILWZvci01
+LjAgdjIgMDAvMTFdIG1pc2M6IFRyaXZpYWwgc3RhdGljIGNvZGUgYW5hbHl6ZXIgZml4ZXMNCj4N
+Cj5MZSAyMy8wMy8yMDIwIMOgIDE1OjQ1LCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSBhIMOpY3Jp
+dMKgOg0KPj4gT24gMy8yMy8yMCAzOjMyIFBNLCBMYXVyZW50IFZpdmllciB3cm90ZToNCj4+PiBM
+ZSAyMS8wMy8yMDIwIMOgIDE1OjQwLCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSBhIMOpY3JpdMKg
+Og0KPj4+PiBGaXggdHJpdmlhbCB3YXJuaW5ncyByZXBvcnRlZCBieSB0aGUgQ2xhbmcgc3RhdGlj
+IGNvZGUgYW5hbHl6ZXIuDQo+Pj4+DQo+Pj4+IFNpbmNlIHYxOg0KPj4+PiAtIEFkZHJlc3NlZCBN
+YXJrdXMvWm9sdGFuL0FsZWtzYW5kYXIgcmV2aWV3IGNvbW1lbnRzDQo+Pj4+DQo+Pj4+IFBoaWxp
+cHBlIE1hdGhpZXUtRGF1ZMOpICgxMSk6DQo+Pj4+IMKgwqAgYmxvY2s6IEF2b2lkIGRlYWQgYXNz
+aWdubWVudA0KPj4+PiDCoMKgIGJsb2NrZGV2OiBSZW1vdmUgZGVhZCBhc3NpZ25tZW50DQo+Pj4+
+IMKgwqAgaHcvaTJjL3BtX3NtYnVzOiBSZW1vdmUgZGVhZCBhc3NpZ25tZW50DQo+Pj4+IMKgwqAg
+aHcvaW5wdXQvYWRiLWtiZDogUmVtb3ZlIGRlYWQgYXNzaWdubWVudA0KPj4+PiDCoMKgIGh3L2lk
+ZS9zaWkzMTEyOiBSZW1vdmUgZGVhZCBhc3NpZ25tZW50DQo+Pj4+IMKgwqAgaHcvaXNhL2k4MjM3
+ODogUmVtb3ZlIGRlYWQgYXNzaWdubWVudA0KPj4+PiDCoMKgIGh3L2dwaW8vYXNwZWVkX2dwaW86
+IFJlbW92ZSBkZWFkIGFzc2lnbm1lbnQNCj4+Pj4gwqDCoCBody90aW1lci9leHlub3M0MjEwX21j
+dDogUmVtb3ZlIGRlYWQgYXNzaWdubWVudHMNCg0KU2FtZSBhcyB0aGlzOg0KaHR0cHM6Ly9wYXRj
+aHdvcmsua2VybmVsLm9yZy9wYXRjaC8xMTQxNTUyNy8NCg0KPj4+PiDCoMKgIGh3L3RpbWVyL3N0
+bTMyZjJ4eF90aW1lcjogUmVtb3ZlIGRlYWQgYXNzaWdubWVudA0KPj4+PiDCoMKgIGh3L3RpbWVy
+L3B4YTJ4eF90aW1lcjogQWRkIGFzc2VydGlvbiB0byBzaWxlbnQgc3RhdGljIGFuYWx5emVyDQo+
+Pj4+IHdhcm5pbmcNCj4+Pj4gwqDCoCBody9zY3NpL2VzcC1wY2k6IFJlbW92ZSBkZWFkIGFzc2ln
+bm1lbnQNCg0KU2FtZSBhcyB0aGlzOg0KaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9wYXRj
+aC8xMTQxNTUyOS8NCg0KPj4+Pg0KPj4+PiDCoCBibG9jay5jwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgfCAyICstDQo+Pj4+IMKgIGJsb2NrZGV2LmPCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIgKy0NCj4+Pj4gwqAgaHcvZ3Bpby9hc3BlZWRfZ3Bpby5j
+wqDCoMKgwqDCoCB8IDIgKy0NCj4+Pj4gwqAgaHcvaTJjL3BtX3NtYnVzLmPCoMKgwqDCoMKgwqDC
+oMKgwqAgfCAxIC0NCj4+Pj4gwqAgaHcvaWRlL3NpaTMxMTIuY8KgwqDCoMKgwqDCoMKgwqDCoMKg
+IHwgNSArKystLQ0KPj4+PiDCoCBody9pbnB1dC9hZGIta2JkLmPCoMKgwqDCoMKgwqDCoMKgIHwg
+NiArLS0tLS0NCj4+Pj4gwqAgaHcvaXNhL2k4MjM3OC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8
+IDggKysrKy0tLS0NCj4+Pj4gwqAgaHcvc2NzaS9lc3AtcGNpLmPCoMKgwqDCoMKgwqDCoMKgwqAg
+fCAxIC0NCj4+Pj4gwqAgaHcvdGltZXIvZXh5bm9zNDIxMF9tY3QuY8KgIHwgMyAtLS0NCj4+Pj4g
+wqAgaHcvdGltZXIvcHhhMnh4X3RpbWVyLmPCoMKgwqAgfCAxICsNCj4+Pj4gwqAgaHcvdGltZXIv
+c3RtMzJmMnh4X3RpbWVyLmMgfCAxIC0NCj4+Pj4gwqAgMTEgZmlsZXMgY2hhbmdlZCwgMTIgaW5z
+ZXJ0aW9ucygrKSwgMjAgZGVsZXRpb25zKC0pDQo+Pj4+DQo+Pj4NCj4+PiBJIHRoaW5rIHlvdXIg
+c2VyaWVzIGNvdmVycyBjYXNlcyBhbHJlYWR5IGNvdmVyZWQgYnk6DQo+Pj4NCj4+PiBbUEFUQ0gg
+djMgMDAvMTJdIHJlZHVuZGFudCBjb2RlOiBGaXggd2FybmluZ3MgcmVwb3J0ZWQgYnkgQ2xhbmcN
+Cj4+PiBzdGF0aWMgY29kZSBhbmFseXplcg0KPj4+IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8y
+MDIwMDMwMjEzMDcxNS4yOTQ0MC0xLWt1aG4uY2gNCj4+DQo+PiBVbmZvcnR1bmF0ZWx5IFtmb3Ig
+bWUuLi5dIEkgZG9uJ3QgaGF2ZSB2MyBpbiBteSBJTkJPWC4uLiAqc2lnaCogVGhpcw0KPj4gd2Fz
+IDMgd2Vla3MgYWdvLiAqc2lnaCouDQo+Pg0KPj4gSSBjYW4gc2VlIHRoZSBzZXJpZXMgaW4gdGhl
+IGFyY2hpdmVzOg0KPj4gaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRl
+dmVsLzIwMjAtMDMvbXNnMDAyMTkuaHRtbA0KPj4gQnV0IEkgY2FuJ3QgZmluZCB0aGUgb3V0Y29t
+ZSwgd2FzIGl0IHF1ZXVlZCBpbiB0aGUgdHJpdmlhbCB0cmVlPw0KPj4gQW55IGlkZWEgd2hlbiB0
+aGlzIHdpbGwgYmUgbWVyZ2VkIGluIHRoZSBtYXN0ZXIgdHJlZT8NCj4NCj5Tb21lIHBhdGNoZXMg
+YXJlIGFscmVhZHkgbWVyZ2VkIHZpYSB0cml2aWFsICgxLCAyIChzaG91bGQgZ28gYnkgU0NTSQ0K
+PnF1ZXVlKSAzLCA1LCA2LCA3LCA5LCAxMSAoYnkgVVNCIHF1ZXVlKSwgMTIpLg0KPg0KPkJ1dCBv
+dGhlcnMgbmVlZGVkIFItYiB0YWdzIG9yIG5ldyB2ZXJzaW9uLiBJIGRpZG4ndCBjaGVjayB3aGlj
+aCBvZiB5b3VyIHBhdGNoZXMNCj5hcmUgYWxyZWFkeSBjb3ZlcmVkIGJ5IHRoaXMgc2VyaWVzLg0K
+Pg0KSGksIExhdXJlbnQgYW5kIFBoaWxpcHBlDQoNCiAgICAgIFllcywgdGhlcmUgYXJlIGN1cnJl
+bnRseSB0aHJlZSBwYXRjaGVzKCA044CBOCDjgIExMCkgdGhhdCBhcmUgbm90IG1lcmdlZC4gIA0K
+QW5kLCBvbmx5IHBhdGNoNCBhbmQgcGF0Y2gxMCAgaGF2ZSB0aGUgc2FtZSBwb2ludHMgYXMgdGhp
+cyBzZXJpZXMuDQoNCkkgc2hvdWxkIHVwZGF0ZSBpdCBhZ2FpbiBlYXJsaWVyLg0KDQpUaGFua3Mu
+DQo=
 
