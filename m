@@ -2,79 +2,94 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB443C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 06:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3339C2BAEE
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 06:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A17552073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 06:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A17552073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B1C0F20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 06:17:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArxcFgzP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C0F20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGcdQ-0005qM-Qo
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 02:01:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43353)
+	id 1jGcsu-0001Gd-SU
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 02:17:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jGccV-0005Je-Nu
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 02:01:00 -0400
+ (envelope-from <shannon.zhaosl@gmail.com>) id 1jGcs5-0000lV-1U
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 02:17:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jGccU-0005Rg-EL
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 02:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45008)
+ (envelope-from <shannon.zhaosl@gmail.com>) id 1jGcs4-0007Yl-4T
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 02:17:04 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36602)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jGccU-0005Qj-8t
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 02:00:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jGccR-0007bd-Gr
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 06:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 774F52E806B
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 06:00:55 +0000 (UTC)
+ (Exim 4.71) (envelope-from <shannon.zhaosl@gmail.com>)
+ id 1jGcs2-0007VT-0c; Tue, 24 Mar 2020 02:17:02 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k18so17484524oib.3;
+ Mon, 23 Mar 2020 23:17:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ntwu0iNk5SxCHAsBwOrQKWEafoKA9mB3OGWLeaqo74s=;
+ b=ArxcFgzP4sznUBhNmRg2O6o4lVtFtUn0x/Tz3s6yChWB05s3YDIlNrx1081JchJ+BA
+ qmGPzVlJ6YYVYdm11rXSyk4WMMUc8juLKSr2esDvElBzSnCq0YBAif2u8W2nF/G/un/r
+ WMk8DGR0QDF604XADy/37yhQ7c9hFIyKlg7lxhw5liis5BILbsbIu+F/rLAtRw1onoU9
+ GhzOJwNOZJXq8msaLHfPAyCONMyJ4QTivprAEDtIEEhTEeNVu7s1Omlom8r1kIjQJ2K9
+ odIG62vHCzo1VEPzI71ZwH8Qbn1nkzfwLdZoaSfUUF99Leb3Axl4ACUJovuLWL1TTDqF
+ Y6+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ntwu0iNk5SxCHAsBwOrQKWEafoKA9mB3OGWLeaqo74s=;
+ b=ZYBSzoXYO7Gs+3nX68xgiaZQV2GCHrG8iPKdsvTcQfm/Z5R5o12NEZfeAjLL4p3MLF
+ HLfYr9UtEoXoUSqotcbgGG3LjGgUl4cRa8Y8jCpR0YAKL5uTOR9gICIPeG0RVuOUT6SP
+ 7zUcGq6+APipEu/c3Y8+6dU/Pg1EJG6mC3T4N+zrJ42nbqmKoOethU9EBo3q1XpyIo19
+ qbrZsJTEKNl2hRj32/Whr+ck7CC0rANYE5Bq73f40DsiOw6lr4SFOgVL75dUgruukrz9
+ tTYpGbLcor9wP8XkQdPQuIAdWkIArPyxGbOYL/JGAl5o6uV0oCDoB12jMTnzbFz5VYJ1
+ kGiA==
+X-Gm-Message-State: ANhLgQ2hmpds4ERJNA+R4GwSIBWEICYQiD3ylzwNgF8f9w/tqh7ZLPx3
+ EGX1SoZKqJoPpxUdZI3B3PU=
+X-Google-Smtp-Source: ADFU+vseYXZS49aKQ9OW9Wpd4/BsiO/cnQIfMmooRrDJzBuPDknxv5PAP+PWIn/i3C0CTvO3UA2X3w==
+X-Received: by 2002:aca:3a83:: with SMTP id h125mr2236038oia.64.1585030620674; 
+ Mon, 23 Mar 2020 23:17:00 -0700 (PDT)
+Received: from [30.43.122.30] ([47.89.83.57])
+ by smtp.gmail.com with ESMTPSA id f3sm2815282oto.42.2020.03.23.23.16.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Mar 2020 23:16:59 -0700 (PDT)
+Subject: Re: [PATCH v3 07/10] hw/arm/virt: Add nvdimm hotplug support
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com,
+ imammedo@redhat.com
+References: <20200311172014.33052-1-shameerali.kolothum.thodi@huawei.com>
+ <20200311172014.33052-8-shameerali.kolothum.thodi@huawei.com>
+From: Shannon Zhao <shannon.zhaosl@gmail.com>
+Message-ID: <079d4ae2-4be1-feef-4729-d94c85431a6f@gmail.com>
+Date: Tue, 24 Mar 2020 14:16:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Mar 2020 05:55:19 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1866870@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Invalid; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=seabios; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h janitor paelzer
- tstrike34
-X-Launchpad-Bug-Reporter: tstrike (tstrike34)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
-Message-Id: <158502931920.19913.14687950347989356742.malone@chaenomeles.canonical.com>
-Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b34a448a354a2cd4b27621f5d0763ea37516ee0d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <20200311172014.33052-8-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,71 +98,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, mst@redhat.com,
+ david@redhat.com, linuxarm@huawei.com, xuwei5@hisilicon.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you Boris and Tstrike for the report and your help.
-It was a great bug to identify and fix before the release of 20.04, I appre=
-ciate you using (and hereby testing) it ahead of time!
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1866870
+On 2020/3/12 1:20, Shameer Kolothum wrote:
+> diff --git a/docs/specs/acpi_hw_reduced_hotplug.rst b/docs/specs/acpi_hw_reduced_hotplug.rst
+> index 911a98255b..e3abe975bf 100644
+> --- a/docs/specs/acpi_hw_reduced_hotplug.rst
+> +++ b/docs/specs/acpi_hw_reduced_hotplug.rst
+> @@ -63,6 +63,7 @@ GED IO interface (4 byte access)
+>       bits:
+>          0: Memory hotplug event
+>          1: System power down event
+> +       2: NVDIMM hotplug event
+>       2-31: Reserved
+should modify "2-31: Reserved"
 
-Title:
-  KVM Guest pauses after upgrade to Ubuntu 20.04
-
-Status in QEMU:
-  Invalid
-Status in qemu package in Ubuntu:
-  Invalid
-Status in seabios package in Ubuntu:
-  Fix Released
-
-Bug description:
-  Symptom:
-  Error unpausing domain: internal error: unable to execute QEMU command 'c=
-ont': Resetting the Virtual Machine is required
-
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
-e 66, in newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
- in resume
-      self._backend.resume()
-    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
-      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
-=3Dself)
-  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
-t': Resetting the Virtual Machine is required
-
-  =
-
-  ---
-
-  As outlined here:
-  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
-
-  After upgrade, all KVM guests are in a default pause state. Even after
-  forcing them off via virsh, and restarting them the guests are paused.
-
-  These Guests are not nested.
-
-  A lot of diganostic information are outlined in the previous bug
-  report link provided. The solution mentioned in previous report had
-  been allegedly integrated into the downstream updates.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
+Thanks,
+Shannon
 
