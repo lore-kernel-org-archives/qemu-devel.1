@@ -2,90 +2,84 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34467C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1411CC2BAEE
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F073D20774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:51:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D84C5208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:58:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x5hXsmn/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F073D20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdmYonjU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D84C5208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGlq1-0003o7-4F
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 11:51:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41221)
+	id 1jGlxA-0005r7-W0
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 11:58:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jGlpN-0003If-57
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:50:54 -0400
+ (envelope-from <eblake@redhat.com>) id 1jGlwX-0005Ke-Lt
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jGlpL-0007nb-T5
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:50:52 -0400
-Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:36008)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jGlpL-0007mw-IM
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:50:51 -0400
-Received: by mail-pj1-x102a.google.com with SMTP id nu11so1619639pjb.1
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 08:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=eSVbIg6x3AEUYOba3BSh/q8fW0W+tNUPLoN4le5KbfI=;
- b=x5hXsmn/uSL4L4BL7yV8j+di7L4pj9ae1zY/GaclSCU4XmrcGZp7jhvqs2McLfoREB
- iido2AdxKanYnfK7z9fEki8i736WGEJFNqu2iu53UM5Gg1Oj3byQXiCSgeOILHgscgNC
- KYsHcXr+O2qGN/VCBy4m0Ujrtrfo8GWbPNv1qZCrh0uqsFq3/Y7HizEUZF352v9Nht8c
- sZYWcYTFwO+UZd8wj0HVntHD3fpMubVUu2JjAfR3FjgF9jIZSaf5pDiu6LCYkNMmBGF2
- cpG8bFVA8eeNe6mo5fiTaJQjwSU2Qs89vFYkU2R8J4RiX+Q81MShJG3T2Z6lLDioVEDw
- ZTFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=eSVbIg6x3AEUYOba3BSh/q8fW0W+tNUPLoN4le5KbfI=;
- b=LdjYLiiy5D3xWP0EWE9ohxZ3Z18tLC+BZ1KMA29QBNrG8q3YR5a4EUIAZdu0dLIoXM
- QroZpR8pQ+Mk19dSQTAk2lstbcuftjbZZtWE8krXG2mumsrA48g28dMf9yunBD43B4Wn
- ca8NAS9G3PK4ICzN1X5VCnYCQH/s8cFDiW++ZllKRSZL4kRRrtqxi+Wbto2TivWAuuDL
- 69mwLmbfIkfDu1lKWsQ4mWzmPJUdGIH+h31HBmafGj6NdLx8v6zqRoNQx1VVXvZ4v0Cr
- h8/fjIQfK9uNVJv+WBrsFdwq9q0VX2Y7WMjjBmO5t+hIfRyRPW0lG4z38kT2xI/rxY8N
- 9Hmg==
-X-Gm-Message-State: ANhLgQ0VOvmwGq2OsIYGjez96u1BFsog1ZwalzzPPE10pPA5A2f3XZB6
- TnAM2DAumvr4Ugei90dLYXSAag==
-X-Google-Smtp-Source: ADFU+vtI36Bel1rCSXvPXfi6o1Ov9T00BN8RcBscHZR76Kok1ru4QciJmiHW+cS4mItHDBldAi5lIQ==
-X-Received: by 2002:a17:90a:ad45:: with SMTP id
- w5mr6147090pjv.179.1585065050032; 
- Tue, 24 Mar 2020 08:50:50 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id k5sm2496342pju.29.2020.03.24.08.50.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Mar 2020 08:50:49 -0700 (PDT)
-Subject: Re: [PATCH for-5.0 0/6] Several error use-after-free
+ (envelope-from <eblake@redhat.com>) id 1jGlwW-0003mR-E2
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:58:17 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54066)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jGlwW-0003m5-B8
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:58:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585065496;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Vtk9t42jBIiHh/rZG0tZmRWfFMMiUmLJpoQVV1w0g2E=;
+ b=MdmYonjUjurpjBf/yL/642vBB7jyVJu+SnaXPYMSes1ZZWWUvlBcX4UzJPsQJc+/u0m692
+ pOVdqTgcbg3o3mHfmJQ/2cxegcSc6/GkUnAczR2MISszijhCbH878Ms8LrwK+Avh5z/dcg
+ YQ9s86UK1EieScUkqFw1qrcwdnI7sns=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-1s6zPYVNNw2iQXXiFHqXQw-1; Tue, 24 Mar 2020 11:58:10 -0400
+X-MC-Unique: 1s6zPYVNNw2iQXXiFHqXQw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F292189D6C0;
+ Tue, 24 Mar 2020 15:58:08 +0000 (UTC)
+Received: from [10.3.113.103] (ovpn-113-103.phx2.redhat.com [10.3.113.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8863F60CD1;
+ Tue, 24 Mar 2020 15:57:59 +0000 (UTC)
+Subject: Re: [PATCH 2/6] block/mirror: fix use after free of local_err
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6aabd257-d9fd-7511-fd49-6e746a5fd43b@linaro.org>
-Date: Tue, 24 Mar 2020 08:50:47 -0700
+ <20200324153630.11882-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <36deb99f-e8a9-c0c0-3e99-f031016cfcc0@redhat.com>
+Date: Tue, 24 Mar 2020 10:57:58 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200324153630.11882-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200324153630.11882-3-vsementsov@virtuozzo.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::102a
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,23 +94,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
  quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com,
  marcandre.lureau@redhat.com, den@openvz.org, mreitz@redhat.com,
- jsnow@redhat.com, mdroth@linux.vnet.ibm.com
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/24/20 8:36 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Vladimir Sementsov-Ogievskiy (6):
->   scripts/coccinelle: add error-use-after-free.cocci
->   block/mirror: fix use after free of local_err
->   dump/win_dump: fix use after free of err
->   migration/colo: fix use after free of local_err
->   migration/ram: fix use after free of local_err
->   qga/commands-posix: fix use after free of local_err
+On 3/24/20 10:36 AM, Vladimir Sementsov-Ogievskiy wrote:
+> local_err is used again in mirror_exit_common() after
+> bdrv_set_backing_hd(), so we must zero it. Otherwise try to set
+> non-NULL local_err will crash.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/mirror.c | 1 +
+>   1 file changed, 1 insertion(+)
 
-Whole series:
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 447051dbc6..6203e5946e 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -678,6 +678,7 @@ static int mirror_exit_common(Job *job)
+>               bdrv_set_backing_hd(target_bs, backing, &local_err);
+>               if (local_err) {
+>                   error_report_err(local_err);
+> +                local_err = NULL;
+>                   ret = -EPERM;
+>               }
+>           }
+> 
 
-r~
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
