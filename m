@@ -1,60 +1,78 @@
 Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1271BC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5986AC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:35:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD68820658
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:34:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD68820658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 214FB206F6
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 13:35:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mngtThy7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214FB206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGjhD-0005kk-2w
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 09:34:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49937)
+	id 1jGjia-0008Q6-Af
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 09:35:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50813)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jGjgM-0004fw-30
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:33:27 -0400
+ (envelope-from <alia.mk345@gmail.com>) id 1jGgYp-0002s1-I2
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jGjgJ-0006Pe-Fy
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:33:26 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:22885)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>) id 1jGjgJ-0006N9-8P
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 09:33:23 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 0023142B03;
- Tue, 24 Mar 2020 14:33:22 +0100 (CET)
-Date: Tue, 24 Mar 2020 14:33:19 +0100 (CET)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
-Message-ID: <1806708761.60.1585056799652@webmail.proxmox.com>
-In-Reply-To: <1512602350.59.1585056617632@webmail.proxmox.com>
-References: <2007060575.48.1585048408879@webmail.proxmox.com>
- <1512602350.59.1585056617632@webmail.proxmox.com>
-Subject: Re: backup transaction with io-thread core dumps
+ (envelope-from <alia.mk345@gmail.com>) id 1jGgYn-0006J2-HG
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:13:27 -0400
+Received: from mail-ed1-x531.google.com ([2a00:1450:4864:20::531]:34683)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alia.mk345@gmail.com>)
+ id 1jGgYn-0006IJ-9G
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:13:25 -0400
+Received: by mail-ed1-x531.google.com with SMTP id i24so20074549eds.1
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 03:13:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=AmjP5FeI1Me5y1Lbr0uS3oNCTYzFG2rgjTcNdGd76os=;
+ b=mngtThy7TKdDEdOZD6gPiDN1pijZ78I864kuELlM3S5d83tiSgOUC32Tm74T177x0N
+ 723y4F73aSnfmg2inljVkF8DRaRTmF3EmfdlRIU0UxbDPvYgVjbeVV/7FMWYhs7/vfVL
+ JQgPSfoEVjah5dqS5gvezMDu2J96cp1KSumZLW4aOaQ8f0HGKfe9ncCeSFuIycq7rgEh
+ wdxkvbAYZNyI6QZwi4N2FwZiA3at0uRlCaAWHc2gdfLvpXagGgc92YeqOZKSu54eQEkn
+ 6Y0tf/72mqHZAMa47IUvw5bU+eRjtIQfkC31ffEtcVUdTcu7D8rHmGoKQk1VjI6MhOP/
+ GfIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=AmjP5FeI1Me5y1Lbr0uS3oNCTYzFG2rgjTcNdGd76os=;
+ b=lVKBk+BmyYrgEuBrk9Ebc/9e9boHtb/cZXPsBY2DrwY7ENHWALCcBPvE/g8WdmUJPO
+ MKc5Z1Etmzx3Wr4qFe8icF6tcWltuBruIaLfFmbB6sfh2gxZhuXRCgLAJXEtrGNKV6hs
+ Kju/SzbWSgmWdSVV19639W9nqV6ehobwug+vYtMuun5zYKHlQtNF/ztj37UsmQEJRnOb
+ UH73t83HEgH5N+oJTkWPMycbZqIb0nqN+QGXIzn9ZzdNInGVDiD+0kRJ4G7mgQU26gF9
+ w/3dRpKk3i+Sxw0Bwp6sdN3/ol2Z0JEduCYXbYbUnkzVqryB7o0N90bOFL9aLy2Y+s6b
+ ML/A==
+X-Gm-Message-State: ANhLgQ3SNjYm8RXkqCOpACPgAosEwBhrGYamh3EKjFO5SGarCF+Nh4/R
+ lqULdpUm3Lw/4HmyiYXOuktHteQVHvAhO90HFC/tBK9V/j0=
+X-Google-Smtp-Source: ADFU+vtrqgxyF4zdJRrsPwF4v9ikKyq7JozSrYFbedcnVIOCT+zdtWEPseM8XNClgp0MA4z5vLF9K2SWEiNWrLKtOS4=
+X-Received: by 2002:aa7:c607:: with SMTP id h7mr9295850edq.73.1585044803016;
+ Tue, 24 Mar 2020 03:13:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev22
-X-Originating-Client: open-xchange-appsuite
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.186.127.180
+From: Chained Up <alia.mk345@gmail.com>
+Date: Tue, 24 Mar 2020 12:13:03 +0200
+Message-ID: <CAEwvOcF7==uOdEJoQpNh1-wE44nJqWJLFP93yK0dHEUA38EXKQ@mail.gmail.com>
+Subject: Help
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="0000000000006fda0b05a19700a4"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::531
+X-Mailman-Approved-At: Tue, 24 Mar 2020 09:34:06 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,81 +84,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-spoke too soon - the error is still there, sigh
- 
-> This is fixed with this patch:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07249.html
-> 
-> thanks!
-> 
-> > On March 24, 2020 12:13 PM Dietmar Maurer <dietmar@proxmox.com> wrote:
-> > 
-> >  
-> > I get a core dump with backup transactions when using io-threads.
-> > 
-> > To reproduce, create and start a VM with:
-> > 
-> > # qemu-img create disk1.raw 100M
-> > # qemu-img create disk2.raw 100M
-> > #./x86_64-softmmu/qemu-system-x86_64 -chardev 'socket,id=qmp,path=/var/run/qemu-test.qmp,server,nowait' -mon 'chardev=qmp,mode=control' -pidfile /var/run/qemu-server/108.pid  -m 512 -object 'iothread,id=iothread-virtioscsi0' -object 'iothread,id=iothread-virtioscsi1'  -device 'virtio-scsi-pci,id=virtioscsi0,iothread=iothread-virtioscsi0' -drive 'file=disk1.raw,if=none,id=drive-scsi0,format=raw,cache=none,aio=native,detect-zeroes=on' -device 'scsi-hd,bus=virtioscsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0' -device 'virtio-scsi-pci,id=virtioscsi1,iothread=iothread-virtioscsi1' -drive 'file=disk2.raw,if=none,id=drive-scsi1,format=raw,cache=none,aio=native,detect-zeroes=on' -device 'scsi-hd,bus=virtioscsi1.0,channel=0,scsi-id=0,lun=1,drive=drive-scsi1,id=scsi1'
-> > 
-> > Then open socat to the qmp socket
-> > # socat /var/run/qemu-test.qmp -
-> > 
-> > And run the following qmp command:
-> > 
-> > { "execute": "qmp_capabilities", "arguments": {} }
-> > { "execute": "transaction", "arguments":  { "actions": [{ "type": "drive-backup", "data": { "device": "drive-scsi0", "sync": "full", "target": "backup-sysi0.raw" }}, { "type": "drive-backup", "data": { "device": "drive-scsi1", "sync": "full", "target": "backup-scsi1.raw" }}], "properties": { "completion-mode": "grouped" } } }
-> > 
-> > The VM will core dump:
-> > 
-> > qemu: qemu_mutex_unlock_impl: Operation not permitted
-> > Aborted (core dumped)
-> > (gdb) bt
-> > #0  0x00007f099d5037bb in __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
-> > #1  0x00007f099d4ee535 in __GI_abort () at abort.c:79
-> > #2  0x000055c04e39525e in error_exit (err=<optimized out>, msg=msg@entry=0x55c04e5122e0 <__func__.16544> "qemu_mutex_unlock_impl") at util/qemu-thread-posix.c:36
-> > #3  0x000055c04e395813 in qemu_mutex_unlock_impl (mutex=mutex@entry=0x7f09903154e0, file=file@entry=0x55c04e51129f "util/async.c", line=line@entry=601)
-> >     at util/qemu-thread-posix.c:108
-> > #4  0x000055c04e38f8e5 in aio_context_release (ctx=ctx@entry=0x7f0990315480) at util/async.c:601
-> > #5  0x000055c04e299073 in bdrv_set_aio_context_ignore (bs=0x7f0929a76500, new_context=new_context@entry=0x7f0990315000, ignore=ignore@entry=0x7ffe08fa7400)
-> >     at block.c:6238
-> > #6  0x000055c04e2990cc in bdrv_set_aio_context_ignore (bs=bs@entry=0x7f092af47900, new_context=new_context@entry=0x7f0990315000, ignore=ignore@entry=0x7ffe08fa7400)
-> >     at block.c:6211
-> > #7  0x000055c04e299443 in bdrv_child_try_set_aio_context (bs=bs@entry=0x7f092af47900, ctx=0x7f0990315000, ignore_child=ignore_child@entry=0x0, errp=errp@entry=0x0)
-> >     at block.c:6324
-> > #8  0x000055c04e299576 in bdrv_try_set_aio_context (errp=0x0, ctx=<optimized out>, bs=0x7f092af47900) at block.c:6333
-> > #9  0x000055c04e299576 in bdrv_replace_child (child=child@entry=0x7f09902ef5e0, new_bs=new_bs@entry=0x0) at block.c:2551
-> > #10 0x000055c04e2995ff in bdrv_detach_child (child=0x7f09902ef5e0) at block.c:2666
-> > #11 0x000055c04e299ec9 in bdrv_root_unref_child (child=<optimized out>) at block.c:2677
-> > #12 0x000055c04e29f3fe in block_job_remove_all_bdrv (job=job@entry=0x7f0927c18800) at blockjob.c:191
-> > #13 0x000055c04e29f429 in block_job_free (job=0x7f0927c18800) at blockjob.c:88
-> > #14 0x000055c04e2a0909 in job_unref (job=0x7f0927c18800) at job.c:359
-> > #15 0x000055c04e2a0909 in job_unref (job=0x7f0927c18800) at job.c:351
-> > #16 0x000055c04e2a0b68 in job_conclude (job=0x7f0927c18800) at job.c:620
-> > #17 0x000055c04e2a0b68 in job_finalize_single (job=0x7f0927c18800) at job.c:688
-> > #18 0x000055c04e2a0b68 in job_finalize_single (job=0x7f0927c18800) at job.c:660
-> > #19 0x000055c04e2a14fc in job_txn_apply (txn=<optimized out>, fn=0x55c04e2a0a50 <job_finalize_single>) at job.c:145
-> > #20 0x000055c04e2a14fc in job_do_finalize (job=0x7f0927c1c200) at job.c:781
-> > #21 0x000055c04e2a1751 in job_completed_txn_success (job=0x7f0927c1c200) at job.c:831
-> > #22 0x000055c04e2a1751 in job_completed (job=0x7f0927c1c200) at job.c:844
-> > #23 0x000055c04e2a1751 in job_completed (job=0x7f0927c1c200) at job.c:835
-> > #24 0x000055c04e2a17b0 in job_exit (opaque=0x7f0927c1c200) at job.c:863
-> > #25 0x000055c04e38ee75 in aio_bh_call (bh=0x7f098ec52000) at util/async.c:164
-> > #26 0x000055c04e38ee75 in aio_bh_poll (ctx=ctx@entry=0x7f0990315000) at util/async.c:164
-> > #27 0x000055c04e3924fe in aio_dispatch (ctx=0x7f0990315000) at util/aio-posix.c:380
-> > #28 0x000055c04e38ed5e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:298
-> > #29 0x00007f099f020f2e in g_main_context_dispatch () at /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-> > #30 0x000055c04e391768 in glib_pollfds_poll () at util/main-loop.c:219
-> > #31 0x000055c04e391768 in os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:242
-> > #32 0x000055c04e391768 in main_loop_wait (nonblocking=nonblocking@entry=0) at util/main-loop.c:518
-> > #33 0x000055c04e032329 in qemu_main_loop () at /home/dietmar/pve5-devel/mirror_qemu/softmmu/vl.c:1665
-> > #34 0x000055c04df36a8e in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /home/dietmar/pve5-devel/mirror_qemu/softmmu/main.c:49
+--0000000000006fda0b05a19700a4
+Content-Type: text/plain; charset="UTF-8"
 
+Please can some explain what should i do here?
+ Prepare import-libraries using Borland's implib program.  The ".lib"
+    files that it uses are a different format than the import libraries
+    distributed with GnuWin2.  From Lynx's source directory run bcblibs
+
+Environment:
+    At this point, the bin-directory for the compiler and for the GnuWin32
+    libraries should be in your path.
+
+Building:
+    From Lynx's source directory
+cd src\chrtrans
+makew32 clean
+makew32
+cd ..\..
+makew32 clean
+makew32
+
+--0000000000006fda0b05a19700a4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Please can some explain what should i do here?</div>=
+=C2=A0Prepare import-libraries using Borland&#39;s implib program.=C2=A0 Th=
+e &quot;.lib&quot;<br>=C2=A0 =C2=A0 files that it uses are a different form=
+at than the import libraries<br>=C2=A0 =C2=A0 distributed with GnuWin2.=C2=
+=A0 From Lynx&#39;s source directory run bcblibs<br><br>Environment:<br>=C2=
+=A0 =C2=A0 At this point, the bin-directory for the compiler and for the Gn=
+uWin32<br>=C2=A0 =C2=A0 libraries should be in your path.<br><br>Building:<=
+br>=C2=A0 =C2=A0 From Lynx&#39;s source directory<br>	cd src\chrtrans<br>	m=
+akew32 clean<br>	makew32<br>	cd ..\..<br>	makew32 clean<br>	makew32<br></di=
+v>
+
+--0000000000006fda0b05a19700a4--
 
