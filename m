@@ -2,80 +2,102 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FD3C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C52AC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41ACE20774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13F2A20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:49:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d4LF26vo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41ACE20774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYLRqyWQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13F2A20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGkpr-0007c7-Dj
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:47:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60612)
+	id 1jGkrl-0001Ia-7T
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:49:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jGkoo-0006OH-Ec
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:46:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGkqg-0000P1-Cl
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:48:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jGkon-0005Dw-7v
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:46:14 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45061)
+ (envelope-from <mreitz@redhat.com>) id 1jGkqf-00077e-FL
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:48:10 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:53079)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jGkon-0005DT-39
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:46:13 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGkqf-00077D-Bl
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:48:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585061172;
+ s=mimecast20190719; t=1585061289;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=n/JS4XRB7wgrmi4hF7t/5YtDt8GYkKhrsykPbvNcCq0=;
- b=d4LF26voUhqb2eWzL7nEyG3Szol/IlOLlQ3jc1T5mb1SMK3JKKnrTGEipWBtomLWb7kdz9
- gnNu0ClDWc2+ItLc7dxsWh2/gtL1QmaAJ3pcV6hjN/mZTllqmti/ozntxSi9z/R9pnGk88
- evjYH617tVlc1FPUnVuoTDU41W5ZncI=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=uF8d/Bf7NlDz3rD2n4ZdQFSZcntZJY9AgYeEq2AMMo0=;
+ b=LYLRqyWQlmUQF4+StVent8RHEaYhlor0l/oEjxIWjMzEwLbukCZMCZJXVa4Uf4oiySOgpn
+ Dk+TYCuFj7gCbYPKUBLMWCh9gRdGD2oaVZVoz2+VEhY/QzqOD3S/q7YTxu8ppLY0HY7/OR
+ eJ58ZDp0XLNOwLs7pomN8b5gfSK31Is=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-2kmK-zO-PSWlhQvLM7jhKg-1; Tue, 24 Mar 2020 10:46:11 -0400
-X-MC-Unique: 2kmK-zO-PSWlhQvLM7jhKg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-38-J7-JNoo-PrmzjhpRzRfHGg-1; Tue, 24 Mar 2020 10:48:04 -0400
+X-MC-Unique: J7-JNoo-PrmzjhpRzRfHGg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29C53800D48;
- Tue, 24 Mar 2020 14:46:09 +0000 (UTC)
-Received: from [10.3.113.103] (ovpn-113-103.phx2.redhat.com [10.3.113.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BE5C10016EB;
- Tue, 24 Mar 2020 14:46:08 +0000 (UTC)
-Subject: Re: [PATCH] qcow2: Forbid discard in qcow2 v2 images with backing
- files
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20200323194429.1717-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5bcf1bf6-4375-afe6-bd6c-dedbd06d136d@redhat.com>
-Date: Tue, 24 Mar 2020 09:46:07 -0500
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E8391005510;
+ Tue, 24 Mar 2020 14:48:03 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-213.ams2.redhat.com
+ [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BBF2F9B934;
+ Tue, 24 Mar 2020 14:48:00 +0000 (UTC)
+Subject: Re: [PATCH v8 05/11] iotests: add pylintrc file
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200317004105.27059-1-jsnow@redhat.com>
+ <20200317004105.27059-6-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2913909d-3411-04cf-9cc4-47ea1e7e6749@redhat.com>
+Date: Tue, 24 Mar 2020 15:47:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200323194429.1717-1-berto@igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200317004105.27059-6-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,80 +111,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ philmd@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/23/20 2:44 PM, Alberto Garcia wrote:
-> A discard request deallocates the selected clusters so they read back
-> as zeroes. This is done by clearing the cluster offset field and
-> setting QCOW_OFLAG_ZERO in the L2 entry.
-> 
-> This flag is however only supported when qcow_version >= 3. In older
-> images the cluster is simply deallocated, exposing any possible stale
-> data from the backing file.
-> 
-> Since discard is an advisory operation it's safer to simply forbid it
-> in this scenario.
-> 
-> Note that we are adding this check to qcow2_co_pdiscard() and not to
-> qcow2_cluster_discard() or discard_in_l2_slice() because the last
-> two are also used by qcow2_snapshot_create() to discard the clusters
-> used by the VM state. In this case there's no risk of exposing stale
-> data to the guest and we really want that the clusters are always
-> discarded.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or
+Content-Type: multipart/mixed; boundary="POMmOI39VqP96LeCKHjUOSqPlwhlgvRBr"
+
+--POMmOI39VqP96LeCKHjUOSqPlwhlgvRBr
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 17.03.20 01:40, John Snow wrote:
+> This allows others to get repeatable results with pylint. If you run
+> `pylint iotests.py`, you should see a 100% pass.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->   block/qcow2.c              |  6 +++
->   tests/qemu-iotests/060     |  5 ++-
->   tests/qemu-iotests/060.out |  2 -
->   tests/qemu-iotests/289     | 90 ++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/289.out | 52 ++++++++++++++++++++++
->   tests/qemu-iotests/group   |  1 +
->   6 files changed, 152 insertions(+), 4 deletions(-)
->   create mode 100755 tests/qemu-iotests/289
->   create mode 100644 tests/qemu-iotests/289.out
+>  tests/qemu-iotests/pylintrc | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+>  create mode 100644 tests/qemu-iotests/pylintrc
 
-The actual fix is much smaller than the iotest fallout ;)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> +++ b/tests/qemu-iotests/060
-> @@ -167,9 +167,10 @@ _make_test_img -o 'compat=0.10' -b "$BACKING_IMG" 1G
->   # Write two clusters, the second one enforces creation of an L2 table after
->   # the first data cluster.
->   $QEMU_IO -c 'write 0k 64k' -c 'write 512M 64k' "$TEST_IMG" | _filter_qemu_io
-> -# Discard the first cluster. This cluster will soon enough be reallocated and
-> +# Free the first cluster. This cluster will soon enough be reallocated and
->   # used for COW.
-> -$QEMU_IO -c 'discard 0k 64k' "$TEST_IMG" | _filter_qemu_io
-> +poke_file "$TEST_IMG" '262144' "\x00\x00\x00\x00\x00\x00\x00\x00" # 0x40000 - L2 entry
-> +poke_file "$TEST_IMG" '131082' "\x00\x00" # 0x2000a - Refcount entry
 
-Instead of writing '262144' ... # 0x40000, you could write $((0x40000)) 
-in-place.  Similarly for 131082 vs. 0x2000a.
+--POMmOI39VqP96LeCKHjUOSqPlwhlgvRBr--
 
-Also, Max has pending patches for adding poke_file_be; if those land 
-first, this becomes simpler as:
+--WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-poke_file_be "$TEST_IMG" $((0x40000)) 8 0 # L2 entry
-poke_file_be "$TEST_IMG" $((0x2000a)) 2 0 # Refcount entry
+-----BEGIN PGP SIGNATURE-----
 
-> +++ b/tests/qemu-iotests/289
-> @@ -0,0 +1,90 @@
-> +#!/usr/bin/env bash
-> +#
-> +# Test how 'qemu-io -c discard' behaves on v2 and v3 qcow2 images
-At any rate, the new test looks reasonable to me. I see you have other 
-review comments for improving it, with thos in, you can add
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl56HZ4ACgkQ9AfbAGHV
+z0AAzQgAitk2GjB2K/hsHN+0e77uplBO/F9KfuVtLr9iQzUfueDCYwFPNckyVZcY
+ZXYbS9hgGJU2D0KrM8UhtAin171DmZ6gQtiwo3bT6q7I9bYVRsKu5jRnD3prL42w
+K9JUUdwa7S5RCGUaf0DNuttveh2R8YACBGyO6lup1HA6QjkX4INloSrarVQFHBic
+IHB5i0WLxlWo7LTecraRr74po+vhd38HiQvnRgmCRtiApWMQnR+vi1sztKQxD2n2
+SsjS31MbTX/VZEqTrCe74YS0oBbPKWwrkhPdK306ceCDX3hD4KbXyqawBQqweaIV
+yE/n8A6vdj9Gz/t+tdkoCDvRJO8z3Q==
+=YHMc
+-----END PGP SIGNATURE-----
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--WYn3oj8ixq3GKCTfWKIL8H0ssAnFbx3or--
 
 
