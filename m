@@ -2,84 +2,69 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5E9C4332B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13AF8C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:07:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 688AE20775
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:06:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PlkQ1tgO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 688AE20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D728E20775
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 10:07:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D728E20775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGgRu-00007Y-D2
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 06:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49639)
+	id 1jGgSf-0001NR-24
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 06:07:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jGgQR-0007BS-8Y
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:04:51 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jGgP6-0005zd-1w
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:03:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia.ml@gmail.com>) id 1jGgQP-0001FH-Sp
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:04:47 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44695)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuval.shaia.ml@gmail.com>)
- id 1jGgQP-0001Eg-Mn
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:04:45 -0400
-Received: by mail-ot1-x341.google.com with SMTP id a49so16412578otc.11
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 03:04:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ScsCWkCC1HMSXVs54n3zmnU3aeTPc9GMhd1nGtsZZs0=;
- b=PlkQ1tgOxqR9lNcjMP6EHx3i9W3MS7lglegfh+4At8bmKeUDyZ6ccjKztOG+/2tLP6
- i4HeXRjsJudaR2iOyJmSci5whJcfu+inbbFfUWJCRl6p0R5xNmSGRtVvFvo3Km0XwUNt
- WkL4q4oBhPUf7VNiY99+3O7yBJZgSKIBKFJQbaaJ+VwJ1VQIdUCW6Cid9BMBgSBvzAb5
- p6yufokc8HILdYMBBQYHnb7vB855RCqGwn1HVfYxTxF0FwF6Nqwu2RA3ezAkVCjrMGYl
- 6HjWQ6rWT1l86FLXbV424ZKR0ef6VaEOVV1r96AW1DCUTUovuQ2BaxqNzEemFKQi0RAq
- wuzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ScsCWkCC1HMSXVs54n3zmnU3aeTPc9GMhd1nGtsZZs0=;
- b=DpxmrFzrdP2NbfIriVDJ8X2cexBL0jugFRGfeBd1YtPh7rF/V7LNc6SLdHMwWyq/CC
- kATX+/LgM2jA2hp32osaZcbcBwoqnJCYj6ABBoKkj5J3Hd+TrAsHIPMdg0gGcyJT6FNk
- YpLuMlxCw1kZLYdivpnpFvYehQ8hINjVBrz3GQmqGwaeuqRQVdfSvI04zoVfGfpeYoBS
- KiBgFu9t794n6j+j00VnAQ2k1gvCHh0poecVLTQRHnwcUqioO8/5CsaskYlSCv05zKew
- LzDk4agpu+WrGmTdwtMdHkhteUkHjHbrwvwTscj1xWTlvfjZdI1KVgt0xJ2Yp43vLInk
- Z53Q==
-X-Gm-Message-State: ANhLgQ2R1xdD0iRgss0+NhLn+Ds3d/GXHKrSKIj/F+5XcNuJxpJpq/m8
- p4fvXK0N3fguNjLhQ6nANH6MZ6cmZC0vENSUXgY=
-X-Google-Smtp-Source: ADFU+vuwiOKQazsduZii1zTNVYD18dkVT97Xy/NcCzKJupS4RATwPW/k6QepXjECRDyy7DqIuP8o/WAmIpSOXbfkXM4=
-X-Received: by 2002:a9d:4009:: with SMTP id m9mr4363468ote.132.1585044284278; 
- Tue, 24 Mar 2020 03:04:44 -0700 (PDT)
+ (envelope-from <laurent@vivier.eu>) id 1jGgP4-0000b6-JV
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:03:23 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:55719)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jGgP4-0000aN-9o
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 06:03:22 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1McH1O-1jode3026G-00clcY; Tue, 24 Mar 2020 11:03:15 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 2/5] linux-user/i386: Split out gen_signal
+Date: Tue, 24 Mar 2020 11:03:08 +0100
+Message-Id: <20200324100311.588288-3-laurent@vivier.eu>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200324100311.588288-1-laurent@vivier.eu>
+References: <20200324100311.588288-1-laurent@vivier.eu>
 MIME-Version: 1.0
-References: <20190310084610.23077-1-yuval.shaia@oracle.com>
- <20190310084610.23077-8-yuval.shaia@oracle.com>
- <CAFEAcA86hGnX5MfZjzfR0486qNOXfLmC+YSfc7GOc7d9jakrFQ@mail.gmail.com>
- <CAMPkWoML1fuZht6-doBPjEKMMb77O+diA=5Eg+bFV0OM7ZhcYg@mail.gmail.com>
-In-Reply-To: <CAMPkWoML1fuZht6-doBPjEKMMb77O+diA=5Eg+bFV0OM7ZhcYg@mail.gmail.com>
-From: Yuval Shaia <yuval.shaia.ml@gmail.com>
-Date: Tue, 24 Mar 2020 12:04:33 +0200
-Message-ID: <CAMPkWoNg4KvAQTRGw0M=mx6V=-5My5JeiV8+OVhRxqnhuF6LVw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 07/10] hw/rdma: Free all receive buffers
- when QP is destroyed
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000848a4b05a196e1c1"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:KDGkdGysTorHu+lyENNEGinap9YULlqxASmrCjx6pd9q/7TcpIF
+ FTxGr2d/WfJjJTBPF7F6/10F/nHvIIWGc+q/nyC8q8wx9NoMrirvlT8rnKfx0spkcUzu3x6
+ i5opCeNiPwPeGfDqaWDBR3B+LnAS4muapQEXlY3E3K+SAsXiLN0k1dfDR6/xbXenYx9TICF
+ 9ElXn5qPOE7PCPhayexwg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:yCXWpCqa5ZQ=:rntgXdb7zkJk4tucKeS273
+ YW9cAcm0hnqfKhyRZvEKroKaE7uFRa1Umy9Mb1Yf937B9+ogVOcz6GrSraZtX5dqIPPgAsl9A
+ LYheaInfYG0/QgW/NCkJi4yVquWG3A0ENfvxetl126+/hfnPMJ73opXAN7Y0H95uxFFWszoUZ
+ 211saKcX3iBvTFeR5ovp3bAzCNipYLdXtru3/E1W9oSiLcZkb1NqgD/u69poFUjPDdmJ7J+JK
+ RHP1ZcXxyHkOopc5JN1d9dIJAaDfPxto6bQ/ynFBHYW+MalbwBd7CP55RQZHLnkzxybJ7+lBD
+ 1xjCPknHuOcNuCb5X1NQG8EvwPqSAb+3HPIjvEl2Q1h/GagZlYxPfjH2snwzznuMB9/ETUQ9O
+ FEynVrPpKK5o4/l+pCbpzVDrv0fzRS31clTcZQ2YlWkRaL/d+yGpIaXjFjs/i9pNwJSQlXBW3
+ bFzHEyv58Va6UJ9LCFucdoBtX3xVqtvmZ/raGIi1KQnmiiDoTovWZrch6estlBwpAFU9ZstHs
+ LiGbMqCTvHibmAAwj/+DrkY1l9kz8hADppgruIyMnnildKrCb9mRg/FtYLTNkduBY5TJjAkew
+ 0vjANC4zBAQS93ZVxWH0KW9KkhM50eykndEH9UKJTmYFf16Llycwbc7dlt0du6AsnA6Awf693
+ ozCxYAqtLOoMBJNcaW742UUu2kmfcMJ7H8gKsCPfasEPhwOQw8pNlFC14vzqyIeDlbZFF4bPJ
+ AVQYYmE7Iwwo7mnY3m0CWJqJC2528TOuQ1g6X4HRrceJyWAuf7km+m50vAHd1N9x+CXv5EKLd
+ YLZ4IqxTu8cLGEch6/KQNbMA05S2LU7GSJPxBEnPfm4frf7eJAyFNW+88X+QBCRjoLhuBz5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,177 +76,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Yuval Shaia <yuval.shaia@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000848a4b05a196e1c1
-Content-Type: text/plain; charset="UTF-8"
+From: Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, 24 Mar 2020 at 11:56, Yuval Shaia <yuval.shaia.ml@gmail.com> wrote:
+This is a bit tidier than open-coding the 5 lines necessary
+to initialize the target_siginfo_t.  In addition, this zeros
+the remaining bytes of the target_siginfo_t, rather than
+passing in garbage.
 
->
->
-> On Mon, 23 Mar 2020 at 12:32, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->
->> On Sun, 10 Mar 2019 at 09:25, Yuval Shaia <yuval.shaia@oracle.com> wrote:
->> >
->> > When QP is destroyed the backend QP is destroyed as well. This ensures
->> > we clean all received buffer we posted to it.
->> > However, a contexts of these buffers are still remain in the device.
->> > Fix it by maintaining a list of buffer's context and free them when QP
->> > is destroyed.
->> >
->> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->> > Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>
->> Hi; Coverity has just raised an issue on this code (CID 1421951):
->>
->> > diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
->> > index 0a8abe572d..73f279104c 100644
->> > --- a/hw/rdma/rdma_utils.c
->> > +++ b/hw/rdma/rdma_utils.c
->> > @@ -90,3 +90,32 @@ int64_t
->> rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
->> >
->> >      return qnum_get_uint(qobject_to(QNum, obj));
->> >  }
->> > +
->> > +void rdma_protected_gslist_init(RdmaProtectedGSList *list)
->> > +{
->> > +    qemu_mutex_init(&list->lock);
->> > +}
->> > +
->> > +void rdma_protected_gslist_destroy(RdmaProtectedGSList *list)
->> > +{
->> > +    if (list->list) {
->> > +        g_slist_free(list->list);
->> > +        list->list = NULL;
->> > +    }
->>
->> Coverity wonders whether this function should take the list->lock
->> before freeing the list, because the other places which manipulate
->> list->list take the lock.
->>
->> > +}
->>
->> This is one of those Coverity checks which is quite prone to
->> false positives because it's just heuristically saying "you
->> look like you take the lock when you modify this field elsewhere,
->> maybe this place should take the lock too". Does this function
->> need to take a lock, or does the code that uses it guarantee
->> that it's never possible for another thread to be running
->> with access to the structure once we decide to destroy it?
->>
->
-> It hit a real error here.
->
-> Will fix and post a patch soon.
->
-> Thanks,
-> Yuval
->
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200213032223.14643-3-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/i386/cpu_loop.c | 93 ++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 60 deletions(-)
 
-For clarification: The code that uses this API make sure not to access the
-qlist after it is destroyed *but* we cannot trust that in the future caller
-will not do that.
+diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
+index 024b6f4d588c..e217cca5ee1e 100644
+--- a/linux-user/i386/cpu_loop.c
++++ b/linux-user/i386/cpu_loop.c
+@@ -81,13 +81,23 @@ static void set_idt(int n, unsigned int dpl)
+ }
+ #endif
+ 
++static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
++{
++    target_siginfo_t info = {
++        .si_signo = sig,
++        .si_code = code,
++        ._sifields._sigfault._addr = addr
++    };
++
++    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++}
++
+ void cpu_loop(CPUX86State *env)
+ {
+     CPUState *cs = env_cpu(env);
+     int trapnr;
+     abi_ulong pc;
+     abi_ulong ret;
+-    target_siginfo_t info;
+ 
+     for(;;) {
+         cpu_exec_start(cs);
+@@ -134,70 +144,45 @@ void cpu_loop(CPUX86State *env)
+ #endif
+         case EXCP0B_NOSEG:
+         case EXCP0C_STACK:
+-            info.si_signo = TARGET_SIGBUS;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_SI_KERNEL;
+-            info._sifields._sigfault._addr = 0;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGBUS, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP0D_GPF:
+             /* XXX: potential problem if ABI32 */
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_fault(env);
+-            } else
+-#endif
+-            {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SI_KERNEL;
+-                info._sifields._sigfault._addr = 0;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP0E_PAGE:
+-            info.si_signo = TARGET_SIGSEGV;
+-            info.si_errno = 0;
+-            if (!(env->error_code & 1))
+-                info.si_code = TARGET_SEGV_MAPERR;
+-            else
+-                info.si_code = TARGET_SEGV_ACCERR;
+-            info._sifields._sigfault._addr = env->cr[2];
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGSEGV,
++                       (env->error_code & 1 ?
++                        TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR),
++                       env->cr[2]);
+             break;
+         case EXCP00_DIVZ:
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
+-#endif
+-            {
+-                /* division by zero */
+-                info.si_signo = TARGET_SIGFPE;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_FPE_INTDIV;
+-                info._sifields._sigfault._addr = env->eip;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGFPE, TARGET_FPE_INTDIV, env->eip);
+             break;
+         case EXCP01_DB:
+         case EXCP03_INT3:
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
++                break;
++            }
+ #endif
+-            {
+-                info.si_signo = TARGET_SIGTRAP;
+-                info.si_errno = 0;
+-                if (trapnr == EXCP01_DB) {
+-                    info.si_code = TARGET_TRAP_BRKPT;
+-                    info._sifields._sigfault._addr = env->eip;
+-                } else {
+-                    info.si_code = TARGET_SI_KERNEL;
+-                    info._sifields._sigfault._addr = 0;
+-                }
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            if (trapnr == EXCP01_DB) {
++                gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, env->eip);
++            } else {
++                gen_signal(env, TARGET_SIGTRAP, TARGET_SI_KERNEL, 0);
+             }
+             break;
+         case EXCP04_INTO:
+@@ -205,31 +190,19 @@ void cpu_loop(CPUX86State *env)
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
+-#endif
+-            {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SI_KERNEL;
+-                info._sifields._sigfault._addr = 0;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP06_ILLOP:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_ILL_ILLOPN;
+-            info._sifields._sigfault._addr = env->eip;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGILL, TARGET_ILL_ILLOPN, env->eip);
+             break;
+         case EXCP_INTERRUPT:
+             /* just indicate that signals should be handled asap */
+             break;
+         case EXCP_DEBUG:
+-            info.si_signo = TARGET_SIGTRAP;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_TRAP_BRKPT;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, 0);
+             break;
+         case EXCP_ATOMIC:
+             cpu_exec_step_atomic(cs);
+-- 
+2.25.1
 
-
->
->> thanks
->> -- PMM
->>
->>
-
---000000000000848a4b05a196e1c1
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, 24 Mar 2020 at 11:56, Yuval S=
-haia &lt;<a href=3D"mailto:yuval.shaia.ml@gmail.com">yuval.shaia.ml@gmail.c=
-om</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-"><div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, 23 Mar 2020 at 12:32, Peter=
- Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank">=
-peter.maydell@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail=
-_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204=
-,204);padding-left:1ex">On Sun, 10 Mar 2019 at 09:25, Yuval Shaia &lt;<a hr=
-ef=3D"mailto:yuval.shaia@oracle.com" target=3D"_blank">yuval.shaia@oracle.c=
-om</a>&gt; wrote:<br>
-&gt;<br>
-&gt; When QP is destroyed the backend QP is destroyed as well. This ensures=
-<br>
-&gt; we clean all received buffer we posted to it.<br>
-&gt; However, a contexts of these buffers are still remain in the device.<b=
-r>
-&gt; Fix it by maintaining a list of buffer&#39;s context and free them whe=
-n QP<br>
-&gt; is destroyed.<br>
-&gt;<br>
-&gt; Signed-off-by: Yuval Shaia &lt;<a href=3D"mailto:yuval.shaia@oracle.co=
-m" target=3D"_blank">yuval.shaia@oracle.com</a>&gt;<br>
-&gt; Reviewed-by: Marcel Apfelbaum &lt;<a href=3D"mailto:marcel.apfelbaum@g=
-mail.com" target=3D"_blank">marcel.apfelbaum@gmail.com</a>&gt;<br>
-<br>
-Hi; Coverity has just raised an issue on this code (CID 1421951):<br>
-<br>
-&gt; diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c<br>
-&gt; index 0a8abe572d..73f279104c 100644<br>
-&gt; --- a/hw/rdma/rdma_utils.c<br>
-&gt; +++ b/hw/rdma/rdma_utils.c<br>
-&gt; @@ -90,3 +90,32 @@ int64_t rdma_protected_qlist_pop_int64(RdmaProtecte=
-dQList *list)<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 return qnum_get_uint(qobject_to(QNum, obj));<br>
-&gt;=C2=A0 }<br>
-&gt; +<br>
-&gt; +void rdma_protected_gslist_init(RdmaProtectedGSList *list)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 qemu_mutex_init(&amp;list-&gt;lock);<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +void rdma_protected_gslist_destroy(RdmaProtectedGSList *list)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 if (list-&gt;list) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_slist_free(list-&gt;list);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 list-&gt;list =3D NULL;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-<br>
-Coverity wonders whether this function should take the list-&gt;lock<br>
-before freeing the list, because the other places which manipulate<br>
-list-&gt;list take the lock.<br>
-<br>
-&gt; +}<br>
-<br>
-This is one of those Coverity checks which is quite prone to<br>
-false positives because it&#39;s just heuristically saying &quot;you<br>
-look like you take the lock when you modify this field elsewhere,<br>
-maybe this place should take the lock too&quot;. Does this function<br>
-need to take a lock, or does the code that uses it guarantee<br>
-that it&#39;s never possible for another thread to be running<br>
-with access to the structure once we decide to destroy it?<br></blockquote>=
-<div><br></div><div>It hit a real error here.</div><div><br></div><div>Will=
- fix and post a patch soon.</div><div><br></div><div>Thanks,</div><div>Yuva=
-l</div></div></div></blockquote><div><br></div><div>For clarification: The =
-code that uses this API make sure not to access the=C2=A0 qlist after it is=
- destroyed *but* we cannot trust that in the future caller will not do that=
-.</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><di=
-v dir=3D"ltr"><div class=3D"gmail_quote"><div><br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">
-<br>
-thanks<br>
--- PMM<br>
-<br>
-</blockquote></div></div>
-</blockquote></div></div>
-
---000000000000848a4b05a196e1c1--
 
