@@ -2,95 +2,79 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 157E7C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21747C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:53:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0B5420774
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:53:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD56B20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 14:53:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FWyV2l4C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0B5420774
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jwGcWA1s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD56B20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGkvP-0004c2-1J
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:53:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33310)
+	id 1jGkwE-0005hJ-3D
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 10:53:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jGkua-000445-5u
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:52:13 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jGkvU-0004tt-HK
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:53:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jGkuY-0002bH-Ua
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:52:11 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39517)
+ (envelope-from <peter.maydell@linaro.org>) id 1jGkvT-0003QS-Bo
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:53:08 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41332)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jGkuY-0002a5-HC
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:52:10 -0400
-Received: by mail-pf1-x443.google.com with SMTP id d25so9362263pfn.6
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 07:52:10 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jGkvT-0003Pz-6j
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 10:53:07 -0400
+Received: by mail-ot1-x343.google.com with SMTP id f52so283929otf.8
+ for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 07:53:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=BU+olHEDMA4SWXhPhSUdr47aT74Eb79xNS9MUGXxFYI=;
- b=FWyV2l4C0eRh0krBZFBqrAkVNLPgzkOuMeTQJlVI/JBG2xfQED4mcRbESUMK5yvxqL
- sVSjiMkHSRBK51T1v7rtp06Kmy+sjcPI1QZcDpkt23lVdr647Pwex/Q+bOJ6W9mGmei1
- i9jiwFZZnFE1spRJ7Fc+7b22KFqA3sf3w6CaTd2/4e1HZiMNwvuRQ5kSwaQBD2MepQE3
- MnedyGT8Im+v83aPG3hSNUUruNoe5u4RoilYi5g4EcVe58A5eE+9ISC/xipTnPpXzaUw
- Y2koIw3aB8DvzN9RvbRnZ+Zgkgxi7eixODwHC3Z7j7KpAwfStB8yTBC16+Ks7k3a58Zx
- XUvQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GIefcW/kUZn9CT8AEq2rh611q7yBxsdo0Z6TBAjtmB0=;
+ b=jwGcWA1sQYagrl51hyV2rZH+V+bJlRrXZZUBjzo0VOlvjBiiKlvaEUIJMVNdWENCVY
+ 97NdQCQ13kecdtMyHUul3Wmlo5hNqKJ19lFUuJaGRYOHar4V4zdekm/hccHDrHDOuoCU
+ dK33ceZsHfWwhSsPz+nmwvB2UHU544ZGSk1ryv5TsoG7xFBTaJYxLlBFBws7FCaoaEk2
+ iZLHHcxgFH0C+lZCzVAxrM7HNGXXDEM/CXRgaZNCBU8Q5QGwSZl4KfzUALbYxgwR5JA7
+ s1lGx0zwwhKMWYgxZsf8t1MZ11YdTj4UwHJt5keFtc6RM3jjy26nr9Q0cjiqOlwTgk6p
+ 2bTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BU+olHEDMA4SWXhPhSUdr47aT74Eb79xNS9MUGXxFYI=;
- b=GDNjg+wnCd945BX4/KA+iJgeDqA7ZGPKyLyzB6DRFW0WKBcMTWkyw6M8IMgBQsIkjT
- LtgUozL6lH1agVmVTr/GzEo2amEcGpnauPGHMnlLbz5zgKpa6sIegCOvaNjZkykex3b3
- C9hzZhBflAcEB6tPrLBZJYGxvc9jrMDsfd1IlF7SPh8YbloKegVsDTPM/jiGbMS/s+DJ
- /CAvjsMqX5uyTPUcVxofThqatYyjLL/8TBv5xI6vNkxXzgROMoa/o41NfTKEONbx7WJR
- HVHl3wcMl51zVUK1918u8QmNcuveyQC/4jNXMvbUSeK3svoD6H33vhDz6Bsdg8wdpV0N
- Q6gA==
-X-Gm-Message-State: ANhLgQ1iE22fyCehomqbIVQNaR3xU5LACz3aUdw+lwUfZwrZREsLZKQt
- Xd2H00NP/7xDHWJO4Frp8sBjrg==
-X-Google-Smtp-Source: ADFU+vvG7YxfYdT+qEUqfiNPI2Z6eWyn6O7L/mghIYQYPkxj5MLW45sJhOdQAOyBMkFA4A20vTMLaQ==
-X-Received: by 2002:a05:6a00:8d:: with SMTP id
- c13mr31114563pfj.68.1585061528986; 
- Tue, 24 Mar 2020 07:52:08 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id k1sm15182475pgg.56.2020.03.24.07.52.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Mar 2020 07:52:08 -0700 (PDT)
-Subject: Re: [PATCH v5 57/60] target/riscv: vector slide instructions
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-58-zhiwei_liu@c-sky.com>
- <28063df7-bf38-d136-2d32-39651692c4c6@linaro.org>
- <88b87d58-5387-9d0d-b1a0-5705171f2e83@c-sky.com>
- <76b6c079-15b2-08f1-f8e2-570efb6cfae5@linaro.org>
- <a99c100f-4b32-810a-97d7-ee54f5f65cda@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <25b384a0-c1d7-ed5a-94a1-7912e020c8ed@linaro.org>
-Date: Tue, 24 Mar 2020 07:52:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GIefcW/kUZn9CT8AEq2rh611q7yBxsdo0Z6TBAjtmB0=;
+ b=Z5cThf06BkImjW7lHbWazl4Ad8iCZR/SuGjmCP+rmOSEPQvY5j1mq4OC/8oEzyLTez
+ l8BT5rbXD4CuF/6jw0Ju/cLNcOsR9DeQs7qXofTsOjuDRBYtsuIWC4tfRmGricjFeE/1
+ HSZfUABTIjJqyS4725hHwhj/r/rZ0XtMCPcgIRYcQrBQHNeD/LfQMlMilwKayhHKO6p2
+ p02Q+ewZZx3auQrYIpIrBmj7YML11cPAc2+1MLtZYIiLF+OZ2HiRBF43jIvtC8oGAjib
+ RVUz5msw3PfsVxkP9qtmSkWKg1DuRfbm2tRyvMe57UL9aMEWN/C0ZWlPsHtJHAtYmrtp
+ KbQQ==
+X-Gm-Message-State: ANhLgQ0uHSg6+TyJ5mIWls6j8FurUVDTA36osj+wA30/G9/Ted9KmaZ7
+ g8B8q9dlSxDyWG8FZVr4mM4T1JdeZUGBodGqkmbzuQ==
+X-Google-Smtp-Source: ADFU+vuKBCwTYmhDdpXa72+llgEmbglP5LsmTPH7IiFMjuBfi1rN6gwn2fC4L4aBAGdvDB5+BsqR0YF2Ax/ParRuGmI=
+X-Received: by 2002:a9d:1d43:: with SMTP id m61mr22377075otm.91.1585061586335; 
+ Tue, 24 Mar 2020 07:53:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a99c100f-4b32-810a-97d7-ee54f5f65cda@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200324122044.1131326-1-mreitz@redhat.com>
+In-Reply-To: <20200324122044.1131326-1-mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Mar 2020 14:52:54 +0000
+Message-ID: <CAFEAcA9YKqfUY338zT+8Fj60mWEMu0BzUmojbB8dxu-1n9RuCA@mail.gmail.com>
+Subject: Re: [PULL 0/6] Block patches for 5.0-rc0
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,29 +86,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/24/20 3:51 AM, LIU Zhiwei wrote:
->> (3) It would be handy to have TCGv cpu_vl.
-> Do you mean I should define cpu_vl as a global TCG varible like cpu_pc?
-> So that I can check vl==0 in translation time.
+On Tue, 24 Mar 2020 at 12:21, Max Reitz <mreitz@redhat.com> wrote:
+>
+> The following changes since commit f1e748d27996e0cd8269db837a32e453dd55930a:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2020-03-23 20:54:24 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/XanClic/qemu.git tags/pull-block-2020-03-24
+>
+> for you to fetch changes up to c264e5d2f9f5d73977eac8e5d084f727b3d07ea9:
+>
+>   iotests/026: Move v3-exclusive test to new file (2020-03-24 12:05:31 +0100)
+>
+> ----------------------------------------------------------------
+> Block patches for 5.0-rc0:
+> - Use-after-free fix
+> - Fix for a memleak in an error path
+> - Preventative measures against other potential use-after-frees, and
+>   against NULL deferences at runtime
+> - iotest fixes
 
-Yes.
+Applied, thanks.
 
->> vslide1up.vx:
->>      Ho hum, I forgot about masking.  Some options:
->>      (1) Call a helper just as you did in your original patch.
->>      (2) Call a helper only for !vm, for vm as below.
-> 
-> Sorry, I don't get it why I need a helper for !vm.
-> I think I can  call vslideup w/1 whether !vm or vm, then a store to vd[0].
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-That's right.  I didn't mean a helper specific to vslide1up, but any helper.
-
-
-r~
+-- PMM
 
