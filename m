@@ -2,84 +2,74 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6039DC54EEB
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:04:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F49C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:07:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A4CD20409
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:04:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E79620409
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 20:07:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gDtWOCv4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4CD20409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="IkcnvMda"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E79620409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGpmc-0000ei-Cj
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 16:04:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53184)
+	id 1jGppO-00027h-E1
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 16:07:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53729)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jGplp-0000DU-Fe
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:03:30 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jGpoS-0001Nn-QJ
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jGplo-0007f6-1T
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:03:29 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52219)
+ (envelope-from <kwankhede@nvidia.com>) id 1jGpoQ-0000Q5-Gu
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:06:12 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:18876)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jGpln-0007eo-Rl
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:03:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585080207;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/8MNNRbg+bRwtci2pKFgzEsCe+hwl9dEwuw2oAOovR0=;
- b=gDtWOCv4YUEZdigU1cJ/n0mzLTkudsfDSVZPRirfNrQ7fm2XBS5J1q9OkMORWeQTUU72li
- k54QsWvL4v7dnzI2ysW2O5iSgW8PlVJKILCpiPlpuPu062F5DZ/7HlBTtSZejO6GBq0pza
- EghExtYXwOrbN1ql/8bcNGZpNN+YKbE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-vQcBUbD8NHy1ZjVoM8Xq7A-1; Tue, 24 Mar 2020 16:03:23 -0400
-X-MC-Unique: vQcBUbD8NHy1ZjVoM8Xq7A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1794107ACC4;
- Tue, 24 Mar 2020 20:03:21 +0000 (UTC)
-Received: from [10.3.113.103] (ovpn-113-103.phx2.redhat.com [10.3.113.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2628ABBBC2;
- Tue, 24 Mar 2020 20:03:18 +0000 (UTC)
-Subject: Re: [PATCH 6/6] qga/commands-posix: fix use after free of local_err
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
- <20200324153630.11882-7-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <012d4cf0-e168-a9ea-273a-a683e50ef7a0@redhat.com>
-Date: Tue, 24 Mar 2020 15:03:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1jGpoQ-0000Pl-3E
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 16:06:10 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e7a68220000>; Tue, 24 Mar 2020 13:05:54 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Tue, 24 Mar 2020 13:06:07 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate102.nvidia.com on Tue, 24 Mar 2020 13:06:07 -0700
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 24 Mar
+ 2020 20:06:07 +0000
+Received: from kwankhede-dev.nvidia.com (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via
+ Frontend Transport; Tue, 24 Mar 2020 20:06:01 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v16 Kernel 0/7] KABIs to support migration for VFIO devices
+Date: Wed, 25 Mar 2020 01:02:32 +0530
+Message-ID: <1585078359-20124-1-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+X-NVConfidentiality: public
 MIME-Version: 1.0
-In-Reply-To: <20200324153630.11882-7-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1585080354; bh=Z2j+6gx1dsfGmQOm+VWO6MwVPydfmL204YqWASsyX9s=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ X-NVConfidentiality:MIME-Version:Content-Type;
+ b=IkcnvMdaw/wLfFAcVde+tdG/OUzRlNCuGMyVQ4lMaPypvAB/h7ElumQ5D0giLUbeb
+ 5EojZ9TrWNSR8BEDtVERnipX5sjIMm/GgHMPKd+B899G5BIJhOpMmr2JHJyqjuw9+F
+ roUXEk6s1OCXmobItd3kPoC1nkLKWaywmfnaf8420uKO5o5nZHqVSLwoUsu6FRyJ44
+ 5ttQ0hMraH3KEum3aKfSPHFXr3OG8RctJL7Yjn0Uo8Waqa+8LS8Bc9iIVzp6CIt6YQ
+ ci8ChrfiVZ55w3l/MwGv4yNP7J+HF6It5d1AEl7Ei70EyZRCOo8tw8pIhY4yQbABvc
+ u7+HKkz/WeRHg==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,97 +81,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com,
- marcandre.lureau@redhat.com, den@openvz.org, mreitz@redhat.com,
- jsnow@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/24/20 10:36 AM, Vladimir Sementsov-Ogievskiy wrote:
-> local_err is used several times in guest_suspend(). Setting non-NULL
-> local_err will crash, so let's zero it after freeing. Also fix possible
-> leak of local_err in final if().
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   qga/commands-posix.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 93474ff770..cc69b82704 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -1773,6 +1773,7 @@ static void guest_suspend(SuspendMode mode, Error **errp)
->       }
->   
->       error_free(local_err);
-> +    local_err = NULL;
+Hi,
 
-Let's show this with more context.
+This patch set adds:
+* New IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+  respect to IOMMU container rather than per device. All pages pinned by
+  vendor driver through vfio_pin_pages external API has to be marked as
+  dirty during  migration. When IOMMU capable device is present in the
+  container and all pages are pinned and mapped, then all pages are marked
+  dirty.
+  When there are CPU writes, CPU dirty page tracking can identify dirtied
+  pages, but any page pinned by vendor driver can also be written by
+  device. As of now there is no device which has hardware support for
+  dirty page tracking. So all pages which are pinned should be considered
+  as dirty.
+  This ioctl is also used to start/stop dirty pages tracking for pinned and
+  unpinned pages while migration is active.
 
-> static void guest_suspend(SuspendMode mode, Error **errp)
-> {
->     Error *local_err = NULL;
->     bool mode_supported = false;
-> 
->     if (systemd_supports_mode(mode, &local_err)) {
+* Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
+  unmapping IO virtual address range.
+  With vIOMMU, during pre-copy phase of migration, while CPUs are still
+  running, IO virtual address unmap can happen while device still keeping
+  reference of guest pfns. Those pages should be reported as dirty before
+  unmap, so that VFIO user space application can copy content of those
+  pages from source to destination.
 
-Hmm - we have an even earlier bug that needs fixing.  Note that 
-systemd_supports_mode() returns a bool AND conditionally sets errp.  But 
-it is inconsistent: it has the following table of actions based on the 
-results of run_process_child() on "systemctl status" coupled with the 
-man page on "systemctl status" return values:
--1 (unable to run systemctl) -> errp set, return false
-0 (unit is active) -> errp left unchanged, return false
-1 (unit not failed) -> errp left unchanged, return true
-2 (unused) -> errp left unchanged, return true
-3 (unit not active) -> errp left unchanged, return true
-4 (no such unit) -> errp left unchanged, return false
-5+ (unexpected from systemctl) -> errp left unchanged, return false
+* Patch 7 detect if IOMMU capable device driver is smart to report pages
+  to be marked dirty by pinning pages using vfio_pin_pages() API.
 
-But the comments in systemd_supports_mode() claim that ANY status < 4 
-(other than -1, which means we did not run systemctl) should count as 
-the service existing, even though the most common status is 3.  If our 
-comment is to be believed, then we should return true, not false, for 
-status 0.
 
-Now, back to _this_ function:
+Yet TODO:
+Since there is no device which has hardware support for system memmory
+dirty bitmap tracking, right now there is no other API from vendor driver
+to VFIO IOMMU module to report dirty pages. In future, when such hardware
+support will be implemented, an API will be required such that vendor
+driver could report dirty pages to VFIO module during migration phases.
 
->         mode_supported = true;
->         systemd_suspend(mode, &local_err);
+Adding revision history from previous QEMU patch set to understand KABI
+changes done till now
 
-Okay - if we get here (whether from status 1-3, or with 
-systemd_supports_mode fixed to support status 0-3), local_err is still 
-unset prior to calling systemd_suspend(), and we are guaranteed that 
-after the call, either we suspended successfully or local_err is now set.
+v15 -> v16
+- Minor edits and nit picks (Auger Eric)
+- On copying bitmap to user, re-populated bitmap only for pinned pages,
+  excluding unmapped pages and CPU dirtied pages.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
 
->     }
-> 
->     if (!local_err) {
->         return;
->     }
+v14 -> v15
+- Minor edits and nit picks.
+- In the verification of user allocated bitmap memory, added check of
+   maximum size.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
 
-So if returned, we succeeded at systemd_suspend, and there is nothing 
-further to do; but if we get past that point, we don't know if it was 
-systemd_supports_mode that failed or systemd_suspend that failed, and we 
-don't know if local_err is set.
+v13 -> v14
+- Added struct vfio_bitmap to kabi. updated structure
+  vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
+- All small changes suggested by Alex.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
 
-> 
->     error_free(local_err);
-> +    local_err = NULL;
+v12 -> v13
+- Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
+- Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
+- Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
+  field.
 
-Yet, we blindly throw away local_err, without trying to report it.  If 
-that's the case, then WHY are we passing in local_err?  Wouldn't it be 
-better to pass in NULL (we really don't care about the error message), 
-and/or fix systemd_suspend() to return a bool just like 
-systemd_supports_mode, and/or fix systemd_supports_mode to guarantee 
-that it sets errp when returning false?
+v11 -> v12
+- Changed bitmap allocation in vfio_iommu_type1.
+- Remove atomicity of ref_count.
+- Updated comments for migration device state structure about error
+  reporting.
+- Nit picks from v11 reviews
+
+v10 -> v11
+- Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
+- Added proposal to detect if IOMMU capable device calls external pin pages
+  API to mark pages dirty.
+- Nit picks from v10 reviews
+
+v9 -> v10:
+- Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
+  during unmap while migration is active
+- Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
+  tracking.
+- If iommu_mapped, mark all pages dirty.
+- Added unpinned pages tracking while migration is active.
+- Updated comments for migration device state structure with bit
+  combination table and state transition details.
+
+v8 -> v9:
+- Split patch set in 2 sets, Kernel and QEMU.
+- Dirty pages bitmap is queried from IOMMU container rather than from
+  vendor driver for per device. Added 2 ioctls to achieve this.
+
+v7 -> v8:
+- Updated comments for KABI
+- Added BAR address validation check during PCI device's config space load
+  as suggested by Dr. David Alan Gilbert.
+- Changed vfio_migration_set_state() to set or clear device state flags.
+- Some nit fixes.
+
+v6 -> v7:
+- Fix build failures.
+
+v5 -> v6:
+- Fix build failure.
+
+v4 -> v5:
+- Added decriptive comment about the sequence of access of members of
+  structure vfio_device_migration_info to be followed based on Alex's
+  suggestion
+- Updated get dirty pages sequence.
+- As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+  get_object, save_config and load_config.
+- Fixed multiple nit picks.
+- Tested live migration with multiple vfio device assigned to a VM.
+
+v3 -> v4:
+- Added one more bit for _RESUMING flag to be set explicitly.
+- data_offset field is read-only for user space application.
+- data_size is read for every iteration before reading data from migration,
+  that is removed assumption that data will be till end of migration
+  region.
+- If vendor driver supports mappable sparsed region, map those region
+  during setup state of save/load, similarly unmap those from cleanup
+  routines.
+- Handles race condition that causes data corruption in migration region
+  during save device state by adding mutex and serialiaing save_buffer and
+  get_dirty_pages routines.
+- Skip called get_dirty_pages routine for mapped MMIO region of device.
+- Added trace events.
+- Split into multiple functional patches.
+
+v2 -> v3:
+- Removed enum of VFIO device states. Defined VFIO device state with 2
+  bits.
+- Re-structured vfio_device_migration_info to keep it minimal and defined
+  action on read and write access on its members.
+
+v1 -> v2:
+- Defined MIGRATION region type and sub-type which should be used with
+  region type capability.
+- Re-structured vfio_device_migration_info. This structure will be placed
+  at 0th offset of migration region.
+- Replaced ioctl with read/write for trapped part of migration region.
+- Added both type of access support, trapped or mmapped, for data section
+  of the region.
+- Moved PCI device functions to pci file.
+- Added iteration to get dirty page bitmap until bitmap for all requested
+  pages are copied.
+
+Thanks,
+Kirti
+
+
+Kirti Wankhede (7):
+  vfio: KABI for migration interface for device state
+  vfio iommu: Remove atomicity of ref_count of pinned pages
+  vfio iommu: Add ioctl definition for dirty pages tracking.
+  vfio iommu: Implementation of ioctl for dirty pages tracking.
+  vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
+  vfio iommu: Adds flag to indicate dirty pages tracking capability
+    support
+  vfio: Selective dirty page tracking if IOMMU backed device pins pages
+
+ drivers/vfio/vfio.c             |  13 +-
+ drivers/vfio/vfio_iommu_type1.c | 421 ++++++++++++++++++++++++++++++++++++++--
+ include/linux/vfio.h            |   4 +-
+ include/uapi/linux/vfio.h       | 299 +++++++++++++++++++++++++++-
+ 4 files changed, 715 insertions(+), 22 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.7.0
 
 
