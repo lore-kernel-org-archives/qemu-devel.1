@@ -2,95 +2,107 @@ Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D46C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD98C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:16:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57DF82076F
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:14:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57DF82076F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4220E2076F
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 15:16:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ic1n9KRF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4220E2076F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGlGZ-00074f-GM
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 11:14:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35864)
+	id 1jGlHk-0000pK-D5
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 11:16:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jGlBd-0007DQ-BY
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:09:50 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jGlEJ-0003ii-J9
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:12:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jGlBc-0003Lq-7O
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:09:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43328)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jGlBb-0003Ky-VJ
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:09:48 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02OF5mFl059476
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 11:09:47 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yxw7dfbhm-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 11:09:46 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Tue, 24 Mar 2020 15:09:43 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 24 Mar 2020 15:09:40 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02OF9ema44957982
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 24 Mar 2020 15:09:41 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E51ACA4060;
- Tue, 24 Mar 2020 15:09:40 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 92C34A405B;
- Tue, 24 Mar 2020 15:09:39 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.9.40])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 24 Mar 2020 15:09:39 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 7/8] pc-bios: s390x: Replace 0x00 with 0x0 or 0
-Date: Tue, 24 Mar 2020 11:08:46 -0400
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200324150847.10476-1-frankja@linux.ibm.com>
-References: <20200324150847.10476-1-frankja@linux.ibm.com>
+ (envelope-from <mreitz@redhat.com>) id 1jGlEI-0005xq-2c
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:12:35 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37742)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jGlEH-0005vs-P0
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 11:12:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585062751;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=XVRI+0TaVkGSXoxGYRPK4jgkzwvM7P7yrtyi91Xapf8=;
+ b=Ic1n9KRFXQ252/L0BOkXCgegC3aqXeXbHsPIOlhg8EVEb+xyjueuAAtFtQMpKXzjfymAS7
+ 9/m6TY/FGlZt5v0/7jiWW0bwvmAPUrz5Q5pJOzVLIkwSnhIHi+XDD04PWBTlKr9ztt15DS
+ cQx/dyn2WnxiNBvHSC7OCm+MP+h8LjU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-95--M9lljIeNhSQdyoGV9LVtg-1; Tue, 24 Mar 2020 11:12:28 -0400
+X-MC-Unique: -M9lljIeNhSQdyoGV9LVtg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D981A1360;
+ Tue, 24 Mar 2020 15:12:27 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-213.ams2.redhat.com
+ [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 62D6560BF3;
+ Tue, 24 Mar 2020 15:12:24 +0000 (UTC)
+Subject: Re: [PATCH v8 07/11] iotests: limit line length to 79 chars
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200317004105.27059-1-jsnow@redhat.com>
+ <20200317004105.27059-8-jsnow@redhat.com>
+ <dcc1f8fa-2916-4241-b213-5ddf0ed62c34@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2f230c22-bd4b-ded5-27a9-1971efea0ec3@redhat.com>
+Date: Tue, 24 Mar 2020 16:12:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032415-0012-0000-0000-00000396E73F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032415-0013-0000-0000-000021D3DBAE
-Message-Id: <20200324150847.10476-8-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-24_05:2020-03-23,
- 2020-03-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- lowpriorityscore=0 malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=456
- mlxscore=0 suspectscore=1 bulkscore=0 priorityscore=1501 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240079
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <dcc1f8fa-2916-4241-b213-5ddf0ed62c34@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="r8upjIegqRpxbzSOcgLVSPuSsU8132QV7"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,77 +114,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ philmd@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-0x00 looks odd, time to replace it with 0 or 0x0 (for pointers).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--r8upjIegqRpxbzSOcgLVSPuSsU8132QV7
+Content-Type: multipart/mixed; boundary="AWgbCxGh2oPHEFXbBICLWStbnVevmOCRX"
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- pc-bios/s390-ccw/dasd-ipl.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+--AWgbCxGh2oPHEFXbBICLWStbnVevmOCRX
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
-index b932531e6f838405..764ee89e92e3ae8d 100644
---- a/pc-bios/s390-ccw/dasd-ipl.c
-+++ b/pc-bios/s390-ccw/dasd-ipl.c
-@@ -98,18 +98,18 @@ static int run_dynamic_ccw_program(SubChannelId schid, uint16_t cutype,
- 
- static void make_readipl(void)
- {
--    Ccw0 *ccwIplRead = (Ccw0 *)0x00;
-+    Ccw0 *ccwIplRead = (Ccw0 *)0x0;
- 
-     /* Create Read IPL ccw at address 0 */
-     ccwIplRead->cmd_code = CCW_CMD_READ_IPL;
--    ccwIplRead->cda = 0x00; /* Read into address 0x00 in main memory */
-+    ccwIplRead->cda = 0x0; /* Read into address 0x00 in main memory */
-     ccwIplRead->chain = 0; /* Chain flag */
-     ccwIplRead->count = 0x18; /* Read 0x18 bytes of data */
- }
- 
- static void run_readipl(SubChannelId schid, uint16_t cutype)
- {
--    if (do_cio(schid, cutype, 0x00, CCW_FMT0)) {
-+    if (do_cio(schid, cutype, 0x0, CCW_FMT0)) {
-         panic("dasd-ipl: Failed to run Read IPL channel program\n");
-     }
- }
-@@ -133,10 +133,10 @@ static void check_ipl2(uint32_t ipl2_addr)
- {
-     Ccw0 *ccw = u32toptr(ipl2_addr);
- 
--    if (ipl2_addr == 0x00) {
-+    if (ipl2_addr == 0) {
-         panic("IPL2 address invalid. Is this disk really bootable?\n");
-     }
--    if (ccw->cmd_code == 0x00) {
-+    if (ccw->cmd_code == 0) {
-         panic("IPL2 ccw data invalid. Is this disk really bootable?\n");
-     }
- }
-@@ -161,7 +161,7 @@ static void ipl1_fixup(void)
-     memcpy(ccwRead, (void *)0x08, 16);
- 
-     /* Disable chaining so we don't TIC to IPL2 channel program */
--    ccwRead->chain = 0x00;
-+    ccwRead->chain = 0;
- 
-     ccwSeek->cmd_code = CCW_CMD_DASD_SEEK;
-     ccwSeek->cda = ptr2u32(seekData);
-@@ -206,7 +206,7 @@ static void run_ipl2(SubChannelId schid, uint16_t cutype, uint32_t addr)
-  */
- void dasd_ipl(SubChannelId schid, uint16_t cutype)
- {
--    PSWLegacy *pswl = (PSWLegacy *) 0x00;
-+    PSWLegacy *pswl = (PSWLegacy *) 0x0;
-     uint32_t ipl2_addr;
- 
-     /* Construct Read IPL CCW and run it to read IPL1 from boot disk */
--- 
-2.25.1
+On 24.03.20 16:02, Max Reitz wrote:
+> On 17.03.20 01:41, John Snow wrote:
+>> 79 is the PEP8 recommendation. This recommendation works well for
+>> reading patch diffs in TUI email clients.
+>=20
+> Also for my very GUI-y diff program (kompare).
+>=20
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/iotests.py | 64 +++++++++++++++++++++++------------
+>>  tests/qemu-iotests/pylintrc   |  6 +++-
+>>  2 files changed, 47 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.=
+py
+>> index 3d90fb157d..75fd697d77 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>=20
+> [...]
+>=20
+>> @@ -529,11 +539,13 @@ def pause_drive(self, drive, event=3DNone):
+>>              self.pause_drive(drive, "write_aio")
+>>              return
+>>          self.qmp('human-monitor-command',
+>> -                 command_line=3D'qemu-io %s "break %s bp_%s"' % (drive,=
+ event, drive))
+>> +                 command_line=3D'qemu-io %s "break %s bp_%s"'
+>> +                 % (drive, event, drive))
+>=20
+> Can we put this value in a variable instead?  I don=E2=80=99t like the %
+> aligning with the parameter name instead of the string value.  (I also
+> don=E2=80=99t like how there are no spaces around the assignment =3D, but=
+ around
+> the %, even though the % binds more strongly.)
+>=20
+>> =20
+>>      def resume_drive(self, drive):
+>>          self.qmp('human-monitor-command',
+>> -                 command_line=3D'qemu-io %s "remove_break bp_%s"' % (dr=
+ive, drive))
+>> +                 command_line=3D'qemu-io %s "remove_break bp_%s"'
+>> +                 % (drive, drive))
+>> =20
+>>      def hmp_qemu_io(self, drive, cmd):
+>>          '''Write to a given drive using an HMP command'''
+>> @@ -793,16 +805,18 @@ def dictpath(self, d, path):
+>>                  idx =3D int(idx)
+>> =20
+>>              if not isinstance(d, dict) or component not in d:
+>> -                self.fail('failed path traversal for "%s" in "%s"' % (p=
+ath, str(d)))
+>> +                self.fail(f'failed path traversal for "{path}" in "{d}"=
+')
+>=20
+> Do we require 3.6 so that f-strings are guaranteed to work?  (I thought
+> we didn=E2=80=99t.  I=E2=80=99d be happy to use them.)
+
+Oh.  Of course we do.  It says so in this file that this whole series is
+about.
+
+Max
+
+
+--AWgbCxGh2oPHEFXbBICLWStbnVevmOCRX--
+
+--r8upjIegqRpxbzSOcgLVSPuSsU8132QV7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl56I1YACgkQ9AfbAGHV
+z0CM4Qf9FkwZFN9SCQscD1Uu0jw/CUuvjFNfdvJdOUkmep64HaxA62z57mPg72sh
+TWxGfR7B77gjbP4a/6z1epWw1001wehvKzu/RQCnCKky5HJ4S+xfo5PT1RIYwhUO
+6I6tHMrI2BMAJbeQaoUeECLGCTO1ctVhsMPWxfCTmzzKG5CvO7ViiQN833BxNnyU
+hf8kwWB+oEPDIboCMYe5Lf7odnLtW/1ZzSIf401mr4KXIU1pZrEF8GfJO9rRTbsN
+BGHhh31MImEpdRrej0ZNoqPnA/RH8oqMCC/FwFzDpwp7bgDjSiveCq5U862WhD8B
+Gb0bdaE6B3Dlor7zO7NbEPNKDbbWKQ==
+=AIOP
+-----END PGP SIGNATURE-----
+
+--r8upjIegqRpxbzSOcgLVSPuSsU8132QV7--
 
 
