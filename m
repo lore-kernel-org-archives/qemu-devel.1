@@ -1,74 +1,69 @@
 Return-Path: <SRS0=M7c2=5J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLACK autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF149C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 04:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C22B0C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 04:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9139720714
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 04:30:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9139720714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8E4862073E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Mar 2020 04:49:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="E0NazzpY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4862073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGbDN-0001Qo-Mv
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 00:30:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58930)
+	id 1jGbVY-0007Ey-NB
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 00:49:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33401)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jGbCN-0000j1-9k
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 00:29:56 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jGbUr-0006ka-DM
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 00:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jGbCM-0007ya-3I
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 00:29:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37410)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jGbCL-0007y8-UH
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 00:29:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jGbCL-0002Ai-3L
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 04:29:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1298A2E8076
- for <qemu-devel@nongnu.org>; Tue, 24 Mar 2020 04:29:53 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1jGbUp-0008Db-Ks
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 00:49:00 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:38311 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jGbUo-0008B7-BJ; Tue, 24 Mar 2020 00:48:59 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48mf0M6sQcz9sSL; Tue, 24 Mar 2020 15:48:51 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1585025331;
+ bh=bxZxelmebJBmouwxWHIMvReN6q3JRF3WCEg7dFnZteU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=E0NazzpYAgpY/mpbavLgKB5UYZPnGBXjnvrIVfpKE9nzjOVAL8f26UOrE9V5WXB3z
+ /52hHk2dZhbY2xWubKfEzZMoEhymLw4FpZYDT45z4b+T73QgCi1DPAniSFmW5eurei
+ lIKfcZ3YgR3cR3t1Qx0gBPPT+uRosj4n2ieCNgek=
+Date: Tue, 24 Mar 2020 15:24:25 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PULL 11/26] vfio/spapr: Allow backing bigger guest IOMMU pages
+ with smaller physical pages
+Message-ID: <20200324042425.GD36889@umbus.fritz.box>
+References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
+ <20180821043343.7514-12-david@gibson.dropbear.id.au>
+ <CAFEAcA_yCceBjJU+QfcSe+wHkSZp90e3XZ-H_Au2VhfY_Zmuxw@mail.gmail.com>
+ <11abd8d3-f2f0-c1c2-fb1c-2466091a23fc@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Mar 2020 04:17:23 -0000
-From: Launchpad Bug Tracker <1592336@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor jirislaby th-huth
-X-Launchpad-Bug-Reporter: Jirislaby (jirislaby)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160614095524.12099.1990.malonedeb@wampee.canonical.com>
-Message-Id: <158502344396.22792.615932202292848899.malone@loganberry.canonical.com>
-Subject: [Bug 1592336] Re: mouse is defunct when grabbed
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 243dcf05f10104ff831fe134dd6b0959e075798d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="pQhZXvAqiZgbeUkD"
+Content-Disposition: inline
+In-Reply-To: <11abd8d3-f2f0-c1c2-fb1c-2466091a23fc@ozlabs.ru>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,60 +72,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1592336 <1592336@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+--pQhZXvAqiZgbeUkD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Tue, Mar 24, 2020 at 03:08:22PM +1100, Alexey Kardashevskiy wrote:
+>=20
+>=20
+> On 23/03/2020 21:55, Peter Maydell wrote:
+> > On Tue, 21 Aug 2018 at 05:33, David Gibson <david@gibson.dropbear.id.au=
+> wrote:
+> >>
+> >> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>
+> >> At the moment the PPC64/pseries guest only supports 4K/64K/16M IOMMU
+> >> pages and POWER8 CPU supports the exact same set of page size so
+> >> so far things worked fine.
+> >>
+> >> However POWER9 supports different set of sizes - 4K/64K/2M/1G and
+> >> the last two - 2M and 1G - are not even allowed in the paravirt interf=
+ace
+> >> (RTAS DDW) so we always end up using 64K IOMMU pages, although we could
+> >> back guest's 16MB IOMMU pages with 2MB pages on the host.
+> >>
+> >> This stores the supported host IOMMU page sizes in VFIOContainer and u=
+ses
+> >> this later when creating a new DMA window. This uses the system page s=
+ize
+> >> (64k normally, 2M/16M/1G if hugepages used) as the upper limit of
+> >> the IOMMU pagesize.
+> >>
+> >> This changes the type of @pagesize to uint64_t as this is what
+> >> memory_region_iommu_get_min_page_size() returns and clz64() takes.
+> >>
+> >> There should be no behavioral changes on platforms other than pseries.
+> >> The guest will keep using the IOMMU page size selected by the PHB page=
+size
+> >> property as this only changes the underlying hardware TCE table
+> >> granularity.
+> >=20
+> > Hi; Coverity has raised an issue (CID 1421903) on this code and
+> > I'm not sure if it's correct or not.
+> >=20
+> >=20
+> >> @@ -144,9 +145,27 @@ int vfio_spapr_create_window(VFIOContainer *conta=
+iner,
+> >>  {
+> >>      int ret;
+> >>      IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr);
+> >> -    unsigned pagesize =3D memory_region_iommu_get_min_page_size(iommu=
+_mr);
+> >> +    uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu=
+_mr);
+> >>      unsigned entries, pages;
+> >>      struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeof=
+(create) };
+> >> +    long systempagesize =3D qemu_getrampagesize();
+> >> +
+> >> +    /*
+> >> +     * The host might not support the guest supported IOMMU page size,
+> >> +     * so we will use smaller physical IOMMU pages to back them.
+> >> +     */
+> >> +    if (pagesize > systempagesize) {
+> >> +        pagesize =3D systempagesize;
+> >> +    }
+>=20
+> pagesize cannot be zero here (I checked possible code paths)...
+>=20
+>=20
+>=20
+> >> +    pagesize =3D 1ULL << (63 - clz64(container->pgsizes &
+> >> +                                   (pagesize | (pagesize - 1))));
+> >> If the argument to clz64() is zero then it will return 64, and
+> > then we will try to do a shift by -1, which is undefined
+> > behaviour.
+>=20
+> ... but the clz64() argument can if lets say container->pgsizes=3D1<<30
+> (comes from VFIO) and pagesize=3D1<<16 (decided by QEMU or guest).
+>=20
+>=20
+> I'll sent a patch to handle clz64()=3D>64. Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1592336
+Thanks, Alexey.
 
-Title:
-  mouse is defunct when grabbed
+Peter, I don't think this is urgent however - it's really unlikely in
+practice.
 
-Status in QEMU:
-  Expired
+>=20
+>=20
+> > Can the expression ever be zero? It's not immediately obvious to me
+> > that it can't be, so my suggestion would be that if it is
+> > impossible then an assert() of that would be helpful, and if it
+> > is possible then the code needs to avoid the illegal shift.
+>=20
+> >> +    if (!pagesize) {
+> >> +        error_report("Host doesn't support page size 0x%"PRIx64
+> >> +                     ", the supported mask is 0x%lx",
+> >> +                     memory_region_iommu_get_min_page_size(iommu_mr),
+> >> +                     container->pgsizes);
+> >> +        return -EINVAL;
+> >> +    }
+> >=20
+> > thanks
+> > -- PMM
+> >=20
+>=20
 
-Bug description:
-  I run qemu as follows:
-  qemu-system-x86_64 -machine accel=3Dkvm -k en-us -smp 4 -m 2371 -usb \
-    -device virtio-rng-pci \
-    -drive file=3D/home/new/suse-fact.img,format=3Draw,discard=3Dunmap,if=
-=3Dnone,id=3Dhd
-    -device virtio-scsi-pci,id=3Dscsi -device scsi-hd,drive=3Dhd \
-    -soundhw hda \
-    -net user,tftp=3D/home/xslaby/tftp,bootfile=3D/pxelinux.0,hostfwd=3Dtcp=
-::2222-:22,hostfwd=3Dtcp::3632-:3632 -net nic,model=3Dvirtio \
-    -serial pty -balloon virtio -vga virtio -display gtk,gl=3Don
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  When I run X server with icewm inside the machine, the cursor works
-  until I grab the mous with ctrl-alt-g. Then the cursor dismissed and
-  the mouse is defunct.
+--pQhZXvAqiZgbeUkD
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  I also tried -usbdevice mouse and  -usbdevice tablet with the same
-  result.
+-----BEGIN PGP SIGNATURE-----
 
-  I have these versions of qemu packages:
-  qemu-2.6.0-470.2.x86_64
-  qemu-ipxe-1.0.0-470.2.noarch
-  qemu-ksm-2.6.0-470.2.x86_64
-  qemu-kvm-2.6.0-470.2.x86_64
-  qemu-ovmf-x86_64-2015+git1462940744.321151f-2.1.noarch
-  qemu-ppc-2.6.0-470.2.x86_64
-  qemu-seabios-1.9.1-470.2.noarch
-  qemu-sgabios-8-470.2.noarch
-  qemu-tools-2.6.0-470.2.x86_64
-  qemu-vgabios-1.9.1-470.2.noarch
-  qemu-x86-2.6.0-470.2.x86_64
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl55i3kACgkQbDjKyiDZ
+s5JxFBAA4hwCFZE6v9B+TnWL0mykx6M16yNLNMIOllQYbm9vGH8UtJ24+zn66lBS
+lhtPSZ6Wi5BSMa/SfuXJ54qDAA4M3ddukYGHWv8zk5N2yjgftMAIls8MZZmiXWJ2
+g4W+N+IJ7Zo66qON+SsQ17w9Abe8TcGX6DCzoO0h4cgdYQeTjRL75qVWd7FI38i3
+V/sBxq2XLU33c45J+XjBU2ctZpzFFsjv5Qt4JRINlSDi6zwC2X2ZxQX9Cq3HhszL
+EbSKXmXUeHwTh7POelbiWFFZxUcgcKXgWlclPNSZK75CIPEj/WoFXl15D5lff+8G
+is1RH6pfGjob1KpE96IB8dOddJTmYxdfHveQFegwOBaLKdYxeZjw/V+MoFw91+AS
+9Vm+fZB506pBGfBLbwGyVhLsM34YzxBejL/Rbuzx40FftutGfRgQgR+36KOtYo+0
+gbud35rDwIiq09Lu0CzJEgweZTpThssg2zBNVVbuDIvY9RgaW9/gdvhEbasYEcnt
+XaLfQT2+DhzRzVFcYlsccZxW/6hllmA/RHXnHv5HSZZtfu3gfMTDlw1um1y1VtHJ
+yVmc5yqrhaoYKr2yq/t1N+LX7dYP4o0LjJKjy+1srLdBFdmfM393V4Pk0ubR0zPt
+RFa0XuqYknq+FlYTCoRUZkD3gEN1q1KynLHFPT2edLzWmhQvQ3M=
+=ilKL
+-----END PGP SIGNATURE-----
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1592336/+subscriptions
+--pQhZXvAqiZgbeUkD--
 
