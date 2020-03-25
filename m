@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F203C2D0E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B31A5C2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D7B02077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 811BA20774
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:59:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iVPi4dKS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D7B02077D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h68cwDYe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 811BA20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHAIU-00033n-8V
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:58:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37936)
+	id 1jHAJW-0004Z7-LI
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:59:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37557)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jHAHM-0001eu-Jh
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:57:29 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jHAFx-0008UD-OG
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jHAHL-0001To-DN
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:57:24 -0400
-Received: from mail-vk1-xa44.google.com ([2607:f8b0:4864:20::a44]:36284)
+ (envelope-from <alistair23@gmail.com>) id 1jHAFw-0000QY-Dx
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:55:57 -0400
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:39431)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jHAHL-0001Td-9K; Wed, 25 Mar 2020 13:57:23 -0400
-Received: by mail-vk1-xa44.google.com with SMTP id m131so935270vkh.3;
- Wed, 25 Mar 2020 10:57:23 -0700 (PDT)
+ id 1jHAFw-0000QN-9d; Wed, 25 Mar 2020 13:55:56 -0400
+Received: by mail-vs1-xe43.google.com with SMTP id j128so2088508vsd.6;
+ Wed, 25 Mar 2020 10:55:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8XBKuKHkiomYbsAdzYphsuRy+m0BwopVAsXsVOg9Wsg=;
- b=iVPi4dKSg6jjIAwnZkyZlR8QtQNVHvREPGZQtaxZzP3NATHbLxZT6m/vJ1DCB1p9rP
- EX72hXCJF3ncm0K+tvWwjdK5KuRfrbH/TI4zPbdrMvN3HSs0ERUR97ekNdrZi38R8lHO
- x/bDDqPixIFEEGmhz2yuTrJnQ99AiYk322+AfegVDQpyA8wsyZUBS8lK4GpEmJAzA+fw
- IkEVR7Vybe0Prn1L7idD/s5Ik3TDTaKn8VMADuBX+g0SzFlEORLyrSF8J5gPtD+u95w+
- 7q7M5d7AJBQMgjyEwYje64GYKhlRxxXkwlQGkldSELGUTnNzZcO7C5dfmfpZyD6yp4G0
- OVVQ==
+ :cc; bh=Hb41Uu9X+qdK+JM63ddY79ni7JfY01j0661vSqrp/JM=;
+ b=h68cwDYeO8roMKfbD0BJxpHIPmOM69JncIw6hUCgZQkiqwfEBrDGHwRekOCBoyz2N7
+ 9scRL+CDDqf2MTJXZXFazZAduOaoFKo0Fr8ZkzC/nqctZtSMPRJejjsPJKZlJDH3mg7C
+ /f0nFYz1KNXb4F4t8Ah8YctTVqY4t403K8N9ko0or+HLTB8rZ3cdW+xxrpjCGKb4QXIj
+ sE6g1E+mrErfM9EEkhHvW4Glvry1+98KlPVffkiI/wzE8lYI5VU29jcv/LPDdpW7ThdJ
+ wTaAmcpQ4L4fc7xxb5Le2S9fzjDE+FgAlBufqKjREsLz0ev0pxDtVOmTCcpTGEi6B5Iz
+ XOcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8XBKuKHkiomYbsAdzYphsuRy+m0BwopVAsXsVOg9Wsg=;
- b=XtlmDK07W158L7yFT4j2jR/sl19h80oYZ7wPGmpkqfv42nshk48ESyPM8fSzwyOEld
- QzG5h90cFOcubjJqidE2oBxUoTVLec3i8V+RT73I50YfLjScPZB6yi+YfFiYn42EUp/N
- vYxk0S0VoULKFBHoTNgUCd5hHpbnR50s71kDfGcqwn8AxpOMEfKZUdb7A6QZO6mOSHXJ
- +fUYsr80w4IbCG3J+gxstnqWmpWJKE6xHxN3v3UkHRzTZ7i777CCiZfhJNeuKdW2quAK
- XH7ilDbZM8NIDj6PRFxOfhrWJod5o1rYkdtd94jL7ZDQKMsF1GTwciz29qotl9d9MnHA
- olMg==
-X-Gm-Message-State: ANhLgQ26TNIMOn+oybo1r0Sf7i7bXxoYQA7rCINiJLwfxz1/xXS1q/Xz
- RxF567evGWJDYqmQmuNfCFYBonfdJZyS/XQZLXw=
-X-Google-Smtp-Source: ADFU+vtGAuzbaGJ+g1ehuxWBrsCvjjTdytj9yUTptXN/T2NfKIMhbeYzbcA8+cqvJmhRCMi7CgcVTt1bia8upqhnxYA=
-X-Received: by 2002:a1f:5e0a:: with SMTP id s10mr3391436vkb.37.1585159042486; 
- Wed, 25 Mar 2020 10:57:22 -0700 (PDT)
+ bh=Hb41Uu9X+qdK+JM63ddY79ni7JfY01j0661vSqrp/JM=;
+ b=W6hbkNUKj3gFiAtZGvf6HXXn6tAmSqLKe3FfOoEo14ilpWc6ZYhfAFpNuchDkpapUo
+ J7EvQ6827gt1eMfYJ6ovRHslvcVkP3lxYxBVzWOqm6d73oqrWim1FC+k9WpiplgsO2KF
+ vdD6AY7d4oC1g04IRUHNHBv7IeThMEvSJDwRgl4rELuHToz+EC2m2ZvR2P4poFiTadTZ
+ U3/nX86lig0nHqkal7SIiH6+d3b9E8EXV8x8pTDgnVxznvPoT+q0jzIhJ62E9AgT6+e1
+ VxLqHRevuJdFYy2ntI8a5Qa5j0i219KzhZGOGUcjnGtiSv5pJ/5DKS1hkk+H+CIv7oXt
+ LOeQ==
+X-Gm-Message-State: ANhLgQ2YegcGe4i+grKTNTJDwOlZxdYcxqfkGynAEr6r1LMkfF8jjU0l
+ rnmK2tLuKaqabcdN1i26ycBBezhx91qq43z1GFc=
+X-Google-Smtp-Source: ADFU+vt5unbIpI5fcJsfTtsLOkOTbmI2DJIvyRkn80JKIE5ja80hlmIkvoQxy/ybHwh/wwnniJWSa3HpIFL5SR2AZEA=
+X-Received: by 2002:a67:8a88:: with SMTP id m130mr3662851vsd.70.1585158955633; 
+ Wed, 25 Mar 2020 10:55:55 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
- <20200317150653.9008-62-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200317150653.9008-62-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-38-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-38-zhiwei_liu@c-sky.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 25 Mar 2020 10:49:23 -0700
-Message-ID: <CAKmqyKM=+x9gJGzLA4D9q189uvv+8Vhb=5nMLcPKuDbE2h4SOw@mail.gmail.com>
-Subject: Re: [PATCH v6 61/61] target/riscv: configure and turn on vector
- extension from command line
+Date: Wed, 25 Mar 2020 10:47:56 -0700
+Message-ID: <CAKmqyKMKGUuD=YVMZTpEWjCgESOZdSyFDPN8XmUispbjT4rUow@mail.gmail.com>
+Subject: Re: [PATCH v6 37/61] target/riscv: vector floating-point min/max
+ instructions
 To: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::a44
+X-Received-From: 2607:f8b0:4864:20::e43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,121 +97,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 17, 2020 at 10:09 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Vector extension is default off. The only way to use vector extension is
-> 1. use cpu rv32 or rv64
-> 2. turn on it by command line
-> "-cpu rv64,x-v=true,vlen=128,elen=64,vext_spec=v0.7.1".
->
-> vlen is the vector register length, default value is 128 bit.
-> elen is the max operator size in bits, default value is 64 bit.
-> vext_spec is the vector specification version, default value is v0.7.1.
-> These properties can be specified with other values.
+On Tue, Mar 17, 2020 at 9:21 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
 >
 > Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  target/riscv/cpu.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
->  target/riscv/cpu.h |  2 ++
->  2 files changed, 45 insertions(+), 1 deletion(-)
+>  target/riscv/helper.h                   | 13 ++++++++++++
+>  target/riscv/insn32.decode              |  4 ++++
+>  target/riscv/insn_trans/trans_rvv.inc.c |  6 ++++++
+>  target/riscv/vector_helper.c            | 27 +++++++++++++++++++++++++
+>  4 files changed, 50 insertions(+)
 >
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 6e4135583d..92cbcf1a2d 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -395,7 +395,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
->      }
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index a5d3a5a832..47d91933de 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -917,3 +917,16 @@ DEF_HELPER_6(vfwnmsac_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+>  DEF_HELPER_5(vfsqrt_v_h, void, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_5(vfsqrt_v_w, void, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_5(vfsqrt_v_d, void, ptr, ptr, ptr, env, i32)
+> +
+> +DEF_HELPER_6(vfmin_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmin_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmin_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmax_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmax_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmax_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmin_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmin_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmin_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmax_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmax_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmax_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index 4ea71eaf39..5ec5595e2c 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -490,6 +490,10 @@ vfwmsac_vf      111110 . ..... ..... 101 ..... 1010111 @r_vm
+>  vfwnmsac_vv     111111 . ..... ..... 001 ..... 1010111 @r_vm
+>  vfwnmsac_vf     111111 . ..... ..... 101 ..... 1010111 @r_vm
+>  vfsqrt_v        100011 . ..... 00000 001 ..... 1010111 @r2_vm
+> +vfmin_vv        000100 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfmin_vf        000100 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfmax_vv        000110 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfmax_vf        000110 . ..... ..... 101 ..... 1010111 @r_vm
 >
->      set_priv_version(env, priv_version);
-> -    set_vext_version(env, vext_version);
->      set_resetvec(env, DEFAULT_RSTVEC);
->
->      if (cpu->cfg.mmu) {
-> @@ -463,6 +462,45 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
->          if (cpu->cfg.ext_h) {
->              target_misa |= RVH;
->          }
-> +        if (cpu->cfg.ext_v) {
-> +            target_misa |= RVV;
-> +            if (!is_power_of_2(cpu->cfg.vlen)) {
-> +                error_setg(errp,
-> +                        "Vector extension VLEN must be power of 2");
-> +                return;
-> +            }
-> +            if (cpu->cfg.vlen > RV_VLEN_MAX || cpu->cfg.vlen < 128) {
-> +                error_setg(errp,
-> +                        "Vector extension implementation only supports VLEN "
-> +                        "in the range [128, %d]", RV_VLEN_MAX);
-> +                return;
-> +            }
-> +            if (!is_power_of_2(cpu->cfg.elen)) {
-> +                error_setg(errp,
-> +                        "Vector extension ELEN must be power of 2");
-> +                return;
-> +            }
-> +            if (cpu->cfg.elen > 64 || cpu->cfg.vlen < 8) {
-> +                error_setg(errp,
-> +                        "Vector extension implementation only supports ELEN "
-> +                        "in the range [8, 64]");
-> +                return;
-> +            }
-> +            if (cpu->cfg.vext_spec) {
-> +                if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
-> +                    vext_version = VEXT_VERSION_0_07_1;
-> +                } else {
-> +                    error_setg(errp,
-> +                           "Unsupported vector spec version '%s'",
-> +                           cpu->cfg.vext_spec);
-> +                    return;
-> +                }
-> +            } else {
-> +                qemu_log("vector verison is not specified, "
-> +                        "use the default value v0.7.1\n");
-> +            }
-> +            set_vext_version(env, vext_version);
-> +        }
->
->          set_misa(env, RVXLEN | target_misa);
->      }
-> @@ -500,10 +538,14 @@ static Property riscv_cpu_properties[] = {
->      DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
->      /* This is experimental so mark with 'x-' */
->      DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
-> +    DEFINE_PROP_BOOL("x-v", RISCVCPU, cfg.ext_v, false),
->      DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
->      DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
->      DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
->      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
-> +    DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
-> +    DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
-> +    DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
->      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
->      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
->      DEFINE_PROP_END_OF_LIST(),
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index f42f075024..42ab0f141a 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -285,12 +285,14 @@ typedef struct RISCVCPU {
->          bool ext_s;
->          bool ext_u;
->          bool ext_h;
-> +        bool ext_v;
->          bool ext_counters;
->          bool ext_ifencei;
->          bool ext_icsr;
->
->          char *priv_spec;
->          char *user_spec;
-> +        char *vext_spec;
->          uint16_t vlen;
->          uint16_t elen;
->          bool mmu;
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index bea126c07b..0c00d44e21 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -1986,3 +1986,9 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+>      return false;                                                  \
+>  }
+>  GEN_OPFV_TRANS(vfsqrt_v, opfv_check)
+> +
+> +/* Vector Floating-Point MIN/MAX Instructions */
+> +GEN_OPFVV_TRANS(vfmin_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfmax_vv, opfvv_check)
+> +GEN_OPFVF_TRANS(vfmin_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfmax_vf, opfvf_check)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index 342ba0c196..f80b522c47 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -3768,3 +3768,30 @@ RVVCALL(OPFVV1, vfsqrt_v_d, OP_UU_D, H8, H8, float64_sqrt)
+>  GEN_VEXT_V_ENV(vfsqrt_v_h, 2, 2, clearh)
+>  GEN_VEXT_V_ENV(vfsqrt_v_w, 4, 4, clearl)
+>  GEN_VEXT_V_ENV(vfsqrt_v_d, 8, 8, clearq)
+> +
+> +/* Vector Floating-Point MIN/MAX Instructions */
+> +RVVCALL(OPFVV2, vfmin_vv_h, OP_UUU_H, H2, H2, H2, float16_minnum)
+> +RVVCALL(OPFVV2, vfmin_vv_w, OP_UUU_W, H4, H4, H4, float32_minnum)
+> +RVVCALL(OPFVV2, vfmin_vv_d, OP_UUU_D, H8, H8, H8, float64_minnum)
+> +GEN_VEXT_VV_ENV(vfmin_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfmin_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfmin_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF2, vfmin_vf_h, OP_UUU_H, H2, H2, float16_minnum)
+> +RVVCALL(OPFVF2, vfmin_vf_w, OP_UUU_W, H4, H4, float32_minnum)
+> +RVVCALL(OPFVF2, vfmin_vf_d, OP_UUU_D, H8, H8, float64_minnum)
+> +GEN_VEXT_VF(vfmin_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfmin_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfmin_vf_d, 8, 8, clearq)
+> +
+> +RVVCALL(OPFVV2, vfmax_vv_h, OP_UUU_H, H2, H2, H2, float16_maxnum)
+> +RVVCALL(OPFVV2, vfmax_vv_w, OP_UUU_W, H4, H4, H4, float32_maxnum)
+> +RVVCALL(OPFVV2, vfmax_vv_d, OP_UUU_D, H8, H8, H8, float64_maxnum)
+> +GEN_VEXT_VV_ENV(vfmax_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfmax_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfmax_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF2, vfmax_vf_h, OP_UUU_H, H2, H2, float16_maxnum)
+> +RVVCALL(OPFVF2, vfmax_vf_w, OP_UUU_W, H4, H4, float32_maxnum)
+> +RVVCALL(OPFVF2, vfmax_vf_d, OP_UUU_D, H8, H8, float64_maxnum)
+> +GEN_VEXT_VF(vfmax_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfmax_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfmax_vf_d, 8, 8, clearq)
 > --
 > 2.23.0
 >
