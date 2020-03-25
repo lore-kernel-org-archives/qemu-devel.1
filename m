@@ -2,75 +2,66 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C23CC1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E22C54FD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:16:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4753320409
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:12:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4753320409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57C2820409
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57C2820409
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH8dg-0007qR-Er
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 12:12:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49797)
+	id 1jH8hG-0000qa-FL
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 12:16:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jH8cw-00073w-AW
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:11:35 -0400
+ (envelope-from <clg@kaod.org>) id 1jH8gL-0000EU-6l
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:15:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jH8ct-0005fs-Sx
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:11:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49336)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jH8ct-0005dx-Nb
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:11:31 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jH8cr-0006ES-Nr
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 16:11:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9462D2E80C9
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 16:11:29 +0000 (UTC)
+ (envelope-from <clg@kaod.org>) id 1jH8gJ-0001Iw-Rm
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:15:04 -0400
+Received: from 1.mo7.mail-out.ovh.net ([178.33.45.51]:42656)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jH8gJ-0001Au-LZ
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:15:03 -0400
+Received: from player726.ha.ovh.net (unknown [10.108.42.145])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 2A9991579D3
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 17:14:54 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player726.ha.ovh.net (Postfix) with ESMTPSA id 9F5A010B4D17A;
+ Wed, 25 Mar 2020 16:14:46 +0000 (UTC)
+Subject: Re: [EXTERNAL] [PATCH 1/5] ppc/spapr: tweak change system reset helper
+To: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org
+References: <20200325144147.221875-1-npiggin@gmail.com>
+ <20200325144147.221875-2-npiggin@gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <dd019924-a007-d69b-cbf7-ee2e1ccebfc5@kaod.org>
+Date: Wed, 25 Mar 2020 17:14:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200325144147.221875-2-npiggin@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 9475010669408127908
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudehgedgieduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Mar 2020 15:57:45 -0000
-From: Alex Williamson <alex.l.williamson@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm passthrough tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alex-l-williamson hrw pmaydell
-X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
-X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
-References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
-Message-Id: <158515186595.7043.14755579395187622825.malone@wampee.canonical.com>
-Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
- guest memory but fails on 4GB (vfio_dma_map invalid arg)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3669ff8b0930c9b07a9662366153419a95827882
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 178.33.45.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,95 +70,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1869006 <1869006@bugs.launchpad.net>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is not related to the BARs, the mapping of the BARs into the guest
-is purely virtual and controlled by the guest.  The issue is that the
-device needs to be able to DMA into guest RAM, and to do that
-transparently (ie. the guest doesn't know it's being virtualized), we
-need to map GPAs into the host IOMMU such that the guest interacts with
-the device in terms of GPAs, the host IOMMU translates that to HPAs.
-Thus the IOMMU needs to support GPA range of the guest as IOVA.
-However, there are ranges of IOVA space that the host IOMMU cannot map,
-for example the MSI range here is handled by the interrupt remmapper,
-not the DMA translation portion of the IOMMU (on physical ARM systems
-these are one-in-the-same, on x86 they are different components, using
-different mapping interfaces of the IOMMU).  Therefore if the guest
-programmed the device to perform a DMA to 0xfee00000, the host IOMMU
-would see that as an MSI, not a DMA.  When we do an x86 VM on and x86
-host, both the host and the guest have complimentary reserved regions,
-which avoids this issue.
+On 3/25/20 3:41 PM, Nicholas Piggin wrote:
+> Rather than have the helper take an optional vector address
+> override, instead have its caller modify env->nip itself.
+> This is more consistent when adding pnv nmi support, and also
+> with mce injection added later.
+>=20
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-Also, to expand on what I mentioned on IRC, every x86 host is going to
-have some reserved range below 4G for this purpose, but if the aarch64
-VM has no requirements for memory below 4G, the starting GPA for the VM
-could be at or above 4G and avoid this issue.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1869006
+> ---
+>  hw/ppc/spapr.c           | 9 ++++++---
+>  target/ppc/cpu.h         | 2 +-
+>  target/ppc/excp_helper.c | 5 +----
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 9a2bd501aa..785c41d205 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3385,13 +3385,13 @@ static void spapr_machine_finalizefn(Object *ob=
+j)
+>  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg)
+>  {
+>      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +    CPUPPCState *env =3D &cpu->env;
+>=20
+>      cpu_synchronize_state(cs);
+>      /* If FWNMI is inactive, addr will be -1, which will deliver to 0x=
+100 */
+>      if (spapr->fwnmi_system_reset_addr !=3D -1) {
+>          uint64_t rtas_addr, addr;
+> -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -        CPUPPCState *env =3D &cpu->env;
+>=20
+>          /* get rtas addr from fdt */
+>          rtas_addr =3D spapr_get_rtas_addr();
+> @@ -3405,7 +3405,10 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, =
+run_on_cpu_data arg)
+>          stq_be_phys(&address_space_memory, addr + sizeof(uint64_t), 0)=
+;
+>          env->gpr[3] =3D addr;
+>      }
+> -    ppc_cpu_do_system_reset(cs, spapr->fwnmi_system_reset_addr);
+> +    ppc_cpu_do_system_reset(cs);
+> +    if (spapr->fwnmi_system_reset_addr !=3D -1) {
+> +        env->nip =3D spapr->fwnmi_system_reset_addr;
+> +    }
+>  }
+>=20
+>  static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 88d9449555..f4a5304d43 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1220,7 +1220,7 @@ int ppc64_cpu_write_elf64_note(WriteCoreDumpFunct=
+ion f, CPUState *cs,
+>  int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+>                                 int cpuid, void *opaque);
+>  #ifndef CONFIG_USER_ONLY
+> -void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector);
+> +void ppc_cpu_do_system_reset(CPUState *cs);
+>  void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector)=
+;
+>  extern const VMStateDescription vmstate_ppc_cpu;
+>  #endif
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 08bc885ca6..7f2b5899d3 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -961,15 +961,12 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>      }
+>  }
+>=20
+> -void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector)
+> +void ppc_cpu_do_system_reset(CPUState *cs)
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      CPUPPCState *env =3D &cpu->env;
+>=20
+>      powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_RESET);
+> -    if (vector !=3D -1) {
+> -        env->nip =3D vector;
+> -    }
+>  }
+>=20
+>  void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector)
+>=20
 
-Title:
-  PCIe cards passthrough to TCG guest works on 2GB of guest memory but
-  fails on 4GB (vfio_dma_map invalid arg)
-
-Status in QEMU:
-  New
-
-Bug description:
-  During one meeting coworker asked "did someone tried to passthrough
-  PCIe card to other arch guest?" and I decided to check it.
-
-  Plugged SATA and USB3 controllers into spare slots on mainboard and
-  started playing. On 1GB VM instance it worked (both cold- and hot-
-  plugged). On 4GB one it did not:
-
-  B=C5=82=C4=85d podczas uruchamiania domeny: internal error: process exite=
-d while connecting to monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarc=
-h64: -device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D=
-0x0: VFIO_MAP_DMA: -22
-  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
-0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
-d to setup container for group 28: memory listener initialization failed: R=
-egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
-0x7fb2a3e00000) =3D -22 (Invalid argument)
-
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
-e 66, in newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1279,=
- in startup
-      self._backend.create()
-    File "/usr/lib64/python3.8/site-packages/libvirt.py", line 1234, in cre=
-ate
-      if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
-=3Dself)
-  libvirt.libvirtError: internal error: process exited while connecting to =
-monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch64: -device vfio-pci,=
-host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: VFIO_MAP_DMA: -22
-  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
-0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
-d to setup container for group 28: memory listener initialization failed: R=
-egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
-0x7fb2a3e00000) =3D -22 (Invalid argument)
-
-  =
-
-  I played with memory and 3054 MB is maximum value possible to boot VM wit=
-h coldplugged host PCIe cards.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1869006/+subscriptions
 
