@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 125D5C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0DCFC43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:58:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDCAD206F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B96A9206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:58:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PVmJn5G2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCAD206F6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fVck/HS6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96A9206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH3jv-0007Hv-Vq
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:58:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37584)
+	id 1jH3kC-0007uZ-Pr
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:58:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36243)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3iV-0005Zl-DQ
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:57:00 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3Xo-0000oE-0K
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:45:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3iU-0001Xh-7D
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:56:59 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:46245)
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3Xm-0005CH-OE
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:45:55 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45686)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3iU-0001XM-3v
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:56:58 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3Xm-0005Bw-Jn
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:45:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585133817;
+ s=mimecast20190719; t=1585133154;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gdAs4D5H6p2LmwnmJAvi/+zpP9bvny/E7lPhY6MUwCc=;
- b=PVmJn5G2jtN/4t/P+gjmczoCYweW+JwrvqFLNiZMsiikrS/l460tAfW61WaptyPmcjnIcf
- hCQNCLYAz6+pwsqY//ZN25sbH/br2CL6Wom4brdjQe0cdl/BzOsS4+YUD4BFvGay6gc2l0
- qac4LzOsosjWORX252XCBTL++K8rZfU=
+ bh=gKoEf7EdMWTgGzNkMuUzYgo/AMgyKhn6j7tpOT05QQo=;
+ b=fVck/HS6brVms8nmDnpRGrVmFMsi0FhWm7TKaoftZfnYvAcNMlf3sfHI6y1QNj0v4ZQYnu
+ v/PAqV6NEbE0svWyz3hDn7WAG2+O/WkJhV/kptYW74pTM1/vzZwQfFBwwO/A05AenSxKZV
+ WIxCtfykOWarKxGoLFSAzD8mIRlD9Qw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-qftK3qVMPDOZ70p3sPp9PQ-1; Wed, 25 Mar 2020 06:56:54 -0400
-X-MC-Unique: qftK3qVMPDOZ70p3sPp9PQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-124-fxyne2N8PWKxcTOAQ0XvRQ-1; Wed, 25 Mar 2020 06:45:52 -0400
+X-MC-Unique: fxyne2N8PWKxcTOAQ0XvRQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0FA81851C37;
- Wed, 25 Mar 2020 10:56:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 500871005512;
+ Wed, 25 Mar 2020 10:45:51 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C3D3B5D9C5;
- Wed, 25 Mar 2020 10:56:50 +0000 (UTC)
-Message-ID: <27ff4b99b076e90ee7536a9c9063f10201a66096.camel@redhat.com>
-Subject: Re: [PATCH v6 29/42] nvme: refactor request bounds checking
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36A6ECDBC1;
+ Wed, 25 Mar 2020 10:45:49 +0000 (UTC)
+Message-ID: <8001a1b07bce413961ff6e3569988ab118542f5d.camel@redhat.com>
+Subject: Re: [PATCH v6 24/42] nvme: remove redundant has_sg member
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-Date: Wed, 25 Mar 2020 12:56:49 +0200
-In-Reply-To: <20200316142928.153431-30-its@irrelevant.dk>
+Date: Wed, 25 Mar 2020 12:45:48 +0200
+In-Reply-To: <20200316142928.153431-25-its@irrelevant.dk>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-30-its@irrelevant.dk>
+ <20200316142928.153431-25-its@irrelevant.dk>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
@@ -95,80 +95,95 @@ Sender: "Qemu-devel"
 On Mon, 2020-03-16 at 07:29 -0700, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> ---
->  hw/block/nvme.c | 28 ++++++++++++++++++++++------
->  1 file changed, 22 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index eecfad694bf8..ba520c76bae5 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -491,6 +491,20 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
->      }
->  }
->  
-> +static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
-> +                                         uint64_t slba, uint32_t nlb,
-> +                                         NvmeRequest *req)
-> +{
-> +    uint64_t nsze = le64_to_cpu(ns->id_ns.nsze);
-> +
-> +    if (unlikely(UINT64_MAX - slba < nlb || slba + nlb > nsze)) {
-> +        trace_nvme_dev_err_invalid_lba_range(slba, nlb, nsze);
-> +        return NVME_LBA_RANGE | NVME_DNR;
-> +    }
-> +
-> +    return NVME_SUCCESS;
-> +}
-Looks good.
+> Remove the has_sg member from NvmeRequest since it's redundant.
 
-> +
->  static void nvme_rw_cb(void *opaque, int ret)
->  {
->      NvmeRequest *req = opaque;
-> @@ -536,10 +550,11 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
->      uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
->      uint64_t offset = slba << data_shift;
->      uint32_t count = nlb << data_shift;
-> +    uint16_t status;
->  
-> -    if (unlikely(slba + nlb > ns->id_ns.nsze)) {
-> -        trace_nvme_dev_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
-> -        return NVME_LBA_RANGE | NVME_DNR;
-> +    status = nvme_check_bounds(n, ns, slba, nlb, req);
-> +    if (status) {
-> +        return status;
->      }
->  
->      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
-> @@ -562,13 +577,14 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
->      uint64_t data_offset = slba << data_shift;
->      int is_write = rw->opcode == NVME_CMD_WRITE ? 1 : 0;
->      enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
-> +    uint16_t status;
->  
->      trace_nvme_dev_rw(is_write ? "write" : "read", nlb, data_size, slba);
->  
-> -    if (unlikely((slba + nlb) > ns->id_ns.nsze)) {
-> +    status = nvme_check_bounds(n, ns, slba, nlb, req);
-> +    if (status) {
->          block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-> -        trace_nvme_dev_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
-> -        return NVME_LBA_RANGE | NVME_DNR;
-> +        return status;
->      }
->  
->      if (nvme_map(n, cmd, &req->qsg, &req->iov, data_size, req)) {
-Looks good as well, once we get support for discard, it will
-use this as well, but for now indeed only write zeros and read/write
-need bounds checking on the IO path.
+To be honest this patch also replaces the dma_acct_start with block_acct_start
+which looks right to me, and IMHO its OK to have both in the same patch,
+but that should be mentioned in the commit message
 
+With this fixed,
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
 
+> 
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> ---
+>  hw/block/nvme.c | 18 ++++++++++++------
+>  hw/block/nvme.h |  1 -
+>  2 files changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 187c816eb6ad..e40c080c3b48 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -484,16 +484,20 @@ static void nvme_rw_cb(void *opaque, int ret)
+>          block_acct_failed(blk_get_stats(n->conf.blk), &req->acct);
+>          req->status = NVME_INTERNAL_DEV_ERROR;
+>      }
+> -    if (req->has_sg) {
+> +
+> +    if (req->qsg.nalloc) {
+>          qemu_sglist_destroy(&req->qsg);
+>      }
+> +    if (req->iov.nalloc) {
+> +        qemu_iovec_destroy(&req->iov);
+> +    }
+> +
+>      nvme_enqueue_req_completion(cq, req);
+>  }
+>  
+>  static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>      NvmeRequest *req)
+>  {
+> -    req->has_sg = false;
+>      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+>           BLOCK_ACCT_FLUSH);
+>      req->aiocb = blk_aio_flush(n->conf.blk, nvme_rw_cb, req);
+> @@ -517,7 +521,6 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>          return NVME_LBA_RANGE | NVME_DNR;
+>      }
+>  
+> -    req->has_sg = false;
+>      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+>                       BLOCK_ACCT_WRITE);
+>      req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
+> @@ -554,16 +557,19 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+>  
+> -    dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
+>      if (req->qsg.nsg > 0) {
+> -        req->has_sg = true;
+> +        block_acct_start(blk_get_stats(n->conf.blk), &req->acct, req->qsg.size,
+> +                         acct);
+> +
+>          req->aiocb = is_write ?
+>              dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
+>                            nvme_rw_cb, req) :
+>              dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
+>                           nvme_rw_cb, req);
+>      } else {
+> -        req->has_sg = false;
+> +        block_acct_start(blk_get_stats(n->conf.blk), &req->acct, req->iov.size,
+> +                         acct);
+> +
+>          req->aiocb = is_write ?
+>              blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
+>                              req) :
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index b4d1738a3d0a..442b17bf1701 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -29,7 +29,6 @@ typedef struct NvmeRequest {
+>      struct NvmeSQueue       *sq;
+>      BlockAIOCB              *aiocb;
+>      uint16_t                status;
+> -    bool                    has_sg;
+>      NvmeCqe                 cqe;
+>      BlockAcctCookie         acct;
+>      QEMUSGList              qsg;
 
 
 
