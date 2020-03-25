@@ -2,98 +2,80 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A62C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47000C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:16:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01C2120719
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:13:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F2472076A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:16:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2ve5a71"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C2120719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J11jbYhc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2472076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH7iK-0000wp-6f
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:13:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40918)
+	id 1jH7lM-0003j7-0E
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:16:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jH7hd-0000EE-Uj
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:12:23 -0400
+ (envelope-from <beata.michalska@linaro.org>) id 1jH7kY-0002xE-Lq
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jH7hc-0005XV-Cq
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:12:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60812)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jH7hc-0005VG-8X
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:12:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585149139;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kpX64YQtJm4ujg56oJNHBQs9VC+OnT7YID8fWL1FT4s=;
- b=X2ve5a71V9TnEeGa9ztZp924Xe+ZlNsS6tgcIynTatp0YY7exVh1WHIR+5zfhfRokXK2j4
- 3UdXAZP9Y27VTc+5FKPBbDuAP2cB4r3rojmWJM1ssmTI0oMwY2xqT2rWt35IARRh6xj4F8
- zpNP4TBSnbq6Uvu4rrT721lD0/vydAo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-QAF3NmXFMImP1Q8T30WGPg-1; Wed, 25 Mar 2020 11:12:11 -0400
-X-MC-Unique: QAF3NmXFMImP1Q8T30WGPg-1
-Received: by mail-wm1-f69.google.com with SMTP id y1so1005728wmj.3
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 08:12:11 -0700 (PDT)
+ (envelope-from <beata.michalska@linaro.org>) id 1jH7kW-0007Yw-Lg
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:22 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:33294)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
+ id 1jH7kW-0007Vy-DT
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:20 -0400
+Received: by mail-io1-xd42.google.com with SMTP id o127so2614791iof.0
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 08:15:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=f/nHfhqolLq9DAlvAPV5hSMp5M2cRTZ5m4aLtZbOM8s=;
+ b=J11jbYhcH8sxlSp+x21Pqjk5+VPDMUjGAYfVtnYu3o3RC0TjQX8zi3QIYaaIr8S7kH
+ D00oZSFQjRO7/BfJ646aizaA+2/vDXVfnxyMkKI+/N3c6RvuW4PPGLn/3YA4NFzpr5Zq
+ u9ticRNE+WCfBtatOB+Kx6JLY1IE9dOdHm3GSIEm/cFaQkb2tpV+DgBNlqowWcsq5pKQ
+ bCGxSf0w4RaydLePY6VPWRywD6Pa2Jtnilcbe5YAeSfaXcyeXzFvFZv+8oRxrdW82W2a
+ J0XA1zlqurqgsCk3yjiE5CY8nBr0CGGPvy8yJrInPmMlUiccgDgByOnjadZUrKMu+3Mv
+ DhVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=BF8rpSmfd7uy+0GUmrMmaYfuGnMqUZoMQRMQpXoo6Oc=;
- b=ejoTVfcRa9H101G4b9LOSoTR+dGyH33CKnSvXjndrKDxR/343t5wtW6SfaV6lmNayG
- GjbcfD6YuhiVLgle4N1J7UirY51tUFBGWWBB3i1nehOqQG27VtWIo8XTq2fda8T7fRJU
- cZ7IDa6QIJPy5BFDXPMSYL2v7C/WQpJ2XCl2f5725dBnxOv1+Ii5Fp0E6Bf1GoAgP5tN
- DltOGoY3gEcKM+pwBozcwy1RiKKOkKVRo9h7/xJ7RZJ180J0F9t1OTOBSdtiDy6tbpZt
- 5crQeFoooV8I37zbn82fRzYWuhhetLu1V15Di7Pplb5mA4OJv8RdzdAIN4YpQJUtgmdG
- EQLA==
-X-Gm-Message-State: ANhLgQ3TlTjxHCfGzOvMOS78S2ryw65+eSADpqidIgDzAOv+Jb5ehwMO
- 3bSeJto2QRibwm7+0YA44FXQfXCYGSXHBCecl1UKpZtJiUaXAqWWtjpP2jcxqMWktuItwUhgPfW
- fUZ63BgJizzqNtJc=
-X-Received: by 2002:adf:82a6:: with SMTP id 35mr3958073wrc.307.1585149130667; 
- Wed, 25 Mar 2020 08:12:10 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvJSAeAijCToDir/jXjYps+m1+WT66rSqwQyM4y5jMfMZPwTvoFMa55jDZ/hXUUp/cd520hqw==
-X-Received: by 2002:adf:82a6:: with SMTP id 35mr3958028wrc.307.1585149130322; 
- Wed, 25 Mar 2020 08:12:10 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id k126sm9743577wme.4.2020.03.25.08.12.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 08:12:09 -0700 (PDT)
-Date: Wed, 25 Mar 2020 11:12:05 -0400
-From: Peter Xu <peterx@redhat.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v1 17/22] intel_iommu: do not pass down pasid bind for
- PASID #0
-Message-ID: <20200325151205.GD354390@xz-x1>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-18-git-send-email-yi.l.liu@intel.com>
- <20200324181326.GB127076@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A201FC7@SHSMSX104.ccr.corp.intel.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=f/nHfhqolLq9DAlvAPV5hSMp5M2cRTZ5m4aLtZbOM8s=;
+ b=qKAU6QNFJ5PFMtWGDw/dRm62WfJbwYwwB9sEDPogFVVGTvuYbs5MNDM5+28yBvhFtX
+ kkIe3itG3cDn93m3xIRI33lca+wsFKTzt+qQxNPWL/sBcFAMYbuRfooCXshlOYT/MwBT
+ xRl4PHYAOa1YxOJ6BZm//koawSemjvF0tf/pkmYjvJOk50gpLivRpKITcBa4AikgMMm5
+ IjnymjjMp9KANT5S9lyLHKAGxbS0yLqjpo3pR28Vx5EiAZJWNsBkiDwKdkMTK5dZ0MTp
+ ALfVxQ8Acy1detkx7cSfuwH/TIBJy/ZKw44ymcSOvzb+24oT4PlQmpEND//3otaoy3/d
+ UcDA==
+X-Gm-Message-State: ANhLgQ3lYJkenrKbdz7vr7YMe+0x3OD9eU/lGjZlI9C20kXSCJRGs/te
+ x594eZqkRnbdT89xXHYkP5F0mDm3h3KOwooSw3XCsg==
+X-Google-Smtp-Source: ADFU+vtGkefyEPNZu1kccV3WqAr8fY1zL3k8ApBQ+YFOAgIsLdyKoYg3Xb5HqXWhcgAOrETpgTzpHNpuSmbuXVx+0Q8=
+X-Received: by 2002:a6b:b212:: with SMTP id b18mr3384277iof.117.1585149319068; 
+ Wed, 25 Mar 2020 08:15:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A201FC7@SHSMSX104.ccr.corp.intel.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200323113227.3169-1-beata.michalska@linaro.org>
+ <20200323113227.3169-2-beata.michalska@linaro.org>
+ <20200323124405.xdv56zplli23sl46@kamzik.brq.redhat.com>
+In-Reply-To: <20200323124405.xdv56zplli23sl46@kamzik.brq.redhat.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Wed, 25 Mar 2020 15:15:07 +0000
+Message-ID: <CADSWDzt7SL3bBYdm5a7CTzsHJbuo4GbewxaTQOkbfsUmSYFzZA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] target/arm: kvm: Handle DABT with no valid ISS
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,106 +87,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Christoffer Dall <Christoffer.Dall@arm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 25, 2020 at 10:42:25AM +0000, Liu, Yi L wrote:
-> > From: Peter Xu < peterx@redhat.com>
-> > Sent: Wednesday, March 25, 2020 2:13 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v1 17/22] intel_iommu: do not pass down pasid bind =
-for PASID
-> > #0
-> >=20
-> > On Sun, Mar 22, 2020 at 05:36:14AM -0700, Liu Yi L wrote:
-> > > RID_PASID field was introduced in VT-d 3.0 spec, it is used for DMA
-> > > requests w/o PASID in scalable mode VT-d. It is also known as IOVA.
-> > > And in VT-d 3.1 spec, there is definition on it:
-> > >
-> > > "Implementations not supporting RID_PASID capability (ECAP_REG.RPS is
-> > > 0b), use a PASID value of 0 to perform address translation for
-> > > requests without PASID."
-> > >
-> > > This patch adds a check against the PASIDs which are going to be boun=
-d
-> > > to device. For PASID #0, it is not necessary to pass down pasid bind
-> > > request for it since PASID #0 is used as RID_PASID for DMA requests
-> > > without pasid. Further reason is current Intel vIOMMU supports gIOVA
-> > > by shadowing guest 2nd level page table. However, in future, if guest
-> > > IOMMU driver uses 1st level page table to store IOVA mappings, then
-> > > guest IOVA support will also be done via nested translation. When
-> > > gIOVA is over FLPT, then vIOMMU should pass down the pasid bind
-> > > request for PASID #0 to host, host needs to bind the guest IOVA page
-> > > table to a proper PASID. e.g PASID value in RID_PASID field for PF/VF
-> > > if ECAP_REG.RPS is clear or default PASID for ADI (Assignable Device
-> > > Interface in Scalable IOV solution).
-> > >
-> > > IOVA over FLPT support on Intel VT-d:
-> > > https://lkml.org/lkml/2019/9/23/297
-> > >
-> > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Cc: Peter Xu <peterx@redhat.com>
-> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Richard Henderson <rth@twiddle.net>
-> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c | 10 ++++++++++
-> > >  1 file changed, 10 insertions(+)
-> > >
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
-> > > 1e0ccde..b007715 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -1886,6 +1886,16 @@ static int vtd_bind_guest_pasid(IntelIOMMUStat=
-e *s,
-> > VTDBus *vtd_bus,
-> > >      struct iommu_gpasid_bind_data *g_bind_data;
-> > >      int ret =3D -1;
-> > >
-> > > +    if (pasid < VTD_MIN_HPASID) {
-> > > +        /*
-> > > +         * If pasid < VTD_HPASID_MIN, this pasid is not allocated
-> >=20
-> > s/VTD_HPASID_MIN/VTD_MIN_HPASID/.
->=20
-> Got it.
->=20
-> >=20
-> > > +         * from host. No need to pass down the changes on it to host=
-.
-> > > +         * TODO: when IOVA over FLPT is ready, this switch should be
-> > > +         * refined.
-> >=20
-> > What will happen if without this patch?  Is it a must?
->=20
-> Before gIOVA is supported by nested translation, it is a must. This requi=
-res
-> IOVA over 1st level page table is ready in guest kernel, also requires th=
-e
-> QEMU/VFIO supports to bind the guest IOVA page table to host.
-> Currently, guest kernel side is ready. However, QEMU and VFIO side is
-> not.
+Hi,
 
-OK:
+On Mon, 23 Mar 2020 at 12:44, Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Mon, Mar 23, 2020 at 11:32:26AM +0000, Beata Michalska wrote:
+> > On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
+> > exception with no valid ISS info to be decoded. The lack of decode info
+> > makes it at least tricky to emulate those instruction which is one of the
+> > (many) reasons why KVM will not even try to do so.
+> >
+> > Add support for handling those by requesting KVM to inject external
+> > dabt into the quest.
+> >
+> > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> > ---
+> >  target/arm/cpu.h     |  2 ++
+> >  target/arm/kvm.c     | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  target/arm/kvm_arm.h | 11 +++++++++++
+> >  3 files changed, 67 insertions(+)
+> >
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index 4ffd991..4f834c1 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -560,6 +560,8 @@ typedef struct CPUARMState {
+> >          uint64_t esr;
+> >      } serror;
+> >
+> > +    uint8_t ext_dabt_pending; /* Request for injecting ext DABT */
+> > +
+> >      /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
+> >      uint32_t irq_line_state;
+> >
+> > diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> > index 85860e6..c088589 100644
+> > --- a/target/arm/kvm.c
+> > +++ b/target/arm/kvm.c
+> > @@ -39,6 +39,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> >
+> >  static bool cap_has_mp_state;
+> >  static bool cap_has_inject_serror_esr;
+> > +static bool cap_has_inject_ext_dabt;
+> >
+> >  static ARMHostCPUFeatures arm_host_cpu_features;
+> >
+> > @@ -244,6 +245,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >          ret = -EINVAL;
+> >      }
+> >
+> > +    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER)) {
+> > +        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
+> > +            warn_report("Failed to enable DABT NISV cap");
+>
+> Shouldn't this be an error? If KVM says it has KVM_CAP_ARM_NISV_TO_USER,
+> then I think it should always work to enable it, unless userspace passes
+> the wrong flags. Currently flags must be zero, but if they were to change
+> then we'll need to add the flags to vmstate and fail migration when they
+> aren't compatible, and I guess that failure would occur here.
+>
+That's a fair point. From the kernel point of view this one is pretty
+straightforward,
+so it should not fail. I haven't used the error here as the lack of
+this cap is not really
+critical for guest but indeed it might be worth to have it here .
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+> > +        } else {
+> > +            /* Set status for supporting the external dabt injection */
+> > +            cap_has_inject_ext_dabt = kvm_check_extension(s,
+> > +                                    KVM_CAP_ARM_INJECT_EXT_DABT);
+> > +        }
+> > +    }
+> > +
+> >      return ret;
+> >  }
+> >
+> > @@ -703,9 +714,16 @@ int kvm_put_vcpu_events(ARMCPU *cpu)
+> >          events.exception.serror_esr = env->serror.esr;
+> >      }
+> >
+> > +    if (cap_has_inject_ext_dabt) {
+> > +        events.exception.ext_dabt_pending = env->ext_dabt_pending;
+> > +    }
+> > +
+> >      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
+> >      if (ret) {
+> >          error_report("failed to put vcpu events");
+> > +    } else {
+> > +        /* Clear instantly if the call was successful */
+> > +        env->ext_dabt_pending = 0;
+> >      }
+> >
+> >      return ret;
+> > @@ -819,6 +837,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+> >              ret = EXCP_DEBUG;
+> >          } /* otherwise return to guest */
+> >          break;
+> > +    case KVM_EXIT_ARM_NISV:
+> > +        /* External DABT with no valid iss to decode */
+> > +        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
+> > +                                       run->arm_nisv.fault_ipa);
+> > +        break;
+> >      default:
+> >          qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
+> >                        __func__, run->exit_reason);
+> > @@ -953,3 +976,34 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+> >  {
+> >      return (data - 32) & 0xffff;
+> >  }
+> > +
+> > +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
+> > +                             uint64_t fault_ipa)
+> > +{
+> > +    ARMCPU *cpu = ARM_CPU(cs);
+> > +    CPUARMState *env = &cpu->env;
+> > +
+> > +   /*
+> > +    * ISS [23:14] is invalid so there is a limited info
+> > +    * on what has just happened so the only *useful* thing that can
+> > +    * be retrieved from ISS is WnR & DFSC (though in some cases WnR
+> > +    * might be less of a value as well)
+> > +    */
+> > +
+> > +    /*
+> > +     * Set pending ext dabt and trigger SET_EVENTS so that
+> > +     * KVM can inject the abort
+> > +     */
+> > +    if (cap_has_inject_ext_dabt) {
+> > +        kvm_cpu_synchronize_state(cs);
+>
+> I guess this is just an expensive 'vcpu_dirty=true', which the comment
+> above justifies, but not super clearly. Can you try to clarify the
+> comment some more?  I also wonder if we shouldn't add a KVM function
+> that just marks a vcpu dirty, rather than fetching all registers.
+>
+I can definitely adjust the comments here to explain the case more
+clearly. And I would definitely vote for moving the flag
+setting/clearing outside the
+sync so that it can be triggered separately without involving all the series
+of potentially unnecessary ioctls. WIll draft that in the next iteration.
 
---=20
-Peter Xu
+Thanks
+Beata
 
+
+> > +        env->ext_dabt_pending = 1;
+> > +    } else {
+> > +        error_report("Data abort exception triggered by guest memory access "
+> > +                     "at physical address: 0x"  TARGET_FMT_lx,
+> > +                     (target_ulong)fault_ipa);
+> > +        error_printf("KVM unable to emulate faulting instruction.\n");
+> > +        return -1;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> > index ae9e075..39472d5 100644
+> > --- a/target/arm/kvm_arm.h
+> > +++ b/target/arm/kvm_arm.h
+> > @@ -450,6 +450,17 @@ struct kvm_guest_debug_arch;
+> >  void kvm_arm_copy_hw_debug_data(struct kvm_guest_debug_arch *ptr);
+> >
+> >  /**
+> > + * kvm_arm_handle_dabt_nisv:
+> > + * @cs: CPUState
+> > + * @esr_iss: ISS encoding (limited) for the exception from Data Abort
+> > + *           ISV bit set to '0b0' -> no valid instruction syndrome
+> > + * @fault_ipa: faulting address for the synch data abort
+> > + *
+> > + * Returns: 0 if the exception has been handled, < 0 otherwise
+> > + */
+> > +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
+> > +                             uint64_t fault_ipa);
+> > +/**
+> >   * its_class_name:
+> >   *
+> >   * Return the ITS class name to use depending on whether KVM acceleration
+> > --
+> > 2.7.4
+> >
+>
+> Thanks,
+> drew
+>
 
