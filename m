@@ -8,74 +8,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFAFCC2D0EB
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A64BC2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3FE02077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:49:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 487A2206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:51:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPTnjMNG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3FE02077D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J5eNztw6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487A2206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHAAA-0002Dj-VZ
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:49:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36510)
+	id 1jHABe-0003p4-Gd
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:51:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jHA9O-0001iT-Kx
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:49:12 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jHAAH-0002SK-BJ
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:50:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jHA9M-0004Jk-Qv
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:49:10 -0400
-Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:45179)
+ (envelope-from <alistair23@gmail.com>) id 1jHAAF-00054T-Nw
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:50:05 -0400
+Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:39673)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jHA9M-0004JS-MX; Wed, 25 Mar 2020 13:49:08 -0400
-Received: by mail-vs1-xe43.google.com with SMTP id x82so2052759vsc.12;
- Wed, 25 Mar 2020 10:49:08 -0700 (PDT)
+ id 1jHAAF-00053z-K0; Wed, 25 Mar 2020 13:50:03 -0400
+Received: by mail-ua1-x941.google.com with SMTP id o16so1076867uap.6;
+ Wed, 25 Mar 2020 10:50:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cPLkRAKlWOcXsQFYe7cbBfkPV9YTCAb16AFUMS26xiA=;
- b=QPTnjMNG7O5EJi+drLVh1YuVjsJ+vg3HX63jwoLgrH750S4TAaXnSkQvtYrdRkNNWr
- MW/NQPjq60qHkDaqN2bRcPgB1BEfrfrm62yQqWwSQA60ElM2cfVv8UbRKFcvv23eGO8M
- nSOBo1ATlDuewGnA+OvGMIxmSOJAhJ5A+EQWn6BX+MWMhDLRlQE953504woRb7wjB7bH
- w12rrtpGWIZJiPJMmDd4L6D2BGn6P7GXNi9Utg7K3+ZmRJt4UbpRcT/vnOar3LY3z8Gc
- Tjazwoaq2DAKiq9wDPJAfhDmeu8h061njs8R/jFQzbmeJT2lAwT1fI9AlQhdNKYsDLBk
- sLdA==
+ :cc; bh=ieONrgCMVlSNEaui7/pnG4c9RgEkO8/mNP48GoRUSAs=;
+ b=J5eNztw6dnhzD9ngvw0X1mvT5ZwAQZAfSkXNrP+9N0cA7l8YjpfUxqjw8N1YHKmn2P
+ Xe5ojj8PJmEKxaCNFrHvtzlBbySpE00OAgSDA1scf/xFjkjppNSEonAhy5TbHZCRH0Xb
+ 3xlL2Q16+lSTI3FDvCYFX6FcTcnabB2xB4CYB+oVFOHZ4/GmrcfDiVFiojqHf4v+XU2f
+ 1z2//J0jHLn2mj2aD7n4VgYBz55b4U4QtyIzgThM5YoHgiGPJFe9qGzC5fLJ1LIOkK3Z
+ 8xR1a0sNhVbUQMRWDJVms7LuAC2x8zWJeOcwfm2Eit3RipuazG0vpIvhm6ENFgQm91C1
+ ZTuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=cPLkRAKlWOcXsQFYe7cbBfkPV9YTCAb16AFUMS26xiA=;
- b=HrmUzgyZMJ84ApvZCclq6pWtppvL+RVveIU82VFZb2e+PTqokcrWPQ+0cE8wbVgVPQ
- dNazm5nN5SmzJ6WZ8bgw00x0glLKllBoOfmQCLdSl9knc6xHJoUvQM0dYKJUKw12lqzH
- HRAVmZB0HCicGRKF4CMTK6wibaNl5pYOXHU8COYk7Ci9MP4eXRyEofYBlhbP2A2NJhWO
- uF9pD8DkQdpSpUJHUde3mjR3DdckURLx50gGLOyxu4/RlMB5E0nchGG1ccqHiaEkFdGy
- vd9zvBUfD572qvA4orgFl63hLqkNmJYGKR7lWJU0aQsnDieCJL/Px8VxsIvPUr+3Db3y
- mQXA==
-X-Gm-Message-State: ANhLgQ2I3IBh3/U69b9x62Rv0nvYZkI/UCGyDp9LVupwIXLc1eBPY9A9
- globHBN7sFrhnCk8RQI4ppDAw4+cPNQaEbwLECM=
-X-Google-Smtp-Source: ADFU+vs3SylU/8LwXiAJXPgfd5WYVXy/O4bvPC+3ay+OLT4YtLWRcbOM9N9veOYB3Sc8WWHsTiW+WcapobDuEklto8w=
-X-Received: by 2002:a67:1b81:: with SMTP id b123mr3829223vsb.172.1585158547647; 
- Wed, 25 Mar 2020 10:49:07 -0700 (PDT)
+ bh=ieONrgCMVlSNEaui7/pnG4c9RgEkO8/mNP48GoRUSAs=;
+ b=F5HflMi0eMJ0dKAtbLRwXnSoyZXDX6Bc1h5Ap8g9s7KScsw4nL9m7e9v7XvfpwWApr
+ SZpKORICJ8/7076cnCxJOAt9svY0yfNwkQJNtXCZ/a5xHgf+NYGE6GZXgwc3XJoVNPra
+ 88R6Ayr+4XhmPnhGwK2FQn33vMQaLVgYxHT4l/7wJ3jElCUsnU4ANjt+Xn8jkF/f8dZy
+ U+9a7hI9DoqvMvInPOJ8/UqusliW9C1iEobJ/4zs5DvUQe0g9hrUB1kbHj3QwOWFVE3Q
+ 37A9H3aA1AsSeoDHVHltQejdEBqKgsD3ngQQMs+hLo+oFS84kflnTSE5fK59Y7WRsiXx
+ GxYg==
+X-Gm-Message-State: ANhLgQ0uab2qoyHavKcSUTmKZuCM9coB+Xjg/A0mioA9TRbSRlWXKxsH
+ IGiREwDt8ljAxf7Oa05haIx9x5+dM2dDryiybO8=
+X-Google-Smtp-Source: ADFU+vv0faZ8+4S19gDGH6kPl4ykco2QZVd03J6OYmlGlNBhm6BmYElIK2jwM2W+aNdPabt/ETWlM4xZVaPa+vzAkCo=
+X-Received: by 2002:ab0:2881:: with SMTP id s1mr3375367uap.8.1585158602942;
+ Wed, 25 Mar 2020 10:50:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1584571250.git.alistair.francis@wdc.com>
- <d9390e368a9a1fd32d52aa771815e6e3d40cb1d4.1584571250.git.alistair.francis@wdc.com>
-In-Reply-To: <d9390e368a9a1fd32d52aa771815e6e3d40cb1d4.1584571250.git.alistair.francis@wdc.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-23-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-23-zhiwei_liu@c-sky.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 25 Mar 2020 10:41:08 -0700
-Message-ID: <CAKmqyKNTpfDvWx85eAK2YNRgzxHRMA8NBvJJf081X3O76B=ekQ@mail.gmail.com>
-Subject: Re: [PATCH v9 3/4] linux-user: Support futex_time64
-To: Alistair Francis <alistair.francis@wdc.com>
+Date: Wed, 25 Mar 2020 10:42:03 -0700
+Message-ID: <CAKmqyKOjTezWbJz60SiZ8sHyFYREnfNzG91MCWzQQjCa+GdqRA@mail.gmail.com>
+Subject: Re: [PATCH v6 22/61] target/riscv: vector widening integer
+ multiply-add instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::e43
+X-Received-From: 2607:f8b0:4864:20::941
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,259 +88,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 18, 2020 at 3:54 PM Alistair Francis
-<alistair.francis@wdc.com> wrote:
+On Tue, Mar 17, 2020 at 8:51 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
 >
-> Add support for host and target futex_time64. If futex_time64 exists on
-> the host we try that first before falling back to the standard futux
-> syscall.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-@Laurent did you see this?
-
-I guess it's a little late for 5.0 but it would be nice to support.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  linux-user/syscall.c | 144 +++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 131 insertions(+), 13 deletions(-)
+>  target/riscv/helper.h                   | 22 ++++++++++++
+>  target/riscv/insn32.decode              |  7 ++++
+>  target/riscv/insn_trans/trans_rvv.inc.c |  9 +++++
+>  target/riscv/vector_helper.c            | 45 +++++++++++++++++++++++++
+>  4 files changed, 83 insertions(+)
 >
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 60fd775d9c..3354f41bb2 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -245,7 +245,12 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,  \
->  #define __NR_sys_rt_sigqueueinfo __NR_rt_sigqueueinfo
->  #define __NR_sys_rt_tgsigqueueinfo __NR_rt_tgsigqueueinfo
->  #define __NR_sys_syslog __NR_syslog
-> -#define __NR_sys_futex __NR_futex
-> +#if defined(__NR_futex)
-> +# define __NR_sys_futex __NR_futex
-> +#endif
-> +#if defined(__NR_futex_time64)
-> +# define __NR_sys_futex_time64 __NR_futex_time64
-> +#endif
->  #define __NR_sys_inotify_init __NR_inotify_init
->  #define __NR_sys_inotify_add_watch __NR_inotify_add_watch
->  #define __NR_sys_inotify_rm_watch __NR_inotify_rm_watch
-> @@ -295,10 +300,16 @@ _syscall1(int,exit_group,int,error_code)
->  #if defined(TARGET_NR_set_tid_address) && defined(__NR_set_tid_address)
->  _syscall1(int,set_tid_address,int *,tidptr)
->  #endif
-> -#if defined(TARGET_NR_futex) && defined(__NR_futex)
-> +#if (defined(TARGET_NR_futex) && defined(__NR_futex)) || \
-> +    (defined(TARGET_NR_futex_time64) && \
-> +        (HOST_LONG_BITS == 64 && defined(__NR_futex)))
->  _syscall6(int,sys_futex,int *,uaddr,int,op,int,val,
->            const struct timespec *,timeout,int *,uaddr2,int,val3)
->  #endif
-> +#if defined(__NR_futex_time64)
-> +_syscall6(int,sys_futex_time64,int *,uaddr,int,op,int,val,
-> +          const struct timespec *,timeout,int *,uaddr2,int,val3)
-> +#endif
->  #define __NR_sys_sched_getaffinity __NR_sched_getaffinity
->  _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
->            unsigned long *, user_mask_ptr);
-> @@ -762,10 +773,14 @@ safe_syscall5(int, ppoll, struct pollfd *, ufds, unsigned int, nfds,
->  safe_syscall6(int, epoll_pwait, int, epfd, struct epoll_event *, events,
->                int, maxevents, int, timeout, const sigset_t *, sigmask,
->                size_t, sigsetsize)
-> -#ifdef TARGET_NR_futex
-> +#if defined(__NR_futex)
->  safe_syscall6(int,futex,int *,uaddr,int,op,int,val, \
->                const struct timespec *,timeout,int *,uaddr2,int,val3)
->  #endif
-> +#if defined(__NR_futex_time64)
-> +safe_syscall6(int,futex_time64,int *,uaddr,int,op,int,val, \
-> +              const struct timespec *,timeout,int *,uaddr2,int,val3)
-> +#endif
->  safe_syscall2(int, rt_sigsuspend, sigset_t *, newset, size_t, sigsetsize)
->  safe_syscall2(int, kill, pid_t, pid, int, sig)
->  safe_syscall2(int, tkill, int, tid, int, sig)
-> @@ -1229,7 +1244,7 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
->  }
->  #endif
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index 098288df76..1f0d3d60e3 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -643,3 +643,25 @@ DEF_HELPER_6(vnmsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vnmsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vnmsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vnmsub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +
+> +DEF_HELPER_6(vwmaccu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vwmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index b49b60aea1..9735ac3565 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -393,6 +393,13 @@ vmadd_vv        101001 . ..... ..... 010 ..... 1010111 @r_vm
+>  vmadd_vx        101001 . ..... ..... 110 ..... 1010111 @r_vm
+>  vnmsub_vv       101011 . ..... ..... 010 ..... 1010111 @r_vm
+>  vnmsub_vx       101011 . ..... ..... 110 ..... 1010111 @r_vm
+> +vwmaccu_vv      111100 . ..... ..... 010 ..... 1010111 @r_vm
+> +vwmaccu_vx      111100 . ..... ..... 110 ..... 1010111 @r_vm
+> +vwmacc_vv       111101 . ..... ..... 010 ..... 1010111 @r_vm
+> +vwmacc_vx       111101 . ..... ..... 110 ..... 1010111 @r_vm
+> +vwmaccsu_vv     111110 . ..... ..... 010 ..... 1010111 @r_vm
+> +vwmaccsu_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
+> +vwmaccus_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
 >
-> -#if defined(TARGET_NR_clock_settime64)
-> +#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64)
->  static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
->                                                   abi_ulong target_addr)
->  {
-> @@ -6890,6 +6905,55 @@ static inline abi_long host_to_target_statx(struct target_statx *host_stx,
->  }
->  #endif
->
-> +static int do_sys_futex(int *uaddr, int op, int val,
-> +                         const struct timespec *timeout, int *uaddr2,
-> +                         int val3)
-> +{
-> +#if HOST_LONG_BITS == 64
-> +#if defined(__NR_futex)
-> +    /* always a 64-bit time_t, it doesn't define _time64 version  */
-> +    return sys_futex(uaddr, op, val, timeout, uaddr2, val3);
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index 6d2ccbd615..269d04c7fb 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -1490,3 +1490,12 @@ GEN_OPIVX_TRANS(vmacc_vx, opivx_check)
+>  GEN_OPIVX_TRANS(vnmsac_vx, opivx_check)
+>  GEN_OPIVX_TRANS(vmadd_vx, opivx_check)
+>  GEN_OPIVX_TRANS(vnmsub_vx, opivx_check)
 > +
-> +#endif
-> +#else /* HOST_LONG_BITS == 64 */
-> +#if defined(__NR_futex_time64)
-> +    if (sizeof(timeout->tv_sec) == 8) {
-> +        /* _time64 function on 32bit arch */
-> +        return sys_futex_time64(uaddr, op, val, timeout, uaddr2, val3);
-> +    }
-> +#endif
-> +#if defined(__NR_futex)
-> +    /* old function on 32bit arch */
-> +    return sys_futex(uaddr, op, val, timeout, uaddr2, val3);
-> +#endif
-> +#endif /* HOST_LONG_BITS == 64 */
-> +    g_assert_not_reached();
-> +}
+> +/* Vector Widening Integer Multiply-Add Instructions */
+> +GEN_OPIVV_WIDEN_TRANS(vwmaccu_vv, opivv_widen_check)
+> +GEN_OPIVV_WIDEN_TRANS(vwmacc_vv, opivv_widen_check)
+> +GEN_OPIVV_WIDEN_TRANS(vwmaccsu_vv, opivv_widen_check)
+> +GEN_OPIVX_WIDEN_TRANS(vwmaccu_vx)
+> +GEN_OPIVX_WIDEN_TRANS(vwmacc_vx)
+> +GEN_OPIVX_WIDEN_TRANS(vwmaccsu_vx)
+> +GEN_OPIVX_WIDEN_TRANS(vwmaccus_vx)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index f65ed6abbc..5adce9e0a3 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -1954,3 +1954,48 @@ GEN_VEXT_VX(vnmsub_vx_b, 1, 1, clearb)
+>  GEN_VEXT_VX(vnmsub_vx_h, 2, 2, clearh)
+>  GEN_VEXT_VX(vnmsub_vx_w, 4, 4, clearl)
+>  GEN_VEXT_VX(vnmsub_vx_d, 8, 8, clearq)
 > +
-> +static int do_safe_futex(int *uaddr, int op, int val,
-> +                         const struct timespec *timeout, int *uaddr2,
-> +                         int val3)
-> +{
-> +#if HOST_LONG_BITS == 64
-> +#if defined(__NR_futex)
-> +    /* always a 64-bit time_t, it doesn't define _time64 version  */
-> +    return get_errno(safe_futex(uaddr, op, val, timeout, uaddr2, val3));
-> +#endif
-> +#else /* HOST_LONG_BITS == 64 */
-> +#if defined(__NR_futex_time64)
-> +    if (sizeof(timeout->tv_sec) == 8) {
-> +        /* _time64 function on 32bit arch */
-> +        return get_errno(safe_futex_time64(uaddr, op, val, timeout, uaddr2,
-> +                                           val3));
-> +    }
-> +#endif
-> +#if defined(__NR_futex)
-> +    /* old function on 32bit arch */
-> +    return get_errno(safe_futex(uaddr, op, val, timeout, uaddr2, val3));
-> +#endif
-> +#endif /* HOST_LONG_BITS == 64 */
-> +    return -TARGET_ENOSYS;
-> +}
->
->  /* ??? Using host futex calls even when target atomic operations
->     are not really atomic probably breaks things.  However implementing
-> @@ -6919,12 +6983,61 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
->          } else {
->              pts = NULL;
->          }
-> -        return get_errno(safe_futex(g2h(uaddr), op, tswap32(val),
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, tswap32(val),
-> +                         pts, NULL, val3));
-> +    case FUTEX_WAKE:
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +    case FUTEX_FD:
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +    case FUTEX_REQUEUE:
-> +    case FUTEX_CMP_REQUEUE:
-> +    case FUTEX_WAKE_OP:
-> +        /* For FUTEX_REQUEUE, FUTEX_CMP_REQUEUE, and FUTEX_WAKE_OP, the
-> +           TIMEOUT parameter is interpreted as a uint32_t by the kernel.
-> +           But the prototype takes a `struct timespec *'; insert casts
-> +           to satisfy the compiler.  We do not need to tswap TIMEOUT
-> +           since it's not compared to guest memory.  */
-> +        pts = (struct timespec *)(uintptr_t) timeout;
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, pts,
-> +                                       g2h(uaddr2),
-> +                                       (base_op == FUTEX_CMP_REQUEUE
-> +                                        ? tswap32(val3)
-> +                                        : val3)));
-> +    default:
-> +        return -TARGET_ENOSYS;
-> +    }
-> +}
-> +#endif
+> +/* Vector Widening Integer Multiply-Add Instructions */
+> +RVVCALL(OPIVV3, vwmaccu_vv_b, WOP_UUU_B, H2, H1, H1, DO_MACC)
+> +RVVCALL(OPIVV3, vwmaccu_vv_h, WOP_UUU_H, H4, H2, H2, DO_MACC)
+> +RVVCALL(OPIVV3, vwmaccu_vv_w, WOP_UUU_W, H8, H4, H4, DO_MACC)
+> +RVVCALL(OPIVV3, vwmacc_vv_b, WOP_SSS_B, H2, H1, H1, DO_MACC)
+> +RVVCALL(OPIVV3, vwmacc_vv_h, WOP_SSS_H, H4, H2, H2, DO_MACC)
+> +RVVCALL(OPIVV3, vwmacc_vv_w, WOP_SSS_W, H8, H4, H4, DO_MACC)
+> +RVVCALL(OPIVV3, vwmaccsu_vv_b, WOP_SSU_B, H2, H1, H1, DO_MACC)
+> +RVVCALL(OPIVV3, vwmaccsu_vv_h, WOP_SSU_H, H4, H2, H2, DO_MACC)
+> +RVVCALL(OPIVV3, vwmaccsu_vv_w, WOP_SSU_W, H8, H4, H4, DO_MACC)
+> +GEN_VEXT_VV(vwmaccu_vv_b, 1, 2, clearh)
+> +GEN_VEXT_VV(vwmaccu_vv_h, 2, 4, clearl)
+> +GEN_VEXT_VV(vwmaccu_vv_w, 4, 8, clearq)
+> +GEN_VEXT_VV(vwmacc_vv_b, 1, 2, clearh)
+> +GEN_VEXT_VV(vwmacc_vv_h, 2, 4, clearl)
+> +GEN_VEXT_VV(vwmacc_vv_w, 4, 8, clearq)
+> +GEN_VEXT_VV(vwmaccsu_vv_b, 1, 2, clearh)
+> +GEN_VEXT_VV(vwmaccsu_vv_h, 2, 4, clearl)
+> +GEN_VEXT_VV(vwmaccsu_vv_w, 4, 8, clearq)
 > +
-> +#if defined(TARGET_NR_futex_time64)
-> +static int do_futex_time64(target_ulong uaddr, int op, int val, target_ulong timeout,
-> +                           target_ulong uaddr2, int val3)
-> +{
-> +    struct timespec ts, *pts;
-> +    int base_op;
-> +
-> +    /* ??? We assume FUTEX_* constants are the same on both host
-> +       and target.  */
-> +#ifdef FUTEX_CMD_MASK
-> +    base_op = op & FUTEX_CMD_MASK;
-> +#else
-> +    base_op = op;
-> +#endif
-> +    switch (base_op) {
-> +    case FUTEX_WAIT:
-> +    case FUTEX_WAIT_BITSET:
-> +        if (timeout) {
-> +            pts = &ts;
-> +            target_to_host_timespec64(pts, timeout);
-> +        } else {
-> +            pts = NULL;
-> +        }
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, tswap32(val),
->                           pts, NULL, val3));
->      case FUTEX_WAKE:
-> -        return get_errno(safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
->      case FUTEX_FD:
-> -        return get_errno(safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
->      case FUTEX_REQUEUE:
->      case FUTEX_CMP_REQUEUE:
->      case FUTEX_WAKE_OP:
-> @@ -6934,16 +7047,17 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
->             to satisfy the compiler.  We do not need to tswap TIMEOUT
->             since it's not compared to guest memory.  */
->          pts = (struct timespec *)(uintptr_t) timeout;
-> -        return get_errno(safe_futex(g2h(uaddr), op, val, pts,
-> -                                    g2h(uaddr2),
-> -                                    (base_op == FUTEX_CMP_REQUEUE
-> -                                     ? tswap32(val3)
-> -                                     : val3)));
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, pts,
-> +                                       g2h(uaddr2),
-> +                                       (base_op == FUTEX_CMP_REQUEUE
-> +                                        ? tswap32(val3)
-> +                                        : val3)));
->      default:
->          return -TARGET_ENOSYS;
->      }
->  }
->  #endif
-> +
->  #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
->  static abi_long do_name_to_handle_at(abi_long dirfd, abi_long pathname,
->                                       abi_long handle, abi_long mount_id,
-> @@ -7505,7 +7619,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->              ts = cpu->opaque;
->              if (ts->child_tidptr) {
->                  put_user_u32(0, ts->child_tidptr);
-> -                sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
-> +                do_sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
->                            NULL, NULL, 0);
->              }
->              thread_cpu = NULL;
-> @@ -11597,6 +11711,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_futex:
->          return do_futex(arg1, arg2, arg3, arg4, arg5, arg6);
->  #endif
-> +#ifdef TARGET_NR_futex_time64
-> +    case TARGET_NR_futex_time64:
-> +        return do_futex_time64(arg1, arg2, arg3, arg4, arg5, arg6);
-> +#endif
->  #if defined(TARGET_NR_inotify_init) && defined(__NR_inotify_init)
->      case TARGET_NR_inotify_init:
->          ret = get_errno(sys_inotify_init());
+> +RVVCALL(OPIVX3, vwmaccu_vx_b, WOP_UUU_B, H2, H1, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccu_vx_h, WOP_UUU_H, H4, H2, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccu_vx_w, WOP_UUU_W, H8, H4, DO_MACC)
+> +RVVCALL(OPIVX3, vwmacc_vx_b, WOP_SSS_B, H2, H1, DO_MACC)
+> +RVVCALL(OPIVX3, vwmacc_vx_h, WOP_SSS_H, H4, H2, DO_MACC)
+> +RVVCALL(OPIVX3, vwmacc_vx_w, WOP_SSS_W, H8, H4, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccsu_vx_b, WOP_SSU_B, H2, H1, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccsu_vx_h, WOP_SSU_H, H4, H2, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccsu_vx_w, WOP_SSU_W, H8, H4, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccus_vx_b, WOP_SUS_B, H2, H1, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccus_vx_h, WOP_SUS_H, H4, H2, DO_MACC)
+> +RVVCALL(OPIVX3, vwmaccus_vx_w, WOP_SUS_W, H8, H4, DO_MACC)
+> +GEN_VEXT_VX(vwmaccu_vx_b, 1, 2, clearh)
+> +GEN_VEXT_VX(vwmaccu_vx_h, 2, 4, clearl)
+> +GEN_VEXT_VX(vwmaccu_vx_w, 4, 8, clearq)
+> +GEN_VEXT_VX(vwmacc_vx_b, 1, 2, clearh)
+> +GEN_VEXT_VX(vwmacc_vx_h, 2, 4, clearl)
+> +GEN_VEXT_VX(vwmacc_vx_w, 4, 8, clearq)
+> +GEN_VEXT_VX(vwmaccsu_vx_b, 1, 2, clearh)
+> +GEN_VEXT_VX(vwmaccsu_vx_h, 2, 4, clearl)
+> +GEN_VEXT_VX(vwmaccsu_vx_w, 4, 8, clearq)
+> +GEN_VEXT_VX(vwmaccus_vx_b, 1, 2, clearh)
+> +GEN_VEXT_VX(vwmaccus_vx_h, 2, 4, clearl)
+> +GEN_VEXT_VX(vwmaccus_vx_w, 4, 8, clearq)
 > --
-> 2.25.1
+> 2.23.0
 >
 
