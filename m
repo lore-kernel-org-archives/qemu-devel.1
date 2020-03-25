@@ -2,94 +2,81 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA30C2D0E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC5BC2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:46:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F37B20777
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12CC92074D
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:46:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NAz2LxYt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F37B20777
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s5OPESJ2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12CC92074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHA4M-0005QO-JV
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:43:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35841)
+	id 1jHA6L-0007ox-8F
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:46:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jHA3c-0004To-Fq
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:43:13 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jHA4q-0006Oe-Kb
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:44:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jHA3b-0001On-DM
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:43:12 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:34530)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jHA3b-0001OX-9Y
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:43:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585158190;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=npq6in6QIhRC2Vf/wwQDgFyiMQzVNAEh8CyukAjaTMo=;
- b=NAz2LxYtkIF5zeKGHHP9B73xdGS/L7lvgE2CWPjdUFP1uO1DiIAfJOJEytGhfRI7lSKpDe
- W+7AvueXcduAEvvo1SEGNp5xvaB9dB4MmPEjGpmwaEaRXZzEjB/9nMpn7kEMzbp5MkKmF6
- WiNzLoGXnwBK/ZiS8dCK2/RfPEOpC0M=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-FjGLWdE4PjmEya-KRuCIIQ-1; Wed, 25 Mar 2020 13:43:08 -0400
-X-MC-Unique: FjGLWdE4PjmEya-KRuCIIQ-1
-Received: by mail-wm1-f72.google.com with SMTP id m4so2761352wme.0
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 10:43:08 -0700 (PDT)
+ (envelope-from <alistair23@gmail.com>) id 1jHA4o-00023r-5J
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:44:28 -0400
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:36144)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jHA4o-00023R-0n; Wed, 25 Mar 2020 13:44:26 -0400
+Received: by mail-vs1-xe43.google.com with SMTP id 184so1302693vsu.3;
+ Wed, 25 Mar 2020 10:44:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HzTxdhjKRXuGd4FU9D4C1TJdTWnX5bZcMQPDdU84rlI=;
+ b=s5OPESJ2nWg7U2Na0jHEiuuS+M38td3aFwZGNgjy2SGxPvRf4QmGE1Rxj5LsiPW6xX
+ CsMlBRQsIbTPKJ1+ILuk27PjMigcxSKBOdFLypoWrvae3+27Yyx//ce8OqLE69NI98MW
+ gHkTc1b8REAchAZmvz7St4KelGWvqmBE+G83ckR5fCvYujXh7S8yHn6FhgWE7mnZIDKz
+ 9RvGProQAXUQ+b3w7cWsaI/5iap8wBMcj88mb7pQcIe6aJNdmcorqE4QRTg/QxzwfKWe
+ 0FBL/wOFydx8Pd6xcmCLDzh27ssJuu1KXMt5Ip3WQu4syi/8szp/wrskjII6SAw5pb2y
+ lyeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=EOCoqUjf8CUS3+fsPCv7fqtKWLfg28PneudeeOMjZA8=;
- b=Kk1gav2ZtdDvhX+DKB3jUJi8CiXkLidlcrPbxzw5bqKODu+rTjtl+B2H0RUnA/xJf5
- CjKddGqDgPLhL8198EEqInYTTSYrHjqZU29pWwolf3lkogvSUO4363McnEH9RimTVTGn
- thioFY0znryD1Ov/yQIWqagCWlttCdG89Lwakci/OVSBxEn0xNkkRQrR3xaR7Jn9imVW
- PTcnB+ms0tYrf4o3bTVL1GEclvdsHCWmCS2YZuybMUfdT6R5rzhXtI99yx51SgPJupDZ
- n+hVR5M3dFD8EIybVLmlF/CRJQuFxTgpRmBuOBhhx2fZL8/Bw8ILy+HWlEGXFgNeP33V
- zEUw==
-X-Gm-Message-State: ANhLgQ39AWAaO6F5wWDs3ew27U947gAAzGpTUxFNOeVmjyXlmZptGKy2
- eGPK5qtA4ma57H/5gIVUR6SsWLLPuQEpRDKS0GrlALL6djz2El6I/IX5NLqxOhlTF7pXCShRGot
- gN5Xgx222c6gmQGo=
-X-Received: by 2002:a1c:4c0e:: with SMTP id z14mr30904wmf.0.1585158187365;
- Wed, 25 Mar 2020 10:43:07 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vssqFB2I8kqzhRWvvj0byjaBttrQn1GglvbPvcBb798yRTs9B0YcfUzpAHmvtVz1KSIRtJxZA==
-X-Received: by 2002:a1c:4c0e:: with SMTP id z14mr30894wmf.0.1585158186865;
- Wed, 25 Mar 2020 10:43:06 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id b15sm34290676wru.70.2020.03.25.10.43.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 10:43:06 -0700 (PDT)
-Date: Wed, 25 Mar 2020 13:43:02 -0400
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH RFC 1/9] KVM: Fixup kvm_log_clear_one_slot() ioctl return
- check
-Message-ID: <20200325174302.GH354390@xz-x1>
-References: <20200205141749.378044-1-peterx@redhat.com>
- <20200205141749.378044-2-peterx@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HzTxdhjKRXuGd4FU9D4C1TJdTWnX5bZcMQPDdU84rlI=;
+ b=PNOXIA4+6hsDw88+bkEEQrVlDp+9PQ6r3kJiIF9d5O2dF6sJmsuBkEWhiAf2yDPmW4
+ yxvRpr/tlvUxMVNnb+2jVlwN8LT76oZSZLYPHnxfHYKfa/G2axzKnw1YnoTWvdsnwan/
+ Id2yuRKrrLQF8f5alM4DhlwJR19LHI0xgVedUG0CR5oYMl4JUwm0ObvFicG+gX+PTJin
+ ReDfxu+NMbSQkupqyyyfiG0X9lKF/xLkdpVi1RRLljAV8ZCks0gCYfYUDH/NkeQMT4Vf
+ TpQZK2Tm6gtrsyDV2FjTdG1KeTUzf3UnX6GW8q4VL3lNwYQdgS+Oj4NxNfXwi4koV+8o
+ ftLg==
+X-Gm-Message-State: ANhLgQ039WJm3oOsXO+bFKV/308EdY/0HxJzpl/pjJvyDna27i3viCmp
+ fqm6AxrKK/q7uRrXrMQtnP9ZjXTHFfTjr5Ki5Bg=
+X-Google-Smtp-Source: ADFU+vvE9SjldAtbk/tVDnBHQRZIHAyka0cn06olOcXb37LZkCFSiX9P43bk6tDNAuUk/wo/tHib+PGYxsTeGscpf04=
+X-Received: by 2002:a67:26c2:: with SMTP id m185mr3659014vsm.180.1585158265268; 
+ Wed, 25 Mar 2020 10:44:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200205141749.378044-2-peterx@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-19-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-19-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 25 Mar 2020 10:36:25 -0700
+Message-ID: <CAKmqyKP3AZXrry+OkJxUejySEuE8JbQ8w7YmJUWNpNfb0nOdEg@mail.gmail.com>
+Subject: Re: [PATCH v6 18/61] target/riscv: vector single-width integer
+ multiply instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::e43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,62 +88,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 05, 2020 at 09:17:41AM -0500, Peter Xu wrote:
-> kvm_vm_ioctl() handles the errno trick already for ioctl() on
-> returning -1 for errors.  Fix this.
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Tue, Mar 17, 2020 at 8:43 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->  accel/kvm/kvm-all.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->=20
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index c111312dfd..4be3cd2352 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -688,14 +688,13 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int=
- as_id, uint64_t start,
->      d.num_pages =3D bmap_npages;
->      d.slot =3D mem->slot | (as_id << 16);
-> =20
-> -    if (kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d) =3D=3D -1) {
-> -        ret =3D -errno;
-> +    ret =3D kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d);
-
-Dave raised a question offlist when comparing with KVM_GET_DIRTY_LOG,
-regarding 50212d6346 ("Revert "fix return check for KVM_GET_DIRTY_LOG
-ioctl"", 2014-04-14) where we wanted to allow KVM_GET_DIRTY_LOG to
-fail for some cases.  I didn't find any context of that, and from the
-first glance I don't understand why and when we'll get -ENOENT during
-sync dirty log (we should have BQL held, so I don't know why a memslot
-can be gone underneath).  Anyone knows more?
-
-CCing Peter Maydell and Michael Tokarev too.
-
-> +    if (ret) {
->          error_report("%s: KVM_CLEAR_DIRTY_LOG failed, slot=3D%d, "
->                       "start=3D0x%"PRIx64", size=3D0x%"PRIx32", errno=3D%=
-d",
->                       __func__, d.slot, (uint64_t)d.first_page,
->                       (uint32_t)d.num_pages, ret);
->      } else {
-> -        ret =3D 0;
->          trace_kvm_clear_dirty_log(d.slot, d.first_page, d.num_pages);
->      }
-> =20
-> --=20
-> 2.24.1
->=20
-
---=20
-Peter Xu
-
+>  target/riscv/helper.h                   |  33 +++++
+>  target/riscv/insn32.decode              |   8 ++
+>  target/riscv/insn_trans/trans_rvv.inc.c |  10 ++
+>  target/riscv/vector_helper.c            | 156 ++++++++++++++++++++++++
+>  4 files changed, 207 insertions(+)
+>
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index c7d4ff185a..f42a12eef3 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -525,3 +525,36 @@ DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +
+> +DEF_HELPER_6(vmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulh_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index aafbdc6be7..abfed469bc 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -363,6 +363,14 @@ vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
+>  vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
+>  vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
+>  vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
+> +vmul_vv         100101 . ..... ..... 010 ..... 1010111 @r_vm
+> +vmul_vx         100101 . ..... ..... 110 ..... 1010111 @r_vm
+> +vmulh_vv        100111 . ..... ..... 010 ..... 1010111 @r_vm
+> +vmulh_vx        100111 . ..... ..... 110 ..... 1010111 @r_vm
+> +vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
+> +vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
+> +vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
+> +vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
+>
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index 53c49ee15c..c276beabd6 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -1452,3 +1452,13 @@ GEN_OPIVX_TRANS(vminu_vx, opivx_check)
+>  GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
+>  GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
+>  GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
+> +
+> +/* Vector Single-Width Integer Multiply Instructions */
+> +GEN_OPIVV_GVEC_TRANS(vmul_vv,  mul)
+> +GEN_OPIVV_TRANS(vmulh_vv, opivv_check)
+> +GEN_OPIVV_TRANS(vmulhu_vv, opivv_check)
+> +GEN_OPIVV_TRANS(vmulhsu_vv, opivv_check)
+> +GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
+> +GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
+> +GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
+> +GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index 32c2760a8a..56ba9a7422 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -852,6 +852,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+>  #define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
+>  #define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
+>  #define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
+> +#define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
+> +#define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
+> +#define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
+> +#define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
+>
+>  /* operation of two vector elements */
+>  typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+> @@ -1585,3 +1589,155 @@ GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
+>  GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
+>  GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
+>  GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
+> +
+> +/* Vector Single-Width Integer Multiply Instructions */
+> +#define DO_MUL(N, M) (N * M)
+> +RVVCALL(OPIVV2, vmul_vv_b, OP_SSS_B, H1, H1, H1, DO_MUL)
+> +RVVCALL(OPIVV2, vmul_vv_h, OP_SSS_H, H2, H2, H2, DO_MUL)
+> +RVVCALL(OPIVV2, vmul_vv_w, OP_SSS_W, H4, H4, H4, DO_MUL)
+> +RVVCALL(OPIVV2, vmul_vv_d, OP_SSS_D, H8, H8, H8, DO_MUL)
+> +GEN_VEXT_VV(vmul_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV(vmul_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV(vmul_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV(vmul_vv_d, 8, 8, clearq)
+> +
+> +static int8_t do_mulh_b(int8_t s2, int8_t s1)
+> +{
+> +    return (int16_t)s2 * (int16_t)s1 >> 8;
+> +}
+> +
+> +static int16_t do_mulh_h(int16_t s2, int16_t s1)
+> +{
+> +    return (int32_t)s2 * (int32_t)s1 >> 16;
+> +}
+> +
+> +static int32_t do_mulh_w(int32_t s2, int32_t s1)
+> +{
+> +    return (int64_t)s2 * (int64_t)s1 >> 32;
+> +}
+> +
+> +static int64_t do_mulh_d(int64_t s2, int64_t s1)
+> +{
+> +    uint64_t hi_64, lo_64;
+> +
+> +    muls64(&lo_64, &hi_64, s1, s2);
+> +    return hi_64;
+> +}
+> +
+> +static uint8_t do_mulhu_b(uint8_t s2, uint8_t s1)
+> +{
+> +    return (uint16_t)s2 * (uint16_t)s1 >> 8;
+> +}
+> +
+> +static uint16_t do_mulhu_h(uint16_t s2, uint16_t s1)
+> +{
+> +    return (uint32_t)s2 * (uint32_t)s1 >> 16;
+> +}
+> +
+> +static uint32_t do_mulhu_w(uint32_t s2, uint32_t s1)
+> +{
+> +    return (uint64_t)s2 * (uint64_t)s1 >> 32;
+> +}
+> +
+> +static uint64_t do_mulhu_d(uint64_t s2, uint64_t s1)
+> +{
+> +    uint64_t hi_64, lo_64;
+> +
+> +    mulu64(&lo_64, &hi_64, s2, s1);
+> +    return hi_64;
+> +}
+> +
+> +static int8_t do_mulhsu_b(int8_t s2, uint8_t s1)
+> +{
+> +    return (int16_t)s2 * (uint16_t)s1 >> 8;
+> +}
+> +
+> +static int16_t do_mulhsu_h(int16_t s2, uint16_t s1)
+> +{
+> +    return (int32_t)s2 * (uint32_t)s1 >> 16;
+> +}
+> +
+> +static int32_t do_mulhsu_w(int32_t s2, uint32_t s1)
+> +{
+> +    return (int64_t)s2 * (uint64_t)s1 >> 32;
+> +}
+> +
+> +static int64_t do_mulhsu_d(int64_t s2, uint64_t s1)
+> +{
+> +    uint64_t hi_64, lo_64, abs_s2 = s2;
+> +
+> +    if (s2 < 0) {
+> +        abs_s2 = -s2;
+> +    }
+> +    mulu64(&lo_64, &hi_64, abs_s2, s1);
+> +    if (s2 < 0) {
+> +        lo_64 = ~lo_64;
+> +        hi_64 = ~hi_64;
+> +        if (lo_64 == UINT64_MAX) {
+> +            lo_64 = 0;
+> +            hi_64 += 1;
+> +        } else {
+> +            lo_64 += 1;
+> +        }
+> +    }
+> +
+> +    return hi_64;
+> +}
+> +
+> +RVVCALL(OPIVV2, vmulh_vv_b, OP_SSS_B, H1, H1, H1, do_mulh_b)
+> +RVVCALL(OPIVV2, vmulh_vv_h, OP_SSS_H, H2, H2, H2, do_mulh_h)
+> +RVVCALL(OPIVV2, vmulh_vv_w, OP_SSS_W, H4, H4, H4, do_mulh_w)
+> +RVVCALL(OPIVV2, vmulh_vv_d, OP_SSS_D, H8, H8, H8, do_mulh_d)
+> +RVVCALL(OPIVV2, vmulhu_vv_b, OP_UUU_B, H1, H1, H1, do_mulhu_b)
+> +RVVCALL(OPIVV2, vmulhu_vv_h, OP_UUU_H, H2, H2, H2, do_mulhu_h)
+> +RVVCALL(OPIVV2, vmulhu_vv_w, OP_UUU_W, H4, H4, H4, do_mulhu_w)
+> +RVVCALL(OPIVV2, vmulhu_vv_d, OP_UUU_D, H8, H8, H8, do_mulhu_d)
+> +RVVCALL(OPIVV2, vmulhsu_vv_b, OP_SUS_B, H1, H1, H1, do_mulhsu_b)
+> +RVVCALL(OPIVV2, vmulhsu_vv_h, OP_SUS_H, H2, H2, H2, do_mulhsu_h)
+> +RVVCALL(OPIVV2, vmulhsu_vv_w, OP_SUS_W, H4, H4, H4, do_mulhsu_w)
+> +RVVCALL(OPIVV2, vmulhsu_vv_d, OP_SUS_D, H8, H8, H8, do_mulhsu_d)
+> +GEN_VEXT_VV(vmulh_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV(vmulh_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV(vmulh_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV(vmulh_vv_d, 8, 8, clearq)
+> +GEN_VEXT_VV(vmulhu_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV(vmulhu_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV(vmulhu_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV(vmulhu_vv_d, 8, 8, clearq)
+> +GEN_VEXT_VV(vmulhsu_vv_b, 1, 1, clearb)
+> +GEN_VEXT_VV(vmulhsu_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV(vmulhsu_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV(vmulhsu_vv_d, 8, 8, clearq)
+> +
+> +RVVCALL(OPIVX2, vmul_vx_b, OP_SSS_B, H1, H1, DO_MUL)
+> +RVVCALL(OPIVX2, vmul_vx_h, OP_SSS_H, H2, H2, DO_MUL)
+> +RVVCALL(OPIVX2, vmul_vx_w, OP_SSS_W, H4, H4, DO_MUL)
+> +RVVCALL(OPIVX2, vmul_vx_d, OP_SSS_D, H8, H8, DO_MUL)
+> +RVVCALL(OPIVX2, vmulh_vx_b, OP_SSS_B, H1, H1, do_mulh_b)
+> +RVVCALL(OPIVX2, vmulh_vx_h, OP_SSS_H, H2, H2, do_mulh_h)
+> +RVVCALL(OPIVX2, vmulh_vx_w, OP_SSS_W, H4, H4, do_mulh_w)
+> +RVVCALL(OPIVX2, vmulh_vx_d, OP_SSS_D, H8, H8, do_mulh_d)
+> +RVVCALL(OPIVX2, vmulhu_vx_b, OP_UUU_B, H1, H1, do_mulhu_b)
+> +RVVCALL(OPIVX2, vmulhu_vx_h, OP_UUU_H, H2, H2, do_mulhu_h)
+> +RVVCALL(OPIVX2, vmulhu_vx_w, OP_UUU_W, H4, H4, do_mulhu_w)
+> +RVVCALL(OPIVX2, vmulhu_vx_d, OP_UUU_D, H8, H8, do_mulhu_d)
+> +RVVCALL(OPIVX2, vmulhsu_vx_b, OP_SUS_B, H1, H1, do_mulhsu_b)
+> +RVVCALL(OPIVX2, vmulhsu_vx_h, OP_SUS_H, H2, H2, do_mulhsu_h)
+> +RVVCALL(OPIVX2, vmulhsu_vx_w, OP_SUS_W, H4, H4, do_mulhsu_w)
+> +RVVCALL(OPIVX2, vmulhsu_vx_d, OP_SUS_D, H8, H8, do_mulhsu_d)
+> +GEN_VEXT_VX(vmul_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX(vmul_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX(vmul_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX(vmul_vx_d, 8, 8, clearq)
+> +GEN_VEXT_VX(vmulh_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX(vmulh_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX(vmulh_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX(vmulh_vx_d, 8, 8, clearq)
+> +GEN_VEXT_VX(vmulhu_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX(vmulhu_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX(vmulhu_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX(vmulhu_vx_d, 8, 8, clearq)
+> +GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
+> +GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
+> +GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
+> +GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
+> --
+> 2.23.0
+>
 
