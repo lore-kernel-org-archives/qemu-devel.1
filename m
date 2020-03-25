@@ -2,70 +2,54 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=DATE_IN_PAST_96_XX,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47129C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 02:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1054DC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 03:05:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 181B720578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 02:25:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 181B720578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D10AE20732
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 03:05:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10AE20732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIk7D-0000vt-8o
-	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 22:25:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53383)
+	id 1jIkja-0002Qv-VK
+	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 23:05:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jIk6c-0000WS-9U
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 22:24:51 -0400
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1jIkj1-0001wf-Gd
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 23:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1jIk6a-0001lP-6T
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 22:24:49 -0400
-Received: from mga04.intel.com ([192.55.52.120]:39280)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1jIk6Z-0001iR-Tx
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 22:24:48 -0400
-IronPort-SDR: tdA+dgfXJIbK8fuAX4tydyNlC/Rj9+ofd9rgvSVOuogWKAGwZcLlnXRTuPafyZGc2+4qU4MXRn
- rLsYDwm9GtGg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Mar 2020 19:24:44 -0700
-IronPort-SDR: LNQIuW64wDlZVPiKJn63DVtJ/4DNuUQCARCuBcqiUEX2HuSoubJXLUtXjhIkmRiR8EvUBy4uVh
- ATXPTOhCKy5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,322,1580803200"; d="scan'208";a="272224977"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga004.fm.intel.com with ESMTP; 29 Mar 2020 19:24:39 -0700
-Date: Sun, 29 Mar 2020 22:15:06 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v16 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-Message-ID: <20200330021506.GC30683@joy-OptiPlex-7040>
-References: <1585078359-20124-1-git-send-email-kwankhede@nvidia.com>
- <1585078359-20124-6-git-send-email-kwankhede@nvidia.com>
- <20200325021800.GC20109@joy-OptiPlex-7040>
- <3cabb357-b9c5-f8b3-5d57-1178ec0dde5a@nvidia.com>
- <20200327000426.GA26419@joy-OptiPlex-7040>
- <b6524b4a-e6a0-7328-5003-7286f2fd61a8@nvidia.com>
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1jIkj0-0001of-Bg
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 23:04:31 -0400
+Received: from [192.146.154.243] (port=30230 helo=mcp01.nutanix.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <raphael.norwitz@nutanix.com>)
+ id 1jIkiw-0001je-NG; Sun, 29 Mar 2020 23:04:26 -0400
+Received: from localhost.localdomain (unknown [10.40.36.165])
+ by mcp01.nutanix.com (Postfix) with ESMTP id 98DAD100ABE3;
+ Mon, 30 Mar 2020 03:04:24 +0000 (UTC)
+Date: Wed, 25 Mar 2020 19:03:32 -0400
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+To: Li Feng <fengli@smartx.com>
+Subject: Re: [PATCH] fix vhost_user_blk_watch crash
+Message-ID: <20200325230332.GA18793@localhost.localdomain>
+References: <20200323052924.29286-1-fengli@smartx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b6524b4a-e6a0-7328-5003-7286f2fd61a8@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.120
+In-Reply-To: <20200323052924.29286-1-fengli@smartx.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 192.146.154.243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,147 +61,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 27, 2020 at 12:42:43PM +0800, Kirti Wankhede wrote:
-> 
-> 
-> On 3/27/2020 5:34 AM, Yan Zhao wrote:
-> > On Fri, Mar 27, 2020 at 05:39:44AM +0800, Kirti Wankhede wrote:
-> >>
-> >>
-> >> On 3/25/2020 7:48 AM, Yan Zhao wrote:
-> >>> On Wed, Mar 25, 2020 at 03:32:37AM +0800, Kirti Wankhede wrote:
-> >>>> DMA mapped pages, including those pinned by mdev vendor drivers, might
-> >>>> get unpinned and unmapped while migration is active and device is still
-> >>>> running. For example, in pre-copy phase while guest driver could access
-> >>>> those pages, host device or vendor driver can dirty these mapped pages.
-> >>>> Such pages should be marked dirty so as to maintain memory consistency
-> >>>> for a user making use of dirty page tracking.
-> >>>>
-> >>>> To get bitmap during unmap, user should allocate memory for bitmap, set
-> >>>> size of allocated memory, set page size to be considered for bitmap and
-> >>>> set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
-> >>>>
-> >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >>>> ---
-> >>>>    drivers/vfio/vfio_iommu_type1.c | 54 ++++++++++++++++++++++++++++++++++++++---
-> >>>>    include/uapi/linux/vfio.h       | 10 ++++++++
-> >>>>    2 files changed, 60 insertions(+), 4 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >>>> index 27ed069c5053..b98a8d79e13a 100644
-> >>>> --- a/drivers/vfio/vfio_iommu_type1.c
-> >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >>>> @@ -982,7 +982,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> >>>>    }
-> >>>>    
-> >>>>    static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> >>>> -			     struct vfio_iommu_type1_dma_unmap *unmap)
-> >>>> +			     struct vfio_iommu_type1_dma_unmap *unmap,
-> >>>> +			     struct vfio_bitmap *bitmap)
-> >>>>    {
-> >>>>    	uint64_t mask;
-> >>>>    	struct vfio_dma *dma, *dma_last = NULL;
-> >>>> @@ -1033,6 +1034,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> >>>>    	 * will be returned if these conditions are not met.  The v2 interface
-> >>>>    	 * will only return success and a size of zero if there were no
-> >>>>    	 * mappings within the range.
-> >>>> +	 *
-> >>>> +	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
-> >>>> +	 * must be for single mapping. Multiple mappings with this flag set is
-> >>>> +	 * not supported.
-> >>>>    	 */
-> >>>>    	if (iommu->v2) {
-> >>>>    		dma = vfio_find_dma(iommu, unmap->iova, 1);
-> >>>> @@ -1040,6 +1045,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> >>>>    			ret = -EINVAL;
-> >>>>    			goto unlock;
-> >>>>    		}
-> >>>> +
-> >>>> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> >>>> +		    (dma->iova != unmap->iova || dma->size != unmap->size)) {
-> >>> potential NULL pointer!
-> >>>
-> >>> And could you address the comments in v14?
-> >>> How to handle DSI unmaps in vIOMMU
-> >>> (https://lore.kernel.org/kvm/20200323011041.GB5456@joy-OptiPlex-7040/)
-> >>>
-> >>
-> >> Sorry, I drafted reply to it, but I missed to send, it remained in my drafts
-> >>
-> >>   >
-> >>   > it happens in vIOMMU Domain level invalidation of IOTLB
-> >>   > (domain-selective invalidation, see vtd_iotlb_domain_invalidate() in
-> >> qemu).
-> >>   > common in VTD lazy mode, and NOT just happening once at boot time.
-> >>   > rather than invalidate page by page, it batches the page invalidation.
-> >>   > so, when this invalidation takes place, even higher level page tables
-> >>   > have been invalid and therefore it has to invalidate a bigger
-> >> combined range.
-> >>   > That's why we see IOVAs are mapped in 4k pages, but are unmapped in 2M
-> >>   > pages.
-> >>   >
-> >>   > I think those UNMAPs should also have GET_DIRTY_BIMTAP flag on, right?
-> >>
-> >>
-> >> vtd_iotlb_domain_invalidate()
-> >>     vtd_sync_shadow_page_table()
-> >>       vtd_sync_shadow_page_table_range(vtd_as, &ce, 0, UINT64_MAX)
-> >>         vtd_page_walk()
-> >>           vtd_page_walk_level() - walk over specific level for IOVA range
-> >>             vtd_page_walk_one()
-> >>               memory_region_notify_iommu()
-> >>               ...
-> >>                 vfio_iommu_map_notify()
-> >>
-> >> In the above trace, isn't page walk will take care of creating proper
-> >> IOTLB entry which should be same as created during mapping for that
-> >> IOTLB entry?
-> >>
-> > No. It does walk the page table, but as it's dsi (delay & batched unmap),
-> > pages table entry for a whole 2M (the higher level, not last level for 4K)
-> > range is invalid, so the iotlb->addr_mask what vfio_iommu_map_notify()
-> > receives is (2M - 1), not the same as the size for map.
-> > 
-> 
-> When do this happen? during my testing I never hit this case. How can I 
-> hit this case?
+On Mon, Mar 23, 2020 at 01:29:24PM +0800, Li Feng wrote:
+>=20
+> the G_IO_HUP is watched in tcp_chr_connect, and the callback
+> vhost_user_blk_watch is not needed, because tcp_chr_hup is registered a=
+s
+> callback. And it will close the tcp link.
+>=20
+> Signed-off-by: Li Feng <fengli@smartx.com>
 
-Just common settings to enable vIOMMU:
-Qemu: -device intel-iommu,caching-mode=true
-guest kernel parameter: intel_iommu=on
+Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
-(intel_iommu=on turns on lazy mode by default)
-
-In lazy mode, guest notifies DMA MAP on page level, but notifies DMA UNMAPs
-in batch.
-with a pass-through NVMe, there are 89 DSI unmaps in 1 second for a typical fio.
-With a pass-through GPU, there 22 DSI unmaps in total for benchmark openArena
-(lasting around 55 secs)
-> 
-> In this case, will adjacent whole vfio_dmas will be clubbed together or 
-> will there be any intersection of vfio_dmas?
->
-clubbed together.
+> ---
+>  hw/block/vhost-user-blk.c          | 19 -------------------
+>  include/hw/virtio/vhost-user-blk.h |  1 -
+>  2 files changed, 20 deletions(-)
+>=20
+> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> index 12925a47ec..17df5338e7 100644
+> --- a/hw/block/vhost-user-blk.c
+> +++ b/hw/block/vhost-user-blk.c
+> @@ -349,18 +349,6 @@ static void vhost_user_blk_disconnect(DeviceState =
+*dev)
+>      vhost_dev_cleanup(&s->dev);
+>  }
+> =20
+> -static gboolean vhost_user_blk_watch(GIOChannel *chan, GIOCondition co=
+nd,
+> -                                     void *opaque)
+> -{
+> -    DeviceState *dev =3D opaque;
+> -    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+> -    VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+> -
+> -    qemu_chr_fe_disconnect(&s->chardev);
+> -
+> -    return true;
+> -}
+> -
+>  static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
+>  {
+>      DeviceState *dev =3D opaque;
+> @@ -373,15 +361,9 @@ static void vhost_user_blk_event(void *opaque, QEM=
+UChrEvent event)
+>              qemu_chr_fe_disconnect(&s->chardev);
+>              return;
+>          }
+> -        s->watch =3D qemu_chr_fe_add_watch(&s->chardev, G_IO_HUP,
+> -                                         vhost_user_blk_watch, dev);
+>          break;
+>      case CHR_EVENT_CLOSED:
+>          vhost_user_blk_disconnect(dev);
+> -        if (s->watch) {
+> -            g_source_remove(s->watch);
+> -            s->watch =3D 0;
+> -        }
+>          break;
+>      case CHR_EVENT_BREAK:
+>      case CHR_EVENT_MUX_IN:
+> @@ -428,7 +410,6 @@ static void vhost_user_blk_device_realize(DeviceSta=
+te *dev, Error **errp)
+> =20
+>      s->inflight =3D g_new0(struct vhost_inflight, 1);
+>      s->vhost_vqs =3D g_new0(struct vhost_virtqueue, s->num_queues);
+> -    s->watch =3D 0;
+>      s->connected =3D false;
+> =20
+>      qemu_chr_fe_set_handlers(&s->chardev,  NULL, NULL, vhost_user_blk_=
+event,
+> diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vho=
+st-user-blk.h
+> index 05ea0ad183..34ad6f0c0e 100644
+> --- a/include/hw/virtio/vhost-user-blk.h
+> +++ b/include/hw/virtio/vhost-user-blk.h
+> @@ -38,7 +38,6 @@ typedef struct VHostUserBlk {
+>      VhostUserState vhost_user;
+>      struct vhost_virtqueue *vhost_vqs;
+>      VirtQueue **virtqs;
+> -    guint watch;
+>      bool connected;
+>  } VHostUserBlk;
+> =20
+> --=20
+> 2.11.0
+>=20
+>=20
+> --=20
+> The SmartX email address is only for business purpose. Any sent message=
+=20
+> that is not related to the business is not authorized or permitted by=20
+> SmartX.
+> =E6=9C=AC=E9=82=AE=E7=AE=B1=E4=B8=BA=E5=8C=97=E4=BA=AC=E5=BF=97=E5=87=8C=
+=E6=B5=B7=E7=BA=B3=E7=A7=91=E6=8A=80=E6=9C=89=E9=99=90=E5=85=AC=E5=8F=B8=EF=
+=BC=88SmartX=EF=BC=89=E5=B7=A5=E4=BD=9C=E9=82=AE=E7=AE=B1. =E5=A6=82=E6=9C=
+=AC=E9=82=AE=E7=AE=B1=E5=8F=91=E5=87=BA=E7=9A=84=E9=82=AE=E4=BB=B6=E4=B8=8E=
+=E5=B7=A5=E4=BD=9C=E6=97=A0=E5=85=B3,=E8=AF=A5=E9=82=AE=E4=BB=B6=E6=9C=AA=
+=E5=BE=97=E5=88=B0=E6=9C=AC=E5=85=AC=E5=8F=B8=E4=BB=BB=E4=BD=95=E7=9A=84=E6=
+=98=8E=E7=A4=BA=E6=88=96=E9=BB=98=E7=A4=BA=E7=9A=84=E6=8E=88=E6=9D=83.
+>=20
+>=20
+>=20
+>=20
 
