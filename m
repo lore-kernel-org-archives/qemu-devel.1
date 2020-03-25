@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21957C54FD0
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF27DC43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:42:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5A9020772
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:41:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 685F920772
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:42:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfyw0yCa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5A9020772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtKTXkx+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 685F920772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH3Tk-00020W-2N
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:41:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35344)
+	id 1jH3Um-0003kQ-IN
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:42:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35433)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3SY-0008Ur-90
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:40:31 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3T5-0001RI-55
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3SW-00020Q-R1
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:40:30 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:56181)
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3T3-0002Nr-A6
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:41:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24146)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3SW-00020H-Lc
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:40:28 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3T3-0002N9-4r
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:41:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585132828;
+ s=mimecast20190719; t=1585132860;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Hp9w/wPafJwHU+Sf5P2vW+G4ELiVQqiunXtbIR2/7iw=;
- b=bfyw0yCaCCpSEP+oopUaPXBWfNuUShGHF95dT9Bn9AvDUhmSw6uAkoRkurNZr4uUbL+bIu
- FMCy327EEThQnT0khRQZKOoz1rnBQIQucpzO+sxzYvIdO9PFUHZX+Bie1NlshJfKN1JoF8
- 7MHoJF81a4ul/9uADxKvoDl4Ajyjano=
+ bh=MBdSlGMfwoUiFT/e8Xxde9UtZjr1v4pvMkeZU8DDiw8=;
+ b=AtKTXkx+/Udk9wUoP0CrogaV8IudSRCRTZ0ocT5fqBQqCNWmz+PGuXHFF4JlyYCdXtCqsV
+ JqOoY+y9T4AlysafQ4ZgfCaAErRgCoH+0g57/5RyaVASAYcdYgKqg6VDa6A/lIpQZvLXl8
+ yf6GreaHy6pWYceYkMU6pWgC4dtfh+U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-co__mUTWPTGzfQBnvaj53Q-1; Wed, 25 Mar 2020 06:40:26 -0400
-X-MC-Unique: co__mUTWPTGzfQBnvaj53Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-142-zJGZ5ZTvOZ-Uihiprlb1oQ-1; Wed, 25 Mar 2020 06:40:58 -0400
+X-MC-Unique: zJGZ5ZTvOZ-Uihiprlb1oQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E62D107ACCA;
- Wed, 25 Mar 2020 10:40:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 695D5800D5C;
+ Wed, 25 Mar 2020 10:40:57 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 366115C1A2;
- Wed, 25 Mar 2020 10:40:23 +0000 (UTC)
-Message-ID: <47ef3ec5800b5f74017df60e599f16ba905daab6.camel@redhat.com>
-Subject: Re: [PATCH v6 11/42] nvme: add temperature threshold feature
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3448294B5B;
+ Wed, 25 Mar 2020 10:40:55 +0000 (UTC)
+Message-ID: <a7c92a47957a8185a9bd8d7d8b919072d757ff3a.camel@redhat.com>
+Subject: Re: [PATCH v6 12/42] nvme: add support for the get log page command
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-Date: Wed, 25 Mar 2020 12:40:22 +0200
-In-Reply-To: <20200316142928.153431-12-its@irrelevant.dk>
+Date: Wed, 25 Mar 2020 12:40:53 +0200
+In-Reply-To: <20200316142928.153431-13-its@irrelevant.dk>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-12-its@irrelevant.dk>
+ <20200316142928.153431-13-its@irrelevant.dk>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
@@ -95,154 +95,257 @@ Sender: "Qemu-devel"
 On Mon, 2020-03-16 at 07:28 -0700, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> It might seem wierd to implement this feature for an emulated device,
-> but it is mandatory to support and the feature is useful for testing
-> asynchronous event request support, which will be added in a later
-> patch.
+> Add support for the Get Log Page command and basic implementations of
+> the mandatory Error Information, SMART / Health Information and Firmware
+> Slot Information log pages.
 > 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> In violation of the specification, the SMART / Health Information log
+> page does not persist information over the lifetime of the controller
+> because the device has no place to store such persistent state.
+> 
+> Note that the LPA field in the Identify Controller data structure
+> intentionally has bit 0 cleared because there is no namespace specific
+> information in the SMART / Health information log page.
+> 
+> Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
+> Section 5.10 ("Get Log Page command").
+> 
+> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 > Acked-by: Keith Busch <kbusch@kernel.org>
 > ---
->  hw/block/nvme.c      | 48 ++++++++++++++++++++++++++++++++++++++++++++
->  hw/block/nvme.h      |  2 ++
->  include/block/nvme.h |  8 +++++++-
->  3 files changed, 57 insertions(+), 1 deletion(-)
+>  hw/block/nvme.c       | 138 +++++++++++++++++++++++++++++++++++++++++-
+>  hw/block/nvme.h       |  10 +++
+>  hw/block/trace-events |   2 +
+>  3 files changed, 149 insertions(+), 1 deletion(-)
 > 
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 665485045066..64c42101df5c 100644
+> index 64c42101df5c..83ff3fbfb463 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -45,6 +45,9 @@
->  #include "nvme.h"
+> @@ -569,6 +569,138 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
+>      return NVME_SUCCESS;
+>  }
 >  
->  #define NVME_CMB_BIR 2
-> +#define NVME_TEMPERATURE 0x143
-> +#define NVME_TEMPERATURE_WARNING 0x157
-> +#define NVME_TEMPERATURE_CRITICAL 0x175
->  
->  #define NVME_GUEST_ERR(trace, fmt, ...) \
->      do { \
-> @@ -798,9 +801,31 @@ static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
->  static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  {
->      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> +static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+> +                                uint64_t off, NvmeRequest *req)
+> +{
+> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+> +    uint32_t nsid = le32_to_cpu(cmd->nsid);
+> +
+> +    uint32_t trans_len;
+> +    time_t current_ms;
+> +    uint64_t units_read = 0, units_written = 0;
+> +    uint64_t read_commands = 0, write_commands = 0;
+> +    NvmeSmartLog smart;
+> +    BlockAcctStats *s;
+> +
+> +    if (nsid && nsid != 0xffffffff) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    s = blk_get_stats(n->conf.blk);
+> +
+> +    units_read = s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
+> +    units_written = s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
+> +    read_commands = s->nr_ops[BLOCK_ACCT_READ];
+> +    write_commands = s->nr_ops[BLOCK_ACCT_WRITE];
+> +
+> +    if (off > sizeof(smart)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    trans_len = MIN(sizeof(smart) - off, buf_len);
+> +
+> +    memset(&smart, 0x0, sizeof(smart));
+> +
+> +    smart.data_units_read[0] = cpu_to_le64(units_read / 1000);
+> +    smart.data_units_written[0] = cpu_to_le64(units_written / 1000);
+> +    smart.host_read_commands[0] = cpu_to_le64(read_commands);
+> +    smart.host_write_commands[0] = cpu_to_le64(write_commands);
+> +
+> +    smart.temperature[0] = n->temperature & 0xff;
+> +    smart.temperature[1] = (n->temperature >> 8) & 0xff;
+> +
+> +    if ((n->temperature > n->features.temp_thresh_hi) ||
+> +        (n->temperature < n->features.temp_thresh_low)) {
+> +        smart.critical_warning |= NVME_SMART_TEMPERATURE;
+> +    }
+> +
+> +    current_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+> +    smart.power_on_hours[0] =
+> +        cpu_to_le64((((current_ms - n->starttime_ms) / 1000) / 60) / 60);
+OH, I didn't notice that you didn't have the endian conversion in V5, it is needed here
+of course.
+
+> +
+> +    return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp1,
+> +                             prp2);
+> +}
+> +
+> +static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+> +                                 uint64_t off, NvmeRequest *req)
+> +{
+> +    uint32_t trans_len;
+> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+> +    NvmeFwSlotInfoLog fw_log;
+> +
+> +    if (off > sizeof(fw_log)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    memset(&fw_log, 0, sizeof(NvmeFwSlotInfoLog));
+> +
+> +    trans_len = MIN(sizeof(fw_log) - off, buf_len);
+> +
+> +    return nvme_dma_read_prp(n, (uint8_t *) &fw_log + off, trans_len, prp1,
+> +                             prp2);
+> +}
+> +
+> +static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+> +                                uint64_t off, NvmeRequest *req)
+> +{
+> +    uint32_t trans_len;
+> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+> +    uint8_t errlog[64];
+I'll would replace this with sizeof(NvmeErrorLogEntry)
+(and add NvmeErrorLogEntry to the nvme.h), just for the sake of consistency,
+and in case we end up reporting some errors to the log in the future.
+
+
+> +
+> +    if (off > sizeof(errlog)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    memset(errlog, 0x0, sizeof(errlog));
+> +
+> +    trans_len = MIN(sizeof(errlog) - off, buf_len);
+> +
+> +    return nvme_dma_read_prp(n, errlog, trans_len, prp1, prp2);
+> +}
+Besides this, looks good now.
+
+> +
+> +static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> +{
+> +    uint32_t dw10 = le32_to_cpu(cmd->cdw10);
 > +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
->      uint32_t result;
->  
->      switch (dw10) {
-> +    case NVME_TEMPERATURE_THRESHOLD:
-> +        result = 0;
+> +    uint32_t dw12 = le32_to_cpu(cmd->cdw12);
+> +    uint32_t dw13 = le32_to_cpu(cmd->cdw13);
+> +    uint8_t  lid = dw10 & 0xff;
+> +    uint8_t  rae = (dw10 >> 15) & 0x1;
+> +    uint32_t numdl, numdu;
+> +    uint64_t off, lpol, lpou;
+> +    size_t   len;
 > +
-> +        /*
-> +         * The controller only implements the Composite Temperature sensor, so
-> +         * return 0 for all other sensors.
-> +         */
-> +        if (NVME_TEMP_TMPSEL(dw11)) {
-> +            break;
-> +        }
+> +    numdl = (dw10 >> 16);
+> +    numdu = (dw11 & 0xffff);
+> +    lpol = dw12;
+> +    lpou = dw13;
 > +
-> +        switch (NVME_TEMP_THSEL(dw11)) {
-> +        case 0x0:
-> +            result = cpu_to_le16(n->features.temp_thresh_hi);
-> +            break;
-> +        case 0x1:
-> +            result = cpu_to_le16(n->features.temp_thresh_low);
-> +            break;
-> +        }
+> +    len = (((numdu << 16) | numdl) + 1) << 2;
+> +    off = (lpou << 32ULL) | lpol;
 > +
-> +        break;
->      case NVME_VOLATILE_WRITE_CACHE:
->          result = blk_enable_write_cache(n->conf.blk);
->          trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
-> @@ -845,6 +870,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
->  
->      switch (dw10) {
-> +    case NVME_TEMPERATURE_THRESHOLD:
-> +        if (NVME_TEMP_TMPSEL(dw11)) {
-> +            break;
-> +        }
+> +    if (off & 0x3) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
 > +
-> +        switch (NVME_TEMP_THSEL(dw11)) {
-> +        case 0x0:
-> +            n->features.temp_thresh_hi = NVME_TEMP_TMPTH(dw11);
-> +            break;
-> +        case 0x1:
-> +            n->features.temp_thresh_low = NVME_TEMP_TMPTH(dw11);
-> +            break;
-> +        default:
-> +            return NVME_INVALID_FIELD | NVME_DNR;
-> +        }
+> +    trace_nvme_dev_get_log(nvme_cid(req), lid, rae, len, off);
 > +
-> +        break;
->      case NVME_VOLATILE_WRITE_CACHE:
->          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
->          break;
-> @@ -1374,6 +1416,7 @@ static void nvme_init_state(NvmeCtrl *n)
+> +    switch (lid) {
+> +    case NVME_LOG_ERROR_INFO:
+> +        return nvme_error_info(n, cmd, len, off, req);
+> +    case NVME_LOG_SMART_INFO:
+> +        return nvme_smart_info(n, cmd, len, off, req);
+> +    case NVME_LOG_FW_SLOT_INFO:
+> +        return nvme_fw_log_info(n, cmd, len, off, req);
+> +    default:
+> +        trace_nvme_dev_err_invalid_log_page(nvme_cid(req), lid);
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +}
+> +
+>  static void nvme_free_cq(NvmeCQueue *cq, NvmeCtrl *n)
+>  {
+>      n->cq[cq->cqid] = NULL;
+> @@ -914,6 +1046,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          return nvme_del_sq(n, cmd);
+>      case NVME_ADM_CMD_CREATE_SQ:
+>          return nvme_create_sq(n, cmd);
+> +    case NVME_ADM_CMD_GET_LOG_PAGE:
+> +        return nvme_get_log(n, cmd, req);
+>      case NVME_ADM_CMD_DELETE_CQ:
+>          return nvme_del_cq(n, cmd);
+>      case NVME_ADM_CMD_CREATE_CQ:
+> @@ -1416,7 +1550,9 @@ static void nvme_init_state(NvmeCtrl *n)
 >      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
 >      n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
 >      n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
-> +    n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
+> +    n->temperature = NVME_TEMPERATURE;
+>      n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
+> +    n->starttime_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
 >  }
 >  
 >  static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-> @@ -1451,6 +1494,11 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+> @@ -1493,7 +1629,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+>       */
 >      id->acl = 3;
 >      id->frmw = 7 << 1;
->      id->lpa = 1 << 0;
-> +
-> +    /* recommended default value (~70 C) */
-> +    id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
-> +    id->cctemp = cpu_to_le16(NVME_TEMPERATURE_CRITICAL);
-> +
->      id->sqes = (0x6 << 4) | 0x6;
->      id->cqes = (0x4 << 4) | 0x4;
->      id->nn = cpu_to_le32(n->num_namespaces);
+> -    id->lpa = 1 << 0;
+> +    id->lpa = 1 << 2;
+>  
+>      /* recommended default value (~70 C) */
+>      id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
 > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index b7c465560eea..8cda5f02c622 100644
+> index 8cda5f02c622..ebeee2edc4f4 100644
 > --- a/hw/block/nvme.h
 > +++ b/hw/block/nvme.h
-> @@ -108,6 +108,7 @@ typedef struct NvmeCtrl {
->      uint64_t    irq_status;
+> @@ -109,6 +109,7 @@ typedef struct NvmeCtrl {
 >      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
 >      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
-> +    uint16_t    temperature;
-You forgot to move this too.
-
+>      uint16_t    temperature;
+> +    uint64_t    starttime_ms;
 >  
 >      NvmeNamespace   *namespaces;
 >      NvmeSQueue      **sq;
-> @@ -115,6 +116,7 @@ typedef struct NvmeCtrl {
->      NvmeSQueue      admin_sq;
->      NvmeCQueue      admin_cq;
->      NvmeIdCtrl      id_ctrl;
-> +    NvmeFeatureVal  features;
->  } NvmeCtrl;
+> @@ -124,4 +125,13 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+>      return n->ns_size >> nvme_ns_lbads(ns);
+>  }
 >  
->  static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index a083c1b3a613..91fc4738a3e0 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -688,7 +688,13 @@ enum NvmeIdCtrlOncs {
->  typedef struct NvmeFeatureVal {
->      uint32_t    arbitration;
->      uint32_t    power_mgmt;
-> -    uint32_t    temp_thresh;
-> +    union {
-> +        struct {
-> +            uint16_t temp_thresh_hi;
-> +            uint16_t temp_thresh_low;
-> +        };
-> +        uint32_t temp_thresh;
-> +    };
->      uint32_t    err_rec;
->      uint32_t    volatile_wc;
->      uint32_t    num_queues;
+> +static inline uint16_t nvme_cid(NvmeRequest *req)
+> +{
+> +    if (req) {
+> +        return le16_to_cpu(req->cqe.cid);
+> +    }
+> +
+> +    return 0xffff;
+> +}
+> +
+>  #endif /* HW_NVME_H */
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index ade506ea2bb2..7da088479f39 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -46,6 +46,7 @@ nvme_dev_getfeat_numq(int result) "get feature number of queues, result=%d"
+>  nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
+>  nvme_dev_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
+>  nvme_dev_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
+> +nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+>  nvme_dev_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+>  nvme_dev_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+>  nvme_dev_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
+> @@ -85,6 +86,7 @@ nvme_dev_err_invalid_create_cq_qflags(uint16_t qflags) "failed creating completi
+>  nvme_dev_err_invalid_identify_cns(uint16_t cns) "identify, invalid cns=0x%"PRIx16""
+>  nvme_dev_err_invalid_getfeat(int dw10) "invalid get features, dw10=0x%"PRIx32""
+>  nvme_dev_err_invalid_setfeat(uint32_t dw10) "invalid set features, dw10=0x%"PRIx32""
+> +nvme_dev_err_invalid_log_page(uint16_t cid, uint16_t lid) "cid %"PRIu16" lid 0x%"PRIx16""
+>  nvme_dev_err_startfail_cq(void) "nvme_start_ctrl failed because there are non-admin completion queues"
+>  nvme_dev_err_startfail_sq(void) "nvme_start_ctrl failed because there are non-admin submission queues"
+>  nvme_dev_err_startfail_nbarasq(void) "nvme_start_ctrl failed because the admin submission queue address is null"
 
-With 'temperature' field removed from the header:
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
