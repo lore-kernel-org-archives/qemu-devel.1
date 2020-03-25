@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E26C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 292C3C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 572F620663
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:56:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572F620663
+	by mail.kernel.org (Postfix) with ESMTPS id EFF2F20663
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:57:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF2F20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH6WA-00030m-F4
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58390)
+	id 1jH6Wq-0003RU-5n
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jH6VO-00026t-6P
+ (envelope-from <bounces@canonical.com>) id 1jH6VO-00026p-73
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jH6VM-00056P-Is
+ (envelope-from <bounces@canonical.com>) id 1jH6VM-00056U-JX
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34222)
+Received: from indium.canonical.com ([91.189.90.7]:34216)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jH6VM-00055a-Cx
+ id 1jH6VM-00055D-DM
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:36 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jH6VL-0007wm-Fk
+ id 1jH6VL-0007wy-06
  for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 747692E80C7
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id F1B532E80BA
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Mar 2020 13:47:32 -0000
+Date: Wed, 25 Mar 2020 13:47:27 -0000
 From: Marcin Juszkiewicz <1869006@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,17 +54,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: hrw
 X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
 X-Launchpad-Bug-Modifier: Marcin Juszkiewicz (hrw)
-References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
-Message-Id: <158514405290.16008.9555499615618002985.malone@gac.canonical.com>
-Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
- guest memory but fails on 4GB
+Message-Id: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
+Subject: [Bug 1869006] [NEW] PCIe cards passthrough to TCG guest works on 2GB
+ of guest memory but fails on 4GB (vfio_dma_map invalid arg)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a27f3a59a4355c12e10c5fb7c984a3085c0d495e
+X-Launchpad-Hash: 67c4d743f0c97c8598ab784198d41eb6ad3d2fcd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,117 +81,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Qemu command line for booting VM was generated by libvirt:
+Public bug reported:
 
-/usr/bin/qemu-system-aarch64 =
+During one meeting coworker asked "did someone tried to passthrough PCIe
+card to other arch guest?" and I decided to check it.
 
--name guest=3Dfedora-aarch64-pcie,debug-threads=3Don =
+Plugged SATA and USB3 controllers into spare slots on mainboard and
+started playing. On 1GB VM instance it worked (both cold- and hot-
+plugged). On 4GB one it did not:
 
--S =
+B=C5=82=C4=85d podczas uruchamiania domeny: internal error: process exited =
+while connecting to monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch6=
+4: -device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x=
+0: VFIO_MAP_DMA: -22
+2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D00=
+00:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: failed =
+to setup container for group 28: memory listener initialization failed: Reg=
+ion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, 0x=
+7fb2a3e00000) =3D -22 (Invalid argument)
 
--object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/do=
-main-1-fedora-aarch64-pcie/master-key.aes =
+Traceback (most recent call last):
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_wr=
+apper
+    callback(asyncjob, *args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tmpcb
+    callback(*args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", line =
+66, in newfn
+    ret =3D fn(self, *args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/object/domain.py", line 1279, i=
+n startup
+    self._backend.create()
+  File "/usr/lib64/python3.8/site-packages/libvirt.py", line 1234, in create
+    if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
+=3Dself)
+libvirt.libvirtError: internal error: process exited while connecting to mo=
+nitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch64: -device vfio-pci,ho=
+st=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: VFIO_MAP_DMA: -22
+2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D00=
+00:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: failed =
+to setup container for group 28: memory listener initialization failed: Reg=
+ion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, 0x=
+7fb2a3e00000) =3D -22 (Invalid argument)
 
--blockdev {"driver":"file","filename":"/usr/share/edk2/aarch64/QEMU_EFI-pfl=
-ash.raw","node-name":"libvirt-pflash0-storage","auto-read-only":true,"disca=
-rd":"unmap"} =
 
--blockdev {"node-name":"libvirt-pflash0-format","read-only":true,"driver":"=
-raw","file":"libvirt-pflash0-storage"} =
+I played with memory and 3054 MB is maximum value possible to boot VM with =
+coldplugged host PCIe cards.
 
--blockdev {"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/fedora-a=
-arch64-pcie_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only"=
-:true,"discard":"unmap"} =
-
--blockdev {"node-name":"libvirt-pflash1-format","read-only":false,"driver":=
-"raw","file":"libvirt-pflash1-storage"} =
-
--machine virt-4.2,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff,gic-version=
-=3D2,pflash0=3Dlibvirt-pflash0-format,pflash1=3Dlibvirt-pflash1-format =
-
--cpu cortex-a57 =
-
--m 2048 =
-
--overcommit mem-lock=3Doff =
-
--smp 3,sockets=3D3,cores=3D1,threads=3D1 =
-
--uuid 139dc97a-1511-480d-b215-c58a5c80e646 =
-
--no-user-config =
-
--nodefaults =
-
--chardev socket,id=3Dcharmonitor,fd=3D32,server,nowait =
-
--mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol =
-
--rtc base=3Dutc =
-
--no-shutdown =
-
--boot strict=3Don =
-
--device pcie-root-port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multi=
-function=3Don,addr=3D0x1 =
-
--device pcie-root-port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=
-=3D0x1.0x1 =
-
--device pcie-root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=
-=3D0x1.0x2 =
-
--device pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=
-=3D0x1.0x3 =
-
--device pcie-root-port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=
-=3D0x1.0x4 =
-
--device pcie-root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=
-=3D0x1.0x5 =
-
--device pcie-root-port,port=3D0xe,chassis=3D7,id=3Dpci.7,bus=3Dpcie.0,addr=
-=3D0x1.0x6 =
-
--device pcie-root-port,port=3D0xf,chassis=3D8,id=3Dpci.8,bus=3Dpcie.0,addr=
-=3D0x1.0x7 =
-
--device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.2,addr=3D0x0 =
-
--netdev tap,fd=3D29,id=3Dhostnet0 =
-
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:87:3e:d3,=
-bus=3Dpci.1,addr=3D0x0 =
-
--chardev pty,id=3Dcharserial0 =
-
--serial chardev:charserial0 =
-
--chardev socket,id=3Dcharchannel0,fd=3D33,server,nowait =
-
--device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0=
-,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 =
-
--spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Do=
-ff,seamless-migration=3Don =
-
--device virtio-gpu-pci,id=3Dvideo0,max_outputs=3D1,bus=3Dpci.7,addr=3D0x0 =
-
--device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0 =
-
--device vfio-pci,host=3D0000:28:00.0,id=3Dhostdev1,bus=3Dpci.4,addr=3D0x0 =
-
--device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 =
-
--object rng-random,id=3Dobjrng0,filename=3D/dev/urandom =
-
--device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.6,addr=3D0x0 =
-
--sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcec=
-ontrol=3Ddeny =
-
--msg timestamp=3Don
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
