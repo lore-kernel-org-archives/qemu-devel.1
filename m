@@ -2,81 +2,81 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E10ADC2D0E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE93FC2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0D24206F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:53:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD8F8206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:55:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eviQ6+K7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0D24206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="skBqPPnb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8F8206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHADa-0006Ls-QM
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:53:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37008)
+	id 1jHAFj-0007o9-TD
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jHACp-0005VB-NJ
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:52:44 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jHAEm-0007Cu-Jh
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:54:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jHACo-0007B0-Dg
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:52:43 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37499)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jHACo-000796-9q
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:52:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585158761;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YfN04JHhEXuAk3BZBYDX3M4SPcTLKZj+FrNLdtpRuV0=;
- b=eviQ6+K73msQNhb8LhUjKLMYbblmEXtuOafinhYD9EzgNyytSgAI/avgdSrmAQ0KA7Oj18
- K9j7vTflmO6IhoKFZ0/VkhPeVbbRje3cv4gv8EvwRLnQQylMkCdEDFj7Gy2vZNpEUUZkcM
- 1tcWV4kOzj/GR2yu2LwmYPRj1MKW/0A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-3TdgafQnM6iO8csdAmK1Qw-1; Wed, 25 Mar 2020 13:52:39 -0400
-X-MC-Unique: 3TdgafQnM6iO8csdAmK1Qw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28D079F413
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 17:52:29 +0000 (UTC)
-Received: from work-vm (ovpn-114-213.ams2.redhat.com [10.36.114.213])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 85D3F60C05;
- Wed, 25 Mar 2020 17:52:22 +0000 (UTC)
-Date: Wed, 25 Mar 2020 17:52:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH RFC 5/9] KVM: Provide helper to get kvm dirty log
-Message-ID: <20200325175220.GD2635@work-vm>
-References: <20200205141749.378044-1-peterx@redhat.com>
- <20200205141749.378044-6-peterx@redhat.com>
+ (envelope-from <alistair23@gmail.com>) id 1jHAEk-00086C-Mr
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:54:44 -0400
+Received: from mail-vk1-xa44.google.com ([2607:f8b0:4864:20::a44]:38180)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jHAEk-000863-Gl; Wed, 25 Mar 2020 13:54:42 -0400
+Received: by mail-vk1-xa44.google.com with SMTP id n128so931872vke.5;
+ Wed, 25 Mar 2020 10:54:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EiSgyS+F8Ki0Ro1Uai+PKS6+aeJI7JrkE0o6rIN8NDE=;
+ b=skBqPPnbeO4UgXfF5KO+StHxAz4R17V08+6ZajmfzRiim8YypdQEo/TFgnhvNWX67a
+ GafbC5R++TePcZmumsxH2hugyg9KbXuFz11Z2EyAne5dFJ1sPTlODMFcdwrAGqVV7HCp
+ bJSyBXPxUAKrAHBoOPo7VoH+CKztd0tvPG8bTS4J42oTeQMo3L8alh6iSOSqRc+CKq8c
+ JNa6CaOHaF+IQvTl1npOdh1FMsaPOc5+1a0NAUApI9Xzufwgti2F1OL06m960ZvbElWg
+ 0lNWWWX7CVmwcxMboOr+ccLCzuQkKv137HDhIWlTh8vB2//SvScOjU9WrLO7CXKkqu5i
+ 4xtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EiSgyS+F8Ki0Ro1Uai+PKS6+aeJI7JrkE0o6rIN8NDE=;
+ b=gPD2u3BE/PVi/GgVqsZR1IahU0iIBIQjc/S1bC1zHiAzTZH40hxN51m6hHbswMabm2
+ hftA7LbcwWizyxKHN1Q4qhN9edt1tTuyA5wJpqkY9DeiMrdzHSLH4FoYRof2R19OEaR/
+ cqvyoDD9hJOIZyfISXzUmTBLJ5Rf49G5tE3WIshXfELs5Auz9eblR6Uqlph/qGVizu/j
+ Q9RV8x28uAZcwh71lW9NXZaATBheNtE4nq/xu26oSF+fGFS8pr3jn3UFRBkY01TxAm+t
+ AnhUbsLvVw6gqkRj3yuc7t1Jd99CBj3LZ24xRcwRAjifYmtKsURIDHc1FAxft31wzBJ7
+ ztEg==
+X-Gm-Message-State: ANhLgQ1/ftb/k+76lDdr8UmRTenWej6eXaLNCoL1VU2jI7rCFZC5IdQb
+ MJ3Fs69JphVwDQFOBBEH7WRFZ/ACAcztQXqA4v1VMf3g
+X-Google-Smtp-Source: ADFU+vtPvedJqfFFMMe3N3z0DYfK/U2W1xMU0vdxpn6+F5cse5Ke9lC+MMFC7IzFd7ACsiA6XkUuwMVi9jqKZyPtauw=
+X-Received: by 2002:a1f:5e0a:: with SMTP id s10mr3380314vkb.37.1585158881558; 
+ Wed, 25 Mar 2020 10:54:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200205141749.378044-6-peterx@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-33-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-33-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 25 Mar 2020 10:46:42 -0700
+Message-ID: <CAKmqyKMBOsiuMwBEo2GCARvJqDmvRJ9ec5ie-ZghHoUAEg_q7Q@mail.gmail.com>
+Subject: Re: [PATCH v6 32/61] target/riscv: vector single-width floating-point
+ multiply/divide instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::a44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,154 +88,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Provide a helper kvm_slot_get_dirty_log() to make the function
-> kvm_physical_sync_dirty_bitmap() clearer.  We can even cache the as_id
-> into KVMSlot when it is created, so that we don't even need to pass it
-> down every time.
->=20
-> Since at it, remove return value of kvm_physical_sync_dirty_bitmap()
-> because it should never fail.
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Tue, Mar 17, 2020 at 9:11 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->  accel/kvm/kvm-all.c      | 39 +++++++++++++++++++--------------------
->  include/sysemu/kvm_int.h |  2 ++
->  2 files changed, 21 insertions(+), 20 deletions(-)
->=20
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index bb635c775f..608216fd53 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -553,6 +553,18 @@ static void kvm_slot_init_dirty_bitmap(KVMSlot *mem)
->      mem->dirty_bmap =3D g_malloc0(bitmap_size);
->  }
-> =20
-> +/* Sync dirty bitmap from kernel to KVMSlot.dirty_bmap */
-> +static void kvm_slot_get_dirty_log(KVMState *s, KVMSlot *slot)
-> +{
-> +    struct kvm_dirty_log d =3D {};
-> +    int ret;
+>  target/riscv/helper.h                   | 16 +++++++++
+>  target/riscv/insn32.decode              |  5 +++
+>  target/riscv/insn_trans/trans_rvv.inc.c |  7 ++++
+>  target/riscv/vector_helper.c            | 48 +++++++++++++++++++++++++
+>  4 files changed, 76 insertions(+)
+>
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index 384d661283..abd0bbd2fc 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -826,3 +826,19 @@ DEF_HELPER_6(vfwadd_wf_h, void, ptr, ptr, i64, ptr, env, i32)
+>  DEF_HELPER_6(vfwadd_wf_w, void, ptr, ptr, i64, ptr, env, i32)
+>  DEF_HELPER_6(vfwsub_wf_h, void, ptr, ptr, i64, ptr, env, i32)
+>  DEF_HELPER_6(vfwsub_wf_w, void, ptr, ptr, i64, ptr, env, i32)
 > +
-> +    d.dirty_bitmap =3D slot->dirty_bmap;
-> +    d.slot =3D slot->slot | (slot->as_id << 16);
-> +    ret =3D kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d);
-> +    assert(ret !=3D -1);
-
-As discussed on irc, that -1 check seems odd given your previous check
-but there seems to be some history as to why it was still there.  Hmm.
-
-It also seems very trusting that it can never possibly fail!
-
-Dave
-
+> +DEF_HELPER_6(vfmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfdiv_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfdiv_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfdiv_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmul_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmul_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmul_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfrdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfrdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfrdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index 68e9448842..16fd938261 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -456,6 +456,11 @@ vfwsub_vv       110010 . ..... ..... 001 ..... 1010111 @r_vm
+>  vfwsub_vf       110010 . ..... ..... 101 ..... 1010111 @r_vm
+>  vfwsub_wv       110110 . ..... ..... 001 ..... 1010111 @r_vm
+>  vfwsub_wf       110110 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfmul_vv        100100 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfmul_vf        100100 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfdiv_vv        100000 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfdiv_vf        100000 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfrdiv_vf       100001 . ..... ..... 101 ..... 1010111 @r_vm
+>
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index 5ec5debc09..f6864b42bb 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -1910,3 +1910,10 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
+>  }
+>  GEN_OPFWF_WIDEN_TRANS(vfwadd_wf)
+>  GEN_OPFWF_WIDEN_TRANS(vfwsub_wf)
+> +
+> +/* Vector Single-Width Floating-Point Multiply/Divide Instructions */
+> +GEN_OPFVV_TRANS(vfmul_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfdiv_vv, opfvv_check)
+> +GEN_OPFVF_TRANS(vfmul_vf,  opfvf_check)
+> +GEN_OPFVF_TRANS(vfdiv_vf,  opfvf_check)
+> +GEN_OPFVF_TRANS(vfrdiv_vf,  opfvf_check)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index 16ba9148fb..f5f5897d12 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -3343,3 +3343,51 @@ RVVCALL(OPFVF2, vfwsub_wf_h, WOP_WUUU_H, H4, H2, vfwsubw16)
+>  RVVCALL(OPFVF2, vfwsub_wf_w, WOP_WUUU_W, H8, H4, vfwsubw32)
+>  GEN_VEXT_VF(vfwsub_wf_h, 2, 4, clearl)
+>  GEN_VEXT_VF(vfwsub_wf_w, 4, 8, clearq)
+> +
+> +/* Vector Single-Width Floating-Point Multiply/Divide Instructions */
+> +RVVCALL(OPFVV2, vfmul_vv_h, OP_UUU_H, H2, H2, H2, float16_mul)
+> +RVVCALL(OPFVV2, vfmul_vv_w, OP_UUU_W, H4, H4, H4, float32_mul)
+> +RVVCALL(OPFVV2, vfmul_vv_d, OP_UUU_D, H8, H8, H8, float64_mul)
+> +GEN_VEXT_VV_ENV(vfmul_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfmul_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfmul_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF2, vfmul_vf_h, OP_UUU_H, H2, H2, float16_mul)
+> +RVVCALL(OPFVF2, vfmul_vf_w, OP_UUU_W, H4, H4, float32_mul)
+> +RVVCALL(OPFVF2, vfmul_vf_d, OP_UUU_D, H8, H8, float64_mul)
+> +GEN_VEXT_VF(vfmul_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfmul_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfmul_vf_d, 8, 8, clearq)
+> +
+> +RVVCALL(OPFVV2, vfdiv_vv_h, OP_UUU_H, H2, H2, H2, float16_div)
+> +RVVCALL(OPFVV2, vfdiv_vv_w, OP_UUU_W, H4, H4, H4, float32_div)
+> +RVVCALL(OPFVV2, vfdiv_vv_d, OP_UUU_D, H8, H8, H8, float64_div)
+> +GEN_VEXT_VV_ENV(vfdiv_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfdiv_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfdiv_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF2, vfdiv_vf_h, OP_UUU_H, H2, H2, float16_div)
+> +RVVCALL(OPFVF2, vfdiv_vf_w, OP_UUU_W, H4, H4, float32_div)
+> +RVVCALL(OPFVF2, vfdiv_vf_d, OP_UUU_D, H8, H8, float64_div)
+> +GEN_VEXT_VF(vfdiv_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfdiv_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfdiv_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t float16_rdiv(uint16_t a, uint16_t b, float_status *s)
+> +{
+> +    return float16_div(b, a, s);
 > +}
 > +
->  /**
->   * kvm_physical_sync_dirty_bitmap - Sync dirty bitmap from kernel space
->   *
-> @@ -564,15 +576,13 @@ static void kvm_slot_init_dirty_bitmap(KVMSlot *mem=
-)
->   * @kml: the KVM memory listener object
->   * @section: the memory section to sync the dirty bitmap with
->   */
-> -static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
-> -                                          MemoryRegionSection *section)
-> +static void kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
-> +                                           MemoryRegionSection *section)
->  {
->      KVMState *s =3D kvm_state;
-> -    struct kvm_dirty_log d =3D {};
->      KVMSlot *mem;
->      hwaddr start_addr, size;
->      hwaddr slot_size, slot_offset =3D 0;
-> -    int ret =3D 0;
-> =20
->      size =3D kvm_align_section(section, &start_addr);
->      while (size) {
-> @@ -582,27 +592,19 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemory=
-Listener *kml,
->          mem =3D kvm_lookup_matching_slot(kml, start_addr, slot_size);
->          if (!mem) {
->              /* We don't have a slot if we want to trap every access. */
-> -            goto out;
-> +            return;
->          }
-> =20
-> -        d.dirty_bitmap =3D mem->dirty_bmap;
-> -        d.slot =3D mem->slot | (kml->as_id << 16);
-> -        if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) =3D=3D -1) {
-> -            DPRINTF("ioctl failed %d\n", errno);
-> -            ret =3D -1;
-> -            goto out;
-> -        }
-> +        kvm_slot_get_dirty_log(s, mem);
-> =20
->          subsection.offset_within_region +=3D slot_offset;
->          subsection.size =3D int128_make64(slot_size);
-> -        kvm_get_dirty_pages_log_range(&subsection, d.dirty_bitmap);
-> +        kvm_get_dirty_pages_log_range(&subsection, mem->dirty_bmap);
-> =20
->          slot_offset +=3D slot_size;
->          start_addr +=3D slot_size;
->          size -=3D slot_size;
->      }
-> -out:
-> -    return ret;
->  }
-> =20
->  /* Alignment requirement for KVM_CLEAR_DIRTY_LOG - 64 pages */
-> @@ -1077,6 +1079,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml=
-,
->      do {
->          slot_size =3D MIN(kvm_max_slot_size, size);
->          mem =3D kvm_alloc_slot(kml);
-> +        mem->as_id =3D kml->as_id;
->          mem->memory_size =3D slot_size;
->          mem->start_addr =3D start_addr;
->          mem->ram =3D ram;
-> @@ -1119,14 +1122,10 @@ static void kvm_log_sync(MemoryListener *listener=
-,
->                           MemoryRegionSection *section)
->  {
->      KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,=
- listener);
-> -    int r;
-> =20
->      kvm_slots_lock(kml);
-> -    r =3D kvm_physical_sync_dirty_bitmap(kml, section);
-> +    kvm_physical_sync_dirty_bitmap(kml, section);
->      kvm_slots_unlock(kml);
-> -    if (r < 0) {
-> -        abort();
-> -    }
->  }
-> =20
->  static void kvm_log_clear(MemoryListener *listener,
-> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-> index ac2d1f8b56..4434e15ec7 100644
-> --- a/include/sysemu/kvm_int.h
-> +++ b/include/sysemu/kvm_int.h
-> @@ -23,6 +23,8 @@ typedef struct KVMSlot
->      int old_flags;
->      /* Dirty bitmap cache for the slot */
->      unsigned long *dirty_bmap;
-> +    /* Cache of the address space ID */
-> +    int as_id;
->  } KVMSlot;
-> =20
->  typedef struct KVMMemoryListener {
-> --=20
-> 2.24.1
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+> +static uint32_t float32_rdiv(uint32_t a, uint32_t b, float_status *s)
+> +{
+> +    return float32_div(b, a, s);
+> +}
+> +
+> +static uint64_t float64_rdiv(uint64_t a, uint64_t b, float_status *s)
+> +{
+> +    return float64_div(b, a, s);
+> +}
+> +RVVCALL(OPFVF2, vfrdiv_vf_h, OP_UUU_H, H2, H2, float16_rdiv)
+> +RVVCALL(OPFVF2, vfrdiv_vf_w, OP_UUU_W, H4, H4, float32_rdiv)
+> +RVVCALL(OPFVF2, vfrdiv_vf_d, OP_UUU_D, H8, H8, float64_rdiv)
+> +GEN_VEXT_VF(vfrdiv_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfrdiv_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfrdiv_vf_d, 8, 8, clearq)
+> --
+> 2.23.0
+>
 
