@@ -2,95 +2,78 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986E5C2D0E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 18:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5288C2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 18:20:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60ECF2074D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 18:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96D79206F8
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 18:20:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f69i6aaW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60ECF2074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4nyyLR/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D79206F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHAaC-0002MB-GW
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 14:16:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44490)
+	id 1jHAdl-0003lA-Pb
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 14:20:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45430)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jHAZO-0001vE-30
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 14:16:07 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jHAco-0003Kl-Kr
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 14:19:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jHAZL-0004g9-QC
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 14:16:00 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:53416)
+ (envelope-from <alex.williamson@redhat.com>) id 1jHAcn-0007xr-5P
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 14:19:34 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50754)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jHAZJ-0004a4-Ej
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 14:15:58 -0400
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jHAcn-0007w0-0x
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 14:19:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585160150;
+ s=mimecast20190719; t=1585160369;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=e0q30Q3+vXFuRYLssXRtjeQaM7yOSGwdKNdarkd9+oc=;
- b=f69i6aaWZd3w3Os0VDV9h151V7ifu58LckqLeSjr9Q+k3tFkatjNF4LjR52XWhvnr/L9qZ
- WRSwHdidpiIJ+Qc40zOXZwc8LwkyPQDB3SOzfjNw/0oLTKrfOEZAtZnKGfWsKN7TXklxL8
- w/ork0PF4HoL/m/mXTG27Td5z8PokHo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-_X3NBYbnNhGc1QYm4_dI7g-1; Wed, 25 Mar 2020 14:15:48 -0400
-X-MC-Unique: _X3NBYbnNhGc1QYm4_dI7g-1
-Received: by mail-wr1-f69.google.com with SMTP id d1so1517190wru.15
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 11:15:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=DflHpgEprK9pfAKqsvE8f/A6K3V5qBcFlBDVPsJ7x/k=;
- b=Go+roTpdnUH6HWBKFQw70OsvdSmrIHF/AeUDKguKrxTdH+ewyUukD+2gtdOZolRJad
- 72mUp6X5fgiABQefwGAmmr0XOdnqm+M+Ld1K7I8re7nJ2VVg69w5nj9EEUVFfaJ2U2vZ
- +YQLMvdyd0BrkWqQCjqSkKUWhd8opqYNpcyepuAEAJAThQc/f9fhXiX0+f3eZKQt6lXv
- nxWkLxXmPlGAERBcurRURTESk+P5QikDpq/0T51EkpR7ZDvv5WrhTqUIy4jAKp6XFFe1
- tYj0R2J68hGQB8pBnWY1vqMMaRi9GCpbLrPHJHEKEU372bPEWDKe2Gx/fgmrs3i9BgdG
- izEQ==
-X-Gm-Message-State: ANhLgQ0AqWPcSqxNvx8PHttqnXAQVDjydsd9pxwdaA4ABJNSEVtWwZtR
- tIVwKqe1tEB1Za6gZYOG7Sj2gCKuUIzHu0TbYfykgtDBNQopZdJ5myn01N+WmyKITsdxn/l7r6u
- 8HODPaAvUK7KThM4=
-X-Received: by 2002:a1c:ed1a:: with SMTP id l26mr4619010wmh.175.1585160147285; 
- Wed, 25 Mar 2020 11:15:47 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvBQeStysTQfaJx075L8v3k7dhNmLIT7JsyWJj+GnG1IGDjgnNE0u4Uig+zV7/Sil9ZY3FPrw==
-X-Received: by 2002:a1c:ed1a:: with SMTP id l26mr4618992wmh.175.1585160147054; 
- Wed, 25 Mar 2020 11:15:47 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id r16sm24328682wrv.33.2020.03.25.11.15.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 11:15:46 -0700 (PDT)
-Date: Wed, 25 Mar 2020 14:15:43 -0400
-From: Peter Xu <peterx@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH RFC 5/9] KVM: Provide helper to get kvm dirty log
-Message-ID: <20200325181543.GA404034@xz-x1>
-References: <20200205141749.378044-1-peterx@redhat.com>
- <20200205141749.378044-6-peterx@redhat.com>
- <20200325175220.GD2635@work-vm>
+ bh=azMKMjKPV052t5XwJnSu9sgGfeYyXtSz8ruQxkbcDxo=;
+ b=V4nyyLR/JD+q6Xupa7tDZ11zyoFaIl+1RW8uggOMHy3DwSvaT49xl6NRN1PiAOGnWb7ZOd
+ S+I6PGTLyltWIpfPwEeGJpdVUZkfNOEk07yMNF5yQ7nuAOuZHCIKtUBsNuvg3NmMHEKGvV
+ el/673YyD8dtGZtge60Ts/KyzVhXc/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38-eTiE4i44May_JqiRMfDmiQ-1; Wed, 25 Mar 2020 14:19:23 -0400
+X-MC-Unique: eTiE4i44May_JqiRMfDmiQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F26E8100550D;
+ Wed, 25 Mar 2020 18:19:21 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88E801001B09;
+ Wed, 25 Mar 2020 18:19:21 +0000 (UTC)
+Date: Wed, 25 Mar 2020 12:19:21 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>, kwankhede@nvidia.com
+Subject: Re: [PATCH] vfio/migration: fix dirty pages lost bug for ram beyond 3G
+Message-ID: <20200325121921.511d6e3b@w520.home>
+In-Reply-To: <1583487689-9813-1-git-send-email-yan.y.zhao@intel.com>
+References: <1583487689-9813-1-git-send-email-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200325175220.GD2635@work-vm>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,61 +85,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Kevin Tian <kevin.tian@intel.com>, intel-gvt-dev@lists.freedesktop.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 25, 2020 at 05:52:20PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Provide a helper kvm_slot_get_dirty_log() to make the function
-> > kvm_physical_sync_dirty_bitmap() clearer.  We can even cache the as_id
-> > into KVMSlot when it is created, so that we don't even need to pass it
-> > down every time.
-> >=20
-> > Since at it, remove return value of kvm_physical_sync_dirty_bitmap()
-> > because it should never fail.
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  accel/kvm/kvm-all.c      | 39 +++++++++++++++++++--------------------
-> >  include/sysemu/kvm_int.h |  2 ++
-> >  2 files changed, 21 insertions(+), 20 deletions(-)
-> >=20
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index bb635c775f..608216fd53 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -553,6 +553,18 @@ static void kvm_slot_init_dirty_bitmap(KVMSlot *me=
-m)
-> >      mem->dirty_bmap =3D g_malloc0(bitmap_size);
-> >  }
-> > =20
-> > +/* Sync dirty bitmap from kernel to KVMSlot.dirty_bmap */
-> > +static void kvm_slot_get_dirty_log(KVMState *s, KVMSlot *slot)
-> > +{
-> > +    struct kvm_dirty_log d =3D {};
-> > +    int ret;
-> > +
-> > +    d.dirty_bitmap =3D slot->dirty_bmap;
-> > +    d.slot =3D slot->slot | (slot->as_id << 16);
-> > +    ret =3D kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d);
-> > +    assert(ret !=3D -1);
->=20
-> As discussed on irc, that -1 check seems odd given your previous check
-> but there seems to be some history as to why it was still there.  Hmm.
->=20
-> It also seems very trusting that it can never possibly fail!
+On Fri,  6 Mar 2020 17:41:29 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Yeah I agree.  I've asked the question under patch 1.
+> the start address passing to
+> cpu_physical_memory_set_dirty_range() and
+> cpu_physical_memory_set_dirty_lebitmap() is the address within the
+> ram block plus ram block offset.
+> 
+> it's safe to set this start address to gpa if total memory is less than
+> 3G, as ram block offset for pc.ram is 0. But if memory size is beyond
+> 3G, gpa is not equal to the offset in its ram block.
+> 
+> e.g.
+> for gpa 0x100000000, its offset is actually 0xc0000000.
+> and for gpa 0x42f500000, its offset should be 0x3EF500000.
+> 
+> This fix is based on Kirti's VFIO live migration patch set v8.
+> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05542.html
+> (for PATCH v8 11/13
+> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05553.html
+> and PATCH v8 12/13
+> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05554.html
+> }
+> 
+> The idea behind it should also be applied to other VFIO live migraiton
+> patch series below:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg01763.html
+> (Kirti v9)
+> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04912.html
+> (Yan)
+> https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg01138.html
+> (Yulei RFC v4)
+> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg05568.html
+> (Yulei RFC)
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  hw/vfio/common.c              | 5 ++++-
+>  hw/vfio/migration.c           | 8 +++++---
+>  include/hw/vfio/vfio-common.h | 3 ++-
+>  3 files changed, 11 insertions(+), 5 deletions(-)
 
-Before we know the answer, I'll remove the assertion to print an error
-if it triggers; check against -1 (-EPERM) explicitly does look odd...
+Thanks for this, Yan.
 
-Thanks,
+Kirti, I never saw an acknowledgment of this, can you confirm you've
+incorporated this into your latest?  I do see we're making use of
+memory_region_get_ram_addr() now.  Thanks,
 
---=20
-Peter Xu
+Alex
+
+ 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 6f36b02..ba1a8ef 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -799,6 +799,7 @@ static void vfio_listerner_log_sync(MemoryListener *listener,
+>          MemoryRegionSection *section)
+>  {
+>      uint64_t start_addr, size, pfn_count;
+> +    uint64_t block_start;
+>      VFIOGroup *group;
+>      VFIODevice *vbasedev;
+>  
+> @@ -819,11 +820,13 @@ static void vfio_listerner_log_sync(MemoryListener *listener,
+>      start_addr = TARGET_PAGE_ALIGN(section->offset_within_address_space);
+>      size = int128_get64(section->size);
+>      pfn_count = size >> TARGET_PAGE_BITS;
+> +    block_start = TARGET_PAGE_ALIGN(section->offset_within_region +
+> +                             memory_region_get_ram_addr(section->mr));
+>  
+>      QLIST_FOREACH(group, &vfio_group_list, next) {
+>          QLIST_FOREACH(vbasedev, &group->device_list, next) {
+>              vfio_get_dirty_page_list(vbasedev, start_addr >> TARGET_PAGE_BITS,
+> -                                     pfn_count, TARGET_PAGE_SIZE);
+> +                                     pfn_count, TARGET_PAGE_SIZE, block_start);
+>          }
+>      }
+>  }
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index 640bea1..a19b957 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -279,7 +279,8 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+>  void vfio_get_dirty_page_list(VFIODevice *vbasedev,
+>                                uint64_t start_pfn,
+>                                uint64_t pfn_count,
+> -                              uint64_t page_size)
+> +                              uint64_t page_size,
+> +                              uint64_t block_start)
+>  {
+>      VFIOMigration *migration = vbasedev->migration;
+>      VFIORegion *region = &migration->region;
+> @@ -293,6 +294,7 @@ void vfio_get_dirty_page_list(VFIODevice *vbasedev,
+>      while (total_pfns > 0) {
+>          uint64_t bitmap_size, data_offset = 0;
+>          uint64_t start = start_pfn + count;
+> +        uint64_t block_start_seg = block_start + count * page_size;
+>          void *buf = NULL;
+>          bool buffer_mmaped = false;
+>  
+> @@ -341,7 +343,7 @@ void vfio_get_dirty_page_list(VFIODevice *vbasedev,
+>              break;
+>          } else if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_ALL) {
+>              /* Mark all pages dirty for this range */
+> -            cpu_physical_memory_set_dirty_range(start * page_size,
+> +            cpu_physical_memory_set_dirty_range(block_start_seg,
+>                                                  total_pfns * page_size,
+>                                                  DIRTY_MEMORY_MIGRATION);
+>              break;
+> @@ -382,7 +384,7 @@ void vfio_get_dirty_page_list(VFIODevice *vbasedev,
+>          }
+>  
+>          cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
+> -                                               start * page_size,
+> +                                               block_start_seg,
+>                                                 copied_pfns);
+>          count      += copied_pfns;
+>          total_pfns -= copied_pfns;
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 41ff5eb..6d868fa 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -220,6 +220,7 @@ int vfio_spapr_remove_window(VFIOContainer *container,
+>  int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
+>  void vfio_migration_finalize(VFIODevice *vbasedev);
+>  void vfio_get_dirty_page_list(VFIODevice *vbasedev, uint64_t start_pfn,
+> -                               uint64_t pfn_count, uint64_t page_size);
+> +                               uint64_t pfn_count, uint64_t page_size,
+> +                               uint64_t block_start);
+>  
+>  #endif /* HW_VFIO_VFIO_COMMON_H */
 
 
