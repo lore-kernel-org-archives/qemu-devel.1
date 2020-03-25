@@ -2,98 +2,89 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A636BC54FCF
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD19C54FD0
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:20:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74FAA2076A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A52B20772
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:20:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/Jhe4ea"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74FAA2076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ap3g89TW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A52B20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH7pm-0003YJ-J5
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:20:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41477)
+	id 1jH7pp-0003cV-GG
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:20:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jH7l4-0003bl-PF
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:56 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jH7lD-0003tD-03
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:16:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jH7l3-000803-0k
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33361)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jH7l2-0007zN-Sm
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585149351;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VV/qB4XiviO7kh1hhG2n4hx9rW8OBYrSXnkFMevqrEY=;
- b=X/Jhe4eaxRA8TkMKou1paBR6OWvdp06viqKvOGlu9FBfLjZZbcUcj4kMykT3bqSTgQbjaH
- wLHpFjH0OC0ms+21fIHNsyEbdMX1RcBGqZfYq5r9f8aqwKKgbV+sh+gmZ7zjos8pxdVJSK
- pFOQUgV3NZ+XjXMlkRth96wN1KMji9U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-F-ThaBcENIyeQxv7d1uIhQ-1; Wed, 25 Mar 2020 11:15:48 -0400
-X-MC-Unique: F-ThaBcENIyeQxv7d1uIhQ-1
-Received: by mail-wr1-f70.google.com with SMTP id l17so1300903wro.3
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 08:15:47 -0700 (PDT)
+ (envelope-from <alex.bennee@linaro.org>) id 1jH7l8-00084S-0W
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:16:02 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:34182)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jH7l7-00082u-QQ
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:57 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id 26so5175977wmk.1
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 08:15:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=fDYf/1zmgKNKjKhgfcohx9pQW+K3uRqOoa+dvB2+KwU=;
+ b=ap3g89TW5oitenk2RhM1bRY3+t+rXXQJ78jp01F0wjpcIrJSMgDTHlE01xr7rAMv+s
+ 0xs/tgYhtosn4JdgSikpVAWwslr7DaENMfN6CSus5iuIhs7PIqYwXuIr3DSZeft65me4
+ u0uN28dxwn1cKZVawx2UTPqz/4FuGTq3jHDq7n61tcbO4y6vGWnCkDzWCUN+g33os+wN
+ +aAWsU5DW56i9bMuJEc+UK0X8MuLm+3Smabypmi4Umu2SsTWE6Z5rcSbH/3JPJZijWZR
+ GcnuC1wGK8aI2DI1TvFEiJtLSMylJyvkNTjWEBkdYgBdTy4yS2gnSPo8XiD+CHeaiHZS
+ PfGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=85Iz7qm55ak28GWxIHEHs8MmNnZEjWo4E+H4mhBr6/Q=;
- b=Z4pNLZYmvhzXdAYrpvwlZlE+tBd2BMcU/6X3MFiHTYLpi3R4T845MEXuyHKRA5Cn+/
- b5TuwENCjtsES9hN+U/pMvdCSbawl+NBa9YGpp+ZNc1yXgVKjdso5Ft0drVumlqin/p9
- hPo3RJL6sAGNXWz1olHjEuuPmb4xw5VCJWAJLhLInqUafZ1ujM6kQ2EAUYNNeMLU9A68
- t3IqphoSA2AwXxQ47KJZMYMwjHtzkT4TwZdHeE0SJOwPzhHgCwdu7uFFzbT7cQiDXX6p
- 3BU7QZgxAehuI2wlC5TjCJKzdRZxtcVQoG8VBU/rlGfLRplWwOtthXyUozva+HwltiUY
- I5VA==
-X-Gm-Message-State: ANhLgQ1lxRmMG/17xrSkaVWgWTae3cJrpHPyRas2pACFE6bYgbLwwWus
- iHUlXRSoJXLtz1gx1H+PgogXVkfbk/WTntI+2AxSsih4O7swLKCAnr972IMs+NmGrPXGefo5r3i
- kObbohON3m9RowhU=
-X-Received: by 2002:a1c:1b51:: with SMTP id b78mr3936826wmb.8.1585149347011;
- Wed, 25 Mar 2020 08:15:47 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtvttgse0+xLvAuZ1+Y+vqPJhjVQWmRMDmQ8GkvLI7/TEIhbBiRpP5z+u7oZYO7GONLwyERYg==
-X-Received: by 2002:a1c:1b51:: with SMTP id b78mr3936803wmb.8.1585149346812;
- Wed, 25 Mar 2020 08:15:46 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id y80sm10091321wmc.45.2020.03.25.08.15.42
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=fDYf/1zmgKNKjKhgfcohx9pQW+K3uRqOoa+dvB2+KwU=;
+ b=na52ryuIViZ4XxFs5W+ywOjGeU05UEOMssrZURT4gk7lrgvjyPFGR0Ah51Z3iZYARN
+ 6CaFP6+kI+zYg1TD96vSlBdRhEEs+UPoyZIVuJOc7UKM1XrhCu3TKDivUz3XSLsXAENZ
+ yoFBVQ8Wygmzy0HT4//nZxmLqnds0aigkXS1XdrILNPcc0qepOhlwUxCDyu4ezUYLxt+
+ OkJaR2s0OvEFP7Scw64FIkqEcFfLqpSccqCKCH4TFEQMmqV455LyC0KFLP8IVpdhCYUv
+ zoATmtd7/HkPScw31I0lzxoXuWAz0dRXb89FVO2Z0CxtZ6OSKlywhNCKaPsSCqkhra0E
+ uxwg==
+X-Gm-Message-State: ANhLgQ0Eo0zRVxqW4Q/80H4gF50ja8s8TA4lna+W+5ySSLLD9zqrgaeh
+ xbSf3BqipvpV0JErFSbb4PHIzERj+HE=
+X-Google-Smtp-Source: ADFU+vvJBgBPy6+k3/trpphC+S+pW0YaDTDXuebM8qL2yxmqRooXhejq0UFz8/QbkLZQ5nVUKLgcLQ==
+X-Received: by 2002:a1c:b657:: with SMTP id g84mr3910303wmf.107.1585149356801; 
+ Wed, 25 Mar 2020 08:15:56 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u16sm34744270wro.23.2020.03.25.08.15.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 08:15:46 -0700 (PDT)
-Date: Wed, 25 Mar 2020 11:15:40 -0400
-From: Peter Xu <peterx@redhat.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v1 19/22] intel_iommu: process PASID-based iotlb
- invalidation
-Message-ID: <20200325151540.GE354390@xz-x1>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-20-git-send-email-yi.l.liu@intel.com>
- <20200324182623.GD127076@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A202340@SHSMSX104.ccr.corp.intel.com>
+ Wed, 25 Mar 2020 08:15:52 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E03241FF93;
+ Wed, 25 Mar 2020 15:15:43 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 07/11] tests/docker: Keep package list sorted
+Date: Wed, 25 Mar 2020 15:15:39 +0000
+Message-Id: <20200325151543.32478-8-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200325151543.32478-1-alex.bennee@linaro.org>
+References: <20200325151543.32478-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A202340@SHSMSX104.ccr.corp.intel.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,120 +96,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 25, 2020 at 01:36:03PM +0000, Liu, Yi L wrote:
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Wednesday, March 25, 2020 2:26 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v1 19/22] intel_iommu: process PASID-based iotlb in=
-validation
-> >=20
-> > On Sun, Mar 22, 2020 at 05:36:16AM -0700, Liu Yi L wrote:
-> > > This patch adds the basic PASID-based iotlb (piotlb) invalidation
-> > > support. piotlb is used during walking Intel VT-d 1st level page
-> > > table. This patch only adds the basic processing. Detailed handling
-> > > will be added in next patch.
-> > >
-> > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Cc: Peter Xu <peterx@redhat.com>
-> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Richard Henderson <rth@twiddle.net>
-> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c          | 57
-> > ++++++++++++++++++++++++++++++++++++++++++
-> > >  hw/i386/intel_iommu_internal.h | 13 ++++++++++
-> > >  2 files changed, 70 insertions(+)
-> > >
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
-> > > b007715..b9ac07d 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -3134,6 +3134,59 @@ static bool vtd_process_pasid_desc(IntelIOMMUS=
-tate
-> > *s,
-> > >      return (ret =3D=3D 0) ? true : false;  }
-> > >
-> > > +static void vtd_piotlb_pasid_invalidate(IntelIOMMUState *s,
-> > > +                                        uint16_t domain_id,
-> > > +                                        uint32_t pasid) { }
-> > > +
-> > > +static void vtd_piotlb_page_invalidate(IntelIOMMUState *s, uint16_t =
-domain_id,
-> > > +                             uint32_t pasid, hwaddr addr, uint8_t am=
-,
-> > > +bool ih) { }
-> > > +
-> > > +static bool vtd_process_piotlb_desc(IntelIOMMUState *s,
-> > > +                                    VTDInvDesc *inv_desc) {
-> > > +    uint16_t domain_id;
-> > > +    uint32_t pasid;
-> > > +    uint8_t am;
-> > > +    hwaddr addr;
-> > > +
-> > > +    if ((inv_desc->val[0] & VTD_INV_DESC_PIOTLB_RSVD_VAL0) ||
-> > > +        (inv_desc->val[1] & VTD_INV_DESC_PIOTLB_RSVD_VAL1)) {
-> > > +        error_report_once("non-zero-field-in-piotlb_inv_desc hi: 0x%=
-" PRIx64
-> > > +                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val=
-[0]);
-> > > +        return false;
-> > > +    }
-> > > +
-> > > +    domain_id =3D VTD_INV_DESC_PIOTLB_DID(inv_desc->val[0]);
-> > > +    pasid =3D VTD_INV_DESC_PIOTLB_PASID(inv_desc->val[0]);
-> > > +    switch (inv_desc->val[0] & VTD_INV_DESC_IOTLB_G) {
-> > > +    case VTD_INV_DESC_PIOTLB_ALL_IN_PASID:
-> > > +        vtd_piotlb_pasid_invalidate(s, domain_id, pasid);
-> > > +        break;
-> > > +
-> > > +    case VTD_INV_DESC_PIOTLB_PSI_IN_PASID:
-> > > +        am =3D VTD_INV_DESC_PIOTLB_AM(inv_desc->val[1]);
-> > > +        addr =3D (hwaddr) VTD_INV_DESC_PIOTLB_ADDR(inv_desc->val[1])=
-;
-> > > +        if (am > VTD_MAMV) {
-> >=20
-> > I saw this of spec 10.4.2, MAMV:
-> >=20
-> >         Independent of value reported in this field, implementations
-> >         supporting SMTS must support address-selective PASID-based
-> >         IOTLB invalidations (p_iotlb_inv_dsc) with any defined address
-> >         mask.
-> >=20
-> > Does it mean we should even support larger AM?
-> >=20
-> > Besides that, the patch looks good to me.
->=20
-> I don't think so. This field is for second-level table in scalable mode
-> and the translation table in legacy mode. For first-level table, it alway=
-s
-> supports page selective invalidation and all the supported masks
-> regardless of the PSI support bit and the MAMV field in the CAP_REG.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Yes that's exactly what I wanted to ask...  Let me try again.
+Keep package list sorted, this eases rebase/cherry-pick.
 
-I thought VTD_MAMV was only for 2nd level page table, not for
-pasid-iotlb invalidations.  So I think we should remove this "if"
-check (that corresponds to "we should even support larger AM"), right?
+Fixes: 3a6784813
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200322120104.21267-2-philmd@redhat.com>
+Message-Id: <20200323161514.23952-8-alex.bennee@linaro.org>
 
---=20
-Peter Xu
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
+index cdd72de7ebf..9a2a2e515d7 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -2,6 +2,8 @@ FROM centos:7
+ RUN yum install -y epel-release centos-release-xen-48
+ 
+ RUN yum -y update
++
++# Please keep this list sorted alphabetically
+ ENV PACKAGES \
+     bison \
+     bzip2 \
+@@ -19,6 +21,7 @@ ENV PACKAGES \
+     libepoxy-devel \
+     libfdt-devel \
+     librdmacm-devel \
++    libzstd-devel \
+     lzo-devel \
+     make \
+     mesa-libEGL-devel \
+@@ -33,7 +36,6 @@ ENV PACKAGES \
+     tar \
+     vte-devel \
+     xen-devel \
+-    zlib-devel \
+-    libzstd-devel
++    zlib-devel
+ RUN yum install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index a6522228c02..019eb12dcb1 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -1,4 +1,6 @@
+ FROM fedora:30
++
++# Please keep this list sorted alphabetically
+ ENV PACKAGES \
+     bc \
+     bison \
+@@ -38,6 +40,7 @@ ENV PACKAGES \
+     libubsan \
+     libusbx-devel \
+     libxml2-devel \
++    libzstd-devel \
+     llvm \
+     lzo-devel \
+     make \
+@@ -92,8 +95,7 @@ ENV PACKAGES \
+     vte291-devel \
+     which \
+     xen-devel \
+-    zlib-devel \
+-    libzstd-devel
++    zlib-devel
+ ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
+ 
+ RUN dnf install -y $PACKAGES
+-- 
+2.20.1
 
 
