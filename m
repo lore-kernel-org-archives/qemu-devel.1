@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72942C54FD0
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63913C54FCF
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:17:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 403752076A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2ADE62076A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:17:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DY/7yBu2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403752076A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ev5FjM5E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ADE62076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH7m4-00055n-CJ
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:16:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41421)
+	id 1jH7mG-0005Wn-9k
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:17:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jH7kz-0003Sy-Pv
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:50 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jH7lA-0003n4-80
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:16:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jH7ky-0007xD-R1
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:49 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:46365)
+ (envelope-from <alex.bennee@linaro.org>) id 1jH7l9-000868-60
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:16:00 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:44702)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jH7ky-0007wQ-Kh
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:48 -0400
-Received: by mail-wr1-x430.google.com with SMTP id j17so3521798wru.13
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 08:15:48 -0700 (PDT)
+ id 1jH7l8-00084j-Vr
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:15:59 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id m17so3554703wrw.11
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 08:15:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gyO7FMb6Kog7HFYI2emP9ylf6WG5qE9183WrVkkssuU=;
- b=DY/7yBu2uCN1ul0cNqvpch+bDgQ2niscBAmEUfPjrotOI5WO2qoHoBatgOhQ3c4fFO
- ybIQKqQY4x3f0qFbMokyOLF5mWZPAnnHQ7+qSAzsp+wpYEYYckMQx8IJuCdQ/HaT6gmP
- McuB5WhqV6upz0+T1QhujcWyx53M9XVkHI/GV5o/DAqkx0Wh5E4T+7iGJy6yCf9J64+B
- grTlmY6kH5WXqW23EMNRRPOEYHmKtmp+eZsXRhTsNRnsbOG6tGk0B725uBFCZvxq1JEy
- VfVj5i/Sdvynaw2aVVLgkPybnvOgwRwKiuQtCP72T0ghkttmEY0HhICPZKLUjnnxXv1K
- CKqw==
+ bh=hddMp6YbU7VIRh+p3dmSk6KMYfcJvHBxPkgSszrgB38=;
+ b=ev5FjM5Ew7LWhxoP6rZJMO+8+DPDef97WiPSduRHUtbI0LOpr6ET5WCwr7GLAWp/Bz
+ IMveDXwSTXIKtl4IzvmheHDWd5p5gUGwP5pXFxG2URuPFaGmYNoH+PRyptBeT3Z4sMJC
+ z7++NuGZW00IxHvfOw1CmgTx9McjTnrp83lliKWtLRSoQSTxURZsSeClIX73TkwTBxnQ
+ AVSLayWkbRSpz/QQOELDJ2pnJQ/B0v9q5uhmamcQTjN/4RKpOi5/AJ0cklDxYzU2pvms
+ kDNnOKMiYlcEKfbs9dXNm5Q7BTnmrojThRxyjKQemMZtxcUevFH/LFINERDskDhO6kNV
+ rr3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gyO7FMb6Kog7HFYI2emP9ylf6WG5qE9183WrVkkssuU=;
- b=QlUi9COy2JwbdKq6vXliGP1Fm/AcxXLJ2EuHffPlFFxjtp+zsjgeY50lulSeeqQRQe
- yyDZwdpm3x+SkTiBKGKDGBvzCv9JKwODZHJWf0581JRkfaFMweRsD8SKT2kg/TciJSae
- JV56uuG2dCqeF3aBnLk91PAR1t8MQg65a88p+nIBiUrF63hj7yEUAC+4taxnMMtX57F0
- TRNDi0eJnNRDciLXZ8qZORZj0r91voIlpew5sESN3SHHsKhqKsFlFL1NbDxb6a/oQf32
- TWgaCa5n5XPcfIijLVKPX8j+TQRIH7W3yq3Awk8xFCeXSP7+Of2ot1YdKFP00+i+CQuJ
- so8g==
-X-Gm-Message-State: ANhLgQ2VXRatXTH+Z2RSv03OBLEEPZ8P2tEHp8m3TO2MOdJ9gW3WjArX
- Ly/9DLIk4tfTuB2+GByncNGthQ==
-X-Google-Smtp-Source: ADFU+vvZMab3MeUi+oX1d9UeoZA+SH/1ImgDcwWUfa+cHM04konPwGt1zpcH8IYdjKA3U3G2XdjwsA==
-X-Received: by 2002:a05:6000:111:: with SMTP id
- o17mr3911770wrx.111.1585149347375; 
- Wed, 25 Mar 2020 08:15:47 -0700 (PDT)
+ bh=hddMp6YbU7VIRh+p3dmSk6KMYfcJvHBxPkgSszrgB38=;
+ b=R0sCjGHEH1q5O0i+5t9bJb45c/1x1XFJDUUGTYAQGuY9UnRwI/xKyzfmERLdM3IIP6
+ V/wjzHN+fWVECynWP0WEBb0gmz3TUCfB6kaI+WD1zFwT4akn191PIDqB5rh54pUPPfO0
+ IHdlgfvKIku006IXcnVC9V5sA4wGTaD4LjN5RDTuTIetxJ8qi7KDwAE2FM/dsQ5IRlvH
+ ikjzYm0bNNUQQtPy1HhOOJp5e3L+64EZaArE2FG3N60g9IVV2ddtXhENET7d1yvHe/aS
+ +VK1Y8kJX9USP+dbV7WfTXeZdA/FjBUqet8t3xsWUs0gVq0fvl7qgc3bOg8lNRGPiAWQ
+ fZcA==
+X-Gm-Message-State: ANhLgQ10Uc8wzvOi+eGPEfN80yfOKT8qme1AOGDmA8YVjbg7ZmrqX+PW
+ 5dk2gnshxEJo9pB+MrbDD09Xjg==
+X-Google-Smtp-Source: ADFU+vtYJwXVW3lIPTgEKtC/+uqpc+ZkP2gUdLXhET6sHnfKKANlMn//PD1WJhHfEZKAVTMaZrbHvw==
+X-Received: by 2002:adf:f2c7:: with SMTP id d7mr3926101wrp.184.1585149357904; 
+ Wed, 25 Mar 2020 08:15:57 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u11sm1633773wrt.29.2020.03.25.08.15.44
+ by smtp.gmail.com with ESMTPSA id l10sm2851392wrq.95.2020.03.25.08.15.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 08:15:44 -0700 (PDT)
+ Wed, 25 Mar 2020 08:15:53 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 56D371FF87;
+ by zen.linaroharston (Postfix) with ESMTP id F40531FF96;
  Wed, 25 Mar 2020 15:15:43 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 01/11] tests/vm: write raw console log
-Date: Wed, 25 Mar 2020 15:15:33 +0000
-Message-Id: <20200325151543.32478-2-alex.bennee@linaro.org>
+Subject: [PULL 08/11] tests/docker: Install gcrypt devel package in Debian
+ image
+Date: Wed, 25 Mar 2020 15:15:40 +0000
+Message-Id: <20200325151543.32478-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200325151543.32478-1-alex.bennee@linaro.org>
 References: <20200325151543.32478-1-alex.bennee@linaro.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,48 +98,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Run "tail -f /var/tmp/*/qemu*console.raw" in another terminal
-to watch the install console.
+In commit 6f8bbb374be we enabled building with the gcrypt library
+on the the Debian 'x86 host', which was based on Debian Stretch.
+Later in commit 698a71edbed we upgraded the Debian base image to
+Buster.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Apparently Debian Stretch was listing gcrypt as a QEMU dependency,
+but this is not the case anymore in Buster, so we need to install
+it manually (it it not listed by 'apt-get -s build-dep qemu' in
+the common debian10.docker anymore). This fixes:
+
+ $ ../configure $QEMU_CONFIGURE_OPTS
+
+  ERROR: User requested feature gcrypt
+         configure was not able to find it.
+         Install gcrypt devel >= 1.5.0
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200310083218.26355-2-kraxel@redhat.com>
-Message-Id: <20200323161514.23952-2-alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200322120104.21267-3-philmd@redhat.com>
+Message-Id: <20200323161514.23952-9-alex.bennee@linaro.org>
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 8400b0e07f6..c53fd354d95 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -213,6 +213,9 @@ class BaseVM(object):
-     def console_init(self, timeout = 120):
-         vm = self._guest
-         vm.console_socket.settimeout(timeout)
-+        self.console_raw_path = os.path.join(vm._temp_dir,
-+                                             vm._name + "-console.raw")
-+        self.console_raw_file = open(self.console_raw_path, 'wb')
- 
-     def console_log(self, text):
-         for line in re.split("[\r\n]", text):
-@@ -234,6 +237,9 @@ class BaseVM(object):
-         while True:
-             try:
-                 chars = vm.console_socket.recv(1)
-+                if self.console_raw_file:
-+                    self.console_raw_file.write(chars)
-+                    self.console_raw_file.flush()
-             except socket.timeout:
-                 sys.stderr.write("console: *** read timeout ***\n")
-                 sys.stderr.write("console: waiting for: '%s'\n" % expect)
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
+index d4849f509f4..957f0bc2e79 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -16,6 +16,7 @@ RUN apt update && \
+     apt install -y --no-install-recommends \
+         libbz2-dev \
+         liblzo2-dev \
++        libgcrypt20-dev \
+         librdmacm-dev \
+         libsasl2-dev \
+         libsnappy-dev \
 -- 
 2.20.1
 
