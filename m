@@ -2,79 +2,80 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 970CDC2D0E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 21:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CEEC2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 21:06:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61BE820737
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 21:05:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4005A20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 21:06:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eROiT/Gb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61BE820737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WmCg5kUN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4005A20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHDDY-0001ev-8t
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 17:05:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43786)
+	id 1jHDEP-0002s8-FW
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 17:06:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jHDBH-0007MU-Ed
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 17:03:20 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jHDAz-000716-Jo
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 17:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jHDBG-00020g-0B
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 17:03:19 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:33634)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jHDBD-0001xC-0e; Wed, 25 Mar 2020 17:03:15 -0400
-Received: by mail-io1-xd42.google.com with SMTP id o127so3861339iof.0;
- Wed, 25 Mar 2020 14:03:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NsFh4ZWQW5xf93MxxSQq7WYTkJzxtzcQn8elvCc5naw=;
- b=eROiT/GbXRT2J3qYnSs75btYPYnYW6O60jX2kkQ9z3lXx/lfjh32w6mSBjlLmoZ0Ej
- FtNcUHqb/NB1cMz3ixScbygmAWuC8CklVpCFaFjTbIyQ+OiEgVzeUf22j0ay+Kl/zVKn
- NWJfm+c015ZE+mL7a1e/CwkzTRCBekaMcHzSRcFDsgRR0VnUfmUu62Xf++/iTpIdJgbr
- Cv/ZQqn0a5XETBA713/LtGW2s4AEJeNpRqSIFb+h9lIJj5WvG6QjAfffGxbRt9haCDVY
- eBMZ0PX3DnK0LHV5z42wB92tpBRoKEP5MbFTrpdwqALHmAZjSOtcCc/65Fc2ZYRwqrad
- hfOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NsFh4ZWQW5xf93MxxSQq7WYTkJzxtzcQn8elvCc5naw=;
- b=RWTYTKkrsHbIPXyQkU9P6aIHOYdTWa8a6lp38YjQlgR2HSpo/QdRGE1SV5kP+qQPsh
- xs5E+wT8Ypu5y6uU+p/weIBbfS6bQosXoF+P7SHZPmq9JeHV0PICLBlnZdQ695r7ggqj
- 0OxqU9InzpabEhyUgGiNli2HNJkXJBm2rkFvzxYondpR5hkKqqECxBBkp3ChzD5pGTza
- dHR/1Sw4aL0AwVz/1devnV/CJowlD0I8t/3N5+K4J17bueZ/IfYcGMlxRxRATcSqrXBg
- WEqq20UnJMrFUo6N0bOm62hUaRd7ntT9cQ3Z5z13C+Jo79cwbp2QArFGpIzUClU9TsMA
- UHAg==
-X-Gm-Message-State: ANhLgQ0+187j9EyPR6JDAt4OkpapnXJYcJ1fus7mSn+6WTP3d/j0Sfch
- PoRHmWgS1tIVBGnUr3azPF7qQuMyWRDRDDcNHnw=
-X-Google-Smtp-Source: ADFU+vu1mHNpTXHMZ9JN4KeQwoZnug3qzyESaZUxqKZAZzKW58OjAUiTpmVMOTNK7wfoB2PpLDza+bHYveelAwc6HC8=
-X-Received: by 2002:a02:b616:: with SMTP id h22mr1367368jam.126.1585170193351; 
- Wed, 25 Mar 2020 14:03:13 -0700 (PDT)
+ (envelope-from <alex.williamson@redhat.com>) id 1jHDAx-0001fs-MC
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 17:03:01 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49045)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jHDAx-0001fN-Fi
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 17:02:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585170178;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MNoLllsJ1Qi7H58h7uCANDJscHJdoXMmlXwPlE5gIaQ=;
+ b=WmCg5kUNXJEvSCFOvum0BuCDZ1WwXRjUHYeYT1x2uizm6hpY9hVfFssxAZkhVHGZu2y25u
+ zHQ8SZsWuvcknUpnJ3KRFzWHfoqK9GZjvNrCGgkj3hPT2bpNE1EwYwu9mpt0DqYwuusJXD
+ I1+p9MM60zbpFpU1nibLbEI9GuTBK0U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-oOGirRakP2SuRhIBCHMPrQ-1; Wed, 25 Mar 2020 17:02:54 -0400
+X-MC-Unique: oOGirRakP2SuRhIBCHMPrQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 878DA8017CC;
+ Wed, 25 Mar 2020 21:02:51 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1742ABBBDD;
+ Wed, 25 Mar 2020 21:02:49 +0000 (UTC)
+Date: Wed, 25 Mar 2020 15:02:48 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v16 QEMU 08/16] vfio: Register SaveVMHandlers for VFIO
+ device
+Message-ID: <20200325150248.6661e1bd@w520.home>
+In-Reply-To: <1585084154-29461-9-git-send-email-kwankhede@nvidia.com>
+References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
+ <1585084154-29461-9-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-References: <20200324212103.7616-1-peter.maydell@linaro.org>
-In-Reply-To: <20200324212103.7616-1-peter.maydell@linaro.org>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Wed, 25 Mar 2020 22:03:02 +0100
-Message-ID: <CAPan3Wpr_ys2qZ_kTZPYyc3qfpvqPdhnDj6VYdbei8Y0_uTG2g@mail.gmail.com>
-Subject: Re: [PATCH] hw/net/allwinner-sun8i-emac.c: Fix REG_ADDR_HIGH/LOW reads
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000048881405a1b4321d"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,184 +87,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>, Jason Wang <jasowang@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000048881405a1b4321d
-Content-Type: text/plain; charset="UTF-8"
+On Wed, 25 Mar 2020 02:39:06 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-On Tue, Mar 24, 2020 at 10:21 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> Coverity points out (CID 1421926) that the read code for
-> REG_ADDR_HIGH reads off the end of the buffer, because it does a
-> 32-bit read from byte 4 of a 6-byte buffer.
->
-> The code also has an endianness issue for both REG_ADDR_HIGH and
-> REG_ADDR_LOW, because it will do the wrong thing on a big-endian
-> host.
->
-> Rewrite the read code to use ldl_le_p() and lduw_le_p() to fix this;
-> the write code is not incorrect, but for consistency we make it use
-> stl_le_p() and stw_le_p().
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
-Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-
-By the way, is the coverity output of master publically available by any
-chance?
-
-Regards,
-Niek
-
-
+> Define flags to be used as delimeter in migration file stream.
+> Added .save_setup and .save_cleanup functions. Mapped & unmapped migration
+> region from these functions at source during saving or pre-copy phase.
+> Set VFIO device state depending on VM's state. During live migration, VM is
+> running when .save_setup is called, _SAVING | _RUNNING state is set for VFIO
+> device. During save-restore, VM is paused, _SAVING state is set for VFIO device.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
 > ---
->  hw/net/allwinner-sun8i-emac.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/net/allwinner-sun8i-emac.c b/hw/net/allwinner-sun8i-emac.c
-> index 3fc5e346401..fc67a1be70a 100644
-> --- a/hw/net/allwinner-sun8i-emac.c
-> +++ b/hw/net/allwinner-sun8i-emac.c
-> @@ -611,10 +611,10 @@ static uint64_t allwinner_sun8i_emac_read(void
-> *opaque, hwaddr offset,
->          value = s->mii_data;
->          break;
->      case REG_ADDR_HIGH:         /* MAC Address High */
-> -        value = *(((uint32_t *) (s->conf.macaddr.a)) + 1);
-> +        value = lduw_le_p(s->conf.macaddr.a + 4);
->          break;
->      case REG_ADDR_LOW:          /* MAC Address Low */
-> -        value = *(uint32_t *) (s->conf.macaddr.a);
-> +        value = ldl_le_p(s->conf.macaddr.a);
->          break;
->      case REG_TX_DMA_STA:        /* Transmit DMA Status */
->          break;
-> @@ -728,14 +728,10 @@ static void allwinner_sun8i_emac_write(void *opaque,
-> hwaddr offset,
->          s->mii_data = value;
->          break;
->      case REG_ADDR_HIGH:         /* MAC Address High */
-> -        s->conf.macaddr.a[4] = (value & 0xff);
-> -        s->conf.macaddr.a[5] = (value & 0xff00) >> 8;
-> +        stw_le_p(s->conf.macaddr.a + 4, value);
->          break;
->      case REG_ADDR_LOW:          /* MAC Address Low */
-> -        s->conf.macaddr.a[0] = (value & 0xff);
-> -        s->conf.macaddr.a[1] = (value & 0xff00) >> 8;
-> -        s->conf.macaddr.a[2] = (value & 0xff0000) >> 16;
-> -        s->conf.macaddr.a[3] = (value & 0xff000000) >> 24;
-> +        stl_le_p(s->conf.macaddr.a, value);
->          break;
->      case REG_TX_DMA_STA:        /* Transmit DMA Status */
->      case REG_TX_CUR_DESC:       /* Transmit Current Descriptor */
-> --
-> 2.20.1
->
->
+>  hw/vfio/migration.c  | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events |  2 ++
+>  2 files changed, 78 insertions(+)
+> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index 22ded9d28cf3..033f76526e49 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -8,6 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/main-loop.h"
+>  #include <linux/vfio.h>
+>  
+>  #include "sysemu/runstate.h"
+> @@ -24,6 +25,17 @@
+>  #include "pci.h"
+>  #include "trace.h"
+>  
+> +/*
+> + * Flags used as delimiter:
+> + * 0xffffffff => MSB 32-bit all 1s
+> + * 0xef10     => emulated (virtual) function IO
+> + * 0x0000     => 16-bits reserved for flags
+> + */
+> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
+> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
+> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+> +#define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+> +
+>  static void vfio_migration_region_exit(VFIODevice *vbasedev)
+>  {
+>      VFIOMigration *migration = vbasedev->migration;
+> @@ -126,6 +138,69 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
+>      return 0;
+>  }
+>  
+> +/* ---------------------------------------------------------------------- */
+> +
+> +static int vfio_save_setup(QEMUFile *f, void *opaque)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    int ret;
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_SETUP_STATE);
+> +
+> +    if (migration->region.mmaps) {
+> +        qemu_mutex_lock_iothread();
+> +        ret = vfio_region_mmap(&migration->region);
+> +        qemu_mutex_unlock_iothread();
+> +        if (ret) {
+> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
+> +                         vbasedev->name, migration->region.index,
+> +                         strerror(-ret));
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    ret = vfio_migration_set_state(vbasedev, ~0, VFIO_DEVICE_STATE_SAVING);
+> +    if (ret) {
+> +        error_report("%s: Failed to set state SAVING", vbasedev->name);
+> +        return ret;
+> +    }
+> +
+> +    /*
+> +     * Save migration region size. This is used to verify migration region size
+> +     * is greater than or equal to migration region size at destination
+> +     */
+> +    qemu_put_be64(f, migration->region.size);
 
--- 
-Niek Linnenbank
+Is this requirement supported by the uapi?  The vendor driver operates
+within the migration region, but it has no requirement to use the full
+extent of the region.  Shouldn't we instead insert the version string
+from versioning API Yan proposed?  Is this were we might choose to use
+an interface via the vfio API rather than sysfs if we had one?
 
---00000000000048881405a1b4321d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    ret = qemu_file_get_error(f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    trace_vfio_save_setup(vbasedev->name);
+> +    return 0;
+> +}
+> +
+> +static void vfio_save_cleanup(void *opaque)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +    VFIOMigration *migration = vbasedev->migration;
+> +
+> +    if (migration->region.mmaps) {
+> +        vfio_region_unmap(&migration->region);
+> +    }
+> +    trace_vfio_save_cleanup(vbasedev->name);
+> +}
+> +
+> +static SaveVMHandlers savevm_vfio_handlers = {
+> +    .save_setup = vfio_save_setup,
+> +    .save_cleanup = vfio_save_cleanup,
+> +};
+> +
+> +/* ---------------------------------------------------------------------- */
+> +
+>  static void vfio_vmstate_change(void *opaque, int running, RunState state)
+>  {
+>      VFIODevice *vbasedev = opaque;
+> @@ -191,6 +266,7 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>          return ret;
+>      }
+>  
+> +    register_savevm_live("vfio", -1, 1, &savevm_vfio_handlers, vbasedev);
+>      vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+>                                                            vbasedev);
+>  
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index 69503228f20e..4bb43f18f315 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -149,3 +149,5 @@ vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
+>  vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
+>  vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
+>  vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
+> +vfio_save_setup(char *name) " (%s)"
+> +vfio_save_cleanup(char *name) " (%s)"
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Mar 24, 2020 at 10:21 PM Pete=
-r Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lin=
-aro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
-t:1ex">Coverity points out (CID 1421926) that the read code for<br>
-REG_ADDR_HIGH reads off the end of the buffer, because it does a<br>
-32-bit read from byte 4 of a 6-byte buffer.<br>
-<br>
-The code also has an endianness issue for both REG_ADDR_HIGH and<br>
-REG_ADDR_LOW, because it will do the wrong thing on a big-endian<br>
-host.<br>
-<br>
-Rewrite the read code to use ldl_le_p() and lduw_le_p() to fix this;<br>
-the write code is not incorrect, but for consistency we make it use<br>
-stl_le_p() and stw_le_p().<br>
-<br>
-Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org=
-" target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br></blockquote><div>T=
-ested-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">n=
-ieklinnenbank@gmail.com</a>&gt;</div><div>Reviewed-by: Niek Linnenbank &lt;=
-<a href=3D"mailto:nieklinnenbank@gmail.com">nieklinnenbank@gmail.com</a>&gt=
-;<br></div><div><br></div><div>By the way, is the coverity output of master=
- publically available by any chance?<br></div><div><br></div><div>Regards,<=
-/div><div>Niek<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" =
-style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pa=
-dding-left:1ex">
----<br>
-=C2=A0hw/net/allwinner-sun8i-emac.c | 12 ++++--------<br>
-=C2=A01 file changed, 4 insertions(+), 8 deletions(-)<br>
-<br>
-diff --git a/hw/net/allwinner-sun8i-emac.c b/hw/net/allwinner-sun8i-emac.c<=
-br>
-index 3fc5e346401..fc67a1be70a 100644<br>
---- a/hw/net/allwinner-sun8i-emac.c<br>
-+++ b/hw/net/allwinner-sun8i-emac.c<br>
-@@ -611,10 +611,10 @@ static uint64_t allwinner_sun8i_emac_read(void *opaqu=
-e, hwaddr offset,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0value =3D s-&gt;mii_data;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case REG_ADDR_HIGH:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- MAC Address High */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 value =3D *(((uint32_t *) (s-&gt;conf.macaddr.=
-a)) + 1);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 value =3D lduw_le_p(s-&gt;conf.macaddr.a + 4);=
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case REG_ADDR_LOW:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*=
- MAC Address Low */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 value =3D *(uint32_t *) (s-&gt;conf.macaddr.a)=
-;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 value =3D ldl_le_p(s-&gt;conf.macaddr.a);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case REG_TX_DMA_STA:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Tran=
-smit DMA Status */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-@@ -728,14 +728,10 @@ static void allwinner_sun8i_emac_write(void *opaque, =
-hwaddr offset,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;mii_data =3D value;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case REG_ADDR_HIGH:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- MAC Address High */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;conf.macaddr.a[4] =3D (value &amp; 0xff)=
-;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;conf.macaddr.a[5] =3D (value &amp; 0xff0=
-0) &gt;&gt; 8;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 stw_le_p(s-&gt;conf.macaddr.a + 4, value);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case REG_ADDR_LOW:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*=
- MAC Address Low */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;conf.macaddr.a[0] =3D (value &amp; 0xff)=
-;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;conf.macaddr.a[1] =3D (value &amp; 0xff0=
-0) &gt;&gt; 8;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;conf.macaddr.a[2] =3D (value &amp; 0xff0=
-000) &gt;&gt; 16;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;conf.macaddr.a[3] =3D (value &amp; 0xff0=
-00000) &gt;&gt; 24;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 stl_le_p(s-&gt;conf.macaddr.a, value);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case REG_TX_DMA_STA:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Tran=
-smit DMA Status */<br>
-=C2=A0 =C2=A0 =C2=A0case REG_TX_CUR_DESC:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Tran=
-smit Current Descriptor */<br>
--- <br>
-2.20.1<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
-
---00000000000048881405a1b4321d--
 
