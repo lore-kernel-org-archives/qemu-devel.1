@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F081EC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6FFC54FD0
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:07:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBE4E2077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:07:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACD4F2077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:07:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="a1KZuhHF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE4E2077D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="D88QaeVU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACD4F2077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH2wQ-0003Dm-Uz
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:07:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58025)
+	id 1jH2wT-0003Iw-OW
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:07:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jH2vR-00023W-Jk
+ (envelope-from <jiaxun.yang@flygoat.com>) id 1jH2vR-00023T-HW
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jH2vQ-0006no-9X
+ (envelope-from <jiaxun.yang@flygoat.com>) id 1jH2vQ-0006nv-Ca
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:06:17 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17978)
+Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17977)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jH2vP-0006lG-Eq
+ id 1jH2vP-0006l6-K0
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:06:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1585130732; 
  s=mail; d=flygoat.com; i=jiaxun.yang@flygoat.com;
  h=From:To:Cc:Message-ID:Subject:Date:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type;
- bh=qMWTxxz/WaHyFQ7Puh8tAQtBhAcUMn+n2qm0HZxj5zM=;
- b=a1KZuhHFnGEmnd/+f2mwbSgnMIif2q2CVybKFDiHkf4vA0ne0umnqfnBob2B57FV
- 6Sr2h0acyxdxbVjAGQ3FBCmONwYejDMVDFLq3d8wGcZx1fkJ2SZgvd1Qql4BfIqUwaa
- 39pLNMw+KkNb95V6jr3kJ5ktfMUaLwCPCSJtHkz4=
+ bh=qSOKUP5jgt+GUvLRCzrVgQmtfvEOkW4n979u095348A=;
+ b=D88QaeVUGD1hLRtMDjwmuAd9yAvgK55zx7/pRcb+tJ8fmbp6+OMmoCSluo3G2FwJ
+ mfphID6WC2mHf5VLDCIWFa7AyOaCiIlNHPdt3k8MFs4rG7g0e7f/VBjoHG9qp7hIMKz
+ qV7ZG6LaXlJjr4cEXj25duhFWrQxYge3tRM5Fxw4=
 Received: from localhost.localdomain (39.155.141.144 [39.155.141.144]) by
- mx.zoho.com.cn with SMTPS id 1585130731039892.8143082035314;
- Wed, 25 Mar 2020 18:05:31 +0800 (CST)
+ mx.zoho.com.cn with SMTPS id 1585130730450706.2792337116358;
+ Wed, 25 Mar 2020 18:05:30 +0800 (CST)
 From: Jiaxun Yang <jiaxun.yang@flygoat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20200325100520.206210-3-jiaxun.yang@flygoat.com>
-Subject: [PATCH 2/3] target/mips: Add loongson ext lsdc2 instrustions
-Date: Wed, 25 Mar 2020 18:05:19 +0800
+Message-ID: <20200325100520.206210-2-jiaxun.yang@flygoat.com>
+Subject: [PATCH 1/3] target/mips: Introduce loongson ext & mmi ASE flags
+Date: Wed, 25 Mar 2020 18:05:18 +0800
 X-Mailer: git-send-email 2.26.0.rc2
 In-Reply-To: <20200325100520.206210-1-jiaxun.yang@flygoat.com>
 References: <20200325100520.206210-1-jiaxun.yang@flygoat.com>
@@ -79,198 +79,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-LDC2/SDC2 opcodes have been rewritten as "load & store with offset"
-instructions by loongson-ext ASE.
+Start from Loongson-3A, loongson treat their extension instructions
+as ASE and implemented mips64r2 as their baseline ISA.
+Here we simply identify instructions shared between 2F and 3A and
+mark them with MMI or EXT flag.
 
 Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- target/mips/translate.c | 157 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 157 insertions(+)
+ target/mips/mips-defs.h | 2 ++
+ target/mips/translate.c | 9 +++++----
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index a831bb4384..1d25417c76 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -58,6 +58,8 @@
+  */
+ #define ASE_MMI           0x0100000000000000ULL
+ #define ASE_MXU           0x0200000000000000ULL
++#define ASE_LOONGSON_MMI  0x0400000000000000ULL
++#define ASE_LOONGSON_EXT  0x0800000000000000ULL
+=20
+ /* MIPS CPU defines. */
+ #define CPU_MIPS1       (ISA_MIPS1)
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2d556e0dea..255d999f74 100644
+index 25b595a17d..2d556e0dea 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -460,6 +460,24 @@ enum {
-     R6_OPC_SCD         =3D 0x27 | OPC_SPECIAL3,
- };
+@@ -3421,7 +3421,8 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
+     TCGv t0, t1, t2;
+     int mem_idx =3D ctx->mem_idx;
 =20
-+/* Loongson EXT LDC2/SDC2 opcodes */
-+#define MASK_LOONGSON_LSDC2(op)           (MASK_OP_MAJOR(op) | (op & 0x7))
-+
-+enum {
-+    OPC_GSLBX      =3D 0x0 | OPC_LDC2,
-+    OPC_GSLHX      =3D 0x1 | OPC_LDC2,
-+    OPC_GSLWX      =3D 0x2 | OPC_LDC2,
-+    OPC_GSLDX      =3D 0x3 | OPC_LDC2,
-+    OPC_GSLWXC1    =3D 0x6 | OPC_LDC2,
-+    OPC_GSLDXC1    =3D 0x7 | OPC_LDC2,
-+    OPC_GSSBX      =3D 0x0 | OPC_SDC2,
-+    OPC_GSSHX      =3D 0x1 | OPC_SDC2,
-+    OPC_GSSWX      =3D 0x2 | OPC_SDC2,
-+    OPC_GSSDX      =3D 0x3 | OPC_SDC2,
-+    OPC_GSSWXC1    =3D 0x6 | OPC_SDC2,
-+    OPC_GSSDXC1    =3D 0x7 | OPC_SDC2,
-+};
-+
- /* BSHFL opcodes */
- #define MASK_BSHFL(op)              (MASK_SPECIAL3(op) | (op & (0x1F << 6)=
-))
-=20
-@@ -5910,6 +5928,143 @@ no_rd:
-     tcg_temp_free_i64(t1);
- }
-=20
-+/* Loongson EXT LDC2/SDC2 */
-+static void gen_loongson_lsdc2(DisasContext *ctx, int rt,
-+                                int rs, int rd)
-+{
-+    int offset =3D (int8_t)(ctx->opcode >> 3);
-+    uint32_t opc =3D MASK_LOONGSON_LSDC2(ctx->opcode);
-+    TCGv t0, t1;
-+    TCGv_i32 t32;
-+    TCGv_i64 t64;
-+
-+    /* Pre-conditions */
-+    switch (opc) {
-+    case OPC_GSLBX:
-+    case OPC_GSLHX:
-+    case OPC_GSLWX:
-+    case OPC_GSLDX:
-+        /* prefetch, implement as NOP */
-+        if (rt =3D=3D 0) {
-+            return;
-+        }
-+        break;
-+    case OPC_GSSBX:
-+    case OPC_GSSHX:
-+    case OPC_GSSWX:
-+    case OPC_GSSDX:
-+        break;
-+    case OPC_GSLWXC1:
-+    case OPC_GSLDXC1:
-+        check_cp1_enabled(ctx);
-+        /* prefetch, implement as NOP */
-+        if (rt =3D=3D 0) {
-+            return;
-+        }
-+        break;
-+    case OPC_GSSWXC1:
-+    case OPC_GSSDXC1:
-+        check_cp1_enabled(ctx);
-+        break;
-+    default:
-+        MIPS_INVAL("loongson_lsdc2");
-+        generate_exception_end(ctx, EXCP_RI);
-+        return;
-+        break;
-+    }
-+
-+    t0 =3D tcg_temp_new();
-+    gen_base_offset_addr(ctx, t0, rs, offset);
-+    if (rd !=3D 0) {
-+        gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
-+    }
-+
-+    switch (opc) {
-+    case OPC_GSLBX:
-+        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_SB);
-+        gen_store_gpr(t0, rt);
-+        break;
-+    case OPC_GSLHX:
-+        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESW |
-+                            ctx->default_tcg_memop_mask);
-+        gen_store_gpr(t0, rt);
-+        break;
-+    case OPC_GSLWX:
-+        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESL |
-+                            ctx->default_tcg_memop_mask);
-+        gen_store_gpr(t0, rt);
-+        break;
-+#if defined(TARGET_MIPS64)
-+    case OPC_GSLDX:
-+        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
-+                            ctx->default_tcg_memop_mask);
-+        gen_store_gpr(t0, rt);
-+        break;
-+#endif
-+    case OPC_GSLWXC1:
-+        t32 =3D tcg_temp_new_i32();
-+        tcg_gen_qemu_ld_i32(t32, t0, ctx->mem_idx, MO_TESL |
-+                            ctx->default_tcg_memop_mask);
-+        gen_store_fpr32(ctx, t32, rt);
-+        tcg_temp_free_i32(t32);
-+        break;
-+    case OPC_GSLDXC1:
-+        t64 =3D tcg_temp_new_i64();
-+        tcg_gen_qemu_ld_i64(t64, t0, ctx->mem_idx, MO_TEQ |
-+                            ctx->default_tcg_memop_mask);
-+        gen_store_fpr64(ctx, t64, rt);
-+        tcg_temp_free_i64(t64);
-+        break;
-+    case OPC_GSSBX:
-+        t1 =3D tcg_temp_new();
-+        gen_load_gpr(t1, rt);
-+        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_SB);
-+        tcg_temp_free(t1);
-+        break;
-+    case OPC_GSSHX:
-+        t1 =3D tcg_temp_new();
-+        gen_load_gpr(t1, rt);
-+        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUW |
-+                            ctx->default_tcg_memop_mask);
-+        tcg_temp_free(t1);
-+        break;
-+    case OPC_GSSWX:
-+        t1 =3D tcg_temp_new();
-+        gen_load_gpr(t1, rt);
-+        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUL |
-+                            ctx->default_tcg_memop_mask);
-+        tcg_temp_free(t1);
-+        break;
-+#if defined(TARGET_MIPS64)
-+    case OPC_GSSDX:
-+        t1 =3D tcg_temp_new();
-+        gen_load_gpr(t1, rt);
-+        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEQ |
-+                            ctx->default_tcg_memop_mask);
-+        tcg_temp_free(t1);
-+        break;
-+#endif
-+    case OPC_GSSWXC1:
-+        t32 =3D tcg_temp_new_i32();
-+        gen_load_fpr32(ctx, t32, rt);
-+        tcg_gen_qemu_st_i32(t32, t0, ctx->mem_idx, MO_TEUL |
-+                            ctx->default_tcg_memop_mask);
-+        tcg_temp_free_i32(t32);
-+        break;
-+    case OPC_GSSDXC1:
-+        t64 =3D tcg_temp_new_i64();
-+        gen_load_fpr64(ctx, t64, rt);
-+        tcg_gen_qemu_st_i64(t64, t0, ctx->mem_idx, MO_TEQ |
-+                            ctx->default_tcg_memop_mask);
-+        tcg_temp_free_i64(t64);
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    tcg_temp_free(t0);
-+}
-+
- /* Traps */
- static void gen_trap(DisasContext *ctx, uint32_t opc,
-                      int rs, int rt, int16_t imm)
-@@ -30635,6 +30790,8 @@ static void decode_opc(CPUMIPSState *env, DisasCont=
+-    if (rt =3D=3D 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2=
+F)) {
++    if (rt =3D=3D 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2=
+F |
++                                        ASE_LOONGSON_EXT)) {
+         /*
+          * Loongson CPU uses a load to zero register for prefetch.
+          * We emulate it as a NOP. On other CPU we must perform the
+@@ -27161,7 +27162,7 @@ static void decode_opc_special2_legacy(CPUMIPSState=
+ *env, DisasContext *ctx)
+     case OPC_MULTU_G_2F:
+     case OPC_MOD_G_2F:
+     case OPC_MODU_G_2F:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, INSN_LOONGSON2F | ASE_LOONGSON_EXT);
+         gen_loongson_integer(ctx, op1, rd, rs, rt);
+         break;
+     case OPC_CLO:
+@@ -27194,7 +27195,7 @@ static void decode_opc_special2_legacy(CPUMIPSState=
+ *env, DisasContext *ctx)
+     case OPC_DDIVU_G_2F:
+     case OPC_DMOD_G_2F:
+     case OPC_DMODU_G_2F:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, INSN_LOONGSON2F | ASE_LOONGSON_EXT);
+         gen_loongson_integer(ctx, op1, rd, rs, rt);
+         break;
+ #endif
+@@ -30641,7 +30642,7 @@ static void decode_opc(CPUMIPSState *env, DisasCont=
 ext *ctx)
-                 /* OPC_JIC, OPC_JIALC */
-                 gen_compute_compact_branch(ctx, op, 0, rt, imm);
-             }
-+        } else if (ctx->insn_flags & ASE_LOONGSON_EXT) {
-+            gen_loongson_lsdc2(ctx, rt, rs, rd);
-         } else {
-             /* OPC_LWC2, OPC_SWC2 */
-             /* COP2: Not implemented. */
+         }
+         break;
+     case OPC_CP2:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, INSN_LOONGSON2F | ASE_LOONGSON_MMI);
+         /* Note that these instructions use different fields.  */
+         gen_loongson_multimedia(ctx, sa, rd, rt);
+         break;
 --=20
 2.26.0.rc2
 
