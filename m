@@ -2,89 +2,80 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4C4C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 518CAC43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:23:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44EFA2077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:23:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44EFA2077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19A232077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:23:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aItFvmQH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A232077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH60K-0001Em-CO
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:23:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54294)
+	id 1jH60c-0001sg-9j
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:23:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jH5zY-0008O1-9L
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:22:45 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jH5u3-00078E-Tm
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:17:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jH5zX-0004QR-1W
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:22:44 -0400
-Received: from mga07.intel.com ([134.134.136.100]:28559)
+ (envelope-from <dgilbert@redhat.com>) id 1jH5u2-0006P3-Uf
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:17:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:48666)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jH5zW-0004PP-NB
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:22:42 -0400
-IronPort-SDR: mi2BVSwsZk1zBUEVW55SjJnKNmPEOL3CobXkYfH+wr35gqocqttx7LQqt0ALZTFYWpWGWk9snz
- 8M9OCXTTxWMQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Mar 2020 06:22:41 -0700
-IronPort-SDR: V6eoHgS9mGrIbVaIZk6VgCBS018JKv91W09hu6Td3hnLLMwCeF5uYzbRxWwfHjcHYGsa88RWKV
- cVyeMCkYCnCw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,304,1580803200"; d="scan'208";a="326223822"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by orsmga001.jf.intel.com with ESMTP; 25 Mar 2020 06:22:40 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Mar 2020 06:22:40 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 25 Mar 2020 06:22:39 -0700
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 25 Mar 2020 06:22:39 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.232]) with mapi id 14.03.0439.000;
- Wed, 25 Mar 2020 21:22:34 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: RE: [PATCH v1 22/22] intel_iommu: modify x-scalable-mode to be
- string option
-Thread-Topic: [PATCH v1 22/22] intel_iommu: modify x-scalable-mode to be
- string option
-Thread-Index: AQHWAEW8/T619bILS0iQ30uH62aieKhXkGUAgAG/ypA=
-Date: Wed, 25 Mar 2020 13:22:34 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A2022DD@SHSMSX104.ccr.corp.intel.com>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-23-git-send-email-yi.l.liu@intel.com>
- <20200324183918.GG127076@xz-x1>
-In-Reply-To: <20200324183918.GG127076@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jH5u2-0006Oh-R6
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:17:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585142222;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zz0Ct3y11qKGgf70xqYznROrobSz7/NPUeqRaoI2Y84=;
+ b=aItFvmQHfM5di0AyscNCgtO+T7AWap2f3HLtoSuXFzLfJzdFtxgf4JVO8H0JaqX8SSN2cu
+ cR8gWizSC0xILuIiYENbutKOmFvNWt4hr9xB7pFORNiGZUXZPZJ3rvmLQ0mnJMBdBxs/De
+ s3qJPRBYQGfRXwPvCjPispLMoZe1HBo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-qsXLFQfNP1C02B-g3i3fSg-1; Wed, 25 Mar 2020 09:17:00 -0400
+X-MC-Unique: qsXLFQfNP1C02B-g3i3fSg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C415619251C0;
+ Wed, 25 Mar 2020 13:16:55 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-114-213.ams2.redhat.com
+ [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 680A95C3F8;
+ Wed, 25 Mar 2020 13:16:53 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, pannengyuan@huawei.com,
+ maozhongyi@cmss.chinamobile.com, vsementsov@virtuozzo.com,
+ imammedo@redhat.com, philmd@redhat.com
+Subject: [PULL 8/9] migration/ram: fix use after free of local_err
+Date: Wed, 25 Mar 2020 13:16:31 +0000
+Message-Id: <20200325131632.311034-9-dgilbert@redhat.com>
+In-Reply-To: <20200325131632.311034-1-dgilbert@redhat.com>
+References: <20200325131632.311034-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.100
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,81 +87,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
-TWFyY2ggMjUsIDIwMjAgMjozOSBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5j
-b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMjIvMjJdIGludGVsX2lvbW11OiBtb2RpZnkg
-eC1zY2FsYWJsZS1tb2RlIHRvIGJlIHN0cmluZw0KPiBvcHRpb24NCj4gDQo+IE9uIFN1biwgTWFy
-IDIyLCAyMDIwIGF0IDA1OjM2OjE5QU0gLTA3MDAsIExpdSBZaSBMIHdyb3RlOg0KPiA+IEludGVs
-IFZULWQgMy4wIGludHJvZHVjZXMgc2NhbGFibGUgbW9kZSwgYW5kIGl0IGhhcyBhIGJ1bmNoIG9m
-DQo+ID4gY2FwYWJpbGl0aWVzIHJlbGF0ZWQgdG8gc2NhbGFibGUgbW9kZSB0cmFuc2xhdGlvbiwg
-dGh1cyB0aGVyZSBhcmUgbXVsdGlwbGUNCj4gY29tYmluYXRpb25zLg0KPiA+IFdoaWxlIHRoaXMg
-dklPTU1VIGltcGxlbWVudGF0aW9uIHdhbnRzIHNpbXBsaWZ5IGl0IGZvciB1c2VyIGJ5DQo+ID4g
-cHJvdmlkaW5nIHR5cGljYWwgY29tYmluYXRpb25zLiBVc2VyIGNvdWxkIGNvbmZpZyBpdCBieQ0K
-PiA+ICJ4LXNjYWxhYmxlLW1vZGUiIG9wdGlvbi4gVGhlIHVzYWdlIGlzIGFzIGJlbG93Og0KPiA+
-DQo+ID4gIi1kZXZpY2UgaW50ZWwtaW9tbXUseC1zY2FsYWJsZS1tb2RlPVsibGVnYWN5InwibW9k
-ZXJuInwib2ZmIl0iDQo+ID4NCj4gPiAgLSAibGVnYWN5IjogZ2l2ZXMgc3VwcG9ydCBmb3IgU0wg
-cGFnZSB0YWJsZQ0KPiA+ICAtICJtb2Rlcm4iOiBnaXZlcyBzdXBwb3J0IGZvciBGTCBwYWdlIHRh
-YmxlLCBwYXNpZCwgdmlydHVhbCBjb21tYW5kDQo+ID4gIC0gIm9mZiI6IG5vIHNjYWxhYmxlIG1v
-ZGUgc3VwcG9ydA0KPiA+ICAtICBpZiBub3QgY29uZmlndXJlZCwgbWVhbnMgbm8gc2NhbGFibGUg
-bW9kZSBzdXBwb3J0LCBpZiBub3QgcHJvcGVyDQo+ID4gICAgIGNvbmZpZ3VyZWQsIHdpbGwgdGhy
-b3cgZXJyb3INCj4gPg0KPiA+IE5vdGU6IHRoaXMgcGF0Y2ggaXMgc3VwcG9zZWQgdG8gYmUgbWVy
-Z2VkIHdoZW4gIHRoZSB3aG9sZSB2U1ZBIHBhdGNoDQo+ID4gc2VyaWVzIHdlcmUgbWVyZ2VkLg0K
-PiA+DQo+ID4gQ2M6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwuY29tPg0KPiA+IENjOiBK
-YWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tPg0KPiA+IENjOiBQZXRlciBY
-dSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gQ2M6IFlpIFN1biA8eWkueS5zdW5AbGludXguaW50
-ZWwuY29tPg0KPiA+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiA+
-IENjOiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0KPiA+IENjOiBFZHVhcmRv
-IEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogTGl1IFlp
-IEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBZaSBTdW4gPHlpLnku
-c3VuQGxpbnV4LmludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdS5j
-ICAgICAgICAgIHwgMjkgKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4gPiAgaHcvaTM4
-Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oIHwgIDQgKysrKw0KPiA+IGluY2x1ZGUvaHcvaTM4Ni9p
-bnRlbF9pb21tdS5oICB8ICAyICsrDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgMzMgaW5zZXJ0aW9u
-cygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVs
-X2lvbW11LmMgYi9ody9pMzg2L2ludGVsX2lvbW11LmMgaW5kZXgNCj4gPiA3MmNkNzM5Li5lYTFm
-NWM0IDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBiL2h3
-L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IEBAIC00MTcxLDcgKzQxNzEsNyBAQCBzdGF0aWMgUHJv
-cGVydHkgdnRkX3Byb3BlcnRpZXNbXSA9IHsNCj4gPiAgICAgIERFRklORV9QUk9QX1VJTlQ4KCJh
-dy1iaXRzIiwgSW50ZWxJT01NVVN0YXRlLCBhd19iaXRzLA0KPiA+ICAgICAgICAgICAgICAgICAg
-ICAgICAgVlREX0hPU1RfQUREUkVTU19XSURUSCksDQo+ID4gICAgICBERUZJTkVfUFJPUF9CT09M
-KCJjYWNoaW5nLW1vZGUiLCBJbnRlbElPTU1VU3RhdGUsIGNhY2hpbmdfbW9kZSwNCj4gRkFMU0Up
-LA0KPiA+IC0gICAgREVGSU5FX1BST1BfQk9PTCgieC1zY2FsYWJsZS1tb2RlIiwgSW50ZWxJT01N
-VVN0YXRlLCBzY2FsYWJsZV9tb2RlLA0KPiBGQUxTRSksDQo+ID4gKyAgICBERUZJTkVfUFJPUF9T
-VFJJTkcoIngtc2NhbGFibGUtbW9kZSIsIEludGVsSU9NTVVTdGF0ZSwNCj4gPiArIHNjYWxhYmxl
-X21vZGVfc3RyKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0JPT0woImRtYS1kcmFpbiIsIEludGVs
-SU9NTVVTdGF0ZSwgZG1hX2RyYWluLCB0cnVlKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0VORF9P
-Rl9MSVNUKCksDQo+ID4gIH07DQo+ID4gQEAgLTQ4MDIsOCArNDgwMiwxMiBAQCBzdGF0aWMgdm9p
-ZCB2dGRfaW5pdChJbnRlbElPTU1VU3RhdGUgKnMpDQo+ID4gICAgICB9DQo+ID4NCj4gPiAgICAg
-IC8qIFRPRE86IHJlYWQgY2FwL2VjYXAgZnJvbSBob3N0IHRvIGRlY2lkZSB3aGljaCBjYXAgdG8g
-YmUgZXhwb3NlZC4gKi8NCj4gPiAtICAgIGlmIChzLT5zY2FsYWJsZV9tb2RlKSB7DQo+ID4gKyAg
-ICBpZiAocy0+c2NhbGFibGVfbW9kZSAmJiAhcy0+c2NhbGFibGVfbW9kZXJuKSB7DQo+ID4gICAg
-ICAgICAgcy0+ZWNhcCB8PSBWVERfRUNBUF9TTVRTIHwgVlREX0VDQVBfU1JTIHwgVlREX0VDQVBf
-U0xUUzsNCj4gPiArICAgIH0gZWxzZSBpZiAocy0+c2NhbGFibGVfbW9kZSAmJiBzLT5zY2FsYWJs
-ZV9tb2Rlcm4pIHsNCj4gPiArICAgICAgICBzLT5lY2FwIHw9IFZURF9FQ0FQX1NNVFMgfCBWVERf
-RUNBUF9TUlMgfCBWVERfRUNBUF9QQVNJRA0KPiA+ICsgICAgICAgICAgICAgICAgICAgfCBWVERf
-RUNBUF9GTFRTIHwgVlREX0VDQVBfUFNTIHwgVlREX0VDQVBfVkNTOw0KPiA+ICsgICAgICAgIHMt
-PnZjY2FwIHw9IFZURF9WQ0NBUF9QQVM7DQo+ID4gICAgICB9DQo+ID4NCj4gPiAgICAgIHZ0ZF9y
-ZXNldF9jYWNoZXMocyk7DQo+ID4gQEAgLTQ5MzUsNiArNDkzOSwyNyBAQCBzdGF0aWMgYm9vbCB2
-dGRfZGVjaWRlX2NvbmZpZyhJbnRlbElPTU1VU3RhdGUgKnMsDQo+IEVycm9yICoqZXJycCkNCj4g
-PiAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+ID4gICAgICB9DQo+ID4NCj4gPiArICAgIGlmIChz
-LT5zY2FsYWJsZV9tb2RlX3N0ciAmJg0KPiA+ICsgICAgICAgIChzdHJjbXAocy0+c2NhbGFibGVf
-bW9kZV9zdHIsICJtb2Rlcm4iKSAmJg0KPiA+ICsgICAgICAgICBzdHJjbXAocy0+c2NhbGFibGVf
-bW9kZV9zdHIsICJsZWdhY3kiKSkpIHsNCj4gDQo+IFRoZSAnb2ZmJyBjaGVjayBpcyBtaXNzaW5n
-Pw0KDQpPb3BzLCB5ZXMsIG15IGJhZC4gd2lsbCBhZGQgaXQuDQoNClJlZ2FyZHMsDQpZaSBMaXUN
-Cg==
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+local_err is used again in migration_bitmap_sync_precopy() after
+precopy_notify(), so we must zero it. Otherwise try to set
+non-NULL local_err will crash.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20200324153630.11882-6-vsementsov@virtuozzo.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/ram.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/migration/ram.c b/migration/ram.c
+index c12cfdbe26..04f13feb2e 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -980,6 +980,7 @@ static void migration_bitmap_sync_precopy(RAMState *rs)
+      */
+     if (precopy_notify(PRECOPY_NOTIFY_BEFORE_BITMAP_SYNC, &local_err)) {
+         error_report_err(local_err);
++        local_err =3D NULL;
+     }
+=20
+     migration_bitmap_sync(rs);
+--=20
+2.25.1
+
 
