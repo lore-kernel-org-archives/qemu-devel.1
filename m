@@ -2,81 +2,87 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9AAC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E04BC43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44E5620772
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:50:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="iIi0HB8n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44E5620772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	by mail.kernel.org (Postfix) with ESMTPS id 01A5120772
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:51:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01A5120772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH2fx-0003mh-BK
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 05:50:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55182)
+	id 1jH2gd-0005LK-5Y
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 05:50:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dereksu@qnap.com>) id 1jH2aX-0005fE-A7
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:44:42 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jH2fF-0003d8-1Y
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dereksu@qnap.com>) id 1jH2aW-0005OI-3n
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:44:41 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:33060)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dereksu@qnap.com>) id 1jH2aV-0005Nm-UY
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:44:40 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id jz1so2166443pjb.0
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 02:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ZETUdq7dbeFyJSuB/tOC54IXqXsZmOKkkHBOPGbf4yg=;
- b=iIi0HB8nH6ErjWqdZlH8cxuBvlq4YPChdlwHFw9yylTueYfsGmqJHdTYhvtrDSVK04
- LhECckheUUvZG4UhPs0WMb8qFTRY28TMs/bTzIUxihaxvh4t0J6v6vewY11KH/nUVQEU
- 9ALt5uewqipBD8GDEcQuhainOmm/aglWJD5a0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=ZETUdq7dbeFyJSuB/tOC54IXqXsZmOKkkHBOPGbf4yg=;
- b=P+PS5LbpxomO7m+nlUSp3WLJQwlwYP3/MO90kMqk+HULuIdoA6LzcLvax/3pXLhDz9
- cV1anVJuXfGY6utS/0uotunQ1x2c7l86CvlvFIAhVzM7IeJxSFbZxMF1wQcF/GfimhLA
- gsiz8uaWGlscR99YS093E6uLT8j3DfwHz5dXsyXKcpSH0BGWsR7o1yUF/O9VzxDKRY8q
- A6xCUsfUYzTid2vz67RdGBI13zlzD/mpG7/ZpIZQgBuPQlMAFY+75YqphvhwnLfx8m4y
- E4AmCE0+EZGybI/zdpiAW5uEPf1SEeyJffMl+zsbdPf0FpqVgYNC0gEzSODWF/Tl5cC7
- +OZA==
-X-Gm-Message-State: ANhLgQ1mhLs8bHoCdtf0SD9rV3+W2IL3jkxY3nvDUgexFX82iJisKCAt
- vTabBmIJScGN6E8I6zLOq5FLFPHcbQk=
-X-Google-Smtp-Source: ADFU+vukktLx4dwA4TBPfxn1qanseJe1HFAnR67E5VDoDAV98ECbPGhyR2mC2PNCMIQsXCyF3OHMGg==
-X-Received: by 2002:a17:90a:350d:: with SMTP id
- q13mr2614185pjb.171.1585129478505; 
- Wed, 25 Mar 2020 02:44:38 -0700 (PDT)
-Received: from localhost.localdomain (202-39-79-13.HINET-IP.hinet.net.
- [202.39.79.13])
- by smtp.gmail.com with ESMTPSA id j126sm18090602pfg.60.2020.03.25.02.44.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 02:44:37 -0700 (PDT)
-From: Derek Su <dereksu@qnap.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] net/colo-compare.c: handling of the full primary or
- secondary queue
-Date: Wed, 25 Mar 2020 17:43:54 +0800
-Message-Id: <20200325094354.19677-3-dereksu@qnap.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200325094354.19677-1-dereksu@qnap.com>
-References: <20200325094354.19677-1-dereksu@qnap.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+ (envelope-from <yi.l.liu@intel.com>) id 1jH2fC-0000tr-3s
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:49:31 -0400
+Received: from mga09.intel.com ([134.134.136.24]:62578)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jH2fB-0000sg-Qg
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:49:30 -0400
+IronPort-SDR: tkNyxWNie6+XvNcTWJt2Hfp3AJLiyrR/LmMOPJXG4fcjZjrGOMlVe1nnVLjVnTnQjbnFsN9jA+
+ k5KvI06HKvxg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Mar 2020 02:49:28 -0700
+IronPort-SDR: QnDFwi1eOP9EOSUOS105zuJWf7fOshXREM51JHsW11j74I+ZSoKn8w6aHA43BWP6wXx4YDpyYY
+ Gz9UOeCKr+4Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; d="scan'208";a="326182720"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by orsmga001.jf.intel.com with ESMTP; 25 Mar 2020 02:49:27 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 02:49:27 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 25 Mar 2020 02:49:27 -0700
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 25 Mar 2020 02:49:26 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.235]) with mapi id 14.03.0439.000;
+ Wed, 25 Mar 2020 17:49:23 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH v1 13/22] vfio: add bind stage-1 page table support
+Thread-Topic: [PATCH v1 13/22] vfio: add bind stage-1 page table support
+Thread-Index: AQHWAEW3G3tO+4+IDkCwmVDpgLUkb6hXgDSAgAGT8oA=
+Date: Wed, 25 Mar 2020 09:49:22 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A201E70@SHSMSX104.ccr.corp.intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-14-git-send-email-yi.l.liu@intel.com>
+ <20200324174121.GX127076@xz-x1>
+In-Reply-To: <20200324174121.GX127076@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,129 +94,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lizhijian@cn.fujitsu.com, chyang@qnap.com, Derek Su <dereksu@qnap.com>,
- jasowang@redhat.com, ctcheng@qnap.com, chen.zhang@intel.com,
- jwsu1986@gmail.com
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pervious handling of the full primary or queue is only dropping
-the packet. If there are lots of clients to the guest VM,
-the "drop" will lead to the lost of the networking connection
-until next checkpoint.
-
-To address the issue, this patch drops the packet firstly.
-Then, send all queued primary packets, remove all queued secondary
-packets and do checkpoint.
-
-Signed-off-by: Derek Su <dereksu@qnap.com>
----
- net/colo-compare.c | 41 ++++++++++++++++++++++++++++++-----------
- 1 file changed, 30 insertions(+), 11 deletions(-)
-
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index cdd87b2aa8..1a52f50fbe 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -125,6 +125,12 @@ static const char *colo_mode[] = {
-     [SECONDARY_IN] = "secondary",
- };
- 
-+enum {
-+    QUEUE_INSERT_ERR = -1,
-+    QUEUE_INSERT_OK = 0,
-+    QUEUE_INSERT_FULL = 1,
-+};
-+
- static int compare_chr_send(CompareState *s,
-                             const uint8_t *buf,
-                             uint32_t size,
-@@ -211,8 +217,10 @@ static int colo_insert_packet(GQueue *queue, Packet *pkt, uint32_t *max_ack)
- }
- 
- /*
-- * Return 0 on success, if return -1 means the pkt
-- * is unsupported(arp and ipv6) and will be sent later
-+ * Return QUEUE_INSERT_OK on success.
-+ * If return QUEUE_INSERT_FULL means list is full, and
-+ * QUEUE_INSERT_ERR means the pkt is unsupported(arp and ipv6) and
-+ * will be sent later
-  */
- static int packet_enqueue(CompareState *s, int mode, Connection **con)
- {
-@@ -234,7 +242,7 @@ static int packet_enqueue(CompareState *s, int mode, Connection **con)
-     if (parse_packet_early(pkt)) {
-         packet_destroy(pkt, NULL);
-         pkt = NULL;
--        return -1;
-+        return QUEUE_INSERT_ERR;
-     }
-     fill_connection_key(pkt, &key);
- 
-@@ -258,11 +266,12 @@ static int packet_enqueue(CompareState *s, int mode, Connection **con)
-                      "drop packet", colo_mode[mode]);
-         packet_destroy(pkt, NULL);
-         pkt = NULL;
-+        return QUEUE_INSERT_FULL;
-     }
- 
-     *con = conn;
- 
--    return 0;
-+    return QUEUE_INSERT_OK;
- }
- 
- static inline bool after(uint32_t seq1, uint32_t seq2)
-@@ -995,17 +1004,22 @@ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
- {
-     CompareState *s = container_of(pri_rs, CompareState, pri_rs);
-     Connection *conn = NULL;
-+    int ret;
- 
--    if (packet_enqueue(s, PRIMARY_IN, &conn)) {
-+    ret = packet_enqueue(s, PRIMARY_IN, &conn);
-+    if (ret == QUEUE_INSERT_OK) {
-+        /* compare packet in the specified connection */
-+        colo_compare_connection(conn, s);
-+    } else if (ret == QUEUE_INSERT_FULL) {
-+        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
-+        colo_compare_inconsistency_notify(s);
-+    } else {
-         trace_colo_compare_main("primary: unsupported packet in");
-         compare_chr_send(s,
-                          pri_rs->buf,
-                          pri_rs->packet_len,
-                          pri_rs->vnet_hdr_len,
-                          false);
--    } else {
--        /* compare packet in the specified connection */
--        colo_compare_connection(conn, s);
-     }
- }
- 
-@@ -1013,12 +1027,17 @@ static void compare_sec_rs_finalize(SocketReadState *sec_rs)
- {
-     CompareState *s = container_of(sec_rs, CompareState, sec_rs);
-     Connection *conn = NULL;
-+    int ret;
- 
--    if (packet_enqueue(s, SECONDARY_IN, &conn)) {
--        trace_colo_compare_main("secondary: unsupported packet in");
--    } else {
-+    ret = packet_enqueue(s, SECONDARY_IN, &conn);
-+    if (ret == QUEUE_INSERT_OK) {
-         /* compare packet in the specified connection */
-         colo_compare_connection(conn, s);
-+    } else if (ret == QUEUE_INSERT_FULL) {
-+        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
-+        colo_compare_inconsistency_notify(s);
-+    } else {
-+        trace_colo_compare_main("secondary: unsupported packet in");
-     }
- }
- 
--- 
-2.17.1
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
+TWFyY2ggMjUsIDIwMjAgMTo0MSBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5j
+b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMTMvMjJdIHZmaW86IGFkZCBiaW5kIHN0YWdl
+LTEgcGFnZSB0YWJsZSBzdXBwb3J0DQo+IA0KPiBPbiBTdW4sIE1hciAyMiwgMjAyMCBhdCAwNToz
+NjoxMEFNIC0wNzAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGFkZHMgYmluZF9z
+dGFnZTFfcGd0YmwoKSBkZWZpbml0aW9uIGluDQo+ID4gSG9zdElPTU1VQ29udGV4dENsYXNzLCBh
+bHNvIGFkZHMgY29ycmVzcG9uZGluZyBpbXBsZW1lbnRhdGlvbiBpbiBWRklPLg0KPiA+IFRoaXMg
+aXMgdG8gZXhwb3NlIGEgd2F5IGZvciB2SU9NTVUgdG8gc2V0dXAgZHVhbCBzdGFnZSBETUEgdHJh
+bnNsYXRpb24NCj4gPiBmb3IgcGFzc3RocnUgZGV2aWNlcyBvbiBoYXJkd2FyZS4NCj4gPg0KPiA+
+IENjOiBLZXZpbiBUaWFuIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gPiBDYzogSmFjb2IgUGFu
+IDxqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBDYzogUGV0ZXIgWHUgPHBldGVy
+eEByZWRoYXQuY29tPg0KPiA+IENjOiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+
+DQo+ID4gQ2M6IFlpIFN1biA8eWkueS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+IENjOiBEYXZp
+ZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4gPiBDYzogQWxleCBXaWxs
+aWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBM
+aXUgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBody9pb21tdS9ob3N0
+X2lvbW11X2NvbnRleHQuYyAgICAgICAgIHwgNDkNCj4gKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrLQ0KPiA+ICBody92ZmlvL2NvbW1vbi5jICAgICAgICAgICAgICAgICAgICAgIHwgNTUg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gPiAgaW5jbHVkZS9ody9pb21t
+dS9ob3N0X2lvbW11X2NvbnRleHQuaCB8IDI2ICsrKysrKysrKysrKysrKystDQo+ID4gIDMgZmls
+ZXMgY2hhbmdlZCwgMTI3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBk
+aWZmIC0tZ2l0IGEvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0LmMNCj4gPiBiL2h3L2lvbW11
+L2hvc3RfaW9tbXVfY29udGV4dC5jIGluZGV4IGFmNjE4OTkuLjhhNTMzNzYgMTAwNjQ0DQo+ID4g
+LS0tIGEvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0LmMNCj4gPiArKysgYi9ody9pb21tdS9o
+b3N0X2lvbW11X2NvbnRleHQuYw0KPiA+IEBAIC02OSwyMSArNjksNjcgQEAgaW50IGhvc3RfaW9t
+bXVfY3R4X3Bhc2lkX2ZyZWUoSG9zdElPTU1VQ29udGV4dA0KPiAqaG9zdF9pY3gsIHVpbnQzMl90
+IHBhc2lkKQ0KPiA+ICAgICAgcmV0dXJuIGhpY3hjLT5wYXNpZF9mcmVlKGhvc3RfaWN4LCBwYXNp
+ZCk7ICB9DQo+ID4NCj4gPiAraW50IGhvc3RfaW9tbXVfY3R4X2JpbmRfc3RhZ2UxX3BndGJsKEhv
+c3RJT01NVUNvbnRleHQgKmhvc3RfaWN4LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgRHVhbElPTU1VU3RhZ2UxQmluZERhdGEgKmRhdGEpIHsNCj4gPiArICAgIEhv
+c3RJT01NVUNvbnRleHRDbGFzcyAqaGljeGM7DQo+ID4gKw0KPiA+ICsgICAgaWYgKCFob3N0X2lj
+eCkgew0KPiA+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICsgICAgfQ0KPiA+ICsNCj4g
+PiArICAgIGhpY3hjID0gSE9TVF9JT01NVV9DT05URVhUX0dFVF9DTEFTUyhob3N0X2ljeCk7DQo+
+ID4gKyAgICBpZiAoIWhpY3hjKSB7DQo+ID4gKyAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+ID4g
+KyAgICB9DQo+ID4gKw0KPiA+ICsgICAgaWYgKCEoaG9zdF9pY3gtPmZsYWdzICYgSE9TVF9JT01N
+VV9ORVNUSU5HKSB8fA0KPiA+ICsgICAgICAgICFoaWN4Yy0+YmluZF9zdGFnZTFfcGd0YmwpIHsN
+Cj4gPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAg
+ICByZXR1cm4gaGljeGMtPmJpbmRfc3RhZ2UxX3BndGJsKGhvc3RfaWN4LCBkYXRhKTsgfQ0KPiA+
+ICsNCj4gPiAraW50IGhvc3RfaW9tbXVfY3R4X3VuYmluZF9zdGFnZTFfcGd0YmwoSG9zdElPTU1V
+Q29udGV4dCAqaG9zdF9pY3gsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIER1YWxJT01NVVN0YWdlMUJpbmREYXRhICpkYXRhKQ0KPiA+ICt7DQo+ID4gKyAgICBI
+b3N0SU9NTVVDb250ZXh0Q2xhc3MgKmhpY3hjOw0KPiA+ICsNCj4gPiArICAgIGlmICghaG9zdF9p
+Y3gpIHsNCj4gPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiArICAgIH0NCj4gPiArDQo+
+ID4gKyAgICBoaWN4YyA9IEhPU1RfSU9NTVVfQ09OVEVYVF9HRVRfQ0xBU1MoaG9zdF9pY3gpOw0K
+PiA+ICsgICAgaWYgKCFoaWN4Yykgew0KPiA+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+
+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIGlmICghKGhvc3RfaWN4LT5mbGFncyAmIEhPU1RfSU9N
+TVVfTkVTVElORykgfHwNCj4gPiArICAgICAgICAhaGljeGMtPnVuYmluZF9zdGFnZTFfcGd0Ymwp
+IHsNCj4gPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4g
+KyAgICByZXR1cm4gaGljeGMtPnVuYmluZF9zdGFnZTFfcGd0YmwoaG9zdF9pY3gsIGRhdGEpOyB9
+DQo+ID4gKw0KPiA+ICB2b2lkIGhvc3RfaW9tbXVfY3R4X2luaXQodm9pZCAqX2hvc3RfaWN4LCBz
+aXplX3QgaW5zdGFuY2Vfc2l6ZSwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0
+IGNoYXIgKm1ydHlwZW5hbWUsDQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRf
+dCBmbGFncykNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGZsYWdzLCB1
+aW50MzJfdCBmb3JtYXRzKQ0KPiA+ICB7DQo+ID4gICAgICBIb3N0SU9NTVVDb250ZXh0ICpob3N0
+X2ljeDsNCj4gPg0KPiA+ICAgICAgb2JqZWN0X2luaXRpYWxpemUoX2hvc3RfaWN4LCBpbnN0YW5j
+ZV9zaXplLCBtcnR5cGVuYW1lKTsNCj4gPiAgICAgIGhvc3RfaWN4ID0gSE9TVF9JT01NVV9DT05U
+RVhUKF9ob3N0X2ljeCk7DQo+ID4gICAgICBob3N0X2ljeC0+ZmxhZ3MgPSBmbGFnczsNCj4gPiAr
+ICAgIGhvc3RfaWN4LT5zdGFnZTFfZm9ybWF0cyA9IGZvcm1hdHM7DQo+ID4gICAgICBob3N0X2lj
+eC0+aW5pdGlhbGl6ZWQgPSB0cnVlOw0KPiA+ICB9DQo+ID4NCj4gPiAgdm9pZCBob3N0X2lvbW11
+X2N0eF9kZXN0cm95KEhvc3RJT01NVUNvbnRleHQgKmhvc3RfaWN4KSAgew0KPiA+ICAgICAgaG9z
+dF9pY3gtPmZsYWdzID0gMHgwOw0KPiA+ICsgICAgaG9zdF9pY3gtPnN0YWdlMV9mb3JtYXRzID0g
+MHgwOw0KPiANCj4gVGhpcyBjb3VsZCBiZSBkcm9wcGVkIHRvbyB3aXRoIHRoZSBmdW5jdGlvbi4u
+DQoNCnllcywgaXQgaXMuDQoNCj4gPiAgICAgIGhvc3RfaWN4LT5pbml0aWFsaXplZCA9IGZhbHNl
+Ow0KPiA+ICB9DQo+ID4NCj4gPiBAQCAtOTIsNiArMTM4LDcgQEAgc3RhdGljIHZvaWQgaG9zdF9p
+Y3hfaW5pdF9mbihPYmplY3QgKm9iaikNCj4gPiAgICAgIEhvc3RJT01NVUNvbnRleHQgKmhvc3Rf
+aWN4ID0gSE9TVF9JT01NVV9DT05URVhUKG9iaik7DQo+ID4NCj4gPiAgICAgIGhvc3RfaWN4LT5m
+bGFncyA9IDB4MDsNCj4gPiArICAgIGhvc3RfaWN4LT5zdGFnZTFfZm9ybWF0cyA9IDB4MDsNCj4g
+DQo+IFNhbWUgaGVyZS4uLg0KDQplY2hvLg0KDQo+ID4gICAgICBob3N0X2ljeC0+aW5pdGlhbGl6
+ZWQgPSBmYWxzZTsNCj4gPiAgfQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2h3L3ZmaW8vY29tbW9u
+LmMgYi9ody92ZmlvL2NvbW1vbi5jIGluZGV4DQo+ID4gZTBmMjgyOC4uNzcwYTc4NSAxMDA2NDQN
+Cj4gPiAtLS0gYS9ody92ZmlvL2NvbW1vbi5jDQo+ID4gKysrIGIvaHcvdmZpby9jb21tb24uYw0K
+PiA+IEBAIC0xMjIzLDYgKzEyMjMsNTIgQEAgc3RhdGljIGludA0KPiB2ZmlvX2hvc3RfaWN4X3Bh
+c2lkX2ZyZWUoSG9zdElPTU1VQ29udGV4dCAqaG9zdF9pY3gsDQo+ID4gICAgICByZXR1cm4gMDsN
+Cj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyBpbnQgdmZpb19ob3N0X2ljeF9iaW5kX3N0YWdlMV9w
+Z3RibChIb3N0SU9NTVVDb250ZXh0DQo+ID4gKypob3N0X2ljeCwNCj4gDQo+IFNhbWUgbmFtZSBp
+c3N1ZSBvbiBpY3g/ICBGZWVsIGZyZWUgdG8gY2hvb3NlIGFueXRoaW5nIHRoYXQgYWxpZ25zIHdp
+dGggeW91cg0KPiBwcmV2aW91cyBkZWNpc2lvbi4uLg0KDQp5ZXMsIEknbGwgdXNlIF9ob3N0X2lv
+bW11X2N0eF8gaW5zdGVhZCBvZiBfaG9zdF9pY3hfLg0KDQo+ID4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBEdWFsSU9NTVVTdGFnZTFCaW5kRGF0YQ0KPiA+ICsq
+YmluZF9kYXRhKSB7DQo+ID4gKyAgICBWRklPQ29udGFpbmVyICpjb250YWluZXIgPSBjb250YWlu
+ZXJfb2YoaG9zdF9pY3gsIFZGSU9Db250YWluZXIsIGhvc3RfaWN4KTsNCj4gPiArICAgIHN0cnVj
+dCB2ZmlvX2lvbW11X3R5cGUxX2JpbmQgKmJpbmQ7DQo+ID4gKyAgICB1bnNpZ25lZCBsb25nIGFy
+Z3N6Ow0KPiA+ICsgICAgaW50IHJldCA9IDA7DQo+ID4gKw0KPiA+ICsgICAgYXJnc3ogPSBzaXpl
+b2YoKmJpbmQpICsgc2l6ZW9mKGJpbmRfZGF0YS0+YmluZF9kYXRhKTsNCj4gPiArICAgIGJpbmQg
+PSBnX21hbGxvYzAoYXJnc3opOw0KPiA+ICsgICAgYmluZC0+YXJnc3ogPSBhcmdzejsNCj4gPiAr
+ICAgIGJpbmQtPmZsYWdzID0gVkZJT19JT01NVV9CSU5EX0dVRVNUX1BHVEJMOw0KPiA+ICsgICAg
+bWVtY3B5KCZiaW5kLT5kYXRhLCAmYmluZF9kYXRhLT5iaW5kX2RhdGEsDQo+ID4gKyBzaXplb2Yo
+YmluZF9kYXRhLT5iaW5kX2RhdGEpKTsNCj4gPiArDQo+ID4gKyAgICBpZiAoaW9jdGwoY29udGFp
+bmVyLT5mZCwgVkZJT19JT01NVV9CSU5ELCBiaW5kKSkgew0KPiA+ICsgICAgICAgIHJldCA9IC1l
+cnJubzsNCj4gPiArICAgICAgICBlcnJvcl9yZXBvcnQoIiVzOiBwYXNpZCAoJXUpIGJpbmQgZmFp
+bGVkOiAlZCIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICBfX2Z1bmNfXywgYmluZF9kYXRh
+LT5wYXNpZCwgcmV0KTsNCj4gPiArICAgIH0NCj4gPiArICAgIGdfZnJlZShiaW5kKTsNCj4gPiAr
+ICAgIHJldHVybiByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyBpbnQgdmZpb19ob3N0
+X2ljeF91bmJpbmRfc3RhZ2UxX3BndGJsKEhvc3RJT01NVUNvbnRleHQgKmhvc3RfaWN4LA0KPiA+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRHVhbElPTU1VU3RhZ2Ux
+QmluZERhdGENCj4gPiArKmJpbmRfZGF0YSkgew0KPiA+ICsgICAgVkZJT0NvbnRhaW5lciAqY29u
+dGFpbmVyID0gY29udGFpbmVyX29mKGhvc3RfaWN4LCBWRklPQ29udGFpbmVyLCBob3N0X2ljeCk7
+DQo+ID4gKyAgICBzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9iaW5kICpiaW5kOw0KPiA+ICsgICAg
+dW5zaWduZWQgbG9uZyBhcmdzejsNCj4gPiArICAgIGludCByZXQgPSAwOw0KPiA+ICsNCj4gPiAr
+ICAgIGFyZ3N6ID0gc2l6ZW9mKCpiaW5kKSArIHNpemVvZihiaW5kX2RhdGEtPmJpbmRfZGF0YSk7
+DQo+ID4gKyAgICBiaW5kID0gZ19tYWxsb2MwKGFyZ3N6KTsNCj4gPiArICAgIGJpbmQtPmFyZ3N6
+ID0gYXJnc3o7DQo+ID4gKyAgICBiaW5kLT5mbGFncyA9IFZGSU9fSU9NTVVfVU5CSU5EX0dVRVNU
+X1BHVEJMOw0KPiA+ICsgICAgbWVtY3B5KCZiaW5kLT5kYXRhLCAmYmluZF9kYXRhLT5iaW5kX2Rh
+dGEsDQo+ID4gKyBzaXplb2YoYmluZF9kYXRhLT5iaW5kX2RhdGEpKTsNCj4gPiArDQo+ID4gKyAg
+ICBpZiAoaW9jdGwoY29udGFpbmVyLT5mZCwgVkZJT19JT01NVV9CSU5ELCBiaW5kKSkgew0KPiA+
+ICsgICAgICAgIHJldCA9IC1lcnJubzsNCj4gPiArICAgICAgICBlcnJvcl9yZXBvcnQoIiVzOiBw
+YXNpZCAoJXUpIHVuYmluZCBmYWlsZWQ6ICVkIiwNCj4gPiArICAgICAgICAgICAgICAgICAgICAg
+IF9fZnVuY19fLCBiaW5kX2RhdGEtPnBhc2lkLCByZXQpOw0KPiA+ICsgICAgfQ0KPiA+ICsgICAg
+Z19mcmVlKGJpbmQpOw0KPiA+ICsgICAgcmV0dXJuIHJldDsNCj4gPiArfQ0KPiA+ICsNCj4gPiAg
+LyoqDQo+ID4gICAqIEdldCBpb21tdSBpbmZvIGZyb20gaG9zdC4gQ2FsbGVyIG9mIHRoaXMgZnVu
+Y2lvbiBzaG91bGQgZnJlZQ0KPiA+ICAgKiB0aGUgbWVtb3J5IHBvaW50ZWQgYnkgdGhlIHJldHVy
+bmVkIHBvaW50ZXIgc3RvcmVkIGluIEBpbmZvIEBADQo+ID4gLTEzMzcsNiArMTM4Myw3IEBAIHN0
+YXRpYyBpbnQgdmZpb19pbml0X2NvbnRhaW5lcihWRklPQ29udGFpbmVyICpjb250YWluZXIsIGlu
+dA0KPiBncm91cF9mZCwNCj4gPiAgICAgICAgICBzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9pbmZv
+X2NhcF9uZXN0aW5nIG5lc3RpbmcgPSB7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgLm5lc3RpbmdfY2FwYWJpbGl0aWVzID0gMHgwLA0KPiA+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC5zdGFnZTFfZm9ybWF0cyA9IDAsIH07
+DQo+ID4gKyAgICAgICAgdWludDMyX3Qgc3RhZ2UxX2Zvcm1hdHM7DQo+ID4NCj4gPiAgICAgICAg
+ICByZXQgPSB2ZmlvX2dldF9uZXN0aW5nX2lvbW11X2NhcChjb250YWluZXIsICZuZXN0aW5nKTsN
+Cj4gPiAgICAgICAgICBpZiAocmV0KSB7DQo+ID4gQEAgLTEzNDcsMTAgKzEzOTQsMTQgQEAgc3Rh
+dGljIGludCB2ZmlvX2luaXRfY29udGFpbmVyKFZGSU9Db250YWluZXINCj4gPiAqY29udGFpbmVy
+LCBpbnQgZ3JvdXBfZmQsDQo+ID4NCj4gPiAgICAgICAgICBmbGFncyB8PSAobmVzdGluZy5uZXN0
+aW5nX2NhcGFiaWxpdGllcyAmIFZGSU9fSU9NTVVfUEFTSURfUkVRUykgPw0KPiA+ICAgICAgICAg
+ICAgICAgICAgIEhPU1RfSU9NTVVfUEFTSURfUkVRVUVTVCA6IDA7DQo+ID4gKyAgICAgICAgZmxh
+Z3MgfD0gSE9TVF9JT01NVV9ORVNUSU5HOw0KPiA+ICsgICAgICAgIHN0YWdlMV9mb3JtYXRzID0g
+bmVzdGluZy5zdGFnZTFfZm9ybWF0czsNCj4gPiArDQo+ID4gICAgICAgICAgaG9zdF9pb21tdV9j
+dHhfaW5pdCgmY29udGFpbmVyLT5ob3N0X2ljeCwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHNpemVvZihjb250YWluZXItPmhvc3RfaWN4KSwNCj4gPiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIFRZUEVfVkZJT19IT1NUX0lPTU1VX0NPTlRFWFQsDQo+ID4gLSAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBmbGFncyk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBmbGFncywNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0YWdlMV9mb3Jt
+YXRzKTsNCj4gDQo+IFdlIGNhbiBjb25zaWRlciBwYXNzaW5nIGluIG5lc3Rpbmcuc3RhZ2UxX2Zv
+cm1hdHMgYW5kIGRyb3Agc3RhZ2UxX2Zvcm1hdHMuDQoNCmFoYSwgeWVzLg0KDQpSZWdhcmRzLA0K
+WWkgTGl1DQoNCg==
 
