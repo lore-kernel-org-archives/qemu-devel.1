@@ -2,77 +2,62 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C42C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B9DC1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:25:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95E0B20772
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:25:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXVjCza4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E0B20772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 318BF20772
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:25:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 318BF20772
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH9mr-00023q-Qq
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:25:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59430)
+	id 1jH9mv-0002B1-Ck
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:25:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jH9kl-0006wq-KG
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:23:44 -0400
+ (envelope-from <groug@kaod.org>) id 1jH9m1-0000ng-GL
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:25:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jH9kk-0002kw-9Q
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:23:43 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44388)
+ (envelope-from <groug@kaod.org>) id 1jH9m0-0003s9-C5
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:25:01 -0400
+Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:51181)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jH9kk-0002kM-5g
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:23:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585157021;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=z4GZIoigkEvsVG7WhJxc+xDFAFpTeOM6YrcFeweRdXQ=;
- b=CXVjCza48p0fYcVB6fFcXYpkFReZDrXolFPcY2txVSIaKvYD1L7TQEZDCKKBcruTXMqFwF
- f4CjXSJQHyRpMfMyahgJvU4tMu+S8sXAcOmSuIwOOlJme1N/KCSF0b2j8p/TeYnajXUy71
- D/1zWpa8Ddh942DuiuKskQw2J/MB9KY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-17tdskvPOwiTcXnycf9HDQ-1; Wed, 25 Mar 2020 13:23:40 -0400
-X-MC-Unique: 17tdskvPOwiTcXnycf9HDQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DC61800D5F;
- Wed, 25 Mar 2020 17:23:39 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-113-184.ams2.redhat.com
- [10.36.113.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7B3794B57;
- Wed, 25 Mar 2020 17:23:37 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 2/2] mirror: Wait only for in-flight operations
-Date: Wed, 25 Mar 2020 18:23:26 +0100
-Message-Id: <20200325172326.22347-3-kwolf@redhat.com>
-In-Reply-To: <20200325172326.22347-1-kwolf@redhat.com>
-References: <20200325172326.22347-1-kwolf@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jH9lz-0003oK-0o
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:25:00 -0400
+Received: from player731.ha.ovh.net (unknown [10.108.57.72])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id AF1D8248107
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 18:24:55 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player731.ha.ovh.net (Postfix) with ESMTPSA id 5F8251096C31A;
+ Wed, 25 Mar 2020 17:24:45 +0000 (UTC)
+Date: Wed, 25 Mar 2020 18:24:44 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2 3/4] ppc/spapr: Add FWNMI machine check delivery
+ warnings
+Message-ID: <20200325182444.4785d131@bahia.lan>
+In-Reply-To: <20200325142906.221248-4-npiggin@gmail.com>
+References: <20200325142906.221248-1-npiggin@gmail.com>
+ <20200325142906.221248-4-npiggin@gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 10657487044611971523
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudehgedgjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 46.105.44.175
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,80 +69,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@fr.ibm.com>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-mirror_wait_for_free_in_flight_slot() just picks a random operation to
-wait for. However, a MirrorOp is already in s->ops_in_flight when
-mirror_co_read() waits for free slots, so if not enough slots are
-immediately available, an operation can end up waiting for itself, or
-two or more operations can wait for each other to complete, which
-results in a hang.
+On Thu, 26 Mar 2020 00:29:05 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-Fix this by adding a flag to MirrorOp that tells us if the request is
-already in flight (and therefore occupies slots that it will later
-free), and picking only such operations for waiting.
+> Add some messages which explain problems and guest misbehaviour that
+> may be difficult to diagnose in rare cases of machine checks.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1794692
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/mirror.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 393131b135..7fef52ded2 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -102,6 +102,7 @@ struct MirrorOp {
-=20
-     bool is_pseudo_op;
-     bool is_active_write;
-+    bool is_in_flight;
-     CoQueue waiting_requests;
-     Coroutine *co;
-=20
-@@ -293,7 +294,9 @@ mirror_wait_for_any_operation(MirrorBlockJob *s, bool a=
-ctive)
-          * caller of this function.  Since there is only one pseudo op
-          * at any given time, we will always find some real operation
-          * to wait on. */
--        if (!op->is_pseudo_op && op->is_active_write =3D=3D active) {
-+        if (!op->is_pseudo_op && op->is_in_flight &&
-+            op->is_active_write =3D=3D active)
-+        {
-             qemu_co_queue_wait(&op->waiting_requests, NULL);
-             return;
-         }
-@@ -367,6 +370,7 @@ static void coroutine_fn mirror_co_read(void *opaque)
-     /* Copy the dirty cluster.  */
-     s->in_flight++;
-     s->bytes_in_flight +=3D op->bytes;
-+    op->is_in_flight =3D true;
-     trace_mirror_one_iteration(s, op->offset, op->bytes);
-=20
-     ret =3D bdrv_co_preadv(s->mirror_top_bs->backing, op->offset, op->byte=
-s,
-@@ -382,6 +386,7 @@ static void coroutine_fn mirror_co_zero(void *opaque)
-     op->s->in_flight++;
-     op->s->bytes_in_flight +=3D op->bytes;
-     *op->bytes_handled =3D op->bytes;
-+    op->is_in_flight =3D true;
-=20
-     ret =3D blk_co_pwrite_zeroes(op->s->target, op->offset, op->bytes,
-                                op->s->unmap ? BDRV_REQ_MAY_UNMAP : 0);
-@@ -396,6 +401,7 @@ static void coroutine_fn mirror_co_discard(void *opaque=
-)
-     op->s->in_flight++;
-     op->s->bytes_in_flight +=3D op->bytes;
-     *op->bytes_handled =3D op->bytes;
-+    op->is_in_flight =3D true;
-=20
-     ret =3D blk_co_pdiscard(op->s->target, op->offset, op->bytes);
-     mirror_write_complete(op, ret);
---=20
-2.20.1
+>  hw/ppc/spapr_events.c | 4 ++++
+>  hw/ppc/spapr_rtas.c   | 3 +++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index a908c5d0e9..c8964eb25d 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -833,6 +833,8 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+>      /* get rtas addr from fdt */
+>      rtas_addr = spapr_get_rtas_addr();
+>      if (!rtas_addr) {
+> +        error_report(
+> +"FWNMI: Unable to deliver machine check to guest: rtas_addr not found.");
+>          qemu_system_guest_panicked(NULL);
+>          g_free(ext_elog);
+>          return;
+> @@ -874,6 +876,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>           * that CPU called "ibm,nmi-interlock")
+>           */
+>          if (spapr->fwnmi_machine_check_interlock == cpu->vcpu_id) {
+> +            error_report(
+> +"FWNMI: Unable to deliver machine check to guest: nested machine check.");
+>              qemu_system_guest_panicked(NULL);
+>              return;
+>          }
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 29abe66d01..bcac0d00e7 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -462,6 +462,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>      }
+>  
+>      if (spapr->fwnmi_machine_check_addr == -1) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +"FWNMI: ibm,nmi-interlock RTAS called with FWNMI not registered.\n");
+> +
+>          /* NMI register not called */
+>          rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>          return;
 
 
