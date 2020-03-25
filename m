@@ -2,79 +2,82 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB3FC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2FA0C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:45:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBDCB206F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:45:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zeuhgz70"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDCB206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A76DC206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:45:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A76DC206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH3XI-0007R8-RW
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:45:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35771)
+	id 1jH3Xc-0008Gh-Pp
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:45:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3Vc-0005dC-7f
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:42 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jH3SS-0008GM-DA
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:40:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3VQ-0003YX-LX
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:30 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52401)
+ (envelope-from <yi.l.liu@intel.com>) id 1jH3SQ-0001vS-CU
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:40:23 -0400
+Received: from mga06.intel.com ([134.134.136.31]:35232)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3VQ-0003YA-Hc
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585133008;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0ab3ZxjSrpD3d/jRxdm/wZgkuCerlnBPqPu/oyZL+h8=;
- b=Zeuhgz70FtbapFCmuwJI9GX0uZUKNcS8q/mcUuP/1ZwP62cHeW9gaNgQSbnibQFOiuZO4M
- W/hGqM88sDjO9dgo/d3iRF31Kx2ykB/Z7a7xbdetkZr18EVH5DLKekwa0FfjYxxJrgIZgK
- dHT5mxXC5V5COKXAMfpC5CujyQHvL5s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-bUkOBvxvPPeZsx3aYk57LA-1; Wed, 25 Mar 2020 06:43:26 -0400
-X-MC-Unique: bUkOBvxvPPeZsx3aYk57LA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 898C218FF662;
- Wed, 25 Mar 2020 10:43:25 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7091794B5B;
- Wed, 25 Mar 2020 10:43:23 +0000 (UTC)
-Message-ID: <e51f7634bc99cabb616801431a72f339df7d5541.camel@redhat.com>
-Subject: Re: [PATCH v6 18/42] nvme: support identify namespace descriptor list
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-Date: Wed, 25 Mar 2020 12:43:22 +0200
-In-Reply-To: <20200316142928.153431-19-its@irrelevant.dk>
-References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-19-its@irrelevant.dk>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jH3SQ-0001kZ-52
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:40:22 -0400
+IronPort-SDR: O8cXcs0Bxu6AVBZhy9f/Yku/Kr8eBgsPwirRdDnzikmPq8gUh5Lzuz9rm93FLO8XcS3RT9RTVL
+ /3LeD3Lfy7Rw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Mar 2020 03:40:13 -0700
+IronPort-SDR: QlNTJjIzx9iOQk2UUPnC15Dwah5AslmRQPSvLxxIzBwk78OdCgPw9Kj5c9I10BFTGBqliIIaBT
+ srMRXJRbS0qQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,304,1580803200"; d="scan'208";a="393587249"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by orsmga004.jf.intel.com with ESMTP; 25 Mar 2020 03:40:12 -0700
+Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 03:40:12 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 03:40:11 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.201]) with mapi id 14.03.0439.000;
+ Wed, 25 Mar 2020 18:40:08 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH v1 18/22] vfio: add support for flush iommu stage-1 cache
+Thread-Topic: [PATCH v1 18/22] vfio: add support for flush iommu stage-1 cache
+Thread-Index: AQHWAEW38keupAMDxUWxV+Of7sKHqqhXisuAgAGX/eA=
+Date: Wed, 25 Mar 2020 10:40:08 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A201F8D@SHSMSX104.ccr.corp.intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-19-git-send-email-yi.l.liu@intel.com>
+ <20200324181915.GC127076@xz-x1>
+In-Reply-To: <20200324181915.GC127076@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.31
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,104 +89,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2020-03-16 at 07:29 -0700, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
-> 
-> Since we are not providing the NGUID or EUI64 fields, we must support
-> the Namespace UUID. We do not have any way of storing a persistent
-> unique identifier, so conjure up a UUID that is just the namespace id.
-> 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> ---
->  hw/block/nvme.c       | 38 ++++++++++++++++++++++++++++++++++++++
->  hw/block/trace-events |  1 +
->  2 files changed, 39 insertions(+)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 16de3ca1c5d5..007f8817f101 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -942,6 +942,42 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
->      return ret;
->  }
->  
-> +static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeIdentify *c)
-> +{
-> +    uint32_t nsid = le32_to_cpu(c->nsid);
-> +    uint64_t prp1 = le64_to_cpu(c->prp1);
-> +    uint64_t prp2 = le64_to_cpu(c->prp2);
-> +
-> +    void *list;
-> +    uint16_t ret;
-> +    NvmeIdNsDescr *ns_descr;
-> +
-> +    trace_nvme_dev_identify_ns_descr_list(nsid);
-> +
-> +    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
-> +        trace_nvme_dev_err_invalid_ns(nsid, n->num_namespaces);
-> +        return NVME_INVALID_NSID | NVME_DNR;
-> +    }
-> +
-> +    list = g_malloc0(NVME_IDENTIFY_DATA_SIZE);
-> +    ns_descr = list;
-> +
-> +    /*
-> +     * Because the NGUID and EUI64 fields are 0 in the Identify Namespace data
-> +     * structure, a Namespace UUID (nidt = 0x3) must be reported in the
-> +     * Namespace Identification Descriptor. Add a very basic Namespace UUID
-> +     * here.
-> +     */
-> +    ns_descr->nidt = NVME_NIDT_UUID;
-> +    ns_descr->nidl = NVME_NIDT_UUID_LEN;
-> +    stl_be_p(ns_descr + sizeof(*ns_descr), nsid);
-> +
-> +    ret = nvme_dma_read_prp(n, (uint8_t *) list, NVME_IDENTIFY_DATA_SIZE, prp1,
-> +                            prp2);
-> +    g_free(list);
-> +    return ret;
-> +}
-> +
->  static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
->  {
->      NvmeIdentify *c = (NvmeIdentify *)cmd;
-> @@ -953,6 +989,8 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
->          return nvme_identify_ctrl(n, c);
->      case NVME_ID_CNS_NS_ACTIVE_LIST:
->          return nvme_identify_nslist(n, c);
-> +    case NVME_ID_CNS_NS_DESCR_LIST:
-> +        return nvme_identify_ns_descr_list(n, c);
->      default:
->          trace_nvme_dev_err_invalid_identify_cns(le32_to_cpu(c->cns));
->          return NVME_INVALID_FIELD | NVME_DNR;
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index 13e2c71664f6..4cde0844ef64 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -41,6 +41,7 @@ nvme_dev_del_cq(uint16_t cqid) "deleted completion queue, sqid=%"PRIu16""
->  nvme_dev_identify_ctrl(void) "identify controller"
->  nvme_dev_identify_ns(uint32_t ns) "nsid %"PRIu32""
->  nvme_dev_identify_nslist(uint32_t ns) "nsid %"PRIu32""
-> +nvme_dev_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
->  nvme_dev_getfeat(uint16_t cid, uint32_t fid) "cid %"PRIu16" fid 0x%"PRIx32""
->  nvme_dev_setfeat(uint16_t cid, uint32_t fid, uint32_t val) "cid %"PRIu16" fid 0x%"PRIx32" val 0x%"PRIx32""
->  nvme_dev_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
-
-I think that we should add namespace uuid as a device parameter,
-but its OK to do this in follow up patch.
-
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
-
-
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
+TWFyY2ggMjUsIDIwMjAgMjoxOSBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5j
+b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMTgvMjJdIHZmaW86IGFkZCBzdXBwb3J0IGZv
+ciBmbHVzaCBpb21tdSBzdGFnZS0xIGNhY2hlDQo+IA0KPiBPbiBTdW4sIE1hciAyMiwgMjAyMCBh
+dCAwNTozNjoxNUFNIC0wNzAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGFkZHMg
+Zmx1c2hfc3RhZ2UxX2NhY2hlKCkgZGVmaW5pdGlvbiBpbiBIb3N0SU9NVUNvbnRleHRDbGFzcy4N
+Cj4gPiBBbmQgYWRkcyBjb3JyZXNwb25kaW5nIGltcGxlbWVudGF0aW9uIGluIFZGSU8uIFRoaXMg
+aXMgdG8gZXhwb3NlIGEgd2F5DQo+ID4gZm9yIHZJT01NVSB0byBmbHVzaCBzdGFnZS0xIGNhY2hl
+IGluIGhvc3Qgc2lkZSBzaW5jZSBndWVzdCBvd25zDQo+ID4gc3RhZ2UtMSB0cmFuc2xhdGlvbiBz
+dHJ1Y3R1cmVzIGluIGR1YWwgc3RhZ2UgRE1BIHRyYW5zbGF0aW9uIGNvbmZpZ3VyYXRpb24uDQo+
+ID4NCj4gPiBDYzogS2V2aW4gVGlhbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+ID4gQ2M6IEph
+Y29iIFBhbiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb20+DQo+ID4gQ2M6IFBldGVyIFh1
+IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiBDYzogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRo
+YXQuY29tPg0KPiA+IENjOiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBD
+YzogRGF2aWQgR2lic29uIDxkYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXU+DQo+ID4gQ2M6IEFs
+ZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+ID4gU2lnbmVkLW9m
+Zi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gDQo+IEFja2VkLWJ5OiBQZXRl
+ciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQoNClRoYW5rcywgUGV0ZXIuDQoNClJlZ2FyZHMsDQpZ
+aSBMaXUNCg==
 
