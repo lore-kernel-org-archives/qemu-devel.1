@@ -6,82 +6,81 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A78C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00DF3C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:39:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41A052073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:38:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41A052073E
+	by mail.kernel.org (Postfix) with ESMTPS id D1D582073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:39:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D582073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH87K-0001rD-En
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:38:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44529)
+	id 1jH87U-00028w-21
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:39:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <muriloo@linux.ibm.com>) id 1jH842-0004wr-0e
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:31 -0400
+ (envelope-from <muriloo@linux.ibm.com>) id 1jH84S-0005jJ-My
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <muriloo@linux.ibm.com>) id 1jH840-0004Mp-O3
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46828
+ (envelope-from <muriloo@linux.ibm.com>) id 1jH84R-0004eV-EX
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52126
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
- id 1jH840-0004Mb-Hz
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:28 -0400
+ id 1jH84R-0004e2-7F
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:55 -0400
 Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02PFYdtR017930; Wed, 25 Mar 2020 11:35:27 -0400
+ 02PFYbT8017806; Wed, 25 Mar 2020 11:35:47 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ywbuww877-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2ywbuww8q8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 11:35:27 -0400
+ Wed, 25 Mar 2020 11:35:47 -0400
 Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02PFZRNi022932;
- Wed, 25 Mar 2020 11:35:27 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ywbuww864-1
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02PFZII5022468;
+ Wed, 25 Mar 2020 11:35:46 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2ywbuww8pd-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 11:35:27 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02PFZAcC015323;
- Wed, 25 Mar 2020 15:35:25 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com
- (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
- by ppma03dal.us.ibm.com with ESMTP id 2ywaw9twc5-1
+ Wed, 25 Mar 2020 11:35:46 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02PFZAZd029623;
+ Wed, 25 Mar 2020 15:35:45 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma04dal.us.ibm.com with ESMTP id 2ywawg2wmw-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 15:35:25 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02PFZOgX50528650
+ Wed, 25 Mar 2020 15:35:45 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02PFZimZ14549728
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 25 Mar 2020 15:35:24 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EA44FBE04F;
- Wed, 25 Mar 2020 15:35:23 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CF4D2BE054;
- Wed, 25 Mar 2020 15:35:22 +0000 (GMT)
+ Wed, 25 Mar 2020 15:35:44 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C5965112061;
+ Wed, 25 Mar 2020 15:35:44 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1F891112062;
+ Wed, 25 Mar 2020 15:35:43 +0000 (GMT)
 Received: from localhost (unknown [9.85.207.6])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Wed, 25 Mar 2020 15:35:22 +0000 (GMT)
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
+ Wed, 25 Mar 2020 15:35:42 +0000 (GMT)
 From: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.ibm.com>
 To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 14/15] numa: Introduce
- ram_block_notifiers_support_resize()
-Date: Wed, 25 Mar 2020 12:24:28 -0300
-Message-ID: <2342235.EQWJVSN7C6@kermit.br.ibm.com>
+Subject: Re: [PATCH v4 07/15] util/mmap-alloc: Factor out calculation of the
+ pagesize for the guard page
+Date: Wed, 25 Mar 2020 12:03:55 -0300
+Message-ID: <3833117.a91c8e1GSb@kermit.br.ibm.com>
 Organization: IBM
-In-Reply-To: <20200305142945.216465-15-david@redhat.com>
+In-Reply-To: <20200305142945.216465-8-david@redhat.com>
 References: <20200305142945.216465-1-david@redhat.com>
- <20200305142945.216465-15-david@redhat.com>
+ <20200305142945.216465-8-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
@@ -112,70 +111,120 @@ Cc: Eduardo Habkost <ehabkost@redhat.com>,
  "Michael S . Tsirkin" <mst@redhat.com>,
  Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>, qemu-devel@nongnu.org,
  Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, March 5, 2020 11:29:44 AM -03 David Hildenbrand wrote:
-> We want to actually use resizeable allocations in resizeable ram blocks
-> (IOW, make everything between used_length and max_length inaccessible) -
-> however, not all ram block notifiers can support that.
->
-> Introduce a way to detect if any registered notifier does not
-> support resizes - ram_block_notifiers_support_resize() - which we can later
-> use to fallback to legacy handling if a registered notifier (esp., SEV and
-> HAX) does not support actual resizes.
+On Thursday, March 5, 2020 11:29:37 AM -03 David Hildenbrand wrote:
+> Let's factor out calculating the size of the guard page and rename the
+> variable to make it clearer that this pagesize only applies to the
+> guard page.
 >
 > Reviewed-by: Peter Xu <peterx@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> Cc: Greg Kurz <groug@kaod.org>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > Cc: Igor Mammedov <imammedo@redhat.com>
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
 
 Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 
->  hw/core/numa.c         | 12 ++++++++++++
->  include/exec/ramlist.h |  1 +
->  2 files changed, 13 insertions(+)
+>  util/mmap-alloc.c | 31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
 >
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index 37ce175e13..1d5288c22c 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -914,3 +914,15 @@ void ram_block_notify_resize(void *host, size_t
-> old_size, size_t new_size) }
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index 27dcccd8ec..f0277f9fad 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -82,17 +82,27 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+>      return qemu_real_host_page_size;
+>  }
+>
+> +static inline size_t mmap_guard_pagesize(int fd)
+> +{
+> +#if defined(__powerpc64__) && defined(__linux__)
+> +    /* Mappings in the same segment must share the same page size */
+> +    return qemu_fd_getpagesize(fd);
+> +#else
+> +    return qemu_real_host_page_size;
+> +#endif
+> +}
+> +
+>  void *qemu_ram_mmap(int fd,
+>                      size_t size,
+>                      size_t align,
+>                      bool shared,
+>                      bool is_pmem)
+>  {
+> +    const size_t guard_pagesize = mmap_guard_pagesize(fd);
+>      int flags;
+>      int map_sync_flags = 0;
+>      int guardfd;
+>      size_t offset;
+> -    size_t pagesize;
+>      size_t total;
+>      void *guardptr;
+>      void *ptr;
+> @@ -113,8 +123,7 @@ void *qemu_ram_mmap(int fd,
+>       * anonymous memory is OK.
+>       */
+>      flags = MAP_PRIVATE;
+> -    pagesize = qemu_fd_getpagesize(fd);
+> -    if (fd == -1 || pagesize == qemu_real_host_page_size) {
+> +    if (fd == -1 || guard_pagesize == qemu_real_host_page_size) {
+>          guardfd = -1;
+>          flags |= MAP_ANONYMOUS;
+>      } else {
+> @@ -123,7 +132,6 @@ void *qemu_ram_mmap(int fd,
+>      }
+>  #else
+>      guardfd = -1;
+> -    pagesize = qemu_real_host_page_size;
+>      flags = MAP_PRIVATE | MAP_ANONYMOUS;
+>  #endif
+>
+> @@ -135,7 +143,7 @@ void *qemu_ram_mmap(int fd,
+>
+>      assert(is_power_of_2(align));
+>      /* Always align to host page size */
+> -    assert(align >= pagesize);
+> +    assert(align >= guard_pagesize);
+>
+>      flags = MAP_FIXED;
+>      flags |= fd == -1 ? MAP_ANONYMOUS : 0;
+> @@ -189,8 +197,8 @@ void *qemu_ram_mmap(int fd,
+>       * a guard page guarding against potential buffer overflows.
+>       */
+>      total -= offset;
+> -    if (total > size + pagesize) {
+> -        munmap(ptr + size + pagesize, total - size - pagesize);
+> +    if (total > size + guard_pagesize) {
+> +        munmap(ptr + size + guard_pagesize, total - size - guard_pagesize);
+> }
+>
+>      return ptr;
+> @@ -198,15 +206,8 @@ void *qemu_ram_mmap(int fd,
+>
+>  void qemu_ram_munmap(int fd, void *ptr, size_t size)
+>  {
+> -    size_t pagesize;
+> -
+>      if (ptr) {
+>          /* Unmap both the RAM block and the guard page */
+> -#if defined(__powerpc64__) && defined(__linux__)
+> -        pagesize = qemu_fd_getpagesize(fd);
+> -#else
+> -        pagesize = qemu_real_host_page_size;
+> -#endif
+> -        munmap(ptr, size + pagesize);
+> +        munmap(ptr, size + mmap_guard_pagesize(fd));
 >      }
 >  }
-> +
-> +bool ram_block_notifiers_support_resize(void)
-> +{
-> +    RAMBlockNotifier *notifier;
-> +
-> +    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
-> +        if (!notifier->ram_block_resized) {
-> +            return false;
-> +        }
-> +    }
-> +    return true;
-> +}
-> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> index 293c0ddabe..ac5811be96 100644
-> --- a/include/exec/ramlist.h
-> +++ b/include/exec/ramlist.h
-> @@ -79,6 +79,7 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
->  void ram_block_notify_add(void *host, size_t size, size_t max_size);
->  void ram_block_notify_remove(void *host, size_t size, size_t max_size);
->  void ram_block_notify_resize(void *host, size_t old_size, size_t new_size);
-> +bool ram_block_notifiers_support_resize(void);
->
->  void ram_block_dump(Monitor *mon);
 
 
 --
