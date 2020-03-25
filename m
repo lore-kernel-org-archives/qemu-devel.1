@@ -2,66 +2,81 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3747C54FD2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 02:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 439B3C54FD5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 02:33:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 737B920714
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 02:29:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 737B920714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0D61420714
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 02:33:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2eRhKyf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D61420714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGvnd-0004MA-MX
-	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 22:29:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43047)
+	id 1jGvrU-0005tf-79
+	for qemu-devel@archiver.kernel.org; Tue, 24 Mar 2020 22:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43696)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jGvn0-0003uX-M6
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 22:29:08 -0400
+ (envelope-from <gshan@redhat.com>) id 1jGvqd-0005Mj-FH
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 22:32:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1jGvmy-0002ts-Us
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 22:29:06 -0400
-Received: from mga17.intel.com ([192.55.52.151]:21693)
+ (envelope-from <gshan@redhat.com>) id 1jGvqb-0005VT-If
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 22:32:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37825)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1jGvmy-0002tI-Kn
- for qemu-devel@nongnu.org; Tue, 24 Mar 2020 22:29:04 -0400
-IronPort-SDR: YoDvFJqxLwF+inJOZcuEHXQOxaI5YtrKh6FzDTwThwWAlfARvk2DCZA5v7UxBmWlknYhn0n2dB
- VyXuL6YPn87Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 24 Mar 2020 19:29:03 -0700
-IronPort-SDR: Nm0XexF/m3nlad7W1/Q90ej9x/p61pB0UF5PLK7Af/SIY0kikQ56Nni4FOHYkClvHsbF+T+lFa
- HLFdbE2BdnhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,302,1580803200"; d="scan'208";a="446474735"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga005.fm.intel.com with ESMTP; 24 Mar 2020 19:28:59 -0700
-Date: Tue, 24 Mar 2020 22:19:28 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v16 QEMU 14/16] vfio: Add vfio_listener_log_sync to mark
- dirty pages
-Message-ID: <20200325021927.GD20109@joy-OptiPlex-7040>
-References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
- <1585084154-29461-15-git-send-email-kwankhede@nvidia.com>
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1jGvqb-0005UP-9q
+ for qemu-devel@nongnu.org; Tue, 24 Mar 2020 22:32:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585103567;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tfvdA6fl0nGiCwzGaUVcG2y7t0dMnDN1knHz/pUXHD8=;
+ b=E2eRhKyfMxcIhqm1tMJScAXAelLaZqGfUxR2dtq+wgNYBwBg1Qwk5KwWeMNfBy3ERELQ9P
+ BUUIlPsO8QzZXJ2ajdhGUJgHmyOqJP0+tj5l/vcH3YqIfr5B8Gcoj1/xJQWmBs82HL+T/T
+ adv/pG3q8NAxlKL6jNYovTY/aohPkkE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-yI709ja9MEezamytUEt5IQ-1; Tue, 24 Mar 2020 22:32:46 -0400
+X-MC-Unique: yI709ja9MEezamytUEt5IQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCA331005513;
+ Wed, 25 Mar 2020 02:32:44 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-53.bne.redhat.com [10.64.54.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C759B5C241;
+ Wed, 25 Mar 2020 02:32:42 +0000 (UTC)
+Subject: Re: [PATCH v3] hw/char/pl011: Enable TxFIFO and async transmission
+From: Gavin Shan <gshan@redhat.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20200311040923.29115-1-gshan@redhat.com>
+Message-ID: <4c32dbe0-7d96-5e60-addc-b1bf43e17f47@redhat.com>
+Date: Wed, 25 Mar 2020 13:32:39 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1585084154-29461-15-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.151
+In-Reply-To: <20200311040923.29115-1-gshan@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,308 +88,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, marcandre.lureau@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 25, 2020 at 05:09:12AM +0800, Kirti Wankhede wrote:
-> vfio_listener_log_sync gets list of dirty pages from container using
-> VFIO_IOMMU_GET_DIRTY_BITMAP ioctl and mark those pages dirty when all
-> devices are stopped and saving state.
-> Return early for the RAM block section of mapped MMIO region.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
+On 3/11/20 3:09 PM, Gavin Shan wrote:
+> The depth of TxFIFO can be 1 or 16 depending on LCR[4]. The TxFIFO is
+> disabled when its depth is 1. It's nice to have TxFIFO enabled if
+> possible because more characters can be piled and transmitted at once,
+> which would have less overhead. Besides, we can be blocked because of
+> qemu_chr_fe_write_all(), which isn't nice.
+>=20
+> This enables TxFIFO if possible. On ther other hand, the asynchronous
+> transmission is enabled if needed, as we did in hw/char/cadence_uart.c
+>=20
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
->  hw/vfio/common.c     | 200 +++++++++++++++++++++++++++++++++++++++++++++++++--
->  hw/vfio/trace-events |   1 +
->  2 files changed, 196 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 4a2f0d6a2233..6d41e1ac5c2f 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -29,6 +29,7 @@
->  #include "hw/vfio/vfio.h"
->  #include "exec/address-spaces.h"
->  #include "exec/memory.h"
-> +#include "exec/ram_addr.h"
->  #include "hw/hw.h"
->  #include "qemu/error-report.h"
->  #include "qemu/main-loop.h"
-> @@ -38,6 +39,7 @@
->  #include "sysemu/reset.h"
->  #include "trace.h"
->  #include "qapi/error.h"
-> +#include "migration/migration.h"
->  
->  VFIOGroupList vfio_group_list =
->      QLIST_HEAD_INITIALIZER(vfio_group_list);
-> @@ -288,6 +290,28 @@ const MemoryRegionOps vfio_region_ops = {
->  };
->  
->  /*
-> + * Device state interfaces
-> + */
-> +
-> +static bool vfio_devices_are_stopped_and_saving(void)
+> v3: Use PL011() to do data type conversion
+>      Return G_SOURCE_REMOVE when the backend is disconnected in pl011_xmi=
+t()
+>      Drop parenthesis in the condition validating @size in pl011_write_fi=
+fo()
+> ---
+>   hw/char/pl011.c         | 105 +++++++++++++++++++++++++++++++++++++---
+>   include/hw/char/pl011.h |   3 ++
+>   2 files changed, 102 insertions(+), 6 deletions(-)
+>=20
+
+Marc-Andr=C3=A9, ping. Could you please review when you get a chance? Thank=
+s in
+advance :)
+
+> diff --git a/hw/char/pl011.c b/hw/char/pl011.c
+> index 13e784f9d9..dccb8c42b0 100644
+> --- a/hw/char/pl011.c
+> +++ b/hw/char/pl011.c
+> @@ -169,6 +169,73 @@ static void pl011_set_read_trigger(PL011State *s)
+>           s->read_trigger =3D 1;
+>   }
+>  =20
+> +static gboolean pl011_xmit(GIOChannel *chan, GIOCondition cond, void *op=
+aque)
 > +{
-> +    VFIOGroup *group;
-> +    VFIODevice *vbasedev;
-> +
-> +    QLIST_FOREACH(group, &vfio_group_list, next) {
-> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
-> +                !(vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
-> +                continue;
-> +            } else {
-> +                return false;
-> +            }
-> +        }
-> +    }
-> +    return true;
-> +}
-> +
-> +/*
->   * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
->   */
->  static int vfio_dma_unmap(VFIOContainer *container,
-> @@ -408,8 +432,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
->  }
->  
->  /* Called with rcu_read_lock held.  */
-> -static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-> -                           bool *read_only)
-> +static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
-> +                               ram_addr_t *ram_addr, bool *read_only)
->  {
->      MemoryRegion *mr;
->      hwaddr xlat;
-> @@ -440,9 +464,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
->          return false;
->      }
->  
-> -    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> -    *read_only = !writable || mr->readonly;
-> +    if (vaddr) {
-> +        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> +    }
->  
-> +    if (ram_addr) {
-> +        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
-> +    }
-> +
-> +    if (read_only) {
-> +        *read_only = !writable || mr->readonly;
-> +    }
->      return true;
->  }
->  
-> @@ -467,7 +499,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
->      rcu_read_lock();
->  
->      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
-> -        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-> +        if (!vfio_get_xlat_addr(iotlb, &vaddr, NULL, &read_only)) {
->              goto out;
->          }
->          /*
-> @@ -813,9 +845,167 @@ static void vfio_listener_region_del(MemoryListener *listener,
->      }
->  }
->  
-> +static int vfio_get_dirty_bitmap(MemoryListener *listener,
-> +                                 MemoryRegionSection *section)
-> +{
-> +    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
-> +    VFIOGuestIOMMU *giommu;
-> +    IOMMUTLBEntry iotlb;
-> +    hwaddr granularity, address_limit, iova;
+> +    PL011State *s =3D PL011(opaque);
 > +    int ret;
 > +
-> +    if (memory_region_is_iommu(section->mr)) {
-> +        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-> +            if (MEMORY_REGION(giommu->iommu) == section->mr &&
-> +                giommu->n.start == section->offset_within_region) {
-> +                break;
-> +            }
-> +        }
+> +    /* Drain FIFO if there is no backend */
+> +    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+> +        s->write_count =3D 0;
+> +        s->flags &=3D ~PL011_FLAG_TXFF;
+> +        s->flags |=3D PL011_FLAG_TXFE;
+> +        return G_SOURCE_REMOVE;
+> +    }
 > +
-> +        if (!giommu) {
-> +            return -EINVAL;
+> +    /* Nothing to do */
+> +    if (!s->write_count) {
+> +        return FALSE;
+> +    }
+> +
+> +    ret =3D qemu_chr_fe_write(&s->chr, s->write_fifo, s->write_count);
+> +    if (ret > 0) {
+> +        s->write_count -=3D ret;
+> +        memmove(s->write_fifo, s->write_fifo + ret, s->write_count);
+> +        s->flags &=3D ~PL011_FLAG_TXFF;
+> +        if (!s->write_count) {
+> +            s->flags |=3D PL011_FLAG_TXFE;
 > +        }
 > +    }
 > +
-> +    if (memory_region_is_iommu(section->mr)) {
-> +        granularity = memory_region_iommu_get_min_page_size(giommu->iommu);
-> +
-> +        address_limit = MIN(int128_get64(section->size),
-> +                            memory_region_iommu_get_address_limit(giommu->iommu,
-> +                                                 int128_get64(section->size)));
-> +    } else {
-> +        granularity = memory_region_size(section->mr);
-> +        address_limit = int128_get64(section->size);
+> +    if (s->write_count) {
+> +        s->watch_tag =3D qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_=
+HUP,
+> +                                             pl011_xmit, s);
+> +        if (!s->watch_tag) {
+> +            s->write_count =3D 0;
+> +            s->flags &=3D ~PL011_FLAG_TXFF;
+> +            s->flags |=3D PL011_FLAG_TXFE;
+> +            return FALSE;
+> +        }
 > +    }
 > +
-> +    iova = TARGET_PAGE_ALIGN(section->offset_within_address_space);
-> +
-> +    RCU_READ_LOCK_GUARD();
-> +
-> +    while (iova < address_limit) {
-> +        struct vfio_iommu_type1_dirty_bitmap *dbitmap;
-> +        struct vfio_iommu_type1_dirty_bitmap_get *range;
-> +        ram_addr_t start, pages;
-> +        uint64_t iova_xlat, size;
-> +
-> +        if (memory_region_is_iommu(section->mr)) {
-> +            iotlb = address_space_get_iotlb_entry(container->space->as, iova,
-> +                                                 true, MEMTXATTRS_UNSPECIFIED);
-> +            if ((iotlb.target_as == NULL) || (iotlb.addr_mask == 0)) {
-> +                if ((iova + granularity) < iova) {
-> +                    break;
-> +                }
-> +                iova += granularity;
-> +                continue;
-> +            }
-> +            iova_xlat = iotlb.iova + giommu->iommu_offset;
-> +            size = iotlb.addr_mask + 1;
-> +        } else {
-> +            iova_xlat = iova;
-> +            size = address_limit;
-> +        }
-> +
-> +        dbitmap = g_malloc0(sizeof(*dbitmap) + sizeof(*range));
-> +        if (!dbitmap) {
-> +            return -ENOMEM;
-> +        }
-> +
-> +        dbitmap->argsz = sizeof(*dbitmap) + sizeof(*range);
-> +        dbitmap->flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +        range = (struct vfio_iommu_type1_dirty_bitmap_get *)&dbitmap->data;
-> +        range->iova = iova_xlat;
-> +        range->size = size;
-> +
-> +        /*
-> +         * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
-> +         * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap's pgsize to
-> +         * TARGET_PAGE_SIZE.
-> +         */
-> +        range->bitmap.pgsize = TARGET_PAGE_SIZE;
-> +
-> +        /*
-> +         * Comment from kvm_physical_sync_dirty_bitmap() since same applies here
-> +         * XXX bad kernel interface alert
-> +         * For dirty bitmap, kernel allocates array of size aligned to
-> +         * bits-per-long.  But for case when the kernel is 64bits and
-> +         * the userspace is 32bits, userspace can't align to the same
-> +         * bits-per-long, since sizeof(long) is different between kernel
-> +         * and user space.  This way, userspace will provide buffer which
-> +         * may be 4 bytes less than the kernel will use, resulting in
-> +         * userspace memory corruption (which is not detectable by valgrind
-> +         * too, in most cases).
-> +         * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
-> +         * a hope that sizeof(long) won't become >8 any time soon.
-> +         */
-> +
-> +        pages = TARGET_PAGE_ALIGN(range->size) >> TARGET_PAGE_BITS;
-> +        range->bitmap.size = ROUND_UP(pages, 64) / 8;
-> +        range->bitmap.data = g_malloc0(range->bitmap.size);
-> +        if (range->bitmap.data == NULL) {
-> +            error_report("Error allocating bitmap of size 0x%llx",
-> +                         range->bitmap.size);
-> +            ret = -ENOMEM;
-> +            goto err_out;
-> +        }
-> +
-> +        ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, dbitmap);
-> +        if (ret) {
-> +            error_report("Failed to get dirty bitmap for iova: 0x%llx "
-> +                         "size: 0x%llx err: %d",
-> +                         range->iova, range->size, errno);
-> +            goto err_out;
-> +        }
-> +
-> +        if (memory_region_is_iommu(section->mr)) {
-> +            if (!vfio_get_xlat_addr(&iotlb, NULL, &start, NULL)) {
-> +                ret = -EINVAL;
-> +                goto err_out;
-> +            }
-> +        } else {
-> +            start = memory_region_get_ram_addr(section->mr) +
-> +                    section->offset_within_region + iova -
-> +                    TARGET_PAGE_ALIGN(section->offset_within_address_space);
-> +        }
-> +
-> +        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)range->bitmap.data,
-> +                                               start, pages);
-> +
-> +        trace_vfio_get_dirty_bitmap(container->fd, range->iova, range->size,
-> +                                    range->bitmap.size, start);
-> +err_out:
-> +        g_free(range->bitmap.data);
-> +        g_free(dbitmap);
-> +
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +
-> +        if ((iova + size) < iova) {
-> +            break;
-> +        }
-> +
-> +        iova += size;
-> +    }
-> +
-> +    return 0;
+> +    s->int_level |=3D PL011_INT_TX;
+> +    pl011_update(s);
+> +    return FALSE;
 > +}
 > +
-> +static void vfio_listerner_log_sync(MemoryListener *listener,
-> +        MemoryRegionSection *section)
+> +static void pl011_write_fifo(void *opaque, const unsigned char *buf, int=
+ size)
 > +{
-> +    if (vfio_listener_skipped_section(section)) {
-> +        return;
+> +    PL011State *s =3D PL011(opaque);
+> +    int depth =3D (s->lcr & 0x10) ? 16 : 1;
+> +
+> +    if (size >=3D depth - s->write_count) {
+> +        size =3D depth - s->write_count;
 > +    }
 > +
-> +    if (vfio_devices_are_stopped_and_saving()) {
-only get dirty in stopped and saving is not right.
-
-> +        vfio_get_dirty_bitmap(listener, section);
+> +    if (size > 0) {
+> +        memcpy(s->write_fifo + s->write_count, buf, size);
+> +        s->write_count +=3D size;
+> +        if (s->write_count >=3D depth) {
+> +            s->flags |=3D PL011_FLAG_TXFF;
+> +        }
+> +        s->flags &=3D ~PL011_FLAG_TXFE;
+> +    }
+> +
+> +    if (!s->watch_tag) {
+> +        pl011_xmit(NULL, G_IO_OUT, s);
 > +    }
 > +}
 > +
->  static const MemoryListener vfio_memory_listener = {
->      .region_add = vfio_listener_region_add,
->      .region_del = vfio_listener_region_del,
-> +    .log_sync = vfio_listerner_log_sync,
->  };
->  
->  static void vfio_listener_release(VFIOContainer *container)
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index ac065b559f4e..bc8f35ee9356 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -160,3 +160,4 @@ vfio_save_complete_precopy(char *name) " (%s)"
->  vfio_load_device_config_state(char *name) " (%s)"
->  vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
->  vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
-> +vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bitmap_size, uint64_t start) "container fd=%d, iova=0x%"PRIx64" size= 0x%"PRIx64" bitmap_size=0x%"PRIx64" start=0x%"PRIx64
-> -- 
-> 2.7.0
-> 
+>   static void pl011_write(void *opaque, hwaddr offset,
+>                           uint64_t value, unsigned size)
+>   {
+> @@ -179,13 +246,8 @@ static void pl011_write(void *opaque, hwaddr offset,
+>  =20
+>       switch (offset >> 2) {
+>       case 0: /* UARTDR */
+> -        /* ??? Check if transmitter is enabled.  */
+>           ch =3D value;
+> -        /* XXX this blocks entire thread. Rewrite to use
+> -         * qemu_chr_fe_write and background I/O callbacks */
+> -        qemu_chr_fe_write_all(&s->chr, &ch, 1);
+> -        s->int_level |=3D PL011_INT_TX;
+> -        pl011_update(s);
+> +        pl011_write_fifo(opaque, &ch, 1);
+>           break;
+>       case 1: /* UARTRSR/UARTECR */
+>           s->rsr =3D 0;
+> @@ -207,7 +269,16 @@ static void pl011_write(void *opaque, hwaddr offset,
+>           if ((s->lcr ^ value) & 0x10) {
+>               s->read_count =3D 0;
+>               s->read_pos =3D 0;
+> +
+> +            if (s->watch_tag) {
+> +                g_source_remove(s->watch_tag);
+> +                s->watch_tag =3D 0;
+> +            }
+> +            s->write_count =3D 0;
+> +            s->flags &=3D ~PL011_FLAG_TXFF;
+> +            s->flags |=3D PL011_FLAG_TXFE;
+>           }
+> +
+>           s->lcr =3D value;
+>           pl011_set_read_trigger(s);
+>           break;
+> @@ -292,6 +363,24 @@ static const MemoryRegionOps pl011_ops =3D {
+>       .endianness =3D DEVICE_NATIVE_ENDIAN,
+>   };
+>  =20
+> +static bool pl011_write_fifo_needed(void *opaque)
+> +{
+> +    PL011State *s =3D PL011(opaque);
+> +    return s->write_count > 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_pl011_write_fifo =3D {
+> +    .name =3D "pl011/write_fifo",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D pl011_write_fifo_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_INT32(write_count, PL011State),
+> +        VMSTATE_UINT8_ARRAY(write_fifo, PL011State, 16),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>   static const VMStateDescription vmstate_pl011 =3D {
+>       .name =3D "pl011",
+>       .version_id =3D 2,
+> @@ -314,6 +403,10 @@ static const VMStateDescription vmstate_pl011 =3D {
+>           VMSTATE_INT32(read_count, PL011State),
+>           VMSTATE_INT32(read_trigger, PL011State),
+>           VMSTATE_END_OF_LIST()
+> +    },
+> +    .subsections =3D (const VMStateDescription * []) {
+> +        &vmstate_pl011_write_fifo,
+> +        NULL
+>       }
+>   };
+>  =20
+> diff --git a/include/hw/char/pl011.h b/include/hw/char/pl011.h
+> index 14187165c6..9d1c24db48 100644
+> --- a/include/hw/char/pl011.h
+> +++ b/include/hw/char/pl011.h
+> @@ -38,6 +38,7 @@ typedef struct PL011State {
+>       uint32_t int_enabled;
+>       uint32_t int_level;
+>       uint32_t read_fifo[16];
+> +    uint8_t  write_fifo[16];
+>       uint32_t ilpr;
+>       uint32_t ibrd;
+>       uint32_t fbrd;
+> @@ -45,6 +46,8 @@ typedef struct PL011State {
+>       int read_pos;
+>       int read_count;
+>       int read_trigger;
+> +    int write_count;
+> +    guint watch_tag;
+>       CharBackend chr;
+>       qemu_irq irq[6];
+>       const unsigned char *id;
+>=20
+
 
