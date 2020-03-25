@@ -2,58 +2,84 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2ABAC18E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:15:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CABDCC1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:17:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98C83206F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:15:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98C83206F6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 98AB9206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:17:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIJ/16Na"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AB9206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH28h-0007U2-Nl
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 05:15:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51355)
+	id 1jH2AX-0000cV-KK
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 05:17:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51537)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jdelvare@suse.de>) id 1jH27t-0006vV-Ly
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:15:06 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jH29c-0000BZ-ML
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:16:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jdelvare@suse.de>) id 1jH27r-0005nE-UF
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:15:05 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36168)
+ (envelope-from <kraxel@redhat.com>) id 1jH29Z-000178-Jr
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:16:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:49037)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jdelvare@suse.de>) id 1jH27r-0005kw-No
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:15:03 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id 950E3ABD1;
- Wed, 25 Mar 2020 09:15:01 +0000 (UTC)
-Date: Wed, 25 Mar 2020 10:14:57 +0100
-From: Jean Delvare <jdelvare@suse.de>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: Re: [PATCH v6 2/8] i2c: i801: Use GPIO_LOOKUP() helper macro
-Message-ID: <20200325101457.0fff5bb9@endymion>
-In-Reply-To: <20200324135653.6676-2-geert+renesas@glider.be>
-References: <20200324135328.5796-1-geert+renesas@glider.be>
- <20200324135653.6676-1-geert+renesas@glider.be>
- <20200324135653.6676-2-geert+renesas@glider.be>
-Organization: SUSE Linux
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jH29Z-000163-92
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:16:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585127808;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4tEh041oXzSa/ftW4a3NWQV4FCp2HQL6fMW+P63qO+c=;
+ b=dIJ/16Nago0LQ5dI5fVZDQI9r8SEfy1J3J1xGs9p9TyvRePx/36wlXimxLkTLnHNRfG98b
+ H97j5V6jM5hPet7MzBimB9EK1eNLbEX4DsGLm05wpioAKwCf8F1sV9CMarGRHp8wwz/sVk
+ oY1iix92PHO2sEeSCkYfbeRm7cQmWZU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-8GQRQVzPM2e6dDmrmVEDDA-1; Wed, 25 Mar 2020 05:16:45 -0400
+X-MC-Unique: 8GQRQVzPM2e6dDmrmVEDDA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC1F9A1360;
+ Wed, 25 Mar 2020 09:16:43 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-49.ams2.redhat.com
+ [10.36.112.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 49E665C1B0;
+ Wed, 25 Mar 2020 09:16:38 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 23E7517535; Wed, 25 Mar 2020 10:16:36 +0100 (CET)
+Date: Wed, 25 Mar 2020 10:16:36 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH 00/13] microvm: add acpi support
+Message-ID: <20200325091636.rqqv3ewxue6wm5qe@sirius.home.kraxel.org>
+References: <20200319080117.7725-1-kraxel@redhat.com>
+ <20200323065050-mutt-send-email-mst@kernel.org>
+ <20200323120948.f6egd7rhfso6276p@sirius.home.kraxel.org>
+ <20200323131658.30152128@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic]
-X-Received-From: 195.135.220.15
+In-Reply-To: <20200323131658.30152128@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,66 +91,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Phil Reid <preid@electromag.com.au>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
- linux-doc@vger.kernel.org, Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Rob Herring <robh+dt@kernel.org>, Harish Jenny K N <harish_kandiga@mentor.com>,
- linux-i2c@vger.kernel.org, linux-gpio@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
- Eugeniu Rosca <erosca@de.adit-jv.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Mar 2020 14:56:47 +0100, Geert Uytterhoeven wrote:
-> i801_add_mux() fills in the GPIO lookup table by manually populating an
-> array of gpiod_lookup structures.  Use the existing GPIO_LOOKUP() helper
-> macro instead, to relax a dependency on the gpiod_lookup structure's
-> member names.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: Jean Delvare <jdelvare@suse.com>
-> Cc: linux-i2c@vger.kernel.org
-> ---
-> While this patch is a dependency for "[PATCH v6 4/8] gpiolib: Add
-> support for GPIO lookup by line name", it can be applied independently.
-> But an Acked-by would be nice, too.
-> 
-> Cover letter and full series at
-> https://lore.kernel.org/r/20200324135328.5796-1-geert+renesas@glider.be/
-> 
-> v6:
->   - New.
-> ---
->  drivers/i2c/busses/i2c-i801.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/i2c/busses/i2c-i801.c b/drivers/i2c/busses/i2c-i801.c
-> index ca4f096fef749302..8e64a71bea684cc7 100644
-> --- a/drivers/i2c/busses/i2c-i801.c
-> +++ b/drivers/i2c/busses/i2c-i801.c
-> @@ -1444,9 +1444,9 @@ static int i801_add_mux(struct i801_priv *priv)
->  		return -ENOMEM;
->  	lookup->dev_id = "i2c-mux-gpio";
->  	for (i = 0; i < mux_config->n_gpios; i++) {
-> -		lookup->table[i].chip_label = mux_config->gpio_chip;
-> -		lookup->table[i].chip_hwnum = mux_config->gpios[i];
-> -		lookup->table[i].con_id = "mux";
-> +		lookup->table[i] = (struct gpiod_lookup)
-> +			GPIO_LOOKUP(mux_config->gpio_chip,
-> +				    mux_config->gpios[i], "mux", 0);
->  	}
->  	gpiod_add_lookup_table(lookup);
->  	priv->lookup = lookup;
+> > mounted.  Decided to use the "i8042: PNP: No PS/2 controller found."
+> > line instead for a simple test (just check the kernel log timestamps,
+> > three runs each).  The ACPI initialization is already done at that
+> > point, so it should be useful nevertheless.  Here we go:
+> >=20
+> > Without acpi:
+> >   0.277710
+> >   0.278852
+> >   0.279520
+> >=20
+> > With acpi:
+> >   0.283917
+> >   0.284262
+> >   0.284836
+> I wonder what would be difference with hw-reduced acpi
 
-Reviewed-by: Jean Delvare <jdelvare@suse.de>
+The kernel does a bunch of reads+writes at boot (roughly 20-30),
+mostly timer ports, so probably while initializing the pm_timer
+clocksource.  Then it stops talking to the acpi hardware,
+preferring kvmclock clocksouce I guess.
 
--- 
-Jean Delvare
-SUSE L3 Support
+So I expect hw-reduced acpi wouldn't make much of a difference.
+Actually trying that isn't that high on my priority list.
+
+There is bigger fish to fry, untangling the hw/i386/acpi-build.c
+monster for starters, so building with ACPI=3Dy + PCI=3Dn works ...
+
+cheers,
+  Gerd
+
 
