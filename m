@@ -2,107 +2,84 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92454C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 11:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB68C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 11:14:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EABB20772
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 11:12:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43A0020771
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 11:14:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAZHvTsX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EABB20772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPGeBj/E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A0020771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH3xf-0007UU-D9
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 07:12:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39427)
+	id 1jH3zW-000068-Df
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 07:14:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39611)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jH3wr-00070K-Nx
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 07:11:50 -0400
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jH3yb-00082f-UO
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 07:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jH3wp-00087B-4I
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 07:11:49 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48561)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jH3wo-00086R-Vx
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 07:11:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585134706;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=1HHMpFzQ4x4Zqjc3VSRrSRBpk8NVTiTtW2F01j5l4mE=;
- b=fAZHvTsX6cHuHyIzge8SgXoFhcVeeqIWDmhMP7ws/5SmFT1RgTEd2guiQXKJkwKUWpSXlC
- 9j1/jDKKURegvK8ITGERuTJNt2xOnCawE1EZtTYirgJrsCG9ExNkRNc+LMPOa8ovLR3Hbp
- bAVvmB1hgfQO3tBlwROmalYgJmlyMmI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-n0Xsf9PIMR-piNcqLwRXow-1; Wed, 25 Mar 2020 07:11:42 -0400
-X-MC-Unique: n0Xsf9PIMR-piNcqLwRXow-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 104A7189F765;
- Wed, 25 Mar 2020 11:11:41 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-115-33.ams2.redhat.com
- [10.36.115.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1423F6266E;
- Wed, 25 Mar 2020 11:11:34 +0000 (UTC)
-Subject: Re: [PATCH 2/6] block/mirror: fix use after free of local_err
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
- <20200324153630.11882-3-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8cb2bda7-55f5-2646-3c35-d901089ccde5@redhat.com>
-Date: Wed, 25 Mar 2020 12:11:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jH3ya-0000m5-Nr
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 07:13:37 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36793)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jH3ya-0000lL-HD
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 07:13:36 -0400
+Received: by mail-wr1-x444.google.com with SMTP id 31so2507093wrs.3
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 04:13:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dxO9XnT9EwVVhWISYTKeamsjCZuSReIpl2TJqE80EPs=;
+ b=aPGeBj/Eg7O0zLb7ummDxaq9E2KJfkDgmRQHJ8pncIbJ6p9HKWRgR5ryAauV6FhbKu
+ WOB7XAP0EoXcOrNqcl4jy7EV++TdestVmJEn8fGRoK3tpjLDIyvjCMZervfeSwjvlV3S
+ bMkFmQmwHo11+FDIcf93f8mc60LOZuKlheYVT7CIZFdvSNiO3lTkigwldxxnwWvYBDze
+ Qp3oOSmMgjoFyhsrRxBerEIlKo4lT5b2mPKILQsXKMMZe09jfMrL+tDKtKql2b9oxOeu
+ vbsPA3sVJeZMWywvBtgTJ/yEf0MlZMzFs8D45PSYmJ+FVDvWFiYME8lxO8lainXnD11J
+ Jtfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dxO9XnT9EwVVhWISYTKeamsjCZuSReIpl2TJqE80EPs=;
+ b=CBID3LnarPyocQ1c89sa3CDO22CH38/dr+LP0clrtQtG6rEHTTP/UWFFzI2WGet7Cn
+ DOnCwpgX6znO2KKo8Y3z1hLOFtM1chUdjzXpG0ZtiDz1NISIIiKp8x9Kat682UbD/+e1
+ leo6PM+332IxjrVZ+RL+5vH6qMT9/EaBGwBimfupkhdU58sTZeXahE2pJ3MsZlQDd8mN
+ 8HbsTig2m6KK6xTdocwqOYRzZXaiBcBWRfLsTE/Jj6cKjCvtpTJrjB4ehdqu5D4HzMrA
+ SaUi+xasZlg4egkiMBSOHLYAoVykFUNc9quLX5eg8bOJyGZ6CNw9CtQI6/97Kk8cJrw5
+ 8FRQ==
+X-Gm-Message-State: ANhLgQ3PwZp1C8omiH4p2iTiyvxWmUXrqQSHSeJs0BmVixGB4bA9cBFW
+ LPGmV61pkAOUmp//E7AFQitTAmN8JvW0eYdhn40=
+X-Google-Smtp-Source: ADFU+vtaCYvfVfFY05muVWvzaeKgcnAUv92v43EgzbOkXRNriNeolvX+IZMmPv9fnIQN6t2jikAfgeX2Zu5aIZa7gvo=
+X-Received: by 2002:adf:f64a:: with SMTP id x10mr2804121wrp.402.1585134815156; 
+ Wed, 25 Mar 2020 04:13:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200324153630.11882-3-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="JWgvyY9ZM437gPLC0XGWPRF3x91cgKQan"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
+ <aa622b1d-e28a-c3f1-d18a-73e8a67c8ccf@linaro.org>
+ <CAHiYmc7R_Y7s5DaVHf=0rkxf7N2qTSLXdTdL_vy6mH+hVdwLqA@mail.gmail.com>
+ <CAHiYmc5nzmk0EiN6U8Wd3h3xBwim1frEXk=27tngfagHwTvYQw@mail.gmail.com>
+In-Reply-To: <CAHiYmc5nzmk0EiN6U8Wd3h3xBwim1frEXk=27tngfagHwTvYQw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Wed, 25 Mar 2020 13:13:19 +0200
+Message-ID: <CAHiYmc6vG+Pe1xxp8edgqOLL7n2je5n6Qye-rT7BP3oA=aaQ=Q@mail.gmail.com>
+Subject: Re: [PATCH for-5.0,
+ v1] target/mips: Fix loongson multimedia condition instructions
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000941b3105a1abf58b"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,79 +91,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com,
- mdroth@linux.vnet.ibm.com, den@openvz.org, marcandre.lureau@redhat.com,
- jsnow@redhat.com
+Cc: aurelien@aurel32.net, aleksandar.rikalo@rt-rk.com,
+ QEMU Developers <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Huacai Chen <chenhc@lemote.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JWgvyY9ZM437gPLC0XGWPRF3x91cgKQan
-Content-Type: multipart/mixed; boundary="KOZzYSWz4cZrYNAQ792GVEsbL5G1LBLRk"
-
---KOZzYSWz4cZrYNAQ792GVEsbL5G1LBLRk
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+--000000000000941b3105a1abf58b
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 24.03.20 16:36, Vladimir Sementsov-Ogievskiy wrote:
-> local_err is used again in mirror_exit_common() after
-> bdrv_set_backing_hd(), so we must zero it. Otherwise try to set
-> non-NULL local_err will crash.
+12:47 Sre, 25.03.2020. Aleksandar Markovic <aleksandar.qemu.devel@gmail.com=
+>
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> 12:44 Sre, 25.03.2020. Aleksandar Markovic <
+aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > 16:59 Uto, 24.03.2020. Richard Henderson <richard.henderson@linaro.org>
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> > >
+> > > On 3/24/20 5:22 AM, Jiaxun Yang wrote:
+> > > > Loongson multimedia condition instructions were previously
+implemented as
+> > > > write 0 to rd due to lack of documentation. So I just confirmed
+with Loongson
+> > > > about their encoding and implemented them correctly.
+> > > >
+> > > > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > > > Acked-by: Huacai Chen <chenhc@lemote.com>
+> > > > ---
+> > > > v1: Use deposit opreations according to Richard's suggestion.
+> > > > ---
+> > > >  target/mips/translate.c | 35 +++++++++++++++++++++++++++++++----
+> > > >  1 file changed, 31 insertions(+), 4 deletions(-)
+> > >
+> > > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> > >
+> >
+> > I just have a couple of mon-essential suggestions wrt coding style, but
+since all that is really of very insignificant nauture, I wouldn't even
+mention them.
+> >
+> > Reviewed-by: Aleksandar Markovic <aleksandar.qemi.devel@gmail.com>
+> >
+>
+> Sorry, there was a typo. It should be:
+>
+> Reviewed-by: Aleksandar Markovic <aleksandar.qem u.devel@gmail.com>
+>
+> ("u" instead of "i" in "qemi")
+>
 
-OK, but wouldn=92t it be better hygiene to set it to NULL every time it is
-freed?  (There is a second instance of error_report_err() in this
-function.  I=92m a bit worried we might introduce another local_err use
-after that one at some point in the future, and forget to run the cocci
-script then.)
+Another problem with text formatting on mobile phones, this line should be:
 
-Are the cocci scripts run regularly by someone?  E.g. as part of a pull
-to master?
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
-Max
+Hope this all right now.
 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/mirror.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 447051dbc6..6203e5946e 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -678,6 +678,7 @@ static int mirror_exit_common(Job *job)
->              bdrv_set_backing_hd(target_bs, backing, &local_err);
->              if (local_err) {
->                  error_report_err(local_err);
-> +                local_err =3D NULL;
->                  ret =3D -EPERM;
->              }
->          }
->=20
+Sorry about that.
 
+> > May I ask you, Richard, to select this patch for your next TCG-for-5.0
+queue, so that I don't go through a MIPS queue process for just a single
+patch?
+> >
+> > Thanks to all involved people!
+> >
+> > Aleksandar
+> >
+> > >
+> > > r~
 
+--000000000000941b3105a1abf58b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---KOZzYSWz4cZrYNAQ792GVEsbL5G1LBLRk--
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">12:47 Sre, 25.03.2020. Aleksandar Markovic &lt;<a href=3D"ma=
+ilto:aleksandar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&g=
+t; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br=
+>
+&gt;<br>
+&gt; 12:44 Sre, 25.03.2020. Aleksandar Markovic &lt;<a href=3D"mailto:aleks=
+andar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&gt; =D1=98=
+=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt; &gt;<br>
+&gt; &gt; 16:59 Uto, 24.03.2020. Richard Henderson &lt;<a href=3D"mailto:ri=
+chard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; =D1=98=D0=
+=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; On 3/24/20 5:22 AM, Jiaxun Yang wrote:<br>
+&gt; &gt; &gt; &gt; Loongson multimedia condition instructions were previou=
+sly implemented as<br>
+&gt; &gt; &gt; &gt; write 0 to rd due to lack of documentation. So I just c=
+onfirmed with Loongson<br>
+&gt; &gt; &gt; &gt; about their encoding and implemented them correctly.<br=
+>
+&gt; &gt; &gt; &gt; <br>
+&gt; &gt; &gt; &gt; Signed-off-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun=
+.yang@flygoat.com">jiaxun.yang@flygoat.com</a>&gt;<br>
+&gt; &gt; &gt; &gt; Acked-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemo=
+te.com">chenhc@lemote.com</a>&gt;<br>
+&gt; &gt; &gt; &gt; ---<br>
+&gt; &gt; &gt; &gt; v1: Use deposit opreations according to Richard&#39;s s=
+uggestion.<br>
+&gt; &gt; &gt; &gt; ---<br>
+&gt; &gt; &gt; &gt;=C2=A0 target/mips/translate.c | 35 ++++++++++++++++++++=
++++++++++++----<br>
+&gt; &gt; &gt; &gt;=C2=A0 1 file changed, 31 insertions(+), 4 deletions(-)<=
+br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; Reviewed-by: Richard Henderson &lt;<a href=3D"mailto:richard=
+.henderson@linaro.org">richard.henderson@linaro.org</a>&gt;<br>
+&gt; &gt; &gt;<br>
+&gt; &gt;<br>
+&gt; &gt; I just have a couple of mon-essential suggestions wrt coding styl=
+e, but since all that is really of very insignificant nauture, I wouldn&#39=
+;t even mention them.<br>
+&gt; &gt;<br>
+&gt; &gt; Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar=
+.qemi.devel@gmail.com">aleksandar.qemi.devel@gmail.com</a>&gt;<br>
+&gt; &gt;<br>
+&gt;<br>
+&gt; Sorry, there was a typo. It should be:<br>
+&gt;<br>
+&gt; Reviewed-by: Aleksandar Markovic &lt;aleksandar.qem <a href=3D"mailto:=
+u.devel@gmail.com">u.devel@gmail.com</a>&gt;<br>
+&gt;<br>
+&gt; (&quot;u&quot; instead of &quot;i&quot; in &quot;qemi&quot;)<br>
+&gt;</p>
+<p dir=3D"ltr">Another problem with text formatting on mobile phones, this =
+line should be:</p>
+<p dir=3D"ltr">Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleks=
+andar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&gt;</p>
+<p dir=3D"ltr">Hope this all right now.</p>
+<p dir=3D"ltr">Sorry about that.<br></p>
+<p dir=3D"ltr">&gt; &gt; May I ask you, Richard, to select this patch for y=
+our next TCG-for-5.0 queue, so that I don&#39;t go through a MIPS queue pro=
+cess for just a single patch?<br>
+&gt; &gt;<br>
+&gt; &gt; Thanks to all involved people!<br>
+&gt; &gt;<br>
+&gt; &gt; Aleksandar<br>
+&gt; &gt;<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; r~<br>
+</p>
 
---JWgvyY9ZM437gPLC0XGWPRF3x91cgKQan
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl57PGQACgkQ9AfbAGHV
-z0CSBgf/Xn+k1IbGoYhr3CQlHRlXQId12pJQ1Rxpzhxl6tDShexfMy//IRG54369
-QnDgTc7VVIOxShWgupNhDTeQyRjFA5ePzyhDyhptbjZxPFdeRMbS/6u3azruYuEI
-gRPPKJmuAA/avInAUpnsbGE+6iTFKghu9kGyhJrR5eHIrU67OEgrid71Kljkpu/b
-SJvvP85QGdhe+YihBupZgi8iB18B34gEFpToAhRNaApttIq0T0TY9KAaaOEOAC/8
-AGDW+z+xe3AzGZYihgzb499WV9jvmFry1fKMb+uOkCUHhBFwtMYKD+KtGTQ0DAGe
-zrmNMgvRqV355NU7CAaDPeuJ9db7QQ==
-=oH5h
------END PGP SIGNATURE-----
-
---JWgvyY9ZM437gPLC0XGWPRF3x91cgKQan--
-
+--000000000000941b3105a1abf58b--
 
