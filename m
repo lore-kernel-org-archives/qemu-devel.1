@@ -2,80 +2,88 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9562CC1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C1FC43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:38:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68FA220714
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:32:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68FA220714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2E32620714
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 09:38:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E32620714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH2Oo-0001we-Ih
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 05:32:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53728)
+	id 1jH2UR-0004Y0-BV
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 05:38:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jH2NS-0000yF-BA
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:31:11 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jH2Ts-00048K-73
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jH2NQ-0008H9-Pf
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:31:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40040)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jH2NQ-0008G2-KF
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:31:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jH2NP-0008GD-0H
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 09:31:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F05AA2E80C3
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 09:31:06 +0000 (UTC)
-MIME-Version: 1.0
+ (envelope-from <yi.l.liu@intel.com>) id 1jH2Tq-0007n7-Sm
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:37:47 -0400
+Received: from mga05.intel.com ([192.55.52.43]:46667)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jH2Tq-0007ju-KN
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 05:37:46 -0400
+IronPort-SDR: 09Q6RSJNOeaPWzEQSwdkgdm79p6JbIUdp5uSVpBnTRdUL+WZp6XBdw6KYe3VgoCaeMM5bWsepe
+ DEeRwE9jL9wg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Mar 2020 02:37:41 -0700
+IronPort-SDR: vhPjM/cowDlQDWyPp9g8cDTlRnVOlTcGWufI14tK3cz67FB29nlKsk1CIcqtF35xUflW9rwh1d
+ xZn0wNGBUPHQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; d="scan'208";a="393574042"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by orsmga004.jf.intel.com with ESMTP; 25 Mar 2020 02:37:41 -0700
+Received: from fmsmsx158.amr.corp.intel.com (10.18.116.75) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 02:37:41 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ fmsmsx158.amr.corp.intel.com (10.18.116.75) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 02:37:41 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.155]) with mapi id 14.03.0439.000;
+ Wed, 25 Mar 2020 17:37:37 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH v1 07/22] intel_iommu: add set/unset_iommu_context callback
+Thread-Topic: [PATCH v1 07/22] intel_iommu: add set/unset_iommu_context
+ callback
+Thread-Index: AQHWAEW1iID+2pWxMk+TzTXpt3GsyKhWLYeAgAFYgbD//9PfAIABtbwQ
+Date: Wed, 25 Mar 2020 09:37:37 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A201DFC@SHSMSX104.ccr.corp.intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-8-git-send-email-yi.l.liu@intel.com>
+ <20200323212911.GQ127076@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A20041A@SHSMSX104.ccr.corp.intel.com>
+ <20200324152416.GV127076@xz-x1>
+In-Reply-To: <20200324152416.GV127076@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Mar 2020 09:25:36 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1868116@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Triaged; importance=High; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
- server-next
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: egmont-gmail leozinho29-eu paelzer
-X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158512833618.16008.3084489727309273836.malone@gac.canonical.com>
-Subject: [Bug 1868116] Re: QEMU monitor no longer works
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 96ed93164c17ba08020065e81ffba5a8676748a8
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,144 +92,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm not really a UI guy, so I was checking what I might have lost by disabl=
-ing VTE and found the very old [1]. That list of features really seems to m=
-ake disabling VTE not an real option:
-  "It's also screen reader accessible, supports copy/paste, proper scrollin=
-g and
-   most of the other features you would expect from a terminal widget."
-
-After seeing that Cole authored the "drop PTY" [3] patch I have
-subscribed him here as well.
-
-I have tried to answer and ask a few questions on the VTE issue [2] to
-get it make progress, but it would really benefit getting the attention
-of Gerhard and Cole (or anyone else who feels the UI-power).
-
-[1]: https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dd861def367b516055dc4=
-c46dc1305143ee653c84
-[2]: https://gitlab.gnome.org/GNOME/vte/issues/222
-[3]: https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dd4370741402a97b8b6d0=
-c38fef18ab38bf25ab22
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1868116
-
-Title:
-  QEMU monitor no longer works
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-Status in vte2.91 package in Ubuntu:
-  New
-
-Bug description:
-  Repro:
-  VTE
-  $ meson _build && ninja -C _build && ninja -C _build install
-
-  qemu:
-  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
-r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
--enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
-sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
--disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
-disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
-opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
-irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
--pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
-vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
-sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
-le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
-e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
-utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
--disable-cap-ng
-  $ make
-
-  Test:
-  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
-uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
-le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
-rent/images/netboot/mini.iso
-  - switch to monitor with CTRL+ALT+2
-  - try to enter something
-
-  Affects head of both usptream git repos.
-
-  =
-
-  --- original bug ---
-
-  It was observed that the QEMU console (normally accessible using
-  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
-  problematic because there are cases where it's required to send
-  commands to the guest, or key combinations that the host would grab
-  (as Ctrl-Alt-F1 or Alt-F4).
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 20.04
-  Package: qemu 1:4.2-3ubuntu2
-  Uname: Linux 5.6.0-rc6+ x86_64
-  ApportVersion: 2.20.11-0ubuntu20
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Thu Mar 19 12:16:31 2020
-  Dependencies:
-
-  InstallationDate: Installed on 2017-06-13 (1009 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine:
-  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
-  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
-86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
-,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
-home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
-  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
--re]
-  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
-5]
-  MachineType: LENOVO 80UG
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
-4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
-rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
-ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
-enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
-7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
-scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
-_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
-  dmi.bios.date: 08/09/2018
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN45WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFR1ZXNkYXksIE1h
+cmNoIDI0LCAyMDIwIDExOjI0IFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNv
+bT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MSAwNy8yMl0gaW50ZWxfaW9tbXU6IGFkZCBzZXQv
+dW5zZXRfaW9tbXVfY29udGV4dCBjYWxsYmFjaw0KPiANCj4gT24gVHVlLCBNYXIgMjQsIDIwMjAg
+YXQgMTE6MTU6MjRBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4gDQo+
+ID4gPiA+ICBzdHJ1Y3QgVlRESU9UTEJFbnRyeSB7DQo+ID4gPiA+IEBAIC0yNzEsNiArMjgyLDgg
+QEAgc3RydWN0IEludGVsSU9NTVVTdGF0ZSB7DQo+ID4gPiA+ICAgICAgLyoNCj4gPiA+ID4gICAg
+ICAgKiBQcm90ZWN0cyBJT01NVSBzdGF0ZXMgaW4gZ2VuZXJhbC4gIEN1cnJlbnRseSBpdCBwcm90
+ZWN0cyB0aGUNCj4gPiA+ID4gICAgICAgKiBwZXItSU9NTVUgSU9UTEIgY2FjaGUsIGFuZCBjb250
+ZXh0IGVudHJ5IGNhY2hlIGluIFZUREFkZHJlc3NTcGFjZS4NCj4gPiA+ID4gKyAgICAgKiBQcm90
+ZWN0IHRoZSB1cGRhdGUvdXNhZ2Ugb2YgSG9zdElPTU1VQ29udGV4dCBwb2ludGVyIGNhY2hlZCBp
+bg0KPiA+ID4gPiArICAgICAqIFZUREJ1cy0+ZGV2X2ljeCBhcnJheSBhcyBhcnJheSBlbGVtZW50
+cyBtYXkgYmUgdXBkYXRlZCBieQ0KPiA+ID4gPiArIGhvdHBsdWcNCj4gPiA+DQo+ID4gPiBJIHRo
+aW5rIHRoZSBjb250ZXh0IHVwZGF0ZSBkb2VzIG5vdCBuZWVkIHRvIGJlIHVwZGF0ZWQsIGJlY2F1
+c2UgdGhleQ0KPiA+ID4gc2hvdWxkIGFsd2F5cyBiZSB3aXRoIHRoZSBCUUwsIHJpZ2h0Pw0KPiA+
+DQo+ID4gSG1tbW0sIG1heWJlIEkgdXNlZCBiYWQgZGVzY3JpcHRpb24uIE15IHB1cnBvc2UgaXMg
+dG8gcHJvdGVjdCB0aGUNCj4gPiBzdG9yZWQgSG9zdElPTU1VQ29udGV4dCBwb2ludGVyIGluIHZJ
+T01NVS4gV2l0aA0KPiA+IHBjaV9kZXZpY2Vfc2V0L3Vuc2V0X2lvbW11X2NvbnRleHQsDQo+ID4g
+dklPTU1VIGhhdmUgYSBjb3B5IG9mIEhvc3RJT01NVUNvbnRleHQuIElmIFZGSU8gY29udGFpbmVy
+IGlzIHJlbGVhc2VkDQo+ID4gKGUuZy4gaG90cHVsZyBvdXQgZGV2aWNlKSwgSG9zdElPTU1VQ29u
+dGV4dCB3aWxsIGFsb3MgYmUgcmVsZWFzZWQuDQo+ID4gVGhpcyB3aWxsIHRyaWdnZXIgdGhlIHBj
+aV9kZXZpY2VfdW5zZXRfaW9tbXVfY29udGV4dCgpIHRvIGNsZWFuIHRoZQ0KPiA+IGNvcHkuIFRv
+IGF2b2lkIHVzaW5nIGEgc3RhbGVkIEhvc3RJT01NVUNvbnRleHQgaW4gdklPTU1VLCB2SU9NTVUN
+Cj4gPiBzaG91bGQgaGF2ZSBhIGxvY2sgdG8gYmxvY2sgdGhlIHBjaV9kZXZpY2VfdW5zZXRfaW9t
+bXVfY29udGV4dCgpDQo+ID4gY2FsbGluZyB1bnRpbCBvdGhlciB0aHJlYWRzIGZpbmlzaGVkIHRo
+ZWlyIEhvc3RJT01NVUNvbnRleHQgdXNhZ2UuIERvDQo+ID4geW91IHdhbnQgYSBkZXNjcmlwdGlv
+biB1cGRhdGUgaGVyZSBvciBvdGhlciBwcmVmZXJlbmNlPw0KPiANCj4gWWVhaCwgYnV0IGhvdCBw
+bHVnL3VucGx1ZyB3aWxsIHN0aWxsIHRha2UgdGhlIEJRTD8NCj4NCj4gQWggYnR3IEkgdGhpbmsg
+aXQncyBhbHNvIE9LIHRvIHRha2UgdGhlIGxvY2sgaWYgeW91IHdhbnQgb3Igbm90IHN1cmUgYWJv
+dXQgd2hldGhlcg0KPiB3ZSdsbCBhbHdheXMgdGFrZSB0aGUgQlFMIGluIHRoZXNlIHBhdGhzLiAN
+Cg0KSSBndWVzcyBiZXR0ZXIgdG8gaGF2ZSBhbiBpbnRlcm5hbCBzeW5jIHRvIGF2b2lkIHJlZmVy
+ZW5jZSBzdGFsZXMgSG9zdElPTU1VQ29udGV4dC4gOi0pDQoNCj4gQnV0IGlmIHNvLCBpbnN0ZWFk
+IG9mIGFkZGluZyBhbm90aGVyDQo+ICJQcm90ZWN0IHRoZSAuLi4iIHNlbnRlbmNlIHRvIHRoZSBj
+b21tZW50LCB3b3VsZCB5b3UgbWluZCBsaXN0IG91dCB3aGF0IHRoZSBsb2NrIGlzDQo+IHByb3Rl
+Y3Rpbmc/DQo+IA0KPiAgIC8qDQo+ICAgICogaW9tbXVfbG9jayBwcm90ZWN0czoNCj4gICAgKiAt
+IHBlci1JT01NVSBJT1RMQiBjYWNoZXMNCj4gICAgKiAtIGNvbnRleHQgZW50cnkgY2FjaGVzDQo+
+ICAgICogLSAuLi4NCj4gICAgKi8NCj4gDQo+IE9yIGFueXRoaW5nIGJldHRlciB0aGFuIHRoYXQu
+ICBUaGFua3MsDQoNCkl0IGxvb2tzIGdvb2QgdG8gbWUuIExldCBtZSB1cGRhdGUgaXQgaW4gbmV4
+dCB2ZXJzaW9uLg0KDQpSZWdhcmRzLA0KWWkgTGl1DQo=
 
