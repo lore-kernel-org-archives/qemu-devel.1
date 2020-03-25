@@ -2,93 +2,98 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E717DC1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 427E0C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:07:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B88C920777
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F22B2073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:07:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0iwp+c5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B88C920777
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DblV9ggG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F22B2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH9Ri-00055h-Ro
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:04:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56879)
+	id 1jH9Ug-0007lj-7R
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:07:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57243)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jH9Qo-0004Bu-7o
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:03:07 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jH9U0-0007MG-Gn
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jH9Qm-000620-Qx
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:03:05 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:48337)
+ (envelope-from <pbonzini@redhat.com>) id 1jH9Ty-000786-Sh
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:06:23 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:31030)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jH9Qm-00061g-Iw
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:03:04 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jH9Ty-00077U-PT
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:06:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585155783;
+ s=mimecast20190719; t=1585155981;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kiHmGKF0kvAkNrfI0xhN7LIgyJG0vefdgpUYFKoz6SM=;
- b=Y0iwp+c5xQR4JktAL1mpBB9ZiySTDAsD8AiD3ReGTW+vliYxXkawDf2HEtFgBSR8YXefts
- jZRywxgk1hy41N+C93jJIAlCqlIDVwRmzxPegHpf3SFgt+SxGorz+nf3AkOPkBvhQEixzG
- UsIaigPUK7gno9qaOiKKOwjjuDXp6zw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-irJV9QUIOsy9k6LHcSXT1Q-1; Wed, 25 Mar 2020 13:03:01 -0400
-X-MC-Unique: irJV9QUIOsy9k6LHcSXT1Q-1
-Received: by mail-wr1-f72.google.com with SMTP id y1so321515wrp.5
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 10:03:01 -0700 (PDT)
+ bh=D6MZTLUVdzjB9KzFwTpQPyOT21rUs2UBLLOryw7w4hQ=;
+ b=DblV9ggGcRrUr/ZaJMhSMR3irs7+NnTl5620N6i59EN+Tl7x+Q1vQQ+kzx5V8H++25BP8q
+ ZlpVLbhu0yZaz37o/xw1Zek8PxG8moq/2QBj6c2YWpkHzaaR70TIhpgqVcrKs2sX7IV5cH
+ BNryO44AbVHuVSVTbY5XK0+WI6BEh4I=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-hI69kycDNiO2_MsFz0-RAQ-1; Wed, 25 Mar 2020 13:06:20 -0400
+X-MC-Unique: hI69kycDNiO2_MsFz0-RAQ-1
+Received: by mail-wr1-f69.google.com with SMTP id v6so1417933wrg.22
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 10:06:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=j8l8OJCJqcgtQ0rfT4C7wvtihZsb2kNdO3jh6r/nrbw=;
- b=gUpB5a80xAA073QwUzLaURP0Cp0XxR6Gh5HXQnMIMLDoZKTLPFxlqqF1pfUw36JU88
- Lwt1/Xz8qkAXFDb3kjyBBZWi23B0YoXwXnUPRWkM1TWjE+Eu3n5nSd3r8xZQTXad7bCy
- /Lgp9p8vnFcHqQaS0uixdPWLtZeMlMKtINHeQaHuqoTkdkvSrIDB8yyS+kKu0bNcm7UO
- dKvbygIMJ8j3UIVVm06EixM9J4Xb6hNMjOQ/MbYCts6/oTcpx7Dxg9xN0vpBTpnplpxc
- A+6zqmsi0caGURx+NYLqgMG/Zz7XoPhjTSjAf+XYgRc8l/EkJ4az/E6mZsla+qBjBQQX
- 8Y+g==
-X-Gm-Message-State: ANhLgQ12U4PbLLMiB+EOBrZNfoDjECLyY27hX1S48i3wYk/GWnp+LY8X
- LhFXNFOsEhSoExGu5PHG7+4LfYMXKTpcOHTNnyQR0wNwpNyHlHdyKxPvDfpzcFNhXQbwmryc5lw
- /YDjoa+5OZHcaosg=
-X-Received: by 2002:adf:aa92:: with SMTP id h18mr4533671wrc.139.1585155780139; 
- Wed, 25 Mar 2020 10:03:00 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvGpkqY69t+Qzw8lOoTfgaK2lGtvUGrPBI6FmdUcwmG4HNgK6aD8yiGb54b8nEkhCcNS+i+Jg==
-X-Received: by 2002:adf:aa92:: with SMTP id h18mr4533655wrc.139.1585155779899; 
- Wed, 25 Mar 2020 10:02:59 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id y187sm10282980wmd.0.2020.03.25.10.02.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 10:02:58 -0700 (PDT)
-Date: Wed, 25 Mar 2020 13:02:56 -0400
-From: Peter Xu <peterx@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH RFC 3/9] memory: Introduce log_sync_global() to memory
- listener
-Message-ID: <20200325170256.GG354390@xz-x1>
-References: <20200205141749.378044-1-peterx@redhat.com>
- <20200205141749.378044-4-peterx@redhat.com>
- <20200325165252.GB2635@work-vm>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pwT4L0xQEq0vVd2SKs/7n542AYUEOH6wbOQLpPWXPUU=;
+ b=PbHsMfredpHB7JJ7nld7zfPWrzKl8hF80ZTdESFfnvKjpFSQURbS4/0AKDr2xF2UYX
+ 0j7ge5pNtf7N/1XrgU9Wbjf0saO0qNr0yvLqzc150LOL5h4qEplPNNEdBxeUzv1Mb2gL
+ GdcNV8pcBv7gFG7J+uIKx1FnCBwhXSQicCoCagSOzN4V86auaoc1cuM7/abjyM9HNzcH
+ YnOb+RRZDh1vwjPEmEAdbOXfmESUMOOMnqVFM1pS5DgLsKNBeReu1fOoocrYt3v8BneB
+ qzZAC5jlwiRbzzcP3igUWGPSpwG0EaCAMu1Bq47yPcKi+IHx1mTwIz7QZyaN5COHqLzq
+ QMZA==
+X-Gm-Message-State: ANhLgQ0DaT3aE3MY4gINmAWbLUjnPAG9Fx9DoBlLRb0Ql4f61atNua/e
+ 9G6Yjp8CEkOs5el/Dva2bbP7h9K+JxWwZns8RHu3J88f28LOLVH1OMRUedBrIKzvyc1C71IB84I
+ O5naR8NvA1kR/iIg=
+X-Received: by 2002:adf:ee52:: with SMTP id w18mr4409061wro.245.1585155978844; 
+ Wed, 25 Mar 2020 10:06:18 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtnMpTem0YSaUUP4LajzNrRho/q4mZgXjksdRCkU+m9beceoLSlp/PGv7hJE3Y4Ui4lCyYaJg==
+X-Received: by 2002:adf:ee52:: with SMTP id w18mr4409038wro.245.1585155978558; 
+ Wed, 25 Mar 2020 10:06:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e4f4:3c00:2b79:d6dc?
+ ([2001:b07:6468:f312:e4f4:3c00:2b79:d6dc])
+ by smtp.gmail.com with ESMTPSA id r17sm5880306wrx.46.2020.03.25.10.06.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 25 Mar 2020 10:06:17 -0700 (PDT)
+Subject: Re: [PATCH v3] piix: fix xenfv regression, add compat machine
+ xenfv-qemu4
+To: Olaf Hering <olaf@aepfle.de>
+References: <20200113174521.3336-1-olaf@aepfle.de>
+ <20200325064736.22416-1-olaf@aepfle.de>
+ <9123dcfd-862f-8986-b728-f4b3d806aea6@redhat.com>
+ <20200325164522.39869e56.olaf@aepfle.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ce1dd710-7818-3883-183e-73e7cfbf22d5@redhat.com>
+Date: Wed, 25 Mar 2020 18:06:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200325165252.GB2635@work-vm>
+In-Reply-To: <20200325164522.39869e56.olaf@aepfle.de>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,44 +107,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 25, 2020 at 04:52:52PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Some of the memory listener may want to do log synchronization without
-> > being able to specify a range of memory to sync but always globally.
-> > Such a memory listener should provide this new method instead of the
-> > log_sync() method.
-> >=20
-> > Obviously we can also achieve similar thing when we put the global
-> > sync logic into a log_sync() handler. However that's not efficient
-> > enough because otherwise memory_global_dirty_log_sync() may do the
-> > global sync N times, where N is the number of flat views.
-> >=20
-> > Make this new method be exclusive to log_sync().
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
+On 25/03/20 16:45, Olaf Hering wrote:
+>> hw_compat_3_1 and pc_compat_3_1
+> I have asked about this earlier, so again:
 >=20
-> OK, so I guess the idea here is that when you have a ring with dirty
-> pages on it, you just need to clear all outstanding things on the ring
-> whereever they came from.
+> What do all these arrays do in the context of 'xenfv' to the emulated sys=
+tem?
 
-Yeah, or say it's about granularity of log_sync(), and the ring layout
-will only be able to sync in a global manner rather than per-memslot.
-It's actually not good when we only want to sync some specific small
-memory region (e.g., the VGA code wants to only sync the VGA ram), but
-we don't have much choice...
+They change the hardware and CPU features that is presented to the VMs,
+if the respective devices are included in the virtual machine.  For
+example USB devices will have a different serial number on 3.1 and 5.0,
+and VGA devices present EDID information on 4.1+.
 
->=20
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks!
-
---=20
-Peter Xu
+Paolo
 
 
