@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE62AC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 125D5C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:58:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 676B6206F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:57:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDCAD206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LmjG5TZ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 676B6206F6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PVmJn5G2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCAD206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH3jK-0006Y7-DD
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:57:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37487)
+	id 1jH3jv-0007Hv-Vq
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:58:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3iA-0004yN-Ix
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:56:39 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3iV-0005Zl-DQ
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3i9-00018j-4D
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:56:38 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47282)
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3iU-0001Xh-7D
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:56:59 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:46245)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3i9-00018Q-05
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:56:37 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3iU-0001XM-3v
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:56:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585133796;
+ s=mimecast20190719; t=1585133817;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=A8z/q2u2Z/Whrr4ulRGRiL3k3gIy/ezdLB2LW90jl2E=;
- b=LmjG5TZ7NPDaotkDq2vj81OHZKoRKTFviBOZy8CZuppV2yoYpJpkIjVmejDLzh8lQ8c97S
- wPoQQMj7XderdTipHoPiU9ns+qn9AbXjafxVQWx96W5neXjCeBtQokd96oOKmJZO0rBowY
- RHcjIWAqlXOIyNwkLFRHR8LBQhmplBs=
+ bh=gdAs4D5H6p2LmwnmJAvi/+zpP9bvny/E7lPhY6MUwCc=;
+ b=PVmJn5G2jtN/4t/P+gjmczoCYweW+JwrvqFLNiZMsiikrS/l460tAfW61WaptyPmcjnIcf
+ hCQNCLYAz6+pwsqY//ZN25sbH/br2CL6Wom4brdjQe0cdl/BzOsS4+YUD4BFvGay6gc2l0
+ qac4LzOsosjWORX252XCBTL++K8rZfU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-fikWqlanOhOBtB_gP6KVUg-1; Wed, 25 Mar 2020 06:56:35 -0400
-X-MC-Unique: fikWqlanOhOBtB_gP6KVUg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-404-qftK3qVMPDOZ70p3sPp9PQ-1; Wed, 25 Mar 2020 06:56:54 -0400
+X-MC-Unique: qftK3qVMPDOZ70p3sPp9PQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A23A4189D6C7;
- Wed, 25 Mar 2020 10:56:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0FA81851C37;
+ Wed, 25 Mar 2020 10:56:52 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CBFCB94B43;
- Wed, 25 Mar 2020 10:56:30 +0000 (UTC)
-Message-ID: <87f22f31c3f90293850f106f72eb12a118701355.camel@redhat.com>
-Subject: Re: [PATCH v6 28/42] nvme: verify validity of prp lists in the cmb
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C3D3B5D9C5;
+ Wed, 25 Mar 2020 10:56:50 +0000 (UTC)
+Message-ID: <27ff4b99b076e90ee7536a9c9063f10201a66096.camel@redhat.com>
+Subject: Re: [PATCH v6 29/42] nvme: refactor request bounds checking
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-Date: Wed, 25 Mar 2020 12:56:29 +0200
-In-Reply-To: <20200316142928.153431-29-its@irrelevant.dk>
+Date: Wed, 25 Mar 2020 12:56:49 +0200
+In-Reply-To: <20200316142928.153431-30-its@irrelevant.dk>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-29-its@irrelevant.dk>
+ <20200316142928.153431-30-its@irrelevant.dk>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,82 +95,81 @@ Sender: "Qemu-devel"
 On Mon, 2020-03-16 at 07:29 -0700, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Before this patch the device already supported this, but it did not
-> check for the validity of it nor announced the support in the LISTS
-> field.
-> 
-> If some of the PRPs in a PRP list are in the CMB, then ALL entries must
-> be there. This patch makes sure that is verified as well as properly
-> announcing support for PRP lists in the CMB.
-> 
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > ---
->  hw/block/nvme.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+>  hw/block/nvme.c | 28 ++++++++++++++++++++++------
+>  1 file changed, 22 insertions(+), 6 deletions(-)
 > 
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 850087aac967..eecfad694bf8 100644
+> index eecfad694bf8..ba520c76bae5 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -210,6 +210,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
->      trans_len = MIN(len, trans_len);
->      int num_prps = (len >> n->page_bits) + 1;
->      uint16_t status;
-> +    bool prp_list_in_cmb = false;
+> @@ -491,6 +491,20 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
+>      }
+>  }
 >  
->      trace_nvme_dev_map_prp(nvme_cid(req), trans_len, len, prp1, prp2,
->                             num_prps);
-> @@ -237,11 +238,16 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
->              status = NVME_INVALID_FIELD | NVME_DNR;
->              goto unmap;
->          }
+> +static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
+> +                                         uint64_t slba, uint32_t nlb,
+> +                                         NvmeRequest *req)
+> +{
+> +    uint64_t nsze = le64_to_cpu(ns->id_ns.nsze);
 > +
->          if (len > n->page_size) {
->              uint64_t prp_list[n->max_prp_ents];
->              uint32_t nents, prp_trans;
->              int i = 0;
+> +    if (unlikely(UINT64_MAX - slba < nlb || slba + nlb > nsze)) {
+> +        trace_nvme_dev_err_invalid_lba_range(slba, nlb, nsze);
+> +        return NVME_LBA_RANGE | NVME_DNR;
+> +    }
+> +
+> +    return NVME_SUCCESS;
+> +}
+Looks good.
+
+> +
+>  static void nvme_rw_cb(void *opaque, int ret)
+>  {
+>      NvmeRequest *req = opaque;
+> @@ -536,10 +550,11 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>      uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
+>      uint64_t offset = slba << data_shift;
+>      uint32_t count = nlb << data_shift;
+> +    uint16_t status;
 >  
-> +            if (nvme_addr_is_cmb(n, prp2)) {
-> +                prp_list_in_cmb = true;
-> +            }
-> +
->              nents = (len + n->page_size - 1) >> n->page_bits;
->              prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
->              nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
-> @@ -255,6 +261,11 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
->                          goto unmap;
->                      }
+> -    if (unlikely(slba + nlb > ns->id_ns.nsze)) {
+> -        trace_nvme_dev_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+> -        return NVME_LBA_RANGE | NVME_DNR;
+> +    status = nvme_check_bounds(n, ns, slba, nlb, req);
+> +    if (status) {
+> +        return status;
+>      }
 >  
-> +                    if (prp_list_in_cmb != nvme_addr_is_cmb(n, prp_ent)) {
-> +                        status = NVME_INVALID_USE_OF_CMB | NVME_DNR;
-> +                        goto unmap;
-> +                    }
-> +
->                      i = 0;
->                      nents = (len + n->page_size - 1) >> n->page_bits;
->                      prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
-> @@ -274,6 +285,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
->                  if (status) {
->                      goto unmap;
->                  }
-> +
->                  len -= trans_len;
->                  i++;
->              }
-> @@ -1931,7 +1943,7 @@ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+>      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+> @@ -562,13 +577,14 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>      uint64_t data_offset = slba << data_shift;
+>      int is_write = rw->opcode == NVME_CMD_WRITE ? 1 : 0;
+>      enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
+> +    uint16_t status;
 >  
->      NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
->      NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
-> -    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
-> +    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 1);
->      NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
->      NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
->      NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2);
+>      trace_nvme_dev_rw(is_write ? "write" : "read", nlb, data_size, slba);
+>  
+> -    if (unlikely((slba + nlb) > ns->id_ns.nsze)) {
+> +    status = nvme_check_bounds(n, ns, slba, nlb, req);
+> +    if (status) {
+>          block_acct_invalid(blk_get_stats(n->conf.blk), acct);
+> -        trace_nvme_dev_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+> -        return NVME_LBA_RANGE | NVME_DNR;
+> +        return status;
+>      }
+>  
+>      if (nvme_map(n, cmd, &req->qsg, &req->iov, data_size, req)) {
+Looks good as well, once we get support for discard, it will
+use this as well, but for now indeed only write zeros and read/write
+need bounds checking on the IO path.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
+
+
 
 
 
