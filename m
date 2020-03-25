@@ -6,96 +6,95 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00DF3C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0AEC54FCF
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1D582073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:39:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D582073E
+	by mail.kernel.org (Postfix) with ESMTPS id 7DF0D20774
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:40:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DF0D20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH87U-00028w-21
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:39:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44641)
+	id 1jH88P-0003o4-Jm
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:40:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <muriloo@linux.ibm.com>) id 1jH84S-0005jJ-My
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:57 -0400
+ (envelope-from <muriloo@linux.ibm.com>) id 1jH84M-0005Yh-JH
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <muriloo@linux.ibm.com>) id 1jH84R-0004eV-EX
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52126
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <muriloo@linux.ibm.com>) id 1jH84L-0004bq-1x
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36826)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
- id 1jH84R-0004e2-7F
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:55 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02PFYbT8017806; Wed, 25 Mar 2020 11:35:47 -0400
+ id 1jH84K-0004bV-Od
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:48 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02PFXOV0085914; Wed, 25 Mar 2020 11:35:38 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ywbuww8q8-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ywfe9xt72-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 11:35:47 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02PFZII5022468;
- Wed, 25 Mar 2020 11:35:46 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ywbuww8pd-1
+ Wed, 25 Mar 2020 11:35:38 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02PFXbqH087480;
+ Wed, 25 Mar 2020 11:35:37 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ywfe9xt67-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 11:35:46 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02PFZAZd029623;
- Wed, 25 Mar 2020 15:35:45 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma04dal.us.ibm.com with ESMTP id 2ywawg2wmw-1
+ Wed, 25 Mar 2020 11:35:37 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02PFZAIU030118;
+ Wed, 25 Mar 2020 15:35:35 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma02wdc.us.ibm.com with ESMTP id 2ywawk29uw-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 15:35:45 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02PFZimZ14549728
+ Wed, 25 Mar 2020 15:35:35 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02PFZYAG38666740
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 25 Mar 2020 15:35:44 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C5965112061;
- Wed, 25 Mar 2020 15:35:44 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1F891112062;
- Wed, 25 Mar 2020 15:35:43 +0000 (GMT)
+ Wed, 25 Mar 2020 15:35:34 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D3F7E78066;
+ Wed, 25 Mar 2020 15:35:34 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6AEDD7805E;
+ Wed, 25 Mar 2020 15:35:33 +0000 (GMT)
 Received: from localhost (unknown [9.85.207.6])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
- Wed, 25 Mar 2020 15:35:42 +0000 (GMT)
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Wed, 25 Mar 2020 15:35:33 +0000 (GMT)
 From: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.ibm.com>
 To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 07/15] util/mmap-alloc: Factor out calculation of the
- pagesize for the guard page
-Date: Wed, 25 Mar 2020 12:03:55 -0300
-Message-ID: <3833117.a91c8e1GSb@kermit.br.ibm.com>
+Subject: Re: [PATCH v4 11/15] util/mmap-alloc: Implement resizeable mmaps
+Date: Wed, 25 Mar 2020 12:14:18 -0300
+Message-ID: <1980751.AR6ZJhPLDG@kermit.br.ibm.com>
 Organization: IBM
-In-Reply-To: <20200305142945.216465-8-david@redhat.com>
+In-Reply-To: <20200305142945.216465-12-david@redhat.com>
 References: <20200305142945.216465-1-david@redhat.com>
- <20200305142945.216465-8-david@redhat.com>
+ <20200305142945.216465-12-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-25_07:2020-03-24,
+ definitions=2020-03-25_08:2020-03-24,
  2020-03-25 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 bulkscore=0
- adultscore=0 mlxscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
- suspectscore=1 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003250123
+ phishscore=0 impostorscore=0
+ suspectscore=1 malwarescore=0 adultscore=0 mlxlogscore=999 clxscore=1015
+ bulkscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003250124
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,7 +108,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
  "Michael S . Tsirkin" <mst@redhat.com>,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>, qemu-devel@nongnu.org,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
  Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
  Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
@@ -117,14 +117,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, March 5, 2020 11:29:37 AM -03 David Hildenbrand wrote:
-> Let's factor out calculating the size of the guard page and rename the
-> variable to make it clearer that this pagesize only applies to the
-> guard page.
+On Thursday, March 5, 2020 11:29:41 AM -03 David Hildenbrand wrote:
+> Implement resizeable mmaps. For now, the actual resizing is not wired up.
+> Introduce qemu_ram_mmap_resizeable() and qemu_ram_mmap_resize(). Make
+> qemu_ram_mmap() a wrapper of qemu_ram_mmap_resizeable().
 >
 > Reviewed-by: Peter Xu <peterx@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
 > Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
 > Cc: Greg Kurz <groug@kaod.org>
 > Cc: Eduardo Habkost <ehabkost@redhat.com>
 > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
@@ -134,95 +136,132 @@ On Thursday, March 5, 2020 11:29:37 AM -03 David Hildenbrand wrote:
 
 Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 
->  util/mmap-alloc.c | 31 ++++++++++++++++---------------
->  1 file changed, 16 insertions(+), 15 deletions(-)
+>  include/qemu/mmap-alloc.h | 21 +++++++++++--------
+>  util/mmap-alloc.c         | 43 ++++++++++++++++++++++++++++-----------
+>  2 files changed, 44 insertions(+), 20 deletions(-)
 >
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index e786266b92..ca8f7edf70 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -7,11 +7,13 @@ size_t qemu_fd_getpagesize(int fd);
+>  size_t qemu_mempath_getpagesize(const char *mem_path);
+>
+>  /**
+> - * qemu_ram_mmap: mmap the specified file or device.
+> + * qemu_ram_mmap_resizeable: reserve a memory region of @max_size to mmap
+> the + *                           specified file or device and mmap @size
+> of it. *
+>   * Parameters:
+>   *  @fd: the file or the device to mmap
+>   *  @size: the number of bytes to be mmaped
+> + *  @max_size: the number of bytes to be reserved
+>   *  @align: if not zero, specify the alignment of the starting mapping
+> address; *          otherwise, the alignment in use will be determined by
+> QEMU. *  @shared: map has RAM_SHARED flag.
+> @@ -21,12 +23,15 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
+>   *  On success, return a pointer to the mapped area.
+>   *  On failure, return MAP_FAILED.
+>   */
+> -void *qemu_ram_mmap(int fd,
+> -                    size_t size,
+> -                    size_t align,
+> -                    bool shared,
+> -                    bool is_pmem);
+> -
+> -void qemu_ram_munmap(int fd, void *ptr, size_t size);
+> +void *qemu_ram_mmap_resizeable(int fd, size_t size, size_t max_size,
+> +                              size_t align, bool shared, bool is_pmem);
+> +bool qemu_ram_mmap_resize(void *ptr, int fd, size_t old_size, size_t
+> new_size, +                          bool shared, bool is_pmem);
+> +static inline void *qemu_ram_mmap(int fd, size_t size, size_t align,
+> +                                  bool shared, bool is_pmem)
+> +{
+> +    return qemu_ram_mmap_resizeable(fd, size, size, align, shared,
+> is_pmem); +}
+> +void qemu_ram_munmap(int fd, void *ptr, size_t max_size);
+>
+>  #endif
 > diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index 27dcccd8ec..f0277f9fad 100644
+> index 2767caa33b..7ed85f16d3 100644
 > --- a/util/mmap-alloc.c
 > +++ b/util/mmap-alloc.c
-> @@ -82,17 +82,27 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
->      return qemu_real_host_page_size;
+> @@ -174,11 +174,8 @@ static inline size_t mmap_guard_pagesize(int fd)
+>  #endif
 >  }
 >
-> +static inline size_t mmap_guard_pagesize(int fd)
-> +{
-> +#if defined(__powerpc64__) && defined(__linux__)
-> +    /* Mappings in the same segment must share the same page size */
-> +    return qemu_fd_getpagesize(fd);
-> +#else
-> +    return qemu_real_host_page_size;
-> +#endif
-> +}
-> +
->  void *qemu_ram_mmap(int fd,
->                      size_t size,
->                      size_t align,
->                      bool shared,
->                      bool is_pmem)
+> -void *qemu_ram_mmap(int fd,
+> -                    size_t size,
+> -                    size_t align,
+> -                    bool shared,
+> -                    bool is_pmem)
+> +void *qemu_ram_mmap_resizeable(int fd, size_t size, size_t max_size,
+> +                               size_t align, bool shared, bool is_pmem)
 >  {
-> +    const size_t guard_pagesize = mmap_guard_pagesize(fd);
->      int flags;
->      int map_sync_flags = 0;
->      int guardfd;
->      size_t offset;
-> -    size_t pagesize;
->      size_t total;
->      void *guardptr;
->      void *ptr;
-> @@ -113,8 +123,7 @@ void *qemu_ram_mmap(int fd,
->       * anonymous memory is OK.
->       */
->      flags = MAP_PRIVATE;
-> -    pagesize = qemu_fd_getpagesize(fd);
-> -    if (fd == -1 || pagesize == qemu_real_host_page_size) {
-> +    if (fd == -1 || guard_pagesize == qemu_real_host_page_size) {
->          guardfd = -1;
->          flags |= MAP_ANONYMOUS;
->      } else {
-> @@ -123,7 +132,6 @@ void *qemu_ram_mmap(int fd,
->      }
->  #else
->      guardfd = -1;
-> -    pagesize = qemu_real_host_page_size;
->      flags = MAP_PRIVATE | MAP_ANONYMOUS;
->  #endif
+>      const size_t guard_pagesize = mmap_guard_pagesize(fd);
+>      const size_t pagesize = qemu_fd_getpagesize(fd);
+> @@ -186,12 +183,14 @@ void *qemu_ram_mmap(int fd,
+>      void *ptr, *guardptr;
 >
-> @@ -135,7 +143,7 @@ void *qemu_ram_mmap(int fd,
+>      g_assert(QEMU_IS_ALIGNED(size, pagesize));
+> +    g_assert(QEMU_IS_ALIGNED(max_size, pagesize));
 >
->      assert(is_power_of_2(align));
->      /* Always align to host page size */
-> -    assert(align >= pagesize);
-> +    assert(align >= guard_pagesize);
+>      /*
+>       * Note: this always allocates at least one extra page of virtual
+> address -     * space, even if size is already aligned.
+> +     * space, even if the size is already aligned. We will reserve an area
+> of +     * at least max_size, but only activate the requested part of it.
+> */
+> -    total = size + align;
+> +    total = max_size + align;
 >
->      flags = MAP_FIXED;
->      flags |= fd == -1 ? MAP_ANONYMOUS : 0;
-> @@ -189,8 +197,8 @@ void *qemu_ram_mmap(int fd,
+>      guardptr = mmap_reserve(NULL, total, fd);
+>      if (guardptr == MAP_FAILED) {
+> @@ -219,21 +218,41 @@ void *qemu_ram_mmap(int fd,
 >       * a guard page guarding against potential buffer overflows.
 >       */
 >      total -= offset;
-> -    if (total > size + pagesize) {
-> -        munmap(ptr + size + pagesize, total - size - pagesize);
-> +    if (total > size + guard_pagesize) {
-> +        munmap(ptr + size + guard_pagesize, total - size - guard_pagesize);
-> }
+> -    if (total > size + guard_pagesize) {
+> -        munmap(ptr + size + guard_pagesize, total - size - guard_pagesize);
+> +    if (total > max_size + guard_pagesize) {
+> +        munmap(ptr + max_size + guard_pagesize,
+> +               total - max_size - guard_pagesize);
+>      }
 >
 >      return ptr;
-> @@ -198,15 +206,8 @@ void *qemu_ram_mmap(int fd,
+>  }
 >
->  void qemu_ram_munmap(int fd, void *ptr, size_t size)
+> -void qemu_ram_munmap(int fd, void *ptr, size_t size)
+> +bool qemu_ram_mmap_resize(void *ptr, int fd, size_t old_size, size_t
+> new_size, +                          bool shared, bool is_pmem)
 >  {
-> -    size_t pagesize;
-> -
+>      const size_t pagesize = qemu_fd_getpagesize(fd);
+>
+> -    g_assert(QEMU_IS_ALIGNED(size, pagesize));
+> +    g_assert(QEMU_IS_ALIGNED(old_size, pagesize));
+> +    g_assert(QEMU_IS_ALIGNED(new_size, pagesize));
+> +
+> +    if (old_size < new_size) {
+> +        /* activate the missing piece in the reserved area */
+> +        ptr = mmap_activate(ptr + old_size, new_size - old_size, fd,
+> old_size, +                            shared, is_pmem);
+> +    } else if (old_size > new_size) {
+> +        /* discard this piece, marking it reserved */
+> +        ptr = mmap_reserve(ptr + new_size, old_size - new_size, fd);
+> +    }
+> +    return ptr != MAP_FAILED;
+> +}
+> +
+> +void qemu_ram_munmap(int fd, void *ptr, size_t max_size)
+> +{
+> +    const size_t pagesize = qemu_fd_getpagesize(fd);
+> +
+> +    g_assert(QEMU_IS_ALIGNED(max_size, pagesize));
+>
 >      if (ptr) {
 >          /* Unmap both the RAM block and the guard page */
-> -#if defined(__powerpc64__) && defined(__linux__)
-> -        pagesize = qemu_fd_getpagesize(fd);
-> -#else
-> -        pagesize = qemu_real_host_page_size;
-> -#endif
-> -        munmap(ptr, size + pagesize);
-> +        munmap(ptr, size + mmap_guard_pagesize(fd));
+> -        munmap(ptr, size + mmap_guard_pagesize(fd));
+> +        munmap(ptr, max_size + mmap_guard_pagesize(fd));
 >      }
 >  }
 
