@@ -2,79 +2,77 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5B9C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 05:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 774ABC1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 05:43:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EEF520774
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 05:32:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EEF520774
+	by mail.kernel.org (Postfix) with ESMTPS id 401FC20777
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 05:43:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 401FC20777
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jGyeU-00022I-6R
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 01:32:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57102)
+	id 1jGypI-0003mc-Fi
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 01:43:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57994)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin.tian@intel.com>) id 1jGydW-0001cM-9l
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 01:31:53 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1jGyof-0003Mm-Gr
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 01:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1jGydS-0006x4-5j
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 01:31:29 -0400
-Received: from mga04.intel.com ([192.55.52.120]:12368)
+ (envelope-from <chen.zhang@intel.com>) id 1jGyod-0004Qd-NO
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 01:43:01 -0400
+Received: from mga12.intel.com ([192.55.52.136]:10971)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1jGydR-0006tt-Nm
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 01:31:26 -0400
-IronPort-SDR: br1X5t9UXDKQYUU68+pWpiBJDh0tKRgcWeIocR2ZHBI6d22CHaYLN9b4zoSrdGwjxpJpHkmDO2
- otrAL/YtXMPA==
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1jGyod-0004K3-F3
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 01:42:59 -0400
+IronPort-SDR: OTUcuR4JM/79/8s/JjP+l4KMZBHVM3LOoqRHVSdifQg+13GBTMLFvLffaSK/PJjy6io47Hr0Fr
+ sTFlA36g3pAw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 24 Mar 2020 22:31:16 -0700
-IronPort-SDR: FZLICKY7XSOBzu9GLXAw0kmFh2MjtGBT6Hq6yhuQdZu5jGyIj+tDMC8TtxMbpQtv89HALUvSHD
- HxC9yKMGhgHw==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 24 Mar 2020 22:42:55 -0700
+IronPort-SDR: Gasm0RWK8wEVBnQvcQ73BUz5CGLLT+kjWEHMy7LFvOa3n/UTiYLPaBKqJ4A2OGu+OCt7TzsaH5
+ gv+2BBVH3YlA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; d="scan'208";a="270692717"
+X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; d="scan'208";a="446515187"
 Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga004.fm.intel.com with ESMTP; 24 Mar 2020 22:31:16 -0700
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
+ by fmsmga005.fm.intel.com with ESMTP; 24 Mar 2020 22:42:55 -0700
+Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
  fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 24 Mar 2020 22:31:16 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 24 Mar 2020 22:31:16 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.43]) with mapi id 14.03.0439.000;
- Wed, 25 Mar 2020 13:31:13 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alex Williamson
- <alex.williamson@redhat.com>
-Subject: RE: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Thread-Topic: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Thread-Index: AQHV/jAV21NxZGgpXU6dz1wdFLv9bqhQAO0AgAE8UwCAAAN2gIAAC00AgAAExwCABKT1gIAADgYAgAABzACAAIjsAIAAwk4AgABgwwCAARv/QA==
-Date: Wed, 25 Mar 2020 05:31:13 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7E8F15@SHSMSX104.ccr.corp.intel.com>
-References: <20200319165704.1f4eb36a@w520.home>
- <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
- <20200320120137.6acd89ee@x1.home>
- <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
- <20200320125910.028d7af5@w520.home>
- <7062f72a-bf06-a8cd-89f0-9e729699a454@nvidia.com>
- <20200323124448.2d3bc315@w520.home> <20200323185114.GF3017@work-vm>
- <20200324030118.GD5456@joy-OptiPlex-7040>
- <20200324083644.36494641@w520.home> <20200324202304.GJ2645@work-vm>
-In-Reply-To: <20200324202304.GJ2645@work-vm>
+ id 14.3.439.0; Tue, 24 Mar 2020 22:42:55 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 25 Mar 2020 13:42:52 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Wed, 25 Mar 2020 13:42:52 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Derek Su <jwsu1986@gmail.com>
+Subject: RE: [PATCH v2 1/1] net/colo-compare.c: Fix memory leak in
+ packet_enqueue()
+Thread-Topic: [PATCH v2 1/1] net/colo-compare.c: Fix memory leak in
+ packet_enqueue()
+Thread-Index: AQHWAHITxBU5D7mjSkWbPnpdLQyVtKhWi7uA///6NgCAAgGA0P//hVGAgAAkogCAAJ4MoA==
+Date: Wed, 25 Mar 2020 05:42:52 +0000
+Message-ID: <3ceb0c3014b84657bd9b3b2d28183ad1@intel.com>
+References: <20200322174751.12559-1-dereksu@qnap.com>
+ <20200322174751.12559-2-dereksu@qnap.com>
+ <883bf4e2916f43baa6700f98bbb85523@intel.com>
+ <CAFKS8hUJ34Qh7gsggtbVM6GU4hLEn_xBLFM7X5mQrsmQg-Yc7w@mail.gmail.com>
+ <2046ed570c754e25ae2b8d5c6c48de2f@intel.com>
+ <CAFKS8hXUTYxsHsTgh5cntHL3hMyp-9q9B53d110VipF2BR8_Hg@mail.gmail.com>
+ <CAFKS8hVA45jTVGTGtGrHKJJcXJsT2uaJ4yxs_60fRtqvG_xzyw@mail.gmail.com>
+In-Reply-To: <CAFKS8hVA45jTVGTGtGrHKJJcXJsT2uaJ4yxs_60fRtqvG_xzyw@mail.gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -82,12 +80,12 @@ X-MS-TNEF-Correlator:
 dlp-product: dlpe-windows
 dlp-version: 11.2.0.6
 dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.120
+X-Received-From: 192.55.52.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,368 +97,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "Liu, Yi
- L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: "dereksu@qnap.com" <dereksu@qnap.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "lizhijian@cn.fujitsu.com" <lizhijian@cn.fujitsu.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Sent: Wednesday, March 25, 2020 4:23 AM
->=20
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > On Mon, 23 Mar 2020 23:01:18 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >
-> > > On Tue, Mar 24, 2020 at 02:51:14AM +0800, Dr. David Alan Gilbert wrot=
-e:
-> > > > * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > > > > On Mon, 23 Mar 2020 23:24:37 +0530
-> > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > >
-> > > > > > On 3/21/2020 12:29 AM, Alex Williamson wrote:
-> > > > > > > On Sat, 21 Mar 2020 00:12:04 +0530
-> > > > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >
-> > > > > > >> On 3/20/2020 11:31 PM, Alex Williamson wrote:
-> > > > > > >>> On Fri, 20 Mar 2020 23:19:14 +0530
-> > > > > > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >>>
-> > > > > > >>>> On 3/20/2020 4:27 AM, Alex Williamson wrote:
-> > > > > > >>>>> On Fri, 20 Mar 2020 01:46:41 +0530
-> > > > > > >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >>>>>
-> > > > > > >>
-> > > > > > >> <snip>
-> > > > > > >>
-> > > > > > >>>>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu
-> *iommu, dma_addr_t iova,
-> > > > > > >>>>>> +				  size_t size, uint64_t pgsize,
-> > > > > > >>>>>> +				  u64 __user *bitmap)
-> > > > > > >>>>>> +{
-> > > > > > >>>>>> +	struct vfio_dma *dma;
-> > > > > > >>>>>> +	unsigned long pgshift =3D __ffs(pgsize);
-> > > > > > >>>>>> +	unsigned int npages, bitmap_size;
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	dma =3D vfio_find_dma(iommu, iova, 1);
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	if (!dma)
-> > > > > > >>>>>> +		return -EINVAL;
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	if (dma->iova !=3D iova || dma->size !=3D size)
-> > > > > > >>>>>> +		return -EINVAL;
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	npages =3D dma->size >> pgshift;
-> > > > > > >>>>>> +	bitmap_size =3D DIRTY_BITMAP_BYTES(npages);
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	/* mark all pages dirty if all pages are pinned and
-> mapped. */
-> > > > > > >>>>>> +	if (dma->iommu_mapped)
-> > > > > > >>>>>> +		bitmap_set(dma->bitmap, 0, npages);
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	if (copy_to_user((void __user *)bitmap, dma-
-> >bitmap, bitmap_size))
-> > > > > > >>>>>> +		return -EFAULT;
-> > > > > > >>>>>
-> > > > > > >>>>> We still need to reset the bitmap here, clearing and re-a=
-dding
-> the
-> > > > > > >>>>> pages that are still pinned.
-> > > > > > >>>>>
-> > > > > > >>>>>
-> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
-> > > > > > >>>>>
-> > > > > > >>>>
-> > > > > > >>>> I thought you agreed on my reply to it
-> > > > > > >>>> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-
-> f72b671fe703@nvidia.com/
-> > > > > > >>>>
-> > > > > > >>>>    > Why re-populate when there will be no change since
-> > > > > > >>>>    > vfio_iova_dirty_bitmap() is called holding iommu->loc=
-k? If
-> there is any
-> > > > > > >>>>    > pin request while vfio_iova_dirty_bitmap() is still w=
-orking, it
-> will
-> > > > > > >>>>    > wait till iommu->lock is released. Bitmap will be pop=
-ulated
-> when page is
-> > > > > > >>>>    > pinned.
-> > > > > > >>>
-> > > > > > >>> As coded, dirty bits are only ever set in the bitmap, never
-> cleared.
-> > > > > > >>> If a page is unpinned between iterations of the user record=
-ing
-> the
-> > > > > > >>> dirty bitmap, it should be marked dirty in the iteration
-> immediately
-> > > > > > >>> after the unpinning and not marked dirty in the following
-> iteration.
-> > > > > > >>> That doesn't happen here.  We're reporting cumulative dirty
-> pages since
-> > > > > > >>> logging was enabled, we need to be reporting dirty pages si=
-nce
-> the user
-> > > > > > >>> last retrieved the dirty bitmap.  The bitmap should be clea=
-red
-> and
-> > > > > > >>> currently pinned pages re-added after copying to the user.
-> Thanks,
-> > > > > > >>>
-> > > > > > >>
-> > > > > > >> Does that mean, we have to track every iteration? do we real=
-ly
-> need that
-> > > > > > >> tracking?
-> > > > > > >>
-> > > > > > >> Generally the flow is:
-> > > > > > >> - vendor driver pin x pages
-> > > > > > >> - Enter pre-copy-phase where vCPUs are running - user starts
-> dirty pages
-> > > > > > >> tracking, then user asks dirty bitmap, x pages reported dirt=
-y by
-> > > > > > >> VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
-> > > > > > >> - In pre-copy phase, vendor driver pins y more pages, now
-> bitmap
-> > > > > > >> consists of x+y bits set
-> > > > > > >> - In pre-copy phase, vendor driver unpins z pages, but bitma=
-p is
-> not
-> > > > > > >> updated, so again bitmap consists of x+y bits set.
-> > > > > > >> - Enter in stop-and-copy phase, vCPUs are stopped, mdev devi=
-ces
-> are stopped
-> > > > > > >> - user asks dirty bitmap - Since here vCPU and mdev devices =
-are
-> stopped,
-> > > > > > >> pages should not get dirty by guest driver or the physical d=
-evice.
-> > > > > > >> Hence, x+y dirty pages would be reported.
-> > > > > > >>
-> > > > > > >> I don't think we need to track every iteration of bitmap rep=
-orting.
-> > > > > > >
-> > > > > > > Yes, once a bitmap is read, it's reset.  In your example, aft=
-er
-> > > > > > > unpinning z pages the user should still see a bitmap with x+y=
- pages,
-> > > > > > > but once they've read that bitmap, the next bitmap should be =
-x+y-
-> z.
-> > > > > > > Userspace can make decisions about when to switch from pre-
-> copy to
-> > > > > > > stop-and-copy based on convergence, ie. the slope of the line
-> recording
-> > > > > > > dirty pages per iteration.  The implementation here never all=
-ows
-> an
-> > > > > > > inflection point, dirty pages reported through vfio would alw=
-ays
-> either
-> > > > > > > be flat or climbing.  There might also be a case that an iomm=
-u
-> backed
-> > > > > > > device could start pinning pages during the course of a migra=
-tion,
-> how
-> > > > > > > would the bitmap ever revert from fully populated to only tra=
-cking
-> the
-> > > > > > > pinned pages?  Thanks,
-> > > > > > >
-> > > > > >
-> > > > > > At KVM forum we discussed this - if guest driver pins say 1024 =
-pages
-> > > > > > before migration starts, during pre-copy phase device can dirty=
- 0
-> pages
-> > > > > > in best case and 1024 pages in worst case. In that case, user w=
-ill
-> > > > > > transfer content of 1024 pages during pre-copy phase and in
-> > > > > > stop-and-copy phase also, that will be pages will be copied twi=
-ce. So
-> we
-> > > > > > decided to only get dirty pages bitmap at stop-and-copy phase. =
-If
-> user
-> > > > > > is going to get dirty pages in stop-and-copy phase only, then t=
-hat will
-> > > > > > be single iteration.
-> > > > > > There aren't any devices yet that can track sys memory dirty pa=
-ges.
-> So
-> > > > > > we can go ahead with this patch and support for dirty pages tra=
-cking
-> > > > > > during pre-copy phase can be added later when there will be
-> consumers of
-> > > > > > that functionality.
-> > > > >
-> > > > > So if I understand this right, you're expecting the dirty bitmap =
-to
-> > > > > accumulate dirty bits, in perpetuity, so that the user can only
-> > > > > retrieve them once at the end of migration?  But if that's the ca=
-se,
-> > > > > the user could simply choose to not retrieve the bitmap until the=
- end
-> > > > > of migration, the result would be the same.  What we have here is
-> that
-> > > > > dirty bits are never cleared, regardless of whether the user has =
-seen
-> > > > > them, which is wrong.  Sorry, we had a lot of discussions at KVM
-> forum,
-> > > > > I don't recall this specific one 5 months later and maybe we were=
-n't
-> > > > > considering all aspects.  I see the behavior we have here as inco=
-rrect,
-> > > > > but it also seems relatively trivial to make correct.  I hope the=
- QEMU
-> > > > > code isn't making us go through all this trouble to report a dirt=
-y
-> > > > > bitmap that gets thrown away because it expects the final one to =
-be
-> > > > > cumulative since the beginning of dirty logging.  Thanks,
-> > > >
-> > > > I remember the discussion that we couldn't track the system memory
-> > > > dirtying with current hardware; so the question then is just to tra=
-ck
-> > > hi Dave
-> > > there are already devices that are able to track the system memory,
-> > > through two ways:
-> > > (1) software method. like VFs for "Intel(R) Ethernet Controller XL710
-> Family
-> > > support".
-> > > (2) hardware method. through hardware internal buffer (as one Intel
-> > > internal hardware not yet to public, but very soon) or through VTD-3.=
-0
-> > > IOMMU.
-> > >
-> > > we have already had code verified using the two ways to track system
-> memory
-> > > in fine-grained level.
-> > >
-> > >
-> > > > what has been pinned and then ideally put that memory off until the
-> end.
-> > > > (Which is interesting because I don't think we currently have  a wa=
-y
-> > > > to delay RAM pages till the end in qemu).
-> > >
-> > > I think the problem here is that we mixed pinned pages with dirty pag=
-es.
-> >
-> > We are reporting dirty pages, pinned pages are just assumed to be dirty=
-.
-> >
-> > > yes, pinned pages for mdev devices are continuously likely to be dirt=
-y
-> > > until device stopped.
-> > > But for devices that are able to report dirty pages, dirtied pages
-> > > will be marked again if hardware writes them later.
-> > >
-> > > So, is it good to introduce a capability to let vfio/qemu know how to
-> > > treat the dirty pages?
-> >
-> > Dirty pages are dirty, QEMU doesn't need any special flag, instead we
-> > need to evolve different mechanisms for the vendor driver so that we
-> > can differentiate pages pinned for read vs pages pinned for write.
-> > Perhaps interfaces to pin pages without dirtying them, and a separate
-> > mechanism to dirty a previously pinned-page, ie. promote it permanently
-> > or transiently to a writable page.
-> >
-> > > (1) for devices have no fine-grained dirty page tracking capability
-> > >   a. pinned pages are regarded as dirty pages. they are not cleared b=
-y
-> > >   dirty page query
-> > >   b. unpinned pages are regarded as dirty pages. they are cleared by
-> > >   dirty page query or UNMAP ioctl.
-> > > (2) for devices that have fine-grained dirty page tracking capability
-> > >    a. pinned/unpinned pages are not regarded as dirty pages
-> >
-> > We need a pin-read-only interface for this.
-> >
-> > >    b. only pages they reported are regarded as dirty pages and are to=
- be
-> > >    cleared by dirty page query and UNMAP ioctl.
-> >
-> > We need a set-dirty or promote-writable interface for this.
-> >
-> > > (3) for dirty pages marking APIs, like vfio_dma_rw()...
-> > >    pages marked by them are regared as dirty and are to be cleared by
-> > >    dirty page query and UNMAP ioctl
-> > >
-> > > For (1), qemu VFIO only reports dirty page amount and would not
-> transfer
-> > > those pages until last round.
-> > > for (2) and (3), qemu VFIO should report and transfer them in each
-> > > round.
-> >
-> > IMO, QEMU should not be aware of any of this.  Userspace has an
-> > interface to retrieve dirtied pages (period).  We should adjust the
-> > pages that we report as dirtied to be accurate based on the
-> > capabilities of the vendor driver.  We can evolve those internal APIs
-> > between the vendor driver and vfio iommu over time without modifying
-> > this user interface.
->=20
-> I'm not sure;  if you have a block of memory that's constantly marked
-> dirty in (1) - we need to avoid constantly retransmitting that memory to
-> the destination; there's no point in sending it until the end of the
-> iterations - so it shouldn't even get sent once in the iteration.
-> But at the same time, we can't ignore the fact that those pages are
-> going to be dirty - because that influences the downtime; so we need
-> to know we're going to be getting them later, even if we don't
-> initially mark them as dirty.
-
-For that we possibly need a way to allow VFIO or vendor driver telling
-the userspace that I can report dirty pages to you but it is better to do
-it in the end since the set is sort of static and big thus not optimal to
-transfer them multiple rounds, and I can also report to you the number=20
-of currently-tracked dirty pages so you may use it to make accurate
-prediction to decide when to exit the precopy. But such feature might
-be introduced orthogonal to the standard bitmap interface, i.e. not
-necessarily to block this series for the baseline live migration support...
-
-Thanks
-Kevin
-
->=20
-> > > > [I still worry whether migration will be usable with any
-> > > > significant amount of system ram that's pinned in this way; the
-> > > > downside will very easily get above the threshold that people like]
-> > > >
-> > > yes. that's why we have to do multi-round dirty page query and
-> > > transfer and clear the dirty bitmaps in each round for devices that a=
-re
-> > > able to track in fine grain.
-> > > and that's why we have to report the amount of dirty pages before
-> > > stop-and-copy phase for mdev devices, so that people are able to know
-> > > the real downtime as much as possible.
-> >
-> > Yes, the dirty bitmap should be accurate to report the pages dirtied
-> > since it was last retrieved and over time we can add internal
-> > interfaces to give vendor drivers more granularity in marking pinned
-> > pages dirty and perhaps even exposing the bitmap to the vendor drivers
-> > to set pages themselves.  I don't necessarily think it's worthwhile to
-> > create a new class of dirtied pages to transfer at the end, we're
-> > fighting a losing battle at that point.  We should be focusing on
-> > improving the granularity of page dirtying in order to reduce the pages
-> > transferred at the end of migration.  Thanks,
->=20
-> Dave
->=20
-> > Alex
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGVyZWsgU3UgPGp3c3Ux
+OTg2QGdtYWlsLmNvbT4NCj4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAyNSwgMjAyMCAxMjoxNyBQ
+TQ0KPiBUbzogWmhhbmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0KPiBDYzogcWVtdS1k
+ZXZlbEBub25nbnUub3JnOyBsaXpoaWppYW5AY24uZnVqaXRzdS5jb207DQo+IGphc293YW5nQHJl
+ZGhhdC5jb207IGRlcmVrc3VAcW5hcC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzFd
+IG5ldC9jb2xvLWNvbXBhcmUuYzogRml4IG1lbW9yeSBsZWFrIGluDQo+IHBhY2tldF9lbnF1ZXVl
+KCkNCj4gDQo+IEppbmctV2VpIFN1IDxqd3N1MTk4NkBnbWFpbC5jb20+IOaWvCAyMDIw5bm0M+ac
+iDI15pelIOmAseS4iSDkuIrljYgxMDowNQ0KPiDlr6vpgZPvvJoNCj4gPg0KPiA+IFpoYW5nLCBD
+aGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4g5pa8IDIwMjDlubQz5pyIMjXml6Ug6YCx5LiJIOS4
+iuWNiA0KPiA5OjM35a+r6YGT77yaDQo+ID4gPg0KPiA+ID4NCj4gPiA+DQo+ID4gPiA+IC0tLS0t
+T3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiA+IEZyb206IEppbmctV2VpIFN1IDxqd3N1MTk4
+NkBnbWFpbC5jb20+DQo+ID4gPiA+IFNlbnQ6IFR1ZXNkYXksIE1hcmNoIDI0LCAyMDIwIDEwOjQ3
+IEFNDQo+ID4gPiA+IFRvOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+DQo+ID4g
+PiA+IENjOiBxZW11LWRldmVsQG5vbmdudS5vcmc7IGxpemhpamlhbkBjbi5mdWppdHN1LmNvbTsN
+Cj4gPiA+ID4gamFzb3dhbmdAcmVkaGF0LmNvbTsgZGVyZWtzdUBxbmFwLmNvbQ0KPiA+ID4gPiBT
+dWJqZWN0OiBSZTogW1BBVENIIHYyIDEvMV0gbmV0L2NvbG8tY29tcGFyZS5jOiBGaXggbWVtb3J5
+IGxlYWsgaW4NCj4gPiA+ID4gcGFja2V0X2VucXVldWUoKQ0KPiA+ID4gPg0KPiA+ID4gPiBaaGFu
+ZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+IOaWvCAyMDIw5bm0M+aciDI05pelIOmAseS6
+jCDkuIrljYgNCj4gMzoyNA0KPiA+ID4gPiDlr6vpgZPvvJoNCj4gPiA+ID4gPg0KPiA+ID4gPiA+
+DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4g
+PiA+ID4gPiBGcm9tOiBEZXJlayBTdSA8andzdTE5ODZAZ21haWwuY29tPg0KPiA+ID4gPiA+ID4g
+U2VudDogTW9uZGF5LCBNYXJjaCAyMywgMjAyMCAxOjQ4IEFNDQo+ID4gPiA+ID4gPiBUbzogcWVt
+dS1kZXZlbEBub25nbnUub3JnDQo+ID4gPiA+ID4gPiBDYzogWmhhbmcsIENoZW4gPGNoZW4uemhh
+bmdAaW50ZWwuY29tPjsNCj4gPiA+ID4gPiA+IGxpemhpamlhbkBjbi5mdWppdHN1LmNvbTsgamFz
+b3dhbmdAcmVkaGF0LmNvbTsNCj4gPiA+ID4gPiA+IGRlcmVrc3VAcW5hcC5jb20NCj4gPiA+ID4g
+PiA+IFN1YmplY3Q6IFtQQVRDSCB2MiAxLzFdIG5ldC9jb2xvLWNvbXBhcmUuYzogRml4IG1lbW9y
+eSBsZWFrIGluDQo+ID4gPiA+ID4gPiBwYWNrZXRfZW5xdWV1ZSgpDQo+ID4gPiA+ID4gPg0KPiA+
+ID4gPiA+ID4gVGhlIHBhdGNoIGlzIHRvIGZpeCB0aGUgInBrdCIgbWVtb3J5IGxlYWsgaW4gcGFj
+a2V0X2VucXVldWUoKS4NCj4gPiA+ID4gPiA+IFRoZSBhbGxvY2F0ZWQgInBrdCIgbmVlZHMgdG8g
+YmUgZnJlZWQgaWYgdGhlIGNvbG8gY29tcGFyZQ0KPiA+ID4gPiA+ID4gcHJpbWFyeSBvciBzZWNv
+bmRhcnkgcXVldWUgaXMgdG9vIGJpZy4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IEhpIERlcmVrLA0K
+PiA+ID4gPiA+DQo+ID4gPiA+ID4gVGhhbmsgeW91IGZvciB0aGUgcGF0Y2guDQo+ID4gPiA+ID4g
+SSByZS10aGluayB0aGlzIGlzc3VlIGluIGEgYmlnIHZpZXcsIGxvb2tzIGp1c3QgZnJlZSB0aGUg
+cGtnIGlzDQo+ID4gPiA+ID4gbm90IGVub3VnaCBpbg0KPiA+ID4gPiB0aGlzIHNpdHVhdGlvbi4N
+Cj4gPiA+ID4gPiBUaGUgcm9vdCBjYXVzZSBpcyBuZXR3b3JrIGlzIHRvbyBidXN5IHRvIGNvbXBh
+cmUsIFNvLCBiZXR0ZXINCj4gPiA+ID4gPiBjaG9pY2UgaXMgbm90aWZ5IENPTE8gZnJhbWUgdG8g
+ZG8gYSBjaGVja3BvaW50IGFuZCBjbGVhbiB1cCBhbGwNCj4gPiA+ID4gPiB0aGUgbmV0d29yayBx
+dWV1ZS4gVGhpcyB3b3JrIG1heWJlIGRlY3JlYXNlIENPTE8gbmV0d29yaw0KPiA+ID4gPiA+IHBl
+cmZvcm1hbmNlIGJ1dCBzZWFtcw0KPiA+ID4gPiBiZXR0ZXIgdGhhbiBkcm9wIGxvdHMgb2YgcGtn
+Lg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gVGhhbmtzDQo+ID4gPiA+ID4gWmhhbmcgQ2hlbg0KPiA+
+ID4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+IEhlbGxvLCBaaGFuZw0KPiA+ID4gPg0KPiA+ID4gPiBH
+b3QgaXQuDQo+ID4gPiA+IFdoYXQgaXMgdGhlIGNvbmNlcm4gb2YgdGhlIG1hc3NpdmUgImRyb3Ag
+cGFja2V0cyI/DQo+ID4gPiA+IERvZXMgdGhlIGJlaGF2aW9yIG1ha2UgdGhlIENPTE8gZG8gY2hl
+Y2twb2ludCBwZXJpb2RpY2FsbHkgKH4yMA0KPiA+ID4gPiBzZWNvbmRzKSBpbnN0ZWFkIG9mIGRv
+aW5nIGltbWVkaWF0ZSBjaGVja3BvaW50IHdoZW4gZW5jb3VudGVyaW5nDQo+ID4gPiA+IGRpZmZl
+cmVudCByZXNwb25zZSBwYWNrZXRzPw0KPiA+ID4NCj4gPiA+IFRoZSBjb25jZXJuIG9mIHRoZSAi
+ZHJvcCBwYWNrZXRzIiBpcyBndWVzdCB3aWxsIGxvc2UgbmV0d29yaw0KPiA+ID4gY29ubmVjdGlv
+biB3aXRoIG1vc3Qgb2YgcmVhbCBjbGllbnRzIHVudGlsIG5leHQgcGVyaW9kaWMgZm9yY2UNCj4g
+PiA+IGNoZWNrcG9pbnQuIENPTE8gZGVzaWduZWQgZm9yIGR5bmFtaWMgY29udHJvbCBjaGVja3Bv
+aW50LCBzbyBJIHRoaW5rIGRvDQo+IGEgY2hlY2twb2ludCBoZXJlIHdpbGwgaGVscCBndWVzdCBz
+dXBwbHkgc2VydmljZSBmYXN0ZXIuDQo+ID4gPg0KPiA+DQo+ID4gSSBzZWUuDQo+ID4gSSdsbCB1
+cGRhdGUgdGhlIHBhdGNoIHdpdGggeW91ciBzdWdnZXN0aW9uIGxhdGVyLg0KPiA+DQo+IA0KPiBI
+aSwgWmhhbmcNCj4gSGVyZSBpcyB0aGUgaWRlYSBhbmQgcHNldWRvIGNvZGUgdG8gaGFuZGxlIHRo
+ZSAiZHJvcCBwYWNrZXQiLg0KPiANCj4gYGBgDQo+IHJldCA9IHBhY2tldF9lbnF1ZXVlDQo+ICgx
+KSByZXQgPT0gMA0KPiAgICAgICBjb21wYXJlIGNvbm5lY3Rpb24NCj4gKDIpIHJldCA9PSAtMQ0K
+PiAgICAgICBzZW5kIHBhY2tldA0KPiAoMykgcmV0ID09IHF1ZXVlIGluc2VydGlvbiBmYWlsDQo+
+ICAgICAgIGRvIGNoZWNrcG9pbnQNCj4gICAgICAgc2VuZCBhbGwgcXVldWVkIHByaW1hcnkgcGFj
+a2V0cw0KPiAgICAgICByZW1vdmUgYWxsIHF1ZXVlZCBzZWNvbmRhcnkgcGFja2V0cyBgYGANCj4g
+DQo+IERvIHlvdSBoYXZlIGFueSBjb21tZW50IGZvciB0aGUgaGFuZGxpbmc/DQoNCkxvb2tzIGdv
+b2QgZm9yIG1lLg0KDQpUaGFua3MNClpoYW5nIENoZW4NCg0KPiANCj4gVGhhbmtzDQo+IERlcmVr
+DQo+IA0KPiA+ID4gPg0KPiA+ID4gPiBJdCBzZWVtcyB0aGF0IGZyZXF1ZW50IGNoZWNrcG9pbnRz
+IGNhdXNlZCBieSB0aGUgZnVsbCBxdWV1ZSAoYnVzeQ0KPiA+ID4gPiBuZXR3b3JrKSBpbnN0ZWFk
+IG9mIGRpZmZlcmVudA0KPiA+ID4gPiByZXNwb25zZSBwYWNrZXRzIG1heSBoYXJtIHRoZSBoaWdo
+IHNwZWVkIG5ldHdvcmsgKDEwIEdicHMgb3INCj4gPiA+ID4gaGlnaGVyKSBwZXJmb3JtYW5jZSBk
+cmFtYXRpY2FsbHkuDQo+ID4gPg0KPiA+ID4gWWVzLCBtYXliZSBJIGNhbiBzZW5kIGEgcGF0Y2gg
+dG8gbWFrZSB1c2VyIGFkanVzdCBxdWV1ZSBzaXplIGRlcGVuZCBvbg0KPiBpdCdzIG93biBlbnZp
+cm9ubWVudC4NCj4gPiA+IEJ1dCB3aXRoIGxhcmdlciBxdWV1ZSBzaXplLCBjb2xvLWNvbXBhcmUg
+d2lsbCBzcGVuZCBtdWNoIHRpbWUgdG8gZG8NCj4gPiA+IGNvbXBhcmUgcGFja2V0IHdoZW4gbmV0
+d29yayBJcyByZWFsIGJ1c3kgc3RhdHVzLg0KPiA+DQo+ID4gVGhhbmsgeW91LiBUaGUgdXNlci1j
+b25maWd1cmFibGUgcXVldWUgc2l6ZSB3aWxsIGJlIHZlcnkgaGVscGZ1bC4NCj4gPg0KPiA+IFRo
+YW5rcy4NCj4gPiBEZXJlayBTdQ0KPiA+DQo+ID4gPg0KPiA+ID4gVGhhbmtzDQo+ID4gPiBaaGFu
+ZyBDaGVuDQo+ID4gPg0KPiA+ID4gPg0KPiA+ID4gPiBUaGFua3MNCj4gPiA+ID4gRGVyZWsNCj4g
+PiA+ID4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBEZXJlayBTdSA8
+ZGVyZWtzdUBxbmFwLmNvbT4NCj4gPiA+ID4gPiA+IC0tLQ0KPiA+ID4gPiA+ID4gIG5ldC9jb2xv
+LWNvbXBhcmUuYyB8IDIzICsrKysrKysrKysrKysrKy0tLS0tLS0tDQo+ID4gPiA+ID4gPiAgMSBm
+aWxlIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKyksIDggZGVsZXRpb25zKC0pDQo+ID4gPiA+ID4g
+Pg0KPiA+ID4gPiA+ID4gZGlmZiAtLWdpdCBhL25ldC9jb2xvLWNvbXBhcmUuYyBiL25ldC9jb2xv
+LWNvbXBhcmUuYyBpbmRleA0KPiA+ID4gPiA+ID4gN2VlMTdmMmNmOC4uY2RkODdiMmFhOCAxMDA2
+NDQNCj4gPiA+ID4gPiA+IC0tLSBhL25ldC9jb2xvLWNvbXBhcmUuYw0KPiA+ID4gPiA+ID4gKysr
+IGIvbmV0L2NvbG8tY29tcGFyZS5jDQo+ID4gPiA+ID4gPiBAQCAtMTIwLDYgKzEyMCwxMCBAQCBl
+bnVtIHsNCj4gPiA+ID4gPiA+ICAgICAgU0VDT05EQVJZX0lOLA0KPiA+ID4gPiA+ID4gIH07DQo+
+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gK3N0YXRpYyBjb25zdCBjaGFyICpjb2xvX21vZGVbXSA9
+IHsNCj4gPiA+ID4gPiA+ICsgICAgW1BSSU1BUllfSU5dID0gInByaW1hcnkiLA0KPiA+ID4gPiA+
+ID4gKyAgICBbU0VDT05EQVJZX0lOXSA9ICJzZWNvbmRhcnkiLCB9Ow0KPiA+ID4gPiA+ID4NCj4g
+PiA+ID4gPiA+ICBzdGF0aWMgaW50IGNvbXBhcmVfY2hyX3NlbmQoQ29tcGFyZVN0YXRlICpzLA0K
+PiA+ID4gPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25zdCB1aW50OF90ICpi
+dWYsIEBAIC0yMTUsNg0KPiA+ID4gPiA+ID4gKzIxOSw3IEBAIHN0YXRpYyBpbnQgcGFja2V0X2Vu
+cXVldWUoQ29tcGFyZVN0YXRlICpzLCBpbnQgbW9kZSwNCj4gPiA+ID4gPiA+IENvbm5lY3Rpb24N
+Cj4gPiA+ID4gKipjb24pDQo+ID4gPiA+ID4gPiAgICAgIENvbm5lY3Rpb25LZXkga2V5Ow0KPiA+
+ID4gPiA+ID4gICAgICBQYWNrZXQgKnBrdCA9IE5VTEw7DQo+ID4gPiA+ID4gPiAgICAgIENvbm5l
+Y3Rpb24gKmNvbm47DQo+ID4gPiA+ID4gPiArICAgIGludCByZXQ7DQo+ID4gPiA+ID4gPg0KPiA+
+ID4gPiA+ID4gICAgICBpZiAobW9kZSA9PSBQUklNQVJZX0lOKSB7DQo+ID4gPiA+ID4gPiAgICAg
+ICAgICBwa3QgPSBwYWNrZXRfbmV3KHMtPnByaV9ycy5idWYsIEBAIC0yNDMsMTYgKzI0OCwxOCBA
+QA0KPiA+ID4gPiA+ID4gc3RhdGljIGludCBwYWNrZXRfZW5xdWV1ZShDb21wYXJlU3RhdGUgKnMs
+IGludCBtb2RlLA0KPiA+ID4gPiA+ID4gQ29ubmVjdGlvbg0KPiA+ID4gPiAqKmNvbikNCj4gPiA+
+ID4gPiA+ICAgICAgfQ0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ICAgICAgaWYgKG1vZGUgPT0g
+UFJJTUFSWV9JTikgew0KPiA+ID4gPiA+ID4gLSAgICAgICAgaWYgKCFjb2xvX2luc2VydF9wYWNr
+ZXQoJmNvbm4tPnByaW1hcnlfbGlzdCwgcGt0LCAmY29ubi0NCj4gPnBhY2spKSB7DQo+ID4gPiA+
+ID4gPiAtICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJjb2xvIGNvbXBhcmUgcHJpbWFyeSBxdWV1
+ZSBzaXplIHRvbyBiaWcsIg0KPiA+ID4gPiA+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICAi
+ZHJvcCBwYWNrZXQiKTsNCj4gPiA+ID4gPiA+IC0gICAgICAgIH0NCj4gPiA+ID4gPiA+ICsgICAg
+ICAgIHJldCA9IGNvbG9faW5zZXJ0X3BhY2tldCgmY29ubi0+cHJpbWFyeV9saXN0LCBwa3QsDQo+
+ID4gPiA+ID4gPiArICZjb25uLT5wYWNrKTsNCj4gPiA+ID4gPiA+ICAgICAgfSBlbHNlIHsNCj4g
+PiA+ID4gPiA+IC0gICAgICAgIGlmICghY29sb19pbnNlcnRfcGFja2V0KCZjb25uLT5zZWNvbmRh
+cnlfbGlzdCwgcGt0LCAmY29ubi0NCj4gPnNhY2spKSB7DQo+ID4gPiA+ID4gPiAtICAgICAgICAg
+ICAgZXJyb3JfcmVwb3J0KCJjb2xvIGNvbXBhcmUgc2Vjb25kYXJ5IHF1ZXVlIHNpemUgdG9vIGJp
+ZywiDQo+ID4gPiA+ID4gPiAtICAgICAgICAgICAgICAgICAgICAgICAgICJkcm9wIHBhY2tldCIp
+Ow0KPiA+ID4gPiA+ID4gLSAgICAgICAgfQ0KPiA+ID4gPiA+ID4gKyAgICAgICAgcmV0ID0gY29s
+b19pbnNlcnRfcGFja2V0KCZjb25uLT5zZWNvbmRhcnlfbGlzdCwgcGt0LA0KPiA+ID4gPiA+ID4g
+KyAmY29ubi0+c2Fjayk7DQo+ID4gPiA+ID4gPiAgICAgIH0NCj4gPiA+ID4gPiA+ICsNCj4gPiA+
+ID4gPiA+ICsgICAgaWYgKCFyZXQpIHsNCj4gPiA+ID4gPiA+ICsgICAgICAgIGVycm9yX3JlcG9y
+dCgiY29sbyBjb21wYXJlICVzIHF1ZXVlIHNpemUgdG9vIGJpZywiDQo+ID4gPiA+ID4gPiArICAg
+ICAgICAgICAgICAgICAgICAgImRyb3AgcGFja2V0IiwgY29sb19tb2RlW21vZGVdKTsNCj4gPiA+
+ID4gPiA+ICsgICAgICAgIHBhY2tldF9kZXN0cm95KHBrdCwgTlVMTCk7DQo+ID4gPiA+ID4gPiAr
+ICAgICAgICBwa3QgPSBOVUxMOw0KPiA+ID4gPiA+ID4gKyAgICB9DQo+ID4gPiA+ID4gPiArDQo+
+ID4gPiA+ID4gPiAgICAgICpjb24gPSBjb25uOw0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ICAg
+ICAgcmV0dXJuIDA7DQo+ID4gPiA+ID4gPiAtLQ0KPiA+ID4gPiA+ID4gMi4xNy4xDQo+ID4gPiA+
+ID4NCg==
 
