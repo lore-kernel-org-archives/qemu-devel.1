@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC9AC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D774C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:48:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAE64206F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:46:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E08FA206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:48:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VEVzKzQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAE64206F6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YNG/umQ8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E08FA206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH3Y6-0000mL-Q7
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:46:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35738)
+	id 1jH3Zr-0002gp-Sg
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:48:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35825)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3V7-00051a-Oc
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:10 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3Vn-0005wU-IU
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3V6-0003MT-F2
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:09 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60587)
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3Vm-0003hI-79
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37704)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3V6-0003MG-AJ
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:08 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3Vm-0003fq-0U
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:43:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585132988;
+ s=mimecast20190719; t=1585133028;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NLXjIXcD6xWCR1Y7Yk1x5ls5003ezmKOOvsW8XHtFNU=;
- b=VEVzKzQO5chAUhKEZdghCdW8PPLUcB48gqhvNmFbhex21wYv3BSNIIKNJEwB8mIcUaKQYN
- bpIQWRLbD5smX3xpBZP1YI6vNLwUnWfTLNDpndISs8uZSDKlkOGGOm0lp9Yo2r3oczk66U
- oU0Da1QJFxw1y6Whaz//myDl5BHkAyI=
+ bh=XaMaxnW2Ugv3SeypvEVTmrYyltIOwTIbonZpA60CF8c=;
+ b=YNG/umQ8wUjgZ2hPwQcLGK9QEHciqAie+rgCP74ehvdo7DPQup5CtaF2jk9nOqJkJbgJIW
+ 2Upvd0uyWquRvnVBX1+HyhDoEuuvzen/avi4Hgm4Siv2/wFidLTajeoc5jUe3+pkr1eT4p
+ 9K0Mp7uBK4eqtibzwdheUb8i9tHJlf4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-74t6Z8ViOvOSLZXbQJ6oiA-1; Wed, 25 Mar 2020 06:43:05 -0400
-X-MC-Unique: 74t6Z8ViOvOSLZXbQJ6oiA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-191-aHnV6E6JOcqeEqsD2EHktg-1; Wed, 25 Mar 2020 06:43:44 -0400
+X-MC-Unique: aHnV6E6JOcqeEqsD2EHktg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2548800D5B;
- Wed, 25 Mar 2020 10:43:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 699FF8010C8;
+ Wed, 25 Mar 2020 10:43:43 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7C3C35D9C5;
- Wed, 25 Mar 2020 10:43:01 +0000 (UTC)
-Message-ID: <53339d66d895398cac49114689f5d77ab07f0aac.camel@redhat.com>
-Subject: Re: [PATCH v6 17/42] nvme: add log specific field to trace events
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 510801001DD8;
+ Wed, 25 Mar 2020 10:43:41 +0000 (UTC)
+Message-ID: <250f6a203ee6db8f8f6b7232e555758a0a4be3a4.camel@redhat.com>
+Subject: Re: [PATCH v6 19/42] nvme: enforce valid queue creation sequence
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-Date: Wed, 25 Mar 2020 12:43:00 +0200
-In-Reply-To: <20200316142928.153431-18-its@irrelevant.dk>
+Date: Wed, 25 Mar 2020 12:43:40 +0200
+In-Reply-To: <20200316142928.153431-20-its@irrelevant.dk>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-18-its@irrelevant.dk>
+ <20200316142928.153431-20-its@irrelevant.dk>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
@@ -96,53 +96,69 @@ Sender: "Qemu-devel"
 On Mon, 2020-03-16 at 07:29 -0700, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> The LSP field is not used directly now, but include it in the trace.
+> Support returning Command Sequence Error if Set Features on Number of
+> Queues is called after queues have been created.
 > 
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > ---
->  hw/block/nvme.c       | 3 ++-
->  hw/block/trace-events | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
+>  hw/block/nvme.c | 7 +++++++
+>  hw/block/nvme.h | 1 +
+>  2 files changed, 8 insertions(+)
 > 
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index e56142c4ea99..16de3ca1c5d5 100644
+> index 007f8817f101..b40d27cddc46 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -760,6 +760,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      uint32_t dw12 = le32_to_cpu(cmd->cdw12);
->      uint32_t dw13 = le32_to_cpu(cmd->cdw13);
->      uint8_t  lid = dw10 & 0xff;
-> +    uint8_t  lsp = (dw10 >> 8) & 0xf;
->      uint8_t  rae = (dw10 >> 15) & 0x1;
->      uint32_t numdl, numdu;
->      uint64_t off, lpol, lpou;
-> @@ -777,7 +778,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->          return NVME_INVALID_FIELD | NVME_DNR;
->      }
+> @@ -881,6 +881,8 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+>      cq = g_malloc0(sizeof(*cq));
+>      nvme_init_cq(cq, n, prp1, cqid, vector, qsize + 1,
+>          NVME_CQ_FLAGS_IEN(qflags));
+> +
+> +    n->qs_created = true;
+Very minor nitpick, maybe it is worth mentioning in a comment,
+why this is only needed in CQ creation, as you explained to me.
+
+
+>      return NVME_SUCCESS; 
+>  }
 >  
-> -    trace_nvme_dev_get_log(nvme_cid(req), lid, rae, len, off);
-> +    trace_nvme_dev_get_log(nvme_cid(req), lid, lsp, rae, len, off);
+> @@ -1194,6 +1196,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+>          break;
+>      case NVME_NUMBER_OF_QUEUES:
+> +        if (n->qs_created) {
+> +            return NVME_CMD_SEQ_ERROR | NVME_DNR;
+> +        }
+> +
+>          /*
+>           * NVMe v1.3, Section 5.21.1.7: 0xffff is not an allowed value for NCQR
+>           * and NSQR.
+> @@ -1332,6 +1338,7 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
 >  
->      switch (lid) {
->      case NVME_LOG_ERROR_INFO:
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index dde1d22bc39a..13e2c71664f6 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -48,7 +48,7 @@ nvme_dev_getfeat_numq(int result) "get feature number of queues, result=%d"
->  nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
->  nvme_dev_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
->  nvme_dev_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
-> -nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
-> +nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
->  nvme_dev_process_aers(int queued) "queued %d"
->  nvme_dev_aer(uint16_t cid) "cid %"PRIu16""
->  nvme_dev_aer_aerl_exceeded(void) "aerl exceeded"
-Perfect!
+>      n->aer_queued = 0;
+>      n->outstanding_aers = 0;
+> +    n->qs_created = false;
+>  
+>      blk_flush(n->conf.blk);
+>      n->bar.cc = 0;
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index b709a8bb8d40..b4d1738a3d0a 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -99,6 +99,7 @@ typedef struct NvmeCtrl {
+>      BlockConf    conf;
+>      NvmeParams   params;
+>  
+> +    bool        qs_created;
+>      uint32_t    page_size;
+>      uint16_t    page_bits;
+>      uint16_t    max_prp_ents;
+
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
+
 
 
 
