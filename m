@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 292C3C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49249C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:58:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFF2F20663
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:57:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF2F20663
+	by mail.kernel.org (Postfix) with ESMTPS id 1EE4320663
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:58:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EE4320663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH6Wq-0003RU-5n
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:57:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58388)
+	id 1jH6Xp-0004iu-80
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:58:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jH6VO-00026p-73
+ (envelope-from <bounces@canonical.com>) id 1jH6VO-000272-FD
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jH6VM-00056U-JX
+ (envelope-from <bounces@canonical.com>) id 1jH6VN-00057A-3b
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34216)
+Received: from indium.canonical.com ([91.189.90.7]:34256)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jH6VM-00055D-DM
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:36 -0400
+ id 1jH6VM-00056D-Un
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jH6VL-0007wy-06
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:35 +0000
+ id 1jH6VM-0007wi-6l
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F1B532E80BA
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:34 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 310122E80C0
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Mar 2020 13:47:27 -0000
+Date: Wed, 25 Mar 2020 13:50:02 -0000
 From: Marcin Juszkiewicz <1869006@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,16 +54,17 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: hrw
 X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
 X-Launchpad-Bug-Modifier: Marcin Juszkiewicz (hrw)
-Message-Id: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
-Subject: [Bug 1869006] [NEW] PCIe cards passthrough to TCG guest works on 2GB
- of guest memory but fails on 4GB (vfio_dma_map invalid arg)
+References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
+Message-Id: <158514420231.19807.4790922488532223949.malone@chaenomeles.canonical.com>
+Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
+ guest memory but fails on 4GB
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 67c4d743f0c97c8598ab784198d41eb6ad3d2fcd
+X-Launchpad-Hash: f0c1a2614fbffe185ecc684acb4e2da1b58b83a1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,56 +82,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+attaching as file as launched wraps in ugly way
 
-During one meeting coworker asked "did someone tried to passthrough PCIe
-card to other arch guest?" and I decided to check it.
+** Attachment added: "lspci -vvv"
+   https://bugs.launchpad.net/qemu/+bug/1869006/+attachment/5341486/+files/=
+lspci-vvv.text
 
-Plugged SATA and USB3 controllers into spare slots on mainboard and
-started playing. On 1GB VM instance it worked (both cold- and hot-
-plugged). On 4GB one it did not:
+** Summary changed:
 
-B=C5=82=C4=85d podczas uruchamiania domeny: internal error: process exited =
-while connecting to monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch6=
-4: -device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x=
-0: VFIO_MAP_DMA: -22
-2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D00=
-00:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: failed =
-to setup container for group 28: memory listener initialization failed: Reg=
-ion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, 0x=
-7fb2a3e00000) =3D -22 (Invalid argument)
-
-Traceback (most recent call last):
-  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_wr=
-apper
-    callback(asyncjob, *args, **kwargs)
-  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tmpcb
-    callback(*args, **kwargs)
-  File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", line =
-66, in newfn
-    ret =3D fn(self, *args, **kwargs)
-  File "/usr/share/virt-manager/virtManager/object/domain.py", line 1279, i=
-n startup
-    self._backend.create()
-  File "/usr/lib64/python3.8/site-packages/libvirt.py", line 1234, in create
-    if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
-=3Dself)
-libvirt.libvirtError: internal error: process exited while connecting to mo=
-nitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch64: -device vfio-pci,ho=
-st=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: VFIO_MAP_DMA: -22
-2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D00=
-00:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: failed =
-to setup container for group 28: memory listener initialization failed: Reg=
-ion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, 0x=
-7fb2a3e00000) =3D -22 (Invalid argument)
-
-
-I played with memory and 3054 MB is maximum value possible to boot VM with =
-coldplugged host PCIe cards.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+- PCIe cards passthrough to TCG guest works on 2GB of guest memory but fail=
+s on 4GB
++ PCIe cards passthrough to TCG guest works only up to 3054MB of guest memo=
+ry
 
 -- =
 
