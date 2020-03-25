@@ -2,64 +2,81 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C42C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EB4C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:53:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A62F22073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:47:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A62F22073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BCA322073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 16:53:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JXWRJk8l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA322073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH9BZ-0005wI-QT
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 12:47:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54337)
+	id 1jH9Hl-0000Zt-SX
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 12:53:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jH9AY-00057X-1q
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:46:19 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jH9H9-00008m-Th
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jH9AW-0003tz-Hx
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:46:17 -0400
-Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:40183)
+ (envelope-from <dgilbert@redhat.com>) id 1jH9H7-0001TQ-Fw
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:53:06 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:57526)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jH9AW-0003sx-Cc
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:46:16 -0400
-Received: from player734.ha.ovh.net (unknown [10.108.57.183])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id CA7DE13664A
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 17:46:14 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player734.ha.ovh.net (Postfix) with ESMTPSA id CB8E110A5C2C2;
- Wed, 25 Mar 2020 16:46:06 +0000 (UTC)
-Subject: Re: [PATCH 3/5] nmi: add MCE class for implementing machine check
- injection commands
-To: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org
-References: <20200325144147.221875-1-npiggin@gmail.com>
- <20200325144147.221875-4-npiggin@gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1d4fb41b-4846-b5a8-481b-dcfadcacd1e2@kaod.org>
-Date: Wed, 25 Mar 2020 17:46:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jH9H7-0001SP-5c
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 12:53:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585155184;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eByqlIsX4SJgAmsoxibAAAy4tbBM36e5+k0JTbS7sbY=;
+ b=JXWRJk8ld6cRb47AgPOrEXzPXDDoz64SgHukipgn41ijTnKgqi25DOZ/ft9Tj9cnzE5tjB
+ 4XMXh+rTah8Ah2zV9gHT8vIYkKug2EY8H4FM2Bc+1THIRYvJwhmYRZBUHe7dRxGWUzMde2
+ 3RsxT3ZBPl2nOKfKQLerLGWqmHT5yfs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-MXqyrFakNTiXBU0RwUOdMA-1; Wed, 25 Mar 2020 12:53:02 -0400
+X-MC-Unique: MXqyrFakNTiXBU0RwUOdMA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 923FC18B9FC2
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 16:53:01 +0000 (UTC)
+Received: from work-vm (ovpn-114-213.ams2.redhat.com [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A2BB91BC6D;
+ Wed, 25 Mar 2020 16:52:54 +0000 (UTC)
+Date: Wed, 25 Mar 2020 16:52:52 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH RFC 3/9] memory: Introduce log_sync_global() to memory
+ listener
+Message-ID: <20200325165252.GB2635@work-vm>
+References: <20200205141749.378044-1-peterx@redhat.com>
+ <20200205141749.378044-4-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200325144147.221875-4-npiggin@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 10004183623548111780
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudehgedgieejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+In-Reply-To: <20200205141749.378044-4-peterx@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.43.93
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,244 +88,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Ganesh Goudar <ganeshgr@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/25/20 3:41 PM, Nicholas Piggin wrote:
-> Like commit 9cb805fd26 ("cpus: Define callback for QEMU "nmi" command")
-> this implements a machine check injection command framework and defines
-> a monitor command for ppc.
+* Peter Xu (peterx@redhat.com) wrote:
+> Some of the memory listener may want to do log synchronization without
+> being able to specify a range of memory to sync but always globally.
+> Such a memory listener should provide this new method instead of the
+> log_sync() method.
 >=20
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Obviously we can also achieve similar thing when we put the global
+> sync logic into a log_sync() handler. However that's not efficient
+> enough because otherwise memory_global_dirty_log_sync() may do the
+> global sync N times, where N is the number of flat views.
+>=20
+> Make this new method be exclusive to log_sync().
+>=20
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Looks good to me,
+OK, so I guess the idea here is that when you have a ring with dirty
+pages on it, you just need to clear all outstanding things on the ring
+whereever they came from.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.=20
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  hmp-commands.hx              | 20 +++++++++++-
->  hw/core/nmi.c                | 61 ++++++++++++++++++++++++++++++++++++
->  include/hw/nmi.h             | 20 ++++++++++++
->  include/monitor/hmp-target.h |  1 -
->  include/monitor/hmp.h        |  1 +
->  monitor/hmp-cmds.c           |  1 +
->  target/ppc/monitor.c         | 11 +++++++
->  7 files changed, 113 insertions(+), 2 deletions(-)
+>  include/exec/memory.h | 12 ++++++++++++
+>  memory.c              | 33 +++++++++++++++++++++++----------
+>  2 files changed, 35 insertions(+), 10 deletions(-)
 >=20
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 7f0f3974ad..4a9089b431 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1581,12 +1581,30 @@ ERST
->          .cmd        =3D hmp_mce,
->      },
->=20
-> -#endif
->  SRST
->  ``mce`` *cpu* *bank* *status* *mcgstatus* *addr* *misc*
->    Inject an MCE on the given CPU (x86 only).
->  ERST
->=20
-> +#endif
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index e85b7de99a..c4427094bb 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -533,6 +533,18 @@ struct MemoryListener {
+>       */
+>      void (*log_sync)(MemoryListener *listener, MemoryRegionSection *sect=
+ion);
+> =20
+> +    /**
+> +     * @log_sync_global:
+> +     *
+> +     * This is the global version of @log_sync when the listener does
+> +     * not have a way to synchronize the log with finer granularity.
+> +     * When the listener registers with @log_sync_global defined, then
+> +     * its @log_sync must be NULL.  Vice versa.
+> +     *
+> +     * @listener: The #MemoryListener.
+> +     */
+> +    void (*log_sync_global)(MemoryListener *listener);
 > +
-> +#if defined(TARGET_PPC)
-> +
-> +    {
-> +        .name       =3D "mce",
-> +        .args_type  =3D "cpu_index:i,srr1_mask:l,dsisr:i,dar:l,recover=
-ed:i",
-> +        .params     =3D "cpu srr1_mask dsisr dar recovered",
-> +        .help       =3D "inject a MCE on the given CPU",
-> +        .cmd        =3D hmp_mce,
-> +    },
-> +
-> +SRST
-> +``mce`` *cpu* *srr1_mask* *dsisr* *dar* *recovered*
-> +  Inject an MCE on the given CPU (PPC only).
-> +ERST
-> +
-> +#endif
-> +
->      {
->          .name       =3D "getfd",
->          .args_type  =3D "fdname:s",
-> diff --git a/hw/core/nmi.c b/hw/core/nmi.c
-> index 481c4b3c7e..2a79500967 100644
-> --- a/hw/core/nmi.c
-> +++ b/hw/core/nmi.c
-> @@ -86,3 +86,64 @@ static void nmi_register_types(void)
+>      /**
+>       * @log_clear:
+>       *
+> diff --git a/memory.c b/memory.c
+> index aeaa8dcc9e..53828ba00c 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2016,6 +2016,10 @@ void memory_region_set_dirty(MemoryRegion *mr, hwa=
+ddr addr,
+>                                          memory_region_get_dirty_log_mask=
+(mr));
 >  }
->=20
->  type_init(nmi_register_types)
-> +
-> +struct do_mce_s {
-> +    const QDict *qdict;
-> +    Error *err;
-> +    bool handled;
-> +};
-> +
-> +static void mce_children(Object *o, struct do_mce_s *ns);
-> +
-> +static int do_mce(Object *o, void *opaque)
-> +{
-> +    struct do_mce_s *ms =3D opaque;
-> +    MCEState *m =3D (MCEState *) object_dynamic_cast(o, TYPE_MCE);
-> +
-> +    if (m) {
-> +        MCEClass *mc =3D MCE_GET_CLASS(m);
-> +
-> +        ms->handled =3D true;
-> +        mc->mce_monitor_handler(m, ms->qdict, &ms->err);
-> +        if (ms->err) {
-> +            return -1;
-> +        }
-> +    }
-> +    mce_children(o, ms);
-> +
-> +    return 0;
-> +}
-> +
-> +static void mce_children(Object *o, struct do_mce_s *ms)
-> +{
-> +    object_child_foreach(o, do_mce, ms);
-> +}
-> +
-> +void mce_monitor_handle(const QDict *qdict, Error **errp)
-> +{
-> +    struct do_mce_s ms =3D {
-> +        .qdict =3D qdict,
-> +        .err =3D NULL,
-> +        .handled =3D false
-> +    };
-> +
-> +    mce_children(object_get_root(), &ms);
-> +    if (ms.handled) {
-> +        error_propagate(errp, ms.err);
-> +    } else {
-> +        error_setg(errp, QERR_UNSUPPORTED);
-> +    }
-> +}
-> +
-> +static const TypeInfo mce_info =3D {
-> +    .name          =3D TYPE_MCE,
-> +    .parent        =3D TYPE_INTERFACE,
-> +    .class_size    =3D sizeof(MCEClass),
-> +};
-> +
-> +static void mce_register_types(void)
-> +{
-> +    type_register_static(&mce_info);
-> +}
-> +
-> +type_init(mce_register_types)
-> diff --git a/include/hw/nmi.h b/include/hw/nmi.h
-> index fe37ce3ad8..de39d95c9a 100644
-> --- a/include/hw/nmi.h
-> +++ b/include/hw/nmi.h
-> @@ -43,4 +43,24 @@ typedef struct NMIClass {
->=20
->  void nmi_monitor_handle(int cpu_index, Error **errp);
->=20
-> +
-> +#define TYPE_MCE "mce"
-> +
-> +#define MCE_CLASS(klass) \
-> +     OBJECT_CLASS_CHECK(MCEClass, (klass), TYPE_MCE)
-> +#define MCE_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(MCEClass, (obj), TYPE_MCE)
-> +#define MCE(obj) \
-> +     INTERFACE_CHECK(MCEState, (obj), TYPE_MCE)
-> +
-> +typedef struct MCEState MCEState;
-> +
-> +typedef struct MCEClass {
-> +    InterfaceClass parent_class;
-> +
-> +    void (*mce_monitor_handler)(MCEState *n, const QDict *qdict, Error=
- **errp);
-> +} MCEClass;
-> +
-> +void mce_monitor_handle(const QDict *qdict, Error **errp);
-> +
->  #endif /* NMI_H */
-> diff --git a/include/monitor/hmp-target.h b/include/monitor/hmp-target.=
-h
-> index 8b7820a3ad..afb8f5bca2 100644
-> --- a/include/monitor/hmp-target.h
-> +++ b/include/monitor/hmp-target.h
-> @@ -45,7 +45,6 @@ CPUState *mon_get_cpu(void);
->=20
->  void hmp_info_mem(Monitor *mon, const QDict *qdict);
->  void hmp_info_tlb(Monitor *mon, const QDict *qdict);
-> -void hmp_mce(Monitor *mon, const QDict *qdict);
->  void hmp_info_local_apic(Monitor *mon, const QDict *qdict);
->  void hmp_info_io_apic(Monitor *mon, const QDict *qdict);
->=20
-> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-> index e33ca5a911..f747a5e214 100644
-> --- a/include/monitor/hmp.h
-> +++ b/include/monitor/hmp.h
-> @@ -54,6 +54,7 @@ void hmp_ringbuf_read(Monitor *mon, const QDict *qdic=
-t);
->  void hmp_cont(Monitor *mon, const QDict *qdict);
->  void hmp_system_wakeup(Monitor *mon, const QDict *qdict);
->  void hmp_nmi(Monitor *mon, const QDict *qdict);
-> +void hmp_mce(Monitor *mon, const QDict *qdict);
->  void hmp_set_link(Monitor *mon, const QDict *qdict);
->  void hmp_balloon(Monitor *mon, const QDict *qdict);
->  void hmp_loadvm(Monitor *mon, const QDict *qdict);
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 58724031ea..3664ef2a4f 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -52,6 +52,7 @@
->  #include "exec/ramlist.h"
->  #include "hw/intc/intc.h"
->  #include "hw/rdma/rdma.h"
-> +#include "hw/nmi.h"
->  #include "migration/snapshot.h"
->  #include "migration/misc.h"
->=20
-> diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
-> index a5a177d717..6daf543efc 100644
-> --- a/target/ppc/monitor.c
-> +++ b/target/ppc/monitor.c
-> @@ -28,6 +28,8 @@
->  #include "qemu/ctype.h"
->  #include "monitor/hmp-target.h"
->  #include "monitor/hmp.h"
-> +#include "qapi/qmp/qdict.h"
-> +#include "hw/nmi.h"
->=20
->  static target_long monitor_get_ccr(const struct MonitorDef *md, int va=
-l)
+> =20
+> +/*
+> + * If memory region `mr' is NULL, do global sync.  Otherwise, sync
+> + * dirty bitmap for the specified memory region.
+> + */
+>  static void memory_region_sync_dirty_bitmap(MemoryRegion *mr)
 >  {
-> @@ -72,6 +74,15 @@ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
->      dump_mmu(env1);
+>      MemoryListener *listener;
+> @@ -2029,18 +2033,24 @@ static void memory_region_sync_dirty_bitmap(Memor=
+yRegion *mr)
+>       * address space once.
+>       */
+>      QTAILQ_FOREACH(listener, &memory_listeners, link) {
+> -        if (!listener->log_sync) {
+> -            continue;
+> -        }
+> -        as =3D listener->address_space;
+> -        view =3D address_space_get_flatview(as);
+> -        FOR_EACH_FLAT_RANGE(fr, view) {
+> -            if (fr->dirty_log_mask && (!mr || fr->mr =3D=3D mr)) {
+> -                MemoryRegionSection mrs =3D section_from_flat_range(fr, =
+view);
+> -                listener->log_sync(listener, &mrs);
+> +        if (listener->log_sync) {
+> +            as =3D listener->address_space;
+> +            view =3D address_space_get_flatview(as);
+> +            FOR_EACH_FLAT_RANGE(fr, view) {
+> +                if (fr->dirty_log_mask && (!mr || fr->mr =3D=3D mr)) {
+> +                    MemoryRegionSection mrs =3D section_from_flat_range(=
+fr, view);
+> +                    listener->log_sync(listener, &mrs);
+> +                }
+>              }
+> +            flatview_unref(view);
+> +        } else if (listener->log_sync_global) {
+> +            /*
+> +             * No matter whether MR is specified, what we can do here
+> +             * is to do a global sync, because we are not capable to
+> +             * sync in a finer granularity.
+> +             */
+> +            listener->log_sync_global(listener);
+>          }
+> -        flatview_unref(view);
+>      }
 >  }
+> =20
+> @@ -2727,6 +2737,9 @@ void memory_listener_register(MemoryListener *liste=
+ner, AddressSpace *as)
+>  {
+>      MemoryListener *other =3D NULL;
+> =20
+> +    /* Only one of them can be defined for a listener */
+> +    assert(!(listener->log_sync && listener->log_sync_global));
+> +
+>      listener->address_space =3D as;
+>      if (QTAILQ_EMPTY(&memory_listeners)
+>          || listener->priority >=3D QTAILQ_LAST(&memory_listeners)->prior=
+ity) {
+> --=20
+> 2.24.1
 >=20
-> +void hmp_mce(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *err =3D NULL;
-> +
-> +    mce_monitor_handle(qdict, &err);
-> +
-> +    hmp_handle_error(mon, err);
-> +}
-> +
->  const MonitorDef monitor_defs[] =3D {
->      { "fpscr", offsetof(CPUPPCState, fpscr) },
->      /* Next instruction pointer */
 >=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
