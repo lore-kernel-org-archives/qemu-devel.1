@@ -2,62 +2,77 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89191C1975A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2232FC1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6076D20772
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:18:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6076D20772
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E5F9320772
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:24:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EKxXx2Of"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5F9320772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH9g6-0004lW-IX
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:18:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58681)
+	id 1jH9lW-0008Cn-2q
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:24:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1jH9fF-00042M-CF
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:18:02 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jH9kk-0006vx-Tv
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:23:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1jH9fD-0006ti-Uj
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:18:01 -0400
-Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:53902)
+ (envelope-from <kwolf@redhat.com>) id 1jH9kj-0002k2-KS
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:23:42 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24459)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jH9fD-0006sZ-Ob
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:17:59 -0400
-Received: from player716.ha.ovh.net (unknown [10.108.54.141])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id A147922C1B7
- for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 18:17:57 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player716.ha.ovh.net (Postfix) with ESMTPSA id 926FA10B7BFEC;
- Wed, 25 Mar 2020 17:17:48 +0000 (UTC)
-Date: Wed, 25 Mar 2020 18:17:47 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 1/4] ppc/spapr: KVM FWNMI should not be enabled until
- guest requests it
-Message-ID: <20200325181747.3d6a7a2c@bahia.lan>
-In-Reply-To: <20200325142906.221248-2-npiggin@gmail.com>
-References: <20200325142906.221248-1-npiggin@gmail.com>
- <20200325142906.221248-2-npiggin@gmail.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jH9kj-0002jQ-Gr
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:23:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585157020;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/8wyeUj06KXeS38TLcF04SKwHtzws1PB37ZwA+U4vxc=;
+ b=EKxXx2OfZnN0uw6ONUqhym6d4TgGxFKJEtVGL1cjGSai0cuW/9J6apNFZGjLPWqn669o4W
+ 3RsO+kuZX/Ro/hpfQ8QuWNGLo0I+EUhX2W0nP/NUZaEyZClkWIryn7SQpy6iNGtaZv3exL
+ ra4CCpYHZyuTVxjZzzjymVQRT1VTlGw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-FE4D07BMM9GbGoGBHbpZ2Q-1; Wed, 25 Mar 2020 13:23:38 -0400
+X-MC-Unique: FE4D07BMM9GbGoGBHbpZ2Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0265107ACC4;
+ Wed, 25 Mar 2020 17:23:37 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-113-184.ams2.redhat.com
+ [10.36.113.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5970A6266E;
+ Wed, 25 Mar 2020 17:23:36 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH 1/2] Revert "mirror: Don't let an operation wait for itself"
+Date: Wed, 25 Mar 2020 18:23:25 +0100
+Message-Id: <20200325172326.22347-2-kwolf@redhat.com>
+In-Reply-To: <20200325172326.22347-1-kwolf@redhat.com>
+References: <20200325172326.22347-1-kwolf@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 10539830503800674755
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudehgedgjeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.33.112
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,126 +84,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
- Ganesh Goudar <ganeshgr@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 26 Mar 2020 00:29:03 +1000
-Nicholas Piggin <npiggin@gmail.com> wrote:
+This reverts commit 7e6c4ff792734e196c8ca82564c56b5e7c6288ca.
 
-> The KVM FWNMI capability should be enabled with the "ibm,nmi-register"
-> rtas call. Although MCEs from KVM will be delivered as architected
-> interrupts to the guest before "ibm,nmi-register" is called, KVM has
-> different behaviour depending on whether the guest has enabled FWNMI
-> (it attempts to do more recovery on behalf of a non-FWNMI guest).
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
+The fix was incomplete as it only protected against requests waiting for
+themselves, but not against requests waiting for each other. We need a
+different solution.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/mirror.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
 
->  hw/ppc/spapr_caps.c  | 7 ++++---
->  hw/ppc/spapr_rtas.c  | 7 +++++++
->  target/ppc/kvm.c     | 7 +++++++
->  target/ppc/kvm_ppc.h | 6 ++++++
->  4 files changed, 24 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 679ae7959f..eb54f94227 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -517,9 +517,10 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
->      }
->  
->      if (kvm_enabled()) {
-> -        if (kvmppc_set_fwnmi() < 0) {
-> -            error_setg(errp, "Firmware Assisted Non-Maskable Interrupts(FWNMI) "
-> -                             "not supported by KVM");
-> +        if (!kvmppc_get_fwnmi()) {
-> +            error_setg(errp,
-> +"Firmware Assisted Non-Maskable Interrupts(FWNMI) not supported by KVM.");
-> +            error_append_hint(errp, "Try appending -machine cap-fwnmi=off\n");
->          }
->      }
->  }
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 9fb8c8632a..29abe66d01 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -437,6 +437,13 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->          return;
->      }
->  
-> +    if (kvm_enabled()) {
-> +        if (kvmppc_set_fwnmi() < 0) {
-> +            rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> +            return;
-> +        }
-> +    }
-> +
->      spapr->fwnmi_system_reset_addr = sreset_addr;
->      spapr->fwnmi_machine_check_addr = mce_addr;
->  
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 597f72be1b..03d0667e8f 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -88,6 +88,7 @@ static int cap_ppc_safe_indirect_branch;
->  static int cap_ppc_count_cache_flush_assist;
->  static int cap_ppc_nested_kvm_hv;
->  static int cap_large_decr;
-> +static int cap_fwnmi;
->  
->  static uint32_t debug_inst_opcode;
->  
-> @@ -136,6 +137,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      kvmppc_get_cpu_characteristics(s);
->      cap_ppc_nested_kvm_hv = kvm_vm_check_extension(s, KVM_CAP_PPC_NESTED_HV);
->      cap_large_decr = kvmppc_get_dec_bits();
-> +    cap_fwnmi = kvm_vm_check_extension(s, KVM_CAP_PPC_FWNMI);
->      /*
->       * Note: setting it to false because there is not such capability
->       * in KVM at this moment.
-> @@ -2064,6 +2066,11 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
->      }
->  }
->  
-> +bool kvmppc_get_fwnmi(void)
-> +{
-> +    return cap_fwnmi;
-> +}
-> +
->  int kvmppc_set_fwnmi(void)
->  {
->      PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 332fa0aa1c..fcaf745516 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
->  void kvmppc_set_papr(PowerPCCPU *cpu);
->  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
->  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
-> +bool kvmppc_get_fwnmi(void);
->  int kvmppc_set_fwnmi(void);
->  int kvmppc_smt_threads(void);
->  void kvmppc_error_append_smt_possible_hint(Error *const *errp);
-> @@ -163,6 +164,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
->  {
->  }
->  
-> +static inline bool kvmppc_get_fwnmi(void)
-> +{
-> +    return false;
-> +}
-> +
->  static inline int kvmppc_set_fwnmi(void)
->  {
->      return -1;
+diff --git a/block/mirror.c b/block/mirror.c
+index 447051dbc6..393131b135 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -283,14 +283,11 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_=
+t *offset,
+ }
+=20
+ static inline void coroutine_fn
+-mirror_wait_for_any_operation(MirrorBlockJob *s, MirrorOp *self, bool acti=
+ve)
++mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
+ {
+     MirrorOp *op;
+=20
+     QTAILQ_FOREACH(op, &s->ops_in_flight, next) {
+-        if (self =3D=3D op) {
+-            continue;
+-        }
+         /* Do not wait on pseudo ops, because it may in turn wait on
+          * some other operation to start, which may in fact be the
+          * caller of this function.  Since there is only one pseudo op
+@@ -305,10 +302,10 @@ mirror_wait_for_any_operation(MirrorBlockJob *s, Mirr=
+orOp *self, bool active)
+ }
+=20
+ static inline void coroutine_fn
+-mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s, MirrorOp *self)
++mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+ {
+     /* Only non-active operations use up in-flight slots */
+-    mirror_wait_for_any_operation(s, self, false);
++    mirror_wait_for_any_operation(s, false);
+ }
+=20
+ /* Perform a mirror copy operation.
+@@ -351,7 +348,7 @@ static void coroutine_fn mirror_co_read(void *opaque)
+=20
+     while (s->buf_free_count < nb_chunks) {
+         trace_mirror_yield_in_flight(s, op->offset, s->in_flight);
+-        mirror_wait_for_free_in_flight_slot(s, op);
++        mirror_wait_for_free_in_flight_slot(s);
+     }
+=20
+     /* Now make a QEMUIOVector taking enough granularity-sized chunks
+@@ -558,7 +555,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlo=
+ckJob *s)
+=20
+         while (s->in_flight >=3D MAX_IN_FLIGHT) {
+             trace_mirror_yield_in_flight(s, offset, s->in_flight);
+-            mirror_wait_for_free_in_flight_slot(s, pseudo_op);
++            mirror_wait_for_free_in_flight_slot(s);
+         }
+=20
+         if (s->ret < 0) {
+@@ -612,7 +609,7 @@ static void mirror_free_init(MirrorBlockJob *s)
+ static void coroutine_fn mirror_wait_for_all_io(MirrorBlockJob *s)
+ {
+     while (s->in_flight > 0) {
+-        mirror_wait_for_free_in_flight_slot(s, NULL);
++        mirror_wait_for_free_in_flight_slot(s);
+     }
+ }
+=20
+@@ -809,7 +806,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJo=
+b *s)
+             if (s->in_flight >=3D MAX_IN_FLIGHT) {
+                 trace_mirror_yield(s, UINT64_MAX, s->buf_free_count,
+                                    s->in_flight);
+-                mirror_wait_for_free_in_flight_slot(s, NULL);
++                mirror_wait_for_free_in_flight_slot(s);
+                 continue;
+             }
+=20
+@@ -962,7 +959,7 @@ static int coroutine_fn mirror_run(Job *job, Error **er=
+rp)
+         /* Do not start passive operations while there are active
+          * writes in progress */
+         while (s->in_active_write_counter) {
+-            mirror_wait_for_any_operation(s, NULL, true);
++            mirror_wait_for_any_operation(s, true);
+         }
+=20
+         if (s->ret < 0) {
+@@ -988,7 +985,7 @@ static int coroutine_fn mirror_run(Job *job, Error **er=
+rp)
+             if (s->in_flight >=3D MAX_IN_FLIGHT || s->buf_free_count =3D=
+=3D 0 ||
+                 (cnt =3D=3D 0 && s->in_flight > 0)) {
+                 trace_mirror_yield(s, cnt, s->buf_free_count, s->in_flight=
+);
+-                mirror_wait_for_free_in_flight_slot(s, NULL);
++                mirror_wait_for_free_in_flight_slot(s);
+                 continue;
+             } else if (cnt !=3D 0) {
+                 delay_ns =3D mirror_iteration(s);
+--=20
+2.20.1
 
 
