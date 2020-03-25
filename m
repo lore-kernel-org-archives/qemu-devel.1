@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF27DC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA071C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:43:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 685F920772
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:42:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A20E920772
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 10:43:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtKTXkx+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 685F920772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W+S58/mR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A20E920772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH3Um-0003kQ-IN
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:42:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35433)
+	id 1jH3VG-0004iD-PR
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 06:43:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3T5-0001RI-55
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:41:04 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3Rs-0007Py-0q
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:39:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jH3T3-0002Nr-A6
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:41:03 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24146)
+ (envelope-from <mlevitsk@redhat.com>) id 1jH3Rq-0001VR-AG
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:39:47 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:56719)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3T3-0002N9-4r
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:41:01 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jH3Rq-0001V3-6V
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 06:39:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585132860;
+ s=mimecast20190719; t=1585132785;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MBdSlGMfwoUiFT/e8Xxde9UtZjr1v4pvMkeZU8DDiw8=;
- b=AtKTXkx+/Udk9wUoP0CrogaV8IudSRCRTZ0ocT5fqBQqCNWmz+PGuXHFF4JlyYCdXtCqsV
- JqOoY+y9T4AlysafQ4ZgfCaAErRgCoH+0g57/5RyaVASAYcdYgKqg6VDa6A/lIpQZvLXl8
- yf6GreaHy6pWYceYkMU6pWgC4dtfh+U=
+ bh=p80QZ0mc4EqJz+/RfKWx+dEtX90r7XAmnZtEUYB3j6k=;
+ b=W+S58/mRbbc1jlJjaXn3xDCYOj7vbxtpy1EtHCdz3QXvmvEVHPNMKNoraBUWuRPNokqLKq
+ Li4tagcHA2KfRwQx7k0KtvJyKeA5c3e+DupIZe7cpPG6Pb9n1StNNONPaNFvhK4F0VhcTq
+ ReSIPBW0LIFMnlscVNwCsiCmhGjLtzs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-zJGZ5ZTvOZ-Uihiprlb1oQ-1; Wed, 25 Mar 2020 06:40:58 -0400
-X-MC-Unique: zJGZ5ZTvOZ-Uihiprlb1oQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-365-0NFnFYW5MvOuY2XlNzfkxQ-1; Wed, 25 Mar 2020 06:39:42 -0400
+X-MC-Unique: 0NFnFYW5MvOuY2XlNzfkxQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 695D5800D5C;
- Wed, 25 Mar 2020 10:40:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95924DBA7;
+ Wed, 25 Mar 2020 10:39:40 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3448294B5B;
- Wed, 25 Mar 2020 10:40:55 +0000 (UTC)
-Message-ID: <a7c92a47957a8185a9bd8d7d8b919072d757ff3a.camel@redhat.com>
-Subject: Re: [PATCH v6 12/42] nvme: add support for the get log page command
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79D29A0A75;
+ Wed, 25 Mar 2020 10:39:38 +0000 (UTC)
+Message-ID: <aae04efeb49752c420e5ed2ba1ce3312909fbb0e.camel@redhat.com>
+Subject: Re: [PATCH v6 09/42] nvme: add max_ioqpairs device parameter
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-Date: Wed, 25 Mar 2020 12:40:53 +0200
-In-Reply-To: <20200316142928.153431-13-its@irrelevant.dk>
+Date: Wed, 25 Mar 2020 12:39:37 +0200
+In-Reply-To: <20200316142928.153431-10-its@irrelevant.dk>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-13-its@irrelevant.dk>
+ <20200316142928.153431-10-its@irrelevant.dk>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,260 +96,192 @@ Sender: "Qemu-devel"
 On Mon, 2020-03-16 at 07:28 -0700, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Add support for the Get Log Page command and basic implementations of
-> the mandatory Error Information, SMART / Health Information and Firmware
-> Slot Information log pages.
+> The num_queues device paramater has a slightly confusing meaning because
+> it accounts for the admin queue pair which is not really optional.
+> Secondly, it is really a maximum value of queues allowed.
 > 
-> In violation of the specification, the SMART / Health Information log
-> page does not persist information over the lifetime of the controller
-> because the device has no place to store such persistent state.
+> Add a new max_ioqpairs parameter that only accounts for I/O queue pairs,
+> but keep num_queues for compatibility.
 > 
-> Note that the LPA field in the Identify Controller data structure
-> intentionally has bit 0 cleared because there is no namespace specific
-> information in the SMART / Health information log page.
-> 
-> Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
-> Section 5.10 ("Get Log Page command").
-> 
-> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
-> Acked-by: Keith Busch <kbusch@kernel.org>
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > ---
->  hw/block/nvme.c       | 138 +++++++++++++++++++++++++++++++++++++++++-
->  hw/block/nvme.h       |  10 +++
->  hw/block/trace-events |   2 +
->  3 files changed, 149 insertions(+), 1 deletion(-)
+>  hw/block/nvme.c | 45 ++++++++++++++++++++++++++-------------------
+>  hw/block/nvme.h |  4 +++-
+>  2 files changed, 29 insertions(+), 20 deletions(-)
 > 
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 64c42101df5c..83ff3fbfb463 100644
+> index 7cf7cf55143e..7dfd8a1a392d 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -569,6 +569,138 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
->      return NVME_SUCCESS;
->  }
+> @@ -19,7 +19,7 @@
+>   *      -drive file=<file>,if=none,id=<drive_id>
+>   *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
+>   *              cmb_size_mb=<cmb_size_mb[optional]>, \
+> - *              num_queues=<N[optional]>
+> + *              max_ioqpairs=<N[optional]>
+>   *
+>   * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
+>   * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
+> @@ -27,6 +27,7 @@
 >  
-> +static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
-> +                                uint64_t off, NvmeRequest *req)
-> +{
-> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
-> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
-> +    uint32_t nsid = le32_to_cpu(cmd->nsid);
-> +
-> +    uint32_t trans_len;
-> +    time_t current_ms;
-> +    uint64_t units_read = 0, units_written = 0;
-> +    uint64_t read_commands = 0, write_commands = 0;
-> +    NvmeSmartLog smart;
-> +    BlockAcctStats *s;
-> +
-> +    if (nsid && nsid != 0xffffffff) {
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +
-> +    s = blk_get_stats(n->conf.blk);
-> +
-> +    units_read = s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
-> +    units_written = s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
-> +    read_commands = s->nr_ops[BLOCK_ACCT_READ];
-> +    write_commands = s->nr_ops[BLOCK_ACCT_WRITE];
-> +
-> +    if (off > sizeof(smart)) {
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +
-> +    trans_len = MIN(sizeof(smart) - off, buf_len);
-> +
-> +    memset(&smart, 0x0, sizeof(smart));
-> +
-> +    smart.data_units_read[0] = cpu_to_le64(units_read / 1000);
-> +    smart.data_units_written[0] = cpu_to_le64(units_written / 1000);
-> +    smart.host_read_commands[0] = cpu_to_le64(read_commands);
-> +    smart.host_write_commands[0] = cpu_to_le64(write_commands);
-> +
-> +    smart.temperature[0] = n->temperature & 0xff;
-> +    smart.temperature[1] = (n->temperature >> 8) & 0xff;
-> +
-> +    if ((n->temperature > n->features.temp_thresh_hi) ||
-> +        (n->temperature < n->features.temp_thresh_low)) {
-> +        smart.critical_warning |= NVME_SMART_TEMPERATURE;
-> +    }
-> +
-> +    current_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-> +    smart.power_on_hours[0] =
-> +        cpu_to_le64((((current_ms - n->starttime_ms) / 1000) / 60) / 60);
-OH, I didn't notice that you didn't have the endian conversion in V5, it is needed here
-of course.
-
-> +
-> +    return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp1,
-> +                             prp2);
-> +}
-> +
-> +static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
-> +                                 uint64_t off, NvmeRequest *req)
-> +{
-> +    uint32_t trans_len;
-> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
-> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
-> +    NvmeFwSlotInfoLog fw_log;
-> +
-> +    if (off > sizeof(fw_log)) {
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +
-> +    memset(&fw_log, 0, sizeof(NvmeFwSlotInfoLog));
-> +
-> +    trans_len = MIN(sizeof(fw_log) - off, buf_len);
-> +
-> +    return nvme_dma_read_prp(n, (uint8_t *) &fw_log + off, trans_len, prp1,
-> +                             prp2);
-> +}
-> +
-> +static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
-> +                                uint64_t off, NvmeRequest *req)
-> +{
-> +    uint32_t trans_len;
-> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
-> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
-> +    uint8_t errlog[64];
-I'll would replace this with sizeof(NvmeErrorLogEntry)
-(and add NvmeErrorLogEntry to the nvme.h), just for the sake of consistency,
-and in case we end up reporting some errors to the log in the future.
-
-
-> +
-> +    if (off > sizeof(errlog)) {
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +
-> +    memset(errlog, 0x0, sizeof(errlog));
-> +
-> +    trans_len = MIN(sizeof(errlog) - off, buf_len);
-> +
-> +    return nvme_dma_read_prp(n, errlog, trans_len, prp1, prp2);
-> +}
-Besides this, looks good now.
-
-> +
-> +static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> +{
-> +    uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
-> +    uint32_t dw12 = le32_to_cpu(cmd->cdw12);
-> +    uint32_t dw13 = le32_to_cpu(cmd->cdw13);
-> +    uint8_t  lid = dw10 & 0xff;
-> +    uint8_t  rae = (dw10 >> 15) & 0x1;
-> +    uint32_t numdl, numdu;
-> +    uint64_t off, lpol, lpou;
-> +    size_t   len;
-> +
-> +    numdl = (dw10 >> 16);
-> +    numdu = (dw11 & 0xffff);
-> +    lpol = dw12;
-> +    lpou = dw13;
-> +
-> +    len = (((numdu << 16) | numdl) + 1) << 2;
-> +    off = (lpou << 32ULL) | lpol;
-> +
-> +    if (off & 0x3) {
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +
-> +    trace_nvme_dev_get_log(nvme_cid(req), lid, rae, len, off);
-> +
-> +    switch (lid) {
-> +    case NVME_LOG_ERROR_INFO:
-> +        return nvme_error_info(n, cmd, len, off, req);
-> +    case NVME_LOG_SMART_INFO:
-> +        return nvme_smart_info(n, cmd, len, off, req);
-> +    case NVME_LOG_FW_SLOT_INFO:
-> +        return nvme_fw_log_info(n, cmd, len, off, req);
-> +    default:
-> +        trace_nvme_dev_err_invalid_log_page(nvme_cid(req), lid);
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +}
-> +
->  static void nvme_free_cq(NvmeCQueue *cq, NvmeCtrl *n)
+>  #include "qemu/osdep.h"
+>  #include "qemu/units.h"
+> +#include "qemu/error-report.h"
+>  #include "hw/block/block.h"
+>  #include "hw/pci/msix.h"
+>  #include "hw/pci/pci.h"
+> @@ -72,12 +73,12 @@ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+>  
+>  static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
 >  {
->      n->cq[cq->cqid] = NULL;
-> @@ -914,6 +1046,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->          return nvme_del_sq(n, cmd);
->      case NVME_ADM_CMD_CREATE_SQ:
->          return nvme_create_sq(n, cmd);
-> +    case NVME_ADM_CMD_GET_LOG_PAGE:
-> +        return nvme_get_log(n, cmd, req);
->      case NVME_ADM_CMD_DELETE_CQ:
->          return nvme_del_cq(n, cmd);
->      case NVME_ADM_CMD_CREATE_CQ:
-> @@ -1416,7 +1550,9 @@ static void nvme_init_state(NvmeCtrl *n)
->      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
->      n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
->      n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
-> +    n->temperature = NVME_TEMPERATURE;
->      n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
-> +    n->starttime_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+> -    return sqid < n->params.num_queues && n->sq[sqid] != NULL ? 0 : -1;
+> +    return sqid < n->params.max_ioqpairs + 1 && n->sq[sqid] != NULL ? 0 : -1;
 >  }
 >  
->  static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-> @@ -1493,7 +1629,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
->       */
->      id->acl = 3;
->      id->frmw = 7 << 1;
-> -    id->lpa = 1 << 0;
-> +    id->lpa = 1 << 2;
+>  static int nvme_check_cqid(NvmeCtrl *n, uint16_t cqid)
+>  {
+> -    return cqid < n->params.num_queues && n->cq[cqid] != NULL ? 0 : -1;
+> +    return cqid < n->params.max_ioqpairs + 1 && n->cq[cqid] != NULL ? 0 : -1;
+>  }
 >  
->      /* recommended default value (~70 C) */
->      id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
+>  static void nvme_inc_cq_tail(NvmeCQueue *cq)
+> @@ -639,7 +640,7 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+>          trace_nvme_dev_err_invalid_create_cq_addr(prp1);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> -    if (unlikely(vector > n->params.num_queues)) {
+> +    if (unlikely(vector > n->params.max_ioqpairs + 1)) {
+>          trace_nvme_dev_err_invalid_create_cq_vector(vector);
+>          return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
+>      }
+> @@ -803,8 +804,8 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
+>          break;
+>      case NVME_NUMBER_OF_QUEUES:
+> -        result = cpu_to_le32((n->params.num_queues - 2) |
+> -                             ((n->params.num_queues - 2) << 16));
+> +        result = cpu_to_le32((n->params.max_ioqpairs - 1) |
+> +                             ((n->params.max_ioqpairs - 1) << 16));
+>          trace_nvme_dev_getfeat_numq(result);
+>          break;
+>      case NVME_TIMESTAMP:
+> @@ -848,10 +849,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>      case NVME_NUMBER_OF_QUEUES:
+>          trace_nvme_dev_setfeat_numq((dw11 & 0xFFFF) + 1,
+>                                      ((dw11 >> 16) & 0xFFFF) + 1,
+> -                                    n->params.num_queues - 1,
+> -                                    n->params.num_queues - 1);
+> -        req->cqe.result = cpu_to_le32((n->params.num_queues - 2) |
+> -                                      ((n->params.num_queues - 2) << 16));
+> +                                    n->params.max_ioqpairs,
+> +                                    n->params.max_ioqpairs);
+> +        req->cqe.result = cpu_to_le32((n->params.max_ioqpairs - 1) |
+> +                                      ((n->params.max_ioqpairs - 1) << 16));
+>          break;
+>      case NVME_TIMESTAMP:
+>          return nvme_set_feature_timestamp(n, cmd);
+> @@ -924,12 +925,12 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
+>  
+>      blk_drain(n->conf.blk);
+>  
+> -    for (i = 0; i < n->params.num_queues; i++) {
+> +    for (i = 0; i < n->params.max_ioqpairs + 1; i++) {
+>          if (n->sq[i] != NULL) {
+>              nvme_free_sq(n->sq[i], n);
+>          }
+>      }
+> -    for (i = 0; i < n->params.num_queues; i++) {
+> +    for (i = 0; i < n->params.max_ioqpairs + 1; i++) {
+>          if (n->cq[i] != NULL) {
+>              nvme_free_cq(n->cq[i], n);
+>          }
+> @@ -1332,9 +1333,15 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      int64_t bs_size;
+>      uint8_t *pci_conf;
+>  
+> -    if (!n->params.num_queues) {
+> -        error_setg(errp, "num_queues can't be zero");
+> -        return;
+> +    if (n->params.num_queues) {
+> +        warn_report("nvme: num_queues is deprecated; please use max_ioqpairs "
+> +                    "instead");
+> +
+> +        n->params.max_ioqpairs = n->params.num_queues - 1;
+> +    }
+> +
+> +    if (!n->params.max_ioqpairs) {
+> +        error_setg(errp, "max_ioqpairs can't be less than 1");
+>      }
+This is not even a nitpick, but just and idea.
+
+It might be worth it to allow max_ioqpairs=0 to simulate a 'broken'
+nvme controller. I know that kernel has special handling for such controllers,
+which include only creation of the control character device (/dev/nvme*) through
+which the user can submit commands to try and 'fix' the controller (by re-uploading firmware
+maybe or something like that).
+
+
+>  
+>      if (!n->conf.blk) {
+> @@ -1365,19 +1372,19 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      pcie_endpoint_cap_init(pci_dev, 0x80);
+>  
+>      n->num_namespaces = 1;
+> -    n->reg_size = pow2ceil(0x1004 + 2 * (n->params.num_queues + 1) * 4);
+> +    n->reg_size = pow2ceil(0x1008 + 2 * (n->params.max_ioqpairs) * 4);
+
+I hate to say it, but it looks like this thing (which I mentioned to you in V5)
+was pre-existing bug, which is indeed fixed now.
+In theory such fixes should go to separate patches, but in this case, I guess it would
+be too much to ask for it.
+Maybe mention this in the commit message instead, so that this fix doesn't stay hidden like that?
+
+
+>      n->ns_size = bs_size / (uint64_t)n->num_namespaces;
+>  
+>      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
+> -    n->sq = g_new0(NvmeSQueue *, n->params.num_queues);
+> -    n->cq = g_new0(NvmeCQueue *, n->params.num_queues);
+> +    n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
+> +    n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
+>  
+>      memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
+>                            "nvme", n->reg_size);
+>      pci_register_bar(pci_dev, 0,
+>          PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
+>          &n->iomem);
+> -    msix_init_exclusive_bar(pci_dev, n->params.num_queues, 4, NULL);
+> +    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
+>  
+>      id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
+>      id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
 > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 8cda5f02c622..ebeee2edc4f4 100644
+> index 9957c4a200e2..98f5b9479244 100644
 > --- a/hw/block/nvme.h
 > +++ b/hw/block/nvme.h
-> @@ -109,6 +109,7 @@ typedef struct NvmeCtrl {
->      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
->      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
->      uint16_t    temperature;
-> +    uint64_t    starttime_ms;
+> @@ -6,11 +6,13 @@
+>  #define DEFINE_NVME_PROPERTIES(_state, _props) \
+>      DEFINE_PROP_STRING("serial", _state, _props.serial), \
+>      DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
+> -    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64)
+> +    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 0), \
+> +    DEFINE_PROP_UINT32("max_ioqpairs", _state, _props.max_ioqpairs, 64)
 >  
->      NvmeNamespace   *namespaces;
->      NvmeSQueue      **sq;
-> @@ -124,4 +125,13 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
->      return n->ns_size >> nvme_ns_lbads(ns);
->  }
+>  typedef struct NvmeParams {
+>      char     *serial;
+>      uint32_t num_queues;
+> +    uint32_t max_ioqpairs;
+>      uint32_t cmb_size_mb;
+>  } NvmeParams;
 >  
-> +static inline uint16_t nvme_cid(NvmeRequest *req)
-> +{
-> +    if (req) {
-> +        return le16_to_cpu(req->cqe.cid);
-> +    }
-> +
-> +    return 0xffff;
-> +}
-> +
->  #endif /* HW_NVME_H */
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index ade506ea2bb2..7da088479f39 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -46,6 +46,7 @@ nvme_dev_getfeat_numq(int result) "get feature number of queues, result=%d"
->  nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
->  nvme_dev_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
->  nvme_dev_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
-> +nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
->  nvme_dev_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
->  nvme_dev_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
->  nvme_dev_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
-> @@ -85,6 +86,7 @@ nvme_dev_err_invalid_create_cq_qflags(uint16_t qflags) "failed creating completi
->  nvme_dev_err_invalid_identify_cns(uint16_t cns) "identify, invalid cns=0x%"PRIx16""
->  nvme_dev_err_invalid_getfeat(int dw10) "invalid get features, dw10=0x%"PRIx32""
->  nvme_dev_err_invalid_setfeat(uint32_t dw10) "invalid set features, dw10=0x%"PRIx32""
-> +nvme_dev_err_invalid_log_page(uint16_t cid, uint16_t lid) "cid %"PRIu16" lid 0x%"PRIx16""
->  nvme_dev_err_startfail_cq(void) "nvme_start_ctrl failed because there are non-admin completion queues"
->  nvme_dev_err_startfail_sq(void) "nvme_start_ctrl failed because there are non-admin submission queues"
->  nvme_dev_err_startfail_nbarasq(void) "nvme_start_ctrl failed because the admin submission queue address is null"
 
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
+
+
+
 
 
 
