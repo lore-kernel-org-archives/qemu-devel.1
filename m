@@ -2,111 +2,73 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83977C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E26C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:56:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 472A920663
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:53:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DWKHyLZQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 472A920663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 572F620663
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 13:56:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572F620663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH6Sq-0001LA-Ee
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:53:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57864)
+	id 1jH6WA-00030m-F4
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 09:56:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jH6S4-0000rr-Kv
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:52:13 -0400
+ (envelope-from <bounces@canonical.com>) id 1jH6VO-00026t-6P
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jH6S3-0001h2-De
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:52:12 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:43270)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jH6S3-0001gx-AM
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:52:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585144331;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=i8B6x6vwNXPYxxgFxw7RQABSa5Efbv7nPaLItHVJnss=;
- b=DWKHyLZQY+LgOlRJ9syArBGO+UykDOPeyopY7u3yDKvSrtgXvZTsjTXdQvsBmz/PD1FRau
- 30+cV8bWp6YES3zTgkEzvrYClPwuLFkaJvWyxMSkJ6BDpRi1VqGlc6YvbMJS/HKFPMKBI1
- 9jmTxpGSPgekwLc6HwSHH2FFYwLIsYE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-glHgGQMPOqGXHmnNxnTLwg-1; Wed, 25 Mar 2020 09:52:07 -0400
-X-MC-Unique: glHgGQMPOqGXHmnNxnTLwg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1D128024E9;
- Wed, 25 Mar 2020 13:52:04 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-115-33.ams2.redhat.com
- [10.36.115.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 738D994B5C;
- Wed, 25 Mar 2020 13:52:02 +0000 (UTC)
-Subject: Re: [PATCH v2 3/4] qcow2: Avoid feature name extension on small
- cluster size
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200324174233.1622067-1-eblake@redhat.com>
- <20200324174233.1622067-4-eblake@redhat.com>
- <d28f2dfc-1f85-1157-0a57-341894205883@redhat.com>
- <f900616b-8e98-d0b1-efd7-f53b8c241c8f@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <61b5c2d0-fc76-cc70-ab25-bd75cd785d69@redhat.com>
-Date: Wed, 25 Mar 2020 14:52:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <bounces@canonical.com>) id 1jH6VM-00056P-Is
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34222)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jH6VM-00055a-Cx
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 09:55:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jH6VL-0007wm-Fk
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 747692E80C7
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 13:55:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <f900616b-8e98-d0b1-efd7-f53b8c241c8f@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="mZcaIIvjewspJyDwPN4vAaAHKLHKmH5E1"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Mar 2020 13:47:32 -0000
+From: Marcin Juszkiewicz <1869006@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: hrw
+X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
+X-Launchpad-Bug-Modifier: Marcin Juszkiewicz (hrw)
+References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
+Message-Id: <158514405290.16008.9555499615618002985.malone@gac.canonical.com>
+Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
+ guest memory but fails on 4GB
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a27f3a59a4355c12e10c5fb7c984a3085c0d495e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -115,113 +77,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Reply-To: Bug 1869006 <1869006@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mZcaIIvjewspJyDwPN4vAaAHKLHKmH5E1
-Content-Type: multipart/mixed; boundary="37Av4K1DFet5RMJh1r5dZledg7bMO8p8O"
+Qemu command line for booting VM was generated by libvirt:
 
---37Av4K1DFet5RMJh1r5dZledg7bMO8p8O
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+/usr/bin/qemu-system-aarch64 =
 
-On 25.03.20 14:18, Eric Blake wrote:
-> On 3/25/20 7:42 AM, Max Reitz wrote:
->> On 24.03.20 18:42, Eric Blake wrote:
->>> As the feature name table can be quite large (over 9k if all 64 bits
->>> of all three feature fields have names; a mere 8 features leaves only
->>> 8 bytes for a backing file name in a 512-byte cluster), it is unwise
->>> to emit this optional header in images with small cluster sizes.
->>>
->>> Update iotest 036 to skip running on small cluster sizes; meanwhile,
->>> note that iotest 061 never passed on alternative cluster sizes
->>> (however, I limited this patch to tests with output affected by adding
->>> feature names, rather than auditing for other tests that are not
->>> robust to alternative cluster sizes).
->>
->=20
->>> -=C2=A0=C2=A0=C2=A0 /* Feature table */
->>> -=C2=A0=C2=A0=C2=A0 if (s->qcow_version >=3D 3) {
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Feature table.=C2=A0 A mere 8 feature names=
- occupies 392 bytes, and
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * when coupled with the v3 minimum header of =
-104 bytes plus the
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * 8-byte end-of-extension marker, that would =
-leave only 8 bytes
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * for a backing file name in an image with 51=
-2-byte clusters.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Thus, we choose to omit this header for clu=
-ster sizes 4k and
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * smaller.
->>
->> Can=E2=80=99t we do this decision more dynamically?=C2=A0 Like, always o=
-mit it when
->> cluster_size - sizeof(features) < 2k/3k/...?
->>
->> Max
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 if (s->qcow_version >=3D 3 && s->cluster_size > 409=
-6) {
->=20
-> Yes.=C2=A0 But when you consider that sizeof(features) is a compile-time
-> constant, it isn't really dynamic for a given qemu release, but rather a
-> different way to spell things; about the only thing it would buy us is
-> that our cutoff window for what cluster size no longer gets the header
-> may automatically shift from 2k to 4k to 8k as future qemu versions add
-> more qcow2 features.
+-name guest=3Dfedora-aarch64-pcie,debug-threads=3Don =
 
-Yes.
+-S =
 
-> If we want to write it like that, which size limit
-> do you propose?=C2=A0 Or asked differently, how much space should we rese=
-rve
-> for other extension headers + backing file name?
+-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/do=
+main-1-fedora-aarch64-pcie/master-key.aes =
 
-Well, that was the =E2=80=9C2k/3k/...=E2=80=9D list. :)
+-blockdev {"driver":"file","filename":"/usr/share/edk2/aarch64/QEMU_EFI-pfl=
+ash.raw","node-name":"libvirt-pflash0-storage","auto-read-only":true,"disca=
+rd":"unmap"} =
 
-The backing file name is limited to 1k, so I suppose that plus 1k for a
-potential external data filename, plus 1k for the rest, so 3k in total?
+-blockdev {"node-name":"libvirt-pflash0-format","read-only":true,"driver":"=
+raw","file":"libvirt-pflash0-storage"} =
 
-Now that I look into the spec, I see that it actually doesn=E2=80=99t say t=
-hat
-the backing filename has to be part of the header cluster.  But, well.
+-blockdev {"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/fedora-a=
+arch64-pcie_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only"=
+:true,"discard":"unmap"} =
 
-It also only says that the image header must be part of the first
-cluster, which in my opinion doesn=E2=80=99t necessarily include its extens=
-ions.
- So header extensions (and the backing filename) could actually be in
-consecutive clusters.  But that of course would be much more difficult
-to implement.
+-blockdev {"node-name":"libvirt-pflash1-format","read-only":false,"driver":=
+"raw","file":"libvirt-pflash1-storage"} =
 
-Max
+-machine virt-4.2,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff,gic-version=
+=3D2,pflash0=3Dlibvirt-pflash0-format,pflash1=3Dlibvirt-pflash1-format =
 
+-cpu cortex-a57 =
 
---37Av4K1DFet5RMJh1r5dZledg7bMO8p8O--
+-m 2048 =
 
---mZcaIIvjewspJyDwPN4vAaAHKLHKmH5E1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+-overcommit mem-lock=3Doff =
 
------BEGIN PGP SIGNATURE-----
+-smp 3,sockets=3D3,cores=3D1,threads=3D1 =
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl57YgAACgkQ9AfbAGHV
-z0CpRAf+Pep9Fqo3QPepXYvFKqIMKHdWylT/pg3P1hWrLHqhr8zjfkytthdMHHeW
-ggCI7Fr+yuHBaRW4yaR0dX62ULYqetkFPimBfAWaKM2936b4kSPDnbLxePJUEe4w
-P3zNrW8T6lX/qE8LXl4WlhfqAtYj04xq4zrIMNHdbL5DnLkqd0KQoPAiPnwoOmVx
-L4LSo+SKDr89D592yW2CvHxFnYYSOB8D6hN+zroTHWUK1QtFydT4paZSDJm/eR0+
-+IU0NBlqrME2zvDRfFXEtTwvOl0tRNocQ/lsscTsdk6A9GI2mn9xClYlikvDOl68
-KhJdn/Sq+oIHZ1qCDUzAvSe7kZ0bIA==
-=Zpcc
------END PGP SIGNATURE-----
+-uuid 139dc97a-1511-480d-b215-c58a5c80e646 =
 
---mZcaIIvjewspJyDwPN4vAaAHKLHKmH5E1--
+-no-user-config =
 
+-nodefaults =
+
+-chardev socket,id=3Dcharmonitor,fd=3D32,server,nowait =
+
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol =
+
+-rtc base=3Dutc =
+
+-no-shutdown =
+
+-boot strict=3Don =
+
+-device pcie-root-port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multi=
+function=3Don,addr=3D0x1 =
+
+-device pcie-root-port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=
+=3D0x1.0x1 =
+
+-device pcie-root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=
+=3D0x1.0x2 =
+
+-device pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=
+=3D0x1.0x3 =
+
+-device pcie-root-port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=
+=3D0x1.0x4 =
+
+-device pcie-root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=
+=3D0x1.0x5 =
+
+-device pcie-root-port,port=3D0xe,chassis=3D7,id=3Dpci.7,bus=3Dpcie.0,addr=
+=3D0x1.0x6 =
+
+-device pcie-root-port,port=3D0xf,chassis=3D8,id=3Dpci.8,bus=3Dpcie.0,addr=
+=3D0x1.0x7 =
+
+-device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.2,addr=3D0x0 =
+
+-netdev tap,fd=3D29,id=3Dhostnet0 =
+
+-device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:87:3e:d3,=
+bus=3Dpci.1,addr=3D0x0 =
+
+-chardev pty,id=3Dcharserial0 =
+
+-serial chardev:charserial0 =
+
+-chardev socket,id=3Dcharchannel0,fd=3D33,server,nowait =
+
+-device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0=
+,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 =
+
+-spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Do=
+ff,seamless-migration=3Don =
+
+-device virtio-gpu-pci,id=3Dvideo0,max_outputs=3D1,bus=3Dpci.7,addr=3D0x0 =
+
+-device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0 =
+
+-device vfio-pci,host=3D0000:28:00.0,id=3Dhostdev1,bus=3Dpci.4,addr=3D0x0 =
+
+-device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 =
+
+-object rng-random,id=3Dobjrng0,filename=3D/dev/urandom =
+
+-device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.6,addr=3D0x0 =
+
+-sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcec=
+ontrol=3Ddeny =
+
+-msg timestamp=3Don
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1869006
+
+Title:
+  PCIe cards passthrough to TCG guest works on 2GB of guest memory but
+  fails on 4GB (vfio_dma_map invalid arg)
+
+Status in QEMU:
+  New
+
+Bug description:
+  During one meeting coworker asked "did someone tried to passthrough
+  PCIe card to other arch guest?" and I decided to check it.
+
+  Plugged SATA and USB3 controllers into spare slots on mainboard and
+  started playing. On 1GB VM instance it worked (both cold- and hot-
+  plugged). On 4GB one it did not:
+
+  B=C5=82=C4=85d podczas uruchamiania domeny: internal error: process exite=
+d while connecting to monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarc=
+h64: -device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D=
+0x0: VFIO_MAP_DMA: -22
+  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
+0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
+d to setup container for group 28: memory listener initialization failed: R=
+egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
+0x7fb2a3e00000) =3D -22 (Invalid argument)
+
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
+wrapper
+      callback(asyncjob, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
+pcb
+      callback(*args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
+e 66, in newfn
+      ret =3D fn(self, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1279,=
+ in startup
+      self._backend.create()
+    File "/usr/lib64/python3.8/site-packages/libvirt.py", line 1234, in cre=
+ate
+      if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
+=3Dself)
+  libvirt.libvirtError: internal error: process exited while connecting to =
+monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch64: -device vfio-pci,=
+host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: VFIO_MAP_DMA: -22
+  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
+0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
+d to setup container for group 28: memory listener initialization failed: R=
+egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
+0x7fb2a3e00000) =3D -22 (Invalid argument)
+
+  =
+
+  I played with memory and 3054 MB is maximum value possible to boot VM wit=
+h coldplugged host PCIe cards.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1869006/+subscriptions
 
