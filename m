@@ -6,81 +6,80 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D5C6C54FCF
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 459E5C1975A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38FFA2073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:40:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38FFA2073E
+	by mail.kernel.org (Postfix) with ESMTPS id 224E62073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 15:40:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 224E62073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jH88s-0004br-BU
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:40:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44620)
+	id 1jH89B-0004tb-9P
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 11:40:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <muriloo@linux.ibm.com>) id 1jH84O-0005bg-D0
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:53 -0400
+ (envelope-from <muriloo@linux.ibm.com>) id 1jH84q-0006LS-2A
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:36:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <muriloo@linux.ibm.com>) id 1jH84N-0004cY-1W
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12006
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <muriloo@linux.ibm.com>) id 1jH84o-0004rN-K7
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:36:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29222)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
- id 1jH84M-0004cH-RX
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:35:50 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ id 1jH84o-0004qq-AP
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 11:36:18 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02PFXwN7124840; Wed, 25 Mar 2020 11:35:50 -0400
+ 02PFXIHH056741; Wed, 25 Mar 2020 11:36:09 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ywet52y3h-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ywejxqtk0-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 11:35:50 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02PFY2tS125108;
- Wed, 25 Mar 2020 11:35:49 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ywet52y2n-1
+ Wed, 25 Mar 2020 11:36:09 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02PFXTeT057144;
+ Wed, 25 Mar 2020 11:35:58 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ywejxqtcf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 11:35:49 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02PFZAZi029623;
- Wed, 25 Mar 2020 15:35:48 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma04dal.us.ibm.com with ESMTP id 2ywawg2wnh-1
+ Wed, 25 Mar 2020 11:35:58 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02PFZCAs025042;
+ Wed, 25 Mar 2020 15:35:41 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma05wdc.us.ibm.com with ESMTP id 2ywawfj9rc-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 25 Mar 2020 15:35:48 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02PFZlni41812242
+ Wed, 25 Mar 2020 15:35:41 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02PFZeT826149156
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 25 Mar 2020 15:35:47 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D10C0AE060;
- Wed, 25 Mar 2020 15:35:47 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E6F62AE05C;
- Wed, 25 Mar 2020 15:35:46 +0000 (GMT)
+ Wed, 25 Mar 2020 15:35:40 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BFDDDC605A;
+ Wed, 25 Mar 2020 15:35:40 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8E93CC605F;
+ Wed, 25 Mar 2020 15:35:37 +0000 (GMT)
 Received: from localhost (unknown [9.85.207.6])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
- Wed, 25 Mar 2020 15:35:46 +0000 (GMT)
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Wed, 25 Mar 2020 15:35:37 +0000 (GMT)
 From: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.ibm.com>
 To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 03/15] util: vfio-helpers: Factor out removal from
- qemu_vfio_undo_mapping()
-Date: Wed, 25 Mar 2020 11:45:51 -0300
-Message-ID: <2516375.9XiQzmnd3r@kermit.br.ibm.com>
+Subject: Re: [PATCH v4 10/15] util/mmap-alloc: Prepare for resizeable mmaps
+Date: Wed, 25 Mar 2020 12:09:12 -0300
+Message-ID: <5052501.7tvaipRbP1@kermit.br.ibm.com>
 Organization: IBM
-In-Reply-To: <20200305142945.216465-4-david@redhat.com>
+In-Reply-To: <20200305142945.216465-11-david@redhat.com>
 References: <20200305142945.216465-1-david@redhat.com>
- <20200305142945.216465-4-david@redhat.com>
+ <20200305142945.216465-11-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
@@ -89,13 +88,13 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
  definitions=2020-03-25_08:2020-03-24,
  2020-03-25 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 bulkscore=0
- mlxlogscore=999 adultscore=0 spamscore=0 clxscore=1015 phishscore=0
- malwarescore=0 lowpriorityscore=0 mlxscore=0 suspectscore=5
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ malwarescore=0 clxscore=1015
+ suspectscore=1 spamscore=0 mlxscore=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2003250124
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,127 +109,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
  "Michael S . Tsirkin" <mst@redhat.com>,
  Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
  Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, March 5, 2020 11:29:33 AM -03 David Hildenbrand wrote:
-> Factor it out and properly use it where applicable. Make
-> qemu_vfio_undo_mapping() look like qemu_vfio_do_mapping(), passing the
-> size and iova, not the mapping.
+On Thursday, March 5, 2020 11:29:40 AM -03 David Hildenbrand wrote:
+> When shrinking a mmap we want to re-reserve the already activated area.
+> When growing a memory region, we want to activate starting with a given
+> fd_offset. Prepare by allowing to pass these parameters.
 >
+> Also, let's make sure we always process full pages, to avoid
+> unmapping/remapping pages that are already in use when
+> growing/shrinking. Add some asserts.
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > Reviewed-by: Peter Xu <peterx@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
+> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Greg Kurz <groug@kaod.org>
+> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
 
 Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 
->  util/vfio-helpers.c | 43 +++++++++++++++++++++++++++----------------
->  1 file changed, 27 insertions(+), 16 deletions(-)
+>  util/mmap-alloc.c | 34 +++++++++++++++++++++++-----------
+>  1 file changed, 23 insertions(+), 11 deletions(-)
 >
-> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> index 7085ca702c..f0c77f0d69 100644
-> --- a/util/vfio-helpers.c
-> +++ b/util/vfio-helpers.c
-> @@ -518,6 +518,20 @@ static IOVAMapping *qemu_vfio_add_mapping(QEMUVFIOState
-> *s, return insert;
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index 8f40ef4fed..2767caa33b 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -83,12 +83,12 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
 >  }
 >
-> +/**
-> + * Remove the mapping from @s and free it.
-> + */
-> +static void qemu_vfio_remove_mapping(QEMUVFIOState *s, IOVAMapping
-> *mapping) +{
-> +    const int index = mapping - s->mappings;
-> +
-> +    assert(index >= 0 && index < s->nr_mappings);
-> +    memmove(mapping, &s->mappings[index + 1],
-> +            sizeof(s->mappings[0]) * (s->nr_mappings - index - 1));
-> +    s->nr_mappings--;
-> +    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
-> +}
-> +
->  /* Do the DMA mapping with VFIO. */
->  static int qemu_vfio_do_mapping(QEMUVFIOState *s, void *host, size_t size,
->                                  uint64_t iova)
-> @@ -539,29 +553,22 @@ static int qemu_vfio_do_mapping(QEMUVFIOState *s, void
-> *host, size_t size, }
+>  /*
+> - * Reserve a new memory region of the requested size to be used for mapping
+> - * from the given fd (if any).
+> + * Reserve a new memory region of the requested size or re-reserve parts
+> + * of an activated region to be used for mapping from the given fd (if
+> any). */
+> -static void *mmap_reserve(size_t size, int fd)
+> +static void *mmap_reserve(void *ptr, size_t size, int fd)
+>  {
+> -    int flags = MAP_PRIVATE;
+> +    int flags = MAP_PRIVATE | (ptr ? MAP_FIXED : 0);
 >
->  /**
-> - * Undo the DMA mapping from @s with VFIO, and remove from mapping list.
-> + * Undo the DMA mapping from @s with VFIO.
+>  #if defined(__powerpc64__) && defined(__linux__)
+>      /*
+> @@ -111,20 +111,24 @@ static void *mmap_reserve(size_t size, int fd)
+>      flags |= MAP_ANONYMOUS;
+>  #endif
+>
+> -    return mmap(0, size, PROT_NONE, flags, fd, 0);
+> +    return mmap(ptr, size, PROT_NONE, flags, fd, 0);
+>  }
+>
+>  /*
+>   * Activate memory in a reserved region from the given fd (if any), to make
+> * it accessible.
 >   */
-> -static void qemu_vfio_undo_mapping(QEMUVFIOState *s, IOVAMapping *mapping)
-> +static void qemu_vfio_undo_mapping(QEMUVFIOState *s, size_t size, uint64_t
-> iova) {
-> -    int index;
->      struct vfio_iommu_type1_dma_unmap unmap = {
->          .argsz = sizeof(unmap),
->          .flags = 0,
-> -        .iova = mapping->iova,
-> -        .size = mapping->size,
-> +        .iova = iova,
-> +        .size = size,
->      };
+> -static void *mmap_activate(void *ptr, size_t size, int fd, bool shared,
+> -                           bool is_pmem)
+> +static void *mmap_activate(void *ptr, size_t size, int fd, size_t
+> fd_offset, +                           bool shared, bool is_pmem)
+>  {
+>      int map_sync_flags = 0;
+>      int flags = MAP_FIXED;
+>      void *activated_ptr;
 >
-> -    index = mapping - s->mappings;
-> -    assert(mapping->size > 0);
-> -    assert(QEMU_IS_ALIGNED(mapping->size, qemu_real_host_page_size));
-> -    assert(index >= 0 && index < s->nr_mappings);
-> +    assert(size > 0);
-> +    assert(QEMU_IS_ALIGNED(size, qemu_real_host_page_size));
->      if (ioctl(s->container, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
->          error_report("VFIO_UNMAP_DMA failed: %s", strerror(errno));
->      }
-> -    memmove(mapping, &s->mappings[index + 1],
-> -            sizeof(s->mappings[0]) * (s->nr_mappings - index - 1));
-> -    s->nr_mappings--;
-> -    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
->  }
->
->  /* Check if the mapping list is (ascending) ordered. */
-> @@ -621,7 +628,7 @@ int qemu_vfio_dma_map(QEMUVFIOState *s, void *host,
-> size_t size, assert(qemu_vfio_verify_mappings(s));
->              ret = qemu_vfio_do_mapping(s, host, size, iova0);
->              if (ret) {
-> -                qemu_vfio_undo_mapping(s, mapping);
-> +                qemu_vfio_remove_mapping(s, mapping);
->                  goto out;
->              }
->              s->low_water_mark += size;
-> @@ -681,7 +688,8 @@ void qemu_vfio_dma_unmap(QEMUVFIOState *s, void *host)
->      if (!m) {
->          goto out;
->      }
-> -    qemu_vfio_undo_mapping(s, m);
-> +    qemu_vfio_undo_mapping(s, m->size, m->iova);
-> +    qemu_vfio_remove_mapping(s, m);
->  out:
->      qemu_mutex_unlock(&s->lock);
->  }
-> @@ -698,7 +706,10 @@ void qemu_vfio_close(QEMUVFIOState *s)
->          return;
->      }
->      while (s->nr_mappings) {
-> -        qemu_vfio_undo_mapping(s, &s->mappings[s->nr_mappings - 1]);
-> +        IOVAMapping *m = &s->mappings[s->nr_mappings - 1];
+> +    if (fd == -1) {
+> +        fd_offset = 0;
+> +    }
 > +
-> +        qemu_vfio_undo_mapping(s, m->size, m->iova);
-> +        qemu_vfio_remove_mapping(s, m);
+>      flags |= fd == -1 ? MAP_ANONYMOUS : 0;
+>      flags |= shared ? MAP_SHARED : MAP_PRIVATE;
+>      if (shared && is_pmem) {
+> @@ -132,7 +136,7 @@ static void *mmap_activate(void *ptr, size_t size, int
+> fd, bool shared, }
+>
+>      activated_ptr = mmap(ptr, size, PROT_READ | PROT_WRITE,
+> -                         flags | map_sync_flags, fd, 0);
+> +                         flags | map_sync_flags, fd, fd_offset);
+>      if (activated_ptr == MAP_FAILED && map_sync_flags) {
+>          if (errno == ENOTSUP) {
+>              char *proc_link = g_strdup_printf("/proc/self/fd/%d", fd);
+> @@ -154,7 +158,8 @@ static void *mmap_activate(void *ptr, size_t size, int
+> fd, bool shared, * If mmap failed with MAP_SHARED_VALIDATE | MAP_SYNC, we
+> will try * again without these flags to handle backwards compatibility. */
+> -        activated_ptr = mmap(ptr, size, PROT_READ | PROT_WRITE, flags, fd,
+> 0); +        activated_ptr = mmap(ptr, size, PROT_READ | PROT_WRITE, flags,
+> fd, +                             fd_offset);
 >      }
->      ram_block_notifier_remove(&s->ram_notifier);
->      qemu_vfio_reset(s);
+>      return activated_ptr;
+>  }
+> @@ -176,16 +181,19 @@ void *qemu_ram_mmap(int fd,
+>                      bool is_pmem)
+>  {
+>      const size_t guard_pagesize = mmap_guard_pagesize(fd);
+> +    const size_t pagesize = qemu_fd_getpagesize(fd);
+>      size_t offset, total;
+>      void *ptr, *guardptr;
+>
+> +    g_assert(QEMU_IS_ALIGNED(size, pagesize));
+> +
+>      /*
+>       * Note: this always allocates at least one extra page of virtual
+> address * space, even if size is already aligned.
+>       */
+>      total = size + align;
+>
+> -    guardptr = mmap_reserve(total, fd);
+> +    guardptr = mmap_reserve(NULL, total, fd);
+>      if (guardptr == MAP_FAILED) {
+>          return MAP_FAILED;
+>      }
+> @@ -196,7 +204,7 @@ void *qemu_ram_mmap(int fd,
+>
+>      offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) -
+> (uintptr_t)guardptr;
+>
+> -    ptr = mmap_activate(guardptr + offset, size, fd, shared, is_pmem);
+> +    ptr = mmap_activate(guardptr + offset, size, fd, 0, shared, is_pmem);
+>      if (ptr == MAP_FAILED) {
+>          munmap(guardptr, total);
+>          return MAP_FAILED;
+> @@ -220,6 +228,10 @@ void *qemu_ram_mmap(int fd,
+>
+>  void qemu_ram_munmap(int fd, void *ptr, size_t size)
+>  {
+> +    const size_t pagesize = qemu_fd_getpagesize(fd);
+> +
+> +    g_assert(QEMU_IS_ALIGNED(size, pagesize));
+> +
+>      if (ptr) {
+>          /* Unmap both the RAM block and the guard page */
+>          munmap(ptr, size + mmap_guard_pagesize(fd));
 
 
 --
