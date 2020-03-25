@@ -2,81 +2,81 @@ Return-Path: <SRS0=PjAl=5K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC5BC2D0E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D9CC2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:47:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12CC92074D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:46:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3669D2074D
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 17:47:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s5OPESJ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12CC92074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VqJ2RW1I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3669D2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHA6L-0007ox-8F
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:46:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36146)
+	id 1jHA7M-0000Hz-EQ
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 13:47:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36181)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jHA4q-0006Oe-Kb
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:44:30 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jHA50-0006fK-6A
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:44:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jHA4o-00023r-5J
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:44:28 -0400
-Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:36144)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jHA4o-00023R-0n; Wed, 25 Mar 2020 13:44:26 -0400
-Received: by mail-vs1-xe43.google.com with SMTP id 184so1302693vsu.3;
- Wed, 25 Mar 2020 10:44:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HzTxdhjKRXuGd4FU9D4C1TJdTWnX5bZcMQPDdU84rlI=;
- b=s5OPESJ2nWg7U2Na0jHEiuuS+M38td3aFwZGNgjy2SGxPvRf4QmGE1Rxj5LsiPW6xX
- CsMlBRQsIbTPKJ1+ILuk27PjMigcxSKBOdFLypoWrvae3+27Yyx//ce8OqLE69NI98MW
- gHkTc1b8REAchAZmvz7St4KelGWvqmBE+G83ckR5fCvYujXh7S8yHn6FhgWE7mnZIDKz
- 9RvGProQAXUQ+b3w7cWsaI/5iap8wBMcj88mb7pQcIe6aJNdmcorqE4QRTg/QxzwfKWe
- 0FBL/wOFydx8Pd6xcmCLDzh27ssJuu1KXMt5Ip3WQu4syi/8szp/wrskjII6SAw5pb2y
- lyeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HzTxdhjKRXuGd4FU9D4C1TJdTWnX5bZcMQPDdU84rlI=;
- b=PNOXIA4+6hsDw88+bkEEQrVlDp+9PQ6r3kJiIF9d5O2dF6sJmsuBkEWhiAf2yDPmW4
- yxvRpr/tlvUxMVNnb+2jVlwN8LT76oZSZLYPHnxfHYKfa/G2axzKnw1YnoTWvdsnwan/
- Id2yuRKrrLQF8f5alM4DhlwJR19LHI0xgVedUG0CR5oYMl4JUwm0ObvFicG+gX+PTJin
- ReDfxu+NMbSQkupqyyyfiG0X9lKF/xLkdpVi1RRLljAV8ZCks0gCYfYUDH/NkeQMT4Vf
- TpQZK2Tm6gtrsyDV2FjTdG1KeTUzf3UnX6GW8q4VL3lNwYQdgS+Oj4NxNfXwi4koV+8o
- ftLg==
-X-Gm-Message-State: ANhLgQ039WJm3oOsXO+bFKV/308EdY/0HxJzpl/pjJvyDna27i3viCmp
- fqm6AxrKK/q7uRrXrMQtnP9ZjXTHFfTjr5Ki5Bg=
-X-Google-Smtp-Source: ADFU+vvE9SjldAtbk/tVDnBHQRZIHAyka0cn06olOcXb37LZkCFSiX9P43bk6tDNAuUk/wo/tHib+PGYxsTeGscpf04=
-X-Received: by 2002:a67:26c2:: with SMTP id m185mr3659014vsm.180.1585158265268; 
- Wed, 25 Mar 2020 10:44:25 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1jHA4y-0002CT-Tx
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:44:38 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:20575)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jHA4y-0002Bv-PM
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 13:44:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585158276;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5FdXOkrbohr7uS5cNFXsajo0Z52raWFVu2MXQ2gQtwg=;
+ b=VqJ2RW1IkvMbOUJw/xv/mZJKvGOmap7g6ME4hdmz5bLiDqhj6IpkFyOKCacZjl8bIyKiWU
+ ccpKrAqo4zSeY/85u+WitL9MAVNk7EsHrvuFpZhS7KikdQ0hOwQjQwoua7i6oQeqqcG4tQ
+ qf8gXSRr/5RJkT1RUkl4TueAJ7+q7tY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-AWEW6vosNWaHX3FByJ3-kQ-1; Wed, 25 Mar 2020 13:44:34 -0400
+X-MC-Unique: AWEW6vosNWaHX3FByJ3-kQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A856800D4E
+ for <qemu-devel@nongnu.org>; Wed, 25 Mar 2020 17:44:33 +0000 (UTC)
+Received: from work-vm (ovpn-114-213.ams2.redhat.com [10.36.114.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CDD8E100164D;
+ Wed, 25 Mar 2020 17:44:27 +0000 (UTC)
+Date: Wed, 25 Mar 2020 17:44:24 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH RFC 4/9] KVM: Create the KVMSlot dirty bitmap on flag
+ changes
+Message-ID: <20200325174424.GC2635@work-vm>
+References: <20200205141749.378044-1-peterx@redhat.com>
+ <20200205141749.378044-5-peterx@redhat.com>
 MIME-Version: 1.0
-References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
- <20200317150653.9008-19-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200317150653.9008-19-zhiwei_liu@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 25 Mar 2020 10:36:25 -0700
-Message-ID: <CAKmqyKP3AZXrry+OkJxUejySEuE8JbQ8w7YmJUWNpNfb0nOdEg@mail.gmail.com>
-Subject: Re: [PATCH v6 18/61] target/riscv: vector single-width integer
- multiply instructions
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e43
+In-Reply-To: <20200205141749.378044-5-peterx@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,280 +88,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 17, 2020 at 8:43 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+* Peter Xu (peterx@redhat.com) wrote:
+> Previously we have two places that will create the per KVMSlot dirty
+> bitmap:
+>=20
+>   1. When a newly created KVMSlot has dirty logging enabled,
+>   2. When the first log_sync() happens for a memory slot.
+>=20
+> The 2nd case is lazy-init, while the 1st case is not (which is a fix
+> of what the 2nd case missed).
+>=20
+> To do explicit initialization of dirty bitmaps, what we're missing is
+> to create the dirty bitmap when the slot changed from not-dirty-track
+> to dirty-track.  Do that in kvm_slot_update_flags().
+>=20
+> With that, we can safely remove the 2nd lazy-init.
+>=20
+> This change will be needed for kvm dirty ring because kvm dirty ring
+> does not use the log_sync() interface at all.
+>=20
+> Since at it, move all the pre-checks into kvm_slot_init_dirty_bitmap().
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+'While at it' or just Also
 
-Alistair
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  target/riscv/helper.h                   |  33 +++++
->  target/riscv/insn32.decode              |   8 ++
->  target/riscv/insn_trans/trans_rvv.inc.c |  10 ++
->  target/riscv/vector_helper.c            | 156 ++++++++++++++++++++++++
->  4 files changed, 207 insertions(+)
->
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index c7d4ff185a..f42a12eef3 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -525,3 +525,36 @@ DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
->  DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
->  DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
->  DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+>  accel/kvm/kvm-all.c | 23 +++++++++--------------
+>  1 file changed, 9 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 4be3cd2352..bb635c775f 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -162,6 +162,8 @@ static NotifierList kvm_irqchip_change_notifiers =3D
+>  #define kvm_slots_lock(kml)      qemu_mutex_lock(&(kml)->slots_lock)
+>  #define kvm_slots_unlock(kml)    qemu_mutex_unlock(&(kml)->slots_lock)
+> =20
+> +static void kvm_slot_init_dirty_bitmap(KVMSlot *mem);
 > +
-> +DEF_HELPER_6(vmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulh_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index aafbdc6be7..abfed469bc 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -363,6 +363,14 @@ vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
->  vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
->  vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
->  vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
-> +vmul_vv         100101 . ..... ..... 010 ..... 1010111 @r_vm
-> +vmul_vx         100101 . ..... ..... 110 ..... 1010111 @r_vm
-> +vmulh_vv        100111 . ..... ..... 010 ..... 1010111 @r_vm
-> +vmulh_vx        100111 . ..... ..... 110 ..... 1010111 @r_vm
-> +vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
-> +vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
-> +vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
-> +vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
->
->  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
->  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> index 53c49ee15c..c276beabd6 100644
-> --- a/target/riscv/insn_trans/trans_rvv.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -1452,3 +1452,13 @@ GEN_OPIVX_TRANS(vminu_vx, opivx_check)
->  GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
->  GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
->  GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
-> +
-> +/* Vector Single-Width Integer Multiply Instructions */
-> +GEN_OPIVV_GVEC_TRANS(vmul_vv,  mul)
-> +GEN_OPIVV_TRANS(vmulh_vv, opivv_check)
-> +GEN_OPIVV_TRANS(vmulhu_vv, opivv_check)
-> +GEN_OPIVV_TRANS(vmulhsu_vv, opivv_check)
-> +GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
-> +GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
-> +GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
-> +GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index 32c2760a8a..56ba9a7422 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -852,6 +852,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
->  #define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
->  #define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
->  #define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
-> +#define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
-> +#define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
-> +#define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
-> +#define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
->
->  /* operation of two vector elements */
->  typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
-> @@ -1585,3 +1589,155 @@ GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
->  GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
->  GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
->  GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
-> +
-> +/* Vector Single-Width Integer Multiply Instructions */
-> +#define DO_MUL(N, M) (N * M)
-> +RVVCALL(OPIVV2, vmul_vv_b, OP_SSS_B, H1, H1, H1, DO_MUL)
-> +RVVCALL(OPIVV2, vmul_vv_h, OP_SSS_H, H2, H2, H2, DO_MUL)
-> +RVVCALL(OPIVV2, vmul_vv_w, OP_SSS_W, H4, H4, H4, DO_MUL)
-> +RVVCALL(OPIVV2, vmul_vv_d, OP_SSS_D, H8, H8, H8, DO_MUL)
-> +GEN_VEXT_VV(vmul_vv_b, 1, 1, clearb)
-> +GEN_VEXT_VV(vmul_vv_h, 2, 2, clearh)
-> +GEN_VEXT_VV(vmul_vv_w, 4, 4, clearl)
-> +GEN_VEXT_VV(vmul_vv_d, 8, 8, clearq)
-> +
-> +static int8_t do_mulh_b(int8_t s2, int8_t s1)
-> +{
-> +    return (int16_t)s2 * (int16_t)s1 >> 8;
-> +}
-> +
-> +static int16_t do_mulh_h(int16_t s2, int16_t s1)
-> +{
-> +    return (int32_t)s2 * (int32_t)s1 >> 16;
-> +}
-> +
-> +static int32_t do_mulh_w(int32_t s2, int32_t s1)
-> +{
-> +    return (int64_t)s2 * (int64_t)s1 >> 32;
-> +}
-> +
-> +static int64_t do_mulh_d(int64_t s2, int64_t s1)
-> +{
-> +    uint64_t hi_64, lo_64;
-> +
-> +    muls64(&lo_64, &hi_64, s1, s2);
-> +    return hi_64;
-> +}
-> +
-> +static uint8_t do_mulhu_b(uint8_t s2, uint8_t s1)
-> +{
-> +    return (uint16_t)s2 * (uint16_t)s1 >> 8;
-> +}
-> +
-> +static uint16_t do_mulhu_h(uint16_t s2, uint16_t s1)
-> +{
-> +    return (uint32_t)s2 * (uint32_t)s1 >> 16;
-> +}
-> +
-> +static uint32_t do_mulhu_w(uint32_t s2, uint32_t s1)
-> +{
-> +    return (uint64_t)s2 * (uint64_t)s1 >> 32;
-> +}
-> +
-> +static uint64_t do_mulhu_d(uint64_t s2, uint64_t s1)
-> +{
-> +    uint64_t hi_64, lo_64;
-> +
-> +    mulu64(&lo_64, &hi_64, s2, s1);
-> +    return hi_64;
-> +}
-> +
-> +static int8_t do_mulhsu_b(int8_t s2, uint8_t s1)
-> +{
-> +    return (int16_t)s2 * (uint16_t)s1 >> 8;
-> +}
-> +
-> +static int16_t do_mulhsu_h(int16_t s2, uint16_t s1)
-> +{
-> +    return (int32_t)s2 * (uint32_t)s1 >> 16;
-> +}
-> +
-> +static int32_t do_mulhsu_w(int32_t s2, uint32_t s1)
-> +{
-> +    return (int64_t)s2 * (uint64_t)s1 >> 32;
-> +}
-> +
-> +static int64_t do_mulhsu_d(int64_t s2, uint64_t s1)
-> +{
-> +    uint64_t hi_64, lo_64, abs_s2 = s2;
-> +
-> +    if (s2 < 0) {
-> +        abs_s2 = -s2;
-> +    }
-> +    mulu64(&lo_64, &hi_64, abs_s2, s1);
-> +    if (s2 < 0) {
-> +        lo_64 = ~lo_64;
-> +        hi_64 = ~hi_64;
-> +        if (lo_64 == UINT64_MAX) {
-> +            lo_64 = 0;
-> +            hi_64 += 1;
-> +        } else {
-> +            lo_64 += 1;
-> +        }
+>  int kvm_get_max_memslots(void)
+>  {
+>      KVMState *s =3D KVM_STATE(current_accel());
+> @@ -442,6 +444,7 @@ static int kvm_slot_update_flags(KVMMemoryListener *k=
+ml, KVMSlot *mem,
+>          return 0;
+>      }
+> =20
+> +    kvm_slot_init_dirty_bitmap(mem);
+>      return kvm_set_user_memory_region(kml, mem, false);
+>  }
+> =20
+> @@ -526,8 +529,12 @@ static int kvm_get_dirty_pages_log_range(MemoryRegio=
+nSection *section,
+>  #define ALIGN(x, y)  (((x)+(y)-1) & ~((y)-1))
+> =20
+>  /* Allocate the dirty bitmap for a slot  */
+> -static void kvm_memslot_init_dirty_bitmap(KVMSlot *mem)
+> +static void kvm_slot_init_dirty_bitmap(KVMSlot *mem)
+>  {
+> +    if (!(mem->flags & KVM_MEM_LOG_DIRTY_PAGES) || mem->dirty_bmap) {
+> +        return;
 > +    }
 > +
-> +    return hi_64;
-> +}
-> +
-> +RVVCALL(OPIVV2, vmulh_vv_b, OP_SSS_B, H1, H1, H1, do_mulh_b)
-> +RVVCALL(OPIVV2, vmulh_vv_h, OP_SSS_H, H2, H2, H2, do_mulh_h)
-> +RVVCALL(OPIVV2, vmulh_vv_w, OP_SSS_W, H4, H4, H4, do_mulh_w)
-> +RVVCALL(OPIVV2, vmulh_vv_d, OP_SSS_D, H8, H8, H8, do_mulh_d)
-> +RVVCALL(OPIVV2, vmulhu_vv_b, OP_UUU_B, H1, H1, H1, do_mulhu_b)
-> +RVVCALL(OPIVV2, vmulhu_vv_h, OP_UUU_H, H2, H2, H2, do_mulhu_h)
-> +RVVCALL(OPIVV2, vmulhu_vv_w, OP_UUU_W, H4, H4, H4, do_mulhu_w)
-> +RVVCALL(OPIVV2, vmulhu_vv_d, OP_UUU_D, H8, H8, H8, do_mulhu_d)
-> +RVVCALL(OPIVV2, vmulhsu_vv_b, OP_SUS_B, H1, H1, H1, do_mulhsu_b)
-> +RVVCALL(OPIVV2, vmulhsu_vv_h, OP_SUS_H, H2, H2, H2, do_mulhsu_h)
-> +RVVCALL(OPIVV2, vmulhsu_vv_w, OP_SUS_W, H4, H4, H4, do_mulhsu_w)
-> +RVVCALL(OPIVV2, vmulhsu_vv_d, OP_SUS_D, H8, H8, H8, do_mulhsu_d)
-> +GEN_VEXT_VV(vmulh_vv_b, 1, 1, clearb)
-> +GEN_VEXT_VV(vmulh_vv_h, 2, 2, clearh)
-> +GEN_VEXT_VV(vmulh_vv_w, 4, 4, clearl)
-> +GEN_VEXT_VV(vmulh_vv_d, 8, 8, clearq)
-> +GEN_VEXT_VV(vmulhu_vv_b, 1, 1, clearb)
-> +GEN_VEXT_VV(vmulhu_vv_h, 2, 2, clearh)
-> +GEN_VEXT_VV(vmulhu_vv_w, 4, 4, clearl)
-> +GEN_VEXT_VV(vmulhu_vv_d, 8, 8, clearq)
-> +GEN_VEXT_VV(vmulhsu_vv_b, 1, 1, clearb)
-> +GEN_VEXT_VV(vmulhsu_vv_h, 2, 2, clearh)
-> +GEN_VEXT_VV(vmulhsu_vv_w, 4, 4, clearl)
-> +GEN_VEXT_VV(vmulhsu_vv_d, 8, 8, clearq)
-> +
-> +RVVCALL(OPIVX2, vmul_vx_b, OP_SSS_B, H1, H1, DO_MUL)
-> +RVVCALL(OPIVX2, vmul_vx_h, OP_SSS_H, H2, H2, DO_MUL)
-> +RVVCALL(OPIVX2, vmul_vx_w, OP_SSS_W, H4, H4, DO_MUL)
-> +RVVCALL(OPIVX2, vmul_vx_d, OP_SSS_D, H8, H8, DO_MUL)
-> +RVVCALL(OPIVX2, vmulh_vx_b, OP_SSS_B, H1, H1, do_mulh_b)
-> +RVVCALL(OPIVX2, vmulh_vx_h, OP_SSS_H, H2, H2, do_mulh_h)
-> +RVVCALL(OPIVX2, vmulh_vx_w, OP_SSS_W, H4, H4, do_mulh_w)
-> +RVVCALL(OPIVX2, vmulh_vx_d, OP_SSS_D, H8, H8, do_mulh_d)
-> +RVVCALL(OPIVX2, vmulhu_vx_b, OP_UUU_B, H1, H1, do_mulhu_b)
-> +RVVCALL(OPIVX2, vmulhu_vx_h, OP_UUU_H, H2, H2, do_mulhu_h)
-> +RVVCALL(OPIVX2, vmulhu_vx_w, OP_UUU_W, H4, H4, do_mulhu_w)
-> +RVVCALL(OPIVX2, vmulhu_vx_d, OP_UUU_D, H8, H8, do_mulhu_d)
-> +RVVCALL(OPIVX2, vmulhsu_vx_b, OP_SUS_B, H1, H1, do_mulhsu_b)
-> +RVVCALL(OPIVX2, vmulhsu_vx_h, OP_SUS_H, H2, H2, do_mulhsu_h)
-> +RVVCALL(OPIVX2, vmulhsu_vx_w, OP_SUS_W, H4, H4, do_mulhsu_w)
-> +RVVCALL(OPIVX2, vmulhsu_vx_d, OP_SUS_D, H8, H8, do_mulhsu_d)
-> +GEN_VEXT_VX(vmul_vx_b, 1, 1, clearb)
-> +GEN_VEXT_VX(vmul_vx_h, 2, 2, clearh)
-> +GEN_VEXT_VX(vmul_vx_w, 4, 4, clearl)
-> +GEN_VEXT_VX(vmul_vx_d, 8, 8, clearq)
-> +GEN_VEXT_VX(vmulh_vx_b, 1, 1, clearb)
-> +GEN_VEXT_VX(vmulh_vx_h, 2, 2, clearh)
-> +GEN_VEXT_VX(vmulh_vx_w, 4, 4, clearl)
-> +GEN_VEXT_VX(vmulh_vx_d, 8, 8, clearq)
-> +GEN_VEXT_VX(vmulhu_vx_b, 1, 1, clearb)
-> +GEN_VEXT_VX(vmulhu_vx_h, 2, 2, clearh)
-> +GEN_VEXT_VX(vmulhu_vx_w, 4, 4, clearl)
-> +GEN_VEXT_VX(vmulhu_vx_d, 8, 8, clearq)
-> +GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
-> +GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
-> +GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
-> +GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
-> --
-> 2.23.0
->
+>      /*
+>       * XXX bad kernel interface alert
+>       * For dirty bitmap, kernel allocates array of size aligned to
+> @@ -578,11 +585,6 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryL=
+istener *kml,
+>              goto out;
+>          }
+> =20
+> -        if (!mem->dirty_bmap) {
+> -            /* Allocate on the first log_sync, once and for all */
+> -            kvm_memslot_init_dirty_bitmap(mem);
+> -        }
+> -
+>          d.dirty_bitmap =3D mem->dirty_bmap;
+>          d.slot =3D mem->slot | (kml->as_id << 16);
+>          if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) =3D=3D -1) {
+> @@ -1079,14 +1081,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *km=
+l,
+>          mem->start_addr =3D start_addr;
+>          mem->ram =3D ram;
+>          mem->flags =3D kvm_mem_flags(mr);
+> -
+> -        if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+> -            /*
+> -             * Reallocate the bmap; it means it doesn't disappear in
+> -             * middle of a migrate.
+> -             */
+> -            kvm_memslot_init_dirty_bitmap(mem);
+> -        }
+> +        kvm_slot_init_dirty_bitmap(mem);
+>          err =3D kvm_set_user_memory_region(kml, mem, true);
+>          if (err) {
+>              fprintf(stderr, "%s: error registering slot: %s\n", __func__=
+,
+> --=20
+> 2.24.1
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
