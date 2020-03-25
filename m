@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DBDC2D0E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 19:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB547C2D0E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 19:23:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F6D4206F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 19:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73944206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Mar 2020 19:23:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TD7KDGHi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F6D4206F6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JK8Z5CR/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73944206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHBbx-00067b-7p
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 15:22:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53260)
+	id 1jHBce-0006rP-Ky
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 15:23:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53277)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jHBY8-0008KM-BT
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 15:18:50 -0400
+ id 1jHBYA-0008OG-0M
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 15:18:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jHBY5-0008Kl-H0
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 15:18:48 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:45164)
+ id 1jHBY8-0008Mh-0m
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 15:18:49 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:40216)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jHBY5-0008KB-6S; Wed, 25 Mar 2020 15:18:45 -0400
-Received: by mail-wr1-x434.google.com with SMTP id t7so4630603wrw.12;
- Wed, 25 Mar 2020 12:18:45 -0700 (PDT)
+ id 1jHBY7-0008M2-PV; Wed, 25 Mar 2020 15:18:47 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id a81so4171790wmf.5;
+ Wed, 25 Mar 2020 12:18:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=b4kiIC5lo8LMjfx4QypRFj4ZCNBWHZLJD1nJLY4etCk=;
- b=TD7KDGHiYFucyDcZtSGToWPcXlYdOxCQkTM5UAaZVovKtIeNVhLD71H6npGGveTmnO
- psJZv6RxBIHhwYmFqFY4C/Br9KDk/hVjXb0hVOZ8Osu6vcL0iLuOfoWKVvzALvvxJPhT
- rtt0Gw80WBVZO9wzlqSxxv0xGKEuxUbqvy4DxahHYDH7oSCQC62SqaGIhCirGKRJk823
- mHPCdcIzk+0axYW/oJoUFwRcriAocdK7/6ZUpfDUeYlA3hnAdQieNuMHFLY4L+lFrAmt
- 4Z9jl/9STFWilAJqPnVqyhfsSldjEi1MaiRIDZqQrhbPHwDdKE80uM2GZWEhQuMq6Gmn
- zNeA==
+ bh=GhVX8f98O0Xa/LOVRL95qx+viSjodj+CYTsM4Px49fY=;
+ b=JK8Z5CR/vAs+6GNWR0Pc0Cq4xV4rhs44H+vI9mGz+3lT8gmhVFY1NllA7uofymoktC
+ OOclKhzERBoU/GzD1dJES4G/UJgvl1RUJJ9kNghnhttGDn0bdwkHRf/Ey1VR0XFH3TzU
+ wOWSW/pQABNh/pmWRlzEMb/uVMCGtnwmGdAEzsnIp+3iSJfmy8TBGnXws3x4QwZfrEPI
+ a4XhOPv35/drV2M+Y8km8jAe9wb2fFCZoc0H/rR5waIKkt3oSsR5WnH7dkuTOkjjUnQw
+ XRRO1F66lML2S3dfYwFA9yy8OFGtXGj0SjPtglj8dq2oQ2rylSGUuLclC8ky934kREEg
+ 5tyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=b4kiIC5lo8LMjfx4QypRFj4ZCNBWHZLJD1nJLY4etCk=;
- b=t5iyXE0Gh1w7mPzL5MHz0BtZhot0ppqsxKVKw5fp6T7StlB42yChT67CtxVp+k+Xjy
- zzfUJsvUujqhy5Tfaxu5r2B/hbBVG1qaY9Yi+z+22UuxmYgFYO3nzBqnKVrd0vtC9yp2
- IYOwdYzIDczi5NsG4346YDykYSF0+PWIvBK46CDCS8Sx4R13OtWiF1cGE/vsTpgA4AFv
- AFxtUOLT32YkvNfBEoKTYZc6oFjbNEo14f+2wl+MKXHpL9llTHOppq3xuMYKZzenHXkW
- zgy8v7cUMzCsB1dKXanrVxXWGTJ+1n69Nrf8TuZ7/9m9jzElh6rxXXU8IkXrwCsvsLnJ
- /Q/w==
-X-Gm-Message-State: ANhLgQ3h+Hjut5RQX5526xJOw9jOu4fywKVHyFbjFWZrfRjsahzSrGBI
- HYT8j+QG1M2x7FVFaKMn5Q7T5+pnN9M=
-X-Google-Smtp-Source: ADFU+vvS9l7lL621rMyd+mf9dmm+wXaQIqCWSXopgfZ69s7e6jWDkc90efzS343tz4B5iXBQvdnnXQ==
-X-Received: by 2002:a5d:4cc5:: with SMTP id c5mr4812027wrt.136.1585163923354; 
- Wed, 25 Mar 2020 12:18:43 -0700 (PDT)
+ bh=GhVX8f98O0Xa/LOVRL95qx+viSjodj+CYTsM4Px49fY=;
+ b=m6pgHU5lSG/HBgJLrYFb/d11O5UMaTciJVMnHa4LDinmiACMS04/Gtd4K6fYUsRLdb
+ XeZBo4UsRaDoS6Kxb+X2DGddccmxTmfEeU7Q0fWxk0QS33vQn6aRva93w2RhWBWqyiiG
+ x0ZmV270bix6vYU/YHWgzpFk50pPLyeiE2PEBuSwExhL9K4G+hATq820HzUr1Ilt13T9
+ DrfFZH/TynDpmjt5o983S4T6haZB2X9ABrxJRRvYUpUr+psOkWEItCLDHW8r/dm/Z53n
+ 5tpB5k4vMrhBXpkQHargJouwEnMsEZWP2GaAklGNlPqRPOYgKJe3YKrIWKBUBgdXDmco
+ ylBw==
+X-Gm-Message-State: ANhLgQ13tiHB97llkQ4bGrzsEaqw2zaptKW8NkAQ3nN155vHoDzKEmKX
+ MgfKVJpwEKXCwjZKOv3Hrdx4j4juh30=
+X-Google-Smtp-Source: ADFU+vvTWcMqq/E0mn8RtOqbGbhhftd/mq/2WBj+7QJppdLptSgZJXwgm/gtKBHwIBbeIRUW73G1pQ==
+X-Received: by 2002:a1c:dc8b:: with SMTP id t133mr4615449wmg.99.1585163926248; 
+ Wed, 25 Mar 2020 12:18:46 -0700 (PDT)
 Received: from localhost.localdomain (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id r17sm6345672wrx.46.2020.03.25.12.18.40
+ by smtp.gmail.com with ESMTPSA id r17sm6345672wrx.46.2020.03.25.12.18.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Mar 2020 12:18:42 -0700 (PDT)
+ Wed, 25 Mar 2020 12:18:45 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 03/12] hw/arm/fsl-imx: Add missing error-propagation
- code
-Date: Wed, 25 Mar 2020 20:18:21 +0100
-Message-Id: <20200325191830.16553-4-f4bug@amsat.org>
+Subject: [PATCH-for-5.0 04/12] hw/arm/stm32fx05_soc: Add missing
+ error-propagation code
+Date: Wed, 25 Mar 2020 20:18:22 +0100
+Message-Id: <20200325191830.16553-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200325191830.16553-1-f4bug@amsat.org>
 References: <20200325191830.16553-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,645 +131,323 @@ Patch created mechanically by running:
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/fsl-imx25.c | 8 ++++++++
- hw/arm/fsl-imx6.c  | 8 ++++++++
- 2 files changed, 16 insertions(+)
+ hw/arm/stm32f205_soc.c | 4 ++++
+ hw/arm/stm32f405_soc.c | 4 ++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 6f1a82ce3d..c915a2106d 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -92,247 +92,255 @@ static void fsl_imx25_init(Object *obj)
- static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index 118c342559..1d80f91dd7 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -83,113 +83,117 @@ static void stm32f205_soc_initfn(Object *obj)
+ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
  {
-     FslIMX25State *s = FSL_IMX25(dev);
-     uint8_t i;
+     STM32F205State *s = STM32F205_SOC(dev_soc);
+     DeviceState *dev, *armv7m;
+     SysBusDevice *busdev;
      Error *err = NULL;
+     int i;
  
-     object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
-     if (err) {
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *sram = g_new(MemoryRegion, 1);
+     MemoryRegion *flash = g_new(MemoryRegion, 1);
+     MemoryRegion *flash_alias = g_new(MemoryRegion, 1);
+ 
+     memory_region_init_rom(flash, OBJECT(dev_soc), "STM32F205.flash",
+                            FLASH_SIZE, &error_fatal);
+     memory_region_init_alias(flash_alias, OBJECT(dev_soc),
+                              "STM32F205.flash.alias", flash, 0, FLASH_SIZE);
+ 
+     memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
+     memory_region_add_subregion(system_memory, 0, flash_alias);
+ 
+     memory_region_init_ram(sram, NULL, "STM32F205.sram", SRAM_SIZE,
+                            &error_fatal);
+     memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
+ 
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 96);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
+     qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+     if (err != NULL) {
          error_propagate(errp, err);
          return;
      }
  
-     object_property_set_bool(OBJECT(&s->avic), true, "realized", &err);
-     if (err) {
+     /* System configuration controller */
+     dev = DEVICE(&s->syscfg);
+     object_property_set_bool(OBJECT(&s->syscfg), true, "realized", &err);
+     if (err != NULL) {
          error_propagate(errp, err);
          return;
      }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->avic), 0, FSL_IMX25_AVIC_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->avic), 0,
-                        qdev_get_gpio_in(DEVICE(&s->cpu), ARM_CPU_IRQ));
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->avic), 1,
-                        qdev_get_gpio_in(DEVICE(&s->cpu), ARM_CPU_FIQ));
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, 0x40013800);
+     sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, 71));
  
-     object_property_set_bool(OBJECT(&s->ccm), true, "realized", &err);
-     if (err) {
+     /* Attach UART (uses USART registers) and USART controllers */
+     for (i = 0; i < STM_NUM_USARTS; i++) {
+         dev = DEVICE(&(s->usart[i]));
+         qdev_prop_set_chr(dev, "chardev", serial_hd(i));
+         object_property_set_bool(OBJECT(&s->usart[i]), true, "realized", &err);
+         if (err != NULL) {
+             error_propagate(errp, err);
+             return;
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, usart_addr[i]);
+         sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, usart_irq[i]));
+     }
+ 
+     /* Timer 2 to 5 */
+     for (i = 0; i < STM_NUM_TIMERS; i++) {
+         dev = DEVICE(&(s->timer[i]));
+         qdev_prop_set_uint64(dev, "clock-frequency", 1000000000);
+         object_property_set_bool(OBJECT(&s->timer[i]), true, "realized", &err);
+         if (err != NULL) {
+             error_propagate(errp, err);
+             return;
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, timer_addr[i]);
+         sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, timer_irq[i]));
+     }
+ 
+     /* ADC 1 to 3 */
+     object_property_set_int(OBJECT(s->adc_irqs), STM_NUM_ADCS,
+                             "num-lines", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(s->adc_irqs), true, "realized", &err);
+     if (err != NULL) {
          error_propagate(errp, err);
          return;
      }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccm), 0, FSL_IMX25_CCM_ADDR);
+     qdev_connect_gpio_out(DEVICE(s->adc_irqs), 0,
+                           qdev_get_gpio_in(armv7m, ADC_IRQ));
  
-     /* Initialize all UARTs */
-     for (i = 0; i < FSL_IMX25_NUM_UARTS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } serial_table[FSL_IMX25_NUM_UARTS] = {
-             { FSL_IMX25_UART1_ADDR, FSL_IMX25_UART1_IRQ },
-             { FSL_IMX25_UART2_ADDR, FSL_IMX25_UART2_IRQ },
-             { FSL_IMX25_UART3_ADDR, FSL_IMX25_UART3_IRQ },
-             { FSL_IMX25_UART4_ADDR, FSL_IMX25_UART4_IRQ },
-             { FSL_IMX25_UART5_ADDR, FSL_IMX25_UART5_IRQ }
-         };
- 
-         qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hd(i));
- 
-         object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
-         if (err) {
+     for (i = 0; i < STM_NUM_ADCS; i++) {
+         dev = DEVICE(&(s->adc[i]));
+         object_property_set_bool(OBJECT(&s->adc[i]), true, "realized", &err);
+         if (err != NULL) {
              error_propagate(errp, err);
              return;
          }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart[i]), 0, serial_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-                                             serial_table[i].irq));
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, adc_addr[i]);
+         sysbus_connect_irq(busdev, 0,
+                            qdev_get_gpio_in(DEVICE(s->adc_irqs), i));
      }
  
-     /* Initialize all GPT timers */
-     for (i = 0; i < FSL_IMX25_NUM_GPTS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } gpt_table[FSL_IMX25_NUM_GPTS] = {
-             { FSL_IMX25_GPT1_ADDR, FSL_IMX25_GPT1_IRQ },
-             { FSL_IMX25_GPT2_ADDR, FSL_IMX25_GPT2_IRQ },
-             { FSL_IMX25_GPT3_ADDR, FSL_IMX25_GPT3_IRQ },
-             { FSL_IMX25_GPT4_ADDR, FSL_IMX25_GPT4_IRQ }
-         };
- 
-         s->gpt[i].ccm = IMX_CCM(&s->ccm);
- 
-         object_property_set_bool(OBJECT(&s->gpt[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpt[i]), 0, gpt_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpt[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-                                             gpt_table[i].irq));
-     }
- 
-     /* Initialize all EPIT timers */
-     for (i = 0; i < FSL_IMX25_NUM_EPITS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } epit_table[FSL_IMX25_NUM_EPITS] = {
-             { FSL_IMX25_EPIT1_ADDR, FSL_IMX25_EPIT1_IRQ },
-             { FSL_IMX25_EPIT2_ADDR, FSL_IMX25_EPIT2_IRQ }
-         };
- 
-         s->epit[i].ccm = IMX_CCM(&s->ccm);
- 
-         object_property_set_bool(OBJECT(&s->epit[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->epit[i]), 0, epit_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->epit[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-                                             epit_table[i].irq));
-     }
- 
-     qdev_set_nic_properties(DEVICE(&s->fec), &nd_table[0]);
- 
-     object_property_set_bool(OBJECT(&s->fec), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->fec), 0, FSL_IMX25_FEC_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->fec), 0,
-                        qdev_get_gpio_in(DEVICE(&s->avic), FSL_IMX25_FEC_IRQ));
- 
-     object_property_set_bool(OBJECT(&s->rngc), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->rngc), 0, FSL_IMX25_RNGC_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->rngc), 0,
-                        qdev_get_gpio_in(DEVICE(&s->avic), FSL_IMX25_RNGC_IRQ));
- 
-     /* Initialize all I2C */
-     for (i = 0; i < FSL_IMX25_NUM_I2CS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } i2c_table[FSL_IMX25_NUM_I2CS] = {
-             { FSL_IMX25_I2C1_ADDR, FSL_IMX25_I2C1_IRQ },
-             { FSL_IMX25_I2C2_ADDR, FSL_IMX25_I2C2_IRQ },
-             { FSL_IMX25_I2C3_ADDR, FSL_IMX25_I2C3_IRQ }
-         };
- 
-         object_property_set_bool(OBJECT(&s->i2c[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c[i]), 0, i2c_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-                                             i2c_table[i].irq));
-     }
- 
-     /* Initialize all GPIOs */
-     for (i = 0; i < FSL_IMX25_NUM_GPIOS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } gpio_table[FSL_IMX25_NUM_GPIOS] = {
-             { FSL_IMX25_GPIO1_ADDR, FSL_IMX25_GPIO1_IRQ },
-             { FSL_IMX25_GPIO2_ADDR, FSL_IMX25_GPIO2_IRQ },
-             { FSL_IMX25_GPIO3_ADDR, FSL_IMX25_GPIO3_IRQ },
-             { FSL_IMX25_GPIO4_ADDR, FSL_IMX25_GPIO4_IRQ }
-         };
- 
-         object_property_set_bool(OBJECT(&s->gpio[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio[i]), 0, gpio_table[i].addr);
-         /* Connect GPIO IRQ to PIC */
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-                                             gpio_table[i].irq));
-     }
- 
-     /* Initialize all SDHC */
-     for (i = 0; i < FSL_IMX25_NUM_ESDHCS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } esdhc_table[FSL_IMX25_NUM_ESDHCS] = {
-             { FSL_IMX25_ESDHC1_ADDR, FSL_IMX25_ESDHC1_IRQ },
-             { FSL_IMX25_ESDHC2_ADDR, FSL_IMX25_ESDHC2_IRQ },
-         };
- 
-         object_property_set_uint(OBJECT(&s->esdhc[i]), 2, "sd-spec-version",
-                                  &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
-                                  "capareg", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->esdhc[i]), 0, esdhc_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->esdhc[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-                                             esdhc_table[i].irq));
-     }
- 
-     /* USB */
-     for (i = 0; i < FSL_IMX25_NUM_USBS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } usb_table[FSL_IMX25_NUM_USBS] = {
-             { FSL_IMX25_USB1_ADDR, FSL_IMX25_USB1_IRQ },
-             { FSL_IMX25_USB2_ADDR, FSL_IMX25_USB2_IRQ },
-         };
- 
-         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
-                                  &error_abort);
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0, usb_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-                                             usb_table[i].irq));
-     }
- 
-     /* initialize 2 x 16 KB ROM */
-     memory_region_init_rom(&s->rom[0], OBJECT(dev), "imx25.rom0",
-                            FSL_IMX25_ROM0_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     memory_region_add_subregion(get_system_memory(), FSL_IMX25_ROM0_ADDR,
-                                 &s->rom[0]);
-     memory_region_init_rom(&s->rom[1], OBJECT(dev), "imx25.rom1",
-                            FSL_IMX25_ROM1_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     memory_region_add_subregion(get_system_memory(), FSL_IMX25_ROM1_ADDR,
-                                 &s->rom[1]);
- 
-     /* initialize internal RAM (128 KB) */
-     memory_region_init_ram(&s->iram, NULL, "imx25.iram", FSL_IMX25_IRAM_SIZE,
-                            &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     memory_region_add_subregion(get_system_memory(), FSL_IMX25_IRAM_ADDR,
-                                 &s->iram);
- 
-     /* internal RAM (128 KB) is aliased over 128 MB - 128 KB */
-     memory_region_init_alias(&s->iram_alias, OBJECT(dev), "imx25.iram_alias",
-                              &s->iram, 0, FSL_IMX25_IRAM_ALIAS_SIZE);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX25_IRAM_ALIAS_ADDR,
-                                 &s->iram_alias);
- }
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 13f1bf23a6..71b2729298 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -116,363 +116,371 @@ static void fsl_imx6_init(Object *obj)
- static void fsl_imx6_realize(DeviceState *dev, Error **errp)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-     FslIMX6State *s = FSL_IMX6(dev);
-     uint16_t i;
-     Error *err = NULL;
-     unsigned int smp_cpus = ms->smp.cpus;
- 
-     if (smp_cpus > FSL_IMX6_NUM_CPUS) {
-         error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-                    TYPE_FSL_IMX6, FSL_IMX6_NUM_CPUS, smp_cpus);
-         return;
-     }
- 
-     for (i = 0; i < smp_cpus; i++) {
- 
-         /* On uniprocessor, the CBAR is set to 0 */
-         if (smp_cpus > 1) {
-             object_property_set_int(OBJECT(&s->cpu[i]), FSL_IMX6_A9MPCORE_ADDR,
-                                     "reset-cbar", &error_abort);
-         }
- 
-         /* All CPU but CPU 0 start in power off mode */
-         if (i) {
-             object_property_set_bool(OBJECT(&s->cpu[i]), true,
-                                      "start-powered-off", &error_abort);
-         }
- 
-         object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-     }
- 
-     object_property_set_int(OBJECT(&s->a9mpcore), smp_cpus, "num-cpu",
-                             &error_abort);
- 
-     object_property_set_int(OBJECT(&s->a9mpcore),
-                             FSL_IMX6_MAX_IRQ + GIC_INTERNAL, "num-irq",
-                             &error_abort);
- 
-     object_property_set_bool(OBJECT(&s->a9mpcore), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->a9mpcore), 0, FSL_IMX6_A9MPCORE_ADDR);
- 
-     for (i = 0; i < smp_cpus; i++) {
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->a9mpcore), i,
-                            qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_IRQ));
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->a9mpcore), i + smp_cpus,
-                            qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_FIQ));
-     }
- 
-     object_property_set_bool(OBJECT(&s->ccm), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccm), 0, FSL_IMX6_CCM_ADDR);
- 
-     object_property_set_bool(OBJECT(&s->src), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->src), 0, FSL_IMX6_SRC_ADDR);
- 
-     /* Initialize all UARTs */
-     for (i = 0; i < FSL_IMX6_NUM_UARTS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } serial_table[FSL_IMX6_NUM_UARTS] = {
-             { FSL_IMX6_UART1_ADDR, FSL_IMX6_UART1_IRQ },
-             { FSL_IMX6_UART2_ADDR, FSL_IMX6_UART2_IRQ },
-             { FSL_IMX6_UART3_ADDR, FSL_IMX6_UART3_IRQ },
-             { FSL_IMX6_UART4_ADDR, FSL_IMX6_UART4_IRQ },
-             { FSL_IMX6_UART5_ADDR, FSL_IMX6_UART5_IRQ },
-         };
- 
-         qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hd(i));
- 
-         object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart[i]), 0, serial_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             serial_table[i].irq));
-     }
- 
-     s->gpt.ccm = IMX_CCM(&s->ccm);
- 
-     object_property_set_bool(OBJECT(&s->gpt), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
- 
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpt), 0, FSL_IMX6_GPT_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpt), 0,
-                        qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                         FSL_IMX6_GPT_IRQ));
- 
-     /* Initialize all EPIT timers */
-     for (i = 0; i < FSL_IMX6_NUM_EPITS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } epit_table[FSL_IMX6_NUM_EPITS] = {
-             { FSL_IMX6_EPIT1_ADDR, FSL_IMX6_EPIT1_IRQ },
-             { FSL_IMX6_EPIT2_ADDR, FSL_IMX6_EPIT2_IRQ },
-         };
- 
-         s->epit[i].ccm = IMX_CCM(&s->ccm);
- 
-         object_property_set_bool(OBJECT(&s->epit[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->epit[i]), 0, epit_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->epit[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             epit_table[i].irq));
-     }
- 
-     /* Initialize all I2C */
-     for (i = 0; i < FSL_IMX6_NUM_I2CS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } i2c_table[FSL_IMX6_NUM_I2CS] = {
-             { FSL_IMX6_I2C1_ADDR, FSL_IMX6_I2C1_IRQ },
-             { FSL_IMX6_I2C2_ADDR, FSL_IMX6_I2C2_IRQ },
-             { FSL_IMX6_I2C3_ADDR, FSL_IMX6_I2C3_IRQ }
-         };
- 
-         object_property_set_bool(OBJECT(&s->i2c[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c[i]), 0, i2c_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             i2c_table[i].irq));
-     }
- 
-     /* Initialize all GPIOs */
-     for (i = 0; i < FSL_IMX6_NUM_GPIOS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq_low;
-             unsigned int irq_high;
-         } gpio_table[FSL_IMX6_NUM_GPIOS] = {
-             {
-                 FSL_IMX6_GPIO1_ADDR,
-                 FSL_IMX6_GPIO1_LOW_IRQ,
-                 FSL_IMX6_GPIO1_HIGH_IRQ
-             },
-             {
-                 FSL_IMX6_GPIO2_ADDR,
-                 FSL_IMX6_GPIO2_LOW_IRQ,
-                 FSL_IMX6_GPIO2_HIGH_IRQ
-             },
-             {
-                 FSL_IMX6_GPIO3_ADDR,
-                 FSL_IMX6_GPIO3_LOW_IRQ,
-                 FSL_IMX6_GPIO3_HIGH_IRQ
-             },
-             {
-                 FSL_IMX6_GPIO4_ADDR,
-                 FSL_IMX6_GPIO4_LOW_IRQ,
-                 FSL_IMX6_GPIO4_HIGH_IRQ
-             },
-             {
-                 FSL_IMX6_GPIO5_ADDR,
-                 FSL_IMX6_GPIO5_LOW_IRQ,
-                 FSL_IMX6_GPIO5_HIGH_IRQ
-             },
-             {
-                 FSL_IMX6_GPIO6_ADDR,
-                 FSL_IMX6_GPIO6_LOW_IRQ,
-                 FSL_IMX6_GPIO6_HIGH_IRQ
-             },
-             {
-                 FSL_IMX6_GPIO7_ADDR,
-                 FSL_IMX6_GPIO7_LOW_IRQ,
-                 FSL_IMX6_GPIO7_HIGH_IRQ
-             },
-         };
- 
-         object_property_set_bool(OBJECT(&s->gpio[i]), true, "has-edge-sel",
-                                  &error_abort);
-         object_property_set_bool(OBJECT(&s->gpio[i]), true, "has-upper-pin-irq",
-                                  &error_abort);
-         object_property_set_bool(OBJECT(&s->gpio[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio[i]), 0, gpio_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             gpio_table[i].irq_low));
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio[i]), 1,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             gpio_table[i].irq_high));
-     }
- 
-     /* Initialize all SDHC */
-     for (i = 0; i < FSL_IMX6_NUM_ESDHCS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } esdhc_table[FSL_IMX6_NUM_ESDHCS] = {
-             { FSL_IMX6_uSDHC1_ADDR, FSL_IMX6_uSDHC1_IRQ },
-             { FSL_IMX6_uSDHC2_ADDR, FSL_IMX6_uSDHC2_IRQ },
-             { FSL_IMX6_uSDHC3_ADDR, FSL_IMX6_uSDHC3_IRQ },
-             { FSL_IMX6_uSDHC4_ADDR, FSL_IMX6_uSDHC4_IRQ },
-         };
- 
-         /* UHS-I SDIO3.0 SDR104 1.8V ADMA */
-         object_property_set_uint(OBJECT(&s->esdhc[i]), 3, "sd-spec-version",
-                                  &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_uint(OBJECT(&s->esdhc[i]), IMX6_ESDHC_CAPABILITIES,
-                                  "capareg", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->esdhc[i]), 0, esdhc_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->esdhc[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             esdhc_table[i].irq));
-     }
- 
-     /* USB */
-     for (i = 0; i < FSL_IMX6_NUM_USB_PHYS; i++) {
-         object_property_set_bool(OBJECT(&s->usbphy[i]), true, "realized",
-                                  &error_abort);
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usbphy[i]), 0,
-                         FSL_IMX6_USBPHY1_ADDR + i * 0x1000);
-     }
-     for (i = 0; i < FSL_IMX6_NUM_USBS; i++) {
-         static const int FSL_IMX6_USBn_IRQ[] = {
-             FSL_IMX6_USB_OTG_IRQ,
-             FSL_IMX6_USB_HOST1_IRQ,
-             FSL_IMX6_USB_HOST2_IRQ,
-             FSL_IMX6_USB_HOST3_IRQ,
-         };
- 
-         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
-                                  &error_abort);
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0,
-                         FSL_IMX6_USBOH3_USB_ADDR + i * 0x200);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             FSL_IMX6_USBn_IRQ[i]));
-     }
- 
-     /* Initialize all ECSPI */
-     for (i = 0; i < FSL_IMX6_NUM_ECSPIS; i++) {
-         static const struct {
-             hwaddr addr;
-             unsigned int irq;
-         } spi_table[FSL_IMX6_NUM_ECSPIS] = {
-             { FSL_IMX6_eCSPI1_ADDR, FSL_IMX6_ECSPI1_IRQ },
-             { FSL_IMX6_eCSPI2_ADDR, FSL_IMX6_ECSPI2_IRQ },
-             { FSL_IMX6_eCSPI3_ADDR, FSL_IMX6_ECSPI3_IRQ },
-             { FSL_IMX6_eCSPI4_ADDR, FSL_IMX6_ECSPI4_IRQ },
-             { FSL_IMX6_eCSPI5_ADDR, FSL_IMX6_ECSPI5_IRQ },
-         };
- 
-         /* Initialize the SPI */
+     /* SPI 1 and 2 */
+     for (i = 0; i < STM_NUM_SPIS; i++) {
+         dev = DEVICE(&(s->spi[i]));
          object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
-         if (err) {
+         if (err != NULL) {
              error_propagate(errp, err);
              return;
          }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                             spi_table[i].irq));
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, spi_addr[i]);
+         sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, spi_irq[i]));
      }
+ }
+diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
+index 4f10ce6176..398a3b5b4f 100644
+--- a/hw/arm/stm32f405_soc.c
++++ b/hw/arm/stm32f405_soc.c
+@@ -89,183 +89,187 @@ static void stm32f405_soc_initfn(Object *obj)
+ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
+ {
+     STM32F405State *s = STM32F405_SOC(dev_soc);
+     MemoryRegion *system_memory = get_system_memory();
+     DeviceState *dev, *armv7m;
+     SysBusDevice *busdev;
+     Error *err = NULL;
+     int i;
  
-     qdev_set_nic_properties(DEVICE(&s->eth), &nd_table[0]);
-     object_property_set_bool(OBJECT(&s->eth), true, "realized", &err);
-     if (err) {
+     memory_region_init_rom(&s->flash, OBJECT(dev_soc), "STM32F405.flash",
+                            FLASH_SIZE, &err);
+     if (err != NULL) {
          error_propagate(errp, err);
          return;
      }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->eth), 0, FSL_IMX6_ENET_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->eth), 0,
-                        qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                         FSL_IMX6_ENET_MAC_IRQ));
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->eth), 1,
-                        qdev_get_gpio_in(DEVICE(&s->a9mpcore),
-                                         FSL_IMX6_ENET_MAC_1588_IRQ));
+     memory_region_init_alias(&s->flash_alias, OBJECT(dev_soc),
+                              "STM32F405.flash.alias", &s->flash, 0,
+                              FLASH_SIZE);
  
-     /*
-      * Watchdog
-      */
-     for (i = 0; i < FSL_IMX6_NUM_WDTS; i++) {
-         static const hwaddr FSL_IMX6_WDOGn_ADDR[FSL_IMX6_NUM_WDTS] = {
-             FSL_IMX6_WDOG1_ADDR,
-             FSL_IMX6_WDOG2_ADDR,
-         };
+     memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, &s->flash);
+     memory_region_add_subregion(system_memory, 0, &s->flash_alias);
  
-         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
-                                  &error_abort);
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0, FSL_IMX6_WDOGn_ADDR[i]);
-     }
- 
-     /* ROM memory */
-     memory_region_init_rom(&s->rom, OBJECT(dev), "imx6.rom",
-                            FSL_IMX6_ROM_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6_ROM_ADDR,
-                                 &s->rom);
- 
-     /* CAAM memory */
-     memory_region_init_rom(&s->caam, OBJECT(dev), "imx6.caam",
-                            FSL_IMX6_CAAM_MEM_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6_CAAM_MEM_ADDR,
-                                 &s->caam);
- 
-     /* OCRAM memory */
-     memory_region_init_ram(&s->ocram, NULL, "imx6.ocram", FSL_IMX6_OCRAM_SIZE,
+     memory_region_init_ram(&s->sram, NULL, "STM32F405.sram", SRAM_SIZE,
                             &err);
-     if (err) {
+     if (err != NULL) {
          error_propagate(errp, err);
          return;
      }
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6_OCRAM_ADDR,
-                                 &s->ocram);
+     memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, &s->sram);
  
-     /* internal OCRAM (256 KB) is aliased over 1 MB */
-     memory_region_init_alias(&s->ocram_alias, OBJECT(dev), "imx6.ocram_alias",
-                              &s->ocram, 0, FSL_IMX6_OCRAM_ALIAS_SIZE);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6_OCRAM_ALIAS_ADDR,
-                                 &s->ocram_alias);
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 96);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
+     qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(system_memory),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+     }
+ 
+     /* System configuration controller */
+     dev = DEVICE(&s->syscfg);
+     object_property_set_bool(OBJECT(&s->syscfg), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+     }
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, SYSCFG_ADD);
+     sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, SYSCFG_IRQ));
+ 
+     /* Attach UART (uses USART registers) and USART controllers */
+     for (i = 0; i < STM_NUM_USARTS; i++) {
+         dev = DEVICE(&(s->usart[i]));
+         qdev_prop_set_chr(dev, "chardev", serial_hd(i));
+         object_property_set_bool(OBJECT(&s->usart[i]), true, "realized", &err);
+         if (err != NULL) {
+             error_propagate(errp, err);
+             return;
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, usart_addr[i]);
+         sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, usart_irq[i]));
+     }
+ 
+     /* Timer 2 to 5 */
+     for (i = 0; i < STM_NUM_TIMERS; i++) {
+         dev = DEVICE(&(s->timer[i]));
+         qdev_prop_set_uint64(dev, "clock-frequency", 1000000000);
+         object_property_set_bool(OBJECT(&s->timer[i]), true, "realized", &err);
+         if (err != NULL) {
+             error_propagate(errp, err);
+             return;
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, timer_addr[i]);
+         sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, timer_irq[i]));
+     }
+ 
+     /* ADC device, the IRQs are ORed together */
+     object_initialize_child(OBJECT(s), "adc-orirq", &s->adc_irqs,
+                             sizeof(s->adc_irqs), TYPE_OR_IRQ,
+                             &err, NULL);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+     }
+     object_property_set_int(OBJECT(&s->adc_irqs), STM_NUM_ADCS,
+                             "num-lines", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->adc_irqs), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+     }
+     qdev_connect_gpio_out(DEVICE(&s->adc_irqs), 0,
+                           qdev_get_gpio_in(armv7m, ADC_IRQ));
+ 
+     dev = DEVICE(&(s->adc[i]));
+     object_property_set_bool(OBJECT(&s->adc[i]), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+     }
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, ADC_ADDR);
+     sysbus_connect_irq(busdev, 0,
+                        qdev_get_gpio_in(DEVICE(&s->adc_irqs), i));
+ 
+     /* SPI devices */
+     for (i = 0; i < STM_NUM_SPIS; i++) {
+         dev = DEVICE(&(s->spi[i]));
+         object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
+         if (err != NULL) {
+             error_propagate(errp, err);
+             return;
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, spi_addr[i]);
+         sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, spi_irq[i]));
+     }
+ 
+     /* EXTI device */
+     dev = DEVICE(&s->exti);
+     object_property_set_bool(OBJECT(&s->exti), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+     }
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, EXTI_ADDR);
+     for (i = 0; i < 16; i++) {
+         sysbus_connect_irq(busdev, i, qdev_get_gpio_in(armv7m, exti_irq[i]));
+     }
+     for (i = 0; i < 16; i++) {
+         qdev_connect_gpio_out(DEVICE(&s->syscfg), i, qdev_get_gpio_in(dev, i));
+     }
+ 
+     create_unimplemented_device("timer[7]",    0x40001400, 0x400);
+     create_unimplemented_device("timer[12]",   0x40001800, 0x400);
+     create_unimplemented_device("timer[6]",    0x40001000, 0x400);
+     create_unimplemented_device("timer[13]",   0x40001C00, 0x400);
+     create_unimplemented_device("timer[14]",   0x40002000, 0x400);
+     create_unimplemented_device("RTC and BKP", 0x40002800, 0x400);
+     create_unimplemented_device("WWDG",        0x40002C00, 0x400);
+     create_unimplemented_device("IWDG",        0x40003000, 0x400);
+     create_unimplemented_device("I2S2ext",     0x40003000, 0x400);
+     create_unimplemented_device("I2S3ext",     0x40004000, 0x400);
+     create_unimplemented_device("I2C1",        0x40005400, 0x400);
+     create_unimplemented_device("I2C2",        0x40005800, 0x400);
+     create_unimplemented_device("I2C3",        0x40005C00, 0x400);
+     create_unimplemented_device("CAN1",        0x40006400, 0x400);
+     create_unimplemented_device("CAN2",        0x40006800, 0x400);
+     create_unimplemented_device("PWR",         0x40007000, 0x400);
+     create_unimplemented_device("DAC",         0x40007400, 0x400);
+     create_unimplemented_device("timer[1]",    0x40010000, 0x400);
+     create_unimplemented_device("timer[8]",    0x40010400, 0x400);
+     create_unimplemented_device("SDIO",        0x40012C00, 0x400);
+     create_unimplemented_device("timer[9]",    0x40014000, 0x400);
+     create_unimplemented_device("timer[10]",   0x40014400, 0x400);
+     create_unimplemented_device("timer[11]",   0x40014800, 0x400);
+     create_unimplemented_device("GPIOA",       0x40020000, 0x400);
+     create_unimplemented_device("GPIOB",       0x40020400, 0x400);
+     create_unimplemented_device("GPIOC",       0x40020800, 0x400);
+     create_unimplemented_device("GPIOD",       0x40020C00, 0x400);
+     create_unimplemented_device("GPIOE",       0x40021000, 0x400);
+     create_unimplemented_device("GPIOF",       0x40021400, 0x400);
+     create_unimplemented_device("GPIOG",       0x40021800, 0x400);
+     create_unimplemented_device("GPIOH",       0x40021C00, 0x400);
+     create_unimplemented_device("GPIOI",       0x40022000, 0x400);
+     create_unimplemented_device("CRC",         0x40023000, 0x400);
+     create_unimplemented_device("RCC",         0x40023800, 0x400);
+     create_unimplemented_device("Flash Int",   0x40023C00, 0x400);
+     create_unimplemented_device("BKPSRAM",     0x40024000, 0x400);
+     create_unimplemented_device("DMA1",        0x40026000, 0x400);
+     create_unimplemented_device("DMA2",        0x40026400, 0x400);
+     create_unimplemented_device("Ethernet",    0x40028000, 0x1400);
+     create_unimplemented_device("USB OTG HS",  0x40040000, 0x30000);
+     create_unimplemented_device("USB OTG FS",  0x50000000, 0x31000);
+     create_unimplemented_device("DCMI",        0x50050000, 0x400);
+     create_unimplemented_device("RNG",         0x50060800, 0x400);
  }
 -- 
 2.21.1
