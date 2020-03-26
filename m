@@ -2,94 +2,82 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDEA7C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0515AC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:31:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C83A20737
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:29:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0A1320737
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:31:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NYhDgI1h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C83A20737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UOqw51jO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A1320737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHSZX-0003DT-KA
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 09:29:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55132)
+	id 1jHSb7-0004gq-Uy
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 09:31:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jHSYh-0002OW-U1
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:28:33 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jHSYv-0002ZW-SR
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jHSYg-0004ll-RA
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:28:31 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:47388)
+ (envelope-from <kwolf@redhat.com>) id 1jHSYu-0004oy-Vu
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:28:45 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48517)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jHSYg-0004ld-N7
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:28:30 -0400
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jHSYt-0004oB-7y
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:28:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585229310;
+ s=mimecast20190719; t=1585229322;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=75oWH/rtAcrj3MZ0LxotFMnC3tUNN8T7bVLLc0FTqEs=;
- b=NYhDgI1hFrjVS2U9PEVSo8EmU3nZhvUvY45/iALpAatwBnrdd2aAJoZ0cBYmaILKMZFITk
- owu8Tk5s3PLOw45y3m1FskISih/2UDw0WhXjX/5fckmyjZZMmY9dRpwmuvwPGCrPfmH3hq
- 5ajK7ZrZM2klvuUkScimLWhv0ED7MEg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-ewCdpbt7MLCxlVS4HUJ5ng-1; Thu, 26 Mar 2020 09:28:28 -0400
-X-MC-Unique: ewCdpbt7MLCxlVS4HUJ5ng-1
-Received: by mail-wr1-f69.google.com with SMTP id f8so3050286wrp.1
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 06:28:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=yCcvKkwTu6dB0tXhdMIpiKowcUa1QYNgBbcWhlwvZzI=;
- b=IS5IHpNbuxSJHqtzElvfhdMixoT71yyDb11B8ZxaQJ+1qDuUSNFJcFfrxYKScfAGTS
- Y4h+w2abkCixlUnQlldRsow86RK552wEgNQeHpPMlkdaiCzhY3p2wfFHjM0C5DIwbNzY
- BgyoJQN77yoyfI4uq19g85KiqO/4m0iJwmi9XrLA1CIJG6ABmdmq69HxTE74vpzGEFdz
- rKrJtmN7EAUwfnta+7me2qzIqmf1TXJ9Z04adl883q/7oQ59YvM0B3oGfT+tKQJOnXQD
- V35Ux8Gy7ZzBKJ42OggqwYEYXgXD51WmW9hVOQkVnxaj9V4j7YasRM1+bf+8kA1IWDSB
- yJzQ==
-X-Gm-Message-State: ANhLgQ0/a8W5NqUAWlT/IuMWRIIYe7PrpCgO03zXRHtL+qPxDQJXeEu6
- VcuzYmZIV6PGWV4L5L13TeoavtPfxPxFqS7RmdXJOttr7Y0fSbpxDGtS38yS54nEM44br9urXD4
- bt2PxlKNc8km/o9M=
-X-Received: by 2002:a1c:2701:: with SMTP id n1mr3226380wmn.180.1585229307203; 
- Thu, 26 Mar 2020 06:28:27 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsk5DbarWwuz+Rn5LkLmS+SsOEIUjHki9kTq8yk1cpZ58x1DzNHHu7IjKVGb4rPzR4dSG5DDw==
-X-Received: by 2002:a1c:2701:: with SMTP id n1mr3226359wmn.180.1585229306931; 
- Thu, 26 Mar 2020 06:28:26 -0700 (PDT)
-Received: from redhat.com (bzq-109-67-62-195.red.bezeqint.net. [109.67.62.195])
- by smtp.gmail.com with ESMTPSA id l83sm3497881wmf.43.2020.03.26.06.28.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 06:28:26 -0700 (PDT)
-Date: Thu, 26 Mar 2020 09:28:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: acpi_pcihp_eject_slot() bug if passed 'slots == 0'
-Message-ID: <20200326092535-mutt-send-email-mst@kernel.org>
-References: <CAFEAcA-oWBjOXWmnLvPww9wrty_QbSc+Xv3BY3sQAnEXFkfQbA@mail.gmail.com>
- <20200326142317.018c13e1@redhat.com>
+ bh=4WBg5CNHrCX+HnopXFTzXesaQuWuulC8fl8X7FIBpDQ=;
+ b=UOqw51jONNpvfGxTFMNc8mJufWb2JPhOuF8ez7gjzkidNC6oMA/wy373I2AoEooZMfR2hp
+ OrGguhuBnOHkU5r2u7MEUc9G+ifocysjBmNq72/kYZ/9mgtTv/Y9uQLUnGWSoS8ozNIW56
+ 5hUIOskjMTEEIw/MSF0Y33is4Yanp/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-ROd7EWlGOAiYBC1yEss5vg-1; Thu, 26 Mar 2020 09:28:40 -0400
+X-MC-Unique: ROd7EWlGOAiYBC1yEss5vg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8ECA11005509;
+ Thu, 26 Mar 2020 13:28:38 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-205.ams2.redhat.com [10.36.112.205])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B88475D9CD;
+ Thu, 26 Mar 2020 13:28:29 +0000 (UTC)
+Date: Thu, 26 Mar 2020 14:28:28 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 2/2] block: trickle down the fallback image creation
+ function use to the block drivers
+Message-ID: <20200326132828.GC7391@linux.fritz.box>
+References: <20200326011218.29230-1-mlevitsk@redhat.com>
+ <20200326011218.29230-3-mlevitsk@redhat.com>
+ <922a6eb5-cb33-d2e4-ba0b-15078d1a6c59@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200326142317.018c13e1@redhat.com>
+In-Reply-To: <922a6eb5-cb33-d2e4-ba0b-15078d1a6c59@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,54 +89,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, integration@gluster.org,
+ sheepdog@lists.wpkg.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Liu Yuan <namei.unix@gmail.com>,
+ Max Reitz <mreitz@redhat.com>, Jason Dillaman <dillaman@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 26, 2020 at 02:23:17PM +0100, Igor Mammedov wrote:
-> On Thu, 26 Mar 2020 11:52:36 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
+Am 26.03.2020 um 14:20 hat Eric Blake geschrieben:
+> > +++ b/block/file-posix.c
+> > @@ -3513,6 +3513,8 @@ static BlockDriver bdrv_host_device =3D {
+> >       .bdrv_reopen_prepare =3D raw_reopen_prepare,
+> >       .bdrv_reopen_commit  =3D raw_reopen_commit,
+> >       .bdrv_reopen_abort   =3D raw_reopen_abort,
+> > +    .bdrv_co_create_opts =3D bdrv_co_create_opts_simple,
+> > +    .create_opts         =3D &bdrv_create_opts_simple,
 >=20
-> > Hi; Coverity spots that if hw/acpi/pcihp.c:acpi_pcihp_eject_slot()
-> > is passed a zero 'slots' argument then ctz32(slots) will return 32,
-> > and then the code that does '1U << slot' is C undefined behaviour
-> > because it's an oversized shift. (This is CID 1421896.)
-> >=20
-> > Since the pci_write() function in this file can call
-> > acpi_pcihp_eject_slot() with an arbitrary value from the guest,
-> > I think we need to handle 'slots =3D=3D 0' safely. But what should
-> > the behaviour be?
->=20
-> it also uncovers a bug, where we are not able to eject slot 0 on bridge,
+> I'd drop the leading & for consistency with the rest of this struct
+> initializer.
 
+This one isn't a function pointer, so I think the & is necessary.
 
-And that is by design. A standard PCI SHPC register can support up to 31
-hotpluggable slots. So we chose slot 0 as non hotpluggable.
-It's consistent across SHPC, PCI-E, so I made ACPI match.
-You can't hot-add it either.
-
-> can be reproduced with:
->=20
->  -enable-kvm -m 4G -device pci-bridge,chassis_nr=3D1 -global PIIX4_PM.acp=
-i-pci-hotplug-with-bridge-support=3Don -device virtio-net-pci,bus=3Dpci.1,a=
-ddr=3D0,id=3Dnetdev12
->=20
-> (monitor) device_del netdev12
-> (monitor) qtree # still shows the device
->=20
-> reason is that acpi_pcihp_eject_slot()
->    if (PCI_SLOT(dev->devfn) =3D=3D slot) { # doesn't  match (0 !=3D 32)
->=20
-> so device is not deleted
-
-We should probably teach QEMU that some slots aren't hotpluggable
-even if device in it is hotpluggable in theory. But that is
-a separate issue.
-
-> > thanks
-> > -- PMM
-> >=20
+Kevin
 
 
