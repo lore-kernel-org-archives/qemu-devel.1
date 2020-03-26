@@ -2,46 +2,48 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF6D4C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3E1C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:58:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B781F20737
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:57:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B781F20737
+	by mail.kernel.org (Postfix) with ESMTPS id E894320737
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:57:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E894320737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHUtB-0002YS-Rd
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 11:57:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57218)
+	id 1jHUtL-0002ra-2G
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 11:57:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <s.reiter@proxmox.com>) id 1jHUs5-0000qx-Tg
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:56:43 -0400
+ (envelope-from <s.reiter@proxmox.com>) id 1jHUs5-0000qz-WF
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <s.reiter@proxmox.com>) id 1jHUs4-0002eG-QY
+ (envelope-from <s.reiter@proxmox.com>) id 1jHUs4-0002eM-S0
  for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:56:41 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:57081)
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:36170)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <s.reiter@proxmox.com>)
- id 1jHUs2-0002ZH-F0; Thu, 26 Mar 2020 11:56:38 -0400
+ id 1jHUs2-0002Yu-F2; Thu, 26 Mar 2020 11:56:38 -0400
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 0336842E0D;
- Thu, 26 Mar 2020 16:56:36 +0100 (CET)
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 201EA42EB1;
+ Thu, 26 Mar 2020 16:56:35 +0100 (CET)
 From: Stefan Reiter <s.reiter@proxmox.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH v2 0/3] Fix some AIO context locking in jobs
-Date: Thu, 26 Mar 2020 16:56:25 +0100
-Message-Id: <20200326155628.859862-1-s.reiter@proxmox.com>
+Subject: [PATCH v2 2/3] job: take each job's lock individually in job_txn_apply
+Date: Thu, 26 Mar 2020 16:56:27 +0100
+Message-Id: <20200326155628.859862-3-s.reiter@proxmox.com>
 X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200326155628.859862-1-s.reiter@proxmox.com>
+References: <20200326155628.859862-1-s.reiter@proxmox.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -64,33 +66,91 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Contains three seperate but related patches cleaning up and fixing some
-issues regarding aio_context_acquire/aio_context_release for jobs. Mostly
-affects blockjobs running for devices that have IO threads enabled AFAICT=
-.
+All callers of job_txn_apply hold a single job's lock, but different
+jobs within a transaction can have different contexts, thus we need to
+lock each one individually before applying the callback function.
 
-This is based on the discussions here:
-https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07929.html
+Similar to job_completed_txn_abort this also requires releasing the
+caller's context before and reacquiring it after to avoid recursive
+locks which might break AIO_WAIT_WHILE in the callback.
 
-I *think* the second patch also fixes the hangs on backup abort that I an=
-d
-Dietmar noticed in v1, but I'm not sure, they we're somewhat intermittent
-before too.
+Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+---
+ job.c | 32 ++++++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 8 deletions(-)
 
-Changes from v1:
-* fixed commit message for patch 1
-* added patches 2 and 3
-
-Stefan Reiter (3):
-  backup: don't acquire aio_context in backup_clean
-  job: take each job's lock individually in job_txn_apply
-  replication: acquire aio context before calling job_cancel_sync
-
- block/backup.c      |  4 ----
- block/replication.c |  6 +++++-
- job.c               | 32 ++++++++++++++++++++++++--------
- 3 files changed, 29 insertions(+), 13 deletions(-)
-
+diff --git a/job.c b/job.c
+index 134a07b92e..e0966162fa 100644
+--- a/job.c
++++ b/job.c
+@@ -136,17 +136,33 @@ static void job_txn_del_job(Job *job)
+     }
+ }
+=20
+-static int job_txn_apply(JobTxn *txn, int fn(Job *))
++static int job_txn_apply(Job *job, int fn(Job *))
+ {
+-    Job *job, *next;
++    AioContext *outer_ctx =3D job->aio_context;
++    AioContext *inner_ctx;
++    Job *other_job, *next;
++    JobTxn *txn =3D job->txn;
+     int rc =3D 0;
+=20
+-    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
+-        rc =3D fn(job);
++    /*
++     * Similar to job_completed_txn_abort, we take each job's lock befor=
+e
++     * applying fn, but since we assume that outer_ctx is held by the ca=
+ller,
++     * we need to release it here to avoid holding the lock twice - whic=
+h would
++     * break AIO_WAIT_WHILE from within fn.
++     */
++    aio_context_release(outer_ctx);
++
++    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
++        inner_ctx =3D other_job->aio_context;
++        aio_context_acquire(inner_ctx);
++        rc =3D fn(other_job);
++        aio_context_release(inner_ctx);
+         if (rc) {
+             break;
+         }
+     }
++
++    aio_context_acquire(outer_ctx);
+     return rc;
+ }
+=20
+@@ -774,11 +790,11 @@ static void job_do_finalize(Job *job)
+     assert(job && job->txn);
+=20
+     /* prepare the transaction to complete */
+-    rc =3D job_txn_apply(job->txn, job_prepare);
++    rc =3D job_txn_apply(job, job_prepare);
+     if (rc) {
+         job_completed_txn_abort(job);
+     } else {
+-        job_txn_apply(job->txn, job_finalize_single);
++        job_txn_apply(job, job_finalize_single);
+     }
+ }
+=20
+@@ -824,10 +840,10 @@ static void job_completed_txn_success(Job *job)
+         assert(other_job->ret =3D=3D 0);
+     }
+=20
+-    job_txn_apply(txn, job_transition_to_pending);
++    job_txn_apply(job, job_transition_to_pending);
+=20
+     /* If no jobs need manual finalization, automatically do so */
+-    if (job_txn_apply(txn, job_needs_finalize) =3D=3D 0) {
++    if (job_txn_apply(job, job_needs_finalize) =3D=3D 0) {
+         job_do_finalize(job);
+     }
+ }
 --=20
 2.26.0
 
