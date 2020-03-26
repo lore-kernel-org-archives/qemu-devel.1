@@ -2,82 +2,80 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F49C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA771C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:12:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FA6020774
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7627A20409
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:12:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCUwyP4t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA6020774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpkJPifH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7627A20409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHQHC-000428-5o
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 07:02:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58220)
+	id 1jHQRR-0006sV-KX
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 07:12:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59953)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jHQG7-0003Dv-BA
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:01:13 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1jHQQW-0006MB-LP
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:11:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jHQG5-0003eb-F3
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:01:11 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39999)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jHQG5-0003eA-B5
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:01:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585220469;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2/2wrMEwU8K1EQxN273Pr7zZuw6dVXbtyGGdt5alEzs=;
- b=QCUwyP4t1qn37NH89dO/4RK8Is67n29ObnSD46HUEzT/udTjcvhZ5nPGEjdk+/L+lQ8Ta3
- Lyp0QJpO5KIHsGz3JOe2SGEKAN51isw8xNifFhX4L5OFutBEMuI8kZOQLyyOhStP/9song
- GLTNMZNlAtVVB+3eCuUU/lhAvNp/QwI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-vsKMGt80N7S49sCooT3n1A-1; Thu, 26 Mar 2020 07:01:02 -0400
-X-MC-Unique: vsKMGt80N7S49sCooT3n1A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AE5318B9FC4;
- Thu, 26 Mar 2020 11:01:01 +0000 (UTC)
-Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AE1D19925;
- Thu, 26 Mar 2020 11:00:55 +0000 (UTC)
-Subject: Re: [RFC v1] arm/virt: Add memory hot remove support
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-References: <20200318123722.19736-1-shameerali.kolothum.thodi@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b6c6f33b-7e4f-0b46-b67d-2de572e12626@redhat.com>
-Date: Thu, 26 Mar 2020 12:00:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <liq3ea@gmail.com>) id 1jHQQU-0004Z9-Ln
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:11:56 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41333)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1jHQQU-0004WC-F3
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:11:54 -0400
+Received: by mail-ot1-x344.google.com with SMTP id f52so5345519otf.8
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 04:11:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zwFZFZopOJpTd6Kx5EeOn+E6OIQWLIYiyrBbgqAde8s=;
+ b=kpkJPifHuu1BUEj8zo6zG7YzenbHTxe43T7SdzXCIxLaw6OkZsecprPDJ95q81DhPN
+ 7wrMDv3CXEQKVfojsH/5ep60+PCpyplgCnOUB0JlHgOmFPfeJCwrRkVdJ176/bUMq8q9
+ Jxu6VSKdVb2Y1EE1EmJAm85RgiCfXZbB+yJ/TZ/DBH9g2BqoZ/YLXu4huizuoPJn2Gej
+ hprFQ33LIBr6T2o+jDPuyJ+fyJB0v5kMGv9zf7vdRmNKYyLrwyW5ChOMr6i+NfAK/cen
+ 9Bfxw1+CXPt8dq7ojt+YuSpdTgNOYw3kBVvwATDTai0sedgJ14o7cdxHskaIdICWYhv6
+ lkUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zwFZFZopOJpTd6Kx5EeOn+E6OIQWLIYiyrBbgqAde8s=;
+ b=QaGOfW6aUc6riNAaoHy556k6pDoD9TIG8SttpnunEqIia0N+8fJD0RkBPhO33DqoQg
+ Rh4YHgIKPsfUIYrZFcFTBT5+A0cQu8IojGPKOvZ128F9xq066qWryGGaILAADmDCesEn
+ q3bgB72IOQWGY1J3KXYHbf7C76hZqemxTkdvxPwWmgWDDdzWo9nKIscwqVwngEEWwH91
+ 2AwqX1L7VwFlbWuuFH5R9TuBVZqnopp4e1Z+EnlybL9e3Xq+oX9/mBToe9jDSnIXi6KV
+ 8eUdIwUK8W9AWIR2qjU4AP5ndXlWxx00QZtCmzWUspg1GDZ+ZpC2GYqtuDvCtZmnEdB3
+ lsLw==
+X-Gm-Message-State: ANhLgQ14FdR9xq4NnLr+0pbO1pG0tGPq/Xbl6jeppaUIY+Dem5pDJvfV
+ xEZlAU2rZ+39eY4SfjHMR+vdbJSTfWOADy+J0Zg=
+X-Google-Smtp-Source: ADFU+vvc2HB4Gghwoql4FJKu9VB5KWVe0YE3RVHwZ/STagMxHLUO0TVAsmlf2b4KP2FKuGcqj0W3tpmfr4wltI3vKno=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr5589273otq.181.1585221113497; 
+ Thu, 26 Mar 2020 04:11:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200318123722.19736-1-shameerali.kolothum.thodi@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <20200324172722.32082-1-ppandit@redhat.com>
+In-Reply-To: <20200324172722.32082-1-ppandit@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 26 Mar 2020 19:11:17 +0800
+Message-ID: <CAKXe6SLY4bXoKmqqwghmXsWA9vF0jgiia7-E23+Sq9cA11pcHg@mail.gmail.com>
+Subject: Re: [PATCH v7] net: tulip: check frame size and r/w data length
+To: P J P <ppandit@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000005c52ce05a1c00d89"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,212 +87,400 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com,
- Anshuman Khandual <anshuman.khandual@arm.com>, linuxarm@huawei.com,
- xuwei5@hisilicon.com, prime.zeng@hisilicon.com, imammedo@redhat.com
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <pangpei.lq@antfin.com>, Sven Schnelle <svens@stackframe.org>,
+ Ziming Zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Shameer,
+--0000000000005c52ce05a1c00d89
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/18/20 1:37 PM, Shameer Kolothum wrote:
-> This adds support for memory hot remove on arm/virt that
-> uses acpi ged device.
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B43=E6=9C=8825=E6=97=A5=E5=
+=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=881:31=E5=86=99=E9=81=93=EF=BC=9A
 
-I gave this a try and it works fine if the PCDIMM slot was initially
-hotplugged:
-(QEMU) object-add qom-type=memory-backend-ram id=mem1 props.size=4294967296
-{"return": {}}
-(QEMU) device_add driver=pc-dimm  id=pcdimm1 memdev=mem1
-(QEMU) device_del id=pcdimm1
-{"return": {}}
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> Tulip network driver while copying tx/rx buffers does not check
+> frame size against r/w data length. This may lead to OOB buffer
+> access. Add check to avoid it.
+>
+> Limit iterations over descriptors to avoid potential infinite
+> loop issue in tulip_xmit_list_update.
+>
+> Reported-by: Li Qiang <pangpei.lq@antfin.com>
+> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+> Reported-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>
 
-on guest I can see:
-[   82.466321] Offlined Pages 262144
-[   82.541712] Offlined Pages 262144
-[   82.589236] Offlined Pages 262144
-[   82.969166] Offlined Pages 262144
 
-However I noticed that if qemu is launched directly with
+Tested-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
--m 16G,maxmem=32G,slots=2 \
--object memory-backend-ram,id=mem1,size=4G \
--device pc-dimm,memdev=mem1,id=dimm1,driver=pc-dimm -device
-
-and then in the qmp shell:
-(QEMU) device_del id=dimm1
-
-the hot-unplug fails in guest:
-
-[   78.897407] Offlined Pages 262144
-[   79.260811] Offlined Pages 262144
-[   79.308105] Offlined Pages 262144
-[   79.333675] page:fffffe00137d1f40 refcount:1 mapcount:0
-mapping:ffff0004ea9f20b1 index:0xaaab11c6e
-[   79.335927] anon flags: 0x17ffff8000080024(uptodate|active|swapbacked)
-[   79.337571] raw: 17ffff8000080024 dead000000000100 dead000000000122
-ffff0004ea9f20b1
-[   79.339502] raw: 0000000aaab11c6e 0000000000000000 00000001ffffffff
-ffff0004fd4e3000
-[   79.341701] page dumped because: unmovable page
-[   79.342887] page->mem_cgroup:ffff0004fd4e3000
-[   79.354729] page:fffffe00137d1f40 refcount:1 mapcount:0
-mapping:ffff0004ea9f20b1 index:0xaaab11c6e
-[   79.357012] anon flags: 0x17ffff8000080024(uptodate|active|swapbacked)
-[   79.358658] raw: 17ffff8000080024 dead000000000100 dead000000000122
-ffff0004ea9f20b1
-[   79.360611] raw: 0000000aaab11c6e 0000000000000000 00000001ffffffff
-ffff0004fd4e3000
-[   79.362560] page dumped because: unmovable page
-[   79.363742] page->mem_cgroup:ffff0004fd4e3000
-[   79.368636] memory memory20: Offline failed.
-
-I did not expect this. The PCDIMM slot in that case does not seem to be
-interpreted as a hot-unpluggable one (?). I added Anshuman in cc.
-
-Thanks
-
-Eric
+Thanks,
+Li Qiang
 
 
 
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
->  -RFC because linux kernel support for mem hot remove is just queued
->   for 5.7[1].
->  -Tested with guest kernel 5.6-rc5 + [1]
-> 
-> 1. https://patchwork.kernel.org/cover/11419301/
-> ---
->  hw/acpi/generic_event_device.c | 28 +++++++++++++++++
->  hw/arm/virt.c                  | 56 ++++++++++++++++++++++++++++++++--
->  2 files changed, 82 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 021ed2bf23..3e28c110fa 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -182,6 +182,32 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
+>  hw/net/tulip.c | 36 +++++++++++++++++++++++++++---------
+>  1 file changed, 27 insertions(+), 9 deletions(-)
+>
+> Update v7: fix length check expression to replace '>=3D' with '>'
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07160.html
+>
+> diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+> index cfac2719d3..1295f51d07 100644
+> --- a/hw/net/tulip.c
+> +++ b/hw/net/tulip.c
+> @@ -170,6 +170,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struc=
+t
+> tulip_descriptor *desc)
+>          } else {
+>              len =3D s->rx_frame_len;
+>          }
+> +
+> +        if (s->rx_frame_len + len > sizeof(s->rx_frame)) {
+> +            return;
+> +        }
+>          pci_dma_write(&s->dev, desc->buf_addr1, s->rx_frame +
+>              (s->rx_frame_size - s->rx_frame_len), len);
+>          s->rx_frame_len -=3D len;
+> @@ -181,6 +185,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struc=
+t
+> tulip_descriptor *desc)
+>          } else {
+>              len =3D s->rx_frame_len;
+>          }
+> +
+> +        if (s->rx_frame_len + len > sizeof(s->rx_frame)) {
+> +            return;
+> +        }
+>          pci_dma_write(&s->dev, desc->buf_addr2, s->rx_frame +
+>              (s->rx_frame_size - s->rx_frame_len), len);
+>          s->rx_frame_len -=3D len;
+> @@ -227,7 +235,8 @@ static ssize_t tulip_receive(TULIPState *s, const
+> uint8_t *buf, size_t size)
+>
+>      trace_tulip_receive(buf, size);
+>
+> -    if (size < 14 || size > 2048 || s->rx_frame_len ||
+> tulip_rx_stopped(s)) {
+> +    if (size < 14 || size > sizeof(s->rx_frame) - 4
+> +        || s->rx_frame_len || tulip_rx_stopped(s)) {
+>          return 0;
+>      }
+>
+> @@ -275,7 +284,6 @@ static ssize_t tulip_receive_nc(NetClientState *nc,
+>      return tulip_receive(qemu_get_nic_opaque(nc), buf, size);
+>  }
+>
+> -
+>  static NetClientInfo net_tulip_info =3D {
+>      .type =3D NET_CLIENT_DRIVER_NIC,
+>      .size =3D sizeof(NICState),
+> @@ -558,7 +566,7 @@ static void tulip_tx(TULIPState *s, struct
+> tulip_descriptor *desc)
+>          if ((s->csr[6] >> CSR6_OM_SHIFT) & CSR6_OM_MASK) {
+>              /* Internal or external Loopback */
+>              tulip_receive(s, s->tx_frame, s->tx_frame_len);
+> -        } else {
+> +        } else if (s->tx_frame_len <=3D sizeof(s->tx_frame)) {
+>              qemu_send_packet(qemu_get_queue(s->nic),
+>                  s->tx_frame, s->tx_frame_len);
+>          }
+> @@ -570,23 +578,31 @@ static void tulip_tx(TULIPState *s, struct
+> tulip_descriptor *desc)
 >      }
 >  }
->  
-> +static void acpi_ged_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                       DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        acpi_memory_unplug_request_cb(hotplug_dev, &s->memhp_state, dev, errp);
-> +    } else {
-> +        error_setg(errp, "acpi: device unplug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
-> +static void acpi_ged_unplug_cb(HotplugHandler *hotplug_dev,
-> +                               DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        acpi_memory_unplug_cb(&s->memhp_state, dev, errp);
-> +    } else {
-> +        error_setg(errp, "acpi: device unplug for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
->  static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+>
+> -static void tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor
+> *desc)
+> +static int tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor
+> *desc)
 >  {
->      AcpiGedState *s = ACPI_GED(adev);
-> @@ -286,6 +312,8 @@ static void acpi_ged_class_init(ObjectClass *class, void *data)
->      dc->vmsd = &vmstate_acpi_ged;
->  
->      hc->plug = acpi_ged_device_plug_cb;
-> +    hc->unplug_request = acpi_ged_unplug_request_cb;
-> +    hc->unplug = acpi_ged_unplug_cb;
->  
->      adevc->send_event = acpi_ged_send_event;
->  }
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 94f93dda54..91974e4e80 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2096,11 +2096,62 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+>      int len1 =3D (desc->control >> TDES1_BUF1_SIZE_SHIFT) &
+> TDES1_BUF1_SIZE_MASK;
+>      int len2 =3D (desc->control >> TDES1_BUF2_SIZE_SHIFT) &
+> TDES1_BUF2_SIZE_MASK;
+>
+> +    if (s->tx_frame_len + len1 > sizeof(s->tx_frame)) {
+> +        return -1;
+> +    }
+>      if (len1) {
+>          pci_dma_read(&s->dev, desc->buf_addr1,
+>              s->tx_frame + s->tx_frame_len, len1);
+>          s->tx_frame_len +=3D len1;
 >      }
+>
+> +    if (s->tx_frame_len + len2 > sizeof(s->tx_frame)) {
+> +        return -1;
+> +    }
+>      if (len2) {
+>          pci_dma_read(&s->dev, desc->buf_addr2,
+>              s->tx_frame + s->tx_frame_len, len2);
+>          s->tx_frame_len +=3D len2;
+>      }
+>      desc->status =3D (len1 + len2) ? 0 : 0x7fffffff;
+> +
+> +    return 0;
 >  }
->  
-> +static void virt_dimm_unplug_request(HotplugHandler *hotplug_dev,
-> +                                     DeviceState *dev, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +    Error *local_err = NULL;
-> +
-> +    if (!vms->acpi_dev) {
-> +        error_setg(errp,
-> +                   "memory hotplug is not enabled: missing acpi-ged device");
-> +        goto out;
-> +    }
-> +
-> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(vms->acpi_dev), dev,
-> +                                   &local_err);
-> +out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void virt_dimm_unplug(HotplugHandler *hotplug_dev,
-> +                             DeviceState *dev, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +    Error *local_err = NULL;
-> +
-> +    hotplug_handler_unplug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
-> +    pc_dimm_unplug(PC_DIMM(dev), MACHINE(vms));
-> +    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
-> +
-> + out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                            DeviceState *dev, Error **errp)
+>
+>  static void tulip_setup_filter_addr(TULIPState *s, uint8_t *buf, int n)
+> @@ -651,13 +667,15 @@ static uint32_t tulip_ts(TULIPState *s)
+>
+>  static void tulip_xmit_list_update(TULIPState *s)
 >  {
-> -    error_setg(errp, "device unplug request for unsupported device"
-> -               " type: %s", object_get_typename(OBJECT(dev)));
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        virt_dimm_unplug_request(hotplug_dev, dev, errp);
-> +    } else {
-> +        error_setg(errp, "device unplug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
-> +static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-> +                                          DeviceState *dev, Error **errp)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        virt_dimm_unplug(hotplug_dev, dev, errp);
-> +    } else {
-> +        error_setg(errp, "virt: device unplug for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
->  }
->  
->  static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-> @@ -2181,6 +2232,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      hc->pre_plug = virt_machine_device_pre_plug_cb;
->      hc->plug = virt_machine_device_plug_cb;
->      hc->unplug_request = virt_machine_device_unplug_request_cb;
-> +    hc->unplug = virt_machine_device_unplug_cb;
->      mc->numa_mem_supported = true;
->      mc->auto_enable_numa_with_memhp = true;
->      mc->default_ram_id = "mach-virt.ram";
-> 
+> +#define TULIP_DESC_MAX 128
+> +    uint8_t i =3D 0;
+>      struct tulip_descriptor desc;
+>
+>      if (tulip_ts(s) !=3D CSR5_TS_SUSPENDED) {
+>          return;
+>      }
+>
+> -    for (;;) {
+> +    for (i =3D 0; i < TULIP_DESC_MAX; i++) {
+>          tulip_desc_read(s, s->current_tx_desc, &desc);
+>          tulip_dump_tx_descriptor(s, &desc);
+>
+> @@ -675,10 +693,10 @@ static void tulip_xmit_list_update(TULIPState *s)
+>                  s->tx_frame_len =3D 0;
+>              }
+>
+> -            tulip_copy_tx_buffers(s, &desc);
+> -
+> -            if (desc.control & TDES1_LS) {
+> -                tulip_tx(s, &desc);
+> +            if (!tulip_copy_tx_buffers(s, &desc)) {
+> +                if (desc.control & TDES1_LS) {
+> +                    tulip_tx(s, &desc);
+> +                }
+>              }
+>          }
+>          tulip_desc_write(s, s->current_tx_desc, &desc);
+> --
+> 2.25.1
+>
+>
+>
 
+--0000000000005c52ce05a1c00d89
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">P J P &lt;<a href=3D"mailto:ppandit@r=
+edhat.com">ppandit@redhat.com</a>&gt; =E4=BA=8E2020=E5=B9=B43=E6=9C=8825=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=881:31=E5=86=99=E9=81=93=EF=BC=9A<=
+br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
+x;border-left:1px solid rgb(204,204,204);padding-left:1ex">From: Prasad J P=
+andit &lt;<a href=3D"mailto:pjp@fedoraproject.org" target=3D"_blank">pjp@fe=
+doraproject.org</a>&gt;<br>
+<br>
+Tulip network driver while copying tx/rx buffers does not check<br>
+frame size against r/w data length. This may lead to OOB buffer<br>
+access. Add check to avoid it.<br>
+<br>
+Limit iterations over descriptors to avoid potential infinite<br>
+loop issue in tulip_xmit_list_update.<br>
+<br>
+Reported-by: Li Qiang &lt;<a href=3D"mailto:pangpei.lq@antfin.com" target=
+=3D"_blank">pangpei.lq@antfin.com</a>&gt;<br>
+Reported-by: Ziming Zhang &lt;<a href=3D"mailto:ezrakiez@gmail.com" target=
+=3D"_blank">ezrakiez@gmail.com</a>&gt;<br>
+Reported-by: Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com" target=
+=3D"_blank">jasowang@redhat.com</a>&gt;<br>
+Signed-off-by: Prasad J Pandit &lt;<a href=3D"mailto:pjp@fedoraproject.org"=
+ target=3D"_blank">pjp@fedoraproject.org</a>&gt;<br></blockquote><div><br><=
+/div><div><br></div><div>Tested-by: Li Qiang &lt;<a href=3D"mailto:liq3ea@g=
+mail.com">liq3ea@gmail.com</a>&gt;</div><div>Reviewed-by: Li Qiang &lt;<a h=
+ref=3D"mailto:liq3ea@gmail.com">liq3ea@gmail.com</a>&gt;</div><div><br></di=
+v><div>Thanks,</div><div>Li Qiang</div><div></div><div><br></div><div>=C2=
+=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
+x;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+---<br>
+=C2=A0hw/net/tulip.c | 36 +++++++++++++++++++++++++++---------<br>
+=C2=A01 file changed, 27 insertions(+), 9 deletions(-)<br>
+<br>
+Update v7: fix length check expression to replace &#39;&gt;=3D&#39; with &#=
+39;&gt;&#39;<br>
+=C2=A0 -&gt; <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-=
+03/msg07160.html" rel=3D"noreferrer" target=3D"_blank">https://lists.gnu.or=
+g/archive/html/qemu-devel/2020-03/msg07160.html</a><br>
+<br>
+diff --git a/hw/net/tulip.c b/hw/net/tulip.c<br>
+index cfac2719d3..1295f51d07 100644<br>
+--- a/hw/net/tulip.c<br>
++++ b/hw/net/tulip.c<br>
+@@ -170,6 +170,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct =
+tulip_descriptor *desc)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0len =3D s-&gt;rx_frame_len;=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (s-&gt;rx_frame_len + len &gt; sizeof(s-&gt=
+;rx_frame)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_write(&amp;s-&gt;dev, desc-&gt;bu=
+f_addr1, s-&gt;rx_frame +<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(s-&gt;rx_frame_size - s-&g=
+t;rx_frame_len), len);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;rx_frame_len -=3D len;<br>
+@@ -181,6 +185,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct =
+tulip_descriptor *desc)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0len =3D s-&gt;rx_frame_len;=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (s-&gt;rx_frame_len + len &gt; sizeof(s-&gt=
+;rx_frame)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_write(&amp;s-&gt;dev, desc-&gt;bu=
+f_addr2, s-&gt;rx_frame +<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(s-&gt;rx_frame_size - s-&g=
+t;rx_frame_len), len);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;rx_frame_len -=3D len;<br>
+@@ -227,7 +235,8 @@ static ssize_t tulip_receive(TULIPState *s, const uint8=
+_t *buf, size_t size)<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0trace_tulip_receive(buf, size);<br>
+<br>
+-=C2=A0 =C2=A0 if (size &lt; 14 || size &gt; 2048 || s-&gt;rx_frame_len || =
+tulip_rx_stopped(s)) {<br>
++=C2=A0 =C2=A0 if (size &lt; 14 || size &gt; sizeof(s-&gt;rx_frame) - 4<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 || s-&gt;rx_frame_len || tulip_rx_stopped(s)) =
+{<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+@@ -275,7 +284,6 @@ static ssize_t tulip_receive_nc(NetClientState *nc,<br>
+=C2=A0 =C2=A0 =C2=A0return tulip_receive(qemu_get_nic_opaque(nc), buf, size=
+);<br>
+=C2=A0}<br>
+<br>
+-<br>
+=C2=A0static NetClientInfo net_tulip_info =3D {<br>
+=C2=A0 =C2=A0 =C2=A0.type =3D NET_CLIENT_DRIVER_NIC,<br>
+=C2=A0 =C2=A0 =C2=A0.size =3D sizeof(NICState),<br>
+@@ -558,7 +566,7 @@ static void tulip_tx(TULIPState *s, struct tulip_descri=
+ptor *desc)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if ((s-&gt;csr[6] &gt;&gt; CSR6_OM_SHIFT)=
+ &amp; CSR6_OM_MASK) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Internal or external Loo=
+pback */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tulip_receive(s, s-&gt;tx_f=
+rame, s-&gt;tx_frame_len);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (s-&gt;tx_frame_len &lt;=3D sizeof(s=
+-&gt;tx_frame)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_send_packet(qemu_get_q=
+ueue(s-&gt;nic),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_fram=
+e, s-&gt;tx_frame_len);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+@@ -570,23 +578,31 @@ static void tulip_tx(TULIPState *s, struct tulip_desc=
+riptor *desc)<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0}<br>
+<br>
+-static void tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor *=
+desc)<br>
++static int tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor *d=
+esc)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0int len1 =3D (desc-&gt;control &gt;&gt; TDES1_BUF1_SIZE=
+_SHIFT) &amp; TDES1_BUF1_SIZE_MASK;<br>
+=C2=A0 =C2=A0 =C2=A0int len2 =3D (desc-&gt;control &gt;&gt; TDES1_BUF2_SIZE=
+_SHIFT) &amp; TDES1_BUF2_SIZE_MASK;<br>
+<br>
++=C2=A0 =C2=A0 if (s-&gt;tx_frame_len + len1 &gt; sizeof(s-&gt;tx_frame)) {=
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
++=C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0if (len1) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_read(&amp;s-&gt;dev, desc-&gt;buf=
+_addr1,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_frame + s-&gt;tx_f=
+rame_len, len1);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_frame_len +=3D len1;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
++=C2=A0 =C2=A0 if (s-&gt;tx_frame_len + len2 &gt; sizeof(s-&gt;tx_frame)) {=
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
++=C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0if (len2) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_dma_read(&amp;s-&gt;dev, desc-&gt;buf=
+_addr2,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_frame + s-&gt;tx_f=
+rame_len, len2);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_frame_len +=3D len2;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0desc-&gt;status =3D (len1 + len2) ? 0 : 0x7fffffff;<br>
++<br>
++=C2=A0 =C2=A0 return 0;<br>
+=C2=A0}<br>
+<br>
+=C2=A0static void tulip_setup_filter_addr(TULIPState *s, uint8_t *buf, int =
+n)<br>
+@@ -651,13 +667,15 @@ static uint32_t tulip_ts(TULIPState *s)<br>
+<br>
+=C2=A0static void tulip_xmit_list_update(TULIPState *s)<br>
+=C2=A0{<br>
++#define TULIP_DESC_MAX 128<br>
++=C2=A0 =C2=A0 uint8_t i =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0struct tulip_descriptor desc;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (tulip_ts(s) !=3D CSR5_TS_SUSPENDED) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 for (;;) {<br>
++=C2=A0 =C2=A0 for (i =3D 0; i &lt; TULIP_DESC_MAX; i++) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tulip_desc_read(s, s-&gt;current_tx_desc,=
+ &amp;desc);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tulip_dump_tx_descriptor(s, &amp;desc);<b=
+r>
+<br>
+@@ -675,10 +693,10 @@ static void tulip_xmit_list_update(TULIPState *s)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;tx_fram=
+e_len =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tulip_copy_tx_buffers(s, &amp;de=
+sc);<br>
+-<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (desc.control &amp; TDES1_LS)=
+ {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tulip_tx(s, &amp;d=
+esc);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!tulip_copy_tx_buffers(s, &a=
+mp;desc)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (desc.control &=
+amp; TDES1_LS) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tuli=
+p_tx(s, &amp;desc);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tulip_desc_write(s, s-&gt;current_tx_desc=
+, &amp;desc);<br>
+-- <br>
+2.25.1<br>
+<br>
+<br>
+</blockquote></div></div>
+
+--0000000000005c52ce05a1c00d89--
 
