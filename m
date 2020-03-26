@@ -2,66 +2,80 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF654C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70489C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:28:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0C1B20719
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:24:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0C1B20719
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3783120719
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:28:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SSIufcEc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3783120719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHOkc-0007Ld-Or
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 05:24:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45228)
+	id 1jHOoQ-0000f3-C1
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 05:28:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45714)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jHOk3-0006qS-L7
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:24:00 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHOnr-0000EH-Ql
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jHOk2-0007H4-Bo
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:23:59 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:42446)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>) id 1jHOk2-0007G4-51
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:23:58 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id C37AB41D14;
- Thu, 26 Mar 2020 10:23:55 +0100 (CET)
-Date: Thu, 26 Mar 2020 10:23:54 +0100 (CET)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <279529502.21.1585214634195@webmail.proxmox.com>
-In-Reply-To: <914048944.11.1585210462162@webmail.proxmox.com>
-References: <2007060575.48.1585048408879@webmail.proxmox.com>
- <1512602350.59.1585056617632@webmail.proxmox.com>
- <1806708761.60.1585056799652@webmail.proxmox.com>
- <32c10c76-1c9f-3a6a-4410-09eebad0f6f3@redhat.com>
- <20200325081312.7wtz6crlgotsw5ul@dritchie>
- <20200325114639.rxwhs7h4bkxhkgsu@dritchie>
- <523142611.32.1585139388758@webmail.proxmox.com>
- <20200325123905.4mygg2ljie7prtbc@dritchie>
- <1427176168.41.1585150848553@webmail.proxmox.com>
- <20200326074924.r4lmqqpeaizywkds@dritchie>
- <914048944.11.1585210462162@webmail.proxmox.com>
-Subject: Re: backup transaction with io-thread core dumps
+ (envelope-from <peter.maydell@linaro.org>) id 1jHOnq-00017T-87
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:27:55 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:40295)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHOnq-00016r-1v
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:27:54 -0400
+Received: by mail-oi1-x235.google.com with SMTP id y71so4872181oia.7
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 02:27:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=x8gFQ0emhdm9GaInZj5zBCQZRuQb+HOJMiySes9+p10=;
+ b=SSIufcEcCBGL70fIcHX5L4IuC12Pe5WFAS3GJHuGI5SRFWUu7gWwTYe5HHhtf6i7hC
+ MZD9vxYMLwhf/ORNMnm4STSMQAa5jPYOmCrVE6QUqc8AVvTMUWx5qS8Xnk/g1MEqDXuS
+ t9rmSkN1J6nKJoKj9j6WF/Fnz6zaWxImAYT08xyRgtkX4fFRJzqQpfPDiCXWZ78ctR0E
+ 26VYgVYH3dqPUv41tUpQuE3rEbiKvC1xdZ01H9WDSQBSXdCFGjeJEewsvO4iPq9jXGhD
+ wwlOlADXgB7LMx3VzhJyOBMKX02gDGPqfa7ASZZUkzH2HKnsG3UR5FSuYr7wU20JHFit
+ CHig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=x8gFQ0emhdm9GaInZj5zBCQZRuQb+HOJMiySes9+p10=;
+ b=d+6IquAo6ggt9I+TWCJ9o9Yc0S9wKSo0USVfzViP7UmnBGgBInNk8Rak1ikj2wAY8a
+ jV0qVzZx38ry5TeAc3hv7LToK1QJRiL1eyxMp+pYJ5vy0K0izuMUhK2oDtaypHguHkv9
+ RgbFi3j1ZE1NEVVOtHVsZ8j3jmnFKboOZenN2JA74+JOJQ/Qm6Q8W7rkIW0RJH8iUpCq
+ EsSH8tOra7um/IgGV1BWxkgS+UwbgeT4XwjB3AT/6+xHR3gJuUBOBRzyF3pnNTd7FVwm
+ 29h1XEjDPYGFwjUZ/t37brnhdUhXGpTIvl/VbP1AXUe3ncrB2pB2kNRPVVDB9KeWZyIt
+ Ipmw==
+X-Gm-Message-State: ANhLgQ1j5ixd0E9dyeynDTv6CNPtLvfWJ24vp9eFpSoCi3nap3ZwKo2Z
+ EJl0QC+EGmGN1Kq24Y3Gj/T5s9aowA3JBZuBV9PxTw==
+X-Google-Smtp-Source: ADFU+vs19HzMMnYgyX6mFfUswnQKGf+jrJUXMQcvZY2L47xnVjo3E7bgwK5CYZ2a+vRRM2PC1IarAlZxxu+Y2gR1zbM=
+X-Received: by 2002:a05:6808:8cb:: with SMTP id
+ k11mr117096oij.48.1585214873151; 
+ Thu, 26 Mar 2020 02:27:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev22
-X-Originating-Client: open-xchange-appsuite
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.186.127.180
+References: <20200325105843.17387-1-kraxel@redhat.com>
+In-Reply-To: <20200325105843.17387-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Mar 2020 09:27:41 +0000
+Message-ID: <CAFEAcA-w3d+0kWk6tOcPV-Lmg8dUDoMyCzypW-tcvPVqgN6KyQ@mail.gmail.com>
+Subject: Re: [PULL 0/2] Fixes 20200325 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::235
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,46 +87,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
-Cc: kwolf@redhat.com, "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > > As mentioned earlier, even a totally simple/normal backup job fails when
-> > > using io-threads and the VM is under load. It results in a total
-> > > VM freeze!
-> > > 
-> > 
-> > This is definitely a different issue. I'll take a look at it today.
-> 
-> Thanks. Stefan found a way to avoid that bug with:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07749.html
-> 
-> But there are doubts that this is the correct way to fix it ...
+On Wed, 25 Mar 2020 at 11:05, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 736cf607e40674776d752acc201f565723e86045:
+>
+>   Update version for v5.0.0-rc0 release (2020-03-24 17:50:00 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/fixes-20200325-pull-request
+>
+> for you to fetch changes up to 95fad99cb28e9970944b01fd7af452f6f9f37484:
+>
+>   hw/audio/fmopl: fix segmentation fault (2020-03-25 09:55:40 +0100)
+>
+> ----------------------------------------------------------------
+> fixes: input error handling & audio segfault
+>
+> ----------------------------------------------------------------
 
-And I just run into another freeze (with Stefans path applied). This time
-when I cancel a running backup:
 
-#0  0x00007ffff5cb3916 in __GI_ppoll (fds=0x7fff63d35c40, nfds=2, timeout=<optimized out>, timeout@entry=0x0, sigmask=sigmask@entry=0x0) at ../sysdeps/unix/sysv/linux/ppoll.c:39
-#1  0x0000555555c5fcd9 in ppoll (__ss=0x0, __timeout=0x0, __nfds=<optimized out>, __fds=<optimized out>) at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
-#2  0x0000555555c5fcd9 in qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, timeout=timeout@entry=-1) at util/qemu-timer.c:335
-#3  0x0000555555c624c1 in fdmon_poll_wait (ctx=0x7fffe8905e80, ready_list=0x7fffffffd2a8, timeout=-1) at util/fdmon-poll.c:79
-#4  0x0000555555c61aa7 in aio_poll (ctx=0x7fffe8905e80, blocking=blocking@entry=true) at util/aio-posix.c:589
-#5  0x0000555555bc2c83 in bdrv_do_drained_begin (poll=<optimized out>, ignore_bds_parents=false, parent=0x0, recursive=false, bs=0x7fffe8954bc0) at block/io.c:429
-#6  0x0000555555bc2c83 in bdrv_do_drained_begin (bs=0x7fffe8954bc0, recursive=<optimized out>, parent=0x0, ignore_bds_parents=<optimized out>, poll=<optimized out>) at block/io.c:395
-#7  0x0000555555bb3c37 in blk_drain (blk=0x7fffe8ebcf80) at block/block-backend.c:1617
-#8  0x0000555555bb481d in blk_unref (blk=0x7fffe8ebcf80) at block/block-backend.c:473
-#9  0x0000555555b6c835 in block_job_free (job=0x7fff64505000) at blockjob.c:89
-#10 0x0000555555b6dd19 in job_unref (job=0x7fff64505000) at job.c:360
-#11 0x0000555555b6dd19 in job_unref (job=0x7fff64505000) at job.c:352
-#12 0x0000555555b6e69a in job_finish_sync (job=job@entry=0x7fff64505000, finish=finish@entry=0x555555b6ec80 <job_cancel_err>, errp=errp@entry=0x0) at job.c:988
-#13 0x0000555555b6ec9e in job_cancel_sync (job=job@entry=0x7fff64505000) at job.c:931
-...
+Applied, thanks.
 
-Any ideas?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
+-- PMM
 
