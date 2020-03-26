@@ -2,60 +2,60 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C65C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 310E9C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BEFF20737
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED6702073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:41:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Pq7zGUe/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BEFF20737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BcLbKrgp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED6702073E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHGa6-0000f6-4i
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 20:41:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43665)
+	id 1jHGaF-00011H-46
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 20:41:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43725)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jHGXK-0003lE-UR
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 20:38:20 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jHGXM-0003lg-Ts
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 20:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jHGXJ-0002He-KM
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 20:38:18 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:33589)
+ (envelope-from <dgibson@ozlabs.org>) id 1jHGXL-0002JE-G4
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 20:38:20 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:33443)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jHGXJ-0002A5-92; Wed, 25 Mar 2020 20:38:17 -0400
+ id 1jHGXL-0002HK-3k; Wed, 25 Mar 2020 20:38:19 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48nmL80JXJz9sSM; Thu, 26 Mar 2020 11:38:07 +1100 (AEDT)
+ id 48nmL81r71z9sST; Thu, 26 Mar 2020 11:38:08 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1585183088;
- bh=XyVjfju493DIm4gXM7RKH2aS3xOA1NQ4eh+jrmOLPVk=;
+ bh=TMrAlnKj9Oaxen6UMKxVPQ+/Vc6J0mqR5EMx3kDLkLI=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Pq7zGUe/MvFTEY+bPfMrj/dmJec63o/tGhxDfbA110NQo5GolQLweFEOj4hB+0GDS
- afS0o6sZzOGN77KvuZOslaOxt2UV+XX1DzhMAcqRJmNLlREVnlAobCzN3xbIOC5EAk
- ezsK58EGDCAV6wf1WGLJESW7yzFARXk9heTTRl3s=
-Date: Thu, 26 Mar 2020 11:02:45 +1100
+ b=BcLbKrgp89V9hqZg3eC2jtOjPdwFfBhC74kb7X01JG7FTaNgwMziA9e8n0QGPTuXs
+ defv/9DoIpB0/BP5rr6uEkMQ/fD+dprcE9xqZE7fHpZYNNAZkY22TwZw5qGZOMyNMo
+ by4t1YRnEgyFTuGU1oo++YhpxclQtFtxP/TY3JDA=
+Date: Thu, 26 Mar 2020 11:15:02 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 1/4] spapr: Don't check capabilities removed between CAS
- calls
-Message-ID: <20200326000245.GH36889@umbus.fritz.box>
-References: <158514992409.478799.6718223069768660390.stgit@bahia.lan>
- <158514993021.478799.10928618293640651819.stgit@bahia.lan>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 2/5] ppc/pnv: Add support for NMI interface
+Message-ID: <20200326001502.GL36889@umbus.fritz.box>
+References: <20200325144147.221875-1-npiggin@gmail.com>
+ <20200325144147.221875-3-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8bBEDOJVaa9YlTAt"
+ protocol="application/pgp-signature"; boundary="yiup30KVCQiHUZFC"
 Content-Disposition: inline
-In-Reply-To: <158514993021.478799.10928618293640651819.stgit@bahia.lan>
+In-Reply-To: <20200325144147.221875-3-npiggin@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
@@ -70,85 +70,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---8bBEDOJVaa9YlTAt
+--yiup30KVCQiHUZFC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 25, 2020 at 04:25:30PM +0100, Greg Kurz wrote:
-> We currently check if some capability in OV5 was removed by the guest
-> since the previous CAS, and we trigger a CAS reboot in that case. This
-> was required because it could call for a device-tree property or node
-> removal, that we didn't support until recently (see commit 6787d27b04a7
-> "spapr: add option vector handling in CAS-generated resets" for details).
+On Thu, Mar 26, 2020 at 12:41:44AM +1000, Nicholas Piggin wrote:
+> This implements the NMI interface for the PNV machine, similarly to
+> commit 3431648272d ("spapr: Add support for new NMI interface") for
+> SPAPR.
 >=20
-> Now that we render a full FDT at CAS and that SLOF is able to handle
-> node removal, we don't need to do a CAS reset in this case anymore.
-> Also, this check can only return true if the guest has already called
-> CAS since the last full system reset (otherwise spapr->ov5_cas is
-> empty). Linux doesn't do that so this can be considered as dead code
-> for the vast majority of existing setups.
->=20
-> Drop the check. Since the only use of the ov5_cas_old variable is
-> precisely the check itself, drop the variable as well.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
 Applied to ppc-for-5.1.
 
 > ---
->  hw/ppc/spapr_hcall.c |   14 +-------------
->  1 file changed, 1 insertion(+), 13 deletions(-)
+>  hw/ppc/pnv.c | 30 +++++++++++++++++++++++++++++-
+>  1 file changed, 29 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 40c86e91eb89..1f123a68e46c 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1676,7 +1676,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
->      target_ulong fdt_bufsize =3D args[2];
->      target_ulong ov_table;
->      uint32_t cas_pvr;
-> -    SpaprOptionVector *ov1_guest, *ov5_guest, *ov5_cas_old;
-> +    SpaprOptionVector *ov1_guest, *ov5_guest;
->      bool guest_radix;
->      Error *local_err =3D NULL;
->      bool raw_mode_supported =3D false;
-> @@ -1781,22 +1781,10 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
->       * by LoPAPR 1.1, 14.5.4.8, which QEMU doesn't implement, we don't n=
-eed
->       * to worry about this for now.
->       */
-> -    ov5_cas_old =3D spapr_ovec_clone(spapr->ov5_cas);
-> -
-> -    /* also clear the radix/hash bit from the current ov5_cas bits to
-> -     * be in sync with the newly ov5 bits. Else the radix bit will be
-> -     * seen as being removed and this will generate a reset loop
-> -     */
-> -    spapr_ovec_clear(ov5_cas_old, OV5_MMU_RADIX_300);
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index b75ad06390..671535ebe6 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -27,6 +27,7 @@
+>  #include "sysemu/runstate.h"
+>  #include "sysemu/cpus.h"
+>  #include "sysemu/device_tree.h"
+> +#include "sysemu/hw_accel.h"
+>  #include "target/ppc/cpu.h"
+>  #include "qemu/log.h"
+>  #include "hw/ppc/fdt.h"
+> @@ -34,6 +35,7 @@
+>  #include "hw/ppc/pnv.h"
+>  #include "hw/ppc/pnv_core.h"
+>  #include "hw/loader.h"
+> +#include "hw/nmi.h"
+>  #include "exec/address-spaces.h"
+>  #include "qapi/visitor.h"
+>  #include "monitor/monitor.h"
+> @@ -1955,10 +1957,35 @@ static void pnv_machine_set_hb(Object *obj, bool =
+value, Error **errp)
+>      }
+>  }
 > =20
->      /* full range of negotiated ov5 capabilities */
->      spapr_ovec_intersect(spapr->ov5_cas, spapr->ov5, ov5_guest);
->      spapr_ovec_cleanup(ov5_guest);
-> -    /* capabilities that have been added since CAS-generated guest reset.
-> -     * if capabilities have since been removed, generate another reset
-> -     */
-> -    spapr->cas_reboot =3D !spapr_ovec_subset(ov5_cas_old, spapr->ov5_cas=
-);
-> -    spapr_ovec_cleanup(ov5_cas_old);
->      /* Now that processing is finished, set the radix/hash bit for the
->       * guest if it requested a valid mode; otherwise terminate the boot.=
- */
->      if (guest_radix) {
->=20
+> +static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, run_on_cpu_data arg)
+> +{
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +    CPUPPCState *env =3D &cpu->env;
+> +
+> +    cpu_synchronize_state(cs);
+> +    ppc_cpu_do_system_reset(cs);
+> +    /*
+> +     * SRR1[42:45] is set to 0100 which the ISA defines as implementation
+> +     * dependent. POWER processors use this for xscom triggered interrup=
+ts,
+> +     * which come from the BMC or NMI IPIs.
+> +     */
+> +    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
+> +}
+> +
+> +static void pnv_nmi(NMIState *n, int cpu_index, Error **errp)
+> +{
+> +    CPUState *cs;
+> +
+> +    CPU_FOREACH(cs) {
+> +        async_run_on_cpu(cs, pnv_cpu_do_nmi_on_cpu, RUN_ON_CPU_NULL);
+> +    }
+> +}
+> +
+>  static void pnv_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+>      InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
+(oc);
+> +    NMIClass *nc =3D NMI_CLASS(oc);
+> =20
+>      mc->desc =3D "IBM PowerNV (Non-Virtualized)";
+>      mc->init =3D pnv_init;
+> @@ -1975,6 +2002,7 @@ static void pnv_machine_class_init(ObjectClass *oc,=
+ void *data)
+>      mc->default_ram_size =3D INITRD_LOAD_ADDR + INITRD_MAX_SIZE;
+>      mc->default_ram_id =3D "pnv.ram";
+>      ispc->print_info =3D pnv_pic_print_info;
+> +    nc->nmi_monitor_handler =3D pnv_nmi;
+> =20
+>      object_class_property_add_bool(oc, "hb-mode",
+>                                     pnv_machine_get_hb, pnv_machine_set_h=
+b,
+> @@ -2038,7 +2066,7 @@ static const TypeInfo types[] =3D {
+>          .class_size    =3D sizeof(PnvMachineClass),
+>          .interfaces =3D (InterfaceInfo[]) {
+>              { TYPE_INTERRUPT_STATS_PROVIDER },
+> -            { },
+> +            { TYPE_NMI },
+>          },
+>      },
+>      {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -156,25 +183,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8bBEDOJVaa9YlTAt
+--yiup30KVCQiHUZFC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl578SUACgkQbDjKyiDZ
-s5L6FQ/+MDBUXp+KiWQ4IGOc7prc7Ua2yjld8P4zUtB6g1oZhglST7spsPmKqQfl
-M5AZaci8kF6hsUUH4RsW6ofFPP+XRQh5phExEWbV9URM5d+c+DMTSBu0sKZOAbRb
-qYRl5L5BtRmLRIPAsvaOnIYxa4OoZ+P3lE7Sx9u3y+xLTI+ZDrYYRTnumQahVekC
-08+bjVq51jOea0xkfdPQNm9tZYnOcQhAdaJj1GjCiRwE2j99Z3NDb1WIcVXFdKbh
-geQWVIBhYJrc25SSxyzdlb51ezoMC3zwOVwEU6EWH2U2H+7WhYeHYahenZAl4SNh
-TDAkxyg6QeonWtFfoUMrca+aDqOMZ4HgJJNEUT5h0LsXGfZ/b65UI8sTG48R4Z0M
-5ixrwVudOz+aHkXooq+UEscZucfsNOmJVERqzPAoA4uwyaAOnchud9zxJl7zYls7
-I0WYk8JbfI6vJm4pD3DQsRRxoN5DcbvApliA3KdliqEueRX+AIBT2GHed8WYO9T2
-8MepGZn3eOvrKYpbm071EQScR3ThaobH/5zMx4onC2LNBTj/MrXGS7tRidIZsbpI
-acdHO2qirxKATFtl1jQvP/0Yg6ErbuFCIQUbJatrvDeLl2ttUPNgBEnxJTsjFUfe
-zzA51ATNFxA/kWMLCBypdXdmmzvbncBkuQm7ZWqQh8geO4WFc0U=
-=//DY
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl579AUACgkQbDjKyiDZ
+s5IjsxAAtP88dcuaVIUz/lYSHthXuPtbuftuNx2umMOpuodtT+7bDP+tWVJzHbd6
+Uu9ACU7bUVw4seR8vcCmdylLwCrHCdBemvBa9cxqw9DYqZnY1Rexv4o7TuVS2Bxb
+yykqzu6TZZnoR3sLL7VTpMThzaXP8dyZIEI6iz0xGnqVCt6YdvVVFuspNZStwlpZ
+MmwiTpJKUtP/JQ4ByJ0lLLiAJrL3O6cbdNaYCQG9KiTQJoMVKK+y1Cfzw8tK3RQK
+Slj0VkDZsxFbW8C4t+zCbsuhUbsQ+pAvnuWyA5IYTbzBicjtM5U0Mnb0YblflY22
+NqOq3cpkf402R++1EIc6VBb0eoRcL7BMXf7ZM+UR5b1qSaCn+abgoULI+vFscYBj
+11e7ck0YVCOOKdsfAFJ1KNMjAa3OZFNJ92prX6Xpq0R9J/noq74mrtc9Fdqtrdhu
+f3w2KGY5rKkWoPSfVbOxWkDiFO5jusWA9fyFtyOzMpiSl9fzDggN6AC10fsumbYy
+auYqn60bEqj7TSI7sZJ0JXPzbIqh08WLfn3vJFcm2s7QKp/Gfp8PiM2N7dUEy6aj
+D2DSUgatgSh0S3U84HZyno9DOn/8eBC7ke+rFuMiy8SJr6rlzd7nViwxGluI48Sk
+A6Tbv0wYcMh4eLNvF5HP59dsYAh5XPbBdywW7FC5tH+w9yV4i3o=
+=FXhw
 -----END PGP SIGNATURE-----
 
---8bBEDOJVaa9YlTAt--
+--yiup30KVCQiHUZFC--
 
