@@ -2,102 +2,74 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FA8FC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 18:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9075C2D0E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 19:01:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3407D20714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 18:49:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcitMga8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3407D20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7875E20719
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 19:01:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7875E20719
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHXZ1-00067I-Bl
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 14:49:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52362)
+	id 1jHXlD-0003Lk-Ll
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 15:01:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54341)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jHXYH-0005ZX-NG
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:48:26 -0400
+ (envelope-from <bounces@canonical.com>) id 1jHXkK-0002OJ-Cg
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jHXYF-0002ft-Kb
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:48:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:37086)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jHXYC-0002df-Dy
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:48:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585248499;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2BOe9Mky1sHd/AxUSvoEQSW5fOlSSXd4c12oRfsY5jA=;
- b=YcitMga8h46UhJ2T6ynohlh8mBHg0PN5L/r2oJw3CLDLJxtXAnICHS44IRPwXGtYm1koR8
- mbluXKvRASxDiWZ5mab/RPlPEc5eyLx4fRxcn1EIiBYyo9zvyEZrpUgDvMJeOvGHrAscE7
- tdHgd988ZpLbh5U4xRJ/zzouEAp36uw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-AJdBqJubOFiDbhWmo86YmQ-1; Thu, 26 Mar 2020 14:48:17 -0400
-X-MC-Unique: AJdBqJubOFiDbhWmo86YmQ-1
-Received: by mail-wr1-f71.google.com with SMTP id h14so3560128wrr.12
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 11:48:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2BOe9Mky1sHd/AxUSvoEQSW5fOlSSXd4c12oRfsY5jA=;
- b=Fd92j0R8C79mbvuLvM1/vS/oxb15dIjg0377X5dllra7RSEQGwl/s5uEOb1eOMbwCM
- 4ImtBp9OcrJCkPUR2MQwKQz+wNer+h5zK3OQcB4Q1S15CAzBmsJAnidfE/NrGx/X00JR
- QUdx4aBSwSzzW21FnONuIx4swgX+GgmP3TRM/SWOqPGg47/2OD3YFgSALRgJsp8y4/CY
- kJxMysgaynhd79amFsd0kAZlsRflshmipwM3FXFe7XYouVFD2QOtod1OMwHKmhaHuhyh
- 1XhnKYBcc4vcJMCpfA8DcTqnMsnSUksy5Js/PsKmfb1a2Vj2APuLEzgwWmjl35EPALBz
- qMeQ==
-X-Gm-Message-State: ANhLgQ1rwjyrkYLR9F0LOhd2jyVggeuI2ZypX63sywHA+WsAksg+7org
- BueRNdthT8PU1BKjxfarjDNV8wlQlHk4bttetsQTs3pOlYjCRuSJEVcBGyw1i4uXZe2RuVaQAjX
- pfmI+VC6pObsO7SA=
-X-Received: by 2002:a1c:23d5:: with SMTP id j204mr1411488wmj.59.1585248495945; 
- Thu, 26 Mar 2020 11:48:15 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsoAaIf+cenjr5d5sdALqsGvAKAb/+Y2Fyxjb6gV1sieW64ySCM677S/v07UCbd001Hz3dmOQ==
-X-Received: by 2002:a1c:23d5:: with SMTP id j204mr1411460wmj.59.1585248495638; 
- Thu, 26 Mar 2020 11:48:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac:65bc:cc13:a014?
- ([2001:b07:6468:f312:ac:65bc:cc13:a014])
- by smtp.gmail.com with ESMTPSA id t193sm4836783wmt.14.2020.03.26.11.48.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 26 Mar 2020 11:48:15 -0700 (PDT)
-Subject: Re: [PATCH] i386/cpu: Expand MAX_FIXED_COUNTERS from 3 to 4 to for
- Icelake
-To: Like Xu <like.xu@linux.intel.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20200317055413.66404-1-like.xu@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b536e5e3-d102-ff82-4ebc-01114b9a1b7f@redhat.com>
-Date: Thu, 26 Mar 2020 19:48:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <bounces@canonical.com>) id 1jHXkI-000821-Uh
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:00:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37902)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jHXkI-00081c-Ot
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:00:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jHXkG-0007DK-UJ
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 19:00:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E19C12E80C3
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 19:00:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200317055413.66404-1-like.xu@linux.intel.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Mar 2020 18:54:26 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1693050@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: paulmenzel philmd rmustacc
+X-Launchpad-Bug-Reporter: Robert Mustacchi (rmustacc)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <149558234717.18218.15801621819682136328.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158524886678.11449.17935218369956127168.malone@soybean.canonical.com>
+Subject: [Bug 1693050] Re: xhci HCIVERSION register read emulation incorrectly
+ handled
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 38bf5bf0778e75858c0634b38cfede01129f7e66
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -106,50 +78,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Bug 1693050 <1693050@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/03/20 06:54, Like Xu wrote:
-> In the Intel SDM, "Table 18-2. Association of Fixed-Function
-> Performance Counters with Architectural Performance Events",
-> we may have a new fixed counter 'TOPDOWN.SLOTS' (since Icelake),
-> which counts the number of available slots for an unhalted
-> logical processor. Check commit 6017608936 in the kernel tree.
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->  target/i386/cpu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 576f309bbf..ec2b67d425 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1185,7 +1185,7 @@ typedef struct {
->  #define CPU_NB_REGS CPU_NB_REGS32
->  #endif
->  
-> -#define MAX_FIXED_COUNTERS 3
-> +#define MAX_FIXED_COUNTERS 4
->  #define MAX_GP_COUNTERS    (MSR_IA32_PERF_STATUS - MSR_P6_EVNTSEL0)
->  
->  #define TARGET_INSN_START_EXTRA_WORDS 1
-> 
+Odd, this should be fixed by commit 6ee021d41 and
+36960b4d66..98f52cdbb5c.
 
-Hi Like, the problem with this patch is that it breaks live migration;
-the vmstate_msr_architectural_pmu record hardcodes MAX_FIXED_COUNTERS as
-the number of registers.
+-- =
 
-So it's more complicated, you need to add a new subsection (following
-vmstate_msr_architectural_pmu) and transmit it only if the 4th counter
-is nonzero (instead of the more complicated check in pmu_enable_needed).
- Just to be safe, I'd make the new subsection hold 16 counters and bump
-MAX_FIXED_COUNTERS to 16.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1693050
 
-Thanks,
+Title:
+  xhci HCIVERSION register read emulation incorrectly handled
 
-Paolo
+Status in QEMU:
+  New
 
+Bug description:
+  We had an illumos user trying to run illumos in QEMU 2.9.0 with the
+  qemu-xhci device enabled. Note, that while this was discovered against
+  QEMU 2.9.0, from my current read of the HEAD, it is still present. The
+  illumos bug at https://www.illumos.org/issues/8173 has additional
+  information on how the user invoked qemu. While investigating the
+  problem we found that the illumos driver was reading a version of
+  0x0000 when reading the HCIVERSION register from qemu.
+
+  In the illumos driver we're performing a 16-bit read of the version
+  register at offset 0x2. From looking around at other OSes, while Linux
+  performs a 4 byte read at offset 0x0 and masks out the version, others
+  that care about the version are doing a two byte read, though not all
+  actually act on the version and some just discard the information.
+
+  The user who hit this was able to enable tracing (note the tracing
+  file is attached to the illumos bug linked previously) and we hit the
+  unimplemented register read with offset 0x2 at
+  http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
+  xhci.c;hb=3DHEAD#l2960. The xhci register specifies today that its
+  allowed for users to do 1-4 byte reads; however, that it implements
+  only four byte reads in its implementation
+  (http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
+  xhci.c;hb=3DHEAD#l3333). Hence why when we read the HCIVERSION register
+  at offset 0x2, it isn't handled in xhci_cap_read() which then returns
+  zeros.
+
+  From digging into this, I think that we're coming into
+  memory_region_dispatch_read() and then memory_region_dispatch_read1().
+  However, I don't see anything in either the general memory region
+  logic or in the xhci_cap_read() function that would deal with
+  adjusting the offset that we're reading at and then masking it off
+  again. While the access_with_adjusted_size() attempts to deal with
+  this, it never adjusts the hardware address that's passed in to be a
+  multiple of the implementation defined offset that I can see. I
+  suspect that the FIXME at line 582
+  (http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dmemory.c;hb=3DHEAD#l582) =
+and
+  the implementation in the xhci code is the crux of the problem.
+
+  For the time being we're working around this in the illumos driver,
+  but I wanted to point this out such that it might be helpful for other
+  systems which are assuming that they can do the two byte read like on
+  hardware.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1693050/+subscriptions
 
