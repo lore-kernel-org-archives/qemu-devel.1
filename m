@@ -2,63 +2,85 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5988CC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 05:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D30FC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 05:43:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 273DC206E6
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 05:41:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="abWvDedw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 273DC206E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id E39A3206E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 05:43:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39A3206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHLGt-0004bb-CD
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 01:41:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46212)
+	id 1jHLIL-0006Qh-0p
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 01:43:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46514)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jHLFc-0003Af-Gd
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 01:40:21 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jHLH5-00059Z-CF
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 01:41:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jHLFb-0000qX-By
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 01:40:20 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:35897)
+ (envelope-from <yi.l.liu@intel.com>) id 1jHLH3-0001br-8n
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 01:41:50 -0400
+Received: from mga02.intel.com ([134.134.136.20]:19355)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jHLFb-0000nk-1b; Thu, 26 Mar 2020 01:40:19 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48nv2l0HFmz9sSN; Thu, 26 Mar 2020 16:40:14 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1585201215;
- bh=5zqp0BrSo+XTId26i2ES/dDzCNRx9VXm9kO8rq5wvko=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=abWvDedwz82reARhapOf2htJGZJtP1ees/pUhyK973xRViXTJUUoWZil4r44gLnHl
- vcTf3OoXK2mfvghPnJkvW058u6+mP0wALrzh5fxftvEU1HWi5AjNF8KfL04HBcevfP
- IaSxcPTzo8mFSnbBQpCVL/HhETT+0z2w/og0DtEk=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: aik@ozlabs.ru,
-	groug@kaod.org
-Subject: [RFC for-5.1 3/4] spapr: Fix failure path for attempting to hot
- unplug PCI bridges
-Date: Thu, 26 Mar 2020 16:40:08 +1100
-Message-Id: <20200326054009.454477-4-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200326054009.454477-1-david@gibson.dropbear.id.au>
-References: <20200326054009.454477-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jHLH3-0001Xy-1K
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 01:41:49 -0400
+IronPort-SDR: egYquBrTO9eIA+LcIwWifCutAVv1cG8FgVGOZDTYcTXpkMyQWr+SjVljequa8r7dG871a14RM1
+ HMrvy26HFftw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Mar 2020 22:41:44 -0700
+IronPort-SDR: iBX8LdSXxxYfNAhRBQW5Grwe3X3dZOWUnXkRczinwgceZxGCvjMrfHUPZbfrRyo5v/rcX+nL27
+ QtkNFBs79JhQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,307,1580803200"; d="scan'208";a="240580674"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by fmsmga008.fm.intel.com with ESMTP; 25 Mar 2020 22:41:44 -0700
+Received: from fmsmsx116.amr.corp.intel.com (10.18.116.20) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 22:41:44 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ fmsmsx116.amr.corp.intel.com (10.18.116.20) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 22:41:44 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.201]) with mapi id 14.03.0439.000;
+ Thu, 26 Mar 2020 13:41:40 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH v1 20/22] intel_iommu: propagate PASID-based iotlb
+ invalidation to host
+Thread-Topic: [PATCH v1 20/22] intel_iommu: propagate PASID-based iotlb
+ invalidation to host
+Thread-Index: AQHWAEW3X+65yqyUwUiucJlWzaqkgqhXjwWAgAHAhkCAAREEgA==
+Date: Thu, 26 Mar 2020 05:41:39 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A203E63@SHSMSX104.ccr.corp.intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-21-git-send-email-yi.l.liu@intel.com>
+ <20200324183423.GE127076@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A2022C5@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A2022C5@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,40 +92,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- clg@kaod.org, qemu-devel@nongnu.org
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For various technical reasons we can't currently allow unplug a PCI to PC=
-I
-bridge on the pseries machine.  spapr_pci_unplug_request() correctly
-generates an error message if that's attempted.
-
-But.. if the given errp is not error_abort or error_fatal, it doesn't
-actually stop trying to unplug the bridge anyway.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_pci.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 709a52780d..55ca9dee1e 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1663,6 +1663,7 @@ static void spapr_pci_unplug_request(HotplugHandler=
- *plug_handler,
-=20
-         if (pc->is_bridge) {
-             error_setg(errp, "PCI: Hot unplug of PCI bridges not support=
-ed");
-+            return;
-         }
-=20
-         /* ensure any other present functions are pending unplug */
---=20
-2.25.1
-
+PiBGcm9tOiBMaXUsIFlpIEwNCj4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAyNSwgMjAyMCA5OjIy
+IFBNDQo+IFRvOiAnUGV0ZXIgWHUnIDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUkU6
+IFtQQVRDSCB2MSAyMC8yMl0gaW50ZWxfaW9tbXU6IHByb3BhZ2F0ZSBQQVNJRC1iYXNlZCBpb3Rs
+Yg0KPiBpbnZhbGlkYXRpb24gdG8gaG9zdA0KPiANCj4gPiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4
+QHJlZGhhdC5jb20+DQo+ID4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAyNSwgMjAyMCAyOjM0IEFN
+DQo+ID4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiA+IFN1YmplY3Q6IFJl
+OiBbUEFUQ0ggdjEgMjAvMjJdIGludGVsX2lvbW11OiBwcm9wYWdhdGUgUEFTSUQtYmFzZWQgaW90
+bGINCj4gPiBpbnZhbGlkYXRpb24gdG8gaG9zdA0KPiA+DQo+ID4gT24gU3VuLCBNYXIgMjIsIDIw
+MjAgYXQgMDU6MzY6MTdBTSAtMDcwMCwgTGl1IFlpIEwgd3JvdGU6DQo+ID4gPiBUaGlzIHBhdGNo
+IHByb3BhZ2F0ZXMgUEFTSUQtYmFzZWQgaW90bGIgaW52YWxpZGF0aW9uIHRvIGhvc3QuDQo+ID4g
+Pg0KPiA+ID4gSW50ZWwgVlQtZCAzLjAgc3VwcG9ydHMgbmVzdGVkIHRyYW5zbGF0aW9uIGluIFBB
+U0lEIGdyYW51bGFyLg0KPiA+ID4gR3Vlc3QgU1ZBIHN1cHBvcnQgY291bGQgYmUgaW1wbGVtZW50
+ZWQgYnkgY29uZmlndXJpbmcgbmVzdGVkDQo+ID4gPiB0cmFuc2xhdGlvbiBvbiBzcGVjaWZpYyBQ
+QVNJRC4gVGhpcyBpcyBhbHNvIGtub3duIGFzIGR1YWwgc3RhZ2UgRE1BDQo+ID4gPiB0cmFuc2xh
+dGlvbi4NCj4gPiA+DQo+ID4gPiBVbmRlciBzdWNoIGNvbmZpZ3VyYXRpb24sIGd1ZXN0IG93bnMg
+dGhlIEdWQS0+R1BBIHRyYW5zbGF0aW9uIHdoaWNoDQo+ID4gPiBpcyBjb25maWd1cmVkIGFzIGZp
+cnN0IGxldmVsIHBhZ2UgdGFibGUgaW4gaG9zdCBzaWRlIGZvciBhIHNwZWNpZmljDQo+ID4gPiBw
+YXNpZCwgYW5kIGhvc3Qgb3ducyBHUEEtPkhQQSB0cmFuc2xhdGlvbi4gQXMgZ3Vlc3Qgb3ducyBm
+aXJzdCBsZXZlbA0KPiA+ID4gdHJhbnNsYXRpb24gdGFibGUsIHBpb3RsYiBpbnZhbGlkYXRpb24g
+c2hvdWxkIGJlIHByb3BhZ2F0ZWQgdG8gaG9zdA0KPiA+ID4gc2luY2UgaG9zdCBJT01NVSB3aWxs
+IGNhY2hlIGZpcnN0IGxldmVsIHBhZ2UgdGFibGUgcmVsYXRlZCBtYXBwaW5ncw0KPiA+ID4gZHVy
+aW5nIERNQSBhZGRyZXNzIHRyYW5zbGF0aW9uLg0KPiA+ID4NCj4gPiA+IFRoaXMgcGF0Y2ggdHJh
+cHMgdGhlIGd1ZXN0IFBBU0lELWJhc2VkIGlvdGxiIGZsdXNoIGFuZCBwcm9wYWdhdGUgaXQNCj4g
+PiA+IHRvIGhvc3QuDQo+ID4gPg0KPiA+ID4gQ2M6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50
+ZWwuY29tPg0KPiA+ID4gQ2M6IEphY29iIFBhbiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5j
+b20+DQo+ID4gPiBDYzogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiA+ID4gQ2M6IFlp
+IFN1biA8eWkueS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+ID4gQ2M6IFBhb2xvIEJvbnppbmkg
+PHBib256aW5pQHJlZGhhdC5jb20+DQo+ID4gPiBDYzogUmljaGFyZCBIZW5kZXJzb24gPHJ0aEB0
+d2lkZGxlLm5ldD4NCj4gPiA+IENjOiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5j
+b20+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBMaXUgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0K
+PiA+ID4gLS0tDQo+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdS5jICAgICAgICAgIHwgMTM5DQo+
+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiA+ICBody9p
+Mzg2L2ludGVsX2lvbW11X2ludGVybmFsLmggfCAgIDcgKysrDQo+ID4gPiAgMiBmaWxlcyBjaGFu
+Z2VkLCAxNDYgaW5zZXJ0aW9ucygrKQ0KPiA+ID4NCj4gPiA+IGRpZmYgLS1naXQgYS9ody9pMzg2
+L2ludGVsX2lvbW11LmMgYi9ody9pMzg2L2ludGVsX2lvbW11LmMgaW5kZXgNCj4gPiA+IGI5YWMw
+N2QuLjEwZDMxNGQgMTAwNjQ0DQo+ID4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11LmMNCj4g
+PiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ID4gQEAgLTMxMzQsMTUgKzMxMzQs
+MTU0IEBAIHN0YXRpYyBib29sDQo+ID4gdnRkX3Byb2Nlc3NfcGFzaWRfZGVzYyhJbnRlbElPTU1V
+U3RhdGUgKnMsDQo+ID4gPiAgICAgIHJldHVybiAocmV0ID09IDApID8gdHJ1ZSA6IGZhbHNlOyAg
+fQ0KPiA+ID4NCj4gPiA+ICsvKioNCj4gPiA+ICsgKiBDYWxsZXIgb2YgdGhpcyBmdW5jdGlvbiBz
+aG91bGQgaG9sZCBpb21tdV9sb2NrLg0KPiA+ID4gKyAqLw0KPiA+ID4gK3N0YXRpYyB2b2lkIHZ0
+ZF9pbnZhbGlkYXRlX3Bpb3RsYihJbnRlbElPTU1VU3RhdGUgKnMsDQo+ID4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFZUREJ1cyAqdnRkX2J1cywNCj4gPiA+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50IGRldmZuLA0KPiA+ID4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBEdWFsSU9NTVVTdGFnZTFDYWNoZQ0KPiA+ID4gKypzdGFn
+ZTFfY2FjaGUpIHsNCj4gPiA+ICsgICAgVlRESG9zdElPTU1VQ29udGV4dCAqdnRkX2Rldl9pY3g7
+DQo+ID4gPiArICAgIEhvc3RJT01NVUNvbnRleHQgKmhvc3RfaWN4Ow0KPiA+ID4gKw0KPiA+ID4g
+KyAgICB2dGRfZGV2X2ljeCA9IHZ0ZF9idXMtPmRldl9pY3hbZGV2Zm5dOw0KPiA+ID4gKyAgICBp
+ZiAoIXZ0ZF9kZXZfaWN4KSB7DQo+ID4gPiArICAgICAgICBnb3RvIG91dDsNCj4gPiA+ICsgICAg
+fQ0KPiA+ID4gKyAgICBob3N0X2ljeCA9IHZ0ZF9kZXZfaWN4LT5ob3N0X2ljeDsNCj4gPiA+ICsg
+ICAgaWYgKCFob3N0X2ljeCkgew0KPiA+ID4gKyAgICAgICAgZ290byBvdXQ7DQo+ID4gPiArICAg
+IH0NCj4gPiA+ICsgICAgaWYgKGhvc3RfaW9tbXVfY3R4X2ZsdXNoX3N0YWdlMV9jYWNoZShob3N0
+X2ljeCwgc3RhZ2UxX2NhY2hlKSkgew0KPiA+ID4gKyAgICAgICAgZXJyb3JfcmVwb3J0KCJDYWNo
+ZSBmbHVzaCBmYWlsZWQiKTsNCj4gPg0KPiA+IEkgdGhpbmsgdGhpcyBzaG91bGQgbm90IGVhc2ls
+eSBiZSB0cmlnZ2VyZWQgYnkgdGhlIGd1ZXN0LCBidXQganVzdCBpbg0KPiA+IGNhc2UuLi4gTGV0
+J3MgdXNlDQo+ID4gZXJyb3JfcmVwb3J0X29uY2UoKSB0byBiZSBzYWZlLg0KPiANCj4gQWdyZWVk
+Lg0KPiANCj4gPiA+ICsgICAgfQ0KPiA+ID4gK291dDoNCj4gPiA+ICsgICAgcmV0dXJuOw0KPiA+
+ID4gK30NCj4gPiA+ICsNCj4gPiA+ICtzdGF0aWMgaW5saW5lIGJvb2wgdnRkX3Bhc2lkX2NhY2hl
+X3ZhbGlkKA0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgVlREUEFTSURBZGRyZXNz
+U3BhY2UgKnZ0ZF9wYXNpZF9hcykgew0KPiA+ID4gKyAgICByZXR1cm4gdnRkX3Bhc2lkX2FzLT5p
+b21tdV9zdGF0ZSAmJg0KPiA+DQo+ID4gVGhpcyBjaGVjayBjYW4gYmUgZHJvcHBlZCBiZWNhdXNl
+IGFsd2F5cyB0cnVlPw0KPiA+DQo+ID4gSWYgeW91IGFncmVlIHdpdGggYm90aCB0aGUgY2hhbmdl
+cywgcGxlYXNlIGFkZDoNCj4gPg0KPiA+IFJldmlld2VkLWJ5OiBQZXRlciBYdSA8cGV0ZXJ4QHJl
+ZGhhdC5jb20+DQo+IA0KPiBJIHRoaW5rIHRoZSBjb2RlIHNob3VsZCBlbnN1cmUgYWxsIHRoZSBw
+YXNpZF9hcyBpbiBoYXNoIHRhYmxlIGlzIHZhbGlkLiBBbmQgd2UgY2FuDQo+IHNpbmNlIGFsbCB0
+aGUgb3BlcmF0aW9ucyBhcmUgdW5kZXIgcHJvdGVjdGlvbiBvZiBpb21tdV9sb2NrLg0KPiANClBl
+dGVyLA0KDQpJIHRoaW5rIG15IHJlcGx5IHdhcyB3cm9uZy4gcGFzaWRfYXMgaW4gaGFzIHRhYmxl
+IG1heSBiZSBzdGFsZSBzaW5jZQ0KdGhlIHBlciBwYXNpZF9hcyBjYWNoZV9nZW4gbWF5IGJlIG5v
+dCBpZGVudGljYWwgd2l0aCB0aGUgY2FjaGVfZ2VuDQppbiBpb21tdV9zdGF0ZS4gZS5nLiB2dGRf
+cGFzaWRfY2FjaGVfcmVzZXQoKSBvbmx5IGluY3JlYXNlcyB0aGUNCmNhY2hlX2dlbiBpbiBpb21t
+dV9zdGF0ZS4gU28gdGhlcmUgd2lsbCBiZSBwYXNpZF9hcyBpbiBoYXNoIHRhYmxlDQp3aGljaCBo
+YXMgY2FjaGVkIHBhc2lkIGVudHJ5IGJ1dCBpdHMgY2FjaGVfZ2VuIGlzIG5vdCBlcXVhbCB0byB0
+aGUNCm9uZSBpbiBpb21tdV9zdGF0ZS4gRm9yIHN1Y2ggcGFzaWRfYXMsIHdlIHNob3VsZCB0cmVh
+dCBpdCBhcyBzdGFsZS4NClNvIEkgZ3Vlc3MgdGhlIHZ0ZF9wYXNpZF9jYWNoZV92YWxpZCgpIGlz
+IHN0aWxsIG5lY2Vzc2FyeS4NCg0KUmVnYXJkcywNCllpIExpdQ0KDQo=
 
