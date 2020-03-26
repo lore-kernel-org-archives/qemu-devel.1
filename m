@@ -2,72 +2,59 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EC1C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 06:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54BF9C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 07:07:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6834206F8
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 06:53:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="uwClgTgX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6834206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2CF6E208E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 07:07:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF6E208E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHMO9-00035u-O9
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 02:53:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52659)
+	id 1jHMbn-0006uu-A6
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 03:07:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rvkagan@yandex-team.ru>) id 1jHMNY-0002bN-Bx
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 02:52:37 -0400
+ (envelope-from <teawaterz@linux.alibaba.com>) id 1jHMbE-0006PR-Cd
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rvkagan@yandex-team.ru>) id 1jHMNX-0004e7-4B
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 02:52:36 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:36572)
+ (envelope-from <teawaterz@linux.alibaba.com>) id 1jHMb8-0003WO-A9
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:06:39 -0400
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:43451)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jHMNR-0004Sj-1X; Thu, 26 Mar 2020 02:52:29 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::162])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 5E7A62E1578;
- Thu, 26 Mar 2020 09:52:23 +0300 (MSK)
-Received: from myt4-18a966dbd9be.qloud-c.yandex.net
- (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
- by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- lJhXDVmP9y-qM54oRkN; Thu, 26 Mar 2020 09:52:23 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1585205543; bh=jWOcllMaGULgexMQwj30L5GAXwCNkVdQlQuQkNB7RQU=;
- h=Message-Id:Date:Subject:To:From:Cc;
- b=uwClgTgXKiyvYJpnIZuB2bsAxyRwUVHiGv47EBh4qqnKtyGYPgDpr2LmdKcngsFCT
- oG/EpDKzmacS7OGI+GO7d2TgGZ36GoeqbM9X+7XmlZt5TpLZl7VAE/DgpoDfD9VZbs
- zGy1XMfZb7G79cZbJnlkv9X0GvdfYSQRkYHwnXPY=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from unknown (unknown [2a02:6b8:b080:7202::1:9])
- by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- cObCXjccKf-qMc4mPeF; Thu, 26 Mar 2020 09:52:22 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Roman Kagan <rvkagan@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] block: make BlockConf.*_size properties 32-bit
-Date: Thu, 26 Mar 2020 09:52:17 +0300
-Message-Id: <20200326065217.1626748-1-rvkagan@yandex-team.ru>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
+ (Exim 4.71) (envelope-from <teawaterz@linux.alibaba.com>)
+ id 1jHMb7-0003NO-I4
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:06:38 -0400
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R121e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e01419; MF=teawaterz@linux.alibaba.com;
+ NM=1; PH=DS; RN=13; SR=0; TI=SMTPD_---0TtfYrM9_1585206379; 
+Received: from 127.0.0.1(mailfrom:teawaterz@linux.alibaba.com
+ fp:SMTPD_---0TtfYrM9_1585206379) by smtp.aliyun-inc.com(127.0.0.1);
+ Thu, 26 Mar 2020 15:06:24 +0800
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH for QEMU v2] virtio-balloon: Add option cont-pages to set
+ VIRTIO_BALLOON_VQ_INFLATE_CONT
+From: teawater <teawaterz@linux.alibaba.com>
+In-Reply-To: <1584893097-12317-2-git-send-email-teawater@gmail.com>
+Date: Thu, 26 Mar 2020 15:06:18 +0800
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a02:6b8:0:1619::183
+Message-Id: <575FA585-343A-4246-830B-C1CB3153B7E0@linux.alibaba.com>
+References: <1584893097-12317-1-git-send-email-teawater@gmail.com>
+ <1584893097-12317-2-git-send-email-teawater@gmail.com>
+To: Hui Zhu <teawater@gmail.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 115.124.30.42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,163 +66,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: pagupta@redhat.com, aquini@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ mojha@codeaurora.org, david@redhat.com, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
+ namit@vmware.com, Andrew Morton <akpm@linux-foundation.org>,
+ Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
-32-bit for logical_block_size, physical_block_size, and min_io_size.
-However, the properties in BlockConf are defined as uint16_t limiting
-the values to 32768.
+Ping.
 
-This appears unnecessary tight, and we've seen bigger block sizes handy
-at times.
+Thanks,
+Hui
 
-Make them 32 bit instead and lift the limitation up to 2 MiB which
-appears to be good enough for everybody.
-
-As the values can now be fairly big and awkward to type, make the
-property setter accept common size suffixes (k, m).
-
-Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
----
-v1 -> v2:
-- cap the property at 2 MiB [Eric]
-- accept size suffixes
-
- include/hw/block/block.h     |  8 ++++----
- include/hw/qdev-properties.h |  2 +-
- hw/core/qdev-properties.c    | 31 +++++++++++++++++++++----------
- 3 files changed, 26 insertions(+), 15 deletions(-)
-
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index d7246f3862..9dd6bba56a 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -18,9 +18,9 @@
-=20
- typedef struct BlockConf {
-     BlockBackend *blk;
--    uint16_t physical_block_size;
--    uint16_t logical_block_size;
--    uint16_t min_io_size;
-+    uint32_t physical_block_size;
-+    uint32_t logical_block_size;
-+    uint32_t min_io_size;
-     uint32_t opt_io_size;
-     int32_t bootindex;
-     uint32_t discard_granularity;
-@@ -51,7 +51,7 @@ static inline unsigned int get_physical_block_exp(Block=
-Conf *conf)
-                           _conf.logical_block_size),                    =
-\
-     DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                =
-\
-                           _conf.physical_block_size),                   =
-\
--    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    =
-\
-+    DEFINE_PROP_UINT32("min_io_size", _state, _conf.min_io_size, 0),    =
-\
-     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    =
-\
-     DEFINE_PROP_UINT32("discard_granularity", _state,                   =
-\
-                        _conf.discard_granularity, -1),                  =
-\
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index f161604fb6..f9e0f8c041 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -197,7 +197,7 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
- #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
- #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
--    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint32_t)
- #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAdd=
-ress)
- #define DEFINE_PROP_OFF_AUTO_PCIBAR(_n, _s, _f, _d) \
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 2047114fca..a571be7607 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -14,6 +14,7 @@
- #include "qapi/visitor.h"
- #include "chardev/char.h"
- #include "qemu/uuid.h"
-+#include "qemu/units.h"
-=20
- void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
-                                   Error **errp)
-@@ -729,30 +730,39 @@ const PropertyInfo qdev_prop_pci_devfn =3D {
-=20
- /* --- blocksize --- */
-=20
-+/* lower limit is sector size */
-+#define MIN_BLOCK_SIZE          512
-+#define MIN_BLOCK_SIZE_STR      "512 B"
-+/* upper limit is arbitrary, 2 MiB looks sufficient */
-+#define MAX_BLOCK_SIZE          (2 * MiB)
-+#define MAX_BLOCK_SIZE_STR      "2 MiB"
-+
- static void set_blocksize(Object *obj, Visitor *v, const char *name,
-                           void *opaque, Error **errp)
- {
-     DeviceState *dev =3D DEVICE(obj);
-     Property *prop =3D opaque;
--    uint16_t value, *ptr =3D qdev_get_prop_ptr(dev, prop);
-+    uint32_t *ptr =3D qdev_get_prop_ptr(dev, prop);
-+    uint64_t value;
-     Error *local_err =3D NULL;
--    const int64_t min =3D 512;
--    const int64_t max =3D 32768;
-=20
-     if (dev->realized) {
-         qdev_prop_set_after_realize(dev, name, errp);
-         return;
-     }
-=20
--    visit_type_uint16(v, name, &value, &local_err);
-+    visit_type_size(v, name, &value, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-     }
-     /* value of 0 means "unset" */
--    if (value && (value < min || value > max)) {
--        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE,
--                   dev->id ? : "", name, (int64_t)value, min, max);
-+    if (value && (value < MIN_BLOCK_SIZE || value > MAX_BLOCK_SIZE)) {
-+        error_setg(errp,
-+                   "Property %s.%s doesn't take value %" PRIu64
-+                   " (minimum: " MIN_BLOCK_SIZE_STR
-+                   ", maximum: " MAX_BLOCK_SIZE_STR ")",
-+                   dev->id ? : "", name, value);
-         return;
-     }
-=20
-@@ -768,9 +778,10 @@ static void set_blocksize(Object *obj, Visitor *v, c=
-onst char *name,
- }
-=20
- const PropertyInfo qdev_prop_blocksize =3D {
--    .name  =3D "uint16",
--    .description =3D "A power of two between 512 and 32768",
--    .get   =3D get_uint16,
-+    .name  =3D "size",
-+    .description =3D "A power of two between " MIN_BLOCK_SIZE_STR
-+                   " and " MAX_BLOCK_SIZE_STR,
-+    .get   =3D get_uint32,
-     .set   =3D set_blocksize,
-     .set_default_value =3D set_default_value_uint,
- };
---=20
-2.25.1
+> 2020=E5=B9=B43=E6=9C=8823=E6=97=A5 00:04=EF=BC=8CHui Zhu =
+<teawater@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> If the guest kernel has many fragmentation pages, use virtio_balloon
+> will split THP of QEMU when it calls MADV_DONTNEED madvise to release
+> the balloon pages.
+> Set option cont-pages to on will open flags =
+VIRTIO_BALLOON_VQ_INFLATE_CONT
+> and set continuous pages order to THP order.
+> Then It will get continuous pages PFN from VQ icvq use use madvise
+> MADV_DONTNEED release the THP page.
+> This will handle the THP split issue.
+>=20
+> Signed-off-by: Hui Zhu <teawaterz@linux.alibaba.com>
+> ---
+> hw/virtio/virtio-balloon.c                      | 32 =
++++++++++++++++++++++----
+> include/hw/virtio/virtio-balloon.h              |  4 +++-
+> include/standard-headers/linux/virtio_balloon.h |  4 ++++
+> 3 files changed, 35 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index a4729f7..88bdaca 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -34,6 +34,7 @@
+> #include "hw/virtio/virtio-access.h"
+>=20
+> #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+> +#define CONT_PAGES_ORDER   9
+>=20
+> typedef struct PartiallyBalloonedPage {
+>     ram_addr_t base_gpa;
+> @@ -65,7 +66,8 @@ static bool =
+virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
+>=20
+> static void balloon_inflate_page(VirtIOBalloon *balloon,
+>                                  MemoryRegion *mr, hwaddr mr_offset,
+> -                                 PartiallyBalloonedPage *pbp)
+> +                                 PartiallyBalloonedPage *pbp,=20
+> +                                 bool is_cont_pages)
+> {
+>     void *addr =3D memory_region_get_ram_ptr(mr) + mr_offset;
+>     ram_addr_t rb_offset, rb_aligned_offset, base_gpa;
+> @@ -76,6 +78,13 @@ static void balloon_inflate_page(VirtIOBalloon =
+*balloon,
+>     /* XXX is there a better way to get to the RAMBlock than via a
+>      * host address? */
+>     rb =3D qemu_ram_block_from_host(addr, false, &rb_offset);
+> +
+> +    if (is_cont_pages) {
+> +        ram_block_discard_range(rb, rb_offset,
+> +                                BALLOON_PAGE_SIZE << =
+CONT_PAGES_ORDER);
+> +        return;
+> +    }
+> +
+>     rb_page_size =3D qemu_ram_pagesize(rb);
+>=20
+>     if (rb_page_size =3D=3D BALLOON_PAGE_SIZE) {
+> @@ -361,9 +370,10 @@ static void =
+virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>             =
+trace_virtio_balloon_handle_output(memory_region_name(section.mr),
+>                                                pa);
+>             if (!qemu_balloon_is_inhibited()) {
+> -                if (vq =3D=3D s->ivq) {
+> +                if (vq =3D=3D s->ivq || vq =3D=3D s->icvq) {
+>                     balloon_inflate_page(s, section.mr,
+> -                                         =
+section.offset_within_region, &pbp);
+> +                                         =
+section.offset_within_region, &pbp,
+> +                                         vq =3D=3D s->icvq);
+>                 } else if (vq =3D=3D s->dvq) {
+>                     balloon_deflate_page(s, section.mr, =
+section.offset_within_region);
+>                 } else {
+> @@ -618,9 +628,12 @@ static size_t =
+virtio_balloon_config_size(VirtIOBalloon *s)
+>     if (s->qemu_4_0_config_size) {
+>         return sizeof(struct virtio_balloon_config);
+>     }
+> -    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
+> +    if (virtio_has_feature(s->host_features, =
+VIRTIO_BALLOON_F_CONT_PAGES)) {
+>         return sizeof(struct virtio_balloon_config);
+>     }
+> +    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
+> +        return offsetof(struct virtio_balloon_config, pages_order);
+> +    }
+>     if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) =
+{
+>         return offsetof(struct virtio_balloon_config, poison_val);
+>     }
+> @@ -646,6 +659,10 @@ static void =
+virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+>                        cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
+>     }
+>=20
+> +    if (virtio_has_feature(dev->host_features, =
+VIRTIO_BALLOON_F_CONT_PAGES)) {
+> +        config.pages_order =3D cpu_to_le32(CONT_PAGES_ORDER);
+> +    }
+> +
+>     trace_virtio_balloon_get_config(config.num_pages, config.actual);
+>     memcpy(config_data, &config, virtio_balloon_config_size(dev));
+> }
+> @@ -816,6 +833,11 @@ static void =
+virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+>             virtio_error(vdev, "iothread is missing");
+>         }
+>     }
+> +
+> +    if (virtio_has_feature(s->host_features, =
+VIRTIO_BALLOON_F_CONT_PAGES)) {
+> +        s->icvq =3D virtio_add_queue(vdev, 128, =
+virtio_balloon_handle_output);
+> +    }
+> +
+>     reset_stats(s);
+> }
+>=20
+> @@ -916,6 +938,8 @@ static Property virtio_balloon_properties[] =3D {
+>                     VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
+>     DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+>                     VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
+> +    DEFINE_PROP_BIT("cont-pages", VirtIOBalloon, host_features,
+> +                    VIRTIO_BALLOON_F_CONT_PAGES, false),
+>     /* QEMU 4.0 accidentally changed the config size even when =
+free-page-hint
+>      * is disabled, resulting in QEMU 3.1 migration incompatibility.  =
+This
+>      * property retains this quirk for QEMU 4.1 machine types.
+> diff --git a/include/hw/virtio/virtio-balloon.h =
+b/include/hw/virtio/virtio-balloon.h
+> index d1c968d..61d2419 100644
+> --- a/include/hw/virtio/virtio-balloon.h
+> +++ b/include/hw/virtio/virtio-balloon.h
+> @@ -42,7 +42,7 @@ enum virtio_balloon_free_page_report_status {
+>=20
+> typedef struct VirtIOBalloon {
+>     VirtIODevice parent_obj;
+> -    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
+> +    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *icvq;
+>     uint32_t free_page_report_status;
+>     uint32_t num_pages;
+>     uint32_t actual;
+> @@ -70,6 +70,8 @@ typedef struct VirtIOBalloon {
+>     uint32_t host_features;
+>=20
+>     bool qemu_4_0_config_size;
+> +
+> +    uint32_t pages_order;
+> } VirtIOBalloon;
+>=20
+> #endif
+> diff --git a/include/standard-headers/linux/virtio_balloon.h =
+b/include/standard-headers/linux/virtio_balloon.h
+> index 9375ca2..ee18be7 100644
+> --- a/include/standard-headers/linux/virtio_balloon.h
+> +++ b/include/standard-headers/linux/virtio_balloon.h
+> @@ -36,6 +36,8 @@
+> #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on =
+OOM */
+> #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free =
+pages */
+> #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page =
+poisoning */
+> +#define VIRTIO_BALLOON_F_CONT_PAGES	5 /* VQ to report continuous =
+pages */
+> +
+>=20
+> /* Size of a PFN in the balloon interface. */
+> #define VIRTIO_BALLOON_PFN_SHIFT 12
+> @@ -51,6 +53,8 @@ struct virtio_balloon_config {
+> 	uint32_t free_page_report_cmd_id;
+> 	/* Stores PAGE_POISON if page poisoning is in use */
+> 	uint32_t poison_val;
+> +	/* Pages order if VIRTIO_BALLOON_F_CONT_PAGES is set */
+> +	uint32_t pages_order;
+> };
+>=20
+> #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in =
+*/
+> --=20
+> 2.7.4
+>=20
 
 
