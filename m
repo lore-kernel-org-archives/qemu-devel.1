@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8071C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 19:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 153F5C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 19:41:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D55B20714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 19:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF66D20714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 19:41:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CsBbrh29"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D55B20714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PoU98qel"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF66D20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHYN2-0003F0-NY
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 15:40:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58453)
+	id 1jHYNY-0004EV-0e
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 15:41:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jHYK2-0006Ae-Iq
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:37:47 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1jHYK1-0001Pn-ER
+ (envelope-from <robert.foley@linaro.org>) id 1jHYK1-00067B-8a
  for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:37:46 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:33122)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <robert.foley@linaro.org>) id 1jHYK0-0001Ok-5t
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:37:45 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:34715)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1jHYK1-0001PI-Ag
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:37:45 -0400
-Received: by mail-qt1-x842.google.com with SMTP id c14so6572427qtp.0
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:37:45 -0700 (PDT)
+ id 1jHYK0-0001OY-1N
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:37:44 -0400
+Received: by mail-qk1-x742.google.com with SMTP id i6so8205090qke.1
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:37:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MXpQV9EpBjzND01X5ptnGqVZfb5b+aXFoE3ZFX11iS4=;
- b=CsBbrh29KtnEN++gMhFFDxPTM1Lu0CcAYVnK0Qd3yVSIdNdIgBKXrYyuaYXvRpojG5
- HOmFY7HQHye9HMFCIJrBMJb6yoUZ8A0miqXpmW14gsHK8dfo4d2aQQHzsKs+5Kx4Y8mD
- sE542r/jsugMbZK/QAtZVjXA2JwDoZLx/K38Rbu5in8NulOkEzebVcfyRs+n7jJFQkHC
- 4J6bpvsPNcKoWFgxQoo0H2qL4WihF59qJ39hkU8olzyFd3CLWRSdZYLCV5hA3oQz6mzl
- BgVvqdoh+X0AUgro9iDYsPxZ/UIyyYfCcfDQmwB/8AaCrXsNk29kWoIyaSwozji4njOM
- pxZQ==
+ bh=wu18ytPvx1d0kVanWp/H7LPvrM4VUoBEe+P8kb9ryLo=;
+ b=PoU98qelE5c7Q3AyXhh58/Azbvhdnb3oeQjWfDvCS+PSJ0PPMNNTk4gT/itHENC8Df
+ ogfbcAA2j+a4Evcca+338ude7PtEKVNVp1jE0TxJDiQNuZQyytsluMyhYmLYO/2pdYHl
+ JlE0LPpMCKjiXDMZ4GYFwR1ynh3FLftmeS+oTkfJ6vVSuMS4RjhLh/HNrkptztYsS+CV
+ IMtGFjzLzm7zzylFK0WUiposvC8+TToLJ6vCwBoFPBNg/EZpBBaXpXynayXHyIz5UbJh
+ wAlJ2bOpRc/FdumalUHpBOH1vM8uHsBg+zwx1DGqwI8RUW2DY8tQHauzKL/ogjmLg0db
+ 8DQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MXpQV9EpBjzND01X5ptnGqVZfb5b+aXFoE3ZFX11iS4=;
- b=IuIdCCbxRqxRxnHRswWlaw2qn3CxzyPiHeZtpKE3rhDrpBK46bEwaDvdBwgwlIjGa2
- J1MzaxpheeVLRH8SToOTyvbjxPwXm1UgCZkqWzufbDcYkYjWJfrwilJqy01WdV0mTRl3
- spq6MKUCj96lTHsPtHxtyVd4RgBtoKshVvDJ0p+5IyFxbTj2U/tRRiuNvAlaE5rpGN1F
- eCpBMdNC+UCjGeFtju9pRmlF0HpEdJ9e/DbvXl3f0UTzV/heK2jd3xFIxs7UMJF4IBnK
- lZlSDiAiiDVhXd6hiDO/e5XDIf1O4IuHGw4OvaSEmnywrwX8T9G00vQdkMWIoAMOpJ+b
- eYzw==
-X-Gm-Message-State: ANhLgQ3kNvp5xfJVfw0OqZuOfJDOZg75Wwa5PIB6PxAOABHZRwyVDnSr
- zDEqwq/0H4fpn+zKnbFwvhRbGSGjg69kiQ==
-X-Google-Smtp-Source: ADFU+vuAh3uYAloF1osiCx1Y2Dv79zQ8IHi8/khwKCWdsYRCHahDkcShe05ihlRdlr5tzLqubEisWA==
-X-Received: by 2002:ac8:7684:: with SMTP id g4mr10303802qtr.339.1585251464500; 
- Thu, 26 Mar 2020 12:37:44 -0700 (PDT)
+ bh=wu18ytPvx1d0kVanWp/H7LPvrM4VUoBEe+P8kb9ryLo=;
+ b=hm/f1lGIaazZTD+Gq40GP8nQGI1G+qPb3n+XxhgXR3Np4C15k/Z3ADry5EIoBxVds1
+ l60fif++mYn2Aw+RyuUQZwROStJibtsMN4Zqf0TZ59DIU2SpE5oWlW3yFXl7Fvjv94TT
+ K2xAcBgR5cXouxwKD9c6KOrX7Z95bNQpOhfIG1Y15ZfIfx8DZG1h9RmtHgeJf+jDnU6L
+ wU2ZRGO09rZMuDal5vB9iZGAWeDHTmyjj2dLIMNn2ivEYyT39Ane4bPh0/30O6VCi+MS
+ hHf9zIbsHcLzlMXJK04xYG91ppNe9KboIL/Ll78aqul1vGHxspTLqDNcBOk4a66gukDT
+ b2uQ==
+X-Gm-Message-State: ANhLgQ1jRMV7n9r9/rV51BbuDrP772cRp6LpJmIzkuy+BwhVBOVQLSBP
+ v5Fa0Ae6KpzelNa2w8BNbLAVHhZg2aJSHQ==
+X-Google-Smtp-Source: ADFU+vsqXmPPyUX/My2BZX/cc1GUKnam4NNcCbffA0JJ96mSM2oXhiw3HJzK8jyDMrqo6UhnQ+3t2w==
+X-Received: by 2002:a37:b4c1:: with SMTP id
+ d184mr10451802qkf.452.1585251463106; 
+ Thu, 26 Mar 2020 12:37:43 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fd55:4e67:1038:8302])
- by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.37.43
+ by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.37.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 12:37:43 -0700 (PDT)
+ Thu, 26 Mar 2020 12:37:42 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 09/74] ppc: convert to helper_cpu_halted_set
-Date: Thu, 26 Mar 2020 15:30:51 -0400
-Message-Id: <20200326193156.4322-10-robert.foley@linaro.org>
+Subject: [PATCH v8 08/74] tcg-runtime: define helper_cpu_halted_set
+Date: Thu, 26 Mar 2020 15:30:50 -0400
+Message-Id: <20200326193156.4322-9-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200326193156.4322-1-robert.foley@linaro.org>
 References: <20200326193156.4322-1-robert.foley@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::842
+X-Received-From: 2607:f8b0:4864:20::742
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,50 +95,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, richard.henderson@linaro.org,
- "Emilio G. Cota" <cota@braap.org>, qemu-ppc@nongnu.org, peter.puhov@linaro.org,
- alex.bennee@linaro.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: richard.henderson@linaro.org, "Emilio G. Cota" <cota@braap.org>,
+ alex.bennee@linaro.org, robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/ppc/translate.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ accel/tcg/tcg-runtime.c | 7 +++++++
+ accel/tcg/tcg-runtime.h | 2 ++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index b207fb5386..ff1ac82320 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -1595,8 +1595,7 @@ GEN_LOGICAL2(nor, tcg_gen_nor_tl, 0x03, PPC_INTEGER);
- static void gen_pause(DisasContext *ctx)
+diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+index 446465a09a..32ec18fe40 100644
+--- a/accel/tcg/tcg-runtime.c
++++ b/accel/tcg/tcg-runtime.c
+@@ -168,3 +168,10 @@ void HELPER(exit_atomic)(CPUArchState *env)
  {
-     TCGv_i32 t0 = tcg_const_i32(0);
--    tcg_gen_st_i32(t0, cpu_env,
--                   -offsetof(PowerPCCPU, env) + offsetof(CPUState, halted));
-+    gen_helper_cpu_halted_set(cpu_env, t0);
-     tcg_temp_free_i32(t0);
+     cpu_loop_exit_atomic(env_cpu(env), GETPC());
+ }
++
++void HELPER(cpu_halted_set)(CPUArchState *env, uint32_t val)
++{
++    CPUState *cpu = env_cpu(env);
++
++    cpu->halted = val;
++}
+diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+index 4fa61b49b4..433b6bc88e 100644
+--- a/accel/tcg/tcg-runtime.h
++++ b/accel/tcg/tcg-runtime.h
+@@ -28,6 +28,8 @@ DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env)
  
-     /* Stop translation, this gives other CPUs a chance to run */
-@@ -3602,8 +3601,7 @@ static void gen_sync(DisasContext *ctx)
- static void gen_wait(DisasContext *ctx)
- {
-     TCGv_i32 t0 = tcg_const_i32(1);
--    tcg_gen_st_i32(t0, cpu_env,
--                   -offsetof(PowerPCCPU, env) + offsetof(CPUState, halted));
-+    gen_helper_cpu_halted_set(cpu_env, t0);
-     tcg_temp_free_i32(t0);
-     /* Stop translation, as the CPU is supposed to sleep from now */
-     gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
+ DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+ 
++DEF_HELPER_FLAGS_2(cpu_halted_set, TCG_CALL_NO_RWG, void, env, i32)
++
+ #ifdef CONFIG_SOFTMMU
+ 
+ DEF_HELPER_FLAGS_5(atomic_cmpxchgb, TCG_CALL_NO_WG,
 -- 
 2.17.1
 
