@@ -2,85 +2,99 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B3EC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 18:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54280C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 18:06:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8050320714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 18:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AE4220714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 18:06:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fP/wVSYu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8050320714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBhc5GHk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE4220714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHWpd-0001ZY-KD
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 14:02:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45990)
+	id 1jHWto-0003s1-57
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 14:06:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jHWoh-0001AR-Ou
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:01:22 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jHWt3-00036W-1I
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:05:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jHWog-0003rW-FC
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:01:19 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:41436)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jHWog-0003py-8K
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:01:18 -0400
-Received: by mail-ed1-x543.google.com with SMTP id v1so7948924edq.8
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 11:01:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=J2/7QbpcaWm+SJuEJkw2PhTYrndQ4RQBuLVBXfxvq/8=;
- b=fP/wVSYuFBXMkeS2zNa0k+GcpUjLWOpybqjMRZivHgCiyQVMgT69j7eNPDZPFon1uV
- 3CFVk+TQN9AcmqvORBI3QwgYJDv07DBc1+yp/cBLw0345G/kNQS9J0W6A1CfQRmvGp0r
- KB7WWQHoyEmaS0TK3jXut7WURCORY2QHMlF0rVPH3fhQ82i3uc7Rr6Xpk4cIMwCzli+Z
- 0FgnuTAGlqiegkSdqbFtdHD6vPG2T5OLMdvC9FbVXqB1zbKlrewtdMedFurSB/sQc71v
- Tcs5fn9qygyhsTzGKc+ilkwLlSIfRUfO3xSoGvTriaB+LgSyG8whS4UzMIQ8wLFo4ut6
- jy6w==
+ (envelope-from <pbonzini@redhat.com>) id 1jHWt1-0007Hi-4j
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:05:48 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:30032)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jHWt0-0007GY-So
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 14:05:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585245945;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yHzZinL72dpz7J+NvdLNP5/b7y0BsFw4TNyQyyIx+40=;
+ b=GBhc5GHk5MMedwdazNREYmBUaQRPYPLuh34NyZRLSR7HFqtre3giQ2Ju9V/Rxm8sPzFVOP
+ aRdh6wMH8g6aqPtoJsOl4AwOl4Oj70x8ume/3KumIIHq6xeHNpKXtrWHeaEWl1+qE76ovV
+ akdYQJwK8Vvfyij4smbbDg7s0iLO+hk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-oUW6zjB_NiS0Iwl7Uqhz4w-1; Thu, 26 Mar 2020 14:05:43 -0400
+X-MC-Unique: oUW6zjB_NiS0Iwl7Uqhz4w-1
+Received: by mail-wm1-f69.google.com with SMTP id f207so2853814wme.6
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 11:05:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=J2/7QbpcaWm+SJuEJkw2PhTYrndQ4RQBuLVBXfxvq/8=;
- b=Os/BCF1viMAdUovQ8dJMr1UKGEbyGQvBoKIucilzU1AoTQLQrrOOAr6RR8S2G4UJaw
- uqaO0aA0xyUc+A6RLsdwKQJo3EgOc5Cbed55dlLqX84ZbKoBtBdfzwf4pDWZ//2VfoNA
- w9e6kY+VNuCRgokveHEClvToIunRSOFpT0XMbRSHNAx9cbEP/bVAKGcE+/In4UGyWfG6
- kltrLb0LDkdhSFbW9OKsN4CczH8LWb7xLDCzZRbQ9Yu5KBVff2fNsjcvTCErVGe9HWk5
- dU2SiR2T1BxZU+yYOMd+EtEuQmJaHDgT+TADPp0BhMItj/Tm+pMrKVnV8U3C32xDQHLI
- rNHQ==
-X-Gm-Message-State: ANhLgQ1oqLrsKyT1WIhn+dna4AravgPeGHgw4AsDNn1q1DcZMkv6/xp5
- hl7IGHT2krJazZVTJ9jM9QAqJDm82M+RtaGsQgpYmw==
-X-Google-Smtp-Source: ADFU+vsaqOrpWac4LsR9y6yWsz45OOgUvvTTB/bdmWU89+va8NUpqXmvJypGYMsIc2zmj8wdrhEV/eXFq9Pxc73+wB4=
-X-Received: by 2002:a17:906:bb16:: with SMTP id
- jz22mr8807158ejb.246.1585245676778; 
- Thu, 26 Mar 2020 11:01:16 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yHzZinL72dpz7J+NvdLNP5/b7y0BsFw4TNyQyyIx+40=;
+ b=uM9pftBabUg7ALcXILCXOz1wZHzZ+PmXcYQ8Na2gQGYm1TXM2uLZ0xM3VgYIgc1Ede
+ 4+gUxVCA4AMg4MKmHa9ExE4XuxTCJCGPPE0ySKu7MzG0D6+NfnlQSzznkEyGFOcYW1dx
+ SEoPAamTeFNFXwuh8SlmpWUWiYgkYsaeQw1MPNvdBBzjtbNVne8cfOwhcEXHvlidy7d4
+ 0EmN5ZAom+uikcBhyjFl1si/QwXU87bYjBsHfg+0KI6vYT8WlhFLJ93ikRKc2yJPDTB7
+ wY/rG0dS1XkjzoHp0aN7jrPWbfWhuuBrCYy40jCbOv5rYA6brYlhhTuIyo5Y1fjgoEW0
+ ksYQ==
+X-Gm-Message-State: ANhLgQ2tpwEyFtpShfFIm6Wvo75nAvrVaB+6tAiS4jW0OdeZO1zWd629
+ DknXPrEQKBxLAGMMxQtnEgGi6W6/OB+24kJpm9ldg3okd2f5vKURAgeQwcFC8YcGktCCAQLzYXC
+ BsrqmV0TbzwZ273E=
+X-Received: by 2002:a5d:630b:: with SMTP id i11mr10129720wru.94.1585245942079; 
+ Thu, 26 Mar 2020 11:05:42 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuYVfB1B/SFyKf7hWzIFxJ7M+9OkVt/+UdepBV+lyHfR+OQ8WxWAyGr1oO6JzMFsCXU2ZeDrw==
+X-Received: by 2002:a5d:630b:: with SMTP id i11mr10129693wru.94.1585245941798; 
+ Thu, 26 Mar 2020 11:05:41 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac:65bc:cc13:a014?
+ ([2001:b07:6468:f312:ac:65bc:cc13:a014])
+ by smtp.gmail.com with ESMTPSA id b187sm4782881wmc.14.2020.03.26.11.05.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 26 Mar 2020 11:05:41 -0700 (PDT)
+Subject: Re: [PATCH] qemu/atomic.h: add #ifdef guards for stdatomic.h
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200326170121.13045-1-alex.bennee@linaro.org>
+ <CAFEAcA8Lo84gNk2tFCKsgM_O50bXTCs6Z9jH6aCvfDA56TDCmA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ba33454a-6e57-960a-7114-fc71a9f09442@redhat.com>
+Date: Thu, 26 Mar 2020 19:05:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200320123137.1937091-1-dnbrdsky@gmail.com>
- <158471180295.15515.1369533827289907154@39012742ff91>
- <20200323132556.GG261260@stefanha-x1.localdomain>
- <CA+ZmoZUFojqmMxNQ1bhGMzjML7OFgDt1GNbogGTw5rte5LD4iw@mail.gmail.com>
- <1b0fa063-6fe4-ad40-06b2-9c3f2f955a06@linaro.org>
- <04a411d6-72e7-d2d2-15f9-895f6a765d22@redhat.com>
- <CA+ZmoZXfrGh3+jnN4K-cfZitR+DVPL=ieZpTZGzH3cYSxko=eA@mail.gmail.com>
-In-Reply-To: <CA+ZmoZXfrGh3+jnN4K-cfZitR+DVPL=ieZpTZGzH3cYSxko=eA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 26 Mar 2020 11:01:05 -0700
-Message-ID: <CAFXwXrkkOzuS=4Gfqm9XtkL5kc5m_5-9WmuziGgTfhFdm8VD0A@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] Replaced locks with lock guard macros
-To: Daniel Brodsky <dnbrdsky@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::543
+In-Reply-To: <CAFEAcA8Lo84gNk2tFCKsgM_O50bXTCs6Z9jH6aCvfDA56TDCmA@mail.gmail.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,32 +106,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 25 Mar 2020 at 04:35, Daniel Brodsky <dnbrdsky@gmail.com> wrote:
-> > There may be ways to rewrite that expression to avoid triggering the
-> > warning on a 32-bit platform.  Untested, but does this help:
-> >
-> > if (sizeof(mask) > 4 && mask <= 0xffffffffu) {
-> >
-> > --
-> > Eric Blake, Principal Software Engineer
-> > Red Hat, Inc.           +1-919-301-3226
-> > Virtualization:  qemu.org | libvirt.org
-> >
-> Unfortunately, the compiler still catches that the statement is always
-> true for 32-bit.
-> An alternative might be to convert cases like this to a macro instead,
-> which doesn't
-> cause any errors.
+On 26/03/20 18:14, Peter Maydell wrote:
+>> +#ifndef atomic_fetch_add
+>>  #define atomic_fetch_add(ptr, n) __atomic_fetch_add(ptr, n, __ATOMIC_SEQ_CST)
+>>  #define atomic_fetch_sub(ptr, n) __atomic_fetch_sub(ptr, n, __ATOMIC_SEQ_CST)
+>>  #define atomic_fetch_and(ptr, n) __atomic_fetch_and(ptr, n, __ATOMIC_SEQ_CST)
+>>  #define atomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST)
+>>  #define atomic_fetch_xor(ptr, n) __atomic_fetch_xor(ptr, n, __ATOMIC_SEQ_CST)
+>> +#endif
+>
+> This will work around FreeBSD's current implementation in particular,
+> but I don't think there's anything in the C11 spec that mandates that
+> atomic_fetch_add() and friends have to be macros and not simply
+> functions...
 
-My preference is to add -Wno-tautological-type-limit-compare in
-configure, so we don't have to work around this same issue elsewhere
-in the code base.
+That's not a problem as long as they are all functions, the macros would
+simply override the function-based implementation.
 
-r~
+Paolo
+
 
