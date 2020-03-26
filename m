@@ -2,81 +2,75 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C134C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A325C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:23:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37F8C206F8
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:16:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB01E206F8
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:23:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+IKItjI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37F8C206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wVNdYLp2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB01E206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHTIi-0005U0-8d
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 10:16:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34641)
+	id 1jHTPx-0000k8-25
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 10:23:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38465)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jHTHX-0004cg-UH
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:14:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHTP1-0008KX-2T
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:22:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jHTHV-0008He-Lz
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:14:51 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34381)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jHTHV-0008H7-HP
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:14:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585232088;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pRtzwZhtwetC9vJFKWUYtF44fsh4fn1D4Hs64xOBHss=;
- b=T+IKItjIQSsTK3nw5/bekecy7DfKAkU2pwf0PvHnYjGTes05H4f940OAu+Jlq8Q/h3RVa7
- AxpguKSpYZyugsYUz6uadLX9mMJt0gXVZ4pXZ/boz5Wb3m90BkCtBQS2i7UpafSld+ljCd
- vTJTV9xWCT6vtKV9JKroMdRwkBBPd18=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-2OG_HyF1MoK3SFR9ZmVwXQ-1; Thu, 26 Mar 2020 10:14:46 -0400
-X-MC-Unique: 2OG_HyF1MoK3SFR9ZmVwXQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D50EDB63
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 14:14:45 +0000 (UTC)
-Received: from work-vm (ovpn-114-228.ams2.redhat.com [10.36.114.228])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F91310002A9;
- Thu, 26 Mar 2020 14:14:38 +0000 (UTC)
-Date: Thu, 26 Mar 2020 14:14:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH RFC 9/9] KVM: Dirty ring support
-Message-ID: <20200326141436.GD2713@work-vm>
-References: <20200205141749.378044-1-peterx@redhat.com>
- <20200205141749.378044-10-peterx@redhat.com>
- <20200325204144.GI2635@work-vm> <20200325213237.GG404034@xz-x1>
+ (envelope-from <peter.maydell@linaro.org>) id 1jHTOz-0007XX-Gl
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:22:34 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37781)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHTOz-0007Vz-9m
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:22:33 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u20so850912oic.4
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 07:22:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=79bE4HFkn+Mv3FHlnfFcSF5KRjYC0PX/AvR+wG7Riuw=;
+ b=wVNdYLp2MvkPHULLyrlFiyLDzd5IiECxfyyyV2j/jrGDllA0MG1AFQqzQoXqoLlWmg
+ e8zp3cHqSwIf3UtXLXy7TNaARtn14j0YfqiECvE5cuBJmjV0ychmESE1+WqM+/CTBzl3
+ PV/pzaAEID0R1rx/Wmhkooxt1btRM7TkjpMg3kmVU2BJRdKXC1zM/N4+/1OSUY6ZfaEl
+ onCcw1YakDW97KhP8pVz+rzcP+Tf+a11ZfZ17iE5FtQw2ACch8T+QO5iFPhdgDWtTQpZ
+ yIJFOMJuJfulFcNYS5mIoncvpnVgsn8tKsWVY2F8PutvAAunaB2ikslMqIC3mA+ekeVx
+ oEmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=79bE4HFkn+Mv3FHlnfFcSF5KRjYC0PX/AvR+wG7Riuw=;
+ b=KKfQZ3Wp+DA+5XXB1xY128jpUFIzogyeWZ7RYUnyOn0SRcOFpenCExQ/ENiPLFLMoE
+ fa0jbmGFfp1jNSkef+sGH4ki86r6LDJnQ0HX/Vn9JznpWszem8laVWoFyr5Sqzc3pUku
+ ReAF8BYX9rNgfWQlEIMS5e3+yvuN82mait+BWxFHNK9QOvW7sPmUzW9ZnTOMtEY9z8I1
+ BBiFkzvqlGO3dG+6L0N6hL7VhwW2FjFqDYT/UJ4GMCwkWCITZ1ZesuRak3+GCXKiLiC1
+ 6qoZoCpUg+EXj0v+gDf5Bdj/ifgMgLuRjAPznTvys67Z2zdk4RlvhTeACXPyE/MxzrZK
+ VjzA==
+X-Gm-Message-State: ANhLgQ0hMbrs6uoDC+mf41fET9NtZsxKKL80PfBxJlNeqj91K1zqCUS3
+ IyuCUwzr1UCQu11/pDUwzpQUMXgzcJ6hYlgnKuixQ6jSxLjN6A==
+X-Google-Smtp-Source: ADFU+vvACXaRkbUmH6KGTTrEFld24Qaa7kS6CL7XaPQP1/7rWBXuZ+KxCMWmu1kHUymdRuiZ+9dDdd0/RSBRIfX5WN4=
+X-Received: by 2002:aca:2318:: with SMTP id e24mr124400oie.0.1585232551714;
+ Thu, 26 Mar 2020 07:22:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200325213237.GG404034@xz-x1>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Mar 2020 14:22:20 +0000
+Message-ID: <CAFEAcA84QTW+p57pccbgGnp5v_=deZT7g52ure+=s96WdM0oXw@mail.gmail.com>
+Subject: booke206_tlb_ways() returning 0
+To: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,211 +82,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Mar 25, 2020 at 08:41:44PM +0000, Dr. David Alan Gilbert wrote:
->=20
-> [...]
->=20
-> > > +enum KVMReaperState {
-> > > +    KVM_REAPER_NONE =3D 0,
-> > > +    /* The reaper is sleeping */
-> > > +    KVM_REAPER_WAIT,
-> > > +    /* The reaper is reaping for dirty pages */
-> > > +    KVM_REAPER_REAPING,
-> > > +};
-> >=20
-> > That probably needs to be KVMDirtyRingReaperState
-> > given there are many things that could be reaped.
->=20
-> Sure.
->=20
-> >=20
-> > > +/*
-> > > + * KVM reaper instance, responsible for collecting the KVM dirty bit=
-s
-> > > + * via the dirty ring.
-> > > + */
-> > > +struct KVMDirtyRingReaper {
-> > > +    /* The reaper thread */
-> > > +    QemuThread reaper_thr;
-> > > +    /*
-> > > +     * Telling the reaper thread to wakeup.  This should be used as =
-a
-> > > +     * generic interface to kick the reaper thread, like, in vcpu
-> > > +     * threads where it gets a exit due to ring full.
-> > > +     */
-> > > +    EventNotifier reaper_event;
-> >=20
-> > I think I'd just used a simple semaphore for this type of thing.
->=20
-> I'm actually uncertain on which is cheaper...
->=20
-> At the meantime, I wanted to poll two handles at the same time below
-> (in kvm_dirty_ring_reaper_thread).  I don't know how to do that with
-> semaphore.  Could it?
+Hi; Coverity points out a possible issue in booke206_get_tlbm()
+(this is CID 1421942):
 
-If you're OK with EventNotifier stick with it;  it's just I'm used
-to doing with it with a semaphore; e.g. a flag then the semaphore - but
-that's fine.
 
-> [...]
->=20
-> > > @@ -412,6 +460,18 @@ int kvm_init_vcpu(CPUState *cpu)
-> > >              (void *)cpu->kvm_run + s->coalesced_mmio * PAGE_SIZE;
-> > >      }
-> > > =20
-> > > +    if (s->kvm_dirty_gfn_count) {
-> > > +        cpu->kvm_dirty_gfns =3D mmap(NULL, s->kvm_dirty_ring_size,
-> > > +                                   PROT_READ | PROT_WRITE, MAP_SHARE=
-D,
-> >=20
-> > Is the MAP_SHARED required?
->=20
-> Yes it's required.  It's the same when we map the per-vcpu kvm_run.
->=20
-> If we use MAP_PRIVATE, it'll be in a COW fashion - when the userspace
-> writes to the dirty gfns the 1st time, it'll copy the current dirty
-> ring page in the kernel and from now on QEMU will never be able to see
-> what the kernel writes to the dirty gfn pages.  MAP_SHARED means the
-> userspace and the kernel shares exactly the same page(s).
+static inline ppcmas_tlb_t *booke206_get_tlbm(CPUPPCState *env, const int tlbn,
+                                              target_ulong ea, int way)
+{
+    int r;
+    uint32_t ways = booke206_tlb_ways(env, tlbn);
+    int ways_bits = ctz32(ways);
+    int tlb_bits = ctz32(booke206_tlb_size(env, tlbn));
+    int i;
 
-OK, worth a comment.
+    way &= ways - 1;
+    ea >>= MAS2_EPN_SHIFT;
+    ea &= (1 << (tlb_bits - ways_bits)) - 1;
+    r = (ea << ways_bits) | way;
 
-> >=20
-> > > +                                   cpu->kvm_fd,
-> > > +                                   PAGE_SIZE * KVM_DIRTY_LOG_PAGE_OF=
-FSET);
-> > > +        if (cpu->kvm_dirty_gfns =3D=3D MAP_FAILED) {
-> > > +            ret =3D -errno;
-> > > +            DPRINTF("mmap'ing vcpu dirty gfns failed\n");
-> >=20
-> > Include errno?
->=20
-> Will do.
->=20
-> [...]
->=20
-> > > +static uint64_t kvm_dirty_ring_reap(KVMState *s)
-> > > +{
-> > > +    KVMMemoryListener *kml;
-> > > +    int ret, i, locked_count =3D s->nr_as;
-> > > +    CPUState *cpu;
-> > > +    uint64_t total =3D 0;
-> > > +
-> > > +    /*
-> > > +     * We need to lock all kvm slots for all address spaces here,
-> > > +     * because:
-> > > +     *
-> > > +     * (1) We need to mark dirty for dirty bitmaps in multiple slots
-> > > +     *     and for tons of pages, so it's better to take the lock he=
-re
-> > > +     *     once rather than once per page.  And more importantly,
-> > > +     *
-> > > +     * (2) We must _NOT_ publish dirty bits to the other threads
-> > > +     *     (e.g., the migration thread) via the kvm memory slot dirt=
-y
-> > > +     *     bitmaps before correctly re-protect those dirtied pages.
-> > > +     *     Otherwise we can have potential risk of data corruption i=
-f
-> > > +     *     the page data is read in the other thread before we do
-> > > +     *     reset below.
-> > > +     */
-> > > +    for (i =3D 0; i < s->nr_as; i++) {
-> > > +        kml =3D s->as[i].ml;
-> > > +        if (!kml) {
-> > > +            /*
-> > > +             * This is tricky - we grow s->as[] dynamically now.  Ta=
-ke
-> > > +             * care of that case.  We also assumed the as[] will fil=
-l
-> > > +             * one by one starting from zero.  Without this, we race
-> > > +             * with register_smram_listener.
-> > > +             *
-> > > +             * TODO: make all these prettier...
-> > > +             */
-> > > +            locked_count =3D i;
-> > > +            break;
-> > > +        }
-> > > +        kvm_slots_lock(kml);
-> > > +    }
-> > > +
-> > > +    CPU_FOREACH(cpu) {
-> > > +        total +=3D kvm_dirty_ring_reap_one(s, cpu);
-> > > +    }
-> > > +
-> > > +    if (total) {
-> > > +        ret =3D kvm_vm_ioctl(s, KVM_RESET_DIRTY_RINGS);
-> > > +        assert(ret =3D=3D total);
-> > > +    }
-> > > +
-> > > +    /* Unlock whatever locks that we have locked */
-> > > +    for (i =3D 0; i < locked_count; i++) {
-> > > +        kvm_slots_unlock(s->as[i].ml);
-> > > +    }
-> > > +
-> > > +    CPU_FOREACH(cpu) {
-> > > +        if (cpu->kvm_dirty_ring_full) {
-> > > +            qemu_sem_post(&cpu->kvm_dirty_ring_avail);
-> > > +        }
-> >=20
-> > Why do you need to wait until here - couldn't you release
-> > each vcpu after you've reaped it?
->=20
-> We probably still need to wait.  Even after we reaped all the dirty
-> bits we only marked the pages as "collected", the buffers will only be
-> available again until the kernel re-protect those pages (when the
-> above KVM_RESET_DIRTY_RINGS completes).  Before that, continuing the
-> vcpu could let it exit again with the same ring full event.
+Here if booke206_tlb_ways() returns zero, then ways_bits()
+will be 32 and the shift left 'ea << ways_bits' is undefined
+behaviour.
 
-Ah OK.
+My first assumption was that booke206_tlb_ways() is not supposed
+to ever return 0 (it's looking at what I think are read-only
+system registers, and it doesn't make much sense to have
+a zero-way TLB). So I tried adding an assert:
 
-> [...]
->=20
-> > > +static int kvm_dirty_ring_reaper_init(KVMState *s)
-> > > +{
-> > > +    struct KVMDirtyRingReaper *r =3D &s->reaper;
-> > > +    int ret;
-> > > +
-> > > +    ret =3D event_notifier_init(&r->reaper_event, false);
-> > > +    assert(ret =3D=3D 0);
-> > > +    ret =3D event_notifier_init(&r->reaper_flush_event, false);
-> > > +    assert(ret =3D=3D 0);
-> > > +    qemu_sem_init(&r->reaper_flush_sem, 0);
-> > > +
-> > > +    qemu_thread_create(&r->reaper_thr, "kvm-reaper",
-> > > +                       kvm_dirty_ring_reaper_thread,
-> > > +                       s, QEMU_THREAD_JOINABLE);
-> >=20
-> > That's marked as joinable - does it ever get joined?
-> > If the reaper thread does exit on error (I can only see the poll
-> > failure?) - what happens elsewhere - will things still try and kick it?
->=20
-> The reaper thread is not designed to fail for sure. If it fails, it'll
-> exit without being joined, but otherwise I'll just abort() directly in
-> the thread which seems to be not anything better...
->=20
-> Regarding to "why not join() it": I think it's simply because we don't
-> have corresponding operation to AccelClass.init_machine() and
-> kvm_init(). :-) From that POV, I think I'll still use JOINABLE with
-> the hope that someday the destroy_machine() hook will be ready and
-> we'll be able to join it.
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 88d94495554..aedb6bcb265 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -2403,6 +2403,7 @@ static inline int booke206_tlb_ways(CPUPPCState
+*env, int tlbn)
+ {
+     uint32_t tlbncfg = env->spr[SPR_BOOKE_TLB0CFG + tlbn];
+     int r = tlbncfg >> TLBnCFG_ASSOC_SHIFT;
++    assert(r > 0);
+     return r;
+ }
 
-OK, that's fine.
+However, this isn't right, because it causes one of the check-acceptance
+tests to fail, with this backtrace:
 
-Dave
+#3  0x00007ffff074d412 in __GI___assert_fail (assertion=0x5555560a0d7d
+"r > 0", file=0x5555560a0d40
+"/home/petmay01/linaro/qemu-from-laptop/qemu/target/ppc/cpu.h",
+line=2406, function=0x5555560a1720 <__PRETTY_FUNCTION__.20811>
+"booke206_tlb_ways") at assert.c:101
+#4  0x0000555555a9939b in booke206_tlb_ways (env=0x555556e52a30,
+tlbn=2) at /home/petmay01/linaro/qemu-from-laptop/qemu/target/ppc/cpu.h:2406
+#5  0x0000555555a9b3ac in mmubooke206_get_physical_address
+(env=0x555556e52a30, ctx=0x7fffd77008a0, address=9223380835095282947,
+rw=0, access_type=0, mmu_idx=1) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/target/ppc/mmu_helper.c:1093
+#6  0x0000555555a9c25d in get_physical_address_wtlb
+(env=0x555556e52a30, ctx=0x7fffd77008a0, eaddr=9223380835095282947,
+rw=0, access_type=0, mmu_idx=1) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/target/ppc/mmu_helper.c:1455
+#7  0x0000555555a9c82b in cpu_ppc_handle_mmu_fault
+(env=0x555556e52a30, address=9223380835095282947, rw=0, mmu_idx=1)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/target/ppc/mmu_helper.c:1597
+#8  0x0000555555a9f975 in ppc_cpu_tlb_fill (cs=0x555556e49560,
+addr=9223380835095282947, size=1, access_type=MMU_DATA_LOAD,
+mmu_idx=1, probe=false, retaddr=140735610345781) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/target/ppc/mmu_helper.c:3053
+#9  0x00005555558e1422 in tlb_fill (cpu=0x555556e49560,
+addr=9223380835095282947, size=1, access_type=MMU_DATA_LOAD,
+mmu_idx=1, retaddr=140735610345781) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cputlb.c:1017
+#10 0x00005555558e279b in load_helper (env=0x555556e52a30,
+addr=9223380835095282947, oi=1, retaddr=140735610345781, op=MO_8,
+code_read=false, full_load=0x5555558e2b3a <full_ldub_mmu>) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cputlb.c:1534
+#11 0x00005555558e2b80 in full_ldub_mmu (env=0x555556e52a30,
+addr=9223380835095282947, oi=1, retaddr=140735610345781)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cputlb.c:1624
+#12 0x00005555558e2bb4 in helper_ret_ldub_mmu (env=0x555556e52a30,
+addr=9223380835095282947, oi=1, retaddr=140735610345781)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cputlb.c:1630
+#13 0x00007fff900fd9c6 in code_gen_buffer ()
+#14 0x00005555558f9915 in cpu_tb_exec (cpu=0x555556e49560,
+itb=0x7fff900fd780 <code_gen_buffer+1038163>)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:172
+#15 0x00005555558fa732 in cpu_loop_exec_tb (cpu=0x555556e49560,
+tb=0x7fff900fd780 <code_gen_buffer+1038163>, last_tb=0x7fffd7701078,
+tb_exit=0x7fffd7701070) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:619
+#16 0x00005555558faa4c in cpu_exec (cpu=0x555556e49560) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:732
+#17 0x00005555558bcf29 in tcg_cpu_exec (cpu=0x555556e49560) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/cpus.c:1405
+#18 0x00005555558bd77f in qemu_tcg_cpu_thread_fn (arg=0x555556e49560)
+at /home/petmay01/linaro/qemu-from-laptop/qemu/cpus.c:1713
+#19 0x0000555555f2ff3f in qemu_thread_start (args=0x555556e8dd10) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/util/qemu-thread-posix.c:519
+#20 0x00007ffff0b156db in start_thread (arg=0x7fffd7704700) at
+pthread_create.c:463
+#21 0x00007ffff083e88f in clone () at
+../sysdeps/unix/sysv/linux/x86_64/clone.S:95
 
-> Thanks,
->=20
-> --=20
-> Peter Xu
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+So under what circumstances can booke206_tlb_ways()
+validly return 0? Should booke206_get_tlbm() cope with a
+zero return, or can it assert() that it will never
+call booke206_tlb_ways() in a way that will cause one?
 
+thanks
+-- PMM
 
