@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEDEC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFE9C2D0E8
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 166A320663
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:23:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3381E20714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T4spmkhx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 166A320663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uIqBnWL8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3381E20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHbqq-0000n6-80
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:23:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59427)
+	id 1jHbrT-0001fS-2w
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:24:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jHbci-00035U-Nw
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jHbcV-0002YU-Ls
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jHbch-0001xl-7z
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:16 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41257)
+ (envelope-from <richard.henderson@linaro.org>) id 1jHbcU-0001cl-GL
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:03 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36573)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jHbch-0001wZ-1c
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:15 -0400
-Received: by mail-pf1-x441.google.com with SMTP id z65so3545055pfz.8
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 16:09:14 -0700 (PDT)
+ id 1jHbcU-0001b3-A1
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:02 -0400
+Received: by mail-pf1-x442.google.com with SMTP id i13so3553596pfe.3
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 16:09:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gruaHJOeD8WvnhMIfKkze3XKHGHvv2/+9IJLAI7Js3I=;
- b=T4spmkhxY+XY0VoCM6cAeio6xDP/bnRE+S2bIyjiIN6IYxOPv8exi560GTi6kAUcpa
- hBnOBO5v3dTcj4NFoyWvTsPXW1uekeOEIunYMZjwaInR5jTKkNqMEXYLMniEMsXCl+ow
- 6M2TwsX5S4MklHqCSZkpDBx+P2v6tTMJhOk+5eZGOAdFH863SIRwai13pMHeC/BGqvPv
- iEz3E3u/tRsBJdwT/8ixdmUtNJ0qrYf7Ns4/MmT/K9BlsJok8Vm6tas1oUT5FBczpHLv
- iXcxkPKScIo8Jhmsgf+/9smNbjaJSeRSsZx8zAcPHXCnupl75DAxTMYtD+Gm/ZPSsZlQ
- oXvA==
+ bh=cv1t9pmvTM2or2y2OW8+tePDhkWPmqSM7xnDl7FKLbM=;
+ b=uIqBnWL8T4v191boSmUZwB494xE/PGFRifYhV43jeTNSJ3Cj5Mm43BNKjSeUAl55sw
+ vZpHh6nj8aEaZFog2zlzPCeedO3UXD8V9+nLMzCuqI9iircm7N7FIdUre1kskonwCdgr
+ KBHtgE1vg8AQRYnz74dth6UCBR9+I222bWevRB9nK1VYtmgZ4rIND3oCiHe1/TrhKiRj
+ IGGoyLmmMUQPujB2Rf9iBo5fch/Cxcbj0DMTZuam8fRBKKxY0j1JMG/s5Fbf0dobOhFe
+ 8SVvRMM1qrpW8VkmErq1AKHlE96DpetQ8FrjlFbH2hHMWpY8JvoWgRElvU/Kt2HJGreR
+ 6S+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gruaHJOeD8WvnhMIfKkze3XKHGHvv2/+9IJLAI7Js3I=;
- b=I05k7XVlskPStGMVpycqCrWV9AQsWA26hgHHGziBhBzAcwHPIdnFMVaRFWArGbgzzL
- Kxaxn2AfzyBUJO11/IJDdwiGxq72q0/T2cliln4uhBN4Qmtm8puZ8DAeAd7TV9Dl0Yk0
- s0YRNnyqKDEDFsxc4QarCHoPtUqP7lQkhrNWJp9hzixVVdh6hQhJZJ2DbbclqAYb8NIW
- 8m3BwVoYO32oU7kV+OHLgJ707M1CZAaHSEGRenmiSHFdkhpoFlA/uHZl7/wrIRvPd3aR
- Lpq+Wj6+Ox8MHM+WivVLT0LzTwQDqY6xorAZbXnXv8PuZHUyTG9ELecmFgsaQUrvHyQf
- q3Iw==
-X-Gm-Message-State: ANhLgQ1xRaFs4ZooEb6yORTuh3kPbuKL9E8yIFZn4RbnunmS11AdMj5X
- LQ5+yF753Fg1jOZJgPUNweJF4lWwvuw=
-X-Google-Smtp-Source: ADFU+vs3L1Sl/5tE2cuoMtF8BNkjYIlc26nth96PD2LmJTnnhwR02hfCEuj2EdMm8qWVWxs+NBz5Gw==
-X-Received: by 2002:a63:7159:: with SMTP id b25mr10696807pgn.72.1585264153691; 
- Thu, 26 Mar 2020 16:09:13 -0700 (PDT)
+ bh=cv1t9pmvTM2or2y2OW8+tePDhkWPmqSM7xnDl7FKLbM=;
+ b=cD5NE3WDJ7J4ulLw8t5WPRLYs8iMeZVZX2+kbvHesJmg9WZhFDyFOb4XQLyMPwHp7K
+ psUq+VSe18iO9KlrPG5TIqKYFGZdwG0C6LhanICRclVTSj/X4xPp/Js47I+akgsjvkz7
+ fIVEGxA0LT7uneqpwvE4x3EON3/Wtgp6F2MfTPzNb7RmTrj6Iew+pvXAFyO57OxuE8yx
+ 8KUSLxTpfOgxPwnSWWRzkrRvpY9gy73N9oI2Qxkq3u7uOiYuY/kF0Bxl18hAJv/gEohV
+ czJqYK2GjIEKRtut/xlcpdTSs+rGF4sJRhmJ4dO0rjNCjWYlWGIaWFCm/m49y+SmKAcV
+ r5QA==
+X-Gm-Message-State: ANhLgQ0x0JEoLA+FQi7YU4tit+wViFT2Mm7Xc30eOrCxv+zm6PSmhNHa
+ q5FJLDhvoZkmsgfdkYMva+u59GPGnjE=
+X-Google-Smtp-Source: ADFU+vt42cA3UfdHbYZGsk8oAxIRBhVuTro4FBG3J6f9YDSKvCyVbgXzqvmyUd8xI8so8TUdQnDSag==
+X-Received: by 2002:a63:e544:: with SMTP id z4mr10927219pgj.174.1585264140810; 
+ Thu, 26 Mar 2020 16:09:00 -0700 (PDT)
 Received: from localhost.localdomain (174-21-138-234.tukw.qwest.net.
  [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id i187sm2530037pfg.33.2020.03.26.16.09.12
+ by smtp.gmail.com with ESMTPSA id i187sm2530037pfg.33.2020.03.26.16.08.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 16:09:13 -0700 (PDT)
+ Thu, 26 Mar 2020 16:09:00 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 27/31] target/arm: Tidy handle_vec_simd_shri
-Date: Thu, 26 Mar 2020 16:08:34 -0700
-Message-Id: <20200326230838.31112-28-richard.henderson@linaro.org>
+Subject: [PATCH 16/31] target/arm: Tidy SVE tszimm shift formats
+Date: Thu, 26 Mar 2020 16:08:23 -0700
+Message-Id: <20200326230838.31112-17-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200326230838.31112-1-richard.henderson@linaro.org>
 References: <20200326230838.31112-1-richard.henderson@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,116 +98,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we've converted all cases to gvec, there is quite a bit
-of dead code at the end of the function.  Remove it.
-
-Sink the call to gen_gvec_fn2i to the end, loading a function
-pointer within the switch statement.
+Rather than require the user to fill in the immediate (shl or shr),
+create full formats that include the immediate.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 56 ++++++++++----------------------------
- 1 file changed, 14 insertions(+), 42 deletions(-)
+ target/arm/sve.decode | 35 ++++++++++++++++-------------------
+ 1 file changed, 16 insertions(+), 19 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index f7d492cce4..fc156a217a 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11096,16 +11096,7 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
-     int size = 32 - clz32(immh) - 1;
-     int immhb = immh << 3 | immb;
-     int shift = 2 * (8 << size) - immhb;
--    bool accumulate = false;
--    int dsize = is_q ? 128 : 64;
--    int esize = 8 << size;
--    int elements = dsize/esize;
--    MemOp memop = size | (is_u ? 0 : MO_SIGN);
--    TCGv_i64 tcg_rn = new_tmp_a64(s);
--    TCGv_i64 tcg_rd = new_tmp_a64(s);
--    TCGv_i64 tcg_round;
--    uint64_t round_const;
--    int i;
-+    GVecGen2iFn *gvec_fn;
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 04bf9e5ce8..440cff4597 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -151,13 +151,17 @@
+ @rd_rn_i6       ........ ... rn:5 ..... imm:s6 rd:5             &rri
  
-     if (extract32(immh, 3, 1) && !is_q) {
-         unallocated_encoding(s);
-@@ -11119,13 +11110,12 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
+ # Two register operand, one immediate operand, with predicate,
+-# element size encoded as TSZHL.  User must fill in imm.
+-@rdn_pg_tszimm  ........ .. ... ... ... pg:3 ..... rd:5 \
+-                &rpri_esz rn=%reg_movprfx esz=%tszimm_esz
++# element size encoded as TSZHL.
++@rdn_pg_tszimm_shl  ........ .. ... ... ... pg:3 ..... rd:5 \
++                    &rpri_esz rn=%reg_movprfx esz=%tszimm_esz imm=%tszimm_shl
++@rdn_pg_tszimm_shr  ........ .. ... ... ... pg:3 ..... rd:5 \
++                    &rpri_esz rn=%reg_movprfx esz=%tszimm_esz imm=%tszimm_shr
  
-     switch (opcode) {
-     case 0x02: /* SSRA / USRA (accumulate) */
--        gen_gvec_fn2i(s, is_q, rd, rn, shift,
--                      is_u ? arm_gen_gvec_usra : arm_gen_gvec_ssra, size);
--        return;
-+        gvec_fn = is_u ? arm_gen_gvec_usra : arm_gen_gvec_ssra;
-+        break;
+ # Similarly without predicate.
+-@rd_rn_tszimm   ........ .. ... ... ...... rn:5 rd:5 \
+-                &rri_esz esz=%tszimm16_esz
++@rd_rn_tszimm_shl   ........ .. ... ... ...... rn:5 rd:5 \
++                    &rri_esz esz=%tszimm16_esz imm=%tszimm16_shl
++@rd_rn_tszimm_shr   ........ .. ... ... ...... rn:5 rd:5 \
++                    &rri_esz esz=%tszimm16_esz imm=%tszimm16_shr
  
-     case 0x08: /* SRI */
--        gen_gvec_fn2i(s, is_q, rd, rn, shift, arm_gen_gvec_sri, size);
--        return;
-+        gvec_fn = arm_gen_gvec_sri;
-+        break;
+ # Two register operand, one immediate operand, with 4-bit predicate.
+ # User must fill in imm.
+@@ -290,14 +294,10 @@ UMINV           00000100 .. 001 011 001 ... ..... .....         @rd_pg_rn
+ ### SVE Shift by Immediate - Predicated Group
  
-     case 0x00: /* SSHR / USHR */
-         if (is_u) {
-@@ -11133,49 +11123,31 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
-                 /* Shift count the same size as element size produces zero.  */
-                 tcg_gen_gvec_dup8i(vec_full_reg_offset(s, rd),
-                                    is_q ? 16 : 8, vec_full_reg_size(s), 0);
--            } else {
--                gen_gvec_fn2i(s, is_q, rd, rn, shift, tcg_gen_gvec_shri, size);
-+                return;
-             }
-+            gvec_fn = tcg_gen_gvec_shri;
-         } else {
-             /* Shift count the same size as element size produces all sign.  */
-             if (shift == 8 << size) {
-                 shift -= 1;
-             }
--            gen_gvec_fn2i(s, is_q, rd, rn, shift, tcg_gen_gvec_sari, size);
-+            gvec_fn = tcg_gen_gvec_sari;
-         }
--        return;
-+        break;
+ # SVE bitwise shift by immediate (predicated)
+-ASR_zpzi        00000100 .. 000 000 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shr
+-LSR_zpzi        00000100 .. 000 001 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shr
+-LSL_zpzi        00000100 .. 000 011 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shl
+-ASRD            00000100 .. 000 100 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shr
++ASR_zpzi        00000100 .. 000 000 100 ... .. ... .....  @rdn_pg_tszimm_shr
++LSR_zpzi        00000100 .. 000 001 100 ... .. ... .....  @rdn_pg_tszimm_shr
++LSL_zpzi        00000100 .. 000 011 100 ... .. ... .....  @rdn_pg_tszimm_shl
++ASRD            00000100 .. 000 100 100 ... .. ... .....  @rdn_pg_tszimm_shr
  
-     case 0x04: /* SRSHR / URSHR (rounding) */
--        gen_gvec_fn2i(s, is_q, rd, rn, shift,
--                      is_u ? arm_gen_gvec_urshr : arm_gen_gvec_srshr, size);
--        return;
-+        gvec_fn = is_u ? arm_gen_gvec_urshr : arm_gen_gvec_srshr;
-+        break;
+ # SVE bitwise shift by vector (predicated)
+ ASR_zpzz        00000100 .. 010 000 100 ... ..... .....   @rdn_pg_rm
+@@ -401,12 +401,9 @@ RDVL            00000100 101 11111 01010 imm:s6 rd:5
+ ### SVE Bitwise Shift - Unpredicated Group
  
-     case 0x06: /* SRSRA / URSRA (accum + rounding) */
--        gen_gvec_fn2i(s, is_q, rd, rn, shift,
--                      is_u ? arm_gen_gvec_ursra : arm_gen_gvec_srsra, size);
--        return;
-+        gvec_fn = is_u ? arm_gen_gvec_ursra : arm_gen_gvec_srsra;
-+        break;
+ # SVE bitwise shift by immediate (unpredicated)
+-ASR_zzi         00000100 .. 1 ..... 1001 00 ..... ..... \
+-                @rd_rn_tszimm imm=%tszimm16_shr
+-LSR_zzi         00000100 .. 1 ..... 1001 01 ..... ..... \
+-                @rd_rn_tszimm imm=%tszimm16_shr
+-LSL_zzi         00000100 .. 1 ..... 1001 11 ..... ..... \
+-                @rd_rn_tszimm imm=%tszimm16_shl
++ASR_zzi         00000100 .. 1 ..... 1001 00 ..... .....  @rd_rn_tszimm_shr
++LSR_zzi         00000100 .. 1 ..... 1001 01 ..... .....  @rd_rn_tszimm_shr
++LSL_zzi         00000100 .. 1 ..... 1001 11 ..... .....  @rd_rn_tszimm_shl
  
-     default:
-         g_assert_not_reached();
-     }
- 
--    round_const = 1ULL << (shift - 1);
--    tcg_round = tcg_const_i64(round_const);
--
--    for (i = 0; i < elements; i++) {
--        read_vec_element(s, tcg_rn, rn, i, memop);
--        if (accumulate) {
--            read_vec_element(s, tcg_rd, rd, i, memop);
--        }
--
--        handle_shri_with_rndacc(tcg_rd, tcg_rn, tcg_round,
--                                accumulate, is_u, size, shift);
--
--        write_vec_element(s, tcg_rd, rd, i, size);
--    }
--    tcg_temp_free_i64(tcg_round);
--
--    clear_vec_high(s, is_q, rd);
-+    gen_gvec_fn2i(s, is_q, rd, rn, shift, gvec_fn, size);
- }
- 
- /* SHL/SLI - Vector shift left */
+ # SVE bitwise shift by wide elements (unpredicated)
+ # Note esz != 3
 -- 
 2.20.1
 
