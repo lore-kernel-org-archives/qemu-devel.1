@@ -2,80 +2,100 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2638C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E1FAC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:44:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D9EB2076A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:43:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA132206E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:44:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jS1hRj6V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9EB2076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="IjG+/9Pi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA132206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHSn3-0005wY-Mp
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 09:43:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57929)
+	id 1jHSo4-00077l-To
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 09:44:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58295)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jHSli-00052e-Mr
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:42:00 -0400
+ (envelope-from <roger.pau@citrix.com>) id 1jHSnK-0006Ep-9L
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jHSlg-00020d-2o
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:41:57 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:22980)
+ (envelope-from <roger.pau@citrix.com>) id 1jHSnJ-0002fj-1f
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:43:38 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:44959)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jHSlf-00020Q-UI
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:41:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585230115;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F4dMXh2qmZ3lSD/osxt7xqO3/C6o+ohC6ZeJuu9Wvbk=;
- b=jS1hRj6V5C10FwB2FCFHtslFET3M62BqzQed2y/wCClh/NfJdY0sBBSBPl5o1fmQ1RaGCV
- LCCiQ11Pl2zxvrXM2BiQ/T4FPG2S6NAp83+lr8VCpcffrYgbDBmqZH25omGOKEVg6b02se
- CU1Cpx1Hx2NyB29qSRH/lu7TNSIV2Fw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-8BYwCuNGOSS3eAH50NwcXw-1; Thu, 26 Mar 2020 09:41:53 -0400
-X-MC-Unique: 8BYwCuNGOSS3eAH50NwcXw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA634100550D
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 13:41:52 +0000 (UTC)
-Received: from work-vm (ovpn-114-228.ams2.redhat.com [10.36.114.228])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 513365C1B0;
- Thu, 26 Mar 2020 13:41:46 +0000 (UTC)
-Date: Thu, 26 Mar 2020 13:41:44 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH RFC 8/9] KVM: Add dirty-ring-size property
-Message-ID: <20200326134144.GC2713@work-vm>
-References: <20200205141749.378044-1-peterx@redhat.com>
- <20200205141749.378044-9-peterx@redhat.com>
- <20200325200031.GG2635@work-vm> <20200325204214.GD404034@xz-x1>
+ (Exim 4.71) (envelope-from <roger.pau@citrix.com>)
+ id 1jHSnI-0002ee-NW
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:43:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1585230217;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=dLmyqyhGeopiywpiXKWNNgDa9zmcQBLA4yhnWSTaxCY=;
+ b=IjG+/9PiBMbdrRi2vBFDfMRmswVSXnr2Q+mHglBCM2cHUNiBQvwzZa+T
+ yyQxwXT3BFAG18939UEFh06EzAaOP7nEp/3jLnRDed5KE5yVbi6L4mAwv
+ vWfpuW0mciK3CFKahpVkSLjGY66NpSGSLkZsiPbjjWYrC0D0IhzogQ1Kb w=;
+Authentication-Results: esa2.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=roger.pau@citrix.com;
+ spf=Pass smtp.mailfrom=roger.pau@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
+ receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="roger.pau@citrix.com";
+ x-sender="roger.pau@citrix.com"; x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+ roger.pau@citrix.com designates 162.221.158.21 as permitted
+ sender) identity=mailfrom; client-ip=162.221.158.21;
+ receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="roger.pau@citrix.com";
+ x-sender="roger.pau@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+ ip4:168.245.78.127 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="roger.pau@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: bRVLWcKMW78I3KXDW5GDWpI+oOgJx89dUf2WEmRQ6KC5+vyCIqbHEzNJpg4LshFRDOnomy8U78
+ dD2go9bU5omzasWAD/Bkd2HjMryOGYaBWrHFHRiJRuy5Qd4PvnbnA5evEs8/gA89l4MfiSYMlP
+ Ht2olHspNvgu5jRnInGytVemTCKI88eKI6xYdUPsWjhLzCI3/HiziZH+f1GULyaCYNa9rCB0h4
+ MIz/nciYmen4itmKcLKejIkrf75wCz2Ih/MQiR06z2dj8BSrNg/6iDOOciTsX95ZCA9OQtOcSb
+ qPw=
+X-SBRS: 2.7
+X-MesageID: 14692363
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.72,308,1580792400"; d="scan'208";a="14692363"
+From: Roger Pau Monne <roger.pau@citrix.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH] qemu-user: fix build with LLVM lld 10
+Date: Thu, 26 Mar 2020 14:43:16 +0100
+Message-ID: <20200326134316.36059-1-roger.pau@citrix.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-In-Reply-To: <20200325204214.GD404034@xz-x1>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.145.153
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,144 +107,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Dimitry Andric <dim@FreeBSD.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Roger Pau Monne <roger.pau@citrix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Mar 25, 2020 at 08:00:31PM +0000, Dr. David Alan Gilbert wrote:
-> > > @@ -2077,6 +2079,33 @@ static int kvm_init(MachineState *ms)
-> > >      s->memory_listener.listener.coalesced_io_add =3D kvm_coalesce_mm=
-io_region;
-> > >      s->memory_listener.listener.coalesced_io_del =3D kvm_uncoalesce_=
-mmio_region;
-> > > =20
-> > > +    /*
-> > > +     * Enable KVM dirty ring if supported, otherwise fall back to
-> > > +     * dirty logging mode
-> > > +     */
-> > > +    if (s->kvm_dirty_ring_size > 0) {
-> > > +        /* Read the max supported pages */
-> > > +        ret =3D kvm_vm_check_extension(kvm_state, KVM_CAP_DIRTY_LOG_=
-RING);
-> > > +        if (ret > 0) {
-> > > +            if (s->kvm_dirty_ring_size > ret) {
-> > > +                error_report("KVM dirty ring size %d too big (maximu=
-m is %d). "
-> > > +                             "Please use a smaller value.",
-> > > +                             s->kvm_dirty_ring_size, ret);
-> > > +                goto err;
-> > > +            }
-> > > +
-> > > +            ret =3D kvm_vm_enable_cap(s, KVM_CAP_DIRTY_LOG_RING, 0,
-> > > +                                    s->kvm_dirty_ring_size);
-> > > +            if (ret) {
-> > > +                error_report("Enabling of KVM dirty ring failed: %d"=
-, ret);
-> > > +                goto err;
-> > > +            }
-> > > +
-> > > +            s->kvm_dirty_gfn_count =3D
-> > > +                s->kvm_dirty_ring_size / sizeof(struct kvm_dirty_gfn=
-);
-> >=20
-> > What happens if I was to pass dirty-ring-size=3D1 ?
-> > Then the count would be 0 and things would get upset somewhere?
-> > Do you need to check for a minimum postive value?
->=20
-> The above kvm_vm_enable_cap() should fail directly and QEMU will stop.
-> Yes we should check it, but kernel will do that in all cases, so I
-> just didn't do that explicitly again in the userspace.
+lld 10.0.0 introduced a new linker option --image-base equivalent to
+the GNU -Ttext-segment one, hence use it when available.
 
-We probably should have that check since you can give them a more
-obvious error message.
+This fixes the build of QEMU on systems using lld 10 or greater.
 
-> I was planning this to be an advanced feature so the user of this
-> parameter should know the rules to pass values in.
+Signed-off-by: Dimitry Andric <dim@FreeBSD.org>
+Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
+---
+Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+---
+ configure | 42 +++++++++++++++++++++++-------------------
+ 1 file changed, 23 insertions(+), 19 deletions(-)
 
-Advanced users just make advanced mistakes :-)
-
-I did wonder if perhaps this option should be a count of entries rather
-than a byte size.
-
-> Of course we can introduce another global knob to enable/disable this
-> feature as a whole, then I can offer a default value for the size
-> parameter.  I just didn't bother that in this RFC version, but I can
-> switch to that if that's preferred.
->=20
-> [...]
->=20
-> > > @@ -3065,6 +3123,12 @@ static void kvm_accel_class_init(ObjectClass *=
-oc, void *data)
-> > >          NULL, NULL, &error_abort);
-> > >      object_class_property_set_description(oc, "kvm-shadow-mem",
-> > >          "KVM shadow MMU size", &error_abort);
-> > > +
-> > > +    object_class_property_add(oc, "dirty-ring-size", "int",
-> > > +        kvm_get_dirty_ring_size, kvm_set_dirty_ring_size,
-> > > +        NULL, NULL, &error_abort);
-> >=20
-> > I don't think someone passing in a non-number should cause an abort;
-> > it should exit, but I don't think it should abort/core.
->=20
-> It won't - &error_abort is for the operation to add the property.  It
-> should never fail.
->=20
-> User illegal input will look like this (a graceful exit):
->=20
-> $ ./x86_64-softmmu/qemu-system-x86_64 -accel kvm,dirty-ring-size=3Da
-> qemu-system-x86_64: -accel kvm,dirty-ring-size=3Da: Parameter 'dirty-ring=
--size' expects int64
-
-OK good.
-
-> >=20
-> > > +    object_class_property_set_description(oc, "dirty-ring-size",
-> > > +        "KVM dirty ring size (<=3D0 to disable)", &error_abort);
-> > >  }
-> > > =20
-> > >  static const TypeInfo kvm_accel_type =3D {
-> > > diff --git a/qemu-options.hx b/qemu-options.hx
-> > > index 224a8e8712..140bd38726 100644
-> > > --- a/qemu-options.hx
-> > > +++ b/qemu-options.hx
-> > > @@ -119,6 +119,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-> > >      "                kernel-irqchip=3Don|off|split controls accelera=
-ted irqchip support (default=3Don)\n"
-> > >      "                kvm-shadow-mem=3Dsize of KVM shadow MMU in byte=
-s\n"
-> > >      "                tb-size=3Dn (TCG translation block cache size)\=
-n"
-> > > +    "                dirty-ring-size=3Dn (KVM dirty ring size in Byt=
-es)\n"
-> > >      "                thread=3Dsingle|multi (enable multi-threaded TC=
-G)\n", QEMU_ARCH_ALL)
-> > >  STEXI
-> > >  @item -accel @var{name}[,prop=3D@var{value}[,...]]
-> > > @@ -140,6 +141,8 @@ irqchip completely is not recommended except for =
-debugging purposes.
-> > >  Defines the size of the KVM shadow MMU.
-> > >  @item tb-size=3D@var{n}
-> > >  Controls the size (in MiB) of the TCG translation block cache.
-> > > +@item dirty-ring-size=3D@val{n}
-> > > +Controls the size (in Bytes) of KVM dirty ring (<=3D0 to disable).
-> >=20
-> > I don't see the point in allowing < 0 ; I'd ban it.
->=20
-> Sure; I can switch to an uint64.
-
-Great.
-
-Dave
-
-> Thanks,
->=20
-> --=20
-> Peter Xu
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/configure b/configure
+index da09c35895..92d57d84fa 100755
+--- a/configure
++++ b/configure
+@@ -6514,27 +6514,31 @@ if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ]; then
+     cat > $TMPC <<EOF
+     int main(void) { return 0; }
+ EOF
+-    textseg_ldflags="-Wl,-Ttext-segment=$textseg_addr"
++    # Test with image-base first, which appeared in lld 10.0.0
++    textseg_ldflags="-Wl,--image-base=$textseg_addr"
+     if ! compile_prog "" "$textseg_ldflags"; then
+-      # In case ld does not support -Ttext-segment, edit the default linker
+-      # script via sed to set the .text start addr.  This is needed on FreeBSD
+-      # at least.
+-      if ! $ld --verbose >/dev/null 2>&1; then
+-        error_exit \
+-            "We need to link the QEMU user mode binaries at a" \
+-            "specific text address. Unfortunately your linker" \
+-            "doesn't support either the -Ttext-segment option or" \
+-            "printing the default linker script with --verbose." \
+-            "If you don't want the user mode binaries, pass the" \
+-            "--disable-user option to configure."
+-      fi
++      textseg_ldflags="-Wl,-Ttext-segment=$textseg_addr"
++      if ! compile_prog "" "$textseg_ldflags"; then
++        # In case ld does not support -Ttext-segment, edit the default linker
++        # script via sed to set the .text start addr.  This is needed on FreeBSD
++        # at least.
++        if ! $ld --verbose >/dev/null 2>&1; then
++          error_exit \
++              "We need to link the QEMU user mode binaries at a" \
++              "specific text address. Unfortunately your linker" \
++              "doesn't support either the --image-base or -Ttext-segment" \
++              "options or printing the default linker script with" \
++              "--verbose. If you don't want the user mode binaries," \
++              "pass the --disable-user option to configure."
++        fi
+ 
+-      $ld --verbose | sed \
+-        -e '1,/==================================================/d' \
+-        -e '/==================================================/,$d' \
+-        -e "s/[.] = [0-9a-fx]* [+] SIZEOF_HEADERS/. = $textseg_addr + SIZEOF_HEADERS/" \
+-        -e "s/__executable_start = [0-9a-fx]*/__executable_start = $textseg_addr/" > config-host.ld
+-      textseg_ldflags="-Wl,-T../config-host.ld"
++        $ld --verbose | sed \
++          -e '1,/==================================================/d' \
++          -e '/==================================================/,$d' \
++          -e "s/[.] = [0-9a-fx]* [+] SIZEOF_HEADERS/. = $textseg_addr + SIZEOF_HEADERS/" \
++          -e "s/__executable_start = [0-9a-fx]*/__executable_start = $textseg_addr/" > config-host.ld
++        textseg_ldflags="-Wl,-T../config-host.ld"
++      fi
+     fi
+   fi
+ fi
+-- 
+2.26.0
 
 
