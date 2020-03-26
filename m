@@ -2,74 +2,83 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C170C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 815A3C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F15820714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:26:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F15820714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 469F120714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:26:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r72PNhsR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 469F120714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHZ5D-0001hs-7e
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:26:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36633)
+	id 1jHZ5Z-0002Me-EV
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:26:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jHZ4M-0000RJ-Ms
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:25:39 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHYys-00034G-MC
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:19:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jHZ4L-0002Qg-FK
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:25:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52200)
+ (envelope-from <peter.maydell@linaro.org>) id 1jHYyr-0007XI-Eq
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:19:58 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45400)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jHZ4L-0002QL-9l
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:25:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jHZ4K-0007Tt-IG
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:25:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 88DE92E8047
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:25:36 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHYyr-0007Wv-9x
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:19:57 -0400
+Received: by mail-ot1-x343.google.com with SMTP id c9so7340259otl.12
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 13:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZPAWN5MUS4egYOv95HReiuAQNVf1YCBjE13Yrr+IeVY=;
+ b=r72PNhsR6NNRmlb8y8tQb1Vavgiwva/iv0UsLCxmdeHuwio3kfMQHKKzL4O0nYbaQZ
+ xfvYnzEk6n8jcjAG/6fcg6hSZmmZwGewEmj0KvBQS4+u5mng1HVWxELPJCh4BSedvuOE
+ BrEbZImIq00Zf1AYakJvIey/zfCNArOYoFh7IYHRcpiPsXUFzxuf1QxRDBfGY3L/YpRr
+ cdx7pNjCuoq7gY+cPlayjkpLTHhjH1dPMtgNN8cA1WMlTBg3vSSk4JvpwLWtWtJ3+JQa
+ CKA2SayzViLFH85UB/afLihzCkfAhh3oycVFiETR+uuywOH7zkcTz/SEwROVhFC1EdaU
+ yMow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZPAWN5MUS4egYOv95HReiuAQNVf1YCBjE13Yrr+IeVY=;
+ b=ekdKSUgsTeQTO058iq4wdQVNtuZClFZBQuMh0+sYnCjqkwDK6dSOqT/8iJCTu5Rdh7
+ RxZ1A898/owYYsNndoH2C8eXsrUx7sxt4512spmEg3H7vX/AHvU9zHcGqDcsDTfkcjKX
+ DTucxHeBsBLDmFpnzeQcv4hpsrA8vUcCVstsztwWS6l/vhvbxdJRO4P5XKUASIwX11Cf
+ U9q0a4qyvPWvLoSx1X5RqpRD/1/5E4LKzG8Y1gYErtExRcYN1GKhDhD4MrTnSVDebIwr
+ IT8EJ1rrGBBFRiQVPWHNTDMPuCwQnuyPHX1/+lb/+3+K+xjdHpJTNtJd6sWK2nJvsNi0
+ Hh8Q==
+X-Gm-Message-State: ANhLgQ3MDjf02akQCMH7USmWdw7pTNQFQiBEjFkbStQqnMJP9jJlcolF
+ 0ySdPK7q0pkcE8jiIkbbr+lNS4Xxjz2HB8hKBQetog==
+X-Google-Smtp-Source: ADFU+vv7YIHW2fkMU44kFv31fo7GGvUs+cuN0nxbYSVAfWebcZk+DAaWKmyPn0sZKlLaLXpTwaSDF/QIRo5dl0gCcns=
+X-Received: by 2002:a9d:1920:: with SMTP id j32mr7420193ota.221.1585253996065; 
+ Thu, 26 Mar 2020 13:19:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Mar 2020 20:16:26 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm passthrough tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alex-l-williamson dgilbert-h hrw pmaydell
-X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
-X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
-References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
-Message-Id: <158525378711.18657.12345515496182587542.malone@chaenomeles.canonical.com>
-Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
- guest memory but fails on 4GB (vfio_dma_map invalid arg)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 83ced78154e828d4ad132d878f0d5810c46deb1f
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <20200326170121.13045-1-alex.bennee@linaro.org>
+ <CAFEAcA8Lo84gNk2tFCKsgM_O50bXTCs6Z9jH6aCvfDA56TDCmA@mail.gmail.com>
+ <ba33454a-6e57-960a-7114-fc71a9f09442@redhat.com>
+In-Reply-To: <ba33454a-6e57-960a-7114-fc71a9f09442@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Mar 2020 20:19:44 +0000
+Message-ID: <CAFEAcA_KSVHkVznGD=cxzLaHSbPmWLN6MSqWHBqB8_ux05gD7A@mail.gmail.com>
+Subject: Re: [PATCH] qemu/atomic.h: add #ifdef guards for stdatomic.h
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,78 +87,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1869006 <1869006@bugs.launchpad.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do we need something like a table of excluded IOVA regions in ACPI or somew=
-here; in a similar way we have a region of exluded physical ram areas?
-Or is the range of excluded IOVA's constant on any one architecture so it d=
-oesn't normally need to worry about it?
+On Thu, 26 Mar 2020 at 18:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 26/03/20 18:14, Peter Maydell wrote:
+> >> +#ifndef atomic_fetch_add
+> >>  #define atomic_fetch_add(ptr, n) __atomic_fetch_add(ptr, n, __ATOMIC_SEQ_CST)
+> >>  #define atomic_fetch_sub(ptr, n) __atomic_fetch_sub(ptr, n, __ATOMIC_SEQ_CST)
+> >>  #define atomic_fetch_and(ptr, n) __atomic_fetch_and(ptr, n, __ATOMIC_SEQ_CST)
+> >>  #define atomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST)
+> >>  #define atomic_fetch_xor(ptr, n) __atomic_fetch_xor(ptr, n, __ATOMIC_SEQ_CST)
+> >> +#endif
+> >
+> > This will work around FreeBSD's current implementation in particular,
+> > but I don't think there's anything in the C11 spec that mandates that
+> > atomic_fetch_add() and friends have to be macros and not simply
+> > functions...
+>
+> That's not a problem as long as they are all functions, the macros would
+> simply override the function-based implementation.
 
--- =
+Oh yes, so it would. I think I was also vaguely thinking in terms
+of FreeBSD being the leading edge of "one day most or all of our
+hosts will have a full stdatomic.h", so maybe we should shift to
+use-host-stdatomic-by-default, with the use of the gcc __atomic*
+as the fallback at some point ?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1869006
-
-Title:
-  PCIe cards passthrough to TCG guest works on 2GB of guest memory but
-  fails on 4GB (vfio_dma_map invalid arg)
-
-Status in QEMU:
-  New
-
-Bug description:
-  During one meeting coworker asked "did someone tried to passthrough
-  PCIe card to other arch guest?" and I decided to check it.
-
-  Plugged SATA and USB3 controllers into spare slots on mainboard and
-  started playing. On 1GB VM instance it worked (both cold- and hot-
-  plugged). On 4GB one it did not:
-
-  B=C5=82=C4=85d podczas uruchamiania domeny: internal error: process exite=
-d while connecting to monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarc=
-h64: -device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D=
-0x0: VFIO_MAP_DMA: -22
-  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
-0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
-d to setup container for group 28: memory listener initialization failed: R=
-egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
-0x7fb2a3e00000) =3D -22 (Invalid argument)
-
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
-e 66, in newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1279,=
- in startup
-      self._backend.create()
-    File "/usr/lib64/python3.8/site-packages/libvirt.py", line 1234, in cre=
-ate
-      if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
-=3Dself)
-  libvirt.libvirtError: internal error: process exited while connecting to =
-monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch64: -device vfio-pci,=
-host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: VFIO_MAP_DMA: -22
-  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
-0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
-d to setup container for group 28: memory listener initialization failed: R=
-egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
-0x7fb2a3e00000) =3D -22 (Invalid argument)
-
-  =
-
-  I played with memory and 3054 MB is maximum value possible to boot VM wit=
-h coldplugged host PCIe cards.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1869006/+subscriptions
+thanks
+-- PMM
 
