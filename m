@@ -2,81 +2,68 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FF9C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5A3C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:57:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ECEA20719
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:53:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEieT6t/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ECEA20719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 21B4220719
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:57:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21B4220719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHcJs-00009c-ID
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:53:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42819)
+	id 1jHcN8-0001Q0-9x
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:57:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jHcJF-00085G-VT
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:53:14 -0400
+ (envelope-from <like.xu@linux.intel.com>) id 1jHcMD-0000nh-Ot
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:56:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jHcJE-0004YY-Se
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:53:13 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:45855)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jHcJE-0004Xf-Nv; Thu, 26 Mar 2020 19:53:12 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id x82so5083747vsc.12;
- Thu, 26 Mar 2020 16:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=z+HGkigCTY+gVybeiKe42pJ6OvxmiSA7KAJu97PBKgo=;
- b=dEieT6t/TXNf289vGBIZeEr+UClY5lMugwuWxqpRLGc4zM7AZm9b4TfQ1XMIaHTRbG
- SqTHQVga0xoNuIHBPvAbBJI1IuIBpklizCGNyaKcUdvcbXEzmEHaNcFzf2HpC0BmaL2o
- XRhDTVURBOWbmr1MAAc8EQ/UyPP6l4W2HGnUxg7Az7xmeCYToD/5dsh2l2d9+Yl2cEYn
- 7QJ2O4qh1GiC36ep8ak2uim9xFdmIfVWIL5wYeCfsaq4J141Er4xo1ViyhYixRTV9NOy
- 0lLyM7qiPrNtWQD0d8GEgyyJk6XO/YkR8HxsVBbxlxwcHLLaPHMDeDeo5aEBXy9KMlhm
- j0VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=z+HGkigCTY+gVybeiKe42pJ6OvxmiSA7KAJu97PBKgo=;
- b=bvigD+RBTargRnXS+PClBKJwM1aNALvvBQ/OMGQ8zEPAV1dKc5FBvzC+Z+mzekns5E
- mJWni4wlpkEKzCsi7M1uFgmz17mbsFSNL3lYBhCewrGDaOnalW9OhxQ7qDdkSIua+GlA
- i31J2ZA4xSsjSyBsyhYiJBiAAe2znQIMgAHEQCwsa5rgBbZYs5WtHYeJBSABG0murs8M
- nsu1idI0POh03rjE2DYZiBjrEh0XWouL4mVitz2CwyRNENvpvigx/guFJku9ZPBGAXfM
- XIJ2nmBlnCdwDi3qdCKBJE5hc+XqHVrd279RLlBIGZL8k83VDyGZMQ5Yp7qIGryFRGEX
- T3wg==
-X-Gm-Message-State: ANhLgQ3f9hKubFvslCcZ5AnbAqil6Hzs08WF8/d0MmMiZuXFfAvPoIUI
- BaWyHtYPcZgblxnC8PT1qNvKoyn1RIg+5URhi9W0Wr0cDsY=
-X-Google-Smtp-Source: ADFU+vvfXwQrBUTTfO4haBLj4m2uoaxYnz2c622TXNGE4J5jAnN8ZVIf9UNaltVZC9rrBLJSAToB4iS2mTb3DI+Hdgk=
-X-Received: by 2002:a67:902:: with SMTP id 2mr10698923vsj.133.1585266791852;
- Thu, 26 Mar 2020 16:53:11 -0700 (PDT)
+ (envelope-from <like.xu@linux.intel.com>) id 1jHcMC-0007rQ-GB
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:56:17 -0400
+Received: from mga02.intel.com ([134.134.136.20]:45021)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
+ id 1jHcMC-0007ke-3j; Thu, 26 Mar 2020 19:56:16 -0400
+IronPort-SDR: 5zmWDaCiLXj5ORlAMG+5wgJqutdlPLvFEioVsD29e5aaQGgfBFFto/Nzi+FtqI5Pc/GkRSNahI
+ kg3RT47z55/w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 26 Mar 2020 16:56:12 -0700
+IronPort-SDR: b3OJQl9lomahSV8T19IP0DhJSpAuyxYmtELbu7egZ1+0GxoglT90wo8W7IgdZQ8ledhpt/wZAX
+ c5a5HIdur9QA==
+X-IronPort-AV: E=Sophos;i="5.72,310,1580803200"; d="scan'208";a="420904573"
+Received: from minggao1-mobl2.ccr.corp.intel.com (HELO [10.249.170.198])
+ ([10.249.170.198])
+ by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 26 Mar 2020 16:56:10 -0700
+Subject: Re: [PATCH] i386/cpu: Expand MAX_FIXED_COUNTERS from 3 to 4 to for
+ Icelake
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20200317055413.66404-1-like.xu@linux.intel.com>
+ <b536e5e3-d102-ff82-4ebc-01114b9a1b7f@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <f72c8886-89e4-10a6-b90f-a7aeea1ed7ec@linux.intel.com>
+Date: Fri, 27 Mar 2020 07:56:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <cover.1585262586.git.alistair.francis@wdc.com>
- <846f1e18f5922d818bc464ec32c144ef314ec724.1585262586.git.alistair.francis@wdc.com>
- <c835ef40-6e7a-7639-236c-5fb939bf7fc2@linaro.org>
-In-Reply-To: <c835ef40-6e7a-7639-236c-5fb939bf7fc2@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 26 Mar 2020 16:45:10 -0700
-Message-ID: <CAKmqyKPnLZTYogkFZf1d4=guuz_qFd_ixo18peEADG_xdtoiPQ@mail.gmail.com>
-Subject: Re: [PATCH for 5.0 v1 2/2] riscv: AND stage-1 and stage-2 protection
- flags
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e42
+In-Reply-To: <b536e5e3-d102-ff82-4ebc-01114b9a1b7f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,74 +75,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 26, 2020 at 4:32 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 3/26/20 3:44 PM, Alistair Francis wrote:
-> > Take the result of stage-1 and stage-2 page table walks and AND the two
-> > protection flags together. This way we require both to set permissions
-> > instead of just stage-2.
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  target/riscv/cpu_helper.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > index f36d184b7b..50e13a064f 100644
-> > --- a/target/riscv/cpu_helper.c
-> > +++ b/target/riscv/cpu_helper.c
-> > @@ -707,7 +707,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> >  #ifndef CONFIG_USER_ONLY
-> >      vaddr im_address;
-> >      hwaddr pa = 0;
-> > -    int prot;
-> > +    int prot, prot2;
-> >      bool pmp_violation = false;
-> >      bool m_mode_two_stage = false;
-> >      bool hs_mode_two_stage = false;
-> > @@ -757,13 +757,15 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> >              /* Second stage lookup */
-> >              im_address = pa;
-> >
-> > -            ret = get_physical_address(env, &pa, &prot, im_address,
-> > +            ret = get_physical_address(env, &pa, &prot2, im_address,
-> >                                         access_type, mmu_idx, false, true);
-> >
-> >              qemu_log_mask(CPU_LOG_MMU,
-> >                      "%s 2nd-stage address=%" VADDR_PRIx " ret %d physical "
-> >                      TARGET_FMT_plx " prot %d\n",
-> > -                    __func__, im_address, ret, pa, prot);
-> > +                    __func__, im_address, ret, pa, prot2);
-> > +
-> > +            prot &= prot2;
-> >
-> >              if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-> >                  (ret == TRANSLATE_SUCCESS) &&
-> >
->
-> Whee!  Yes, I think this is what you've been looking for.
+On 2020/3/27 2:48, Paolo Bonzini wrote:
+> On 17/03/20 06:54, Like Xu wrote:
+>> In the Intel SDM, "Table 18-2. Association of Fixed-Function
+>> Performance Counters with Architectural Performance Events",
+>> we may have a new fixed counter 'TOPDOWN.SLOTS' (since Icelake),
+>> which counts the number of available slots for an unhalted
+>> logical processor. Check commit 6017608936 in the kernel tree.
+>>
+>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>> ---
+>>   target/i386/cpu.h | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index 576f309bbf..ec2b67d425 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -1185,7 +1185,7 @@ typedef struct {
+>>   #define CPU_NB_REGS CPU_NB_REGS32
+>>   #endif
+>>   
+>> -#define MAX_FIXED_COUNTERS 3
+>> +#define MAX_FIXED_COUNTERS 4
+>>   #define MAX_GP_COUNTERS    (MSR_IA32_PERF_STATUS - MSR_P6_EVNTSEL0)
+>>   
+>>   #define TARGET_INSN_START_EXTRA_WORDS 1
+>>
+> 
+> Hi Like, the problem with this patch is that it breaks live migration;
+> the vmstate_msr_architectural_pmu record hardcodes MAX_FIXED_COUNTERS as
+> the number of registers.
+> 
+> So it's more complicated, you need to add a new subsection (following
+> vmstate_msr_architectural_pmu) and transmit it only if the 4th counter
+> is nonzero (instead of the more complicated check in pmu_enable_needed).
+>   Just to be safe, I'd make the new subsection hold 16 counters and bump
+> MAX_FIXED_COUNTERS to 16.
 
-Yep!
+The new MAX_FIXED_COUNTERS looks good to me and
+and let me follow up this live migration issue.
 
-I actually tried this ages ago, but it didn't work without the first
-path so it never fixed the problem.
+Thanks,
+Like Xu
 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> 
 
-Thanks
-
-Alistair
-
->
->
-> r~
 
