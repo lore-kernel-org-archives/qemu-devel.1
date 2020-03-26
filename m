@@ -2,79 +2,80 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA80C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B53C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:47:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 190E22070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D70032070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:47:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zy54bO5T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 190E22070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YdFViQJX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D70032070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHQ02-0004kk-9a
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 06:44:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55845)
+	id 1jHQ3B-0005qL-00
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 06:47:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56607)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jHPzV-0004Kv-3b
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:44:02 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHQ2W-0005OH-11
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jHPzT-0000hJ-P7
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:44:01 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:33079)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jHPzT-0000gl-Kt
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:43:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585219439;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ltzXFucNFySl7Iqt2wRdEHrQIaaIQQGcJHamW5JnQKw=;
- b=Zy54bO5TduK6xN8/jvnDorDpvhsn4W85nhBJlrVFLKrIIs7YCFj4/wBp1BzLMwM7R2tvl6
- KX6oaOir481aLjmW/K0VDI4IkGiLIv7TyP25F/MpWKRG112N0Sfi2rpG8ZW+uyeWA1w9Gv
- SuxLlobS/XdYVm1nzo5DIQ96/XrGD9Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-ADmKvO5vPkStUIACKvvEnw-1; Thu, 26 Mar 2020 06:43:55 -0400
-X-MC-Unique: ADmKvO5vPkStUIACKvvEnw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF67E100E61C;
- Thu, 26 Mar 2020 10:43:44 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AFAC5E242;
- Thu, 26 Mar 2020 10:43:36 +0000 (UTC)
-Date: Thu, 26 Mar 2020 11:43:35 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PULL 006/136] vl.c: move -m parsing after memory backends has
- been processed
-Message-ID: <20200326114335.5029abfe@redhat.com>
-In-Reply-To: <2cc25431-eea0-f81c-9430-56c49f6b61de@redhat.com>
-References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
- <1582631466-13880-6-git-send-email-pbonzini@redhat.com>
- <2cc25431-eea0-f81c-9430-56c49f6b61de@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jHQ2U-0003oN-L3
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:47:07 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42074)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHQ2U-0003nU-3u
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:47:06 -0400
+Received: by mail-oi1-x243.google.com with SMTP id e4so5035018oig.9
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 03:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=347eUQrPcxbgZRU3Nq1duBCDYFrJHpbNU3mfi6zW42I=;
+ b=YdFViQJXSRTl+DT9iP2DgHn2bNIoDaOj+RofIACj00z3WGIYJwGrJtpWjW19ETAXDg
+ HpxEf2YrDSkWnnKK4lqz9ivXGVp4KNSwEJVOXwplcpQF1b1yFvEBFBjZI/rodXsIXKPU
+ 9jEkrJK4ZImsiZufLYwtWVFrfZ05nRN9Frejnh51mJ0oTNqHRsrjP+y7Kzodnz0sYiME
+ OP1cDBwqSLJfkdw2BKd/Km6Tk0frWzMZnZ6tw03LLIR9Y/bCLDGm/aJUD9AsKzC712Dj
+ Kt8o59Fo8z4pCAK1uvYWF/P2jDjEvhl29iKEXrVua7FtzF8hbpoPD9O768EsqExKZ/TF
+ PZ4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=347eUQrPcxbgZRU3Nq1duBCDYFrJHpbNU3mfi6zW42I=;
+ b=IuTg2XgaWDmfnVhcGCrbzFI0F0sn+txUEkiYs0XgcuFNul9wpYnOe8XvfFLctSHFAr
+ J5x93cqoGd+OW/mMkpG+fhSogQtwcVMblBfEn+RphjMFdZD3bSTxD9byaXcNhbUL7Mkl
+ Sc197ErE0Kf2/RA1KzNrNugje2hP6r/e4LDr8kTNE5Wi6DJ8Ggvwd+nXZArNPav7lVAK
+ kda7cIrELOw4AelVZ7c1K1W89FyXtTIquGGhgpdtdu2U5XmmRHUhHhcUjhMKFZOlWi0s
+ 894DulcErlph2KTYLYhEVgZ321f5C1FZP4cK4y1SfTW3+0E/iaM0WqdjKXmbivvkqqyE
+ 5VLg==
+X-Gm-Message-State: ANhLgQ2P8tF4bB/CMmFgs5C0qcU0IQ7hWgPrXq/4yb9pcxpkM/JrRZJL
+ 5LAYs1K/E/+vy5oq5C+aqjGNWnRmxNJ24pQAy6igPw==
+X-Google-Smtp-Source: ADFU+vuf3LYKUrH3jWrEc+vFrgs2SGy9nTZp+tyVeKhrPPHlzHVEeNY5Fn2crnQ8PFX8ZUNQy+ypGFhUCzE5fgv8wmU=
+X-Received: by 2002:a05:6808:8cb:: with SMTP id
+ k11mr274396oij.48.1585219624377; 
+ Thu, 26 Mar 2020 03:47:04 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <20200325131632.311034-1-dgilbert@redhat.com>
+In-Reply-To: <20200325131632.311034-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Mar 2020 10:46:53 +0000
+Message-ID: <CAFEAcA_ZnHkAd7YbvebYcv5vdEh74ETU2-TtZR6NbUbicQ=zxg@mail.gmail.com>
+Subject: Re: [PULL 0/9] migration queue
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,144 +87,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
- Gavin Shan <gshan@redhat.com>, qemu-devel@nongnu.org,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Mao Zhongyi <maozhongyi@cmss.chinamobile.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 26 Mar 2020 10:20:31 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On Wed, 25 Mar 2020 at 13:17, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+>
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit 736cf607e40674776d752acc201f565723e86045:
+>
+>   Update version for v5.0.0-rc0 release (2020-03-24 17:50:00 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20200325b
+>
+> for you to fetch changes up to 7cd75cbdb8a45d9e2d5912f774d8194cbafdfa97:
+>
+>   migration: use "" instead of (null) for tls-authz (2020-03-25 12:31:38 +0000)
+>
+> ----------------------------------------------------------------
+> Combo Migration/HMP/virtiofs pull
+>
+> Small fixes all around.
+> Ones that are noticeable:
+>   a) Igor's migration compatibility fix affecting older machine types
+>      has been seen in the wild
+>   b) Philippe's autconverge fix should fix an intermittently
+>      failing migration test.
+>   c) Mao's makes a small change to the output of 'info
+>      migrate_parameters'  for tls-authz.
+>
 
-> Hi
-> 
-> On 2/25/20 12:48 PM, Paolo Bonzini wrote:
-> > From: Igor Mammedov <imammedo@redhat.com>
-> > 
-> > It will be possible for main RAM to come from memory-backend
-> > and we should check that size specified in -m matches the size
-> > of the backend and [MachineState::]ram_size also matches
-> > backend's size.
-> > 
-> > However -m parsing (set_memory_options()) happens before backends
-> > are intialized (object_create_delayed()) which complicates it.
-> > Consolidate set_memory_options() and assigning parsed results to
-> > current_machine after backends are initialized, so it would be
-> > possible access the initialized backend instance to compare
-> > sizes.
-> > 
-> > This patch only consolidates scattered places touching ram_size
-> > within vl.c. And follow up patch will integrate backend handling
-> > to set_memory_options().
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Message-Id: <20200219160953.13771-7-imammedo@redhat.com>  
-> 
-> Unfortunately this patch breaks ARM virt memory map setting in KVM mode.
-> If you launch ARM virt with PCDIMM you now get
-> 
-> qemu-system-aarch64: -device
-> pc-dimm,memdev=mem1,id=dimm1,driver=pc-dimm: memory devices (e.g. for
-> memory hotplug) are not supported by the machine
-> 
-> With machvirt/KVM
-> configure_accelerators() calls ARM virt_kvm_type(). This function
-> freezes the machine memory map and computes the size of the IPA to be
-> supported by KVM. See:
-> c9650222b8 ("hw/arm/virt: Implement kvm_type function for 4.0 machine")
-> 
-> virt_kvm_type() uses machine memory settings. Igor's patch moves those
-> after the mem backend init, so the virt memory map does not properly
-> take into account the machine memory settings anymore.
-> 
-> So we need to find a way to rework this.
-set_memory_options() was already reverted, so  safest way to fix it during
-freeze is to revert back lines
+Applied, thanks.
 
--    current_machine->ram_size = ram_size;
--    current_machine->maxram_size = maxram_size;
--    current_machine->ram_slots = ram_slots;
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-I'll post a patch
-
-> 
-> Thanks
-> 
-> Eric
-> 
-> 
-> > ---
-> >  vl.c | 27 ++++++++++++++-------------
-> >  1 file changed, 14 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/vl.c b/vl.c
-> > index 2103804..72ffc06 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -2655,6 +2655,14 @@ static void set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
-> >          exit(EXIT_FAILURE);
-> >      }
-> >  
-> > +    if (!xen_enabled()) {
-> > +        /* On 32-bit hosts, QEMU is limited by virtual address space */
-> > +        if (ram_size > (2047 << 20) && HOST_LONG_BITS == 32) {
-> > +            error_report("at most 2047 MB RAM can be simulated");
-> > +            exit(1);
-> > +        }
-> > +    }
-> > +
-> >      loc_pop(&loc);
-> >  }
-> >  
-> > @@ -3819,8 +3827,6 @@ int main(int argc, char **argv, char **envp)
-> >      machine_class = select_machine();
-> >      object_set_machine_compat_props(machine_class->compat_props);
-> >  
-> > -    set_memory_options(&ram_slots, &maxram_size, machine_class);
-> > -
-> >      os_daemonize();
-> >      rcu_disable_atfork();
-> >  
-> > @@ -4122,9 +4128,6 @@ int main(int argc, char **argv, char **envp)
-> >      machine_opts = qemu_get_machine_opts();
-> >      qemu_opt_foreach(machine_opts, machine_set_property, current_machine,
-> >                       &error_fatal);
-> > -    current_machine->ram_size = ram_size;
-> > -    current_machine->maxram_size = maxram_size;
-> > -    current_machine->ram_slots = ram_slots;
-> >  
-> >      /*
-> >       * Note: uses machine properties such as kernel-irqchip, must run
-> > @@ -4235,14 +4238,6 @@ int main(int argc, char **argv, char **envp)
-> >  
-> >      tpm_init();
-> >  
-> > -    if (!xen_enabled()) {
-> > -        /* On 32-bit hosts, QEMU is limited by virtual address space */
-> > -        if (ram_size > (2047 << 20) && HOST_LONG_BITS == 32) {
-> > -            error_report("at most 2047 MB RAM can be simulated");
-> > -            exit(1);
-> > -        }
-> > -    }
-> > -
-> >      blk_mig_init();
-> >      ram_mig_init();
-> >      dirty_bitmap_mig_init();
-> > @@ -4287,6 +4282,12 @@ int main(int argc, char **argv, char **envp)
-> >      if (cpu_option) {
-> >          current_machine->cpu_type = parse_cpu_option(cpu_option);
-> >      }
-> > +
-> > +    set_memory_options(&ram_slots, &maxram_size, machine_class);
-> > +    current_machine->ram_size = ram_size;
-> > +    current_machine->maxram_size = maxram_size;
-> > +    current_machine->ram_slots = ram_slots;
-> > +
-> >      parse_numa_opts(current_machine);
-> >  
-> >      if (machine_class->default_ram_id && current_machine->ram_size &&
-> >   
-
+-- PMM
 
