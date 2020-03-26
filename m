@@ -2,58 +2,84 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 517AEC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F21C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:47:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20C7820714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:44:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C7820714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07A892070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:47:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eh7u5eIo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07A892070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHP43-0006cS-C1
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 05:44:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47587)
+	id 1jHP6l-000169-5m
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 05:47:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48109)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <s.reiter@proxmox.com>) id 1jHP3N-0005nO-CW
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:43:58 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jHP5d-0000Bm-21
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:46:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <s.reiter@proxmox.com>) id 1jHP3L-0004qh-Pq
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:43:57 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:30800)
+ (envelope-from <jasowang@redhat.com>) id 1jHP5b-0006bc-KA
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:46:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34036)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <s.reiter@proxmox.com>)
- id 1jHP3I-0004n9-D6; Thu, 26 Mar 2020 05:43:52 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 50BC6428C9;
- Thu, 26 Mar 2020 10:43:49 +0100 (CET)
-Subject: Re: [PATCH] backup: don't acquire aio_context in backup_clean
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <76edbead-7ccf-833b-a3f2-15dff7f0748c@virtuozzo.com>
- <20200325155055.730633-1-s.reiter@proxmox.com>
- <2b288000-7c09-ba31-82a7-02c5ed55f4e7@virtuozzo.com>
-From: Stefan Reiter <s.reiter@proxmox.com>
-Message-ID: <1d1984b3-14f5-5a17-b477-d70561f75e8f@proxmox.com>
-Date: Thu, 26 Mar 2020 10:43:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jHP5b-0006aQ-Fr
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:46:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585215973;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NyqfYHYIHhGIshtBljTvoynxBHZUL4wOuIRheeuAzUQ=;
+ b=Eh7u5eIoHIdWOi7IBTo7YTV9atVuvYpi5bmnHhauEmeSTxxJdsg+Cs2KodPiviBTe0S1ai
+ XG99K32D5ZpejhCuLBMln8irnEw+L6hXHOFb8LmfwQoP814UKkEyHtBrH786jzm0J8Iy2j
+ 8/xOIpIVVatO7unYPLI+EhzhpMqtplg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-S1BdD39uNxqo4axIUKfsng-1; Thu, 26 Mar 2020 05:46:12 -0400
+X-MC-Unique: S1BdD39uNxqo4axIUKfsng-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B7CF8F16D;
+ Thu, 26 Mar 2020 09:46:02 +0000 (UTC)
+Received: from [10.72.13.193] (ovpn-13-193.pek2.redhat.com [10.72.13.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE5CE10002A5;
+ Thu, 26 Mar 2020 09:45:51 +0000 (UTC)
+Subject: =?UTF-8?B?UmU6IOetlOWkjTogW3F1ZXN0aW9uXXZob3N0LXVzZXI6IGF0dW8gZml4?=
+ =?UTF-8?Q?_network_link_broken_during_migration?=
+To: "yangke (J)" <yangke27@huawei.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <0CC1E03725E48D478F815032182740230A42A312@DGGEMM532-MBS.china.huawei.com>
+ <47abadbd-c559-1900-f3b1-3697f9e7c0b5@redhat.com>
+ <0CC1E03725E48D478F815032182740230A42C15B@DGGEMM532-MBS.china.huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <bb51d1b8-522d-0c05-46ec-102cb8a917f7@redhat.com>
+Date: Thu, 26 Mar 2020 17:45:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <2b288000-7c09-ba31-82a7-02c5ed55f4e7@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <0CC1E03725E48D478F815032182740230A42C15B@DGGEMM532-MBS.china.huawei.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.186.127.180
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,201 +91,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, slp@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
- jsnow@redhat.com, dietmar@proxmox.com
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
+ Maxime Coquelin <maxime.coquelin@redhat.com>,
+ "quintela@redhat.com" <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/03/2020 06:54, Vladimir Sementsov-Ogievskiy wrote:
-> 25.03.2020 18:50, Stefan Reiter wrote:
->> backup_clean is only ever called as a handler via job_exit, which
->=20
-> Hmm.. I'm afraid it's not quite correct.
->=20
-> job_clean
->=20
->  =C2=A0 job_finalize_single
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0 job_completed_txn_abort (lock aio context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0 job_do_finalize
->=20
->=20
-> Hmm. job_do_finalize calls job_completed_txn_abort, which cares to lock=
-=20
-> aio context..
-> And on the same time, it directaly calls job_txn_apply(job->txn,=20
-> job_finalize_single)
-> without locking. Is it a bug?
->=20
 
-I think, as you say, the idea is that job_do_finalize is always called=20
-with the lock acquired. That's why job_completed_txn_abort takes care to=20
-release the lock (at least of the "outer_ctx" as it calls it) before=20
-reacquiring it.
-
-> And, even if job_do_finalize called always with locked context, where i=
-s=20
-> guarantee that all
-> context of all jobs in txn are locked?
->=20
-
-I also don't see anything that guarantees that... I guess it could be=20
-adapted to handle locks like job_completed_txn_abort does?
-
-Haven't looked into transactions too much, but does it even make sense=20
-to have jobs in different contexts in one transaction?
-
-> Still, let's look through its callers.
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_finalize
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 qmp_block_job_finalize (lock aio context)
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 qmp_job_finalize (lock aio context)
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 test_cancel_concluded (doesn't lock, but it's a test)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_completed_t=
-xn_success
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 job_completed
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_exit (lock aio context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_cancel
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-blockdev_mark_auto_del (lock aio context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-job_user_cancel
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 qmp_block_job_cancel (locks context)
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 qmp_job_cancel=C2=A0 (locks context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-job_cancel_err
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_cancel_sync (return=20
-> job_finish_sync(job, &job_cancel_err, NULL);, job_finish_sync just call=
-s=20
-> callback)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 replication_clo=
-se (it's=20
-> .bdrv_close.. Hmm, I don't see context locking, where is it ?)
-Hm, don't see it either. This might indeed be a way to get to job_clean=20
-without a lock held.
-
-I don't have any testing set up for replication atm, but if you believe=20
-this would be correct I can send a patch for that as well (just acquire=20
-the lock in replication_close before job_cancel_async?).
-
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 replication_sto=
-p (locks context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 drive_backup_ab=
-ort (locks context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blockdev_backup=
-_abort (locks context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_cancel_sync=
-_all (locks context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_common (=
-locks context)
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-test_* (I don't care)
->=20
-
-To clarify, aside from the commit message the patch itself does not=20
-appear to be wrong? All paths (aside from replication_close mentioned=20
-above) guarantee the job lock to be held.
-
->> already acquires the job's context. The job's context is guaranteed to
->> be the same as the one used by backup_top via backup_job_create.
+On 2020/3/24 =E4=B8=8B=E5=8D=887:08, yangke (J) wrote:
+>>> We find an issue when host mce trigger openvswitch(dpdk) restart in
+>>> source host during guest migration,
 >>
->> Since the previous logic effectively acquired the lock twice, this
->> broke cleanup of backups for disks using IO threads, since the=20
->> BDRV_POLL_WHILE
->> in bdrv_backup_top_drop -> bdrv_do_drained_begin would only release=20
->> the lock
->> once, thus deadlocking with the IO thread.
+>> Did you mean the vhost-user netev was deleted from the source host?
+>
+> The vhost-user netev was not deleted from the source host. I mean that=EF=
+=BC=9A
+> in normal scenario, OVS(DPDK) begin to restart, then qemu_chr disconnect =
+to OVS and link status is set to link down; OVS(DPDK) started, then qemu_ch=
+r reconnect to OVS and link status is set to link up. But in our scenario, =
+before qemu_chr reconnect to OVS, the VM migrate is finished. The link_down=
+ of frontend was loaded from n->status in destination, it cause the network=
+ in gust never be up again.
+
+
+I'm not sure we should fix this in qemu.
+
+Generally, it's the task of management to make sure the destination=20
+device configuration is the same as source.
+
+E.g in this case, management should bring up the link if re-connection=20
+in source is completed.
+
+What's more the qmp_set_link() done in vhost-user.c looks hacky which=20
+changes the link status without the care of management.
+
+
+>
+> qemu_chr disconnect:
+> #0  vhost_user_write (msg=3Dmsg@entry=3D0x7fff59ecb2b0, fds=3Dfds@entry=
+=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x295c730, dev=3D0x295c730)
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/virtio/vhost_user.c:239
+> #1  0x00000000004e6bad in vhost_user_get_vring_base (dev=3D0x295c730, rin=
+g=3D0x7fff59ecb510)
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/virtio/vhost_user.c:497
+> #2  0x00000000004e2e88 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x295c7=
+30, vdev=3Dvdev@entry=3D0x2ca36c0, vq=3D0x295c898, idx=3D0)
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/virtio/vhost.c:1036
+> #3  0x00000000004e45ab in vhost_dev_stop (hdev=3Dhdev@entry=3D0x295c730, =
+vdev=3Dvdev@entry=3D0x2ca36c0)
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/virtio/vhost.c:1556
+> #4  0x00000000004bc56a in vhost_net_stop_one (net=3D0x295c730, dev=3Ddev@=
+entry=3D0x2ca36c0)
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/net/vhost_net.c:326
+> #5  0x00000000004bcc3b in vhost_net_stop (dev=3Ddev@entry=3D0x2ca36c0, nc=
+s=3D<optimized out>,=09total_queues=3D4)
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/net/vhost_net.c:407
+> #6  0x00000000004b85f6 in virtio_net_vhost_status (n=3Dn@entry=3D0x2ca36c=
+0,=09status=3Dstatus@entry=3D7 '\a')
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/net/virtio_net.c:177
+> #7  0x00000000004b869f in virtio_net_set_status (vdev=3D<optimized out>, =
+status=3D<optimized out>)
+>      at /usr/src/debug/qemu-kvm-2.8.1/hw/net/virtio_net.c:243
+> #8  0x000000000073d00d in qmp_set_link (name=3Dname@entry=3D0x2956d40 "ho=
+stnet0", up=3Dup@entry=3Dfalse, errp=3Derrp@entry=3D0x7fff59ecd718)
+>      at net/net.c:1437
+> #9  0x00000000007460c1 in net_vhost_user_event (opaque=3D0x2956d40, event=
+=3D4) at net/vhost_user.c:217//qemu_chr_be_event
+> #10 0x0000000000574f0d in tcp_chr_disconnect (chr=3D0x2951a40) at qemu_ch=
+ar.c:3220
+> #11 0x000000000057511f in tcp_chr_hup (channel=3D<optimized out>,=09cond=
+=3D<optimized out>, opaque=3D<optimized out>) at qemu_char.c:3265
+>
+>
 >>
->> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
->=20
-> Just note, that this thing were recently touched by 0abf2581717a19 , so=
-=20
-> add Sergio (its author) to CC.
->=20
->> ---
+>>> VM is still link down in frontend after migration, it cause the network=
+ in VM never be up again.
+>>>
+>>> virtio_net_load_device:
+>>>       /* nc.link_down can't be migrated, so infer link_down according
+>>>        * to link status bit in n->status */
+>>>       link_down =3D (n->status & VIRTIO_NET_S_LINK_UP) =3D=3D 0;
+>>>       for (i =3D 0; i < n->max_queues; i++) {
+>>>           qemu_get_subqueue(n->nic, i)->link_down =3D link_down;
+>>>       }
+>>>
+>>> guset:               migrate begin -----> vCPU pause ---> vmsate load -=
+--> migrate finish
+>>>                                       ^                ^               =
+ ^
+>>>                                       |                |               =
+ |
+>>> openvswitch in source host:   begin to restart   restarting        star=
+ted
+>>>                                       ^                ^               =
+ ^
+>>>                                       |                |               =
+ |
+>>> nc in frontend in source:        link down        link down        link=
+ down
+>>>                                       ^                ^               =
+ ^
+>>>                                       |                |               =
+ |
+>>> nc in frontend in destination:   link up          link up          link=
+ down
+>>>                                       ^                ^               =
+ ^
+>>>                                       |                |               =
+ |
+>>> guset network:                    broken           broken           bro=
+ken
+>>>                                       ^                ^               =
+ ^
+>>>                                       |                |               =
+ |
+>>> nc in backend in source:         link down        link down        link=
+ up
+>>>                                       ^                ^               =
+ ^
+>>>                                       |                |               =
+ |
+>>> nc in backend in destination:    link up          link up          link=
+ up
+>>>
+>>> The link_down of frontend was loaded from n->status, n->status is link
+>>> down in source, so the link_down of frontend is true. The backend in
+>>> destination host is link up, but the frontend in destination host is li=
+nk down, it cause the network in gust never be up again until an guest cold=
+ reboot.
+>>>
+>>> Is there a way to auto fix the link status? or just abort the migration=
+ in virtio net device load?
 >>
->> This is a fix for the issue discussed in this part of the thread:
->> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07639.html
->> ...not the original problem (core dump) posted by Dietmar.
+>> Maybe we can try to sync link status after migration?
 >>
->> I've still seen it occasionally hang during a backup abort. I'm trying=
-=20
->> to figure
->> out why that happens, stack trace indicates a similar problem with the=
-=20
->> main
->> thread hanging at bdrv_do_drained_begin, though I have no clue why as=20
->> of yet.
->>
->> =C2=A0 block/backup.c | 4 ----
->> =C2=A0 1 file changed, 4 deletions(-)
->>
->> diff --git a/block/backup.c b/block/backup.c
->> index 7430ca5883..a7a7dcaf4c 100644
->> --- a/block/backup.c
->> +++ b/block/backup.c
->> @@ -126,11 +126,7 @@ static void backup_abort(Job *job)
->> =C2=A0 static void backup_clean(Job *job)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BackupBlockJob *s =3D container_of(job,=
- BackupBlockJob, common.job);
->> -=C2=A0=C2=A0=C2=A0 AioContext *aio_context =3D bdrv_get_aio_context(s=
-->backup_top);
->> -
->> -=C2=A0=C2=A0=C2=A0 aio_context_acquire(aio_context);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_backup_top_drop(s->backup_top);
->> -=C2=A0=C2=A0=C2=A0 aio_context_release(aio_context);
->> =C2=A0 }
->> =C2=A0 void backup_do_checkpoint(BlockJob *job, Error **errp)
->>
->=20
->=20
+>> Thanks
+>
+> In extreme scenario, after migration the OVS(DPDK) in source may be still=
+ not started.
+>
+>
+> Our plan is to check the link state of backend when load the link_down of=
+ frontend.
+>       /* nc.link_down can't be migrated, so infer link_down according
+>        * to link status bit in n->status */
+> -    link_down =3D (n->status & VIRTIO_NET_S_LINK_UP) =3D=3D 0;
+> +    if (qemu_get_queue(n->nic)->peer->info->type =3D=3D NET_CLIENT_DRIVE=
+R_VHOST_USER) {
+> +        link_down =3D (n->status & VIRTIO_NET_S_LINK_UP | !qemu_get_queu=
+e(n->nic)->peer->link_down) =3D=3D 0;
+> +    } else {
+> +        link_down =3D (n->status & VIRTIO_NET_S_LINK_UP) =3D=3D 0;
+> +    }
+>       for (i =3D 0; i < n->max_queues; i++) {
+>           qemu_get_subqueue(n->nic, i)->link_down =3D link_down;
+>       }
+>
+> Is good enough to auto fix the link status?
+
+
+I still think it's the task of management. Try sync status internally as=20
+what vhost-user currently did may lead bugs.
+
+Thanks
+
+
+>
+> Thanks
 
 
