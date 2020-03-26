@@ -2,80 +2,88 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED459C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE181C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:09:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BA4720658
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A39A320658
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:09:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZt19BLV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA4720658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f5jT5e3o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A39A320658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHbXe-0000oV-Qf
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:04:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48700)
+	id 1jHbdE-0003ek-P1
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:09:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jHbWc-00006t-RU
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:03:00 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jHbcC-0001q8-84
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:08:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jHbWb-0003NP-66
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:02:58 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37236)
+ (envelope-from <richard.henderson@linaro.org>) id 1jHbcA-0001Eh-Vm
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:08:44 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:51267)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jHbWa-0003Ls-VA
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:02:57 -0400
-Received: by mail-wm1-x341.google.com with SMTP id d1so10168834wmb.2
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 16:02:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oQLFXCMJ4w3X7wjuOz5gddlquTn/81xe2ZpNp/dZYm0=;
- b=LZt19BLVsvAFU9Q6K7PyUw0AUKqLbZo9aBa+wbzbH5017RDwtSm2THcm0mtDFz0TNH
- v8xCAZOaIIeF/zHbm2aTqufYiSSn6XT1mSDB5on5M+52yR84VRoBaHNp5tjiKpj/jf6+
- let1d44KUuYX7s8g8E4WGMKe1tG4npc9IVTtWLgCUvOWP+O927oulnDnpwJfu3TUchYo
- DVycHLNp0XTiBBg6/f6Vx/Y+aoNIEfOYfMS+idzf6+gZkvV5u2j8W9CKwKRmiZFQN9CI
- pZZfGOOD8OGx1j1JufuWfaWFHKXOFVVTpYBOujLVzm1/4tOiMOk7PesWCD06Q4f4j+ue
- 6lLQ==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jHbcA-0001EM-Qt
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:08:42 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id w9so3092401pjh.1
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 16:08:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xqsUthjNzD1OriitBStkzWbLURropgGL+K53ub9AoCo=;
+ b=f5jT5e3okDqJogWU1nL0qewojI1O986GHmmoWkD+36Iq0ygFlCd1lPWdtKHDaePmwL
+ Wf34+XObhZSN2sjEWcB/ptwoml1Tw8fkyPm+GWzPbaJbr31wNqudVgmMWrK4RMfkwjnC
+ F5zf4Bl8+JhBKETgqYk5AY+kOW/jDUBrhqeI6Gn3jvBeMR+rPS2OwO86sViNtnnL3sVu
+ J9s3+Wm/gLNnAnMiA2JJ0jZxYjHVfJa/2/o8EhHfD4FjmZBrUu+myegxJrRtexspMVnF
+ pVcvbTlGEjqmqsk+5gmAGRCzL8B6PpjGuy5HVW73KnBtN7aeZmlmjrPwNugRoe0iVZ93
+ 5wMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oQLFXCMJ4w3X7wjuOz5gddlquTn/81xe2ZpNp/dZYm0=;
- b=Mj9RHIanfb0Pua5qiEPz7c4v4TocaunS9ZeHhcrEKk6RLxr9Lg8LzQTOFCneO1GcvS
- VYQoVR3ZfRNn6IZMgSAHQSR5YSQlSm0GySKo+lVE+3AHKpM4mEeBf7vm9iOnqkokjmXg
- hHOXffCPkPnO+cGIhbQ81SU3JstpqW9wrIMNBdDtXTUuu8PoKu+2yIOaKpzr6QNbt/Cm
- WJYdqW16l2Wvu7+PRMMTHwPUD15bj+OjQCtG2trYMPkbQnGBw6mvLZD1tuv8jR6Gq8w8
- nghD/0OTbbBHf1XZBDOrzvJOougBqwVqRZ97IjcE0zapNhM6hAk3C4+DCIIy5pTUODV0
- 8aeg==
-X-Gm-Message-State: ANhLgQ0V5nInK3GjEVABDNxPNwwLlvn1uzB0lgO74Ju28mNOievnz4E+
- uveDnFbdpnKoXkr1MbnsnD7rDMhRnF+T1TMV0RiF/Q==
-X-Google-Smtp-Source: ADFU+vs7QhOZ0Xknfo4Ie38ew1KHmubO6yWAtz9PRBNO26R3DHsNnclnX5xpIULq3WnZf5Zp00HXStbN07RuQHso6c8=
-X-Received: by 2002:adf:ba48:: with SMTP id t8mr11643823wrg.329.1585263775531; 
- Thu, 26 Mar 2020 16:02:55 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xqsUthjNzD1OriitBStkzWbLURropgGL+K53ub9AoCo=;
+ b=kmujAE205NGHC5iYmQhcLLCMRfj1wr9q5+Ng2K8lD2+IX50LIhQUF2Rk/brqdGEYbY
+ KpD1Fx6goNy5eDisvHawJriH+vPiMt8eQCOO+f+jYrQfBC2Hi4zpzwG8GtScSG/a5Tpd
+ TWngMc3ZjW/asRsMTRCporYkMF6FV55dapSh0ERKy04KD88ndfCKtHJYS9oh1feJE+JF
+ HdSQ5RRIsPHjVpKN1EQvzxQyxIXYtsn+laTrBozFonDL/IVU3qWTcTyI41GJzl/5V67F
+ GCI+jg+RYOc1F41GCphwgUOFt9jyhM8yjRx45gK2BlONwRW2pqNJRGBCsshAg/pXqhYW
+ ecpw==
+X-Gm-Message-State: ANhLgQ2G6V2jDaY1Q0ZjVfePw5VFNsbQzBIHR78BtNAORtJELwrga8tS
+ R7DkfEFv4mCOO7uXxTMqNMA2mhklTMg=
+X-Google-Smtp-Source: ADFU+vvDUm14Ygsr4QqimV3KgAH+PT9wIKmi9v9l6+fjj0Fz8SHHwfJp+uQ6+XpGO3Ht07D/LNx/vg==
+X-Received: by 2002:a17:90a:2147:: with SMTP id
+ a65mr2534859pje.176.1585264121421; 
+ Thu, 26 Mar 2020 16:08:41 -0700 (PDT)
+Received: from localhost.localdomain (174-21-138-234.tukw.qwest.net.
+ [174.21.138.234])
+ by smtp.gmail.com with ESMTPSA id i187sm2530037pfg.33.2020.03.26.16.08.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 26 Mar 2020 16:08:40 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 01/31] target/arm: Add ID_AA64ZFR0 fields and
+ isar_feature_aa64_sve2
+Date: Thu, 26 Mar 2020 16:08:08 -0700
+Message-Id: <20200326230838.31112-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200326230838.31112-1-richard.henderson@linaro.org>
+References: <20200326230838.31112-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20200325100520.206210-1-jiaxun.yang@flygoat.com>
-In-Reply-To: <20200325100520.206210-1-jiaxun.yang@flygoat.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Fri, 27 Mar 2020 01:02:41 +0200
-Message-ID: <CAHiYmc4+mjtFxvTvrKohG2YBAMVqEAVVDT1e-XfJLC9D_+fnyA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] target/mips: Add loongson gs464 core
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: multipart/alternative; boundary="0000000000003747e505a1c9fc41"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,121 +95,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chenhc@lemote.com, aleksandar.rikalo@rt-rk.com,
- QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: rajav@quicinc.com, qemu-arm@nongnu.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003747e505a1c9fc41
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Will be used for SVE2 isa subset enablement.
 
-12:05 Sre, 25.03.2020. Jiaxun Yang <jiaxun.yang@flygoat.com> =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Loongson gs464 core can be found in Loongson-3A1000 processor.
-> This patchset add minimal support for that core.
-> There are still some instructions missing, I'm going to work on
-> them later.
->
-> The corresponding hw board is also missing. I'm using modified kernel
-> for malta for testing purpose and planing to take the design of Lemote's
-> KVM virtual machine.
->
-> Official manual of this core can be found here [1] (In Chinese).
-> My collection of instruction documents mainly based on Chinese
-> version of manual, binutils gas code and experiments on real machine
-> can be found here [2] (In English).
->
-> [1]:
-http://loongson.cn/uploadfile/cpu/3A1000/Loongson_3A1000_cpu_user_2.pdf
-> [2]: https://github.com/FlyGoat/loongson-insn/blob/master/loongson-ext.md
->
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h    | 16 ++++++++++++++++
+ target/arm/helper.c |  3 +--
+ target/arm/kvm64.c  |  2 ++
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
-Thanks, Jiaxun!
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e9f049c8d8..2314e3c18c 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -900,6 +900,7 @@ struct ARMCPU {
+         uint64_t id_aa64mmfr2;
+         uint64_t id_aa64dfr0;
+         uint64_t id_aa64dfr1;
++        uint64_t id_aa64zfr0;
+     } isar;
+     uint32_t midr;
+     uint32_t revidr;
+@@ -1860,6 +1861,16 @@ FIELD(ID_AA64DFR0, PMSVER, 32, 4)
+ FIELD(ID_AA64DFR0, DOUBLELOCK, 36, 4)
+ FIELD(ID_AA64DFR0, TRACEFILT, 40, 4)
+ 
++FIELD(ID_AA64ZFR0, SVEVER, 0, 4)
++FIELD(ID_AA64ZFR0, AES, 4, 4)
++FIELD(ID_AA64ZFR0, BITPERM, 16, 4)
++FIELD(ID_AA64ZFR0, BFLOAT16, 20, 4)
++FIELD(ID_AA64ZFR0, SHA3, 32, 4)
++FIELD(ID_AA64ZFR0, SM4, 40, 4)
++FIELD(ID_AA64ZFR0, I8MM, 44, 4)
++FIELD(ID_AA64ZFR0, F32MM, 52, 4)
++FIELD(ID_AA64ZFR0, F64MM, 56, 4)
++
+ FIELD(ID_DFR0, COPDBG, 0, 4)
+ FIELD(ID_DFR0, COPSDBG, 4, 4)
+ FIELD(ID_DFR0, MMAPDBG, 8, 4)
+@@ -3839,6 +3850,11 @@ static inline bool isar_feature_aa64_ccidx(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64mmfr2, ID_AA64MMFR2, CCIDX) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_sve2(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, SVEVER) != 0;
++}
++
+ /*
+  * Feature tests for "does this exist in either 32-bit or 64-bit?"
+  */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b3bc33db41..3767002995 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7500,8 +7500,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 4,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .accessfn = access_aa64_tid3,
+-              /* At present, only SVEver == 0 is defined anyway.  */
+-              .resetvalue = 0 },
++              .resetvalue = cpu->isar.id_aa64zfr0 },
+             { .name = "ID_AA64PFR5_EL1_RESERVED", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 5,
+               .access = PL1_R, .type = ARM_CP_CONST,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index be5b31c2b0..eda4679fcd 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -555,6 +555,8 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+                               ARM64_SYS_REG(3, 0, 0, 7, 1));
+         err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64mmfr2,
+                               ARM64_SYS_REG(3, 0, 0, 7, 2));
++        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64zfr0,
++                              ARM64_SYS_REG(3, 0, 0, 4, 4));
+ 
+         /*
+          * Note that if AArch32 support is not present in the host,
+-- 
+2.20.1
 
-Just to mention whay you probably know, since this is a new feature, this
-is too late for 5.0, so we are shooting for integrsying it in 5.1.
-
-Speak to you later of course in more details.
-
-Yours,
-Aleksandar
-
-> Jiaxun Yang (3):
->   target/mips: Introduce loongson ext & mmi ASE flags
->   target/mips: Add loongson ext lsdc2 instrustions
->   target/mips: Add loongson gs464 core
->
->  target/mips/mips-defs.h          |   2 +
->  target/mips/translate.c          | 166 ++++++++++++++++++++++++++++++-
->  target/mips/translate_init.inc.c |  25 ++++-
->  3 files changed, 188 insertions(+), 5 deletions(-)
->
-> --
-> 2.26.0.rc2
->
->
-
---0000000000003747e505a1c9fc41
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">12:05 Sre, 25.03.2020. Jiaxun Yang &lt;<a href=3D"mailto:jia=
-xun.yang@flygoat.com">jiaxun.yang@flygoat.com</a>&gt; =D1=98=D0=B5 =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; Loongson gs464 core can be found in Loongson-3A1000 processor.<br>
-&gt; This patchset add minimal support for that core.<br>
-&gt; There are still some instructions missing, I&#39;m going to work on<br=
->
-&gt; them later.<br>
-&gt;<br>
-&gt; The corresponding hw board is also missing. I&#39;m using modified ker=
-nel<br>
-&gt; for malta for testing purpose and planing to take the design of Lemote=
-&#39;s<br>
-&gt; KVM virtual machine.<br>
-&gt;<br>
-&gt; Official manual of this core can be found here [1] (In Chinese).<br>
-&gt; My collection of instruction documents mainly based on Chinese<br>
-&gt; version of manual, binutils gas code and experiments on real machine<b=
-r>
-&gt; can be found here [2] (In English).<br>
-&gt;<br>
-&gt; [1]: <a href=3D"http://loongson.cn/uploadfile/cpu/3A1000/Loongson_3A10=
-00_cpu_user_2.pdf">http://loongson.cn/uploadfile/cpu/3A1000/Loongson_3A1000=
-_cpu_user_2.pdf</a><br>
-&gt; [2]: <a href=3D"https://github.com/FlyGoat/loongson-insn/blob/master/l=
-oongson-ext.md">https://github.com/FlyGoat/loongson-insn/blob/master/loongs=
-on-ext.md</a><br>
-&gt;</p>
-<p dir=3D"ltr">Thanks, Jiaxun!</p>
-<p dir=3D"ltr">Just to mention whay you probably know, since this is a new =
-feature, this is too late for 5.0, so we are shooting for integrsying it in=
- 5.1.</p>
-<p dir=3D"ltr">Speak to you later of course in more details.</p>
-<p dir=3D"ltr">Yours,<br>
-Aleksandar</p>
-<p dir=3D"ltr">&gt; Jiaxun Yang (3):<br>
-&gt; =C2=A0 target/mips: Introduce loongson ext &amp; mmi ASE flags<br>
-&gt; =C2=A0 target/mips: Add loongson ext lsdc2 instrustions<br>
-&gt; =C2=A0 target/mips: Add loongson gs464 core<br>
-&gt;<br>
-&gt; =C2=A0target/mips/mips-defs.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
-=A0 =C2=A02 +<br>
-&gt; =C2=A0target/mips/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 166 =
-++++++++++++++++++++++++++++++-<br>
-&gt; =C2=A0target/mips/translate_init.inc.c |=C2=A0 25 ++++-<br>
-&gt; =C2=A03 files changed, 188 insertions(+), 5 deletions(-)<br>
-&gt;<br>
-&gt; -- <br>
-&gt; 2.26.0.rc2<br>
-&gt;<br>
-&gt;<br>
-</p>
-
---0000000000003747e505a1c9fc41--
 
