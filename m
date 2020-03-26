@@ -2,77 +2,84 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A24C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9AAC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:54:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4761620748
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:50:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38F312070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:54:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLMGTR+V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4761620748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BQQDaNvI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F312070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHQ60-0007XX-F8
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 06:50:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56876)
+	id 1jHQ9l-0000K6-EX
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 06:54:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jHQ5E-0006V4-C1
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:49:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHQ97-0008HL-2d
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jHQ5D-0006DL-Et
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:49:56 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58554)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jHQ5D-0006D0-Ai
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:49:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585219795;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uAOE0B/1U0YpiEe7/I1rRfCCdwWWpmdQewQN0rqMhdY=;
- b=fLMGTR+V2dtqreVHDt0CGZ1AFTdjJVZAT1L4fyKNzcz8ti9I1bjkXwZUy1P99ThQ6aVMoI
- wdwRf3vofNsvO2Nl+Vx+hwkoJb/40BXl8BbVJ894jAWRDE58W9he/5EnSXUm8tlNaenSTz
- jS7EnvbnDruxF/QIsQDMrd7CHc3Nd5o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-bNmrdSRpPRK2enNHNeoTmQ-1; Thu, 26 Mar 2020 06:49:51 -0400
-X-MC-Unique: bNmrdSRpPRK2enNHNeoTmQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA140189F760;
- Thu, 26 Mar 2020 10:49:48 +0000 (UTC)
-Received: from gondolin (ovpn-112-191.ams2.redhat.com [10.36.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2D4911BC6D;
- Thu, 26 Mar 2020 10:49:40 +0000 (UTC)
-Date: Thu, 26 Mar 2020 11:49:35 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v16 Kernel 2/7] vfio iommu: Remove atomicity of
- ref_count of pinned pages
-Message-ID: <20200326114935.4e729fba.cohuck@redhat.com>
-In-Reply-To: <1585078359-20124-3-git-send-email-kwankhede@nvidia.com>
-References: <1585078359-20124-1-git-send-email-kwankhede@nvidia.com>
- <1585078359-20124-3-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1jHQ95-00082Q-MF
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:53:56 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33267)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHQ95-00081y-GX
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:53:55 -0400
+Received: by mail-wr1-x441.google.com with SMTP id a25so7208846wrd.0
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 03:53:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=DVJOfw7eQi6NV3rlU7rRKdmfQ7n+eT2ZHzUHZHDEz8Q=;
+ b=BQQDaNvIyCBovGlXf8NnL7xZrygmWPkqhj/HnqijrUiN3n7ToWQN/tic6kW3QCdPPN
+ pJ+up30CDjXOT3b6bZdyjMyg0KPQ/u4Tea1/WL7yzt3z2FVEQOOJilzK8J1dCgXSPAhx
+ CkGb5muw2POvK3vK47d+2UZlXipk/eb0XaRZsyPrqK0/K1Y/2XyQeBKFeJnEroUw6UNK
+ FR4AaytsOIJir4A07K7FtRdyFJ+2KmnA5tUyHXuOVOXTSFxGo/1Xp9YAQvYGK8qvdWHO
+ o16N3k+H2gaR17cyzOQEbLoLbZCjH0D4jWbR9EdWR+poTsWGbDUqdhaQXmVM1MbLZ2t9
+ veNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=DVJOfw7eQi6NV3rlU7rRKdmfQ7n+eT2ZHzUHZHDEz8Q=;
+ b=jhz/6Id/oihsQ1U9ThZqlpVQ1/A4skgg8GNYl8PJ4e7LhzsEV+lFGz82gj6P/8QU2Q
+ OxFXFesMmG+CCts0J0n91zwIO3MVeiAapk188fR385tZo9EoYo+oyPHaZBU8PNjb6SXB
+ JWkG/93klZjsxAG4F/I9TlsigB32ItyrKOcoK/zHDVAziTYE/69JIMwvbEu107tJ3Brz
+ W+OnM5Kpsa646kmliWmd1vnXMIgWqRfqQiReEKrQxSifUd+XKLYhfHJ7dX7MdnQtZAdq
+ 93pzqU2hlDAPs33mVx8R2jKRMeK6FJDZekwKHhxNzsPC8fV9VQUxIlV0iCt8e0nNwjsI
+ WS3Q==
+X-Gm-Message-State: ANhLgQ3BpFvg+tLw7ErlugJnR/Hd8FuTnsji1/31ow2F2ccFV1O6V+El
+ 2UC4k+ww7StU4QCwrI8ZrnRa8RT2pTktKA==
+X-Google-Smtp-Source: ADFU+vvrALYNzcs+Q/9UFUtGoriXmkjHM7WJS7DGWxRwKabpNTItg4MSVo4q253hjIttgvdGwhhReg==
+X-Received: by 2002:adf:9cca:: with SMTP id h10mr8505034wre.167.1585220033489; 
+ Thu, 26 Mar 2020 03:53:53 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id m19sm3019626wml.48.2020.03.26.03.53.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 26 Mar 2020 03:53:52 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.0] hw/i386/amd_iommu.c: Fix corruption of log events
+ passed to guest
+Date: Thu, 26 Mar 2020 10:53:49 +0000
+Message-Id: <20200326105349.24588-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,35 +91,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
- kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- alex.williamson@redhat.com, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 25 Mar 2020 01:02:34 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+In the function amdvi_log_event(), we write an event log buffer
+entry into guest ram, whose contents are passed to the function
+via the "uint64_t *evt" argument. Unfortunately, a spurious
+'&' in the call to dma_memory_write() meant that instead of
+writing the event to the guest we would write the literal value
+of the pointer, plus whatever was in the following 8 bytes
+on the stack. This error was spotted by Coverity.
 
-> vfio_pfn.ref_count is always updated by holding iommu->lock, using atomic
+Fix the bug by removing the '&'.
 
-s/by/while/
+Fixes: CID 1421945
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Disclaimer: only tested with 'make check' and 'make check-acceptance'
+which probably don't exercise this corner of the code.
+---
+ hw/i386/amd_iommu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> variable is overkill.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index b1175e52c7d..fd75cae0243 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -181,7 +181,7 @@ static void amdvi_log_event(AMDVIState *s, uint64_t *evt)
+     }
+ 
+     if (dma_memory_write(&address_space_memory, s->evtlog + s->evtlog_tail,
+-        &evt, AMDVI_EVENT_LEN)) {
++                         evt, AMDVI_EVENT_LEN)) {
+         trace_amdvi_evntlog_fail(s->evtlog, s->evtlog_tail);
+     }
+ 
+-- 
+2.20.1
 
 
