@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C72C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98711C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DCCF206E6
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:01:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B8DC2070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:02:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sghoYMdz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DCCF206E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DbJ8J4zX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8DC2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHYhJ-0000Nf-NT
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:01:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59292)
+	id 1jHYiL-0001vc-Ed
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:02:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jHYLE-0008GQ-LI
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:01 -0400
+ (envelope-from <robert.foley@linaro.org>) id 1jHYKe-0007B3-HR
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1jHYLD-00028R-ME
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:00 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:37734)
+ (envelope-from <robert.foley@linaro.org>) id 1jHYKc-0001mU-VX
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:23 -0400
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:44235)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1jHYLD-00028F-I0
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:59 -0400
-Received: by mail-qt1-x842.google.com with SMTP id z24so5299625qtu.4
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:38:59 -0700 (PDT)
+ id 1jHYKc-0001m4-RR
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:22 -0400
+Received: by mail-qv1-xf42.google.com with SMTP id ef12so1652562qvb.11
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:38:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3+dDYhOsrCzCqoW7z+RZ/sAylJhW5dwNkVTgxwH+p1I=;
- b=sghoYMdz86LO2Hy5B+1LuEwfrk1FPwMEUvptutJ0pBrj6NvvBzHSdNdzbpmPCfh8hu
- F+so31ao33JJHSDk5CDHVxIgNJOnZkZomGuruWcbr5tY4DbcLqQEpQxQ9rDxMumrZC8V
- +yV3MKyM//dJkfwSG5a92TIi5yuoGra2kX6CS6+KgXg3gmmVMo+H8G8srYY7F7vyP4Qi
- YVbJXbRRFnNoYs63HRH8hY2p8n1Po7rDoigPj/sxQYOOT8D/s/9/alDRy6IyUJZfXLP6
- zlejRs3ExCg/1DX0Axm3y0RTsFoKtUHAQwEZ64F0FXb/81IPhv35DfXnV4GTfsawaghp
- Jzgg==
+ bh=mmiRxRrUzc6n/Jyo9kUg5Bu0NCG0n21LS2Ois1y8SwI=;
+ b=DbJ8J4zXgPvllhvqWxTxrIYv/oC0UGXUaJa5+YDuUb2MIqdbHA22OxTA7iD3g8xKx5
+ kPzcKq6iVLMCQdazeNDVcbN8SOb24XAgcq69aSO+xhppucVL+c9fas6Je4Nn8+3vuaAD
+ CrG0Eko4LRfXquB1c5f2a3rD5cqUnOYlh8z7UWzJFq+UaNh6+XRXbKMsze8NAp+FLFn1
+ NQEWfj+DlNZolpdTOrUW2dvUwqaG4TQsY8+YHgib8jCXPV8DF5uHvAvLdWbpUqj6rq03
+ C8KV/3cwCaEGc6/+TC2yeYO11Zn/+jAKghPbU6Rb+EBUd9MlpCT/7KOnvcKNKNJ6aWQg
+ ACLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3+dDYhOsrCzCqoW7z+RZ/sAylJhW5dwNkVTgxwH+p1I=;
- b=MahSj656nCNPERFbGsOHSSjgs4XswjE0U9id8u2bb24GmZdSJYU46tRggiMwuk+PbS
- U2e3SF3XsthTilTnBpCPed9LCj51RYYFpVuKLEdfzwd+S5T05+XYtXOpJmjGvF/NZDqT
- LPDzmbeu+AlK1hTF1SA53aB/V7pkcq0abnKV5LOZBF33c+3xOuKCEXJUjSZfR68pQ3BH
- fwvxcTcqm3Wau4bo0w+5Bz9UpB7fJN+iKAjVNR+7mTQZIZgiP5c3+VB7hkQjegbZoUtF
- BZfbi4z6P6/AA+6gafNyw74nKHsDkUXn7P+K1++jKJLqUvS87mzf/e6LY6R+C0Yp4JN9
- JqAQ==
-X-Gm-Message-State: ANhLgQ2I+lio7VzKES6/kjQcJ2HaAqFq9hEny2Oreih2ga2d+OpZ1wgS
- WKrbZ1ZhBc/bSlMg7+E4uJqRuM22QABhlQ==
-X-Google-Smtp-Source: ADFU+vtkbuMwTCvdNgfe5+aY/CkHym6TI6zrX1RWWO6+qrf3JLd/eehIrmlx8zOWuaYFsQCzAcwmuw==
-X-Received: by 2002:ac8:369d:: with SMTP id a29mr10653729qtc.338.1585251538730; 
- Thu, 26 Mar 2020 12:38:58 -0700 (PDT)
+ bh=mmiRxRrUzc6n/Jyo9kUg5Bu0NCG0n21LS2Ois1y8SwI=;
+ b=ZmA0q43PsGGp/FC+zvdlwJPVq9Mh0P7d1/8oHSCKI2k9H/byY5tJxsIqCptRukvqB5
+ o8nw/2z4Lp94HodvJg5mpiU/Ow3Rnry5Ck4IZaBLzjmaNw2xinybUj/0JMTAleG00FHz
+ 5d/fT+fwD+vPeze7eUjVIje+wg9YcK9XQ/0XGQdOIdWjZ8uh7cfqZNWwged0fGDaGYnD
+ 4DPT2/ijn9i6xIXEOFOzplLh8tXBXA5uV7YNaXXNdsi2VCV8cvaww1d7CDNSHC/BM5uy
+ Z/MhvF6oeMmdMKoDPEvuRM0YmVwz3Vx9y5/YB6N5xQNJx3meTge3Elr742J8L6ZHQb90
+ 4y3g==
+X-Gm-Message-State: ANhLgQ1vtSA6pNoKRaRV0xPLsrBetT1HVsKnb4wXZJWdnUzIW5O1jjJi
+ 2U9SA+s7UU5yL5m9lcNya1qkpKnls/CCKg==
+X-Google-Smtp-Source: ADFU+vtcg8mi+zdWBBigQSvqLGw0b48GKjevRGbUlFMldYmal73uW1j8Naqpwyp9Uozrt+YFjZdmhA==
+X-Received: by 2002:a05:6214:70e:: with SMTP id
+ b14mr9826831qvz.246.1585251501700; 
+ Thu, 26 Mar 2020 12:38:21 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fd55:4e67:1038:8302])
- by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.38.57
+ by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.38.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 12:38:58 -0700 (PDT)
+ Thu, 26 Mar 2020 12:38:21 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 61/74] cpu: convert to interrupt_request
-Date: Thu, 26 Mar 2020 15:31:43 -0400
-Message-Id: <20200326193156.4322-62-robert.foley@linaro.org>
+Subject: [PATCH v8 35/74] exec: use cpu_reset_interrupt
+Date: Thu, 26 Mar 2020 15:31:17 -0400
+Message-Id: <20200326193156.4322-36-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200326193156.4322-1-robert.foley@linaro.org>
 References: <20200326193156.4322-1-robert.foley@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::842
+X-Received-From: 2607:f8b0:4864:20::f42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,38 +103,27 @@ Sender: "Qemu-devel"
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-This finishes the conversion to interrupt_request.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/core/cpu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ exec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index 01091d0623..16caa6c589 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -271,7 +271,7 @@ static void cpu_common_reset(DeviceState *dev)
-         log_cpu_state(cpu, cc->reset_dump_flags);
-     }
+diff --git a/exec.c b/exec.c
+index de9d949902..a379016693 100644
+--- a/exec.c
++++ b/exec.c
+@@ -752,7 +752,7 @@ static int cpu_common_post_load(void *opaque, int version_id)
  
--    cpu->interrupt_request = 0;
-+    cpu_interrupt_request_set(cpu, 0);
-     cpu_halted_set(cpu, 0);
-     cpu->mem_io_pc = 0;
-     cpu->icount_extra = 0;
-@@ -411,7 +411,7 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
+     /* 0x01 was CPU_INTERRUPT_EXIT. This line can be removed when the
+        version_id is increased. */
+-    cpu->interrupt_request &= ~0x01;
++    cpu_reset_interrupt(cpu, 1);
+     tlb_flush(cpu);
  
- static void generic_handle_interrupt(CPUState *cpu, int mask)
- {
--    cpu->interrupt_request |= mask;
-+    cpu_interrupt_request_or(cpu, mask);
- 
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
+     /* loadvm has just updated the content of RAM, bypassing the
 -- 
 2.17.1
 
