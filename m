@@ -2,114 +2,82 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FEFC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC251C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:01:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FAA82070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 10:56:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8696C20409
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:01:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vMxODyzy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FAA82070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H57zEztt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8696C20409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHQBp-0001b7-Jp
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 06:56:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57496)
+	id 1jHQFv-0002uT-LK
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 07:00:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58089)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <den@virtuozzo.com>) id 1jHQAx-000175-Si
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:55:52 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jHQFB-0002PM-UB
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:00:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <den@virtuozzo.com>) id 1jHQAw-0000UF-TS
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 06:55:51 -0400
-Received: from mail-eopbgr60107.outbound.protection.outlook.com
- ([40.107.6.107]:32230 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <den@virtuozzo.com>)
- id 1jHQAs-0000Rj-EW; Thu, 26 Mar 2020 06:55:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YmJ6UHLlRgOa4/3+u33fdFjaCf/f9dkefmJD5BNPyEfffOarlUeDZyOnjuA5n6KNmPre7LcehIVPUzDtEgcOJ6M9KNiCZxs9klla5GIvZS1sCOYceaVYFXl/ApP3amvlC67ECk1dxl/2+4joXBQylWLLfzKImjz4qoiuFvNmllX8lpoCmr2cxArIYQCKFQJLUMzLSQCuQSrZ9JO/okWmWRbUMP7xZXK35GfE5SsCt2DG/i+FPiZ16VJ6HUXLj/2pcObmIu26EjKvCRkr5cYmUCA8A85XdPbTVqOoZHyThIiiv8GPYPqLxebeIOx6ktp7iFmgCFSqm+isaFABMjA2vg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3asaRfWhHaCUvWulAQo9w5X4AqtlfMvZlLKulBCYG6U=;
- b=HmBguO7QUI7nVg8J1DjsuJVjS2s2pUM5BmGUmAohh+5v7rCGhdaBWoWzQEr4sgUwdJ8VMwFaqT4CkEe5s7UkZLe/l5KG3DWyZai8gagkr2eNukGP/SDK/5QWcoKXs2NdfW5sqxpyIUfkH3YAcu2F3yWAkjnEt3GG62vaacvnWWlffgqjqjyfQgOlHB+3+lBFUe46UuezJZx48WhwYARJCW6nZO20rAPCPB7SdLLgOIyzt5q8AEG5+xzoODa4KtcCu9m/7KsVxk+rtV6boLRVeMyixqwwxDTk6QTv/T3Dfu8ZE1nyj1XDsKM1ok8DCBum2iRJPstHNNZsQjp1pndW9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
- dkim=pass header.d=openvz.org; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3asaRfWhHaCUvWulAQo9w5X4AqtlfMvZlLKulBCYG6U=;
- b=vMxODyzyn3Fktt863+usb5YVcbN2vzsx6/lkY9Do+wVB6qrFephEE3lAD9ugmaXqAzhPbOtXKvu55TE+RS3rAN9Z7UwY8PW0a4SGrbtA3nYdOSL94YzrHG7UFRBTUkhRdf8IGp/YzsDVapwS4ptjINGeNqrjJ7IcpIpeGJaoocI=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=den@virtuozzo.com; 
-Received: from DB8PR08MB5276.eurprd08.prod.outlook.com (20.179.15.209) by
- DB8PR08MB5339.eurprd08.prod.outlook.com (52.133.240.211) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2835.20; Thu, 26 Mar 2020 10:55:43 +0000
-Received: from DB8PR08MB5276.eurprd08.prod.outlook.com
- ([fe80::4de4:7518:6223:5c6b]) by DB8PR08MB5276.eurprd08.prod.outlook.com
- ([fe80::4de4:7518:6223:5c6b%6]) with mapi id 15.20.2835.025; Thu, 26 Mar 2020
- 10:55:43 +0000
-Subject: Re: [PATCH 0/2] Fix the generic image creation code
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20200326011218.29230-1-mlevitsk@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <e88167d9-0173-f146-e142-a462dbe5a3c3@openvz.org>
-Date: Thu, 26 Mar 2020 13:55:41 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200326011218.29230-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: AM0PR05CA0060.eurprd05.prod.outlook.com
- (2603:10a6:208:be::37) To DB8PR08MB5276.eurprd08.prod.outlook.com
- (2603:10a6:10:bf::17)
+ (envelope-from <imammedo@redhat.com>) id 1jHQFA-0002yi-8M
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:00:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:40495)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jHQFA-0002wv-3j
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:00:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585220410;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UvAwwmvIULHFCVyQMd8BSWITSS6wRL8cxAMpstK/4gs=;
+ b=H57zEzttD28qOlD92U2nLSZpY9OzD9Gkma8Q1+QMj1905lf93kxnTLsAPcFc0KGwnsEIws
+ cWD+UsmCDE53tnczVLrh6t80C36Cbuu/kSsNb/OSJgiJ5H3SWih47a5a5mKrwK0rLwBwsq
+ AhJ5BUxWi+scTt2DbqukZoV1/gXo6bs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-339-RAl-fOq3NdGgAVvGss_-KQ-1; Thu, 26 Mar 2020 06:59:58 -0400
+X-MC-Unique: RAl-fOq3NdGgAVvGss_-KQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C83DA107ACC4;
+ Thu, 26 Mar 2020 10:59:56 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1EC7419925;
+ Thu, 26 Mar 2020 10:59:45 +0000 (UTC)
+Date: Thu, 26 Mar 2020 11:59:43 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 00/13] microvm: add acpi support
+Message-ID: <20200326115943.5e19119b@redhat.com>
+In-Reply-To: <20200326032841-mutt-send-email-mst@kernel.org>
+References: <20200319080117.7725-1-kraxel@redhat.com>
+ <20200325133212.6fd0fefb@redhat.com>
+ <20200325150339.7kqibe5cfkzxhtzr@sirius.home.kraxel.org>
+ <20200325194434.58b50148@redhat.com>
+ <20200326032841-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.45] (31.148.204.195) by
- AM0PR05CA0060.eurprd05.prod.outlook.com (2603:10a6:208:be::37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2835.19 via Frontend Transport; Thu, 26 Mar 2020 10:55:42 +0000
-X-Originating-IP: [31.148.204.195]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: aac5681f-715c-4c2d-c715-08d7d1743b27
-X-MS-TrafficTypeDiagnostic: DB8PR08MB5339:
-X-Microsoft-Antispam-PRVS: <DB8PR08MB533936F997D940D95381C4BCB6CF0@DB8PR08MB5339.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-Forefront-PRVS: 0354B4BED2
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(346002)(39850400004)(396003)(376002)(366004)(136003)(5660300002)(2906002)(36756003)(66946007)(52116002)(54906003)(316002)(16576012)(31686004)(4326008)(81156014)(2616005)(66476007)(16526019)(53546011)(81166006)(7416002)(42882007)(31696002)(8676002)(956004)(66556008)(478600001)(186003)(6486002)(26005)(8936002)(41533002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5339;
- H:DB8PR08MB5276.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3XPZnEpo8qwpS/3yClYB2TVDJbuDpkrxl2X+I2lFltXTvlV+B1krCM+MxF7UDrPLt50N+s+BsC2vBfXkALu35/eCd82q1w9Ic9HQlE5djPZm5n8/WSulr4hNdkHjUIKO6YYvFJLt4YOKwknIsCf/x0okreya1PTygyI53FJ+JpNAXJVL5L5ue5upz5fjbKBl2abAC269iEK/T13m6OED2oh1Q3QNgP71iUkIV3MBB+Abo4Ou3UQDJD2+TIRJeN7WdBxAy+cQLM5Jls2AkjkDWjqUmGCT1NnSfnsbK64QRVGxoRWFSB+nc4OXCimjnGze0R/FOzsotDgXPPRYUo6l2BOotQggaABlQ0hckB/MvBM6+uEvCFvgZ6xrq6jpMAD6Ei6YjA/aYeOwWiF04ANXVO4k4t6cPCCP319wVbeeNKBH64gVhoK90tt+xz30kLbRVkSdRI2/5HndNr7TYns3jxbygkcao9GtEdbwOayh2ZdhUawBRs6v33mPnq0nWrbi
-X-MS-Exchange-AntiSpam-MessageData: hUTRNbyO/g9PDx+G6WUW9ROBt6nvlSpmJGCqSRZPbUL6hEr3ys1JhIJeWYEK0wAm9Qvi2kf2HWI0mSNNAAd8dNrFbtnSbe/YjaSXN+ui/M4RKT9wdLKocXbpVigf1wakyQNUewE5s5AUspK7SDgPoA==
-X-OriginatorOrg: openvz.org
-X-MS-Exchange-CrossTenant-Network-Message-Id: aac5681f-715c-4c2d-c715-08d7d1743b27
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2020 10:55:43.7227 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sZaVR476BLO8UCM9pmONTKJ96siQ1t+55vM9hL6JQQqnt+LAA4mzL+zQ9ZrT1X0grL6PKE8FkfKH2pbIHRc2dw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5339
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.107
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,64 +89,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- integration@gluster.org, sheepdog@lists.wpkg.org,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
- Jason Dillaman <dillaman@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>,
- "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Liu Yuan <namei.unix@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/26/20 4:12 AM, Maxim Levitsky wrote:
-> The recent patches from Max Reitz allowed some block drivers to not
-> provide the .bdrv_co_create_opts and still allow qemu-img to
-> create/format images as long as the image is already existing
-> (that is the case with various block storage drivers like nbd/iscsi/nvme, etc)
->
-> However it was found out that some places in the code depend on the
-> .bdrv_co_create_opts/.create_opts to be != NULL to decide if to allow
-> image creation.
->
-> To avoid adding failback code to all these places, just make generic failback
-> code be used by the drivers that need it, so that for outside user, there
-> is no diffirence if failback was used or not.
->
-> Best regards,
-> 	Maxim Levitsky
->
-> Maxim Levitsky (2):
->   block: pass BlockDriver reference to the .bdrv_co_create
->   block: trickle down the fallback image creation function use to the
->     block drivers
->
->  block.c                   | 38 ++++++++++++++++++++++----------------
->  block/crypto.c            |  3 ++-
->  block/file-posix.c        | 11 +++++++++--
->  block/file-win32.c        |  4 +++-
->  block/gluster.c           |  3 ++-
->  block/iscsi.c             | 16 ++++------------
->  block/nbd.c               |  6 ++++++
->  block/nfs.c               |  4 +++-
->  block/nvme.c              |  3 +++
->  block/parallels.c         |  3 ++-
->  block/qcow.c              |  3 ++-
->  block/qcow2.c             |  4 +++-
->  block/qed.c               |  3 ++-
->  block/raw-format.c        |  4 +++-
->  block/rbd.c               |  3 ++-
->  block/sheepdog.c          |  4 +++-
->  block/ssh.c               |  4 +++-
->  block/vdi.c               |  4 +++-
->  block/vhdx.c              |  3 ++-
->  block/vmdk.c              |  4 +++-
->  block/vpc.c               |  6 ++++--
->  include/block/block.h     |  7 +++++++
->  include/block/block_int.h |  3 ++-
->  23 files changed, 95 insertions(+), 48 deletions(-)
->
-Reviewed-by: Denis V. Lunev <den@openvz.org>
+On Thu, 26 Mar 2020 03:33:35 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Wed, Mar 25, 2020 at 07:44:34PM +0100, Igor Mammedov wrote:
+> > On Wed, 25 Mar 2020 16:03:39 +0100
+> > Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >   
+> > > On Wed, Mar 25, 2020 at 01:32:12PM +0100, Igor Mammedov wrote:  
+> > > > On Thu, 19 Mar 2020 09:01:04 +0100
+> > > > Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > > >     
+> > > > > I know that not supporting ACPI in microvm is intentional.  If you still
+> > > > > don't want ACPI this is perfectly fine, you can use the usual -no-acpi
+> > > > > switch to toggle ACPI support.
+> > > > > 
+> > > > > These are the advantages you are going to loose then:
+> > > > > 
+> > > > >   (1) virtio-mmio device discovery without command line hacks (tweaking
+> > > > >       the command line is a problem when not using direct kernel boot).
+> > > > >   (2) Better IO-APIC support, we can use IRQ lines 16-23.
+> > > > >   (3) ACPI power button (aka powerdown request) works.
+> > > > >   (4) machine poweroff (aka S5 state) works.
+> > > > > 
+> > > > > Together with seabios patches for virtio-mmio support this allows to
+> > > > > boot standard fedora images (cloud, coreos, workstation live) with the
+> > > > > microvm machine type.    
+> > > > 
+> > > > what CLI do you use to test it?    
+> > > 
+> > > Test script below.  "qemu-default" is a wrapper script which starts
+> > > qemu-system-x86_64 from my build directory.  "qemu-firmware" is the
+> > > same plus isa-debugcon configured for a firmware log on stdout.
+> > > 
+> > > Latest bits (with some of the review comments addressed) just pushed
+> > > to git://git,kraxel.org/qemu sirius/microvm  
+> > 
+> > thanks, below are test results I got on my system,
+> > spoiler hw-reduced reduces boot time on ~0.02s compared to full blown acpi
+> > ----
+> > using timestamp at "Run /init as init process" as measuring point
+> > 
+> > no acpi
+> > 1.967316
+> > 1.975272
+> > 1.981267
+> > 1.974316
+> > 1.962452
+> > 1.960988
+> > 
+> > hw reduced acpi
+> > 0.893838
+> > 0.892573
+> > 0.890585
+> > 0.900306
+> > 0.897902
+> > 
+> > normal acpi:
+> > 0.921647
+> > 0.916298
+> > 0.923518
+> > 0.916298
+> > 0.913234
+> > 
+> > PS:
+> > I just quickly hacked hw-reduced acpi (using arm/virt as model)
+> > without implementing power button but I doubt that would affect results noticeably 
+> > on qemu side it probably also will save some time since there are less
+> > things to setup for qemu.  
+> 
+> And no ACPI is faster because of PS/2 probing, right?
+I suppose you've meant -slower- because of ...
+
+if I compare at 'i8042: PNP: No PS/2 controller found.' to rule out
+probing, then no-api and hw-reduced are about in the same ballpark
+(3-4ms difference in favor of no-acpi).
+
+no-acpi
+0.765785
+0.783540
+0.785269
+0.777751
+0.774474
+0.770611
+0.789309
+
+hw-reduced
+0.788733
+0.775982
+0.793132
+0.769077
+0.774771
+0.775191
+0.771170
+
+ 
+
+> 
+> > > 
+> > > HTH,
+> > >   Gerd
+> > > 
+> > > ============================ cut here ============================
+> > > #!/bin/sh
+> > > 
+> > > mode="${1}"
+> > > shift
+> > > 
+> > > back=()
+> > > devs=()
+> > > args=()
+> > > qemu="qemu-firmware -monitor none -boot menu=on"
+> > > disk=""
+> > > liso=""
+> > > krnl=""
+> > > karg="console=ttyS0,115200"
+> > > 
+> > > case "$mode" in
+> > > kernel)
+> > > 	qemu="qemu-default -nographic"
+> > > 	disk="/vmdisk/imagefish/rhel-8.1.0-ks-x86_64-testboot-sys-disk.qcow2"
+> > > 	krnl="$HOME/build/linux-sirius-x86_64-qemu/arch/x86/boot/bzImage"
+> > > 	karg="$karg root=/dev/sda4"
+> > > 	karg="$karg quiet"
+> > > 	;;
+> > > seabios)
+> > > 	disk="/vmdisk/imagefish/rhel-8.1.0-ks-x86_64-testboot-sys-disk.qcow2"
+> > > 	krnl="$HOME/build/linux-sirius-x86_64-qemu/arch/x86/boot/bzImage"
+> > > 	karg="$karg root=/dev/sda4"
+> > > 	args+=("-bios" "/home/kraxel/projects/seabios/out-bios-microvm/bios.bin")
+> > > 	;;
+> > > cloud)
+> > > 	disk="/vmdisk/iso/Fedora-Cloud-Base-31-1.9.x86_64.raw"
+> > > 	;;
+> > > coreos)
+> > > 	disk="/vmdisk/iso/fedora-coreos-31.20200210.3.0-metal.x86_64.raw"
+> > > 	;;
+> > > live)
+> > > 	liso="/vmdisk/iso/Fedora-Workstation-Live-x86_64-30-1.2.iso"
+> > > 	devs+=("-device" "virtio-gpu-device")
+> > > 	devs+=("-device" "virtio-keyboard-device")
+> > > 	devs+=("-device" "virtio-tablet-device")
+> > > 	;;
+> > > *)
+> > > 	echo "unknown mode: $mode"
+> > > 	echo "known modes: kernel seabios cloud coreos live"
+> > > 	exit 1
+> > > 	;;
+> > > esac
+> > > 
+> > > if test "$disk" != ""; then
+> > > 	format="${disk##*.}"
+> > > 	back+=("-drive" "if=none,id=disk,format=${format},file=${disk}")
+> > > 	devs+=("-device" "scsi-hd,drive=disk,bootindex=1")
+> > > fi
+> > > if test "$liso" != ""; then
+> > > 	back+=("-drive" "if=none,id=cdrom,media=cdrom,readonly,format=raw,file=${liso}")
+> > > 	devs+=("-device" "scsi-cd,drive=cdrom,bootindex=2")
+> > > fi
+> > > if test "$krnl" != ""; then
+> > > 	args+=("-kernel" "$krnl")
+> > > 	args+=("-append" "$karg")
+> > > fi
+> > > 
+> > > set -ex
+> > > $qemu \
+> > > 	-enable-kvm \
+> > > 	-cpu host \
+> > > 	-M microvm,graphics=off,pit=off,pic=on,rtc=on \
+> > > 	\
+> > > 	-m 4G \
+> > > 	\
+> > > 	-netdev user,id=net \
+> > > 	"${back[@]}" \
+> > > 	\
+> > > 	-global virtio-mmio.force-legacy=false \
+> > > 	-device virtio-net-device,netdev=net \
+> > > 	-device virtio-scsi-device \
+> > > 	"${devs[@]}" \
+> > > 	\
+> > > 	"${args[@]}" \
+> > > 	"$@"  
+> 
+> 
+
 
