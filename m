@@ -1,79 +1,53 @@
 Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-7.7 required=3.0 tests=DATE_IN_PAST_96_XX,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C94DFC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E80CC2D0F1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:12:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9433B20757
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:05:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K9B2cZ8j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9433B20757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2308F20772
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:12:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2308F20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJTgx-00008y-Mk
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 23:05:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42607)
+	id 1jJTnQ-0002eG-7V
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 23:12:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <carenas@gmail.com>) id 1jJTgD-0008BT-26
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:04:38 -0400
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1jJTmp-00022W-Dj
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <carenas@gmail.com>) id 1jJTg7-0000pZ-Bn
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:04:36 -0400
-Received: from mail-vs1-xe30.google.com ([2607:f8b0:4864:20::e30]:41270)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <carenas@gmail.com>) id 1jJTg6-0000fN-Iq
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:04:30 -0400
-Received: by mail-vs1-xe30.google.com with SMTP id a63so14933964vsa.8
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 20:04:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=juhyjxDRcYlvQErJ1mGGdiwrgHaBacs6wM7C3Ifo/Ck=;
- b=K9B2cZ8j2hAQc9maijkxGu99LNzt4vXD3dYcGyR85gGRUx3nEG/MvBTbZVtLQpV3S5
- 0RP1bOG8R27Sip7aiWsB+WENmm8njyDr5B5JADCqiabaVoDCoRfcBxXX9ycE/y0JlJCb
- rRfjB8LKkzftZDQEos9aGPr8rODZEewtpdKR8YWbH1TwX9NYruHEkq16EXHwHtCuYEve
- wkBFzGPogGKo+3vOxmrv7GH2d17nmsyLD4JJZn+kIbODZMeRtB+zydN974OIdrJ7roMS
- xJJgfS/wzJWFojEHVkpyTGH0qdxGBzBY+xCjEhLO6Mz2VWLkt+M4zZe3kWvfXSMY1Num
- 40Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=juhyjxDRcYlvQErJ1mGGdiwrgHaBacs6wM7C3Ifo/Ck=;
- b=XQbFfBcu1EIv7zelegFQzKg2swo8i7OGxcovIRWoBgYM/V45hD4+uFFqG+mMaGtb+R
- tbjc9bKAW1ZFjto/4Bf2dNfttTn9h6d8H2kkSXoNNhbuVc3hknoA1nyRZUWdvaFhNF1J
- oKgFJZ1y+ZVo5+4OVmN/+7BG5//fwkqhFTsidkUwf1UwFDiJPvZMDUANX32dw6lHfvtJ
- yui2y8ktT/I/sGGPghWm9LrLC4tgfgmW5wta4FMkWIA9en8Rkl72BCw3i7a7TplZ7BLY
- Xc7qXRabz+BmDAIm6aCOX+X6fH5cLwOGGDOKSY+DOz4kdKDtUCBosUevfywS1kg1z+Iq
- ykoA==
-X-Gm-Message-State: AGi0PuZlOVa7yXusHSkO5jCs7rVl6MtDbBay8nLzP5NTFtva3DJS3Iz1
- GNrtUqN+7GvrLKiN+AQ2bF+2+3g787GCKnx8txY=
-X-Google-Smtp-Source: APiQypI7wcH9vVmd9wUbfH72DwZJrR5lELUUCuigcxQ9jGHzQe0lHW1+bdFRooJdpW/yOFdpWtz75Wx7jzjdq53igqw=
-X-Received: by 2002:a67:f404:: with SMTP id p4mr2347711vsn.87.1585710249884;
- Tue, 31 Mar 2020 20:04:09 -0700 (PDT)
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1jJTmn-00029m-La
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:11:26 -0400
+Received: from [192.146.154.243] (port=34750 helo=mcp01.nutanix.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1jJTmn-00027Y-GQ
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:11:25 -0400
+Received: from localhost.localdomain.com (unknown [10.40.48.82])
+ by mcp01.nutanix.com (Postfix) with ESMTP id 8DEC7100ABF8;
+ Wed,  1 Apr 2020 03:11:23 +0000 (UTC)
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+To: qemu-devel@nongnu.org,
+	mst@redhat.com
+Subject: [PATCH] MAINTAINERS: Add myself as vhost-user-blk maintainer
+Date: Thu, 26 Mar 2020 04:57:27 -0400
+Message-Id: <1585213047-20089-1-git-send-email-raphael.norwitz@nutanix.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-References: <20200331103758.370644-1-berrange@redhat.com>
-In-Reply-To: <20200331103758.370644-1-berrange@redhat.com>
-From: Carlo Arenas <carenas@gmail.com>
-Date: Tue, 31 Mar 2020 20:03:58 -0700
-Message-ID: <CAPUEspgRLAyM21h3XaGurncJq9oDCGPAQ8S6zJTwdA31a3fFrg@mail.gmail.com>
-Subject: Re: [PATCH] configure: warn if not using a separate build directory
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000029425805a231f0dc"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e30
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 192.146.154.243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,45 +59,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Liviu Ionescu <ilg@livius.net>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: peter.maydell@linaro.org, raphael.s.norwitz@gmail.com,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000029425805a231f0dc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+As suggested by Michael, let's add me as a maintainer of
+vhost-user-blk and vhost-user-scsi.
 
-On Tue, Mar 31, 2020 at 3:38 AM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m>
-wrote:
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+---
+ MAINTAINERS | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-> Running configure directly from the source directory is a build
-> configuration that will go away in future. It is also not currently
->
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e580276..239ecc1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1845,6 +1845,18 @@ F: hw/display/virtio-gpu*
+ F: hw/display/virtio-vga.*
+ F: include/hw/virtio/virtio-gpu.h
+=20
++vhost-user-blk
++M: Raphael Norwitz <raphael.norwitz@nutanix.com>
++S: Maintained
++F: contrib/vhost-user-blk/
++F: contrib/vhost-user-scsi/
++F: hw/block/vhost-user-blk.c
++F: hw/scsi/vhost-user-scsi.c
++F: hw/virtio/vhost-user-blk-pci.c
++F: hw/virtio/vhost-user-scsi-pci.c
++F: include/hw/virtio/vhost-user-blk.h
++F: include/hw/virtio/vhost-user-scsi.h
++
+ vhost-user-gpu
+ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+ M: Gerd Hoffmann <kraxel@redhat.com>
+--=20
+1.8.3.1
 
-s/in future/in the future/g
-
-Carlo
-
---00000000000029425805a231f0dc
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Tue, Mar 31, 2020 at 3:38 AM Daniel P.=
- Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@redhat.c=
-om</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquote class=3D"=
-gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
-4,204,204);padding-left:1ex">Running configure directly from the source dir=
-ectory is a build<br>
-configuration that will go away in future. It is also not currently<br></bl=
-ockquote><div><br></div><div>s/in future/in the future/g</div><div>=C2=A0</=
-div><div>Carlo</div></div></div>
-
---00000000000029425805a231f0dc--
 
