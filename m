@@ -7,83 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0144FC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CDBC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:10:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD8132070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:09:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09EA8206E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:10:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bXLf9wvE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD8132070A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UZ/tHUYu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09EA8206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHYoz-0004jt-Uc
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:09:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59205)
+	id 1jHYpt-0006Bs-7d
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:10:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59138)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jHYL5-0007pO-Ts
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:52 -0400
+ (envelope-from <robert.foley@linaro.org>) id 1jHYL0-0007YX-DS
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1jHYL4-00024G-UR
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:51 -0400
-Received: from mail-qk1-x729.google.com ([2607:f8b0:4864:20::729]:40359)
+ (envelope-from <robert.foley@linaro.org>) id 1jHYKy-00020n-Ha
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:46 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:43213)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1jHYL4-000244-QH
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:50 -0400
-Received: by mail-qk1-x729.google.com with SMTP id l25so8188309qki.7
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:38:50 -0700 (PDT)
+ id 1jHYKy-00020V-DZ
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:44 -0400
+Received: by mail-qk1-x743.google.com with SMTP id o10so8129723qki.10
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:38:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=TvYnAkjAppdRPxTCTiIdH7gnvDHcZXb4SiVpZ+2G8IY=;
- b=bXLf9wvEJz0IcaMKjjb0mg2gM+JQyhks7b5zuDie1CxSdf0R+VjMTEIgRFrjSxWpmP
- FpgJN+MW6wBRShptt1fcLP5yJqtkPUSHYByn9t3z9UzSjNf5sOkKmfBtHPA/fcxlhBMR
- aLo8NAZCgpEtZOj1rDuSlj1gUP+KeVg09eF9XmE8QOWOqAJXaF7+VdV+X/hrtnyHZEzU
- ZV3CI+nM4WDVhoG9m/Kd2kjb1XQliPwY2Zbxr3PTnWG6iN2/knwGg4rGT84gL/3HhfnI
- eAp7mEKwo+AYzbv5SVzk25oZkklPQGvLYEthUM60HfRjD51xpJ50usLvo4oLhUVmUe1H
- FoNA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=V+COCY1tch1+h8AFER7aKTPV6Dtrz1h9iyiTM5X9pZo=;
+ b=UZ/tHUYuZJcG4QN+Up3UcXS7s3NnhwffMRiF8DJri/BZgkWstZbv4UWUVdUawdgKVV
+ j4FsMgYwQkcXJdVZ0ncDo1IUyITkxGpeuEx7v4ogFtAGl29oWnwvFdu1Pimn9tu/3Ldu
+ 4Nzk3uvhnz5ED06pgSFKHi+3VD6Xg6mhytjIzMFI6/6+BH+4QB4+X1Wr8PWmmV9NTIxv
+ IkFFWAHUaKDIpwxb38FlJNrOBu493dA8fmci0tDKHKkLrv995ZkLKbK+kjMgxY39VxGU
+ NXUonOnupkBzk4maFQgw01UFu+vuYqL6hK2xU4Wr0wfbmUqlSwzJu3Sj84W9YaP2gQ22
+ YC0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=TvYnAkjAppdRPxTCTiIdH7gnvDHcZXb4SiVpZ+2G8IY=;
- b=Vl9ww/YfyuIO/Itfs95C8EwpNRl/C7LE+otcE8QKeKOA2GUMW4fgSvAZXtP6aCUa3q
- sHZxmaqb3pSwQoaPExr1vMmbdCmhLFuH01OeY5WV5RhN1QVX0B1HdfHMNKMqm88WH7Mw
- +q2ZYeEN+HQujLEDXmvZhlSN/24poUmoQ2L1a8rAwsvcq28E0r4z3qLp4OuhMp+pG7xD
- YsE3xhJMiOJYWH0x9hMFChjB7kOSK6lIrGaYFFIr4ZE/69gMx7HvOJw0T/Xt9xOBH/8H
- y7JMC8be1imLZwus41a0r84uoaO647KU3/rMyKDIAXbOM2Am12CR7zbJ4lINpNBjC2Wr
- O8TA==
-X-Gm-Message-State: ANhLgQ2lsftAHC+fdYxxtI+h9ro9P7lKsenZQ36/BnNaSgj8yNFBQJGY
- VYt0P7XiXXKRgFvBMVl5H8OO290DP9uBrw==
-X-Google-Smtp-Source: ADFU+vvA/pjE2XRzg6uaJMRI5KfHbI9Q397XtWceEcBPUetaIYUdkYSrI1sC6rWdtD08FNTljZ3N9A==
-X-Received: by 2002:a37:b986:: with SMTP id
- j128mr10015811qkf.109.1585251530037; 
- Thu, 26 Mar 2020 12:38:50 -0700 (PDT)
+ :references;
+ bh=V+COCY1tch1+h8AFER7aKTPV6Dtrz1h9iyiTM5X9pZo=;
+ b=sTE/7pdU0oRuQcqSV3UJkH6INr5QHyBy1ZiHNaGFu9MDMQeBVutyZROZkRLJrJvSp/
+ x1yUrLBxvA9fvcdWA9RgPsG7ypdeUKY5cxgwioIk4rKPlbdqL2S9fLtXZc36lCb1RymO
+ UtWV/PVU9wUuSU15ssuwZxcYeHO6B10mcxCOlBih8lE+ucNEZCPJWzEfo99fSpOSwWep
+ tJCJfvWOddI0gbnVMK31pqX7zLIS8CNstc8xxZsTOmpH+VG4/FuvJbqa8o1muzjYHO/a
+ S1tTVqPyWHMrUc2JbyEAPejtHq1CO4XRYGSpl1Uq6iYlKRfLWVYtIc0b/q5L+EK9JiY/
+ mk+w==
+X-Gm-Message-State: ANhLgQ1k2mcJGdjVxokgHtWOK/5ODnLxf27zuL3FDIn+BJHOcC/cD7pv
+ xeks0A728nMurgG7wlPdGT9wf0xaQzan3w==
+X-Google-Smtp-Source: ADFU+vvIOpXqi6sB8dw0TcDGNsjLpUhrwvW2eeU6Qc9Yx+8CmVExCeAIDsrRahTlpXKpA7WenF4uog==
+X-Received: by 2002:a37:844:: with SMTP id 65mr9459076qki.15.1585251523644;
+ Thu, 26 Mar 2020 12:38:43 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fd55:4e67:1038:8302])
- by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.38.48
+ by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.38.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 12:38:49 -0700 (PDT)
+ Thu, 26 Mar 2020 12:38:43 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 55/74] moxie: convert to cpu_interrupt_request
-Date: Thu, 26 Mar 2020 15:31:37 -0400
-Message-Id: <20200326193156.4322-56-robert.foley@linaro.org>
+Subject: [PATCH v8 51/74] mips: convert to cpu_interrupt_request
+Date: Thu, 26 Mar 2020 15:31:33 -0400
+Message-Id: <20200326193156.4322-52-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200326193156.4322-1-robert.foley@linaro.org>
 References: <20200326193156.4322-1-robert.foley@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::729
+X-Received-From: 2607:f8b0:4864:20::743
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,37 +90,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, Anthony Green <green@moxielogic.com>,
- richard.henderson@linaro.org, "Emilio G. Cota" <cota@braap.org>,
- peter.puhov@linaro.org, alex.bennee@linaro.org
+Cc: robert.foley@linaro.org, richard.henderson@linaro.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ "Emilio G. Cota" <cota@braap.org>, peter.puhov@linaro.org,
+ alex.bennee@linaro.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Cc: Anthony Green <green@moxielogic.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/moxie/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/mips/cpu.c | 7 ++++---
+ target/mips/kvm.c | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-index 6e0443ccb7..f823eb234d 100644
---- a/target/moxie/cpu.c
-+++ b/target/moxie/cpu.c
-@@ -32,7 +32,7 @@ static void moxie_cpu_set_pc(CPUState *cs, vaddr value)
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index e86cd06548..761d8aaa54 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -56,13 +56,14 @@ static bool mips_cpu_has_work(CPUState *cs)
+     MIPSCPU *cpu = MIPS_CPU(cs);
+     CPUMIPSState *env = &cpu->env;
+     bool has_work = false;
++    uint32_t interrupt_request = cpu_interrupt_request(cs);
  
- static bool moxie_cpu_has_work(CPUState *cs)
- {
--    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
- }
+     /*
+      * Prior to MIPS Release 6 it is implementation dependent if non-enabled
+      * interrupts wake-up the CPU, however most of the implementations only
+      * check for interrupts that can be taken.
+      */
+-    if ((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
+         cpu_mips_hw_interrupts_pending(env)) {
+         if (cpu_mips_hw_interrupts_enabled(env) ||
+             (env->insn_flags & ISA_MIPS32R6)) {
+@@ -76,7 +77,7 @@ static bool mips_cpu_has_work(CPUState *cs)
+          * The QEMU model will issue an _WAKE request whenever the CPUs
+          * should be woken up.
+          */
+-        if (cs->interrupt_request & CPU_INTERRUPT_WAKE) {
++        if (interrupt_request & CPU_INTERRUPT_WAKE) {
+             has_work = true;
+         }
  
- static void moxie_cpu_reset(DeviceState *dev)
+@@ -86,7 +87,7 @@ static bool mips_cpu_has_work(CPUState *cs)
+     }
+     /* MIPS Release 6 has the ability to halt the CPU.  */
+     if (env->CP0_Config5 & (1 << CP0C5_VP)) {
+-        if (cs->interrupt_request & CPU_INTERRUPT_WAKE) {
++        if (interrupt_request & CPU_INTERRUPT_WAKE) {
+             has_work = true;
+         }
+         if (!mips_vp_active(env)) {
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index 2b7d680547..e9b7a9f2ad 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -141,7 +141,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+ 
+     qemu_mutex_lock_iothread();
+ 
+-    if ((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++    if ((cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
+             cpu_mips_io_interrupts_pending(cpu)) {
+         intr.cpu = -1;
+         intr.irq = 2;
 -- 
 2.17.1
 
