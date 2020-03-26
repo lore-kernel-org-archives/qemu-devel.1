@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7042CC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C92C2D0ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:15:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39CD42074D
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D73620714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:15:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q1Fmcxu0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39CD42074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E9zgmuKx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D73620714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHYtr-00042y-Db
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:14:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59240)
+	id 1jHYu5-0004SB-EI
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:15:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jHYLA-00082B-IH
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:57 -0400
+ (envelope-from <robert.foley@linaro.org>) id 1jHYLR-0000Sw-2y
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1jHYL9-00026I-C8
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:56 -0400
-Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:35406)
+ (envelope-from <robert.foley@linaro.org>) id 1jHYLP-0002Es-V2
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:12 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:41685)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1jHYL9-000262-7t
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:55 -0400
-Received: by mail-qv1-xf43.google.com with SMTP id q73so3706624qvq.2
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:38:55 -0700 (PDT)
+ id 1jHYLP-0002El-RC
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:11 -0400
+Received: by mail-qk1-x742.google.com with SMTP id q188so8167815qke.8
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:39:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=g5Ui26IYflB7RMxLLOQyjjArRpQxbNqKCvou8uKMYcU=;
- b=q1Fmcxu053j1KdEh9oYBpX00DIb1chbO7U3ErqqW7nwGZ2E8Cbxo3dTtFeeDuzVSpy
- u0xspx2JKKfJnM6IRUgCm7vl327Zf3jbm5pjyeP+5pZy+HzEwFZ5b5QZVqAvgLhmf4rz
- dS56Wiyzq16RUPXdRFx4CeSGjsbuvWpIrizyhgxAOnIHd454+WkT6FkylCSqEjAxKsbB
- 1U6v7fYgOo95FtPL4gJ58PnpFMFAQaD/QFjS3NBjzSy1UACSs7F9d0LwlBAMS6Y9ptTi
- 7HjzBuOBbh0EBuqjp8gs7MwwFyjTlSt463PpzUEtWPMNy0Mmb6BHVJ0202JuVJYXYbs3
- TdBg==
+ bh=hXS64xfFQVpKibsj9LpVhJbK9gFfN+Viw10h78ZF2Vg=;
+ b=E9zgmuKxYSK0VF+OHcKpZMN5Quqt4ZtwwOOyy+HnVdwmgxWDlDjrwjYSwgnOO8bvwq
+ LyILHWqzwhVFkJGJNru3QIuWDvrvSaw1jEzhI/w6/SGfNUa1TNbeMMQk2CHlWe6qBE8o
+ otaIjLoKoqZbyhN9MXtKwfckI817FkMl9UVyYvGb67QL7udL+fKpbxeC5rN61HFAPGV9
+ vTv+dnIfBBQtNp4XobXLlNzkar+MBo8C/yW6Pt5cl8nVnohC2xE/Qkp52qBNrihpgmjO
+ sadr+T6BhVJot1p/pu9kcERYtfsq+K8UTjYEc6XRvfIM+Rt+Ux5ydzt3w5vnkUDlMlnG
+ iBqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=g5Ui26IYflB7RMxLLOQyjjArRpQxbNqKCvou8uKMYcU=;
- b=XwydXkgueHJHrHlZgV71AeWXQZEg6ZxvUUT1ZgaylywrN43NbfzLt7t4sqg6jEetc0
- BB/kgJ3Pg8HRBLNDHFPNZI/ORkZ3yIqxUOiXdf8GzcMERaJJXXWB/z/GdPJI556xscLZ
- 5hGADCC2ktGukslM4mxeuhMvKX5gSomF6DCulTHr3ahsDstxTqQ2BO5MqAaVjwzRiF1N
- +eyOs7fAzB7Kcfz9I32CcVGjViQ4Z1j+fwEpJYgWNpPwOxVCrAz9klfVSx/K8Cn+h1y3
- uws6xvfSxmViuPW/iRolyqarXHJ+BEaoMgyYN+gIylpkfIHW9vUYtRy+OFbKCG7gn3cJ
- eMRQ==
-X-Gm-Message-State: ANhLgQ3/XbEdK39uROtumCBvW0svE9QKApm/v8qxjd/Y5Myt0HwJMoTj
- l9bNGgT7XVFyYo5mBRp/DWbrovle1m4pug==
-X-Google-Smtp-Source: ADFU+vvZ3V2ISvPPvcqqWL0MEa5ftj8yFnGYAorwVv35HMNyz9uu44/iqJ2sDVdbC7BekFxY+LKL7Q==
-X-Received: by 2002:ad4:4ba7:: with SMTP id i7mr9833152qvw.39.1585251531366;
- Thu, 26 Mar 2020 12:38:51 -0700 (PDT)
+ bh=hXS64xfFQVpKibsj9LpVhJbK9gFfN+Viw10h78ZF2Vg=;
+ b=A0QicGhx8v/lnc53JP/BwEzUKXIoFXL2MbMZCv1LM0QXxRZRidhhuRjluaXcnuGMcs
+ SWfLPXT8CNT0VEf/QYbxLEcVAb8ndtv+JDAEZyj1RjefujzXrU62DDzHoF8a7puc4FAs
+ h5gNPbzaHx1pAnR7OiI6TmUSmYmEgMQgWnYocV4/t+dSlDAD9lwvfeQNTHYagg83ylch
+ NMPSqiysDpWGdill8SBZTDQD32Kgr0IgGuVbC24md+QYVdNz9lBTxpDjBqSnE7C/AxFZ
+ D9CPfDO3qwo1vlsB2qGEcDugYkuNg5TJoMiYRxQr9kHEpf60J2CccnaHaOIyuatanUYm
+ 0JSg==
+X-Gm-Message-State: ANhLgQ1oKS1KW08TFekGBIToUH7MMDo24663eDoJno5mMN1XQRCgh1vS
+ 2LE7tC3EACuKYilECznb9q+oM7AIO2Y77g==
+X-Google-Smtp-Source: ADFU+vvMFRDxCqugl08snGGIMuHg1kr1vyHpfx1oOkGbe9V5K7mz8aAJnH2A6i5TxrqnxCFf7KLcDw==
+X-Received: by 2002:a37:410:: with SMTP id 16mr9858852qke.485.1585251551100;
+ Thu, 26 Mar 2020 12:39:11 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fd55:4e67:1038:8302])
- by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.38.50
+ by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.39.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 12:38:50 -0700 (PDT)
+ Thu, 26 Mar 2020 12:39:10 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 56/74] sparc: convert to cpu_interrupt_request
-Date: Thu, 26 Mar 2020 15:31:38 -0400
-Message-Id: <20200326193156.4322-57-robert.foley@linaro.org>
+Subject: [PATCH v8 70/74] cpu: rename all_cpu_threads_idle to
+ qemu_tcg_rr_all_cpu_threads_idle
+Date: Thu, 26 Mar 2020 15:31:52 -0400
+Message-Id: <20200326193156.4322-71-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200326193156.4322-1-robert.foley@linaro.org>
 References: <20200326193156.4322-1-robert.foley@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::f43
+X-Received-From: 2607:f8b0:4864:20::742
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,63 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- richard.henderson@linaro.org, "Emilio G. Cota" <cota@braap.org>,
- peter.puhov@linaro.org, alex.bennee@linaro.org,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: richard.henderson@linaro.org, "Emilio G. Cota" <cota@braap.org>,
+ alex.bennee@linaro.org, robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This function is only called from TCG rr mode, so add
+a prefix to mark this as well as an assertion.
+
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/sparc64/sparc64.c | 4 ++--
- target/sparc/cpu.c   | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ cpus.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-index fe9c678459..191ebfbb93 100644
---- a/hw/sparc64/sparc64.c
-+++ b/hw/sparc64/sparc64.c
-@@ -57,7 +57,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-     /* The bit corresponding to psrpil is (1<< psrpil), the next bit
-        is (2 << psrpil). */
-     if (pil < (2 << env->psrpil)) {
--        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
-             trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
-             env->interrupt_index = 0;
-             cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-@@ -88,7 +88,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-                 break;
-             }
-         }
--    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-+    } else if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
-         trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->softint,
-                                               env->interrupt_index);
-         env->interrupt_index = 0;
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 3f05aba9d6..cef25238a5 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -704,7 +704,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
-     SPARCCPU *cpu = SPARC_CPU(cs);
-     CPUSPARCState *env = &cpu->env;
- 
--    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
-            cpu_interrupts_enabled(env);
+diff --git a/cpus.c b/cpus.c
+index 50ced4369f..05de56bd53 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -232,10 +232,12 @@ static bool cpu_thread_is_idle(CPUState *cpu)
+     return true;
  }
  
+-static bool all_cpu_threads_idle(void)
++static bool qemu_tcg_rr_all_cpu_threads_idle(void)
+ {
+     CPUState *cpu;
+ 
++    g_assert(qemu_is_tcg_rr());
++
+     CPU_FOREACH(cpu) {
+         if (!cpu_thread_is_idle(cpu)) {
+             return false;
+@@ -643,7 +645,7 @@ void qemu_start_warp_timer(void)
+     }
+ 
+     if (replay_mode != REPLAY_MODE_PLAY) {
+-        if (!all_cpu_threads_idle()) {
++        if (!qemu_tcg_rr_all_cpu_threads_idle()) {
+             return;
+         }
+ 
+@@ -1295,7 +1297,7 @@ static void qemu_tcg_rr_wait_io_event(void)
+ {
+     CPUState *cpu;
+ 
+-    while (all_cpu_threads_idle()) {
++    while (qemu_tcg_rr_all_cpu_threads_idle()) {
+         stop_tcg_kick_timer();
+         qemu_cond_wait(first_cpu->halt_cond, &qemu_global_mutex);
+     }
+@@ -1651,7 +1653,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+             atomic_mb_set(&cpu->exit_request, 0);
+         }
+ 
+-        if (use_icount && all_cpu_threads_idle()) {
++        if (use_icount && qemu_tcg_rr_all_cpu_threads_idle()) {
+             /*
+              * When all cpus are sleeping (e.g in WFI), to avoid a deadlock
+              * in the main_loop, wake it up in order to start the warp timer.
 -- 
 2.17.1
 
