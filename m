@@ -2,76 +2,91 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2871C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 143FCC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:14:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92CE120737
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:12:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92CE120737
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DCE002073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 13:14:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE002073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHSIl-0005xA-ML
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 09:12:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52526)
+	id 1jHSKv-000727-0h
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 09:14:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52739)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jHSHk-0005Ez-H2
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:11:01 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jHSKJ-0006Uo-Jz
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:13:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jHSHj-0007Bf-2k
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:11:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36132)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jHSHi-0007AO-St
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:10:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jHSHg-0007nM-Az
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 13:10:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 522372E80C9
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 13:10:56 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <yi.l.liu@intel.com>) id 1jHSKH-0008Dn-H8
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 09:13:38 -0400
+Received: from mga07.intel.com ([134.134.136.100]:38256)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>)
+ id 1jHSKH-0008DW-A1; Thu, 26 Mar 2020 09:13:37 -0400
+IronPort-SDR: YqRTi94eWTktwQTEGgZtwHVKzL1X46NMQxZWipLsDvIHDDk2rcLnDatPvVki8r72Qun21qAtmD
+ aT0kDNVDOsRg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 26 Mar 2020 06:13:32 -0700
+IronPort-SDR: gMn7iuYRMuIEtF25zmXu0iCA0a9il9/1joqf694JTqs5IyvErTdk2nT0Ewmv1KFJFKcrlnxWlT
+ jkljHO5XbhFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,308,1580803200"; d="scan'208";a="238798886"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by fmsmga007.fm.intel.com with ESMTP; 26 Mar 2020 06:13:32 -0700
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 26 Mar 2020 06:13:32 -0700
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 26 Mar 2020 06:13:31 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.43]) with mapi id 14.03.0439.000;
+ Thu, 26 Mar 2020 21:13:29 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org"
+ <peter.maydell@linaro.org>, "mst@redhat.com" <mst@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>
+Subject: RE: [RFC v6 05/24] memory: Introduce IOMMU Memory Region
+ inject_faults API
+Thread-Topic: [RFC v6 05/24] memory: Introduce IOMMU Memory Region
+ inject_faults API
+Thread-Index: AQHV/tkL56HOGmRgQUStEsCG5C4Dkqha4D1w
+Date: Thu, 26 Mar 2020 13:13:28 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A2044AD@SHSMSX104.ccr.corp.intel.com>
+References: <20200320165840.30057-1-eric.auger@redhat.com>
+ <20200320165840.30057-6-eric.auger@redhat.com>
+In-Reply-To: <20200320165840.30057-6-eric.auger@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Mar 2020 13:00:50 -0000
-From: Launchpad Bug Tracker <1867519@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Tags: focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange janitor mohamadh paelzer
-X-Launchpad-Bug-Reporter: Mohammad Heib (mohamadh)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <158428174672.11238.3583143675239092561.malonedeb@soybean.canonical.com>
-Message-Id: <158522765313.6611.8318733276167131536.launchpad@ackee.canonical.com>
-Subject: [Bug 1867519] Re: qemu 4.2 segfaults on VF detach
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7bff9ad37b1ade37b7bb08d7ef770638b6b48cfe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,82 +95,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1867519 <1867519@bugs.launchpad.net>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "tnowicki@marvell.com" <tnowicki@marvell.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "zhangfei.gao@foxmail.com" <zhangfei.gao@foxmail.com>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+ "bbhushan2@marvell.com" <bbhushan2@marvell.com>,
+ "will@kernel.org" <will@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Merge proposal linked:
-   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
-/381033
+Hi Eric,
 
--- =
+I'm also considering how to inject iommu fault to vIOMMU. As our
+previous discussion (long time ago), MemoryRegion way doesn't work
+well for VTd case. So I'd like see your opinion on the proposal
+below:
+I've a patch to make vIOMMUs register PCIIOMMUOps to PCI layer.
+Current usage is to get address space and set/unset HostIOMMUContext
+(added by me). I think it may be also nice to add the fault injection
+callback in the PCIIOMMUOps. Thoughts?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1867519
+https://patchwork.ozlabs.org/patch/1259645/
 
-Title:
-  qemu 4.2 segfaults on VF detach
+Regards,
+Yi Liu
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Fix Released
+> From: Eric Auger <eric.auger@redhat.com>
+> Sent: Saturday, March 21, 2020 12:58 AM
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-devel@nongnu.or=
+g;
+> Subject: [RFC v6 05/24] memory: Introduce IOMMU Memory Region inject_faul=
+ts
+> API
+>=20
+> This new API allows to inject @count iommu_faults into
+> the IOMMU memory region.
+>=20
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  include/exec/memory.h | 25 +++++++++++++++++++++++++
+>  memory.c              | 10 ++++++++++
+>  2 files changed, 35 insertions(+)
+>=20
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index f2c773163f..141a5dc197 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -57,6 +57,8 @@ struct MemoryRegionMmio {
+>      CPUWriteMemoryFunc *write[3];
+>  };
+>=20
+> +struct iommu_fault;
+> +
+>  typedef struct IOMMUTLBEntry IOMMUTLBEntry;
+>=20
+>  /* See address_space_translate: bit 0 is read, bit 1 is write.  */
+> @@ -357,6 +359,19 @@ typedef struct IOMMUMemoryRegionClass {
+>       * @iommu: the IOMMUMemoryRegion
+>       */
+>      int (*num_indexes)(IOMMUMemoryRegion *iommu);
+> +
+> +    /*
+> +     * Inject @count faults into the IOMMU memory region
+> +     *
+> +     * Optional method: if this method is not provided, then
+> +     * memory_region_injection_faults() will return -ENOENT
+> +     *
+> +     * @iommu: the IOMMU memory region to inject the faults in
+> +     * @count: number of faults to inject
+> +     * @buf: fault buffer
+> +     */
+> +    int (*inject_faults)(IOMMUMemoryRegion *iommu, int count,
+> +                         struct iommu_fault *buf);
+>  } IOMMUMemoryRegionClass;
+>=20
+>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+> @@ -1365,6 +1380,16 @@ int
+> memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
+>   */
+>  int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr);
+>=20
+> +/**
+> + * memory_region_inject_faults : inject @count faults stored in @buf
+> + *
+> + * @iommu_mr: the IOMMU memory region
+> + * @count: number of faults to be injected
+> + * @buf: buffer containing the faults
+> + */
+> +int memory_region_inject_faults(IOMMUMemoryRegion *iommu_mr, int count,
+> +                                struct iommu_fault *buf);
+> +
+>  /**
+>   * memory_region_name: get a memory region's name
+>   *
+> diff --git a/memory.c b/memory.c
+> index 09be40edd2..9cdd77e0de 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2001,6 +2001,16 @@ int
+> memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr)
+>      return imrc->num_indexes(iommu_mr);
+>  }
+>=20
+> +int memory_region_inject_faults(IOMMUMemoryRegion *iommu_mr, int count,
+> +                                struct iommu_fault *buf)
+> +{
+> +    IOMMUMemoryRegionClass *imrc =3D
+> IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
+> +    if (!imrc->inject_faults) {
+> +        return -ENOENT;
+> +    }
+> +    return imrc->inject_faults(iommu_mr, count, buf);
+> +}
+> +
+>  void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client)
+>  {
+>      uint8_t mask =3D 1 << client;
+> --
+> 2.20.1
 
-Bug description:
-  After updating Ubuntu 20.04 to the Beta version, we get the following
-  error and the virtual machines stucks when detaching PCI devices using
-  virsh command:
-
-  Error:
-  error: Failed to detach device from /tmp/vf_interface_attached.xml
-  error: internal error: End of file from qemu monitor
-
-  steps to reproduce:
-   1. create a VM over Ubuntu 20.04 (5.4.0-14-generic)
-   2. attach PCI device to this VM (Mellanox VF for example)
-   3. try to detaching  the PCI device using virsh command:
-     a. create a pci interface xml file:
-          =
-
-        <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
-        <driver name=3D'vfio'/>
-        <source>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x11' slot=3D'0x00' =
-function=3D'0x2' />
-        </source>
-        </hostdev>
-      =
-
-     b.  #virsh detach-device <VM-Doman-name> <pci interface xml file>
-
-
-  - Ubuntu release:
-    Description:    Ubuntu Focal Fossa (development branch)
-    Release:        20.04
-
-  - Package ver:
-    libvirt0:
-    Installed: 6.0.0-0ubuntu3
-    Candidate: 6.0.0-0ubuntu5
-    Version table:
-       6.0.0-0ubuntu5 500
-          500 http://il.archive.ubuntu.com/ubuntu focal/main amd64 Packages
-   *** 6.0.0-0ubuntu3 100
-          100 /var/lib/dpkg/status
-
-  - What you expected to happen: =
-
-    PCI device detached without any errors.
-
-  - What happened instead:
-    getting the errors above and he VM stuck
-
-  additional info:
-  after downgrading the libvirt0 package and all the dependent packages to =
-5.4 the previous, version, seems that the issue disappeared
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1867519/+subscriptions
 
