@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B98C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F71C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:23:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B25A20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B283620663
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 23:23:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C3NYIsWk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B25A20663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="icKxNZgI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B283620663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHbpr-0006wP-D0
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:22:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59048)
+	id 1jHbqC-0007g9-QK
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 19:23:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jHbcc-0002pA-Oa
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:12 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jHbck-00038S-JS
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jHbcZ-0001kl-Au
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:08 -0400
-Received: from mail-pj1-x1033.google.com ([2607:f8b0:4864:20::1033]:52092)
+ (envelope-from <richard.henderson@linaro.org>) id 1jHbci-0001zl-Co
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:18 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39259)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jHbcZ-0001jY-4Z
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:07 -0400
-Received: by mail-pj1-x1033.google.com with SMTP id w9so3092755pjh.1
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 16:09:07 -0700 (PDT)
+ id 1jHbci-0001yT-6j
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 19:09:16 -0400
+Received: by mail-pf1-x444.google.com with SMTP id d25so3539381pfn.6
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 16:09:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=z4NXK1cCVKPNkZrtCQBn5TawdBNm+oJul6QWfWmZysk=;
- b=C3NYIsWkK2jC2OBvctWMG4R9cQGXUIRJxoFtLMVH3vbR+h+iV5c2khBUZL/Kn/eJ6d
- Uy+SzmOgWiiZrmJVmlYfwN7jhg39GQNwq7r1ACRu12d57mQsJYLlctLt78shDvFEDkJr
- RjyvS23MCbQuegedqaSsTE2WB1VJDwV+Zk0oUjDYk/ZhnJ0uyQtvtCLun/H49Vtzm1Xn
- ZS2LIloP67Loxau11L8MLCg0o8LnIr6wm4ZZuLLHsEo3cidqSQsC5eTepvlWf/tXEoKT
- iZgsdkhIpgo15QUSUcKUEqywr1A2qUE1GOzRJhufvAQtGQ1Q02j37gVZGAUz6B1AD2nj
- iCaQ==
+ bh=XWCeE/5E1HZf0ja/1RRJESpNCJLpd5hNPRFBKO5ZIL8=;
+ b=icKxNZgINscLHQzuXJde8x0qqoeXNgrjWKtOxFEHuJVwQZzSoa8bQCLD44dWlVwp+9
+ BMfNG++TtWZ71up4vdx5vki2E1b08GzPXuPscp4JWsnA4bQQeZZYeT9ymHWWnfDHmqyW
+ Pe8u5LgMyX/xLK4fbYM/+4Pt+BwY7A7glNoM6xzEa3/L8ou1HWORqMdV1ho3zkjmuAXr
+ TayBcIb6G9kr/TFuiWU+MddOdi/9BLdy5TYLsQLRPcihZmyc7QKM2b136J/QLSIgEzOh
+ XRdZP3f940aoT4Y2HwsPI+Uju0+0XJP5Q2HpQl/9renCWjG0v1KFTEjVspZYORJ7gvRg
+ qdXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=z4NXK1cCVKPNkZrtCQBn5TawdBNm+oJul6QWfWmZysk=;
- b=sngz6V/NzSWwzLK3DWNiz0octd9sN5vhjSyvjUh7HQyiwKdAx1cvQ4EPoF6/L2pYwt
- xRSUxRXnMHkDEiUVpyNlImIFiAtb0ua1RMksLqtcd+aMC6jsy/cNln+BCS27WmAgIOaH
- /H5bNZJPkajrAErTE0UaBIqLlUEC7jrCPC962BxA0CNigehNZ91JS+mfDoHrISNPPXCp
- nAOktQH6k8ViBsd2HOoRZp0lf0iY8csGKZjCAUvGc/RTNkdznREcZr/ApUaZgP3YgTW6
- pesjseTgnyyftQ5z16rnHmnj/ucjNoJtlnGYcjub0cuInV0WjKP37YdQighQJ2b0ZgxT
- rruw==
-X-Gm-Message-State: ANhLgQ2wMkk3i845Ax60DbEBw94R1CGHlNoNUPV8VPTMSv0EJrxElTVD
- plLwC/Fk8EwJmeTJtn17BhRKKV+Rqos=
-X-Google-Smtp-Source: ADFU+vuVVmjTXCH8Hx0kieKCP17idb53WPWuFFGB2EmWSk2zXBGfmSiHOqDWRB8KNxpI9EaUZL0GaQ==
-X-Received: by 2002:a17:90a:cc14:: with SMTP id
- b20mr2714276pju.75.1585264145760; 
- Thu, 26 Mar 2020 16:09:05 -0700 (PDT)
+ bh=XWCeE/5E1HZf0ja/1RRJESpNCJLpd5hNPRFBKO5ZIL8=;
+ b=HpIcjYOFsAoX/VyamSK+ITQT6/4M03S/UHFpyMDWCO4vB7M0OA5/Yl312Wg53QsbKN
+ /xzIfE/3qqXJggDH5rDE9pjyG0l0gtvlPwqN1IELzkCOUwOfJiNoWT3kqxtvVHS82oLG
+ D5phb4cC+tt0StgzTMZ4PSRw+ON3omkcnV2n+UhbuyBsR8pauunRbNXr3sDb+PCBXJtp
+ UyZLerqyWoVfQpXBIntNfaq/xdCnvnccCD/ilot5HOWSVe37SOSf1RAl0HCNVJ+4krQI
+ mXPFFEJiixKUpe6jky5RbJ8g7pHkEUFRjvVbzAPAJMVmITivxmykiq2w41DmWzMyb8ni
+ CMiQ==
+X-Gm-Message-State: ANhLgQ0+WOd7g4+AgunnLFV/v1GdY6a4BfRjAwKh2uKHvv+2KuGdqD6J
+ tpF3AvDya2esRdKge1TBXLAAV2OdKH8=
+X-Google-Smtp-Source: ADFU+vs+7QumS3vKSXnZJs/GYFazcjo3QHpyyw+CYnc79vfVh/t9HAM3cvMO3+3kMIQP9pjf7TxrXw==
+X-Received: by 2002:aa7:8108:: with SMTP id b8mr11659763pfi.212.1585264154959; 
+ Thu, 26 Mar 2020 16:09:14 -0700 (PDT)
 Received: from localhost.localdomain (174-21-138-234.tukw.qwest.net.
  [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id i187sm2530037pfg.33.2020.03.26.16.09.04
+ by smtp.gmail.com with ESMTPSA id i187sm2530037pfg.33.2020.03.26.16.09.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 16:09:05 -0700 (PDT)
+ Thu, 26 Mar 2020 16:09:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 20/31] target/arm: Implement SVE2 complex integer add
-Date: Thu, 26 Mar 2020 16:08:27 -0700
-Message-Id: <20200326230838.31112-21-richard.henderson@linaro.org>
+Subject: [PATCH 28/31] target/arm: Implement SVE2 bitwise shift and insert
+Date: Thu, 26 Mar 2020 16:08:35 -0700
+Message-Id: <20200326230838.31112-29-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200326230838.31112-1-richard.henderson@linaro.org>
 References: <20200326230838.31112-1-richard.henderson@linaro.org>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1033
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,138 +100,40 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 10 +++++++++
- target/arm/sve.decode      |  9 ++++++++
- target/arm/sve_helper.c    | 42 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 31 ++++++++++++++++++++++++++++
- 4 files changed, 92 insertions(+)
+ target/arm/sve.decode      |  5 +++++
+ target/arm/translate-sve.c | 10 ++++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 466b01986f..0e4b4c48da 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -2400,3 +2400,13 @@ DEF_HELPER_FLAGS_4(sve2_bgrp_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve2_bgrp_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve2_bgrp_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve2_bgrp_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(sve2_cadd_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve2_cadd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve2_cadd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve2_cadd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(sve2_sqcadd_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve2_sqcadd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve2_sqcadd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve2_sqcadd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index ca60e9f2ce..5fb4b5f977 100644
+index 756f939df1..9bf66e8ad4 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -1226,3 +1226,12 @@ EORTB           01000101 .. 0 ..... 10010 1 ..... .....  @rd_rn_rm
- BEXT            01000101 .. 0 ..... 1011 00 ..... .....  @rd_rn_rm
- BDEP            01000101 .. 0 ..... 1011 01 ..... .....  @rd_rn_rm
- BGRP            01000101 .. 0 ..... 1011 10 ..... .....  @rd_rn_rm
+@@ -1261,3 +1261,8 @@ SSRA            01000101 .. 0 ..... 1110 00 ..... .....  @rd_rn_tszimm_shr
+ USRA            01000101 .. 0 ..... 1110 01 ..... .....  @rd_rn_tszimm_shr
+ SRSRA           01000101 .. 0 ..... 1110 10 ..... .....  @rd_rn_tszimm_shr
+ URSRA           01000101 .. 0 ..... 1110 11 ..... .....  @rd_rn_tszimm_shr
 +
-+#### SVE2 Accumulate
++## SVE2 bitwise shift and insert
 +
-+## SVE2 complex integer add
-+
-+CADD_rot90      01000101 .. 00000 0 11011 0 ..... .....  @rdn_rm
-+CADD_rot270     01000101 .. 00000 0 11011 1 ..... .....  @rdn_rm
-+SQCADD_rot90    01000101 .. 00000 1 11011 0 ..... .....  @rdn_rm
-+SQCADD_rot270   01000101 .. 00000 1 11011 1 ..... .....  @rdn_rm
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index b5afa34efe..a3653007ac 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -1289,6 +1289,48 @@ DO_BITPERM(sve2_bgrp_d, uint64_t, bitgroup)
- 
- #undef DO_BITPERM
- 
-+#define DO_CADD(NAME, TYPE, H, ADD_OP, SUB_OP)                  \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc)  \
-+{                                                               \
-+    intptr_t i, opr_sz = simd_oprsz(desc);                      \
-+    int sub_r = simd_data(desc);                                \
-+    if (sub_r) {                                                \
-+        for (i = 0; i < opr_sz; i += 2 * sizeof(TYPE)) {        \
-+            TYPE acc_r = *(TYPE *)(vn + H(i));                  \
-+            TYPE acc_i = *(TYPE *)(vn + H(i + sizeof(TYPE)));   \
-+            TYPE el2_r = *(TYPE *)(vm + H(i));                  \
-+            TYPE el2_i = *(TYPE *)(vm + H(i + sizeof(TYPE)));   \
-+            acc_r = SUB_OP(acc_r, el2_i);                       \
-+            acc_i = ADD_OP(acc_i, el2_r);                       \
-+            *(TYPE *)(vd + H(i)) = acc_r;                       \
-+            *(TYPE *)(vd + H(i + sizeof(TYPE))) = acc_i;        \
-+        }                                                       \
-+    } else {                                                    \
-+        for (i = 0; i < opr_sz; i += 2 * sizeof(TYPE)) {        \
-+            TYPE acc_r = *(TYPE *)(vn + H(i));                  \
-+            TYPE acc_i = *(TYPE *)(vn + H(i + sizeof(TYPE)));   \
-+            TYPE el2_r = *(TYPE *)(vm + H(i));                  \
-+            TYPE el2_i = *(TYPE *)(vm + H(i + sizeof(TYPE)));   \
-+            acc_r = ADD_OP(acc_r, el2_i);                       \
-+            acc_i = SUB_OP(acc_i, el2_r);                       \
-+            *(TYPE *)(vd + H(i)) = acc_r;                       \
-+            *(TYPE *)(vd + H(i + sizeof(TYPE))) = acc_i;        \
-+        }                                                       \
-+    }                                                           \
-+}
-+
-+DO_CADD(sve2_cadd_b, int8_t, H1, DO_ADD, DO_SUB)
-+DO_CADD(sve2_cadd_h, int16_t, H1_2, DO_ADD, DO_SUB)
-+DO_CADD(sve2_cadd_s, int32_t, H1_4, DO_ADD, DO_SUB)
-+DO_CADD(sve2_cadd_d, int64_t,     , DO_ADD, DO_SUB)
-+
-+DO_CADD(sve2_sqcadd_b, int8_t, H1, DO_SQADD_B, DO_SQSUB_B)
-+DO_CADD(sve2_sqcadd_h, int16_t, H1_2, DO_SQADD_H, DO_SQSUB_H)
-+DO_CADD(sve2_sqcadd_s, int32_t, H1_4, DO_SQADD_S, DO_SQSUB_S)
-+DO_CADD(sve2_sqcadd_d, int64_t,     , do_sqadd_d, do_sqsub_d)
-+
-+#undef DO_CADD
-+
- #define DO_ZZI_SHLL(NAME, TYPE, TYPEN, OP) \
- void HELPER(NAME)(void *vd, void *vn, uint32_t desc)           \
- {                                                              \
++SRI             01000101 .. 0 ..... 11110 0 ..... .....  @rd_rn_tszimm_shr
++SLI             01000101 .. 0 ..... 11110 1 ..... .....  @rd_rn_tszimm_shl
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 375b9dc983..3b0aa86e79 100644
+index 1d1f55dfdd..7556cecfb3 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -6209,3 +6209,34 @@ static bool trans_BGRP(DisasContext *s, arg_rrr_esz *a)
-     }
-     return do_sve2_zzw_ool(s, a, fns[a->esz], 0);
+@@ -6351,3 +6351,13 @@ static bool trans_URSRA(DisasContext *s, arg_rri_esz *a)
+ {
+     return do_sve2_fn2i(s, a, arm_gen_gvec_ursra);
  }
 +
-+static bool do_cadd(DisasContext *s, arg_rrr_esz *a, bool sq, bool rot)
++static bool trans_SRI(DisasContext *s, arg_rri_esz *a)
 +{
-+    static gen_helper_gvec_3 * const fns[2][4] = {
-+        { gen_helper_sve2_cadd_b, gen_helper_sve2_cadd_h,
-+          gen_helper_sve2_cadd_s, gen_helper_sve2_cadd_d },
-+        { gen_helper_sve2_sqcadd_b, gen_helper_sve2_sqcadd_h,
-+          gen_helper_sve2_sqcadd_s, gen_helper_sve2_sqcadd_d },
-+    };
-+    return do_sve2_zzw_ool(s, a, fns[sq][a->esz], rot);
++    return do_sve2_fn2i(s, a, arm_gen_gvec_sri);
 +}
 +
-+static bool trans_CADD_rot90(DisasContext *s, arg_rrr_esz *a)
++static bool trans_SLI(DisasContext *s, arg_rri_esz *a)
 +{
-+    return do_cadd(s, a, false, false);
-+}
-+
-+static bool trans_CADD_rot270(DisasContext *s, arg_rrr_esz *a)
-+{
-+    return do_cadd(s, a, false, true);
-+}
-+
-+static bool trans_SQCADD_rot90(DisasContext *s, arg_rrr_esz *a)
-+{
-+    return do_cadd(s, a, true, false);
-+}
-+
-+static bool trans_SQCADD_rot270(DisasContext *s, arg_rrr_esz *a)
-+{
-+    return do_cadd(s, a, true, true);
++    return do_sve2_fn2i(s, a, arm_gen_gvec_sli);
 +}
 -- 
 2.20.1
