@@ -2,80 +2,88 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C29C2D0E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58328C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACBFA20722
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBFA20722
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1200A2070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:35:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gUnYZfPU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1200A2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHZAD-0006h2-T2
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:31:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37184)
+	id 1jHZDT-0000MH-51
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:35:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37490)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jHZ9N-0005e3-Tt
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHZCm-0008GD-Bs
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jHZ9M-0005kA-6W
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52980)
+ (envelope-from <peter.maydell@linaro.org>) id 1jHZCl-0001fk-2z
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:34:20 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50408)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jHZ9L-0005iW-Vj
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jHZ9K-0007zB-JE
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8815F2E80CD
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:46 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHZCk-0001eT-So
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:34:19 -0400
+Received: by mail-wm1-x342.google.com with SMTP id d198so8469498wmd.0
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 13:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=eigIr7yZ70T25XWD0fJuHajFYnnBMnfjgNM68LuO0TM=;
+ b=gUnYZfPUrWCJMMFzK/gN0Vf0dCjh3g0omt8SJVYPENCbD7hfBT4MfXAMc5+UpshO1Y
+ K1IAGOgsZI8PTvUxgZ2DHB+piaw2erVmie2Su4XKg/oy7pbTwh/rJ5ozBMY/2TrXvpQH
+ 3O/ihWMrlzVMh4t0ZuMX/9UjmUDZGDlxkYJdmcCSF2YAQ/p5DIesbP3TgNIv4pft7BMU
+ bynprzklxZJiJ1paRZG+ybELX//0XCZsftJ3dUbsrU/726tJU4zvZ4EwHwXigC8hBkQW
+ 2hXoxQe+Avd9fZxuwOoq3+Jgcm3vPKLXIFIKGiVnqLtlBAUTYbZouo4V/lfiU84yZcid
+ 3Hbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=eigIr7yZ70T25XWD0fJuHajFYnnBMnfjgNM68LuO0TM=;
+ b=bxxCxuykeGxwKDRBAjok//rLWtfC2WOmr2AiEAreCTMqeXmSVtvb0nL6mFwiQiCl5J
+ L1nQQW3l2aIhgygiGySkrGXMpP2o3XUmExVIwZoNo3gw+ASC0me6PIVhWCM9q5szUrL8
+ IR/n/C8ntL0OXB06x8PRmBjN5Moi26cxNfCzHLC7B7Co1/8Ic1T+LvDncL6M6SVPYhEz
+ bsS5VVOkUpS1GB5HESFA+93mVxM2vmV3MUIhsqV/E9YEHPPkqLH8ThFy2yJanCj4VrwP
+ 5kzAHDj2ZjrBiTJjm/mW86OtcwjdkZ4Ua/VIES6q5rMXT0/3j98fj6q2g3EKJmjVWMnT
+ gUEg==
+X-Gm-Message-State: ANhLgQ3fG7GbA8jkv4CL27jpL+f6t4liwmjNAlTrbvzlsRSIdQJ7DpvE
+ m1mhD8vIrssbg1FMagcJGRiZC3/LWQ/lXA==
+X-Google-Smtp-Source: ADFU+vs95qzvnHqwFhjQkVQOpHrXyZhUZ41UowxY90cqCn7xBg2kQ98oD8y2tg+sTQuZGFhASOd0eQ==
+X-Received: by 2002:a7b:ca4e:: with SMTP id m14mr1715107wml.164.1585254857104; 
+ Thu, 26 Mar 2020 13:34:17 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s11sm5299123wrw.58.2020.03.26.13.34.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 26 Mar 2020 13:34:16 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] hw/arm/collie: Put StrongARMState* into a CollieMachineState
+ struct
+Date: Thu, 26 Mar 2020 20:34:14 +0000
+Message-Id: <20200326203414.18140-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Mar 2020 20:22:38 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1868116@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Triaged; importance=High; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
- status=Triaged; importance=Critical; assignee=ubuntu-desktop@lists.ubuntu.com; 
-X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
- server-next
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail leozinho29-eu paelzer
-X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158525415811.6466.4845994087943657843.malone@wampee.canonical.com>
-Subject: [Bug 1868116] Re: QEMU monitor no longer works
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 14f3597b90b203541a599144a9e3e4bf9475b7a2
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,128 +92,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Subscribed and Assigned to Ubuntu Desktop to get to 0.60.1 before Focal rel=
-eases.
-I'd be happy about an update here that this surely is on your todo list.
+Coverity complains that the collie_init() function leaks the memory
+allocated in sa1110_init().  This is true but not significant since
+the function is called only once on machine init and the memory must
+remain in existence until QEMU exits anyway.
 
--- =
+Still, we can avoid the technical memory leak by keeping the pointer
+to the StrongARMState inside the machine state struct.  Switch from
+the simple DEFINE_MACHINE() style to defining a subclass of
+TYPE_MACHINE which extends the MachineState struct, and keep the
+pointer there.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1868116
+Fixes: CID 1421921
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/collie.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-Title:
-  QEMU monitor no longer works
+diff --git a/hw/arm/collie.c b/hw/arm/collie.c
+index 4992084a3f6..8ca0df96b47 100644
+--- a/hw/arm/collie.c
++++ b/hw/arm/collie.c
+@@ -19,6 +19,16 @@
+ #include "exec/address-spaces.h"
+ #include "cpu.h"
+ 
++typedef struct {
++    MachineState parent;
++
++    StrongARMState *sa1110;
++} CollieMachineState;
++
++#define TYPE_COLLIE_MACHINE MACHINE_TYPE_NAME("collie")
++#define COLLIE_MACHINE(obj) \
++    OBJECT_CHECK(CollieMachineState, obj, TYPE_COLLIE_MACHINE)
++
+ static struct arm_boot_info collie_binfo = {
+     .loader_start = SA_SDCS0,
+     .ram_size = 0x20000000,
+@@ -26,9 +36,9 @@ static struct arm_boot_info collie_binfo = {
+ 
+ static void collie_init(MachineState *machine)
+ {
+-    StrongARMState *s;
+     DriveInfo *dinfo;
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
++    CollieMachineState *cms = COLLIE_MACHINE(machine);
+ 
+     if (machine->ram_size != mc->default_ram_size) {
+         char *sz = size_to_str(mc->default_ram_size);
+@@ -37,7 +47,7 @@ static void collie_init(MachineState *machine)
+         exit(EXIT_FAILURE);
+     }
+ 
+-    s = sa1110_init(machine->cpu_type);
++    cms->sa1110 = sa1110_init(machine->cpu_type);
+ 
+     memory_region_add_subregion(get_system_memory(), SA_SDCS0, machine->ram);
+ 
+@@ -57,8 +67,10 @@ static void collie_init(MachineState *machine)
+     arm_load_kernel(s->cpu, machine, &collie_binfo);
+ }
+ 
+-static void collie_machine_init(MachineClass *mc)
++static void collie_machine_class_init(ObjectClass *oc, void *data)
+ {
++    MachineClass *mc = MACHINE_CLASS(oc);
++
+     mc->desc = "Sharp SL-5500 (Collie) PDA (SA-1110)";
+     mc->init = collie_init;
+     mc->ignore_memory_transaction_failures = true;
+@@ -67,4 +79,15 @@ static void collie_machine_init(MachineClass *mc)
+     mc->default_ram_id = "strongarm.sdram";
+ }
+ 
+-DEFINE_MACHINE("collie", collie_machine_init)
++static const TypeInfo collie_machine_typeinfo = {
++    .name = TYPE_COLLIE_MACHINE,
++    .parent = TYPE_MACHINE,
++    .class_init = collie_machine_class_init,
++    .instance_size = sizeof(CollieMachineState),
++};
++
++static void collie_machine_register_types(void)
++{
++    type_register_static(&collie_machine_typeinfo);
++}
++type_init(collie_machine_register_types);
+-- 
+2.20.1
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-Status in vte2.91 package in Ubuntu:
-  Triaged
-
-Bug description:
-  Repro:
-  VTE
-  $ meson _build && ninja -C _build && ninja -C _build install
-
-  qemu:
-  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
-r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
--enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
-sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
--disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
-disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
-opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
-irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
--pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
-vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
-sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
-le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
-e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
-utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
--disable-cap-ng
-  $ make
-
-  Test:
-  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
-uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
-le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
-rent/images/netboot/mini.iso
-  - switch to monitor with CTRL+ALT+2
-  - try to enter something
-
-  Affects head of both usptream git repos.
-
-  =
-
-  --- original bug ---
-
-  It was observed that the QEMU console (normally accessible using
-  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
-  problematic because there are cases where it's required to send
-  commands to the guest, or key combinations that the host would grab
-  (as Ctrl-Alt-F1 or Alt-F4).
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 20.04
-  Package: qemu 1:4.2-3ubuntu2
-  Uname: Linux 5.6.0-rc6+ x86_64
-  ApportVersion: 2.20.11-0ubuntu20
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Thu Mar 19 12:16:31 2020
-  Dependencies:
-
-  InstallationDate: Installed on 2017-06-13 (1009 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine:
-  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
-  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
-86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
-,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
-home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
-  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
--re]
-  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
-5]
-  MachineType: LENOVO 80UG
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
-4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
-rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
-ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
-enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
-7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
-scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
-_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
-  dmi.bios.date: 08/09/2018
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN45WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
