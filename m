@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C94A3C2D0E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1F6C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:42:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DC920737
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8237C20737
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 00:42:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PgYyM1Qz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DC920737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oKt/v6HH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8237C20737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHGaF-00011y-Qf
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 20:41:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43741)
+	id 1jHGbn-0003ne-MV
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 20:42:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jHGXN-0003lj-73
+ (envelope-from <dgibson@ozlabs.org>) id 1jHGXM-0003lf-Tu
  for qemu-devel@nongnu.org; Wed, 25 Mar 2020 20:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jHGXL-0002KV-ML
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 20:38:21 -0400
-Received: from ozlabs.org ([203.11.71.1]:47281)
+ (envelope-from <dgibson@ozlabs.org>) id 1jHGXL-0002KP-Le
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 20:38:20 -0400
+Received: from ozlabs.org ([203.11.71.1]:48977)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jHGXL-0002HY-9n; Wed, 25 Mar 2020 20:38:19 -0400
+ id 1jHGXL-0002HT-8d; Wed, 25 Mar 2020 20:38:19 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48nmL83L1zz9sSY; Thu, 26 Mar 2020 11:38:08 +1100 (AEDT)
+ id 48nmL82cSnz9sSV; Thu, 26 Mar 2020 11:38:08 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1585183088;
- bh=+ozS18bsZrwYGlOCRNToOi3jupPK6PNT9ybjul+tRMU=;
+ bh=nHkn43nALS267IgxmjNcOhNlRhHPMQp8SdF+D7QlZrw=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=PgYyM1QzlT56UEDiIbhwAM3dT5dYSF85TJg0Wz2Ixzww+Sfd0vuakthqKuUzIn3xc
- CALs5+1PPjUmy/1kR4372xOa13NqfuN74gYCZl9aRv4nuitWzsK6wpW6bKyf9XPrtO
- wGt7t+jy6dPiW8FrQL7xnx4HVmx8sZmw2yv4wzEs=
-Date: Thu, 26 Mar 2020 11:30:42 +1100
+ b=oKt/v6HHyds3B+Uuu34Iz6j57qfCd1/G9IoAel30QSnplEmPkHsz+YXObwg/tla7o
+ uPNAzu16Ad4u1JSEE49g7gztjnFlrv4pA0QkkuCPQaLNGfMnRg5nLWvJQ7/+kzlris
+ 5KqYgIL2JvGPtnFYDMAgmkSXBzBj2PNE7XJDQmtM=
+Date: Thu, 26 Mar 2020 11:19:37 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 4/4] ppc/spapr: Don't kill the guest if a recovered
- FWNMI machine check delivery fails
-Message-ID: <20200326003042.GQ36889@umbus.fritz.box>
+Subject: Re: [PATCH v2 3/4] ppc/spapr: Add FWNMI machine check delivery
+ warnings
+Message-ID: <20200326001937.GO36889@umbus.fritz.box>
 References: <20200325142906.221248-1-npiggin@gmail.com>
- <20200325142906.221248-5-npiggin@gmail.com>
+ <20200325142906.221248-4-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="MM5RgFPKyuP3gDcV"
+ protocol="application/pgp-signature"; boundary="GOzekVbrLdOLv44p"
 Content-Disposition: inline
-In-Reply-To: <20200325142906.221248-5-npiggin@gmail.com>
+In-Reply-To: <20200325142906.221248-4-npiggin@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 203.11.71.1
@@ -81,87 +81,63 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---MM5RgFPKyuP3gDcV
+--GOzekVbrLdOLv44p
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 26, 2020 at 12:29:06AM +1000, Nicholas Piggin wrote:
-> Try to be tolerant of FWNMI delivery errors if the machine check had been
-> recovered by the host.
+On Thu, Mar 26, 2020 at 12:29:05AM +1000, Nicholas Piggin wrote:
+> Add some messages which explain problems and guest misbehaviour that
+> may be difficult to diagnose in rare cases of machine checks.
 >=20
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
 Applied to ppc-for-5.0.
 
 > ---
->  hw/ppc/spapr_events.c | 27 ++++++++++++++++++++++-----
->  1 file changed, 22 insertions(+), 5 deletions(-)
+>  hw/ppc/spapr_events.c | 4 ++++
+>  hw/ppc/spapr_rtas.c   | 3 +++
+>  2 files changed, 7 insertions(+)
 >=20
 > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index c8964eb25d..b90ecb8afe 100644
+> index a908c5d0e9..c8964eb25d 100644
 > --- a/hw/ppc/spapr_events.c
 > +++ b/hw/ppc/spapr_events.c
-> @@ -833,13 +833,25 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu=
-, bool recovered)
+> @@ -833,6 +833,8 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, =
+bool recovered)
 >      /* get rtas addr from fdt */
 >      rtas_addr =3D spapr_get_rtas_addr();
 >      if (!rtas_addr) {
-> -        error_report(
-> +        if (!recovered) {
-> +            error_report(
->  "FWNMI: Unable to deliver machine check to guest: rtas_addr not found.");
-> -        qemu_system_guest_panicked(NULL);
-> +            qemu_system_guest_panicked(NULL);
-> +        } else {
-> +            warn_report(
-> +"FWNMI: Unable to deliver machine check to guest: rtas_addr not found. "
-> +"Machine check recovered.");
-> +        }
+> +        error_report(
+> +"FWNMI: Unable to deliver machine check to guest: rtas_addr not found.");
+>          qemu_system_guest_panicked(NULL);
 >          g_free(ext_elog);
 >          return;
->      }
-> =20
-> +    /*
-> +     * Must not set interlock if the MCE does not get delivered to the g=
-uest
-> +     * in the error case above.
-> +     */
-> +    spapr->fwnmi_machine_check_interlock =3D cpu->vcpu_id;
-> +
->      stq_be_phys(&address_space_memory, rtas_addr + RTAS_ERROR_LOG_OFFSET,
->                  env->gpr[3]);
->      cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
-> @@ -876,9 +888,15 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recov=
-ered)
+> @@ -874,6 +876,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recove=
+red)
 >           * that CPU called "ibm,nmi-interlock")
 >           */
 >          if (spapr->fwnmi_machine_check_interlock =3D=3D cpu->vcpu_id) {
-> -            error_report(
-> +            if (!recovered) {
-> +                error_report(
->  "FWNMI: Unable to deliver machine check to guest: nested machine check."=
+> +            error_report(
+> +"FWNMI: Unable to deliver machine check to guest: nested machine check."=
 );
-> -            qemu_system_guest_panicked(NULL);
-> +                qemu_system_guest_panicked(NULL);
-> +            } else {
-> +                warn_report(
-> +"FWNMI: Unable to deliver machine check to guest: nested machine check. "
-> +"Machine check recovered.");
-> +            }
+>              qemu_system_guest_panicked(NULL);
 >              return;
 >          }
->          qemu_cond_wait_iothread(&spapr->fwnmi_machine_check_interlock_co=
-nd);
-> @@ -906,7 +924,6 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recove=
-red)
->          warn_report("Received a fwnmi while migration was in progress");
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 29abe66d01..bcac0d00e7 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -462,6 +462,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
 >      }
 > =20
-> -    spapr->fwnmi_machine_check_interlock =3D cpu->vcpu_id;
->      spapr_mce_dispatch_elog(cpu, recovered);
->  }
-> =20
+>      if (spapr->fwnmi_machine_check_addr =3D=3D -1) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +"FWNMI: ibm,nmi-interlock RTAS called with FWNMI not registered.\n");
+> +
+>          /* NMI register not called */
+>          rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>          return;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -169,25 +145,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---MM5RgFPKyuP3gDcV
+--GOzekVbrLdOLv44p
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5797IACgkQbDjKyiDZ
-s5LdMA//fhou/EOmlZaAByTSHor5tmJ4hJKQqqe+bIqeM2EhlBtlU4Gdp2K/nKeg
-ewZ62e64vkNecjg4N4XrlzZ4MsTvz0L3sSczWsyFK7GtEF2n6oIHsyX76n+wDqTl
-YubKCXSx/J4NAkkY6/jD59kTcFauzUkDZsxam9VAiZ0AYF0Rsjzm5dXNpdEituNe
-t/pQDhmz/DepFtbSarhUPLkaX2egIDBx9Wt5G8vqCPbq55N6yKsXqUZPwgQf1CRq
-sxUhShp4IGfBuApcEaLhxPRTi4oaKGFbi5TpCfXJDXEL5u4JA0wb7Fzvr60Mp16h
-A/cPWw1bjXz+PeL6BlYl244T1KdExG5b0TlXaGsgcU3d0eCqYPZZiAjF/oY0wLRi
-6p2wPz2COGgtYSoB6mEayoS/7xiz8EAgUgai+hDJ31o+852NPxkrlSU/8X8n2HbV
-mUAAeMPVoM2dFP0n9BfqjY36+eB5dd7f7vSVj2k+xXNHtVXZ4qTgSBesO1kpNEKM
-QGAlzb1ACH7ADaRUZcJ2G4Brp/8ry670oETk3DYK9imgp+ML0tlfT1qAthPHJwBr
-1+Gn9MDLw/q1U2Lzzz2gQUm3ISSIIycq+h8hTuphgvTXOaOuEeBk9KQjww/3l+sx
-FTBowKOxYKxcXx3O/kefK+5YvRWcqdxt51il3sHVLEgPhr7C0PI=
-=TtcR
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl579RkACgkQbDjKyiDZ
+s5JxohAAwVxv06KKsJsswIMcLOqBo/dl4t8thsBYTjGXJro1IBS7XFR1ETlZf+mz
+Uk1bok1WFG9486lmx5KlqXowTN3BvwFmn8KliUi7SZGS4mrXwkFqp4XAhSIZljem
+GwYdddvWhaWPcTFthSpdwIP/6LkTac2KdUlrdPni3XrJiB49i4grcX126MZhUR2S
+LM3PH+ZtqiOfyMu28VcvsY7LFo3OQJfBIcUE7RgcVWfynOwiQsYa4LA7SXfzDUde
+1TMwVH8mpn3ZZ8IG5SPDjnITpC/dcfjREbOsotvIgCWHeWbUxqzgRnYIUdrI1TTD
+2ifl/90J88WXmkIe2Jae3Nh4hWLkFpSzRngzET5bnrLm5X8SbBZQde4BbMRYcOpl
+p4piwIcw33PS70sQPQCv/ALxhsQpmKFlJYkWH8+j8vq2psG2I8Bt/TVNIJRX+8zQ
+ybx2LKshyJx5lSb9OjiV9NWtC72j2u/7ey8dV4fduq2bkI152XhKG6qqoQSqFRW5
+Kk2E3cRJG2S3PQp+J88ccmKAywWk80xUD28PWtB/FVN5wQJvTFJOVfJN/vtzcob2
+URfL/PySQJ4FLKt7uRxwNTuiZdfpqXcSUQl8Sry3xiUt4ojXRBgBxKpcFjzrDkO1
+ZlOVUD6qTA2CxIY+pno+5RsQs2YXp0LXrGyrVvtVuO3CxhA/N2U=
+=W8D3
 -----END PGP SIGNATURE-----
 
---MM5RgFPKyuP3gDcV--
+--GOzekVbrLdOLv44p--
 
