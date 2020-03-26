@@ -2,82 +2,82 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC251C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F49C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:02:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8696C20409
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FA6020774
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 11:02:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H57zEztt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8696C20409
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCUwyP4t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA6020774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHQFv-0002uT-LK
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 07:00:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58089)
+	id 1jHQHC-000428-5o
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 07:02:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jHQFB-0002PM-UB
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:00:15 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jHQG7-0003Dv-BA
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jHQFA-0002yi-8M
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:00:13 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:40495)
+ (envelope-from <eric.auger@redhat.com>) id 1jHQG5-0003eb-F3
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:01:11 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39999)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jHQFA-0002wv-3j
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:00:12 -0400
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jHQG5-0003eA-B5
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 07:01:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585220410;
+ s=mimecast20190719; t=1585220469;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UvAwwmvIULHFCVyQMd8BSWITSS6wRL8cxAMpstK/4gs=;
- b=H57zEzttD28qOlD92U2nLSZpY9OzD9Gkma8Q1+QMj1905lf93kxnTLsAPcFc0KGwnsEIws
- cWD+UsmCDE53tnczVLrh6t80C36Cbuu/kSsNb/OSJgiJ5H3SWih47a5a5mKrwK0rLwBwsq
- AhJ5BUxWi+scTt2DbqukZoV1/gXo6bs=
+ bh=2/2wrMEwU8K1EQxN273Pr7zZuw6dVXbtyGGdt5alEzs=;
+ b=QCUwyP4t1qn37NH89dO/4RK8Is67n29ObnSD46HUEzT/udTjcvhZ5nPGEjdk+/L+lQ8Ta3
+ Lyp0QJpO5KIHsGz3JOe2SGEKAN51isw8xNifFhX4L5OFutBEMuI8kZOQLyyOhStP/9song
+ GLTNMZNlAtVVB+3eCuUU/lhAvNp/QwI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-RAl-fOq3NdGgAVvGss_-KQ-1; Thu, 26 Mar 2020 06:59:58 -0400
-X-MC-Unique: RAl-fOq3NdGgAVvGss_-KQ-1
+ us-mta-228-vsKMGt80N7S49sCooT3n1A-1; Thu, 26 Mar 2020 07:01:02 -0400
+X-MC-Unique: vsKMGt80N7S49sCooT3n1A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C83DA107ACC4;
- Thu, 26 Mar 2020 10:59:56 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1EC7419925;
- Thu, 26 Mar 2020 10:59:45 +0000 (UTC)
-Date: Thu, 26 Mar 2020 11:59:43 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 00/13] microvm: add acpi support
-Message-ID: <20200326115943.5e19119b@redhat.com>
-In-Reply-To: <20200326032841-mutt-send-email-mst@kernel.org>
-References: <20200319080117.7725-1-kraxel@redhat.com>
- <20200325133212.6fd0fefb@redhat.com>
- <20200325150339.7kqibe5cfkzxhtzr@sirius.home.kraxel.org>
- <20200325194434.58b50148@redhat.com>
- <20200326032841-mutt-send-email-mst@kernel.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AE5318B9FC4;
+ Thu, 26 Mar 2020 11:01:01 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AE1D19925;
+ Thu, 26 Mar 2020 11:00:55 +0000 (UTC)
+Subject: Re: [RFC v1] arm/virt: Add memory hot remove support
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20200318123722.19736-1-shameerali.kolothum.thodi@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b6c6f33b-7e4f-0b46-b67d-2de572e12626@redhat.com>
+Date: Thu, 26 Mar 2020 12:00:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <20200318123722.19736-1-shameerali.kolothum.thodi@huawei.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,195 +89,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, mst@redhat.com,
+ Anshuman Khandual <anshuman.khandual@arm.com>, linuxarm@huawei.com,
+ xuwei5@hisilicon.com, prime.zeng@hisilicon.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 26 Mar 2020 03:33:35 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Hi Shameer,
 
-> On Wed, Mar 25, 2020 at 07:44:34PM +0100, Igor Mammedov wrote:
-> > On Wed, 25 Mar 2020 16:03:39 +0100
-> > Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >   
-> > > On Wed, Mar 25, 2020 at 01:32:12PM +0100, Igor Mammedov wrote:  
-> > > > On Thu, 19 Mar 2020 09:01:04 +0100
-> > > > Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > > >     
-> > > > > I know that not supporting ACPI in microvm is intentional.  If you still
-> > > > > don't want ACPI this is perfectly fine, you can use the usual -no-acpi
-> > > > > switch to toggle ACPI support.
-> > > > > 
-> > > > > These are the advantages you are going to loose then:
-> > > > > 
-> > > > >   (1) virtio-mmio device discovery without command line hacks (tweaking
-> > > > >       the command line is a problem when not using direct kernel boot).
-> > > > >   (2) Better IO-APIC support, we can use IRQ lines 16-23.
-> > > > >   (3) ACPI power button (aka powerdown request) works.
-> > > > >   (4) machine poweroff (aka S5 state) works.
-> > > > > 
-> > > > > Together with seabios patches for virtio-mmio support this allows to
-> > > > > boot standard fedora images (cloud, coreos, workstation live) with the
-> > > > > microvm machine type.    
-> > > > 
-> > > > what CLI do you use to test it?    
-> > > 
-> > > Test script below.  "qemu-default" is a wrapper script which starts
-> > > qemu-system-x86_64 from my build directory.  "qemu-firmware" is the
-> > > same plus isa-debugcon configured for a firmware log on stdout.
-> > > 
-> > > Latest bits (with some of the review comments addressed) just pushed
-> > > to git://git,kraxel.org/qemu sirius/microvm  
-> > 
-> > thanks, below are test results I got on my system,
-> > spoiler hw-reduced reduces boot time on ~0.02s compared to full blown acpi
-> > ----
-> > using timestamp at "Run /init as init process" as measuring point
-> > 
-> > no acpi
-> > 1.967316
-> > 1.975272
-> > 1.981267
-> > 1.974316
-> > 1.962452
-> > 1.960988
-> > 
-> > hw reduced acpi
-> > 0.893838
-> > 0.892573
-> > 0.890585
-> > 0.900306
-> > 0.897902
-> > 
-> > normal acpi:
-> > 0.921647
-> > 0.916298
-> > 0.923518
-> > 0.916298
-> > 0.913234
-> > 
-> > PS:
-> > I just quickly hacked hw-reduced acpi (using arm/virt as model)
-> > without implementing power button but I doubt that would affect results noticeably 
-> > on qemu side it probably also will save some time since there are less
-> > things to setup for qemu.  
-> 
-> And no ACPI is faster because of PS/2 probing, right?
-I suppose you've meant -slower- because of ...
+On 3/18/20 1:37 PM, Shameer Kolothum wrote:
+> This adds support for memory hot remove on arm/virt that
+> uses acpi ged device.
 
-if I compare at 'i8042: PNP: No PS/2 controller found.' to rule out
-probing, then no-api and hw-reduced are about in the same ballpark
-(3-4ms difference in favor of no-acpi).
+I gave this a try and it works fine if the PCDIMM slot was initially
+hotplugged:
+(QEMU) object-add qom-type=memory-backend-ram id=mem1 props.size=4294967296
+{"return": {}}
+(QEMU) device_add driver=pc-dimm  id=pcdimm1 memdev=mem1
+(QEMU) device_del id=pcdimm1
+{"return": {}}
 
-no-acpi
-0.765785
-0.783540
-0.785269
-0.777751
-0.774474
-0.770611
-0.789309
+on guest I can see:
+[   82.466321] Offlined Pages 262144
+[   82.541712] Offlined Pages 262144
+[   82.589236] Offlined Pages 262144
+[   82.969166] Offlined Pages 262144
 
-hw-reduced
-0.788733
-0.775982
-0.793132
-0.769077
-0.774771
-0.775191
-0.771170
+However I noticed that if qemu is launched directly with
 
- 
+-m 16G,maxmem=32G,slots=2 \
+-object memory-backend-ram,id=mem1,size=4G \
+-device pc-dimm,memdev=mem1,id=dimm1,driver=pc-dimm -device
+
+and then in the qmp shell:
+(QEMU) device_del id=dimm1
+
+the hot-unplug fails in guest:
+
+[   78.897407] Offlined Pages 262144
+[   79.260811] Offlined Pages 262144
+[   79.308105] Offlined Pages 262144
+[   79.333675] page:fffffe00137d1f40 refcount:1 mapcount:0
+mapping:ffff0004ea9f20b1 index:0xaaab11c6e
+[   79.335927] anon flags: 0x17ffff8000080024(uptodate|active|swapbacked)
+[   79.337571] raw: 17ffff8000080024 dead000000000100 dead000000000122
+ffff0004ea9f20b1
+[   79.339502] raw: 0000000aaab11c6e 0000000000000000 00000001ffffffff
+ffff0004fd4e3000
+[   79.341701] page dumped because: unmovable page
+[   79.342887] page->mem_cgroup:ffff0004fd4e3000
+[   79.354729] page:fffffe00137d1f40 refcount:1 mapcount:0
+mapping:ffff0004ea9f20b1 index:0xaaab11c6e
+[   79.357012] anon flags: 0x17ffff8000080024(uptodate|active|swapbacked)
+[   79.358658] raw: 17ffff8000080024 dead000000000100 dead000000000122
+ffff0004ea9f20b1
+[   79.360611] raw: 0000000aaab11c6e 0000000000000000 00000001ffffffff
+ffff0004fd4e3000
+[   79.362560] page dumped because: unmovable page
+[   79.363742] page->mem_cgroup:ffff0004fd4e3000
+[   79.368636] memory memory20: Offline failed.
+
+I did not expect this. The PCDIMM slot in that case does not seem to be
+interpreted as a hot-unpluggable one (?). I added Anshuman in cc.
+
+Thanks
+
+Eric
+
+
 
 > 
-> > > 
-> > > HTH,
-> > >   Gerd
-> > > 
-> > > ============================ cut here ============================
-> > > #!/bin/sh
-> > > 
-> > > mode="${1}"
-> > > shift
-> > > 
-> > > back=()
-> > > devs=()
-> > > args=()
-> > > qemu="qemu-firmware -monitor none -boot menu=on"
-> > > disk=""
-> > > liso=""
-> > > krnl=""
-> > > karg="console=ttyS0,115200"
-> > > 
-> > > case "$mode" in
-> > > kernel)
-> > > 	qemu="qemu-default -nographic"
-> > > 	disk="/vmdisk/imagefish/rhel-8.1.0-ks-x86_64-testboot-sys-disk.qcow2"
-> > > 	krnl="$HOME/build/linux-sirius-x86_64-qemu/arch/x86/boot/bzImage"
-> > > 	karg="$karg root=/dev/sda4"
-> > > 	karg="$karg quiet"
-> > > 	;;
-> > > seabios)
-> > > 	disk="/vmdisk/imagefish/rhel-8.1.0-ks-x86_64-testboot-sys-disk.qcow2"
-> > > 	krnl="$HOME/build/linux-sirius-x86_64-qemu/arch/x86/boot/bzImage"
-> > > 	karg="$karg root=/dev/sda4"
-> > > 	args+=("-bios" "/home/kraxel/projects/seabios/out-bios-microvm/bios.bin")
-> > > 	;;
-> > > cloud)
-> > > 	disk="/vmdisk/iso/Fedora-Cloud-Base-31-1.9.x86_64.raw"
-> > > 	;;
-> > > coreos)
-> > > 	disk="/vmdisk/iso/fedora-coreos-31.20200210.3.0-metal.x86_64.raw"
-> > > 	;;
-> > > live)
-> > > 	liso="/vmdisk/iso/Fedora-Workstation-Live-x86_64-30-1.2.iso"
-> > > 	devs+=("-device" "virtio-gpu-device")
-> > > 	devs+=("-device" "virtio-keyboard-device")
-> > > 	devs+=("-device" "virtio-tablet-device")
-> > > 	;;
-> > > *)
-> > > 	echo "unknown mode: $mode"
-> > > 	echo "known modes: kernel seabios cloud coreos live"
-> > > 	exit 1
-> > > 	;;
-> > > esac
-> > > 
-> > > if test "$disk" != ""; then
-> > > 	format="${disk##*.}"
-> > > 	back+=("-drive" "if=none,id=disk,format=${format},file=${disk}")
-> > > 	devs+=("-device" "scsi-hd,drive=disk,bootindex=1")
-> > > fi
-> > > if test "$liso" != ""; then
-> > > 	back+=("-drive" "if=none,id=cdrom,media=cdrom,readonly,format=raw,file=${liso}")
-> > > 	devs+=("-device" "scsi-cd,drive=cdrom,bootindex=2")
-> > > fi
-> > > if test "$krnl" != ""; then
-> > > 	args+=("-kernel" "$krnl")
-> > > 	args+=("-append" "$karg")
-> > > fi
-> > > 
-> > > set -ex
-> > > $qemu \
-> > > 	-enable-kvm \
-> > > 	-cpu host \
-> > > 	-M microvm,graphics=off,pit=off,pic=on,rtc=on \
-> > > 	\
-> > > 	-m 4G \
-> > > 	\
-> > > 	-netdev user,id=net \
-> > > 	"${back[@]}" \
-> > > 	\
-> > > 	-global virtio-mmio.force-legacy=false \
-> > > 	-device virtio-net-device,netdev=net \
-> > > 	-device virtio-scsi-device \
-> > > 	"${devs[@]}" \
-> > > 	\
-> > > 	"${args[@]}" \
-> > > 	"$@"  
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  -RFC because linux kernel support for mem hot remove is just queued
+>   for 5.7[1].
+>  -Tested with guest kernel 5.6-rc5 + [1]
 > 
+> 1. https://patchwork.kernel.org/cover/11419301/
+> ---
+>  hw/acpi/generic_event_device.c | 28 +++++++++++++++++
+>  hw/arm/virt.c                  | 56 ++++++++++++++++++++++++++++++++--
+>  2 files changed, 82 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+> index 021ed2bf23..3e28c110fa 100644
+> --- a/hw/acpi/generic_event_device.c
+> +++ b/hw/acpi/generic_event_device.c
+> @@ -182,6 +182,32 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
+>      }
+>  }
+>  
+> +static void acpi_ged_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                       DeviceState *dev, Error **errp)
+> +{
+> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
+> +
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +        acpi_memory_unplug_request_cb(hotplug_dev, &s->memhp_state, dev, errp);
+> +    } else {
+> +        error_setg(errp, "acpi: device unplug request for unsupported device"
+> +                   " type: %s", object_get_typename(OBJECT(dev)));
+> +    }
+> +}
+> +
+> +static void acpi_ged_unplug_cb(HotplugHandler *hotplug_dev,
+> +                               DeviceState *dev, Error **errp)
+> +{
+> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
+> +
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +        acpi_memory_unplug_cb(&s->memhp_state, dev, errp);
+> +    } else {
+> +        error_setg(errp, "acpi: device unplug for unsupported device"
+> +                   " type: %s", object_get_typename(OBJECT(dev)));
+> +    }
+> +}
+> +
+>  static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+>  {
+>      AcpiGedState *s = ACPI_GED(adev);
+> @@ -286,6 +312,8 @@ static void acpi_ged_class_init(ObjectClass *class, void *data)
+>      dc->vmsd = &vmstate_acpi_ged;
+>  
+>      hc->plug = acpi_ged_device_plug_cb;
+> +    hc->unplug_request = acpi_ged_unplug_request_cb;
+> +    hc->unplug = acpi_ged_unplug_cb;
+>  
+>      adevc->send_event = acpi_ged_send_event;
+>  }
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 94f93dda54..91974e4e80 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2096,11 +2096,62 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+>      }
+>  }
+>  
+> +static void virt_dimm_unplug_request(HotplugHandler *hotplug_dev,
+> +                                     DeviceState *dev, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    Error *local_err = NULL;
+> +
+> +    if (!vms->acpi_dev) {
+> +        error_setg(errp,
+> +                   "memory hotplug is not enabled: missing acpi-ged device");
+> +        goto out;
+> +    }
+> +
+> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(vms->acpi_dev), dev,
+> +                                   &local_err);
+> +out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+> +static void virt_dimm_unplug(HotplugHandler *hotplug_dev,
+> +                             DeviceState *dev, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    Error *local_err = NULL;
+> +
+> +    hotplug_handler_unplug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +
+> +    pc_dimm_unplug(PC_DIMM(dev), MACHINE(vms));
+> +    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+> +
+> + out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                            DeviceState *dev, Error **errp)
+>  {
+> -    error_setg(errp, "device unplug request for unsupported device"
+> -               " type: %s", object_get_typename(OBJECT(dev)));
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +        virt_dimm_unplug_request(hotplug_dev, dev, errp);
+> +    } else {
+> +        error_setg(errp, "device unplug request for unsupported device"
+> +                   " type: %s", object_get_typename(OBJECT(dev)));
+> +    }
+> +}
+> +
+> +static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
+> +                                          DeviceState *dev, Error **errp)
+> +{
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +        virt_dimm_unplug(hotplug_dev, dev, errp);
+> +    } else {
+> +        error_setg(errp, "virt: device unplug for unsupported device"
+> +                   " type: %s", object_get_typename(OBJECT(dev)));
+> +    }
+>  }
+>  
+>  static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+> @@ -2181,6 +2232,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      hc->pre_plug = virt_machine_device_pre_plug_cb;
+>      hc->plug = virt_machine_device_plug_cb;
+>      hc->unplug_request = virt_machine_device_unplug_request_cb;
+> +    hc->unplug = virt_machine_device_unplug_cb;
+>      mc->numa_mem_supported = true;
+>      mc->auto_enable_numa_with_memhp = true;
+>      mc->default_ram_id = "mach-virt.ram";
 > 
 
 
