@@ -2,80 +2,74 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC04CC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21859C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:56:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2D68206F8
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:39:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLRIeLus"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D68206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EBC64206F6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:56:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC64206F6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHTfZ-0007ft-SU
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 10:39:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41493)
+	id 1jHTva-0004Kx-2h
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 10:56:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jHTWX-0004Sn-71
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:30:22 -0400
+ (envelope-from <bounces@canonical.com>) id 1jHTuy-0003vn-DJ
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:55:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jHTWR-000316-QP
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:30:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:22377)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jHTWR-00030s-NK
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:30:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585233015;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5LhZ9DHL7T1jkRWFOkyzETAnfc6tl8ZcA30FqNDULC4=;
- b=hLRIeLusosDLoURgAAt0zNaw8HGAK2xApyOhybtq37lZvIN4Ku5PtnHsWtFpfZ2Lz9Bouz
- tEqi5UJvWLQ1wDmX6J2rJxJlIKDD4rlz/YTCY8nP1MtafutNDzW6D4EKx6Zcl/JeyB29Rv
- 3/kSQsxUxo5BzHLzd4iXNc+jfvOXH3w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-Qe3kNC_hMKqZA3FARhL0OA-1; Thu, 26 Mar 2020 10:30:13 -0400
-X-MC-Unique: Qe3kNC_hMKqZA3FARhL0OA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32C068018B1;
- Thu, 26 Mar 2020 14:30:12 +0000 (UTC)
-Received: from localhost (ovpn-112-132.ams2.redhat.com [10.36.112.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C0E4E5D9CD;
- Thu, 26 Mar 2020 14:30:11 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 10/10] iotests/138: Test leaks/corruptions fixed report
-Date: Thu, 26 Mar 2020 15:29:33 +0100
-Message-Id: <20200326142933.625037-11-mreitz@redhat.com>
-In-Reply-To: <20200326142933.625037-1-mreitz@redhat.com>
-References: <20200326142933.625037-1-mreitz@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1jHTux-0001Hs-3N
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:55:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59158)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jHTuw-0001Hm-Ts
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:55:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jHTuv-0004UY-Vo
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 14:55:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C25A22E80BA
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 14:55:33 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Mar 2020 14:48:57 -0000
+From: Marcin Juszkiewicz <1869006@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm passthrough tcg
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson hrw pmaydell
+X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
+X-Launchpad-Bug-Modifier: Marcin Juszkiewicz (hrw)
+References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
+Message-Id: <158523413716.16730.16553206473752780114.malone@gac.canonical.com>
+Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
+ guest memory but fails on 4GB (vfio_dma_map invalid arg)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8cea468f372ef6e67845a53c70b825f94ea55b53
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,119 +78,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1869006 <1869006@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test that qemu-img check reports the number of leaks and corruptions
-fixed in its JSON report (after a successful run).
+I wanted to try the same on machine without MSI. But my desktop refuses
+to boot into sane environment with pci=3Dnomsi kernel option.
 
-While touching the _unsupported_imgopts line, adjust the note on why
-data_file does not work with this test: The current comment sounds a bit
-like it is a mistake for qemu-img check not to check external data
-files' refcounts.  But there are no such refcounts, so it is no mistake.
-Just say that qemu-img check does not do much for external data files,
-and this is why this test does not work with them.
+-- =
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200324172757.1173824-4-mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/138     | 41 ++++++++++++++++++++++++++++++++++++--
- tests/qemu-iotests/138.out | 14 +++++++++++++
- 2 files changed, 53 insertions(+), 2 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1869006
 
-diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index 54b01046ad..1d5b0bed6d 100755
---- a/tests/qemu-iotests/138
-+++ b/tests/qemu-iotests/138
-@@ -41,8 +41,10 @@ _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
- # With an external data file, data clusters are not refcounted
--# (and so qemu-img check does not check their refcount)
--_unsupported_imgopts data_file
-+# (so qemu-img check would not do much);
-+# we want to modify the refcounts, so we need them to have a specific
-+# format (namely u16)
-+_unsupported_imgopts data_file 'refcount_bits=3D\([^1]\|.\([^6]\|$\)\)'
-=20
- echo
- echo '=3D=3D=3D Check on an image with a multiple of 2^32 clusters =3D=3D=
-=3D'
-@@ -65,6 +67,41 @@ poke_file "$TEST_IMG" $((2048 + 8)) "\x00\x80\x00\x00\x0=
-0\x00\x00\x00"
- # allocate memory", we have an error showing that l2 entry is invalid.
- _check_test_img
-=20
-+echo
-+echo '=3D=3D=3D Check leaks-fixed/corruptions-fixed report'
-+echo
-+
-+# After leaks and corruptions were fixed, those numbers should be
-+# reported by qemu-img check
-+_make_test_img 64k
-+
-+# Allocate data cluster
-+$QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
-+
-+reftable_ofs=3D$(peek_file_be "$TEST_IMG" 48 8)
-+refblock_ofs=3D$(peek_file_be "$TEST_IMG" $reftable_ofs 8)
-+
-+# Introduce a leak: Make the image header's refcount 2
-+poke_file_be "$TEST_IMG" "$refblock_ofs" 2 2
-+
-+l1_ofs=3D$(peek_file_be "$TEST_IMG" 40 8)
-+
-+# Introduce a corruption: Drop the COPIED flag from the (first) L1 entry
-+l1_entry=3D$(peek_file_be "$TEST_IMG" $l1_ofs 8)
-+l1_entry=3D$((l1_entry & ~(1 << 63)))
-+poke_file_be "$TEST_IMG" $l1_ofs 8 $l1_entry
-+
-+echo
-+# Should print the number of corruptions and leaks fixed
-+# (Filter out all JSON fields (recognizable by their four-space
-+# indentation), but keep the "-fixed" fields (by removing two spaces
-+# from their indentation))
-+# (Also filter out the L1 entry, because why not)
-+_check_test_img -r all --output=3Djson \
-+    | sed -e 's/^  \(.*\)-fixed"/\1-fixed"/' \
-+          -e '/^    /d' \
-+          -e "s/\\([^0-9a-f]\\)$(printf %x $l1_entry)\\([^0-9a-f]\\)/\1L1_=
-ENTRY_VALUE\2/"
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/138.out b/tests/qemu-iotests/138.out
-index aca7d47a80..79681e7cc9 100644
---- a/tests/qemu-iotests/138.out
-+++ b/tests/qemu-iotests/138.out
-@@ -9,4 +9,18 @@ ERROR: counting reference for region exceeding the end of =
-the file by one cluste
-=20
- 1 errors were found on the image.
- Data may be corrupted, or further writes to the image may corrupt it.
-+
-+=3D=3D=3D Check leaks-fixed/corruptions-fixed report
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D65536
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Leaked cluster 0 refcount=3D2 reference=3D1
-+Repairing cluster 0 refcount=3D2 reference=3D1
-+Repairing OFLAG_COPIED L2 cluster: l1_index=3D0 l1_entry=3DL1_ENTRY_VALUE =
-refcount=3D1
-+{
-+  "corruptions-fixed": 1,
-+  "leaks-fixed": 1,
-+}
- *** done
---=20
-2.25.1
+Title:
+  PCIe cards passthrough to TCG guest works on 2GB of guest memory but
+  fails on 4GB (vfio_dma_map invalid arg)
 
+Status in QEMU:
+  New
+
+Bug description:
+  During one meeting coworker asked "did someone tried to passthrough
+  PCIe card to other arch guest?" and I decided to check it.
+
+  Plugged SATA and USB3 controllers into spare slots on mainboard and
+  started playing. On 1GB VM instance it worked (both cold- and hot-
+  plugged). On 4GB one it did not:
+
+  B=C5=82=C4=85d podczas uruchamiania domeny: internal error: process exite=
+d while connecting to monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarc=
+h64: -device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D=
+0x0: VFIO_MAP_DMA: -22
+  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
+0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
+d to setup container for group 28: memory listener initialization failed: R=
+egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
+0x7fb2a3e00000) =3D -22 (Invalid argument)
+
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
+wrapper
+      callback(asyncjob, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
+pcb
+      callback(*args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
+e 66, in newfn
+      ret =3D fn(self, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1279,=
+ in startup
+      self._backend.create()
+    File "/usr/lib64/python3.8/site-packages/libvirt.py", line 1234, in cre=
+ate
+      if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
+=3Dself)
+  libvirt.libvirtError: internal error: process exited while connecting to =
+monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch64: -device vfio-pci,=
+host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: VFIO_MAP_DMA: -22
+  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
+0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
+d to setup container for group 28: memory listener initialization failed: R=
+egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
+0x7fb2a3e00000) =3D -22 (Invalid argument)
+
+  =
+
+  I played with memory and 3054 MB is maximum value possible to boot VM wit=
+h coldplugged host PCIe cards.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1869006/+subscriptions
 
