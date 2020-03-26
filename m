@@ -2,68 +2,68 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B836C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 07:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01832C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 07:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71EBC20714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 07:24:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71EBC20714
+	by mail.kernel.org (Postfix) with ESMTPS id CE82220714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 07:24:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE82220714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHMsi-000668-Iy
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 03:24:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57113)
+	id 1jHMsm-0006D8-Tt
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 03:24:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jHMs3-0005Ju-HS
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:24:08 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jHMs7-0005LZ-A6
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jHMs2-0007rw-DT
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:24:07 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:57415)
+ (envelope-from <laurent@vivier.eu>) id 1jHMs6-0007tK-9Z
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:24:11 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:42019)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jHMs2-0007rb-5a
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:24:06 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jHMs6-0007sv-1D
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 03:24:10 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N4yuK-1jPAt61IAu-010pzm; Thu, 26 Mar 2020 08:23:56 +0100
+ id 1MHXSD-1j4SiM1ZFB-00DYn9; Thu, 26 Mar 2020 08:23:59 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/6] Linux user for 5.0 patches
-Date: Thu, 26 Mar 2020 08:23:46 +0100
-Message-Id: <20200326072352.2056553-1-laurent@vivier.eu>
+Subject: [PULL 5/6] linux-user: Add x86_64 vsyscall page to /proc/self/maps
+Date: Thu, 26 Mar 2020 08:23:51 +0100
+Message-Id: <20200326072352.2056553-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200326072352.2056553-1-laurent@vivier.eu>
+References: <20200326072352.2056553-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:q+9N6Ws1lMKgXf83wGqLeqojmG5PHJkth3J5bx+LtcUtjFbqd5Z
- AQWWhmaHCX8Pc25bHGgsKL1zlDIwAg+p1xyIg9Z1WWQow+FBbMAPw5yV0d697NPKtWgk3sD
- 9TbRv1DKcayZfCi1vRsZpN1PDXTFuAsgb3Nb9g+8cG203XMaOfQejoGzOiPedpEVoHNqBhj
- wKMWdwoGJSCadVwax0CUg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BmOW5DDAf+c=:doPhIeXQng+l+emWA0V2px
- ixIXpljASNjdF3ygKgQsNN1UEDNRxnKXxxC49kk72Iz1lPLd++Y2VRH5ijHTlY3VvzqAo9pR9
- I0h6n7MgQosv7nK4XJCgF6pG2NQPAa29yd9D/lDDoLnE7abUXPHfrzo5MDdqDLXEqpWR7tR68
- WOBUkAHvs7M4EkSdMLhBk6KTjep2RfDbCbOAl20bykLmh0T+0FCH9bP8bUp/T6cX0wIv+GMyB
- lMlH3b1+9BaeSZeSi5f8silNmM0l9cfgPI/NdCDUPYGIyKhU/GLqUTpEzET5/HP5lgxBxRTFy
- ppPTq6Zm1uHIbf28c6Fa2byWxNXxzwOwgM74+ohQaNcAV+I/QQJhzh2/LDXhNSi0zGES0a76w
- T9GW/TV6UQdrlxEBN9s7QyhMQ3Y2KEe1kvtv/AePAAvhqYD+/c/okeHV61/OjH3rp9Ms778Vb
- DuSHctt54jBo7Sp+4DkI2ZsKcdsYXQk8zNZ2N8GpPduAdvjPFCagJUTIjf1DPFUIhDh8YrYDy
- orsena1N5pLJ51mAOwY77ifJKJ35Xp3g8F4Nc+5FZ8ATQrkwaLZVpIz2ZLrrbAVarU9CgbcFd
- SY8nLjtOsjNd2YutlInpytHrxkRQEg2KYyNG+rVsCleMFyLU4zOfZmT11gwQ4WgjDRP863cY3
- BQUx44CT+ZafZsr4PTQaDXm8QIq6v2v+p47JbmrVtAPoYeEmQPLPMJtdZcKsKD34/tRmHnsDA
- IXMBqxWDRj+q1sLV7OzNHS5RIIzUBsh7ycfPEU8UgkmQXh+eRa4jhLaeTEvpllR0TyXtPAY3/
- P8tdNl9CxwrE+nEBpGNLfuywTTHVC4oL+V9VuT8/7bmnX5aWKBS7ryfKPyJDVs2ZdmZrEIN
+X-Provags-ID: V03:K1:N9BloZddGoEI8aaMOWZioelpXj+OrVHQl9zigrnZcP/MsKXmp2Q
+ bfT24knouSbYlvmSXFeyzQ4IdT2X9DEIAmFSwwAAjYSUV4N12AGO1d2yo/IxzaK4mBTwgt8
+ I4cMOT6+rrHZex8D6hZypm72a8zfey21qHguss0uuZVSqXu6Khc7yP2dYtpMohlt2RRrlMI
+ +5FLf2955LFmL5mpfLLcA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ZYP8560LjSM=:msR9P5Q/I1q2yMQwfo8mtW
+ Z+DydHO9oCRc2UOW9O/G8VTjHxN4mHq7c8I86RKuP8NfdV3IwNbtY46eiwways+Vj24M7o54H
+ WNDKzJKfRuzdxZIdvtOGCXEu1P57zLbcBhsaEtZUOWnxTYpirEAlHT1BLxHC7/W6yrcdlOOIw
+ F+4+KM4k1CTfVXB6Wkud11fdcewTrWc2qBo7I/CJTIYqHbkXKa70FHMqbZs0LrXDNzeC3fH4x
+ eWi4A5P8L3hGgiOtfvTIJUvwzduxtNqQZOjZ6Vpy1VFqxe4udBTzhNonHaRPVgDQPGjY0hXfI
+ 4AodIDG0N4u0j85Vy8+V0vHN3UkMWdTfZt1tPf5ceHoMoA2Tp6Zk7VvDT1846hPhQFnHo9839
+ oCgKEAFTua+RlULRH4iUey9EqPPTcc7spFLiCxsM2M3JRLeUjvYlrtLU/YLW3PB8aJ8iZIvHb
+ yDAfmD0TRSJtAwa20/rxkOnsj/WOq+9sEwO+QEJC4xMYTjYOVqlEMNJYnXO+wYVWV7z+1R5kx
+ ws6uDQk3ZVGcsjxmeQ/EaJievGBptens6B7c+qx9pyE2gFKEyb/E+2h0WKoNJLg2WOmgiPzJY
+ dYb2QYgFWDpANeWEq4GRaQoG+BREia+FikLHDaYfVT/lTUAAhlrEX4VzHTKwF1fu19vJhLEzk
+ QfOj/BLs0MdHU7nsYvvXiKyFEdK2YhsEi0Lh0tYYhNonVbxWKIeotW+gr8zmbYf1QUzS9AaJy
+ ygEXiOicbUTdAVf4z4VcnYqjFNAjx+oODq3o58L42VpZPF1aIOoJIQkIIYfNnMb3NOFDIEufN
+ C3pPUZNJDdf0jhzsMaW/UL070+0FnFlI70P9hn00DJuwZPbHg+cbftEV3TzCVYK826JBvCy
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,46 +75,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 736cf607e40674776d752acc201f565723e86045:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-  Update version for v5.0.0-rc0 release (2020-03-24 17:50:00 +0000)
+The page isn't (necessarily) present in the host /proc/self/maps,
+and even if it might be it isn't present in page_flags, and even
+if it was it might not have the same set of page permissions.
 
-are available in the Git repository at:
+The easiest thing to do, particularly when it comes to the
+"[vsyscall]" note at the end of line, is to special case it.
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-5.0-pull-request
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200213032223.14643-5-richard.henderson@linaro.org>
+[lv: remove trailing space]
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-for you to fetch changes up to a52f5f87bece827a338d6eb3332e3def86fb9c33:
-
-  linux-user: Flush out implementation of gettimeofday (2020-03-26 08:08:54 +0100)
-
-----------------------------------------------------------------
-Emulate x86_64 vsyscalls
-Fix syscall_nr.h cleanup
-
-----------------------------------------------------------------
-
-Laurent Vivier (1):
-  linux-user, configure: fix (again) syscall_nr.h dependencies cleanup
-
-Richard Henderson (5):
-  target/i386: Renumber EXCP_SYSCALL
-  linux-user/i386: Split out gen_signal
-  linux-user/i386: Emulate x86_64 vsyscalls
-  linux-user: Add x86_64 vsyscall page to /proc/self/maps
-  linux-user: Flush out implementation of gettimeofday
-
- configure                  |   8 +-
- linux-user/i386/cpu_loop.c | 201 ++++++++++++++++++++++++++-----------
- linux-user/syscall.c       |  39 ++++++-
- target/i386/cpu.h          |  12 ++-
- target/i386/translate.c    |  14 ++-
- 5 files changed, 205 insertions(+), 69 deletions(-)
-
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 35f414666243..dbdd56e42077 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7144,6 +7144,16 @@ static int open_self_maps(void *cpu_env, int fd)
+         }
+     }
+ 
++#ifdef TARGET_VSYSCALL_PAGE
++    /*
++     * We only support execution from the vsyscall page.
++     * This is as if CONFIG_LEGACY_VSYSCALL_XONLY=y from v5.3.
++     */
++    dprintf(fd, TARGET_FMT_lx "-" TARGET_FMT_lx
++            " --xp 00000000 00:00 0 [vsyscall]\n",
++            TARGET_VSYSCALL_PAGE, TARGET_VSYSCALL_PAGE + TARGET_PAGE_SIZE);
++#endif
++
+     free(line);
+     fclose(fp);
+ 
 -- 
 2.25.1
 
