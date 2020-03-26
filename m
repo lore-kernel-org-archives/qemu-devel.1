@@ -2,87 +2,75 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13255C2D0EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC5CC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D55D12074D
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:02:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C4D020714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:09:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ecBrk1q5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D55D12074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCKuqMy0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C4D020714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHVtp-0007n6-04
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 13:02:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37796)
+	id 1jHW0a-0002Ze-J0
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 13:09:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38818)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jHVsx-0007MY-PU
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:01:40 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jHVzO-0001aa-Ag
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jHVsw-0004lj-Cf
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:01:39 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42177)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jHVsv-0004eB-BB
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:01:38 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h15so8704274wrx.9
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 10:01:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=dqLqRQ4b0SR5ODbR+9qMmow31WjM5Vry9omXjfMMazw=;
- b=ecBrk1q5TSqvNxbmz8psUz04AafImfd9hjKQ+yggV3bDIUpHcrkXFGTBhbDCYPeGYO
- LvxGR4TKSg0MO/qG1RnVbj3+1E0MCjuUXsxo7QO4fnYp2nClkmr3LO0N1+5F0bep6pIY
- 2sXw+Gp+Yy7Wgkv4Y6defQAc2VIgIcHlMUU5egtVWzgEgxA/KQVMb3bkv4uzi/X8p2B3
- NWRwPUBY2OBUGF6O2rTl0Qukm4sKiLHbLQdl9Ryxe/Jq0HbnkMLqn6tf6d3cJ5od8EW4
- VyMBlS/0sQhXptON53hvkkD5vU0pLItFKrpvx9N4NrT+/3GeQpWpOvVJyvA4J2c9dSqv
- aL2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=dqLqRQ4b0SR5ODbR+9qMmow31WjM5Vry9omXjfMMazw=;
- b=F6xMCVTtBgfjvW2vmF9ktUfgZGKc7YMRyTZf/LVTGBE7nblt6/Y3tXjeKEwvYwBFht
- GTLGM8dePMsYfIw5DZgp4r3FO8dkDhXyCg6GHsmr3wljebbGYyhM8uei0mkq0tG6OYNx
- 0GecQ+q0ETK1lUvzyeic+KRQuWlcn54VbDCHJO5bmgjPmrhD+C52OCc32ObVqBEsa7g9
- s3Pt+rDSZVEr7/X95GfGlzOE8+dWepVhmYOl91KRByCk2IQiv76lK+eFh9JClURW39x5
- CirR+ERhvsGxjUbxWzoFlEUXnS8d1nGBGk9u/SYat20IgXuDWGgeqf/uFjFzP9quqwOo
- O3eA==
-X-Gm-Message-State: ANhLgQ0+korkY2ouiaiKxTKnmPKgPSFGvwfnRvWoGIWjMgg+tCuKxWy4
- inz7FPpr8JhpQLlnRRxVib78Yg==
-X-Google-Smtp-Source: ADFU+vtXAMgmXxPKKcRWXG6PtSOphvHTiW6L0wPQuigWeLWyU/1rjIjRh6i2Q+3EGPLu0haUKCVvsg==
-X-Received: by 2002:a5d:6a43:: with SMTP id t3mr9940802wrw.87.1585242095139;
- Thu, 26 Mar 2020 10:01:35 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a1sm4717549wro.72.2020.03.26.10.01.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 10:01:33 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1DE0F1FF7E;
- Thu, 26 Mar 2020 17:01:33 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] qemu/atomic.h: add #ifdef guards for stdatomic.h
-Date: Thu, 26 Mar 2020 17:01:21 +0000
-Message-Id: <20200326170121.13045-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <kwolf@redhat.com>) id 1jHVzM-0003F0-FD
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:08:17 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47377)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jHVzM-0003Dw-80
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:08:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585242495;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=yzwQQY8P0vqqev25+cuAzypnx4ZAy2PAsI1HzOaH5SA=;
+ b=fCKuqMy0OzmupXbXknyZxK+3rer4ax276Q1eYjIL+O4nudY/ZmUjtclW2Wt7EBP8xrUr01
+ WlR8whQjDvo/1EsCP/Iol8tTUwJx2RwoyeK+cxM4rfSiJBrvWUrjK9hYpTd7Rx4PQGTF/F
+ CrgQKye1z73Sfd0WxZ4Bs+sEgKumf74=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-195-bdC00XYhPi25LjN-dAk3zQ-1; Thu, 26 Mar 2020 13:08:13 -0400
+X-MC-Unique: bdC00XYhPi25LjN-dAk3zQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B9D0800D5C;
+ Thu, 26 Mar 2020 17:08:12 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-112-205.ams2.redhat.com
+ [10.36.112.205])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79433101D482;
+ Thu, 26 Mar 2020 17:08:11 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH] qcow2: Remove unused fields from BDRVQcow2State
+Date: Thu, 26 Mar 2020 18:07:57 +0100
+Message-Id: <20200326170757.12344-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,57 +82,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Deep inside the FreeBSD netmap headers we end up including stdatomic.h
-which clashes with qemu's atomic functions which are modelled along
-the C11 standard. To avoid a massive rename lets just ifdef around the
-problem.
+These fields were already removed in commit c3c10f72, but then commit
+b58deb34 revived them probably due to bad merge conflict resolution.
+They are still unused, so remove them again.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Fixes: b58deb344ddff3b9d8b265bf73a65274767ee5f4
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/qemu/atomic.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ block/qcow2.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-index f9cd24c8994..ff72db51154 100644
---- a/include/qemu/atomic.h
-+++ b/include/qemu/atomic.h
-@@ -208,11 +208,14 @@
- /* Provide shorter names for GCC atomic builtins, return old value */
- #define atomic_fetch_inc(ptr)  __atomic_fetch_add(ptr, 1, __ATOMIC_SEQ_CST)
- #define atomic_fetch_dec(ptr)  __atomic_fetch_sub(ptr, 1, __ATOMIC_SEQ_CST)
-+
-+#ifndef atomic_fetch_add
- #define atomic_fetch_add(ptr, n) __atomic_fetch_add(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_sub(ptr, n) __atomic_fetch_sub(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_and(ptr, n) __atomic_fetch_and(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_xor(ptr, n) __atomic_fetch_xor(ptr, n, __ATOMIC_SEQ_CST)
-+#endif
- 
- #define atomic_inc_fetch(ptr)    __atomic_add_fetch(ptr, 1, __ATOMIC_SEQ_CST)
- #define atomic_dec_fetch(ptr)    __atomic_sub_fetch(ptr, 1, __ATOMIC_SEQ_CST)
-@@ -392,11 +395,14 @@
- /* Provide shorter names for GCC atomic builtins.  */
- #define atomic_fetch_inc(ptr)  __sync_fetch_and_add(ptr, 1)
- #define atomic_fetch_dec(ptr)  __sync_fetch_and_add(ptr, -1)
-+
-+#ifndef atomic_fetch_add
- #define atomic_fetch_add(ptr, n) __sync_fetch_and_add(ptr, n)
- #define atomic_fetch_sub(ptr, n) __sync_fetch_and_sub(ptr, n)
- #define atomic_fetch_and(ptr, n) __sync_fetch_and_and(ptr, n)
- #define atomic_fetch_or(ptr, n) __sync_fetch_and_or(ptr, n)
- #define atomic_fetch_xor(ptr, n) __sync_fetch_and_xor(ptr, n)
-+#endif
- 
- #define atomic_inc_fetch(ptr)  __sync_add_and_fetch(ptr, 1)
- #define atomic_dec_fetch(ptr)  __sync_add_and_fetch(ptr, -1)
--- 
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 0942126232..f4de0a27d5 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -301,9 +301,6 @@ typedef struct BDRVQcow2State {
+     QEMUTimer *cache_clean_timer;
+     unsigned cache_clean_interval;
+=20
+-    uint8_t *cluster_cache;
+-    uint8_t *cluster_data;
+-    uint64_t cluster_cache_offset;
+     QLIST_HEAD(, QCowL2Meta) cluster_allocs;
+=20
+     uint64_t *refcount_table;
+--=20
 2.20.1
 
 
