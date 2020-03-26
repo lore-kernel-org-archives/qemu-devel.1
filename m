@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 711BCC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C29C2D0E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D7D320722
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7D320722
+	by mail.kernel.org (Postfix) with ESMTPS id ACBFA20722
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBFA20722
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHZAB-0006er-AI
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:31:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37176)
+	id 1jHZAD-0006h2-T2
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:31:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jHZ9M-0005cd-TO
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:50 -0400
+ (envelope-from <bounces@canonical.com>) id 1jHZ9N-0005e3-Tt
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jHZ9L-0005iS-7l
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52834)
+ (envelope-from <bounces@canonical.com>) id 1jHZ9M-0005kA-6W
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52980)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jHZ9K-0005gh-Fh
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:46 -0400
+ id 1jHZ9L-0005iW-Vj
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jHZ9I-0007sw-9w
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:44 +0000
+ id 1jHZ9K-0007zB-JE
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 490D52E80C7
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 8815F2E80CD
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Mar 2020 20:20:41 -0000
+Date: Thu, 26 Mar 2020 20:22:38 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1868116@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -63,7 +63,7 @@ X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158525404173.17161.14858923108107650600.malone@gac.canonical.com>
+Message-Id: <158525415811.6466.4845994087943657843.malone@wampee.canonical.com>
 Subject: [Bug 1868116] Re: QEMU monitor no longer works
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -71,7 +71,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c55625033e9a7fe18f7f38fee97059f74f97178b
+X-Launchpad-Hash: 14f3597b90b203541a599144a9e3e4bf9475b7a2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,40 +89,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
->From IRC:
-[16:10] <seb128> cpaelzer, @vte, we should get 0.60.1 for focal, 0.59.91 is=
- a rc1 for 0.60, we are lacking behind merging the stable version from Debi=
-an but it's on our backlog (kenvandine was look at that one), the .1 is par=
-t of GNOME 3.36.1 which we plan to get before release (I would understand i=
-f you would like to backport a patch to help testing rather than waiting th=
-ough)
-
->From VTE Bug:
-The standard Ubuntu freeze doesn't apply to GNOME packages. Usually Ubuntu =
-aims to ship latest GNOME x.1. VTE is part of GNOME, VTE 0.60.0 is part of =
-GNOME 3.36.0, VTE 0.60.1 belongs to GNOME 3.36.1 etc. Accordingly, 0.60.0 -=
-> 0.60.1 contains important bugfixes only, no new features. In this particu=
-lar case, 0.60.1 will bring a trivial shell script fix (quite important for=
- non-VTE users), and hopefully this one. It would be outright ridiculous fo=
-r an LTS distro to ship an unstable VTE. So, the only reasonable thing for =
-Ubuntu 20.04 is to ship VTE 0.60.1. Anyway, this is not the right place to =
-discuss it.
-
-But gladly there now is a commit with a fix:
-https://gitlab.gnome.org/GNOME/vte/-/commit/277ee003066b3993cf6d55a05606009=
-caac69015
-
-I agree that we need this for 20.04, and therefore will set this up in
-prio and assign it to the Desktop team.
-
-** Changed in: vte2.91 (Ubuntu)
-     Assignee: (unassigned) =3D> Ubuntu Desktop (ubuntu-desktop)
-
-** Changed in: vte2.91 (Ubuntu)
-       Status: New =3D> Triaged
-
-** Changed in: vte2.91 (Ubuntu)
-   Importance: Undecided =3D> Critical
+Subscribed and Assigned to Ubuntu Desktop to get to 0.60.1 before Focal rel=
+eases.
+I'd be happy about an update here that this surely is on your todo list.
 
 -- =
 
