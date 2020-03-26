@@ -2,90 +2,85 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51F7C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7CBC2D0E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:37:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EC6920719
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EA3020719
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 17:37:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MDX9pZWi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC6920719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3kQHm1Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EA3020719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHWNB-0006PO-J0
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 13:32:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42099)
+	id 1jHWRM-0000vV-Jy
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 13:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42616)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jHWMY-0005zd-BN
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:32:15 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jHWQS-0008V5-7L
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jHWMW-00058n-Oo
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:32:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33811)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jHWMW-000585-HD
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:32:12 -0400
-Received: by mail-wr1-x444.google.com with SMTP id 65so8917067wrl.1
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 10:32:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=5hTZw7yNK2PkBz2kNZUIEupEE1z6/sWkI4lRilQ+OtI=;
- b=MDX9pZWi4oaN5xvTo49gIdgElFjPt4UqWJq4oh09p9BQRGDBOt0nLlLHOHWlP8EJTM
- quBzq34MAjTfw0vIASVZJ58F0+VBarTSXC6Evv9MqFohG+GCCNInv6marudXoaJguxOq
- /6t1p9M6f7YuDkQ9D1PGUOZhzWezR5WRL+/eNQJi3mGCAiC21P93V6YjUB8uuR7xPYvm
- 3pQv6PD8tR2m4O4vqdDs4wFgF7NDavowDFL56nhK4ywEXEiauQhDx2ivxyX6q9i8k0xq
- 37h7sFZS40qR6JmRsDmD64+HBN0L/RFqtz/S7vhimCTUACkWM9GGUNYBMA/IN8f6synj
- TVcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=5hTZw7yNK2PkBz2kNZUIEupEE1z6/sWkI4lRilQ+OtI=;
- b=SQj/RlEP6P4tMOiX205YLU4omVaW1sSrARs3//uJ9cmATlxbze4XnmkjxvgyroX9pW
- QKaa7NKyAzi8dzftLXTKgdzDFUNeghE1kkkRfbnx+4xDjfrVv44gRTYJo8lHp5kfCLBw
- CDoGJ0J74ybHlVVJSNR7P5cdVCpVUA0AJyS9VUUzePgSWVot0XVgGGEJOOQH5zokzFCp
- k3bATRuems53Fv4tqE2Vk6th9F33zY1G7ITC0DsOaP7R5ZfB1+Vl6asJNK6w+fmy3ATE
- hEK920GAFufPKP8tzWNafBJ79tmbDsvNvJM/MwegyOCR93PR8XPWInFIeXQ/JwKdzFLD
- BifA==
-X-Gm-Message-State: ANhLgQ1xXeHj22YDIpnJayNMhH4lJu2UxgLzkok87r5GJ1rDItOZdt+A
- FcJ8DMD/IO3uA4eSdteYCAKs5w==
-X-Google-Smtp-Source: ADFU+vsijWLvZin8EgoE24zxFkujsXAYb4l8Ae6cTaVblTfcdis7qKb9JnqsraOfc+Gc89EpQggHZA==
-X-Received: by 2002:adf:f852:: with SMTP id d18mr11091155wrq.172.1585243930908; 
- Thu, 26 Mar 2020 10:32:10 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u16sm4799181wro.23.2020.03.26.10.32.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 10:32:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EB8751FF7E;
- Thu, 26 Mar 2020 17:32:08 +0000 (GMT)
-References: <20200326170121.13045-1-alex.bennee@linaro.org>
- <CAFEAcA8Lo84gNk2tFCKsgM_O50bXTCs6Z9jH6aCvfDA56TDCmA@mail.gmail.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] qemu/atomic.h: add #ifdef guards for stdatomic.h
-In-reply-to: <CAFEAcA8Lo84gNk2tFCKsgM_O50bXTCs6Z9jH6aCvfDA56TDCmA@mail.gmail.com>
-Date: Thu, 26 Mar 2020 17:32:08 +0000
-Message-ID: <87a743nht3.fsf@linaro.org>
+ (envelope-from <eric.auger@redhat.com>) id 1jHWQQ-0007Wn-Kl
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:36:15 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35259)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jHWQQ-0007VW-GQ
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 13:36:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585244173;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tSXRKJ3jjJIKb5g83cbWtnsMmNgKqEK0FvYZddqErZM=;
+ b=D3kQHm1YZj7EN2vx3caNGBICe4rRY1EbBxSm4BJCtf/JduZn+GtI1ITrqN0JNm74wj8sqt
+ WKnsWUN/aNZge/PaapD4O06b7pd3CT+KYneHee66PIqJtf4eDyaCzUiv7JjNQ9aPz7hTNu
+ m0omUT4swi73F1hYkgaXAXBbcKsishI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-cJRT_C-yOpqInvlBp49sKA-1; Thu, 26 Mar 2020 13:36:10 -0400
+X-MC-Unique: cJRT_C-yOpqInvlBp49sKA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88285190B2A0;
+ Thu, 26 Mar 2020 17:36:07 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DEA0D5C1BA;
+ Thu, 26 Mar 2020 17:35:50 +0000 (UTC)
+Subject: Re: [PATCH v9 1/9] hw/vfio/common: Remove error print on mmio region
+ translation by viommu
+To: Alex Williamson <alex.williamson@redhat.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>
+References: <20200323084617.1782-1-bbhushan2@marvell.com>
+ <20200323084617.1782-2-bbhushan2@marvell.com>
+ <20200323170835.5021f845@w520.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8ec6af3c-6bd7-a3dc-c531-16db6b2089c5@redhat.com>
+Date: Thu, 26 Mar 2020 18:35:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <20200323170835.5021f845@w520.home>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,65 +92,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, drjones@redhat.com, peterx@redhat.com,
+ qemu-devel@nongnu.org, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ jean-philippe@linaro.org, linuc.decode@gmail.com,
+ David Gibson <david@gibson.dropbear.id.au>, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Alex,
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Thu, 26 Mar 2020 at 17:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
+On 3/24/20 12:08 AM, Alex Williamson wrote:
+> [Cc +dwg who originated this warning]
+> 
+> On Mon, 23 Mar 2020 14:16:09 +0530
+> Bharat Bhushan <bbhushan2@marvell.com> wrote:
+> 
+>> On ARM, the MSI doorbell is translated by the virtual IOMMU.
+>> As such address_space_translate() returns the MSI controller
+>> MMIO region and we get an "iommu map to non memory area"
+>> message. Let's remove this latter.
 >>
->> Deep inside the FreeBSD netmap headers we end up including stdatomic.h
->> which clashes with qemu's atomic functions which are modelled along
->> the C11 standard. To avoid a massive rename lets just ifdef around the
->> problem.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
 >> ---
->>  include/qemu/atomic.h | 6 ++++++
->>  1 file changed, 6 insertions(+)
+>>  hw/vfio/common.c | 2 --
+>>  1 file changed, 2 deletions(-)
 >>
->> diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
->> index f9cd24c8994..ff72db51154 100644
->> --- a/include/qemu/atomic.h
->> +++ b/include/qemu/atomic.h
->> @@ -208,11 +208,14 @@
->>  /* Provide shorter names for GCC atomic builtins, return old value */
->>  #define atomic_fetch_inc(ptr)  __atomic_fetch_add(ptr, 1, __ATOMIC_SEQ_=
-CST)
->>  #define atomic_fetch_dec(ptr)  __atomic_fetch_sub(ptr, 1, __ATOMIC_SEQ_=
-CST)
->> +
->> +#ifndef atomic_fetch_add
->>  #define atomic_fetch_add(ptr, n) __atomic_fetch_add(ptr, n, __ATOMIC_SE=
-Q_CST)
->>  #define atomic_fetch_sub(ptr, n) __atomic_fetch_sub(ptr, n, __ATOMIC_SE=
-Q_CST)
->>  #define atomic_fetch_and(ptr, n) __atomic_fetch_and(ptr, n, __ATOMIC_SE=
-Q_CST)
->>  #define atomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ=
-_CST)
->>  #define atomic_fetch_xor(ptr, n) __atomic_fetch_xor(ptr, n, __ATOMIC_SE=
-Q_CST)
->> +#endif
->
-> This will work around FreeBSD's current implementation in particular,
-> but I don't think there's anything in the C11 spec that mandates that
-> atomic_fetch_add() and friends have to be macros and not simply
-> functions...
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 5ca11488d6..c586edf47a 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -426,8 +426,6 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+>>                                   &xlat, &len, writable,
+>>                                   MEMTXATTRS_UNSPECIFIED);
+>>      if (!memory_region_is_ram(mr)) {
+>> -        error_report("iommu map to non memory area %"HWADDR_PRIx"",
+>> -                     xlat);
+>>          return false;
+>>      }
+>>  
+> 
+> I'm a bit confused here, I think we need more justification beyond "we
+> hit this warning and we don't want to because it's ok in this one
+> special case, therefore remove it".  I assume the special case is that
+> the device MSI address is managed via the SET_IRQS ioctl and therefore
+> we won't actually get DMAs to this range.
+Yes exactly. The guest creates a mapping between one giova and this gpa
+(corresponding to the MSI controller doorbell) because MSIs are mapped
+on ARM. But practically the physical device is programmed with an host
+chosen iova that maps onto the physical MSI controller's doorbell. so
+the device never performs DMA accesses to this range.
 
-Sure there are two alternative options:
+  But I imagine the case that
+> was in mind when adding this warning was general peer-to-peer between
+> and assigned and emulated device.
+yes makes sense.
 
- - Move to using stdatomic headers - on Linux they seem to be C++ only
- - Rename all out atomic functions - seems a bit of a big patch for rc rele=
-ases
+  Maybe there's an argument to be made
+> that such a p2p mapping might also be used in a non-vIOMMU case.  We
+> skip creating those mappings and drivers continue to work, maybe
+> because nobody attempts to do p2p DMA with the types of devices we
+> emulate, maybe because p2p DMA is not absolutely reliable on bare metal
+> and drivers test it before using it.
+MSI doorbells are mapped using the IOMMU_MMIO flag (dma-iommu.c
+iommu_dma_get_msi_page).
+One idea could be to pass that flag through the IOMMU Notifier mechanism
+into the iotlb->perm. Eventually when we get this in vfio_get_vaddr() we
+would not print the warning. Could that make sense?
 
-I suspect we should look at option two for 5.1
+Thanks
 
---=20
-Alex Benn=C3=A9e
+Eric
+
+
+
+  Anyway, I need a better argument
+> why this is ok.  Thanks,
+> 
+> Alex
+> 
+
 
