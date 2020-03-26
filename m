@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B29C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AABFC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B4BC20714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:33:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D79DA20714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 14:33:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxtGofen"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B4BC20714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RpxtOX0o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79DA20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHTZs-000094-6a
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 10:33:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41354)
+	id 1jHTa0-0000Q6-Su
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 10:33:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jHTWB-0003go-Gh
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:30:00 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jHTW0-0003L5-Ia
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jHTW9-0002rI-Cw
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:29:59 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:42529)
+ (envelope-from <mreitz@redhat.com>) id 1jHTVy-0002mK-QJ
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:29:48 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46941)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jHTW9-0002r3-7e
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:29:57 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jHTVy-0002lx-Kr
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 10:29:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585232996;
+ s=mimecast20190719; t=1585232986;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eiyTEq4pGvTXw9LT3G3qPdgGYom2OUAmGl4ySF4SH0o=;
- b=DxtGofen1kW4nbj/P6CnUlyTYQjPw//7PJ+HuoB2ppCWGb5Qtvy+dD8REKdovhDsDx2XcW
- NMgH3T3ZjLqTjq2i3MGr6SWtqDxjTmUhZf61/uSvnpZEpU2FghdpxvtrwjHStUs1sg+ku7
- HK3bGzKTFm6wFnlNcA7kD7d0YehgTFg=
+ bh=iHrZktTybweA6husRB0wD5LLtIJ/egsn59oX4wviE8A=;
+ b=RpxtOX0odDnmsnU2BVAw0vR3lXIcNaa3tdZZsvaBSt6GIRftlHYkVvKA95O/z2MZtWR+Xo
+ Bqt0k3801lpxH1OU+U1fsfw4ID619TlYPTNRK8+6JdpqWGDKA5mH1yGtQflqKTSCMnMJX6
+ 8Gv3Ms4EAgwwjGlqEvZV2w5IVOfa5Ws=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-5NK-qfOjP9yaq4CPcrQi0A-1; Thu, 26 Mar 2020 10:29:55 -0400
-X-MC-Unique: 5NK-qfOjP9yaq4CPcrQi0A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-247-GEz-c97IP_SxkpVvk1H23A-1; Thu, 26 Mar 2020 10:29:44 -0400
+X-MC-Unique: GEz-c97IP_SxkpVvk1H23A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D04B78018A2;
- Thu, 26 Mar 2020 14:29:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E51621034AE3;
+ Thu, 26 Mar 2020 14:29:42 +0000 (UTC)
 Received: from localhost (ovpn-112-132.ams2.redhat.com [10.36.112.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8854D5E00C;
- Thu, 26 Mar 2020 14:29:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4219A60C18;
+ Thu, 26 Mar 2020 14:29:42 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 05/10] qcow2: List autoclear bit names in header
-Date: Thu, 26 Mar 2020 15:29:28 +0100
-Message-Id: <20200326142933.625037-6-mreitz@redhat.com>
+Subject: [PULL 02/10] block: pass BlockDriver reference to the .bdrv_co_create
+Date: Thu, 26 Mar 2020 15:29:25 +0100
+Message-Id: <20200326142933.625037-3-mreitz@redhat.com>
 In-Reply-To: <20200326142933.625037-1-mreitz@redhat.com>
 References: <20200326142933.625037-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,205 +90,334 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Blake <eblake@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-The feature table is supposed to advertise the name of all feature
-bits that we support; however, we forgot to update the table for
-autoclear bits.  While at it, move the table to read-only memory in
-code, and tweak the qcow2 spec to name the second autoclear bit.
-Update iotests that are affected by the longer header length.
+This will allow the reuse of a single generic .bdrv_co_create
+implementation for several drivers.
+No functional changes.
 
-Fixes: 88ddffae
-Fixes: 93c24936
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20200324174233.1622067-3-eblake@redhat.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-Id: <20200326011218.29230-2-mlevitsk@redhat.com>
+Reviewed-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- docs/interop/qcow2.txt     |  3 ++-
- block/qcow2.c              | 12 +++++++++++-
- tests/qemu-iotests/031.out |  8 ++++----
- tests/qemu-iotests/036.out |  4 ++--
- tests/qemu-iotests/061.out | 14 +++++++-------
- 5 files changed, 26 insertions(+), 15 deletions(-)
+ include/block/block_int.h | 3 ++-
+ block.c                   | 3 ++-
+ block/crypto.c            | 3 ++-
+ block/file-posix.c        | 4 +++-
+ block/file-win32.c        | 4 +++-
+ block/gluster.c           | 3 ++-
+ block/nfs.c               | 4 +++-
+ block/parallels.c         | 3 ++-
+ block/qcow.c              | 3 ++-
+ block/qcow2.c             | 4 +++-
+ block/qed.c               | 3 ++-
+ block/raw-format.c        | 4 +++-
+ block/rbd.c               | 3 ++-
+ block/sheepdog.c          | 4 +++-
+ block/ssh.c               | 4 +++-
+ block/vdi.c               | 4 +++-
+ block/vhdx.c              | 3 ++-
+ block/vmdk.c              | 4 +++-
+ block/vpc.c               | 6 ++++--
+ 19 files changed, 49 insertions(+), 20 deletions(-)
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 5597e24474..640e0eca40 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -143,7 +143,8 @@ the next fields through header_length.
-                                 bit is unset, the bitmaps extension data m=
-ust be
-                                 considered inconsistent.
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index ae9c4da4d0..57c8ea24b2 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -135,7 +135,8 @@ struct BlockDriver {
+     void (*bdrv_close)(BlockDriverState *bs);
+     int coroutine_fn (*bdrv_co_create)(BlockdevCreateOptions *opts,
+                                        Error **errp);
+-    int coroutine_fn (*bdrv_co_create_opts)(const char *filename,
++    int coroutine_fn (*bdrv_co_create_opts)(BlockDriver *drv,
++                                            const char *filename,
+                                             QemuOpts *opts,
+                                             Error **errp);
+     int (*bdrv_make_empty)(BlockDriverState *bs);
+diff --git a/block.c b/block.c
+index cccae5add9..ff23e20443 100644
+--- a/block.c
++++ b/block.c
+@@ -483,7 +483,8 @@ static void coroutine_fn bdrv_create_co_entry(void *opa=
+que)
+     CreateCo *cco =3D opaque;
+     assert(cco->drv);
 =20
--                    Bit 1:      If this bit is set, the external data file=
- can
-+                    Bit 1:      Raw external data bit
-+                                If this bit is set, the external data file=
- can
-                                 be read as a consistent standalone raw ima=
-ge
-                                 without looking at the qcow2 metadata.
+-    ret =3D cco->drv->bdrv_co_create_opts(cco->filename, cco->opts, &local=
+_err);
++    ret =3D cco->drv->bdrv_co_create_opts(cco->drv,
++                                        cco->filename, cco->opts, &local_e=
+rr);
+     error_propagate(&cco->err, local_err);
+     cco->ret =3D ret;
+ }
+diff --git a/block/crypto.c b/block/crypto.c
+index 4425ebeb47..d577f89659 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -601,7 +601,8 @@ fail:
+     return ret;
+ }
 =20
+-static int coroutine_fn block_crypto_co_create_opts_luks(const char *filen=
+ame,
++static int coroutine_fn block_crypto_co_create_opts_luks(BlockDriver *drv,
++                                                         const char *filen=
+ame,
+                                                          QemuOpts *opts,
+                                                          Error **errp)
+ {
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 9bc3838b2a..65bc980bc4 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2405,7 +2405,9 @@ out:
+     return result;
+ }
+=20
+-static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts =
+*opts,
++static int coroutine_fn raw_co_create_opts(BlockDriver *drv,
++                                           const char *filename,
++                                           QemuOpts *opts,
+                                            Error **errp)
+ {
+     BlockdevCreateOptions options;
+diff --git a/block/file-win32.c b/block/file-win32.c
+index 77e8ff7b68..15859839a1 100644
+--- a/block/file-win32.c
++++ b/block/file-win32.c
+@@ -588,7 +588,9 @@ static int raw_co_create(BlockdevCreateOptions *options=
+, Error **errp)
+     return 0;
+ }
+=20
+-static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts =
+*opts,
++static int coroutine_fn raw_co_create_opts(BlockDriver *drv,
++                                           const char *filename,
++                                           QemuOpts *opts,
+                                            Error **errp)
+ {
+     BlockdevCreateOptions options;
+diff --git a/block/gluster.c b/block/gluster.c
+index 4fa4a77a47..0aa1f2cda4 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -1130,7 +1130,8 @@ out:
+     return ret;
+ }
+=20
+-static int coroutine_fn qemu_gluster_co_create_opts(const char *filename,
++static int coroutine_fn qemu_gluster_co_create_opts(BlockDriver *drv,
++                                                    const char *filename,
+                                                     QemuOpts *opts,
+                                                     Error **errp)
+ {
+diff --git a/block/nfs.c b/block/nfs.c
+index 9a6311e270..cc2413d5ab 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -662,7 +662,9 @@ out:
+     return ret;
+ }
+=20
+-static int coroutine_fn nfs_file_co_create_opts(const char *url, QemuOpts =
+*opts,
++static int coroutine_fn nfs_file_co_create_opts(BlockDriver *drv,
++                                                const char *url,
++                                                QemuOpts *opts,
+                                                 Error **errp)
+ {
+     BlockdevCreateOptions *create_options;
+diff --git a/block/parallels.c b/block/parallels.c
+index 7a01997659..6d4ed77f16 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -609,7 +609,8 @@ exit:
+     goto out;
+ }
+=20
+-static int coroutine_fn parallels_co_create_opts(const char *filename,
++static int coroutine_fn parallels_co_create_opts(BlockDriver *drv,
++                                                 const char *filename,
+                                                  QemuOpts *opts,
+                                                  Error **errp)
+ {
+diff --git a/block/qcow.c b/block/qcow.c
+index fce8989868..8973e4e565 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -934,7 +934,8 @@ exit:
+     return ret;
+ }
+=20
+-static int coroutine_fn qcow_co_create_opts(const char *filename,
++static int coroutine_fn qcow_co_create_opts(BlockDriver *drv,
++                                            const char *filename,
+                                             QemuOpts *opts, Error **errp)
+ {
+     BlockdevCreateOptions *create_options =3D NULL;
 diff --git a/block/qcow2.c b/block/qcow2.c
-index b565cf912e..b74cbeb047 100644
+index d1da3d91db..5f65fce924 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2825,7 +2825,7 @@ int qcow2_update_header(BlockDriverState *bs)
+@@ -3558,7 +3558,9 @@ out:
+     return ret;
+ }
 =20
-     /* Feature table */
-     if (s->qcow_version >=3D 3) {
--        Qcow2Feature features[] =3D {
-+        static const Qcow2Feature features[] =3D {
-             {
-                 .type =3D QCOW2_FEAT_TYPE_INCOMPATIBLE,
-                 .bit  =3D QCOW2_INCOMPAT_DIRTY_BITNR,
-@@ -2846,6 +2846,16 @@ int qcow2_update_header(BlockDriverState *bs)
-                 .bit  =3D QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
-                 .name =3D "lazy refcounts",
-             },
-+            {
-+                .type =3D QCOW2_FEAT_TYPE_AUTOCLEAR,
-+                .bit  =3D QCOW2_AUTOCLEAR_BITMAPS_BITNR,
-+                .name =3D "bitmaps",
-+            },
-+            {
-+                .type =3D QCOW2_FEAT_TYPE_AUTOCLEAR,
-+                .bit  =3D QCOW2_AUTOCLEAR_DATA_FILE_RAW_BITNR,
-+                .name =3D "raw external data",
-+            },
-         };
+-static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpt=
+s *opts,
++static int coroutine_fn qcow2_co_create_opts(BlockDriver *drv,
++                                             const char *filename,
++                                             QemuOpts *opts,
+                                              Error **errp)
+ {
+     BlockdevCreateOptions *create_options =3D NULL;
+diff --git a/block/qed.c b/block/qed.c
+index d8c4e5fb1e..1af9b3cb1d 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -720,7 +720,8 @@ out:
+     return ret;
+ }
 =20
-         ret =3D header_ext_add(buf, QCOW2_EXT_MAGIC_FEATURE_TABLE,
-diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
-index d535e407bc..46f97c5a4e 100644
---- a/tests/qemu-iotests/031.out
-+++ b/tests/qemu-iotests/031.out
-@@ -117,7 +117,7 @@ header_length             104
+-static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
++static int coroutine_fn bdrv_qed_co_create_opts(BlockDriver *drv,
++                                                const char *filename,
+                                                 QemuOpts *opts,
+                                                 Error **errp)
+ {
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 3a76ec7dd2..93b25e1b6b 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -419,7 +419,9 @@ static int raw_has_zero_init_truncate(BlockDriverState =
+*bs)
+     return bdrv_has_zero_init_truncate(bs->file->bs);
+ }
 =20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
+-static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts =
+*opts,
++static int coroutine_fn raw_co_create_opts(BlockDriver *drv,
++                                           const char *filename,
++                                           QemuOpts *opts,
+                                            Error **errp)
+ {
+     return bdrv_create_file(filename, opts, errp);
+diff --git a/block/rbd.c b/block/rbd.c
+index 84115d34b4..e637639a07 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -437,7 +437,8 @@ static int qemu_rbd_co_create(BlockdevCreateOptions *op=
+tions, Error **errp)
+     return qemu_rbd_do_create(options, NULL, NULL, errp);
+ }
 =20
- Header extension:
-@@ -150,7 +150,7 @@ header_length             104
+-static int coroutine_fn qemu_rbd_co_create_opts(const char *filename,
++static int coroutine_fn qemu_rbd_co_create_opts(BlockDriver *drv,
++                                                const char *filename,
+                                                 QemuOpts *opts,
+                                                 Error **errp)
+ {
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index cfa84338a2..a8a7e32a41 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -2157,7 +2157,9 @@ out:
+     return ret;
+ }
 =20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
+-static int coroutine_fn sd_co_create_opts(const char *filename, QemuOpts *=
+opts,
++static int coroutine_fn sd_co_create_opts(BlockDriver *drv,
++                                          const char *filename,
++                                          QemuOpts *opts,
+                                           Error **errp)
+ {
+     BlockdevCreateOptions *create_options =3D NULL;
+diff --git a/block/ssh.c b/block/ssh.c
+index b4375cf7d2..84e92821c0 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -963,7 +963,9 @@ fail:
+     return ret;
+ }
 =20
- Header extension:
-@@ -164,7 +164,7 @@ No errors were found on the image.
+-static int coroutine_fn ssh_co_create_opts(const char *filename, QemuOpts =
+*opts,
++static int coroutine_fn ssh_co_create_opts(BlockDriver *drv,
++                                           const char *filename,
++                                           QemuOpts *opts,
+                                            Error **errp)
+ {
+     BlockdevCreateOptions *create_options;
+diff --git a/block/vdi.c b/block/vdi.c
+index 0142da7233..e1a11f2aa0 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -896,7 +896,9 @@ static int coroutine_fn vdi_co_create(BlockdevCreateOpt=
+ions *create_options,
+     return vdi_co_do_create(create_options, DEFAULT_CLUSTER_SIZE, errp);
+ }
 =20
- magic                     0x514649fb
- version                   3
--backing_file_offset       0x178
-+backing_file_offset       0x1d8
- backing_file_size         0x17
- cluster_bits              16
- size                      67108864
-@@ -188,7 +188,7 @@ data                      'host_device'
+-static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts =
+*opts,
++static int coroutine_fn vdi_co_create_opts(BlockDriver *drv,
++                                           const char *filename,
++                                           QemuOpts *opts,
+                                            Error **errp)
+ {
+     QDict *qdict =3D NULL;
+diff --git a/block/vhdx.c b/block/vhdx.c
+index f02d2611be..33e57cd656 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -2046,7 +2046,8 @@ delete_and_exit:
+     return ret;
+ }
 =20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
+-static int coroutine_fn vhdx_co_create_opts(const char *filename,
++static int coroutine_fn vhdx_co_create_opts(BlockDriver *drv,
++                                            const char *filename,
+                                             QemuOpts *opts,
+                                             Error **errp)
+ {
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 8466051bc9..218d9c9800 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -2588,7 +2588,9 @@ exit:
+     return blk;
+ }
 =20
- Header extension:
-diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
-index 0b52b934e1..23b699ce06 100644
---- a/tests/qemu-iotests/036.out
-+++ b/tests/qemu-iotests/036.out
-@@ -26,7 +26,7 @@ compatible_features       []
- autoclear_features        [63]
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
+-static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts=
+ *opts,
++static int coroutine_fn vmdk_co_create_opts(BlockDriver *drv,
++                                            const char *filename,
++                                            QemuOpts *opts,
+                                             Error **errp)
+ {
+     Error *local_err =3D NULL;
+diff --git a/block/vpc.c b/block/vpc.c
+index a65550298e..6df75e22dc 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -1089,8 +1089,10 @@ out:
+     return ret;
+ }
 =20
-=20
-@@ -38,7 +38,7 @@ compatible_features       []
- autoclear_features        []
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- *** done
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index 8b3091a412..413cc4e0f4 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -26,7 +26,7 @@ header_length             104
-=20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- magic                     0x514649fb
-@@ -84,7 +84,7 @@ header_length             104
-=20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- magic                     0x514649fb
-@@ -140,7 +140,7 @@ header_length             104
-=20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- ERROR cluster 5 refcount=3D0 reference=3D1
-@@ -195,7 +195,7 @@ header_length             104
-=20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- magic                     0x514649fb
-@@ -264,7 +264,7 @@ header_length             104
-=20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- read 65536/65536 bytes at offset 44040192
-@@ -298,7 +298,7 @@ header_length             104
-=20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- ERROR cluster 5 refcount=3D0 reference=3D1
-@@ -327,7 +327,7 @@ header_length             104
-=20
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-=20
- read 131072/131072 bytes at offset 0
+-static int coroutine_fn vpc_co_create_opts(const char *filename,
+-                                           QemuOpts *opts, Error **errp)
++static int coroutine_fn vpc_co_create_opts(BlockDriver *drv,
++                                           const char *filename,
++                                           QemuOpts *opts,
++                                           Error **errp)
+ {
+     BlockdevCreateOptions *create_options =3D NULL;
+     QDict *qdict;
 --=20
 2.25.1
 
