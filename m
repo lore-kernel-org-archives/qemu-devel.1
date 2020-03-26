@@ -2,81 +2,91 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25824C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 02:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB24C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 02:43:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E20B52073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 02:41:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwcFSGAW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E20B52073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D0692073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 02:43:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0692073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHIS7-0001pQ-QH
-	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 22:41:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55359)
+	id 1jHIUb-0003b8-LF
+	for qemu-devel@archiver.kernel.org; Wed, 25 Mar 2020 22:43:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55670)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1jHIRR-0001OQ-2A
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 22:40:22 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jHITg-00038T-Mx
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 22:42:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1jHIRP-0002Om-8F
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 22:40:20 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35824)
+ (envelope-from <yi.l.liu@intel.com>) id 1jHITe-0003CL-7F
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 22:42:39 -0400
+Received: from mga05.intel.com ([192.55.52.43]:45411)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1jHIRO-0002OG-TK
- for qemu-devel@nongnu.org; Wed, 25 Mar 2020 22:40:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585190418;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bL077o7+/uHDyyVfYOBzbqDuXIxuR+eMkutinacws10=;
- b=dwcFSGAWJnymmemlGzIeIiNME1sJ3t+v51gzZWP2Z470LIrxtwzLHWdi6+Txr8RwjTyuCU
- b8Jtew1ibua1qabz48pk/O6D0Anx+Himfo+plDIt7fZ6lcms1UcU1TsiyPBxfRe0ykpFy3
- gYfPnfzv3xExjTk2SGGcGg8neVX2RCM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-73NWdO5pNGCrm5O7pmP-ig-1; Wed, 25 Mar 2020 22:40:16 -0400
-X-MC-Unique: 73NWdO5pNGCrm5O7pmP-ig-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DD5E800D54;
- Thu, 26 Mar 2020 02:40:15 +0000 (UTC)
-Received: from redhat.com (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B555BBBDD;
- Thu, 26 Mar 2020 02:40:11 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Subject: Re: [PATCH for-5.0 1/3] migration: fix cleanup_bh leak on resume
-In-Reply-To: <20200325184723.2029630-2-marcandre.lureau@redhat.com>
- (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 25 Mar 2020
- 19:47:21 +0100")
-References: <20200325184723.2029630-1-marcandre.lureau@redhat.com>
- <20200325184723.2029630-2-marcandre.lureau@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Thu, 26 Mar 2020 03:40:09 +0100
-Message-ID: <874kub96uu.fsf@secure.laptop>
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jHITd-0003Bn-Kz
+ for qemu-devel@nongnu.org; Wed, 25 Mar 2020 22:42:37 -0400
+IronPort-SDR: Ay2B+CiUqni9fjTjfhddp4ffKoyDsgzwA6Rt7QNmryHBKjw+8Zfa5Rs4HZptblCesiOrBjis/P
+ 7s8c253Mw2Mg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Mar 2020 19:42:34 -0700
+IronPort-SDR: EH2QIrFI6L3Ssesw9N5jV6GuYhRPy0sqgl7jyDBuy6Mtlcn9lGHZUSxKROhSWOUmbnmNnDloTj
+ NvUjzsy6iI1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,306,1580803200"; d="scan'208";a="240550653"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by fmsmga008.fm.intel.com with ESMTP; 25 Mar 2020 19:42:34 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 19:42:34 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 25 Mar 2020 19:42:33 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 25 Mar 2020 19:42:33 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.144]) with mapi id 14.03.0439.000;
+ Thu, 26 Mar 2020 10:42:29 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH v1 17/22] intel_iommu: do not pass down pasid bind for
+ PASID #0
+Thread-Topic: [PATCH v1 17/22] intel_iommu: do not pass down pasid bind for
+ PASID #0
+Thread-Index: AQHWAEW2o830y533sUCksKmHK8WrT6hXiSsAgAGL4GD//9PKgIABRuXA
+Date: Thu, 26 Mar 2020 02:42:29 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A202EE2@SHSMSX104.ccr.corp.intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-18-git-send-email-yi.l.liu@intel.com>
+ <20200324181326.GB127076@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A201FC7@SHSMSX104.ccr.corp.intel.com>
+ <20200325151205.GD354390@xz-x1>
+In-Reply-To: <20200325151205.GD354390@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,49 +98,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> Since commit 8c6b0356b53977bcfdea5299db07884915425b0c ("util/async:
-> make bh_aio_poll() O(1)"), migration-test reveals a leak:
->
-> QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
-> tests/qtest/migration-test  -p /x86_64/migration/postcopy/recovery
-> tests/qtest/libqtest.c:140: kill_qemu() tried to terminate QEMU
-> process but encountered exit status 1 (expected 0)
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D2082571=3D=3DERROR: LeakSanitizer: detected memory leaks
->
-> Direct leak of 40 byte(s) in 1 object(s) allocated from:
->     #0 0x7f25971dfc58 in __interceptor_malloc (/lib64/libasan.so.5+0x10dc=
-58)
->     #1 0x7f2596d08358 in g_malloc (/lib64/libglib-2.0.so.0+0x57358)
->     #2 0x560970d006f8 in qemu_bh_new /home/elmarco/src/qemu/util/main-loo=
-p.c:532
->     #3 0x5609704afa02 in migrate_fd_connect
-> /home/elmarco/src/qemu/migration/migration.c:3407
->     #4 0x5609704b6b6f in migration_channel_connect
-> /home/elmarco/src/qemu/migration/channel.c:92
->     #5 0x5609704b2bfb in socket_outgoing_migration
-> /home/elmarco/src/qemu/migration/socket.c:108
->     #6 0x560970b9bd6c in qio_task_complete /home/elmarco/src/qemu/io/task=
-.c:196
->     #7 0x560970b9aa97 in qio_task_thread_result
-> /home/elmarco/src/qemu/io/task.c:111
->     #8 0x7f2596cfee3a  (/lib64/libglib-2.0.so.0+0x4de3a)
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
+TWFyY2ggMjUsIDIwMjAgMTE6MTIgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwu
+Y29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxIDE3LzIyXSBpbnRlbF9pb21tdTogZG8gbm90
+IHBhc3MgZG93biBwYXNpZCBiaW5kIGZvciBQQVNJRA0KPiAjMA0KPiANCj4gT24gV2VkLCBNYXIg
+MjUsIDIwMjAgYXQgMTA6NDI6MjVBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+ID4gRnJv
+bTogUGV0ZXIgWHUgPCBwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiA+IFNlbnQ6IFdlZG5lc2RheSwg
+TWFyY2ggMjUsIDIwMjAgMjoxMyBBTQ0KPiA+ID4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50
+ZWwuY29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFtQQVRDSCB2MSAxNy8yMl0gaW50ZWxfaW9tbXU6
+IGRvIG5vdCBwYXNzIGRvd24gcGFzaWQNCj4gPiA+IGJpbmQgZm9yIFBBU0lEDQo+ID4gPiAjMA0K
+PiA+ID4NCj4gPiA+IE9uIFN1biwgTWFyIDIyLCAyMDIwIGF0IDA1OjM2OjE0QU0gLTA3MDAsIExp
+dSBZaSBMIHdyb3RlOg0KPiA+ID4gPiBSSURfUEFTSUQgZmllbGQgd2FzIGludHJvZHVjZWQgaW4g
+VlQtZCAzLjAgc3BlYywgaXQgaXMgdXNlZCBmb3INCj4gPiA+ID4gRE1BIHJlcXVlc3RzIHcvbyBQ
+QVNJRCBpbiBzY2FsYWJsZSBtb2RlIFZULWQuIEl0IGlzIGFsc28ga25vd24gYXMgSU9WQS4NCj4g
+PiA+ID4gQW5kIGluIFZULWQgMy4xIHNwZWMsIHRoZXJlIGlzIGRlZmluaXRpb24gb24gaXQ6DQo+
+ID4gPiA+DQo+ID4gPiA+ICJJbXBsZW1lbnRhdGlvbnMgbm90IHN1cHBvcnRpbmcgUklEX1BBU0lE
+IGNhcGFiaWxpdHkgKEVDQVBfUkVHLlJQUw0KPiA+ID4gPiBpcyAwYiksIHVzZSBhIFBBU0lEIHZh
+bHVlIG9mIDAgdG8gcGVyZm9ybSBhZGRyZXNzIHRyYW5zbGF0aW9uIGZvcg0KPiA+ID4gPiByZXF1
+ZXN0cyB3aXRob3V0IFBBU0lELiINCj4gPiA+ID4NCj4gPiA+ID4gVGhpcyBwYXRjaCBhZGRzIGEg
+Y2hlY2sgYWdhaW5zdCB0aGUgUEFTSURzIHdoaWNoIGFyZSBnb2luZyB0byBiZQ0KPiA+ID4gPiBi
+b3VuZCB0byBkZXZpY2UuIEZvciBQQVNJRCAjMCwgaXQgaXMgbm90IG5lY2Vzc2FyeSB0byBwYXNz
+IGRvd24NCj4gPiA+ID4gcGFzaWQgYmluZCByZXF1ZXN0IGZvciBpdCBzaW5jZSBQQVNJRCAjMCBp
+cyB1c2VkIGFzIFJJRF9QQVNJRCBmb3INCj4gPiA+ID4gRE1BIHJlcXVlc3RzIHdpdGhvdXQgcGFz
+aWQuIEZ1cnRoZXIgcmVhc29uIGlzIGN1cnJlbnQgSW50ZWwgdklPTU1VDQo+ID4gPiA+IHN1cHBv
+cnRzIGdJT1ZBIGJ5IHNoYWRvd2luZyBndWVzdCAybmQgbGV2ZWwgcGFnZSB0YWJsZS4gSG93ZXZl
+ciwNCj4gPiA+ID4gaW4gZnV0dXJlLCBpZiBndWVzdCBJT01NVSBkcml2ZXIgdXNlcyAxc3QgbGV2
+ZWwgcGFnZSB0YWJsZSB0bw0KPiA+ID4gPiBzdG9yZSBJT1ZBIG1hcHBpbmdzLCB0aGVuIGd1ZXN0
+IElPVkEgc3VwcG9ydCB3aWxsIGFsc28gYmUgZG9uZSB2aWENCj4gPiA+ID4gbmVzdGVkIHRyYW5z
+bGF0aW9uLiBXaGVuIGdJT1ZBIGlzIG92ZXIgRkxQVCwgdGhlbiB2SU9NTVUgc2hvdWxkDQo+ID4g
+PiA+IHBhc3MgZG93biB0aGUgcGFzaWQgYmluZCByZXF1ZXN0IGZvciBQQVNJRCAjMCB0byBob3N0
+LCBob3N0IG5lZWRzDQo+ID4gPiA+IHRvIGJpbmQgdGhlIGd1ZXN0IElPVkEgcGFnZSB0YWJsZSB0
+byBhIHByb3BlciBQQVNJRC4gZS5nIFBBU0lEDQo+ID4gPiA+IHZhbHVlIGluIFJJRF9QQVNJRCBm
+aWVsZCBmb3IgUEYvVkYgaWYgRUNBUF9SRUcuUlBTIGlzIGNsZWFyIG9yDQo+ID4gPiA+IGRlZmF1
+bHQgUEFTSUQgZm9yIEFESSAoQXNzaWduYWJsZSBEZXZpY2UgSW50ZXJmYWNlIGluIFNjYWxhYmxl
+IElPViBzb2x1dGlvbikuDQo+ID4gPiA+DQo+ID4gPiA+IElPVkEgb3ZlciBGTFBUIHN1cHBvcnQg
+b24gSW50ZWwgVlQtZDoNCj4gPiA+ID4gaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTkvOS8yMy8y
+OTcNCj4gPiA+ID4NCj4gPiA+ID4gQ2M6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwuY29t
+Pg0KPiA+ID4gPiBDYzogSmFjb2IgUGFuIDxqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbT4N
+Cj4gPiA+ID4gQ2M6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiA+ID4gQ2M6IFlp
+IFN1biA8eWkueS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+ID4gPiBDYzogUGFvbG8gQm9uemlu
+aSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gPiA+ID4gQ2M6IFJpY2hhcmQgSGVuZGVyc29uIDxy
+dGhAdHdpZGRsZS5uZXQ+DQo+ID4gPiA+IENjOiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJl
+ZGhhdC5jb20+DQo+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IExpdSBZaSBMIDx5aS5sLmxpdUBpbnRl
+bC5jb20+DQo+ID4gPiA+IC0tLQ0KPiA+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdS5jIHwgMTAg
+KysrKysrKysrKw0KPiA+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKykNCj4g
+PiA+ID4NCj4gPiA+ID4gZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBiL2h3L2kz
+ODYvaW50ZWxfaW9tbXUuYyBpbmRleA0KPiA+ID4gPiAxZTBjY2RlLi5iMDA3NzE1IDEwMDY0NA0K
+PiA+ID4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11LmMNCj4gPiA+ID4gKysrIGIvaHcvaTM4
+Ni9pbnRlbF9pb21tdS5jDQo+ID4gPiA+IEBAIC0xODg2LDYgKzE4ODYsMTYgQEAgc3RhdGljIGlu
+dA0KPiA+ID4gPiB2dGRfYmluZF9ndWVzdF9wYXNpZChJbnRlbElPTU1VU3RhdGUgKnMsDQo+ID4g
+PiBWVERCdXMgKnZ0ZF9idXMsDQo+ID4gPiA+ICAgICAgc3RydWN0IGlvbW11X2dwYXNpZF9iaW5k
+X2RhdGEgKmdfYmluZF9kYXRhOw0KPiA+ID4gPiAgICAgIGludCByZXQgPSAtMTsNCj4gPiA+ID4N
+Cj4gPiA+ID4gKyAgICBpZiAocGFzaWQgPCBWVERfTUlOX0hQQVNJRCkgew0KPiA+ID4gPiArICAg
+ICAgICAvKg0KPiA+ID4gPiArICAgICAgICAgKiBJZiBwYXNpZCA8IFZURF9IUEFTSURfTUlOLCB0
+aGlzIHBhc2lkIGlzIG5vdCBhbGxvY2F0ZWQNCj4gPiA+DQo+ID4gPiBzL1ZURF9IUEFTSURfTUlO
+L1ZURF9NSU5fSFBBU0lELy4NCj4gPg0KPiA+IEdvdCBpdC4NCj4gPg0KPiA+ID4NCj4gPiA+ID4g
+KyAgICAgICAgICogZnJvbSBob3N0LiBObyBuZWVkIHRvIHBhc3MgZG93biB0aGUgY2hhbmdlcyBv
+biBpdCB0byBob3N0Lg0KPiA+ID4gPiArICAgICAgICAgKiBUT0RPOiB3aGVuIElPVkEgb3ZlciBG
+TFBUIGlzIHJlYWR5LCB0aGlzIHN3aXRjaCBzaG91bGQgYmUNCj4gPiA+ID4gKyAgICAgICAgICog
+cmVmaW5lZC4NCj4gPiA+DQo+ID4gPiBXaGF0IHdpbGwgaGFwcGVuIGlmIHdpdGhvdXQgdGhpcyBw
+YXRjaD8gIElzIGl0IGEgbXVzdD8NCj4gPg0KPiA+IEJlZm9yZSBnSU9WQSBpcyBzdXBwb3J0ZWQg
+YnkgbmVzdGVkIHRyYW5zbGF0aW9uLCBpdCBpcyBhIG11c3QuIFRoaXMNCj4gPiByZXF1aXJlcyBJ
+T1ZBIG92ZXIgMXN0IGxldmVsIHBhZ2UgdGFibGUgaXMgcmVhZHkgaW4gZ3Vlc3Qga2VybmVsLCBh
+bHNvDQo+ID4gcmVxdWlyZXMgdGhlIFFFTVUvVkZJTyBzdXBwb3J0cyB0byBiaW5kIHRoZSBndWVz
+dCBJT1ZBIHBhZ2UgdGFibGUgdG8gaG9zdC4NCj4gPiBDdXJyZW50bHksIGd1ZXN0IGtlcm5lbCBz
+aWRlIGlzIHJlYWR5LiBIb3dldmVyLCBRRU1VIGFuZCBWRklPIHNpZGUgaXMNCj4gPiBub3QuDQo+
+IA0KPiBPSzoNCj4gDQo+IFJldmlld2VkLWJ5OiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+
+DQoNCnRoYW5rcywNCg0KUmVnYXJkcywNCllpIExpdQ0K
 
