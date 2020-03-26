@@ -2,83 +2,78 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDCBC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 16:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1427BC2D0EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 16:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A6D20719
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 16:55:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5C9920719
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 16:57:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pP7TomAP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A6D20719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyNi9gkA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5C9920719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHVnM-00018J-Ef
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 12:55:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36830)
+	id 1jHVon-0002rk-1N
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 12:57:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37060)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jHVmH-0008Up-1m
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 12:54:45 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jHVnb-0001WH-HK
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 12:56:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jHVmG-0007HV-4r
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 12:54:44 -0400
-Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:36166)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jHVmG-0007HA-1I; Thu, 26 Mar 2020 12:54:44 -0400
-Received: by mail-ua1-x944.google.com with SMTP id o15so2396132ual.3;
- Thu, 26 Mar 2020 09:54:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=BiabpToT0d0cgO94rAN5dHCJnx4s1CgNy9OiXHFREHo=;
- b=pP7TomAPBu4tfM1ooEEUvviQa+ujSCFXMaBPP0/tr5P+cxk6NGgquOr97gnqJJoW/M
- 2+DIZCZM0uat48/gsQHyLdKFCJaosLqL2Hq8D3QiFS/3lMtYJAoxCI/NmFRjfY+bfj98
- t63ZWyus/JgcOx1VIBDvlTGSnqQDmQ6djPmJd6khpJzkx5xidQVqdv4Ekax0nnJAvuYA
- 28rxSYcSN6veWRh110HNkzZG5hV+XvDMioMo5+t8guQpJqfE70CZaZ9wFNCtxrv3IBas
- Px8hDN5pBsHGPu3k2h6upUjU9hmub+lVmBsA/ki0crLUQHEKsSFwI5jhEuksgk3KQ8JP
- cCKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=BiabpToT0d0cgO94rAN5dHCJnx4s1CgNy9OiXHFREHo=;
- b=kZ27weULYzD2UpQnYGVizx1eyYZayoGJQy+xGZQW09MxVwjDvoS0lkv9SOG1325R6A
- srYpCYt5L5lXvIt3nNhua80Sozxs6td9Q333nHqiN6dmCXswLwRL2bdMcDpff7cQOiVA
- KTLDfkv9J1HEdYX7LaWqCuCmfWZ5AQWhNg48xYu41CYIK5eCaC3L12dyjboIgfuZLu4Y
- kIg/HwkZOaUE+AzwoornYBNGWMQqgWPB0ONMSd/iRRwBGwfT2KuZtWSJYZClGbwZ1n3+
- uD+4Mfx+3kzCzTHoUmY1Laq4l1s6nNaVtTI9mALbzS6t1Jc5/sSohVcH2SNjUi1Bzxwo
- c+tw==
-X-Gm-Message-State: ANhLgQ15qXQXdAd5ynxg2UdTHUPfV/0pudT8ggvTpgvUOeXSJZhbwAVR
- xxFKC1+yQhBTvwi/xHWRjfvqf0SBFu/vmnLuESo=
-X-Google-Smtp-Source: ADFU+vvYQUzn6P6moMZvOuvfm3Hf5ev5QaBDYUPrWDKpgmEM7quykws19RE3qt9rNx8swc7HJar4Wea1yeekLRrniT0=
-X-Received: by 2002:ab0:143:: with SMTP id 61mr7351543uak.85.1585241683355;
- Thu, 26 Mar 2020 09:54:43 -0700 (PDT)
+ (envelope-from <cohuck@redhat.com>) id 1jHVnZ-0007x0-EA
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 12:56:06 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35755)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jHVnZ-0007wc-6A
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 12:56:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585241764;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3w3eIqtkuZZt0x6XwEPrAwkEHKKBwaKdajX6wsdJN0E=;
+ b=iyNi9gkAsLGknJpHCBEBmmEJUSN6rTbq8zhzJz1YJRFfKV1FWTp12fq+KzOwv5wybVLudv
+ b7xJ1kmW0yLsyNAgVBNTYBBtJ78Kg6kk1S73eEJS9QNMQ/4ac+TZ/LO05ADRBCrlgCp3XL
+ ClI6BE80/5fU7vUo3UBTqZfLmI3eStE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-KCXWVck9NW2Ua8BKgtgGOw-1; Thu, 26 Mar 2020 12:56:02 -0400
+X-MC-Unique: KCXWVck9NW2Ua8BKgtgGOw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 837B88024EF;
+ Thu, 26 Mar 2020 16:56:00 +0000 (UTC)
+Received: from gondolin (ovpn-112-191.ams2.redhat.com [10.36.112.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D8A060C18;
+ Thu, 26 Mar 2020 16:55:54 +0000 (UTC)
+Date: Thu, 26 Mar 2020 17:55:51 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH] s390x: protvirt: Fix stray error_report_err in
+ s390_machine_protect
+Message-ID: <20200326175551.542153aa.cohuck@redhat.com>
+In-Reply-To: <20200326140505.2432-1-frankja@linux.ibm.com>
+References: <20200326140505.2432-1-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <cover.1584571250.git.alistair.francis@wdc.com>
- <d9390e368a9a1fd32d52aa771815e6e3d40cb1d4.1584571250.git.alistair.francis@wdc.com>
- <CAKmqyKNTpfDvWx85eAK2YNRgzxHRMA8NBvJJf081X3O76B=ekQ@mail.gmail.com>
- <9d1ce19f-86ba-3247-c3fc-0ba8d0bc7760@vivier.eu>
-In-Reply-To: <9d1ce19f-86ba-3247-c3fc-0ba8d0bc7760@vivier.eu>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 26 Mar 2020 09:46:42 -0700
-Message-ID: <CAKmqyKOpviMuhJM9qT6Z0nTL46Lp6DWwEZ_RwskCZej9tfeUuA@mail.gmail.com>
-Subject: Re: [PATCH v9 3/4] linux-user: Support futex_time64
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::944
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,44 +85,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 25, 2020 at 11:22 PM Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 25/03/2020 =C3=A0 18:41, Alistair Francis a =C3=A9crit :
-> > On Wed, Mar 18, 2020 at 3:54 PM Alistair Francis
-> > <alistair.francis@wdc.com> wrote:
-> >>
-> >> Add support for host and target futex_time64. If futex_time64 exists o=
-n
-> >> the host we try that first before falling back to the standard futux
-> >> syscall.
-> >>
-> >> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> >
-> > @Laurent did you see this?
-> >
-> > I guess it's a little late for 5.0 but it would be nice to support.
->
-> Yes, I've seen your patch.
->
-> I think it can go into 5.0 RC because it's a bug fix and it is really
-> needed because the 32bit futex will be broken if host timespec uses
-> 64bit field.
->
-> But I need to review and test before.
+On Thu, 26 Mar 2020 10:05:05 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Thanks!
+> In case the protection of the machine fails at s390_pv_vm_enable(),
+> we'll currently report the local_error variable. Problem is that
+> there's no migration blocker error that we can report at this point so
+> the pointer is always NULL which leads to a SEGFAULT.
+> 
+> Let's remove the error report.
 
-Alistair
+Yes, s390_pvm_vm_enable() will already moan on error.
 
->
-> Thanks,
-> Laurent
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> Fixes: 520935eedf941da3 ("s390x: protvirt: Add migration blocker")
+
+Note to self: update commit ID before I send a pull request (I will at
+least need to rebase for a headers update...)
+
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 3cf19c99f3468b7d..855ecf370d6e82fa 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -358,7 +358,6 @@ static int s390_machine_protect(S390CcwMachineState *ms)
+>      rc = s390_pv_vm_enable();
+>      if (rc) {
+>          qemu_balloon_inhibit(false);
+> -        error_report_err(local_err);
+>          migrate_del_blocker(pv_mig_blocker);
+>          error_free_or_abort(&pv_mig_blocker);
+>          return rc;
+
+Thanks, applied.
+
 
