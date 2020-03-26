@@ -2,103 +2,58 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F301C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 517AEC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:44:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 187AF2070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:44:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xr20RDpk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187AF2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 20C7820714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 09:44:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C7820714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHP3s-0006K1-4R
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 05:44:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47557)
+	id 1jHP43-0006cS-C1
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 05:44:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47587)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jHP3C-0005eV-IG
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:43:47 -0400
+ (envelope-from <s.reiter@proxmox.com>) id 1jHP3N-0005nO-CW
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jHP3B-0004k1-Mk
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:43:46 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41463)
+ (envelope-from <s.reiter@proxmox.com>) id 1jHP3L-0004qh-Pq
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:43:57 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:30800)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jHP3B-0004jd-JA
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 05:43:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585215825;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NhyXXU9Obgqam13uryhalZ6Dl3KUPZMBTJpKDfIA+5w=;
- b=Xr20RDpktmbmz+IM8RILYiWsTfmDAJDFK27CohWAIi/cVHieSRj2sel6xkE+APLXIvBwPF
- JWQ0dLi2j2jmU1wo8FgyrtgD/QZhKiz1Y5lQUQFnjTQ8xM4RUSIQGz8TSllHwQjqijJPa5
- ZlM+vpWMd90n/Ulgv0i6FSwnHp6FyDs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-Jn0DsKhtMiuXbqQpnnWduQ-1; Thu, 26 Mar 2020 05:43:41 -0400
-X-MC-Unique: Jn0DsKhtMiuXbqQpnnWduQ-1
-Received: by mail-wm1-f71.google.com with SMTP id i9so393575wmb.5
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 02:43:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NhyXXU9Obgqam13uryhalZ6Dl3KUPZMBTJpKDfIA+5w=;
- b=FPQeDZMXjoTU8SLU8/yEUOecAkbtu484QxUKZrwRxFI9ASCt+dcW6dtSejIa/0vyQV
- 3rYgE2AqQy3P9Rpavhulr0qoNUAow/p+EETTIGuERmRxhT1Q4QN+HaATKpbq6Xzf41JC
- Eh7rRuvQVxT2iY6j7I9buESiUAwj7iteUBe+9MtJ+ohTDzXCYpzkawl4p7Rh1dIh+MIf
- NS+6ptQYytiziwVdkWp7yc49FNmlPxc/L59vp2X28Wopws1nqXOYh7x2DuM9HezMvPWk
- NccoHl0ujHqxxbDqo89vlltL3ZAWZH3d1LUZTOCmS4Lm+qshzRNgcz1uN/GqE7JyHhtQ
- 3ufg==
-X-Gm-Message-State: ANhLgQ0Io/buFUlXwZcPPVe8siLEwjzpKq/26nbTYYISFJM31Q4oocfC
- V0j7y7nvdxJcCBl5Ku5qkvTVm/4V2MuUxbP15Ss8OQxGWJ2gZ1HLJxOPsqsg8GKkDxz2/6wMDYs
- JbJ5hoD8+FrLBL8I=
-X-Received: by 2002:a7b:c842:: with SMTP id c2mr2359306wml.154.1585215820301; 
- Thu, 26 Mar 2020 02:43:40 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtyAhVzl5vU+epEXzL+OtVaaptHYtbQrT38VjqrAqSKOjWV58Mrxd4UX3Hxi5YChhB0UK6ZLg==
-X-Received: by 2002:a7b:c842:: with SMTP id c2mr2359289wml.154.1585215820100; 
- Thu, 26 Mar 2020 02:43:40 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e4f4:3c00:2b79:d6dc?
- ([2001:b07:6468:f312:e4f4:3c00:2b79:d6dc])
- by smtp.gmail.com with ESMTPSA id a1sm3046013wro.72.2020.03.26.02.43.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 26 Mar 2020 02:43:39 -0700 (PDT)
-Subject: Re: [PATCH 2/2] util/bufferiszero: improve avx2 accelerator
-To: "Hu, Robert" <robert.hu@intel.com>, Eric Blake <eblake@redhat.com>,
- Robert Hoo <robert.hu@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>
-References: <1585119021-46593-1-git-send-email-robert.hu@linux.intel.com>
- <1585119021-46593-2-git-send-email-robert.hu@linux.intel.com>
- <9eea6e9c-e35c-72e7-4574-7b9a6b72f9a7@redhat.com>
- <9E79D1C9A97CFD4097BCE431828FDD31178F147A@SHSMSX104.ccr.corp.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <01974c7d-8f44-a9d8-b068-2b80642d6d45@redhat.com>
-Date: Thu, 26 Mar 2020 10:43:38 +0100
+ (Exim 4.71) (envelope-from <s.reiter@proxmox.com>)
+ id 1jHP3I-0004n9-D6; Thu, 26 Mar 2020 05:43:52 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 50BC6428C9;
+ Thu, 26 Mar 2020 10:43:49 +0100 (CET)
+Subject: Re: [PATCH] backup: don't acquire aio_context in backup_clean
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <76edbead-7ccf-833b-a3f2-15dff7f0748c@virtuozzo.com>
+ <20200325155055.730633-1-s.reiter@proxmox.com>
+ <2b288000-7c09-ba31-82a7-02c5ed55f4e7@virtuozzo.com>
+From: Stefan Reiter <s.reiter@proxmox.com>
+Message-ID: <1d1984b3-14f5-5a17-b477-d70561f75e8f@proxmox.com>
+Date: Thu, 26 Mar 2020 10:43:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <9E79D1C9A97CFD4097BCE431828FDD31178F147A@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <2b288000-7c09-ba31-82a7-02c5ed55f4e7@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 212.186.127.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,15 +65,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, slp@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
+ jsnow@redhat.com, dietmar@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/03/20 03:09, Hu, Robert wrote:
-> BTW, do I need to resend these 2 patches?
+On 26/03/2020 06:54, Vladimir Sementsov-Ogievskiy wrote:
+> 25.03.2020 18:50, Stefan Reiter wrote:
+>> backup_clean is only ever called as a handler via job_exit, which
+>=20
+> Hmm.. I'm afraid it's not quite correct.
+>=20
+> job_clean
+>=20
+>  =C2=A0 job_finalize_single
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0 job_completed_txn_abort (lock aio context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0 job_do_finalize
+>=20
+>=20
+> Hmm. job_do_finalize calls job_completed_txn_abort, which cares to lock=
+=20
+> aio context..
+> And on the same time, it directaly calls job_txn_apply(job->txn,=20
+> job_finalize_single)
+> without locking. Is it a bug?
+>=20
 
-No, thanks!  I have queued them.
+I think, as you say, the idea is that job_do_finalize is always called=20
+with the lock acquired. That's why job_completed_txn_abort takes care to=20
+release the lock (at least of the "outer_ctx" as it calls it) before=20
+reacquiring it.
 
-Paolo
+> And, even if job_do_finalize called always with locked context, where i=
+s=20
+> guarantee that all
+> context of all jobs in txn are locked?
+>=20
+
+I also don't see anything that guarantees that... I guess it could be=20
+adapted to handle locks like job_completed_txn_abort does?
+
+Haven't looked into transactions too much, but does it even make sense=20
+to have jobs in different contexts in one transaction?
+
+> Still, let's look through its callers.
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_finalize
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 qmp_block_job_finalize (lock aio context)
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 qmp_job_finalize (lock aio context)
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 test_cancel_concluded (doesn't lock, but it's a test)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_completed_t=
+xn_success
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 job_completed
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_exit (lock aio context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_cancel
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+blockdev_mark_auto_del (lock aio context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+job_user_cancel
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 qmp_block_job_cancel (locks context)
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 qmp_job_cancel=C2=A0 (locks context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+job_cancel_err
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_cancel_sync (return=20
+> job_finish_sync(job, &job_cancel_err, NULL);, job_finish_sync just call=
+s=20
+> callback)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 replication_clo=
+se (it's=20
+> .bdrv_close.. Hmm, I don't see context locking, where is it ?)
+Hm, don't see it either. This might indeed be a way to get to job_clean=20
+without a lock held.
+
+I don't have any testing set up for replication atm, but if you believe=20
+this would be correct I can send a patch for that as well (just acquire=20
+the lock in replication_close before job_cancel_async?).
+
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 replication_sto=
+p (locks context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 drive_backup_ab=
+ort (locks context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blockdev_backup=
+_abort (locks context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_cancel_sync=
+_all (locks context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_common (=
+locks context)
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+test_* (I don't care)
+>=20
+
+To clarify, aside from the commit message the patch itself does not=20
+appear to be wrong? All paths (aside from replication_close mentioned=20
+above) guarantee the job lock to be held.
+
+>> already acquires the job's context. The job's context is guaranteed to
+>> be the same as the one used by backup_top via backup_job_create.
+>>
+>> Since the previous logic effectively acquired the lock twice, this
+>> broke cleanup of backups for disks using IO threads, since the=20
+>> BDRV_POLL_WHILE
+>> in bdrv_backup_top_drop -> bdrv_do_drained_begin would only release=20
+>> the lock
+>> once, thus deadlocking with the IO thread.
+>>
+>> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+>=20
+> Just note, that this thing were recently touched by 0abf2581717a19 , so=
+=20
+> add Sergio (its author) to CC.
+>=20
+>> ---
+>>
+>> This is a fix for the issue discussed in this part of the thread:
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07639.html
+>> ...not the original problem (core dump) posted by Dietmar.
+>>
+>> I've still seen it occasionally hang during a backup abort. I'm trying=
+=20
+>> to figure
+>> out why that happens, stack trace indicates a similar problem with the=
+=20
+>> main
+>> thread hanging at bdrv_do_drained_begin, though I have no clue why as=20
+>> of yet.
+>>
+>> =C2=A0 block/backup.c | 4 ----
+>> =C2=A0 1 file changed, 4 deletions(-)
+>>
+>> diff --git a/block/backup.c b/block/backup.c
+>> index 7430ca5883..a7a7dcaf4c 100644
+>> --- a/block/backup.c
+>> +++ b/block/backup.c
+>> @@ -126,11 +126,7 @@ static void backup_abort(Job *job)
+>> =C2=A0 static void backup_clean(Job *job)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BackupBlockJob *s =3D container_of(job,=
+ BackupBlockJob, common.job);
+>> -=C2=A0=C2=A0=C2=A0 AioContext *aio_context =3D bdrv_get_aio_context(s=
+->backup_top);
+>> -
+>> -=C2=A0=C2=A0=C2=A0 aio_context_acquire(aio_context);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_backup_top_drop(s->backup_top);
+>> -=C2=A0=C2=A0=C2=A0 aio_context_release(aio_context);
+>> =C2=A0 }
+>> =C2=A0 void backup_do_checkpoint(BlockJob *job, Error **errp)
+>>
+>=20
+>=20
 
 
