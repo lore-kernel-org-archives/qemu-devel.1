@@ -2,55 +2,58 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED3DDC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 22:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08608C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 22:33:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1F9C2077D
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 22:32:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C14A82077D
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 22:33:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="gV00BIK9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F9C2077D
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="JyGl3g4H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C14A82077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHb3U-0008H0-PU
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 18:32:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56808)
+	id 1jHb4U-0000y6-0d
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 18:33:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <7c4e49a783c7b2f77aa81794892cf08b4feba914@lizzy.crudebyte.com>)
- id 1jHb27-0007Qz-7v
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 18:31:28 -0400
+ (envelope-from <8ee6bb18b00ccb92ca9ecdeb4ff320503ed6a730@lizzy.crudebyte.com>)
+ id 1jHb37-0008Ul-Ud
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 18:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <7c4e49a783c7b2f77aa81794892cf08b4feba914@lizzy.crudebyte.com>)
- id 1jHb24-0008EO-6A
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 18:31:26 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:43865)
+ (envelope-from <8ee6bb18b00ccb92ca9ecdeb4ff320503ed6a730@lizzy.crudebyte.com>)
+ id 1jHb35-0000aC-7U
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 18:32:28 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:34939)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71)
- (envelope-from <7c4e49a783c7b2f77aa81794892cf08b4feba914@lizzy.crudebyte.com>)
- id 1jHb23-0007ZW-Cq
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 18:31:24 -0400
+ (envelope-from <8ee6bb18b00ccb92ca9ecdeb4ff320503ed6a730@lizzy.crudebyte.com>)
+ id 1jHb34-0008EU-W5
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 18:32:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:Message-Id:Content-Type:
- Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Content-ID:
- Content-Description; bh=L/QR5W5mCD3gzycwHZOJ92NxoawC1fkiwvh5xdRxRBo=; b=gV00B
- IK9Iskkc9Z2kLJsEvTeqFW1vIeCnYHVGxfhvouh3mmtRzI3s/9pmz90Fuk4O48YylYvfB4CTUr7dw
- Hp+0T8D4MnlW2H4/nDBGOr3JTYsm0e1M6mGbloc/UkHrxYAC4odw467Yecher0uXBt/GT6QHUPdj0
- QazoULBf7726mgLaOAjMz4RNFJn8nuFC1k7wbfUJnqd5vfTyQazSnbxtp7wVpwaxEowJrD7lXRRYd
- /QVkJfX/vtdGns2Yn1CF3So1zD1BjLM50ZV+ROlMdiQYtEguivPHJm6usuVZYtV+NoXv1XYGqjoAp
- mybqb/GhRVtN5kHUbIWX+31V/Eg+Q==;
-Message-Id: <cover.1585258105.git.qemu_oss@crudebyte.com>
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=0NiuoPE9FpFqaIkbmn2TcQVwJNLByVhPkawPEjeTIMs=; b=JyGl3
+ g4H+waXVS0MRnKRpTOCXQ0CzRsaogdVw8QN8uk4Oaz8FQJ7K+gh2tfu5BbB/mR6fmQ2ieHGxuuWRR
+ FtckUAq8RzTgvRaLJWglEvz+vLqT7tIUuGnPkr94AJNm0XOyKrA6VjU3o2HjncoDCml7lcNv7pWXC
+ R9lZRjVG6Za3HHIYdwdczjFk5DTQKZ1nsI2LHZLMd2MAQJNXlhvcf2HEmDF5+DY62QKJoEt2qUkKU
+ 6yqRjKtU++Fe+s9v/X25o91qLevKnz0YSxI3r15+VULbG+7j83hZd5pNmUBqvwGJcIFC+LaeHCAOh
+ 7U3pZM8tZfG+guRuhwk/Azq4m/0ig==;
+Message-Id: <8ee6bb18b00ccb92ca9ecdeb4ff320503ed6a730.1585258105.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1585258105.git.qemu_oss@crudebyte.com>
+References: <cover.1585258105.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Thu, 26 Mar 2020 22:28:25 +0100
-Subject: [PATCH v5 0/6] 9pfs: readdir optimization
+Date: Thu, 26 Mar 2020 22:25:18 +0100
+Subject: [PATCH v5 5/6] 9pfs: T_readdir latency optimization
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -70,70 +73,208 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As previously mentioned, I was investigating performance issues with 9pfs.
-Raw file read/write of 9pfs is actually quite good, provided that client
-picked a reasonable high msize (maximum message size). I would recommend
-to log a warning on 9p server side if a client attached with a small msize
-that would cause performance issues for that reason.
+Make top half really top half and bottom half really bottom half:
 
-However there are other aspects where 9pfs currently performs suboptimally,
-especially readdir handling of 9pfs is extremely slow, a simple readdir
-request of a guest typically blocks for several hundred milliseconds or
-even several seconds, no matter how powerful the underlying hardware is.
-The reason for this performance issue: latency.
-Currently 9pfs is heavily dispatching a T_readdir request numerous times
-between main I/O thread and a background I/O thread back and forth; in fact
-it is actually hopping between threads even multiple times for every single
-directory entry during T_readdir request handling which leads in total to
-huge latencies for a single T_readdir request.
+Each T_readdir request handling is hopping between threads (main
+I/O thread and background I/O driver threads) several times for
+every individual directory entry, which sums up to huge latencies
+for handling just a single T_readdir request.
 
-This patch series aims to address this severe performance issue of 9pfs
-T_readdir request handling. The actual performance optimization is patch 5.
+Instead of doing that, collect now all required directory entries
+(including all potentially required stat buffers for each entry) in
+one rush on a background I/O thread from fs driver by calling the
+previously added function v9fs_co_readdir_many() instead of
+v9fs_co_readdir(), then assemble the entire resulting network
+response message for the readdir request on main I/O thread. The
+fs driver is still aborting the directory entry retrieval loop
+(on the background I/O thread inside of v9fs_co_readdir_many())
+as soon as it would exceed the client's requested maximum R_readdir
+response size. So this will not introduce a performance penalty on
+another end.
 
-v4->v5:
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+---
+ hw/9pfs/9p.c | 122 +++++++++++++++++++++++----------------------------
+ 1 file changed, 55 insertions(+), 67 deletions(-)
 
-  * Rebased to master (SHA-1 762fa6d7).
-
-  * Dropped benchmark patches (see v4 if you want to run a benchmark on v5).
-
-  * Divided split-readdir test into 3 individual tests, which also fixes the
-    previously discussed transport error [patch 1].
-
-  * Fixed English spelling for 'split' [patch 1].
-
-  * Rename max_count -> maxsize [NEW patch 2].
-
-  * Divided previous huge readdir optimization patch into individual patches
-    [patch 3], [patch 4], [patch 5].
-
-  * Added comment on v9fs_readdir_response_size() [patch 3].
-
-  * Renamed v9fs_co_readdir_lowlat() -> v9fs_co_readdir_many() [patch 4].
-
-  * Adjusted comment on v9fs_co_readdir_many() [patch 4].
-
-  * Added comment on v9fs_co_run_in_worker() [NEW patch 6].
-
-  * Adjusted commit log message of several patches.
-
-Message-ID of previous version (v4):
-  cover.1579567019.git.qemu_oss@crudebyte.com
-
-Christian Schoenebeck (6):
-  tests/virtio-9p: added split readdir tests
-  9pfs readdir: rename max_count -> maxsize
-  9pfs: make v9fs_readdir_response_size() public
-  9pfs: add new function v9fs_co_readdir_many()
-  9pfs: T_readdir latency optimization
-  9pfs: clarify latency of v9fs_co_run_in_worker()
-
- hw/9pfs/9p.c                 | 148 ++++++++++++++--------------
- hw/9pfs/9p.h                 |  23 +++++
- hw/9pfs/codir.c              | 181 ++++++++++++++++++++++++++++++++---
- hw/9pfs/coth.h               |  15 ++-
- tests/qtest/virtio-9p-test.c | 108 +++++++++++++++++++++
- 5 files changed, 386 insertions(+), 89 deletions(-)
-
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index bd8a7cbfac..5246d96a08 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -971,30 +971,6 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
+     return 0;
+ }
+ 
+-static int coroutine_fn dirent_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
+-                                      struct dirent *dent, V9fsQID *qidp)
+-{
+-    struct stat stbuf;
+-    V9fsPath path;
+-    int err;
+-
+-    v9fs_path_init(&path);
+-
+-    err = v9fs_co_name_to_path(pdu, &fidp->path, dent->d_name, &path);
+-    if (err < 0) {
+-        goto out;
+-    }
+-    err = v9fs_co_lstat(pdu, &path, &stbuf);
+-    if (err < 0) {
+-        goto out;
+-    }
+-    err = stat_to_qid(pdu, &stbuf, qidp);
+-
+-out:
+-    v9fs_path_free(&path);
+-    return err;
+-}
+-
+ V9fsPDU *pdu_alloc(V9fsState *s)
+ {
+     V9fsPDU *pdu = NULL;
+@@ -2337,6 +2313,18 @@ size_t v9fs_readdir_response_size(V9fsString *name)
+     return 24 + v9fs_string_size(name);
+ }
+ 
++static void v9fs_free_dirents(struct V9fsDirEnt *e)
++{
++    struct V9fsDirEnt *next = NULL;
++
++    for (; e; e = next) {
++        next = e->next;
++        g_free(e->dent);
++        g_free(e->st);
++        g_free(e);
++    }
++}
++
+ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
+                                         int32_t maxsize)
+ {
+@@ -2345,54 +2333,53 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
+     V9fsString name;
+     int len, err = 0;
+     int32_t count = 0;
+-    off_t saved_dir_pos;
+     struct dirent *dent;
++    struct stat *st;
++    struct V9fsDirEnt *entries = NULL;
+ 
+-    /* save the directory position */
+-    saved_dir_pos = v9fs_co_telldir(pdu, fidp);
+-    if (saved_dir_pos < 0) {
+-        return saved_dir_pos;
+-    }
+-
+-    while (1) {
+-        v9fs_readdir_lock(&fidp->fs.dir);
++    /*
++     * inode remapping requires the device id, which in turn might be
++     * different for different directory entries, so if inode remapping is
++     * enabled we have to make a full stat for each directory entry
++     */
++    const bool dostat = pdu->s->ctx.export_flags & V9FS_REMAP_INODES;
+ 
+-        err = v9fs_co_readdir(pdu, fidp, &dent);
+-        if (err || !dent) {
+-            break;
+-        }
+-        v9fs_string_init(&name);
+-        v9fs_string_sprintf(&name, "%s", dent->d_name);
+-        if ((count + v9fs_readdir_response_size(&name)) > maxsize) {
+-            v9fs_readdir_unlock(&fidp->fs.dir);
++    /*
++     * Fetch all required directory entries altogether on a background IO
++     * thread from fs driver. We don't want to do that for each entry
++     * individually, because hopping between threads (this main IO thread
++     * and background IO driver thread) would sum up to huge latencies.
++     */
++    count = v9fs_co_readdir_many(pdu, fidp, &entries, maxsize, dostat);
++    if (count < 0) {
++        err = count;
++        count = 0;
++        goto out;
++    }
++    count = 0;
+ 
+-            /* Ran out of buffer. Set dir back to old position and return */
+-            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
+-            v9fs_string_free(&name);
+-            return count;
+-        }
++    for (struct V9fsDirEnt *e = entries; e; e = e->next) {
++        dent = e->dent;
+ 
+         if (pdu->s->ctx.export_flags & V9FS_REMAP_INODES) {
+-            /*
+-             * dirent_to_qid() implies expensive stat call for each entry,
+-             * we must do that here though since inode remapping requires
+-             * the device id, which in turn might be different for
+-             * different entries; we cannot make any assumption to avoid
+-             * that here.
+-             */
+-            err = dirent_to_qid(pdu, fidp, dent, &qid);
++            st = e->st;
++            /* e->st should never be NULL, but just to be sure */
++            if (!st) {
++                err = -1;
++                break;
++            }
++
++            /* remap inode */
++            err = stat_to_qid(pdu, st, &qid);
+             if (err < 0) {
+-                v9fs_readdir_unlock(&fidp->fs.dir);
+-                v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
+-                v9fs_string_free(&name);
+-                return err;
++                break;
+             }
+         } else {
+             /*
+              * Fill up just the path field of qid because the client uses
+              * only that. To fill the entire qid structure we will have
+              * to stat each dirent found, which is expensive. For the
+-             * latter reason we don't call dirent_to_qid() here. Only drawback
++             * latter reason we don't call stat_to_qid() here. Only drawback
+              * is that no multi-device export detection of stat_to_qid()
+              * would be done and provided as error to the user here. But
+              * user would get that error anyway when accessing those
+@@ -2405,25 +2392,26 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
+             qid.version = 0;
+         }
+ 
++        v9fs_string_init(&name);
++        v9fs_string_sprintf(&name, "%s", dent->d_name);
++
+         /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
+         len = pdu_marshal(pdu, 11 + count, "Qqbs",
+                           &qid, dent->d_off,
+                           dent->d_type, &name);
+ 
+-        v9fs_readdir_unlock(&fidp->fs.dir);
++        v9fs_string_free(&name);
+ 
+         if (len < 0) {
+-            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
+-            v9fs_string_free(&name);
+-            return len;
++            err = len;
++            break;
+         }
++
+         count += len;
+-        v9fs_string_free(&name);
+-        saved_dir_pos = dent->d_off;
+     }
+ 
+-    v9fs_readdir_unlock(&fidp->fs.dir);
+-
++out:
++    v9fs_free_dirents(entries);
+     if (err < 0) {
+         return err;
+     }
 -- 
 2.20.1
 
