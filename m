@@ -2,52 +2,75 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D26E2C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:15:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F44C2D0EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC4092073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:15:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4092073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 96EBF2076A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 15:38:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BgU/uOHB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96EBF2076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHUEE-000195-WD
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 11:15:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50716)
+	id 1jHUaM-0006zf-No
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 11:38:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jHUDc-0000h9-PX
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:14:53 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jHUYn-0005Vl-5o
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jHUDa-0000Bx-O8
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:14:51 -0400
-Received: from relay.sw.ru ([185.231.240.75]:56052)
+ (envelope-from <kwolf@redhat.com>) id 1jHUYk-0002rB-Jp
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:36:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:53253)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jHUDa-00009Y-Bt
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:14:50 -0400
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jHUDO-00011Y-3L; Thu, 26 Mar 2020 18:14:38 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] gdbstub: fix compiler complaining
-Date: Thu, 26 Mar 2020 18:14:07 +0300
-Message-Id: <20200326151407.25046-1-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jHUYg-0002o1-Vo
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 11:36:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585236998;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=yBwS7f4qww1s93tPn3J5P+83hlcxr7JDlKJaH1dgrqE=;
+ b=BgU/uOHBryOneT4iJDbF6pKxjmrQiXsjg7+P2M4FHaXrKd3YUQJpdlb85dIqbHl3YQPvo0
+ j1kl97YTM+RkeIzXq6oYqQX2WMgfSdWD045s6k+JJcyym9cGl1686YsoMlLxLW+vx3+2tK
+ ahs2u+UBYpBmQZtg1d7RmzaIBByyGQY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-50-G4y7xfcuPbyvn54AE0j4Wg-1; Thu, 26 Mar 2020 11:36:36 -0400
+X-MC-Unique: G4y7xfcuPbyvn54AE0j4Wg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CF44192D786;
+ Thu, 26 Mar 2020 15:36:35 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-112-205.ams2.redhat.com
+ [10.36.112.205])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0D925C1BA;
+ Thu, 26 Mar 2020 15:36:33 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 0/2] mirror: Fix hang (operation waiting for
+ itself/circular dependency)
+Date: Thu, 26 Mar 2020 16:36:26 +0100
+Message-Id: <20200326153628.4869-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,43 +82,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-    ./gdbstub.c: In function ‘handle_query_thread_extra’:
-        /usr/include/glib-2.0/glib/glib-autocleanups.h:28:10:
-    error: ‘cpu_name’ may be used uninitialized in this function
-    [-Werror=maybe-uninitialized]
-        g_free (*pp);
-               ^
-    ./gdbstub.c:2063:26: note: ‘cpu_name’ was declared here
-        g_autofree char *cpu_name;
-                         ^
-    cc1: all warnings being treated as errors
+The recent fix didn't actually fix the whole problem. Operations can't
+only wait for themselves, but we can also end up with circular
+dependencies like two operations waiting for each other to complete.
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- gdbstub.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This reverts the first fix and implements another approach.
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 013fb1ac0f..171e150950 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2060,8 +2060,8 @@ static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
-         /* Print the CPU model and name in multiprocess mode */
-         ObjectClass *oc = object_get_class(OBJECT(cpu));
-         const char *cpu_model = object_class_get_name(oc);
--        g_autofree char *cpu_name;
--        cpu_name  = object_get_canonical_path_component(OBJECT(cpu));
-+        g_autofree char *cpu_name =
-+            object_get_canonical_path_component(OBJECT(cpu));
-         g_string_printf(rs, "%s %s [%s]", cpu_model, cpu_name,
-                         cpu->halted ? "halted " : "running");
-     } else {
--- 
-2.17.0
+v2:
+- Mark active mirror operations as in-flight, too
+
+Kevin Wolf (2):
+  Revert "mirror: Don't let an operation wait for itself"
+  mirror: Wait only for in-flight operations
+
+ block/mirror.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
+
+--=20
+2.20.1
 
 
