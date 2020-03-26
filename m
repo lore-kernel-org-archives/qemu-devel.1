@@ -2,71 +2,73 @@ Return-Path: <SRS0=Dj2y=5L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9461DC43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 21:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D60CCC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 21:26:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6422E20714
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 21:23:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6422E20714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9B79220714
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 21:26:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B79220714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHZye-0003VE-Hc
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 17:23:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39221)
+	id 1jHa1D-000558-Pq
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 17:26:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42730)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jHZxe-0002mg-8u
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 17:22:47 -0400
+ (envelope-from <bounces@canonical.com>) id 1jHa0U-0004bT-1v
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 17:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jHZxd-0003ci-1T
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 17:22:46 -0400
-Resent-Date: Thu, 26 Mar 2020 17:22:46 -0400
-Resent-Message-Id: <E1jHZxd-0003ci-1T@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21108)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jHZxZ-0003YO-WC; Thu, 26 Mar 2020 17:22:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1585257757; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=RtwP5e3WvG0lSsA6M0biR96U7InVlhJBmlPDVI4owE4+hDy8XIhcxmNjnw3c9W9ogjLFnTUHrtBVAKpYX2eVYA+f6YhNTuMgQfE9uUO6dComnOxFL/vFyJGf9vLD3IellzbzGY09ubRQFK9Zu0ph2Dny+STvEfqDT/PdHDG3FJ0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1585257757;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=UQ1oTNrf1VH1ahRuAhXyGf+I2a02qMIHYEK9VCDSIS4=; 
- b=R8mcRV2jgGt4UPBwTfekbp5TyKdjxePCPysow+VI0PXaUzNlVhwBdsyp0GvO+BOA3wCEgd7vimVXS6fnF0AGgrnHno0NDHFWuVh3N/p+mu786tGIEfNO8NV64iArX4ePaE+3XdJ9MW87GZ4B1b3g7arOtt6jWshdfRpRa19j2lU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1585257756192308.1368310990623;
- Thu, 26 Mar 2020 14:22:36 -0700 (PDT)
-In-Reply-To: <20200326203414.18140-1-peter.maydell@linaro.org>
-Subject: Re: [PATCH] hw/arm/collie: Put StrongARMState* into a
- CollieMachineState struct
-Message-ID: <158525775502.25711.13645073054159373855@39012742ff91>
+ (envelope-from <bounces@canonical.com>) id 1jHa0S-0006VE-9e
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 17:25:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33076)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jHa0S-0006UE-2J
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 17:25:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jHa0Q-0004sS-Dh
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 21:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 65E0A2E80C9
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 21:25:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peter.maydell@linaro.org
-Date: Thu, 26 Mar 2020 14:22:36 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Mar 2020 21:16:08 -0000
+From: Paul Menzel <1693050@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: paulmenzel philmd rmustacc
+X-Launchpad-Bug-Reporter: Robert Mustacchi (rmustacc)
+X-Launchpad-Bug-Modifier: Paul Menzel (paulmenzel)
+References: <149558234717.18218.15801621819682136328.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158525736835.19072.16896591055458736239.malone@chaenomeles.canonical.com>
+Subject: [Bug 1693050] Re: xhci HCIVERSION register read emulation incorrectly
+ handled
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: deac316eb2ac59f6309bf6ce22fab403dd597930
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,54 +77,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Bug 1693050 <1693050@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyNjIwMzQxNC4xODE0
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rp
-bmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGlu
-c3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRv
-Y2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWlu
-Z3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAg
-ICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5vCiAgQ0MgICAgICBh
-YXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9oZWxwZXItYTY0Lm8KL3RtcC9xZW11LXRlc3Qvc3Jj
-L2h3L2FybS9jb2xsaWUuYzogSW4gZnVuY3Rpb24gJ2NvbGxpZV9pbml0JzoKL3RtcC9xZW11LXRl
-c3Qvc3JjL2h3L2FybS9jb2xsaWUuYzo2NzoyMTogZXJyb3I6ICdzJyB1bmRlY2xhcmVkIChmaXJz
-dCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKICAgICBhcm1fbG9hZF9rZXJuZWwocy0+Y3B1LCBtYWNo
-aW5lLCAmY29sbGllX2JpbmZvKTsKICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVz
-dC9zcmMvaHcvYXJtL2NvbGxpZS5jOjY3OjIxOiBub3RlOiBlYWNoIHVuZGVjbGFyZWQgaWRlbnRp
-ZmllciBpcyByZXBvcnRlZCBvbmx5IG9uY2UgZm9yIGVhY2ggZnVuY3Rpb24gaXQgYXBwZWFycyBp
-bgptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGh3L2FybS9j
-b2xsaWUub10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
-Li4uLgogIEdFTiAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vZGVjb2RlLXN2ZS5pbmMu
-YwptYWtlOiAqKiogW01ha2VmaWxlOjUyNzogYWFyY2g2NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgpt
-YWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIEdFTiAgICAgeDg2XzY0
-LXNvZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0LmV4ZQpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNh
-bGwgbGFzdCk6Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkK
-c3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdk
-b2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1jZGI5MTRi
-ZjY2NTI0ZDdlYTNmMTAzZDIyZDEyMTlhNycsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0
-JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICct
-ZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICct
-ZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90
-bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNo
-ZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
-dWd6ejF6dm8vc3JjL2RvY2tlci1zcmMuMjAyMC0wMy0yNi0xNy4yMC4yMS43NzUxOi92YXIvdG1w
-L3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1p
-bmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1s
-YWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWNkYjkxNGJmNjY1MjRkN2VhM2YxMDNkMjJkMTIx
-OWE3Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRp
-cmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXVnenoxenZvL3NyYycKbWFrZTog
-KioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDJtMTQu
-NjIxcwp1c2VyICAgIDBtOC4zMTNzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMyNjIwMzQxNC4xODE0MC0xLXBldGVyLm1heWRlbGxA
-bGluYXJvLm9yZy90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+According to Duncan, it=E2=80=99s not, and the paragraph from the original =
+issue
+still applies.
+
+> The xhci register specifies today that its allowed for users to do 1-4 by=
+te reads; however, that
+> it implements only four byte reads in its implementation
+> (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-xhci.c;hb=3DH=
+EAD#l3333). Hence why when we
+> read the HCIVERSION register at offset 0x2, it isn't handled in xhci_cap_=
+read() which then
+> returns zeros.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1693050
+
+Title:
+  xhci HCIVERSION register read emulation incorrectly handled
+
+Status in QEMU:
+  New
+
+Bug description:
+  We had an illumos user trying to run illumos in QEMU 2.9.0 with the
+  qemu-xhci device enabled. Note, that while this was discovered against
+  QEMU 2.9.0, from my current read of the HEAD, it is still present. The
+  illumos bug at https://www.illumos.org/issues/8173 has additional
+  information on how the user invoked qemu. While investigating the
+  problem we found that the illumos driver was reading a version of
+  0x0000 when reading the HCIVERSION register from qemu.
+
+  In the illumos driver we're performing a 16-bit read of the version
+  register at offset 0x2. From looking around at other OSes, while Linux
+  performs a 4 byte read at offset 0x0 and masks out the version, others
+  that care about the version are doing a two byte read, though not all
+  actually act on the version and some just discard the information.
+
+  The user who hit this was able to enable tracing (note the tracing
+  file is attached to the illumos bug linked previously) and we hit the
+  unimplemented register read with offset 0x2 at
+  http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
+  xhci.c;hb=3DHEAD#l2960. The xhci register specifies today that its
+  allowed for users to do 1-4 byte reads; however, that it implements
+  only four byte reads in its implementation
+  (http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
+  xhci.c;hb=3DHEAD#l3333). Hence why when we read the HCIVERSION register
+  at offset 0x2, it isn't handled in xhci_cap_read() which then returns
+  zeros.
+
+  From digging into this, I think that we're coming into
+  memory_region_dispatch_read() and then memory_region_dispatch_read1().
+  However, I don't see anything in either the general memory region
+  logic or in the xhci_cap_read() function that would deal with
+  adjusting the offset that we're reading at and then masking it off
+  again. While the access_with_adjusted_size() attempts to deal with
+  this, it never adjusts the hardware address that's passed in to be a
+  multiple of the implementation defined offset that I can see. I
+  suspect that the FIXME at line 582
+  (http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dmemory.c;hb=3DHEAD#l582) =
+and
+  the implementation in the xhci code is the crux of the problem.
+
+  For the time being we're working around this in the illumos driver,
+  but I wanted to point this out such that it might be helpful for other
+  systems which are assuming that they can do the two byte read like on
+  hardware.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1693050/+subscriptions
 
