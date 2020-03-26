@@ -6,68 +6,72 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CA5C2D0ED
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 711BCC43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A94C20722
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A94C20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3D7D320722
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:31:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7D320722
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHZ7W-0004s8-EZ
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:28:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36647)
+	id 1jHZAB-0006er-AI
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:31:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37176)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jHZ4T-0000ay-BL
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:25:46 -0400
+ (envelope-from <bounces@canonical.com>) id 1jHZ9M-0005cd-TO
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jHZ4S-0002Wo-2n
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:25:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52506)
+ (envelope-from <bounces@canonical.com>) id 1jHZ9L-0005iS-7l
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52834)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jHZ4R-0002WT-Sf
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:25:44 -0400
+ id 1jHZ9K-0005gh-Fh
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 16:30:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jHZ4R-0007ZO-04
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:25:43 +0000
+ id 1jHZ9I-0007sw-9w
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F37962E80C0
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:25:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 490D52E80C7
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 20:30:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Mar 2020 20:16:02 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Mar 2020 20:20:41 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1868116@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: linux-user syscall-abi
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Triaged; importance=High; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
+ status=Triaged; importance=Critical; assignee=ubuntu-desktop@lists.ubuntu.com; 
+X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
+ server-next
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dflogeras2 liuke marcin-konarski+u1
- philippe-vaucher pmaydell schneiderit
-X-Launchpad-Bug-Reporter: Kan Li (liuke)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158525376387.10961.14562889417372812541.launchpad@soybean.canonical.com>
-Subject: [Bug 1805913] Re: readdir() returns NULL (errno=EOVERFLOW) for 32-bit
- user-static qemu on 64-bit host
+X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail leozinho29-eu paelzer
+X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
+References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158525404173.17161.14858923108107650600.malone@gac.canonical.com>
+Subject: [Bug 1868116] Re: QEMU monitor no longer works
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ae5f6ffea3b2a77c216cd3ca1294542f0f87650b
+X-Launchpad-Hash: c55625033e9a7fe18f7f38fee97059f74f97178b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,71 +84,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
+Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+>From IRC:
+[16:10] <seb128> cpaelzer, @vte, we should get 0.60.1 for focal, 0.59.91 is=
+ a rc1 for 0.60, we are lacking behind merging the stable version from Debi=
+an but it's on our backlog (kenvandine was look at that one), the .1 is par=
+t of GNOME 3.36.1 which we plan to get before release (I would understand i=
+f you would like to backport a patch to help testing rather than waiting th=
+ough)
+
+>From VTE Bug:
+The standard Ubuntu freeze doesn't apply to GNOME packages. Usually Ubuntu =
+aims to ship latest GNOME x.1. VTE is part of GNOME, VTE 0.60.0 is part of =
+GNOME 3.36.0, VTE 0.60.1 belongs to GNOME 3.36.1 etc. Accordingly, 0.60.0 -=
+> 0.60.1 contains important bugfixes only, no new features. In this particu=
+lar case, 0.60.1 will bring a trivial shell script fix (quite important for=
+ non-VTE users), and hopefully this one. It would be outright ridiculous fo=
+r an LTS distro to ship an unstable VTE. So, the only reasonable thing for =
+Ubuntu 20.04 is to ship VTE 0.60.1. Anyway, this is not the right place to =
+discuss it.
+
+But gladly there now is a commit with a fix:
+https://gitlab.gnome.org/GNOME/vte/-/commit/277ee003066b3993cf6d55a05606009=
+caac69015
+
+I agree that we need this for 20.04, and therefore will set this up in
+prio and assign it to the Desktop team.
+
+** Changed in: vte2.91 (Ubuntu)
+     Assignee: (unassigned) =3D> Ubuntu Desktop (ubuntu-desktop)
+
+** Changed in: vte2.91 (Ubuntu)
+       Status: New =3D> Triaged
+
+** Changed in: vte2.91 (Ubuntu)
+   Importance: Undecided =3D> Critical
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805913
+https://bugs.launchpad.net/bugs/1868116
 
 Title:
-  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
-  on 64-bit host
+  QEMU monitor no longer works
 
 Status in QEMU:
-  Confirmed
+  New
+Status in qemu package in Ubuntu:
+  Triaged
+Status in vte2.91 package in Ubuntu:
+  Triaged
 
 Bug description:
-  This can be simply reproduced by compiling and running the attached C
-  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
-  static:
+  Repro:
+  VTE
+  $ meson _build && ninja -C _build && ninja -C _build install
 
-  # Setup docker for user-static binfmt
-  docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  # Compile the code and run (readdir for / is fine, so create a new direct=
-ory /test).
-  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
-to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
-{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
-test && gcc /tmp/readdir-bug.c && ./a.out'
-  dir=3D0xff5b4150
-  readdir(dir)=3D(nil)
-  errno=3D75: Value too large for defined data type
+  qemu:
+  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
+r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
+-enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
+sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
+-disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
+disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
+opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
+irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
+-pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
+vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
+sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
+le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
+e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
+utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
+-disable-cap-ng
+  $ make
 
-  Do remember to replace the /path/to/qemu-arm-static and /path/to
-  /readdir-bug.c to the actual paths of the files.
+  Test:
+  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
+uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
+le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
+rent/images/netboot/mini.iso
+  - switch to monitor with CTRL+ALT+2
+  - try to enter something
 
-  The root cause is in glibc:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
-linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
-378c9256d18e582572b4315e8edfcbfb#l87
+  Affects head of both usptream git repos.
 
-  By C standard, the return type of readdir() is DIR*, in which the
-  inode number and offset are 32-bit integers, therefore, glibc calls
-  getdents64() and check if the inode number and offset fits the 32-bit
-  range, and reports EOVERFLOW if not.
+  =
 
-  The problem here is for 32-bit user-static qemu running on 64-bit
-  host, getdents64 simply passing through the inode number and offset
-  from underlying getdents64 syscall (from 64-bit kernel), which is very
-  likely to not fit into 32-bit range. On real hardware, the 32-bit
-  kernel creates 32-bit inode numbers, therefore works properly.
+  --- original bug ---
 
-  The glibc code makes sense to do the check to be conformant with C
-  standard, therefore ideally it should be a fix on qemu side. I admit
-  this is difficult because qemu has to maintain a mapping between
-  underlying 64-bit inode numbers and 32-bit inode numbers, which would
-  severely hurt the performance. I don't expect this could be fix
-  anytime soon (or even there would be a fix), but it would be
-  worthwhile to surface this issue.
+  It was observed that the QEMU console (normally accessible using
+  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
+  problematic because there are cases where it's required to send
+  commands to the guest, or key combinations that the host would grab
+  (as Ctrl-Alt-F1 or Alt-F4).
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 20.04
+  Package: qemu 1:4.2-3ubuntu2
+  Uname: Linux 5.6.0-rc6+ x86_64
+  ApportVersion: 2.20.11-0ubuntu20
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Thu Mar 19 12:16:31 2020
+  Dependencies:
+
+  InstallationDate: Installed on 2017-06-13 (1009 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine:
+  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
+  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
+86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
+,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
+home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
+  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
+-re]
+  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
+5]
+  MachineType: LENOVO 80UG
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
+4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
+rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
+ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
+enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
+7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
+scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
+_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
+  dmi.bios.date: 08/09/2018
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN45WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
