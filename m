@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68642C43331
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 040B8C43331
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:05:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DB1B206E6
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:04:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C191D206E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Mar 2020 20:05:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j3oFF8mF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DB1B206E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pu/iQU0w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C191D206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHYje-0003s9-Ak
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:04:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59478)
+	id 1jHYkW-0005P3-Sv
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 16:05:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jHYLV-0000dv-He
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:19 -0400
+ (envelope-from <robert.foley@linaro.org>) id 1jHYKl-0007G8-6r
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1jHYLU-0002GD-00
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:17 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:33140)
+ (envelope-from <robert.foley@linaro.org>) id 1jHYKj-0001qi-An
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:31 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:43639)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1jHYLT-0002G4-Px
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:39:15 -0400
-Received: by mail-qt1-x843.google.com with SMTP id c14so6577103qtp.0
- for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:39:15 -0700 (PDT)
+ id 1jHYKj-0001qG-5T
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 15:38:29 -0400
+Received: by mail-qt1-x841.google.com with SMTP id a5so6515286qtw.10
+ for <qemu-devel@nongnu.org>; Thu, 26 Mar 2020 12:38:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=DxV2LkVkxZ0JK8RLYAmvvmQ/YQu2Mo+p3eePMYpr0Kw=;
- b=j3oFF8mFjFA7gqqrPh920l4L7Ce/Hwxlw5fBhVU1CWgL6cUza8FLHE/QcvX0uCekIZ
- udC/ttEAQNvrS3AIpeq8j5ZJBHBjThN/9rj5kRtwwMjaDbS16/jWKYMirnmKUN6+cluT
- MM/njKTrbH49VYyOb95P2g/4QwzIuEGgJ+ulTO/aDfJz8FFZJAQJfcTA72lDDeGmZGJR
- 3PAbOMwlUdi2KM2ytURkzwMml2eyL/T6fJrTECTz4EU5YXG4+gJVRPr/OAZ4Y/Zw9SwI
- 3jxkgNpTSVh+Ek0tTcZHA9iyocSGsRvJxJtSRE5Obs8ntoAa0JyOuNSmff9daaoVgAPY
- pVLg==
+ bh=peeEpurfJyQFOk/Y5mv4nylcNl/81VuZK9r+NVDwKgU=;
+ b=Pu/iQU0wjw5Q8m4vkpiyRh6hZHgO1MATDuKPcN52fchs4/yKvslhi3ViUfiC5XVrYv
+ S0ufH3bi5B66iPearsRvFt4wrlX/KecUZxHge8HrIJcx7RPhbqmaRF7OsdDL0THRdqrK
+ +dz4NXobhiU9EmgtJS/1i9UIEIPQL3cyni0YrLKAgWgjB+p+5NPJc9xILR70km/y5u8n
+ gIJNYyT0HUXohkjQA9+v0/6o+HEUIsjFNuJQcds7Hconv0/3qaKjVJDuIXDf3SWivTcq
+ 8Cmo3ie79lX0ebNTQOahscj6lqX7+pjy9rMeuYoWW5yrz5BzR+EBRdoEGT5Nj5BJKzrF
+ SYHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=DxV2LkVkxZ0JK8RLYAmvvmQ/YQu2Mo+p3eePMYpr0Kw=;
- b=D5F0yl28wqf7EAVWmb15Fxq2ptl5Qrk47EwAI68yZQN+DwvUXHjEwt2o810PDeNger
- Qy/vFV2ypBKlpGHPDQ1ohkRGs404fHAJKlIHiZmR80ZWQV7GWdI7i+uloFEELmmAz96h
- x2zCMMtJtDLT3ooUfnoH6vC/y1e2++YG0SY29KmweR2s0h9Hl0WCuQJmNHldGG36ooUd
- kQyks7Bv/h6KaGhEgwnn/jiXuUujFIL7CicBwKBaq8LD7heKDBHfxja8+SN3DtiFB+pv
- 49lLP3R6djYCmkJ5E6ZdYe+72vXFBW/Ng5nuG7Av2A8nmWvBKHi9mMOFgPAVZrZwSYLq
- TSRg==
-X-Gm-Message-State: ANhLgQ0CWf83sur5vu2jaWMQBZyPtkcZwhkdhx0fqGUoh+yq7yuWF6jz
- 7tlc0KTr2YFKM1vkf88/EMZukLdCBSt3hg==
-X-Google-Smtp-Source: ADFU+vt4CfxRFRH89zGcnsDHySE0mXplwXpxW9TfvGb5diYvehxjI0VcPAH0AOn5+Cq60BsBxC6yVw==
-X-Received: by 2002:ac8:17f9:: with SMTP id r54mr10216067qtk.285.1585251554968; 
- Thu, 26 Mar 2020 12:39:14 -0700 (PDT)
+ bh=peeEpurfJyQFOk/Y5mv4nylcNl/81VuZK9r+NVDwKgU=;
+ b=IY+Fx8+xB5m548W06xeWavNZiXIq//Ub3qYOAzVALnUzyNONj9ip/mFyukofVd2Sjm
+ /RhkbX+D5bPHi89LihLMIQtz9Y594QODKDbY5YOZgIIroDMNjRS+e536H8iup1ZGIfgF
+ fVEZtqVgC7iuVAoHqy8hAtqTfl4+HccIVYsqhhdhJWYECQOa7f5LN3zNLKnR+1DiE2IJ
+ COpj4Z3yqKwMR3Ea+r0zidhV4IUsnjKWeTJuAeHOGlM49STM9Xvwlh3zXsuIV4K22Vat
+ DedM2ZiXu3JJhxjgefLL9iYQ/0xKcmTavEkgz5Aq44grvYfAoYz7Crnzqv87B/mWU+MF
+ 2ubg==
+X-Gm-Message-State: ANhLgQ0csQNi/tgHJ8rGK8KyA5O4npCJWhzT6BCvbisRAcz5g4IaBvOw
+ nVgjvgcxhASENEhmCpMmi9LgdrgmV7hGsQ==
+X-Google-Smtp-Source: ADFU+vsRPu2bv++cyos4KLSlEBhrzmTtN5B5ntwiNulTvBwY1L/uAVQLMcEBOkw5jWSvC9zpfdGufg==
+X-Received: by 2002:aed:2415:: with SMTP id r21mr1157382qtc.82.1585251507974; 
+ Thu, 26 Mar 2020 12:38:27 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fd55:4e67:1038:8302])
- by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.39.13
+ by smtp.gmail.com with ESMTPSA id u51sm2161916qth.46.2020.03.26.12.38.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Mar 2020 12:39:14 -0700 (PDT)
+ Thu, 26 Mar 2020 12:38:27 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 73/74] cpu: add async_run_on_cpu_no_bql
-Date: Thu, 26 Mar 2020 15:31:55 -0400
-Message-Id: <20200326193156.4322-74-robert.foley@linaro.org>
+Subject: [PATCH v8 39/74] arm: convert to cpu_interrupt_request
+Date: Thu, 26 Mar 2020 15:31:21 -0400
+Message-Id: <20200326193156.4322-40-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200326193156.4322-1-robert.foley@linaro.org>
 References: <20200326193156.4322-1-robert.foley@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::843
+X-Received-From: 2607:f8b0:4864:20::841
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,139 +94,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, "Emilio G. Cota" <cota@braap.org>,
- alex.bennee@linaro.org, robert.foley@linaro.org, peter.puhov@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, robert.foley@linaro.org,
+ richard.henderson@linaro.org, "Emilio G. Cota" <cota@braap.org>,
+ qemu-arm@nongnu.org, peter.puhov@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Some async jobs do not need the BQL.
-
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- cpus-common.c         | 39 ++++++++++++++++++++++++++++++++++-----
- include/hw/core/cpu.h | 14 ++++++++++++++
- 2 files changed, 48 insertions(+), 5 deletions(-)
+ target/arm/cpu.c     |  6 +++---
+ target/arm/helper.c  | 16 +++++++---------
+ target/arm/machine.c |  2 +-
+ 3 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index f5daf2d518..efefe5e603 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -101,6 +101,7 @@ struct qemu_work_item {
-     run_on_cpu_func func;
-     run_on_cpu_data data;
-     bool free, exclusive, done;
-+    bool bql;
- };
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 9fa514c999..e190604ae2 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -75,7 +75,7 @@ static bool arm_cpu_has_work(CPUState *cs)
+     ARMCPU *cpu = ARM_CPU(cs);
  
- /* Called with the CPU's lock held */
-@@ -147,6 +148,7 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-     wi.done = false;
-     wi.free = false;
-     wi.exclusive = false;
-+    wi.bql = true;
+     return (cpu->power_state != PSCI_OFF)
+-        && cs->interrupt_request &
++        && cpu_interrupt_request(cs) &
+         (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD
+          | CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ
+          | CPU_INTERRUPT_EXITTB);
+@@ -611,7 +611,7 @@ void arm_cpu_update_virq(ARMCPU *cpu)
+     bool new_state = (env->cp15.hcr_el2 & HCR_VI) ||
+         (env->irq_line_state & CPU_INTERRUPT_VIRQ);
  
-     cpu_mutex_lock(cpu);
-     queue_work_on_cpu_locked(cpu, &wi);
-@@ -171,6 +173,21 @@ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-     wi->func = func;
-     wi->data = data;
-     wi->free = true;
-+    wi->bql = true;
-+
-+    queue_work_on_cpu(cpu, wi);
-+}
-+
-+void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
-+                             run_on_cpu_data data)
-+{
-+    struct qemu_work_item *wi;
-+
-+    wi = g_malloc0(sizeof(struct qemu_work_item));
-+    wi->func = func;
-+    wi->data = data;
-+    wi->free = true;
-+    /* wi->bql initialized to false */
- 
-     queue_work_on_cpu(cpu, wi);
- }
-@@ -319,6 +336,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
-     wi->data = data;
-     wi->free = true;
-     wi->exclusive = true;
-+    /* wi->bql initialized to false */
- 
-     queue_work_on_cpu(cpu, wi);
- }
-@@ -343,6 +361,7 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
-              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
-              * neither CPU can proceed.
-              */
-+            g_assert(!wi->bql);
-             if (has_bql) {
-                 qemu_mutex_unlock_iothread();
-             }
-@@ -353,12 +372,22 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
-                 qemu_mutex_lock_iothread();
-             }
+-    if (new_state != ((cs->interrupt_request & CPU_INTERRUPT_VIRQ) != 0)) {
++    if (new_state != ((cpu_interrupt_request(cs) & CPU_INTERRUPT_VIRQ) != 0)) {
+         if (new_state) {
+             cpu_interrupt(cs, CPU_INTERRUPT_VIRQ);
          } else {
--            if (has_bql) {
--                wi->func(cpu, wi->data);
-+            if (wi->bql) {
-+                if (has_bql) {
-+                    wi->func(cpu, wi->data);
-+                } else {
-+                    qemu_mutex_lock_iothread();
-+                    wi->func(cpu, wi->data);
-+                    qemu_mutex_unlock_iothread();
-+                }
-             } else {
--                qemu_mutex_lock_iothread();
--                wi->func(cpu, wi->data);
--                qemu_mutex_unlock_iothread();
-+                if (has_bql) {
-+                    qemu_mutex_unlock_iothread();
-+                    wi->func(cpu, wi->data);
-+                    qemu_mutex_lock_iothread();
-+                } else {
-+                    wi->func(cpu, wi->data);
-+                }
-             }
-         }
-         cpu_mutex_lock(cpu);
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 8f70249f45..91e35bf940 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -889,9 +889,23 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
-  * @data: Data to pass to the function.
-  *
-  * Schedules the function @func for execution on the vCPU @cpu asynchronously.
-+ * See also: async_run_on_cpu_no_bql()
-  */
- void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
+@@ -632,7 +632,7 @@ void arm_cpu_update_vfiq(ARMCPU *cpu)
+     bool new_state = (env->cp15.hcr_el2 & HCR_VF) ||
+         (env->irq_line_state & CPU_INTERRUPT_VFIQ);
  
-+/**
-+ * async_run_on_cpu_no_bql:
-+ * @cpu: The vCPU to run on.
-+ * @func: The function to be executed.
-+ * @data: Data to pass to the function.
-+ *
-+ * Schedules the function @func for execution on the vCPU @cpu asynchronously.
-+ * This function is run outside the BQL.
-+ * See also: async_run_on_cpu()
-+ */
-+void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
-+                             run_on_cpu_data data);
-+
- /**
-  * async_safe_run_on_cpu:
-  * @cpu: The vCPU to run on.
+-    if (new_state != ((cs->interrupt_request & CPU_INTERRUPT_VFIQ) != 0)) {
++    if (new_state != ((cpu_interrupt_request(cs) & CPU_INTERRUPT_VFIQ) != 0)) {
+         if (new_state) {
+             cpu_interrupt(cs, CPU_INTERRUPT_VFIQ);
+         } else {
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b7b6887241..19efdc0b00 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -2132,26 +2132,27 @@ static uint64_t isr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     CPUState *cs = env_cpu(env);
+     uint64_t hcr_el2 = arm_hcr_el2_eff(env);
+     uint64_t ret = 0;
++    uint32_t interrupt_request = cpu_interrupt_request(cs);
+     bool allow_virt = (arm_current_el(env) == 1 &&
+                        (!arm_is_secure_below_el3(env) ||
+                         (env->cp15.scr_el3 & SCR_EEL2)));
+ 
+     if (allow_virt && (hcr_el2 & HCR_IMO)) {
+-        if (cs->interrupt_request & CPU_INTERRUPT_VIRQ) {
++        if (interrupt_request & CPU_INTERRUPT_VIRQ) {
+             ret |= CPSR_I;
+         }
+     } else {
+-        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
++        if (interrupt_request & CPU_INTERRUPT_HARD) {
+             ret |= CPSR_I;
+         }
+     }
+ 
+     if (allow_virt && (hcr_el2 & HCR_FMO)) {
+-        if (cs->interrupt_request & CPU_INTERRUPT_VFIQ) {
++        if (interrupt_request & CPU_INTERRUPT_VFIQ) {
+             ret |= CPSR_F;
+         }
+     } else {
+-        if (cs->interrupt_request & CPU_INTERRUPT_FIQ) {
++        if (interrupt_request & CPU_INTERRUPT_FIQ) {
+             ret |= CPSR_F;
+         }
+     }
+@@ -9676,10 +9677,7 @@ void arm_cpu_do_interrupt(CPUState *cs)
+     }
+ #endif
+ 
+-    /* Hooks may change global state so BQL should be held, also the
+-     * BQL needs to be held for any modification of
+-     * cs->interrupt_request.
+-     */
++    /* Hooks may change global state so BQL should be held */
+     g_assert(qemu_mutex_iothread_locked());
+ 
+     arm_call_pre_el_change_hook(cpu);
+@@ -9694,7 +9692,7 @@ void arm_cpu_do_interrupt(CPUState *cs)
+     arm_call_el_change_hook(cpu);
+ 
+     if (!kvm_enabled()) {
+-        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++        cpu_interrupt_request_or(cs, CPU_INTERRUPT_EXITTB);
+     }
+ }
+ #endif /* !CONFIG_USER_ONLY */
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index c5a2114f51..42f4368de3 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -713,7 +713,7 @@ static int cpu_post_load(void *opaque, int version_id)
+     if (env->irq_line_state == UINT32_MAX) {
+         CPUState *cs = CPU(cpu);
+ 
+-        env->irq_line_state = cs->interrupt_request &
++        env->irq_line_state = cpu_interrupt_request(cs) &
+             (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIQ |
+              CPU_INTERRUPT_VIRQ | CPU_INTERRUPT_VFIQ);
+     }
 -- 
 2.17.1
 
