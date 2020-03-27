@@ -2,89 +2,89 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBEB7C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B9CCC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:24:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9F732083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C44A02083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:24:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vgi/Ghxx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9F732083E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tmrwX74k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C44A02083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHtcZ-0007xJ-TW
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 14:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40596)
+	id 1jHteJ-0000jH-PN
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 14:24:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42595)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jHtUD-000260-LL
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:42 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jHtdO-000051-Jb
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:23:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jHtUC-000104-EQ
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:41 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:39595)
+ (envelope-from <alex.bennee@linaro.org>) id 1jHtdN-00028p-Dq
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:23:10 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41622)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jHtUB-0000yC-WF
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:40 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id e9so1477673wme.4
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 11:13:39 -0700 (PDT)
+ id 1jHtdN-000281-7A
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:23:09 -0400
+Received: by mail-wr1-x441.google.com with SMTP id h9so12569674wrc.8
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 11:23:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=pz4+hj7n/yl99ow8yOnM+Gbx/Hl9NI3JBuBBYB7hHVY=;
- b=vgi/GhxxGhhqht1b3r3vnllgAroWumGRu8wiJTJ1h04Wc3eXBd+VdLa4oAc0SP/067
- tQU6PAGk40XkUj+hdbO5cRagP8bPB3ZZtF5rUZgLB/aZEjZH36FqCOcW1G3DK0vIhNR/
- q0z9bxEg0wGnyJkWMlOSH8EuN7ZkhFYAzAhWqUNR9GJLJUgMZZ+ToqszI8ZIOICNhRlY
- lNfMl9Wzg1HB81RHIcGbvtIy83jRsbJ2Tg9x5hKs9hsqFWfAv6weQzaKtfmIkFPuMpvM
- +qjsxqDZryc4jN9oo9sDInYDzfnc38uJMBE0EBBczgyPYc66kTXuTrLBJh5ZoV64aWLj
- 2glA==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=6aue5MFunMNljM7iQhigLdXXrEOnLaU80oBBssiecrw=;
+ b=tmrwX74kHG/BWfdMdGSsmJIQQ2hU8sbiqTN3qIVhbBnyDaICDrsPiKjCoYC98e2vGJ
+ J6LKLNqjG0JqTE3JOxqRo/mactIDRF8S1PURE9U71Q/RpcTXHLHVYMEz5qDCwKKfKeO8
+ 01t5unNOC681n9uQxRR3wg/BR2D2D/RnnjW+jJdPXwrwnbn3bBzLoI2ZYe+59grIHe2m
+ 8iKE5gfQ9q2pvDFpzY5OyKEShO6Gcqt0NmzA4s5+rklD5vgc8B1F4X6dQbK88VenwoEV
+ Hn2qVTq3t/O6drMC3Il0Pf/Ij2ElH5uDbQvNp3jds/cEReXIIwDS2zrrPCJMmCe2u95K
+ 59Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=pz4+hj7n/yl99ow8yOnM+Gbx/Hl9NI3JBuBBYB7hHVY=;
- b=UrG/JBlKE44vHqpEavUB6d4q1E7Ep3EiFwZ5xWbqpYUc8IJHQ65q/vyhA6OXPRkL6Z
- Uge7CYk1mW8U5cr0vINRTBvgrDNzg7KOt+Jp4JPz6mUwYsUdtV/NgtJn7KTESRmVe1PZ
- qjUVjOW2yKo31THHDVlCNbGXOs6lVAC+jFteSexiJnzWXu5jhYj/vNRy/lpseoMc/GOc
- 2EjB97jMtymc73CI/f1VOPHU5/hfj/eIhoYyIWTMRjTX1rT4tujp8OY0yBLnwaIEfsYz
- eW6vAfhjg9fddtj62nDb//eyE2y2rPyOGGODz/NgROWAH1HEAS9r+SL+GCg4JZNAXbtJ
- n9JQ==
-X-Gm-Message-State: ANhLgQ0OX6bq4QMAYm2o6C3NB6YSY1MGWoeI7/4KTxCKdT/niV/RJMOD
- WWFXNbfZHG5sxFYPbvmNubun7Q==
-X-Google-Smtp-Source: ADFU+vs5PznMquO/UxtuYNDI+AmZKF/Ro4tIfkXH33bRy7TVUX1FZZ0+ofxsG7Zxu3+kJuPiepqpfQ==
-X-Received: by 2002:a1c:197:: with SMTP id 145mr2495wmb.42.1585332818945;
- Fri, 27 Mar 2020 11:13:38 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=6aue5MFunMNljM7iQhigLdXXrEOnLaU80oBBssiecrw=;
+ b=HnQEo76UpXyYtMIVQEYCYVL1bSIHlPY7dU0Xub1YIoJxEz4TIYw9D2CIESD0iZUh7Z
+ IYJheBoAXLCADdW5sXTW7vKYEL10x3j7irJz6GSTZqEVvRw0iNrKy22iZdih3WMRsJFv
+ 5K+H70SLolUO/bSqwVbpPipxW0J/DjiUZkxNkBNSZO03qfawZv2SVeQcRjN5eqHSf2uG
+ HAV2w4mBx7ek5c4GgsXOikERc6QRcLkincd9QzSS9NnaBayR/d2wbrxtCdEc4MUtNsNE
+ oKPll0Q0SoKYMxcpVeZn7K/ohoap30Xk90YQRHuwXZzoRyXUEnESc026QVTY1245g/kM
+ Y3lw==
+X-Gm-Message-State: ANhLgQ23dsUp2za/L9AtVPWPfIJVWYXC6HXqXXCDaW1EF1+9sAj2PgvH
+ Ddh5APV9kKz4XPuHtssN2eS33Q==
+X-Google-Smtp-Source: ADFU+vviTe6gKEpcTwppLdxQPUuWmTZ0PAXrPkbMl4PuX21NOOybgbYnzKAXdxZM69YewziPgCjePw==
+X-Received: by 2002:a5d:6847:: with SMTP id o7mr735239wrw.274.1585333387746;
+ Fri, 27 Mar 2020 11:23:07 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a71sm8654257wmd.22.2020.03.27.11.13.27
+ by smtp.gmail.com with ESMTPSA id h132sm9598981wmf.18.2020.03.27.11.23.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Mar 2020 11:13:28 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5B7C31FF9B;
- Fri, 27 Mar 2020 18:13:21 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL v2 12/12] .travis.yml: Add a KVM-only s390x job
-Date: Fri, 27 Mar 2020 18:13:20 +0000
-Message-Id: <20200327181320.23329-13-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200327181320.23329-1-alex.bennee@linaro.org>
-References: <20200327181320.23329-1-alex.bennee@linaro.org>
+ Fri, 27 Mar 2020 11:23:06 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8C1461FF7E;
+ Fri, 27 Mar 2020 18:23:05 +0000 (GMT)
+References: <20200326193156.4322-1-robert.foley@linaro.org>
+ <20200327051457.GA2815@t420>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Subject: Re: [PATCH v8 00/74] per-CPU locks
+In-reply-to: <20200327051457.GA2815@t420>
+Date: Fri, 27 Mar 2020 18:23:05 +0000
+Message-ID: <87zhc1lks6.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,85 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "open list:S390 general arch..." <qemu-s390x@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Robert Foley <robert.foley@linaro.org>, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Add a job to build QEMU on s390x with TCG disabled, so
-this configuration won't bitrot over time.
+Emilio G. Cota <cota@braap.org> writes:
 
-This job is quick, running check-unit: Ran for 5 min 30 sec
-https://travis-ci.org/github/philmd/qemu/jobs/665456423
+> (Apologies if I missed some Cc's; I was not Cc'ed in patch 0
+>  so I'm blindly crafting a reply.)
+>
+<snip>
+>> Changes for V8:
+>> - Fixed issue where in rr mode we could destroy the BQL twice.
+>
+> I remember doing little to no testing in record-replay mode, so
+> there should be more bugs hiding in there :-)
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200322154015.25358-1-philmd@redhat.com>
-Message-Id: <20200323161514.23952-12-alex.bennee@linaro.org>
+Well we have two (very simple) rr tests in check-tcg now - so there is
+that ;-)
 
-diff --git a/.travis.yml b/.travis.yml
-index 5672d129ec6..e0c72210b7a 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -525,6 +525,48 @@ jobs:
-               $(exit $BUILD_RC);
-           fi
- 
-+    - name: "[s390x] GCC check (KVM)"
-+      arch: s390x
-+      dist: bionic
-+      addons:
-+        apt_packages:
-+          - libaio-dev
-+          - libattr1-dev
-+          - libbrlapi-dev
-+          - libcap-ng-dev
-+          - libgcrypt20-dev
-+          - libgnutls28-dev
-+          - libgtk-3-dev
-+          - libiscsi-dev
-+          - liblttng-ust-dev
-+          - libncurses5-dev
-+          - libnfs-dev
-+          - libnss3-dev
-+          - libpixman-1-dev
-+          - libpng-dev
-+          - librados-dev
-+          - libsdl2-dev
-+          - libseccomp-dev
-+          - liburcu-dev
-+          - libusb-1.0-0-dev
-+          - libvdeplug-dev
-+          - libvte-2.91-dev
-+          # Tests dependencies
-+          - genisoimage
-+      env:
-+        - TEST_CMD="make check-unit"
-+        - CONFIG="--disable-containers --disable-tcg --enable-kvm --disable-tools"
-+      script:
-+        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-+        - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
-+        - |
-+          if [ "$BUILD_RC" -eq 0 ] ; then
-+              mv pc-bios/s390-ccw/*.img pc-bios/ ;
-+              ${TEST_CMD} ;
-+          else
-+              $(exit $BUILD_RC);
-+          fi
-+
-     # Release builds
-     # The make-release script expect a QEMU version, so our tag must start with a 'v'.
-     # This is the case when release candidate tags are created.
--- 
-2.20.1
+> On a related note, I've done some work to get QEMU-system to work
+> under thread sanitizer, since tsan now supports our longjmp-based
+> coroutines (hurrah!).
 
+When did that go in? Will I need a new toolchain and -ltsan to make it
+work?
+
+> My idea was to integrate tsan in QEMU (i.e.
+> bring tsan warnings to 0) before (re)trying to merge the
+> per-CPU lock patchset; this would minimize the potential for
+> regressions, which from my personal viewpoint seems like a reasonable
+> thing to do especially now that I have little time to work on QEMU.
+>
+> If there's interest in doing the tsan work first, then I'd be
+> happy to send to the list as soon as this weekend the changes that
+> I have so far [1].
+
+Please do - I've been cleaning up some of the other things the sanitizer
+has found and it certainly won't hurt to get thread sanitizer working
+again.
+
+--=20
+Alex Benn=C3=A9e
 
