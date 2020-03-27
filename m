@@ -2,83 +2,79 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FF2C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99940C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:04:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4AEA2071B
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6100D20716
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:04:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KSwektmy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4AEA2071B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ov0XqJE4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6100D20716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHtAd-0005KP-2k
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 13:53:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35218)
+	id 1jHtL0-0008Uc-Jp
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 14:04:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38214)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jHt5G-0003jI-PN
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:47:56 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jHtK3-00083z-7l
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:03:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jHt5F-0005Ow-0h
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:47:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:56444)
+ (envelope-from <dgilbert@redhat.com>) id 1jHtK1-0004w7-DF
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:03:10 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:52987)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jHt5E-0005ME-So
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:47:52 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jHtK0-0004nw-K3
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:03:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585331272;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1585332185;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jyga5obXmtc3I50IueSDa8L2rkgqVdsgrs+uCszs/QE=;
- b=KSwektmyDK6C+se39HAZLu1YQtQIMXk0koPAT+KVU/9J/SM6qeqwtM2FqjGD/MjKoe6Crp
- nI4dg/pTHlxf3CavLBsVAjgm+zJnrK4jntqGkNRtChLLV/w7xEd3TqJJpARME/yAtRttCc
- x4eZnnQ1iACb9i2fkwPg69m//6trtmI=
+ bh=Tfp+HoFZVGpXPVcI7LwQfbnhm1vKadGooYgO74vAzVY=;
+ b=Ov0XqJE4LcY+c5YzG0xDgc5ChQhYZpe5sgKIGhQrULY7e7WLq2fGjTwau8vdI2NioUBBQk
+ +PHi39l/xgT3iSpc+2V7yScYrEU9ENamR/ucL8mTk8nygQUBv3yEBIk2mv07e5yjZfSsIa
+ oqzJwfb0fJablrSJzjRsL7F45kEUoUI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-tFWlEfo0Ov2eE7vxybtTcQ-1; Fri, 27 Mar 2020 13:47:50 -0400
-X-MC-Unique: tFWlEfo0Ov2eE7vxybtTcQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-370-YKCmeCeIM_qzurRMYUEn7w-1; Fri, 27 Mar 2020 14:03:04 -0400
+X-MC-Unique: YKCmeCeIM_qzurRMYUEn7w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0CD6149C0;
- Fri, 27 Mar 2020 17:47:49 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5425D60BF3;
- Fri, 27 Mar 2020 17:47:45 +0000 (UTC)
-Date: Fri, 27 Mar 2020 17:47:42 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 3/3] nbd: Use shutdown(SHUT_WR) after last item sent
-Message-ID: <20200327174742.GU1619@redhat.com>
-References: <20200327161936.2225989-1-eblake@redhat.com>
- <20200327161936.2225989-4-eblake@redhat.com>
- <20200327163548.GP1619@redhat.com>
- <4a56f56e-60b8-6b1f-f805-31a192eb6148@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA75E1005509;
+ Fri, 27 Mar 2020 18:03:01 +0000 (UTC)
+Received: from work-vm (ovpn-113-149.ams2.redhat.com [10.36.113.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CA13310027A4;
+ Fri, 27 Mar 2020 18:03:00 +0000 (UTC)
+Date: Fri, 27 Mar 2020 18:02:58 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Subject: Re: [PATCH v2] monitor/hmp-cmds: add units for migrate_parameters.
+Message-ID: <20200327180258.GO2786@work-vm>
+References: <bfceb9751f76533c823e9ec91ac14f4bc94a47b6.1585324937.git.maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
-In-Reply-To: <4a56f56e-60b8-6b1f-f805-31a192eb6148@redhat.com>
+In-Reply-To: <bfceb9751f76533c823e9ec91ac14f4bc94a47b6.1585324937.git.maozhongyi@cmss.chinamobile.com>
 User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,114 +86,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 27, 2020 at 12:42:21PM -0500, Eric Blake wrote:
-> On 3/27/20 11:35 AM, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Mar 27, 2020 at 11:19:36AM -0500, Eric Blake wrote:
-> > > Although the remote end should always be tolerant of a socket being
-> > > arbitrarily closed, there are situations where it is a lot easier if
-> > > the remote end can be guaranteed to read EOF even before the socket
-> > > has closed.  In particular, when using gnutls, if we fail to inform
-> > > the remote end about an impending teardown, the remote end cannot
-> > > distinguish between our closing the socket as intended vs. a maliciou=
-s
-> > > intermediary interrupting things, and may result in spurious error
-> > > messages.
-> >=20
-> > Does this actually matter in the NBD case ?
-> >=20
-> > It has an explicit NBD command for requesting shutdown, and once
-> > that's processed, it is fine to just close the socket abruptly - I
-> > don't see a benefit to a TLS shutdown sequence on top.
+* Mao Zhongyi (maozhongyi@cmss.chinamobile.com) wrote:
+> When running:
+> (qemu) info migrate_parameters
+> announce-initial: 50 ms
+> announce-max: 550 ms
+> announce-step: 100 ms
+> compress-wait-thread: on
+> ...
+> max-bandwidth: 33554432 bytes/second
+> downtime-limit: 300 milliseconds
+> x-checkpoint-delay: 20000
+> ...
+> xbzrle-cache-size: 67108864
 >=20
-> You're right that the NBD protocol has ways for the client to advertise i=
-t
-> will be shutting down, AND documents that the server must be robust to
-> clients that just abruptly disconnect after that point.  But we don't hav=
-e
-> control over all such servers, and there may very well be a server that l=
-ogs
-> an error on abrupt closure, where it would be silent if we did a proper
-> gnutls_bye.  Which is more important: maximum speed in disconnecting afte=
-r
-> we expressed intent, or maximum attempt at catering to all sorts of remot=
-e
-> implementations that might not be as tolerant as qemu is of an abrupt
-> termination?
+> add units for the parameters 'x-checkpoint-delay' and
+> 'xbzrle-cache-size', it's easier to read, also move
+> milliseconds to ms to keep the same style.
+>=20
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-It is the cost / benefit tradeoff here that matters. Correctly using
-gnutls_bye(), in contexts which aren't expected to block is non-trivial
-bringing notable extra code complexity. It isn't an obvious win to me
-for something that just changes an error message for a scenario that
-can already be cleanly handled at the application protocol level.
+Thanks
 
->=20
-> > AFAIK, the TLS level clean shutdown is only required if the
-> > application protocol does not have any way to determine an
-> > unexpected shutdown itself.
->=20
-> 'man gnutls_bye' states:
->=20
->        Note that not all implementations will properly terminate a TLS
-> connec=E2=80=90
->        tion.   Some  of  them, usually for performance reasons, will
-> terminate
->        only the  underlying  transport  layer,  and  thus  not
-> distinguishing
->        between  a  malicious  party prematurely terminating the connectio=
-n
-> and
->        normal termination.
->=20
-> You're right that because the protocol has an explicit message, we can
-> reliably distinguish any early termination prior to
-> NBD_OPT_ABORT/NBD_CMD_DISC as being malicious, so the only case where it
-> matters is if we have a premature termination after we asked for clean
-> shutdown, at which point a malicious termination didn't lose any data. So=
- on
-> that front, I guess you are right that not using gnutls_bye isn't going t=
-o
-> have much impact.
->=20
-> >=20
-> > This is relevant for HTTP where the connection data stream may not
-> > have a well defined end condition.
-> >=20
-> > In the NBD case though, we have an explicit NBD_CMD_DISC to trigger
-> > the disconnect. After processing that message, an EOF is acceptable
-> > regardless of whether ,
-> > before processing that message, any EOF is a unexpected.
-> >=20
-> > >            Or, we can end up with a deadlock where both ends are stuc=
-k
-> > > on a read() from the other end but neither gets an EOF.
-> >=20
-> > If the socket has been closed abruptly why would it get stuck in
-> > read() - it should see EOF surely ?
->=20
-> That's what I'm trying to figure out: the nbdkit testsuite definitely hun=
-g
-> even though 'qemu-nbd --list' exited, but I haven't yet figured out wheth=
-er
-> the bug lies in nbdkit proper or in libnbd, nor whether a cleaner tls
-> shutdown would have prevented the hang in a more reliable manner.
-> https://www.redhat.com/archives/libguestfs/2020-March/msg00191.html
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+(info migrate could also be fixed, but that's a separate issue)
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+> ---
+>  monitor/hmp-cmds.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 2a900a528a..790fad3afe 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -436,11 +436,11 @@ void hmp_info_migrate_parameters(Monitor *mon, cons=
+t QDict *qdict)
+>              MigrationParameter_str(MIGRATION_PARAMETER_MAX_BANDWIDTH),
+>              params->max_bandwidth);
+>          assert(params->has_downtime_limit);
+> -        monitor_printf(mon, "%s: %" PRIu64 " milliseconds\n",
+> +        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LIMIT),
+>              params->downtime_limit);
+>          assert(params->has_x_checkpoint_delay);
+> -        monitor_printf(mon, "%s: %u\n",
+> +        monitor_printf(mon, "%s: %u ms\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELA=
+Y),
+>              params->x_checkpoint_delay);
+>          assert(params->has_block_incremental);
+> @@ -453,7 +453,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const =
+QDict *qdict)
+>          monitor_printf(mon, "%s: %s\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_COMPRESSI=
+ON),
+>              MultiFDCompression_str(params->multifd_compression));
+> -        monitor_printf(mon, "%s: %" PRIu64 "\n",
+> +        monitor_printf(mon, "%s: %" PRIu64 " bytes\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE=
+),
+>              params->xbzrle_cache_size);
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+> --=20
+> 2.17.1
+>=20
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
