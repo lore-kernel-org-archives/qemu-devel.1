@@ -2,65 +2,81 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E43FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C7DC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:19:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C1952071B
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FB9B20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:19:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="bOUYs3nN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C1952071B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A8LQosPK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FB9B20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHuQj-0000fQ-8k
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 15:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49881)
+	id 1jHuVj-0002q1-51
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 15:19:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50496)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jHuQ9-0000Bf-Bs
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:13:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHuV2-0002Rb-HJ
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jHuQ8-0007TP-Db
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:13:33 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:37139)
+ (envelope-from <peter.maydell@linaro.org>) id 1jHuV1-0003Iy-AP
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:18:36 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35784)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jHuQ7-0007PZ-Qk; Fri, 27 Mar 2020 15:13:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=hW7AipdSyKUbVimxJIQSvcalLeKcftRta23V3faFWBQ=; 
- b=bOUYs3nNcNY6gGTmbaZg/lLYQWku256ASHsc36cTbg2nMP214Q0uz/9sbGkmApGzHm2N+b0ggYV/lKWMGLKdZtVfJVbrycIGRFUOtsTWDUdp1scdR9FEMkW1yyjPCispZ0RsuuVhQVLjwBS9eBI71+4wkEg8f3ELB4vuABhZ/pk7x8OhneTL2vLWW8EzUDQvTw3XWgN/q68RD9Xe+7yUgv3AvbvzBcDauKxsoILJR9iUL0sxhH0B3ILRqLKv9iTrKSVXyOVm962A4VeYO2U5odmjxMwYKw1q+SXjK8uAAUNtIxiGX9jh05+zOXNbpoAcxjhrVZ4zOBP7yhzyk0HSsQ==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jHuQ4-0005h3-DO; Fri, 27 Mar 2020 20:13:28 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jHuQ4-0005nh-31; Fri, 27 Mar 2020 20:13:28 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v3] qcow2: Forbid discard in qcow2 v2 images with backing
- files
-In-Reply-To: <1871e816-ef2f-379a-93da-9b1a825fa876@redhat.com>
-References: <20200327164857.31415-1-berto@igalia.com>
- <1871e816-ef2f-379a-93da-9b1a825fa876@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Fri, 27 Mar 2020 20:13:28 +0100
-Message-ID: <w51blohhaqv.fsf@maestria.local.igalia.com>
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHuV1-0003Ik-5Q
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:18:35 -0400
+Received: by mail-ot1-x341.google.com with SMTP id v2so6384401oto.2
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 12:18:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=7b8pd2PeUYEhhBSJLFprS4neuvrBP6ynD50ZhKLWaGY=;
+ b=A8LQosPKI/wGGMDcW9ZT7P9yt2l0ZmXaCoTCA1ULPv3Cs3cz0ezYHNLMd4qYR9ppAb
+ xfFUgVjxU8qIN+6uDF+4qAYPObLNAyCYbHJq8INlTprGRrxe4bBKin6dbjQnGtBxryv7
+ aqSahcUkKWLbd4k3QA9ptzKdNdv6AhMIh7NomSSFYdICOe3PgCs8dPffOv5NPTQTbIz+
+ +lKFMuu0f/NyFeOF7DJlMvytHWKiVU+OEe49rePetfDZDHnt0pp+qW2fEIg9bEFE0/vL
+ DDSwlcJXDBXze1nDq7+Ss6NRIrkvkwTDdouPXP7SCPTDgUC6BWTSU01pkYrCXHL910Eo
+ exVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=7b8pd2PeUYEhhBSJLFprS4neuvrBP6ynD50ZhKLWaGY=;
+ b=pu4qRfK+QQqIjY4I+tz8BQi02FkMKek0IkUbpX0hGxCZ1gx8UTu16TdrzdEaEF59l0
+ UWI6mqAA9111TBpmdU49lG3WgTqZHLeJSVqfyMVskQQaJnx2ObhYiyFpRRNZEKG5Vbm+
+ kb8VfFkAuGcD0aK/tspjKk0f47OUWBZjG0z+g83+UWAW1n3iXF+0MPtt8pojJ1MjcwLd
+ 2VTL69Weh9EGq9xZBwQQJdX/Lfk6gbpSDhKVUmWe5OHRWaC+dmF3AyYTzlKIPBlLX8Pp
+ /XRtpGrdOQ4YIe9B0lHNEudiN7KHUQcol+RcPPh1FwgJV2tjEq/vzYGwaLDuMsCoqIkr
+ qmsw==
+X-Gm-Message-State: ANhLgQ0TL94RW8/WQDvLuXbDPeEJKMFJHAx6sC9D8zRWQJPE5u+SVrFB
+ jrYlm8hLQVtgE9rIVT/NOs8B8PySGxWbQK7Br0GhhA==
+X-Google-Smtp-Source: ADFU+vseEXbuq3RqLjMIyTOwgDL4J3B6y99uPnkxp0MNdXzXoU65ulCLhr9qV401tNjOKRSeRU3XC7jABe/KXk2eoaY=
+X-Received: by 2002:a4a:a226:: with SMTP id m38mr810191ool.94.1585336713903;
+ Fri, 27 Mar 2020 12:18:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+References: <20200327181320.23329-1-alex.bennee@linaro.org>
+In-Reply-To: <20200327181320.23329-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Mar 2020 19:18:22 +0000
+Message-ID: <CAFEAcA-5ZApvBLiDrAa5oea_tygX9vyA8n3SFwqjnS5zEekodw@mail.gmail.com>
+Subject: Re: [PULL v2 for 5.0 00/12] testing updates (+ one mttcg change)
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,27 +88,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri 27 Mar 2020 07:57:40 PM CET, Eric Blake wrote:
->> +    /* If the image does not support QCOW_OFLAG_ZERO then discarding
->> +     * clusters could expose stale data from the backing file. */
->> +    if (s->qcow_version < 3 && bs->backing) {
->> +        return -ENOTSUP;
->> +    }
+On Fri, 27 Mar 2020 at 18:13, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
 >
-> Hmm. Should we blindly always fail for v2, or can we be a little bit
-> smarter and still discard a cluster in the top layer if the backing
-> layer does not also have it allocated?
+> The following changes since commit cfe68ae025f704f336d7dd3d1903ce37b44583=
+1d:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0-p=
+ull-request' into staging (2020-03-26 20:55:54 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-testing-270320-2
+>
+> for you to fetch changes up to 41e1f0e2256e4c21bc5671ecb64191e776477c35:
+>
+>   .travis.yml: Add a KVM-only s390x job (2020-03-27 13:43:20 +0000)
+>
+> ----------------------------------------------------------------
+> Testing updates:
+>
+>   - docker updates (various dependencies)
+>   - travis updates (s390x KVM build)
+>   - tweak qemu/atomic.h headers in event of clash
+>   - test/vm updates (NetBSD -> 9.0, FreeBSD -> 12.1)
+>   - disable MTTCG for mips64/mips64el
+>
 
-Not sure if that's worth it. I only wanted to fix what looks like a
-potential security bug so I prefer to keep it simple. qcow2 v3 has been
-out for many years already.
 
-Berto
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
