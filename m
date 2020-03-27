@@ -2,84 +2,78 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB95C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 486F9C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42474206DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:22:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1585F20716
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:26:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b3I4cR+k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42474206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPY2Mlsj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1585F20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHsgl-00018E-Co
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 13:22:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57025)
+	id 1jHske-00030V-4c
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 13:26:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jHsg5-0000fz-Kk
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:21:54 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jHsjo-0002aW-Om
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:25:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1jHsg4-00017V-Df
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:21:53 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43824)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1jHsg3-00014Y-Tm
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:21:52 -0400
-Received: by mail-lj1-x243.google.com with SMTP id g27so10971195ljn.10
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 10:21:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=NOgMP/LsvGYVv9dfR/2BbxGhuZaI5rvVvSUr86nrsiA=;
- b=b3I4cR+k4Q+OGyQKetSVRDfF+Qm5lyw/t6euOXcQzwaaM3ZqucDXGu12bGUVRYzJ3P
- jv3j17G9MD/tKsgTwzE5C/U3xhx42DpZEEzm7vf5YzQ0Xalg9Db+biPlGafGqkjeVBdO
- BXHhP0+UVHvUfVBIHxYwpGCbMdO0dfASl4r4q5OHOVPY/tZNqHRScsjIi41uSwj5hdHy
- NizqO/+oThZ/NWMF/6XbrS+7B5VeMlcheznnZCRKX4XBdGjUu7Hce/Cvj8CQx3zswTi/
- 9sEuR4NF1gYCNfGLbAA8F1jnBhDuDiPrqEvL+yRTU7TbjYSGa0S+DQC8t57O+cLdnZh0
- 4qvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=NOgMP/LsvGYVv9dfR/2BbxGhuZaI5rvVvSUr86nrsiA=;
- b=cvZ6MXrySCxJ1it3W1Bsb82wWUvpOStq0FPGDSNHs3Ett6cDZxLgso1uEmqLxoCBWW
- IvNP3Cush5qhUNcaVDxwkvwAULLYRo8BbZSZ4JOR1v1ynYKrHZys4BEg+m9mpVqLZHdk
- pMUBHhGqEjcV2MsG1kY97WFAEEVoH0AzcpSkVLZQR/VPF2IfnLf/Qx+gWy0E4si/6KL9
- lfIo/fHjG6uY9DHuXhDy5T2ofWnIm4MKumQBoBNs8yz98czC9qiQ+kLsNyXAzlbWSFVs
- Zc/bQ4iky/18n/A+j65+eqrfaGfDpfeUXFumrNo55u3tBspJgauEmWZeE4LtlJJ/U1Vm
- R+gA==
-X-Gm-Message-State: AGi0Pub9HmS6NBd41BspoK+ScHbJLog2jIlTObBgVsRcTkHg6pbvj2lr
- mRsN2j/m15PFBFXWDgzjOP1hPgw6ZV6c3hrz3b0aLw==
-X-Google-Smtp-Source: APiQypIEYQ1dS0t0Wrq600fPW5TINTSVGHVrKtPaKCxKVgI5fnHqk+Ng/f0DIIXh1xQfvT90S8BjYg1HgkxMQ4oSX5s=
-X-Received: by 2002:a2e:9097:: with SMTP id l23mr6043347ljg.173.1585329709805; 
- Fri, 27 Mar 2020 10:21:49 -0700 (PDT)
+ (envelope-from <alex.williamson@redhat.com>) id 1jHsjm-0006IV-3E
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:25:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:20134)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jHsjl-0006HH-Sx
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:25:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585329941;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Pjc35xFK4bFr3t5dXBVOy2iGeocSMSesPRX8AD/UN7c=;
+ b=dPY2MlsjildHyeNhBbMa6202F2QrAd6fkOlNiRQDguQLkUag6D0QPYpCXi0FZQpFCGbHe9
+ Sd0AglcsrpPNYVSqiOqXTrSVvQb9WzSixjfNVyxDa73hWGDYrlsgdK62kVt86UYotTozrJ
+ ZPhB1FEA8mgdAyqnMNQVxVn67fHZR+c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-Pj6ZkXKVOwy57EShOzoeGw-1; Fri, 27 Mar 2020 13:25:39 -0400
+X-MC-Unique: Pj6ZkXKVOwy57EShOzoeGw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BA3C19057A0;
+ Fri, 27 Mar 2020 17:25:38 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 013635C1C3;
+ Fri, 27 Mar 2020 17:25:37 +0000 (UTC)
+Date: Fri, 27 Mar 2020 11:25:37 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: yan.y.zhao@intel.com
+Subject: Re: [PATCH] hw/vfio: let readonly flag take effect for mmaped regions
+Message-ID: <20200327112537.2efd65ac@w520.home>
+In-Reply-To: <20200327111934.71066-1-yan.y.zhao@intel.com>
+References: <20200327111934.71066-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-References: <20200326193156.4322-1-robert.foley@linaro.org>
- <CAHiYmc476rMd71t5ZSdz-pgVZ-i_3RBY=U3bO0aYEOOt5P3V_w@mail.gmail.com>
- <871rpennlp.fsf@linaro.org>
- <CAHiYmc5zTyUtm570NxKS8crJKWgNmEhMk-FcvnkMHf928=9CdQ@mail.gmail.com>
- <CAHiYmc7ZZi784vOQre=_40bf0dgJUGoBupD_zFE2jw-_EcxR+Q@mail.gmail.com>
-In-Reply-To: <CAHiYmc7ZZi784vOQre=_40bf0dgJUGoBupD_zFE2jw-_EcxR+Q@mail.gmail.com>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Fri, 27 Mar 2020 13:21:21 -0400
-Message-ID: <CAEyhzFsW=o8jL0nXStkYXVS5nLY8Yfj-XBB1eYujsVhKVSEHCg@mail.gmail.com>
-Subject: Re: [PATCH v8 00/74] per-CPU locks
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,59 +85,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "peter.puhov@linaro.org" <peter.puhov@linaro.org>
+Cc: pbonzini@redhat.com, Xin Zeng <xin.zeng@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 27 Mar 2020 at 06:24, Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
-> >> >>
-> >> >> This is a continuation of the series created by Emilio Cota.
-> >> >> We are picking up this patch set with the goal to apply
-> >> >> any fixes or updates needed to get this accepted.
-> >> >>
-> >> >
-> >> > Thank for this work, Robert.
-> >> >
-> >> > However, I just hope you don't intend to request integrating the ser=
-ies in
-> >> > 5.0. The right timing for such wide-influencing patch is at the begi=
-ning of
-> >> > dev cycle, not really at the end of (5.0) cycle, IMHO.
-> >>
-> >> It's not marked for 5.0 - I don't think all patch activity on the list
-> >> has to stop during softfreeze. I don't think there is any danger of it
-> >> getting merged and early visibility has already generated useful
-> >> feedback and discussion.
-> >
-> >
-> > OK, nobody ever said we can
->
-> Obviously, I meant here "cannot", not "can". Everbody is allowed to do an=
-y experimentation and evaluation of the series at any time - of course. :)
+On Fri, 27 Mar 2020 11:19:34 +0000
+yan.y.zhao@intel.com wrote:
 
-We do not have any particular release in mind, but we are not
-intending this release for sure.  It is a good point though, that we
-probably should have mentioned this in our cover letter, given the
-timing in the current release cycle.  We'll remember that in the
-future. :)  We're just looking to get this out there now to get some
-feedback and hopefully advance the series forward to the point that it
-can be included in a release in the future.
+> From: Yan Zhao <yan.y.zhao@intel.com>
+> 
+> currently, vfio regions without VFIO_REGION_INFO_FLAG_WRITE are only
+> read-only when VFIO_REGION_INFO_FLAG_MMAP is not set.
+> 
+> regions with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP
+> are only read-only in host page table for qemu.
+> 
+> This patch sets corresponding ept page entries read-only for regions
+> with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP.
+> 
+> accordingly, it ignores guest write when guest writes to the read-only
+> regions are trapped.
+> 
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+> ---
 
-Thanks & Regards,
--Rob
->
-> > examine, discuss and test the series, but I remain thinking that this s=
-eries arrives too late for considering for 5.0.
-> >
-> > Aleksandar
-> >
-> >
-> >>
-> >> --
-> >> Alex Benn=C3=A9e
+Currently we set the r/w protection on the mmap, do I understand
+correctly that the change in the vfio code below results in KVM exiting
+to QEMU to handle a write to a read-only region and therefore we need
+the memory.c change to drop the write?  This prevents a SIGBUS or
+similar?
+
+Meanwhile vfio_region_setup() uses the same vfio_region_ops for all
+regions and vfio_region_write() would still allow writes, so if the
+device were using x-no-mmap=on, I think we'd still get a write to this
+region and expect the vfio device to drop it.  Should we prevent that
+write in QEMU as well?
+
+Can you also identify what device and region requires this so that we
+can decide whether this is QEMU 5.0 or 5.1 material?  PCI BARs are of
+course always R/W and the ROM uses different ops and doesn't support
+mmap, so this is a device specific region of some sort.  Thanks,
+
+Alex
+
+
+>  hw/vfio/common.c | 4 ++++
+>  memory.c         | 3 +++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 0b3593b3c0..e901621ca0 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -971,6 +971,10 @@ int vfio_region_mmap(VFIORegion *region)
+>                                            name, region->mmaps[i].size,
+>                                            region->mmaps[i].mmap);
+>          g_free(name);
+> +
+> +        if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE)) {
+> +            memory_region_set_readonly(&region->mmaps[i].mem, true);
+> +        }
+>          memory_region_add_subregion(region->mem, region->mmaps[i].offset,
+>                                      &region->mmaps[i].mem);
+>  
+> diff --git a/memory.c b/memory.c
+> index 601b749906..4b1071dc74 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1313,6 +1313,9 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+>      MemoryRegion *mr = opaque;
+>  
+>      trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
+> +    if (mr->readonly) {
+> +        return;
+> +    }
+>  
+>      switch (size) {
+>      case 1:
+
 
