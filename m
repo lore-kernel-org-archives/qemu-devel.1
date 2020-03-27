@@ -2,94 +2,76 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13726C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75388C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:47:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D56D020737
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 417BD20857
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:47:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WND5Rr96"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D56D020737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AAeMpQRC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 417BD20857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHs4h-0005Tj-3b
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:43:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46997)
+	id 1jHs8k-0006hM-ES
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:47:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47950)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jHs44-00054t-JE
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:42:37 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jHs7u-0006HA-5e
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:46:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jHs43-0000EF-Jh
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:42:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39238)
+ (envelope-from <imammedo@redhat.com>) id 1jHs7s-00072P-OU
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:46:33 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25913)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jHs43-0000Db-G8
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:42:35 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jHs7s-0006vt-Jw
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:46:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585327355;
+ s=mimecast20190719; t=1585327591;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3wzB5De7ATj5AIgqnI7jha9G1quxvo/+4d1iLzRjPR0=;
- b=WND5Rr96wRhl7VHYqMytiKTsG5CpaNwgNbop21gOH2C9xe4+gGWZFq8M7Ib4RFmneFfoqY
- NPTSLMCB8tWdj92omCbyeg5VaTuCadajk5ImKbs9jij8fHbaubGdQSp7PRZQ71ZglKGIdX
- 3VWULvvHOy0gDy84XrBHAWwLV6iXsG4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-MPFregK2M6CKLn7D-dQU0Q-1; Fri, 27 Mar 2020 12:42:28 -0400
-X-MC-Unique: MPFregK2M6CKLn7D-dQU0Q-1
-Received: by mail-wr1-f69.google.com with SMTP id w12so4796656wrl.23
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 09:42:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3wzB5De7ATj5AIgqnI7jha9G1quxvo/+4d1iLzRjPR0=;
- b=h6rWXkcbKL4uVOA5lYBFBvEEoix5Gg+oFEp+FzRsov4YGMevmxrrw7KdaOi25fEMj2
- xssoRvclbXnQQe9M66RiKyxkTeIK8Tyey3bxzag1kOAFjohhX0/p7Z7kg5pi7fQJkWCI
- WvgcB1UvkHy4+sXuswFct8FcHMO1zlkskFZg10vaehB+XiQWEeoC0ErMwCS6fUONknbN
- Xjt0AiQTRnirB57i2sfNGCgdonHxi8r2cah+Fi1gYoxBuzaaqwXoheTSz14UH3SKZWTg
- y0UfZMRbFQgbgnpNjGMRV7dUTgVen/rtTY+6wOST8QvGeHEXj2JCGawX2sifPRCy+nm0
- PRNw==
-X-Gm-Message-State: ANhLgQ0IcIuUK05FL6Jw6wlfc8Y82NS6ebZNn+GM/d9BCGVKEPOu+9HI
- IQLocwZW/6d9rbBfG7BaMB4efq/kwrqjkzFY+KnZyy9msiIVqhSvfARNvplppKaZlXnajZmsq08
- Iz2HfxWNUP+S5qI4=
-X-Received: by 2002:adf:edd2:: with SMTP id v18mr298631wro.55.1585327347421;
- Fri, 27 Mar 2020 09:42:27 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvp/OLxwqBeTVtcTOZAnfdT0ze853vEiz7KWHsE3UE3ogC2MHDiieeELo3e4PUZCxYuQip5lQ==
-X-Received: by 2002:adf:edd2:: with SMTP id v18mr298613wro.55.1585327347227;
- Fri, 27 Mar 2020 09:42:27 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea?
- ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
- by smtp.gmail.com with ESMTPSA id m19sm8901234wml.48.2020.03.27.09.42.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 27 Mar 2020 09:42:26 -0700 (PDT)
-Subject: Re: [PATCH for-5.0] xen: fixup RAM memory region initialization
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20200327104828.12647-1-imammedo@redhat.com>
- <20200327173622.0fb2f5dc@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5ddf9ac6-884f-f791-2dbe-cae10b855d1f@redhat.com>
-Date: Fri, 27 Mar 2020 17:42:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=WrvWjEVAogqGLXAVUnUNcFoDwPHvVTSNWLcFCDUMuag=;
+ b=AAeMpQRCjv8Df6xDWA4iEcxnR5lK6upUuCkOAsIMFHQvODMDj3lmM7VfZSLuc4zg9wMs0X
+ LDL1Wp34FWDpCQQ52liBxOUI813rkVvoC1HAQOvOvsFmirhlox0OSsvh6O+JVtARBge0yi
+ w+xPngZUsxwGl9WC+JYmEDW1/J2aQCg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-NnruVez9MZqd8O2jTd5OkA-1; Fri, 27 Mar 2020 12:46:30 -0400
+X-MC-Unique: NnruVez9MZqd8O2jTd5OkA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A89B3800D4E;
+ Fri, 27 Mar 2020 16:46:28 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8E1385E02B;
+ Fri, 27 Mar 2020 16:46:22 +0000 (UTC)
+Date: Fri, 27 Mar 2020 17:46:20 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Re: [PATCH v1] s390x: Reject unaligned RAM sizes
+Message-ID: <20200327174620.06b9c324@redhat.com>
+In-Reply-To: <24681aa0-9053-238f-89da-8ce08d34241d@de.ibm.com>
+References: <20200327152930.66636-1-david@redhat.com>
+ <64cefab8-f1e0-fbc7-27d3-4f28758c595a@de.ibm.com>
+ <d8fb50c1-639a-826c-0dce-e2ddc26ae5e1@redhat.com>
+ <24681aa0-9053-238f-89da-8ce08d34241d@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200327173622.0fb2f5dc@redhat.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -105,19 +87,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: anthony.perard@citrix.com, rth@twiddle.net, ehabkost@redhat.com,
- mst@redhat.com
+Cc: =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr . David Alan
+ Gilbert" <dgilbert@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/03/20 17:36, Igor Mammedov wrote:
-> Paolo,
+On Fri, 27 Mar 2020 17:05:34 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 27.03.20 17:01, David Hildenbrand wrote:
+> > On 27.03.20 16:34, Christian Borntraeger wrote:  
+> >>
+> >>
+> >> On 27.03.20 16:29, David Hildenbrand wrote:  
+> >>> Historically, we fixed up the RAM size (rounded it down), to fit into
+> >>> storage increments. Since commit 3a12fc61af5c ("390x/s390-virtio-ccw: use
+> >>> memdev for RAM"), we no longer consider the fixed-up size when
+> >>> allcoating the RAM block - which will break migration.
+> >>>
+> >>> Let's simply drop that manual fixup code and let the user supply sane
+> >>> RAM sizes. This will bail out early when trying to migrate (and make
+> >>> an existing guest with e.g., 12345 MB non-migratable), but maybe we
+> >>> should have rejected such RAM sizes right from the beginning.
+> >>>
+> >>> As we no longer fixup maxram_size as well, make other users use ram_size
+> >>> instead. Keep using maxram_size when setting the maximum ram size in KVM,
+> >>> as that will come in handy in the future when supporting memory hotplug
+> >>> (in contrast, storage keys and storage attributes for hotplugged memory
+> >>>  will have to be migrated per RAM block in the future).
+> >>>
+> >>> This fixes (or rather rejects early):
+> >>>
+> >>> 1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as the
+> >>>    RAM block size changed.  
+> >>
+> >> Not sure I like this variant. Instead of breaking migration (that was 
+> >> accidentially done by Igors changes) we now reject migration from older
+> >> QEMUs to 5.0. This is not going to help those that still have such guests
+> >> running and want to migrate.   
+> > 
+> > As Igor mentioned on another channel, you most probably can migrate an
+> > older guest by starting it on the target with a fixed-up size.
+> > 
+> > E.g., migrate an old QEMU "-m 1235M" to a new QEMU "-m 1234M"  
 > 
-> could you take it along with Olaf's xenfv patch?
+> Yes, that should probably work.
+I'm in process of testing it.
 
-Yes, thanks.  Also your other patch.
-
-Paolo
+> > Not sure how many such weird-size VMs we actually do have in practice.  
+> 
+> I am worried about some automated deployments where tooling has created
+> these sizes for dozens or hundreds of containers in VMS and so.
+Yep, it's possible but then that tooling/configs should be fixed to work with
+new QEMU that validates user's input.
 
 
