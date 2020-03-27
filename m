@@ -2,56 +2,57 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1958C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9045CC2D0E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:42:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6BD720716
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:42:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6BD720716
+	by mail.kernel.org (Postfix) with ESMTPS id 6935B20716
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:42:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6935B20716
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHlVf-00075R-Ph
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 05:42:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58369)
+	id 1jHlVh-00077K-H1
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 05:42:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58493)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jHlUU-0005S9-RH
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:41:27 -0400
+ (envelope-from <pannengyuan@huawei.com>) id 1jHlUX-0005Vh-VG
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:41:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1jHlUT-0000Jl-9O
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:41:26 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59452 helo=huawei.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1jHlUW-0000hj-SH
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:41:29 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:48222 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1jHlUS-0008UE-Tw
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:41:25 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 742D66D0B783458096A8;
- Fri, 27 Mar 2020 17:41:17 +0800 (CST)
+ id 1jHlUT-00008O-PU; Fri, 27 Mar 2020 05:41:26 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 7E3A3FB9F4D53A6B2C22;
+ Fri, 27 Mar 2020 17:41:22 +0800 (CST)
 Received: from localhost.huawei.com (10.175.104.216) by
  DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 27 Mar 2020 17:41:11 +0800
+ 14.3.487.0; Fri, 27 Mar 2020 17:41:15 +0800
 From: Pan Nengyuan <pannengyuan@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v3 0/2] fix two virtio queues memleak
-Date: Fri, 27 Mar 2020 17:56:40 +0800
-Message-ID: <20200327095642.18424-1-pannengyuan@huawei.com>
+Subject: [PATCH v3 1/2] virtio-blk: delete vqs on the error path in realize()
+Date: Fri, 27 Mar 2020 17:56:41 +0800
+Message-ID: <20200327095642.18424-2-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.18.2
+In-Reply-To: <20200327095642.18424-1-pannengyuan@huawei.com>
+References: <20200327095642.18424-1-pannengyuan@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.104.216]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,31 +64,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: euler.robot@huawei.com, Pan Nengyuan <pannengyuan@huawei.com>,
- zhang.zhanghailiang@huawei.com, mst@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, mst@redhat.com, Pan Nengyuan <pannengyuan@huawei.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan
+ Hajnoczi <stefanha@redhat.com>, euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series fix two vqs leak:
-1. Do delete vqs on the error path in virtio_blk_device_realize().
-2. Do delete vqs in virtio_iommu_device_unrealize() to fix another leaks.
+virtio_vqs forgot to free on the error path in realize(). Fix that.
 
+The asan stack:
+Direct leak of 14336 byte(s) in 1 object(s) allocated from:
+    #0 0x7f58b93fd970 in __interceptor_calloc (/lib64/libasan.so.5+0xef970)
+    #1 0x7f58b858249d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
+    #2 0x5562cc627f49 in virtio_add_queue /mnt/sdb/qemu/hw/virtio/virtio.c:2413
+    #3 0x5562cc4b524a in virtio_blk_device_realize /mnt/sdb/qemu/hw/block/virtio-blk.c:1202
+    #4 0x5562cc613050 in virtio_device_realize /mnt/sdb/qemu/hw/virtio/virtio.c:3615
+    #5 0x5562ccb7a568 in device_set_realized /mnt/sdb/qemu/hw/core/qdev.c:891
+    #6 0x5562cd39cd45 in property_set_bool /mnt/sdb/qemu/qom/object.c:2238
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
 v2->v1:
-- Fix incorrect free in virtio_blk_device_realize, it will cause a uaf.
+- Fix incorrect free in v1, it will cause a uaf.
+---
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
+---
+ hw/block/virtio-blk.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-v3->v2:
-- Aslo clean 's->as_by_busptr' hash table in virtio_iommu_device_unrealize.(Suggested by Stefano Garzarella) 
-
-Pan Nengyuan (2):
-  virtio-blk: delete vqs on the error path in realize()
-  virtio-iommu: delete vqs in unrealize to fix memleak
-
- hw/block/virtio-blk.c    | 3 +++
- hw/virtio/virtio-iommu.c | 3 +++
- 2 files changed, 6 insertions(+)
-
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 142863a3b2..97ba8a2187 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1204,6 +1204,9 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+     virtio_blk_data_plane_create(vdev, conf, &s->dataplane, &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
++        for (i = 0; i < conf->num_queues; i++) {
++            virtio_del_queue(vdev, i);
++        }
+         virtio_cleanup(vdev);
+         return;
+     }
 -- 
 2.18.2
-
 
