@@ -2,147 +2,119 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A19C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 05:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D1BC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 06:01:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4010520663
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 05:51:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCB7F20714
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 06:01:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="q06ala5e";
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="peH/Xc1h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4010520663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nL1wb7T3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCB7F20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHhtw-0001aa-AI
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 01:51:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49801)
+	id 1jHi42-0003XK-UP
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 02:01:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=2355768c4b=bbhushan2@marvell.com>)
- id 1jHhtG-0000vv-T5
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 01:50:48 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jHi2j-0002hl-UX
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 02:00:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=2355768c4b=bbhushan2@marvell.com>)
- id 1jHhtF-0000Y0-I7
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 01:50:46 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:5032)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jHi2i-0006gI-Od
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 02:00:33 -0400
+Received: from mail-eopbgr10139.outbound.protection.outlook.com
+ ([40.107.1.139]:14697 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=2355768c4b=bbhushan2@marvell.com>)
- id 1jHhtB-0008R4-8m; Fri, 27 Mar 2020 01:50:41 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
- by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02R5jGow032453; Thu, 26 Mar 2020 22:50:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pfpt0818;
- bh=FJkZLx0G70kyLZrKIwdIByY2uJ8d6utnGBq5EP3730U=;
- b=q06ala5e+kByp/27YmRkYrwqD7VNB0ksUUA5IUjoOs8FTTt6PVf4MWv5ltRef1T+b2EH
- YB6jWyzmHmYz3OrKa0XN3Y6k3hoC5tTrA+Lxs5r5X3nsX0jm6jKkSdTEjPsFbwE2dpP1
- ZG/8P6rzPxjFwhAgLPFuKbfbTcSF38Pzn3WCt7kUdEefeyjCzkJj1OYG/0qpBDXm5WbU
- OxSU3Kwv1xyfn3AxWy0aqWJ6E9habrJs986L4B75sTB2HfR3dsBiunNoMthrW29kb+GW
- CMd6Bj6WWDzQH9JNMQ+qNYbRA6GwA0obdOxFAPC7VR/iZzE8SAizTwLozXR9sUK/X4Up Rg== 
-Received: from sc-exch04.marvell.com ([199.233.58.184])
- by mx0b-0016f401.pphosted.com with ESMTP id 300bpcyqvg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Thu, 26 Mar 2020 22:50:30 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH04.marvell.com
- (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
- Thu, 26 Mar 2020 22:50:28 -0700
-Received: from SC-EXCH04.marvell.com (10.93.176.84) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
- Thu, 26 Mar 2020 22:50:28 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
- by SC-EXCH04.marvell.com (10.93.176.84) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Thu, 26 Mar 2020 22:50:27 -0700
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jHi2e-0005wg-7L; Fri, 27 Mar 2020 02:00:28 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jqZevkVX13A6nXdlwhcGjt2Cd2SdXSzIShyXXWfkWhqy4YMrD+BiIb6Sa6GCV2D5Fm8mvS1d+n4sOljLwij3iTCzcz8hoKHgRIGGTHLVvbXgPb6Rj3+RrQQY4Rhmzhq7CLXtXdoyRZ7wZNUD2yWqY9W9/mBIJDiL1a+bfhimVqN8kpxl093wiH7pOHkHMStNy4lMHyCgnjXKp53Ph9ij6vCff7BsHfVGtY0iy47fuiXlGBKV6mYHYC40LDVSI95pw7jh+pmB9DLL7Qpg1HJYOrJLhvpAAIxcECWZLCz7SURTZqKhaGutZzm81SP8Do02pz5YUnnQxnHEuml6FbJ4QQ==
+ b=mrBtqYHZOAENUPeNX+dO4nGv/vi0i9ZmG5QZr4D5YXX3K8L/ElahTvXBbl5BtjiiBggOU0nGEdluhD5ZJZZcwCm/1/yekQbJx0aDI9vV92LwDmFPgEdzzK8Nd7UmJAk1GTdInRti6r6I2Qqh/pftuev70Nak90dH4ayxce0oqqNFvuwoxlT5Jlu6ejPdQv7pRsyXau6kZGbWn0jXrGJ1dckc2OOFWBkyGMzhhPcKmCLvDsK7eOksvDFh7/IVyZ738NWF8xFRwrB4SJfORtGChyGvSVkrB9Bnpyxa1HoeTHh9MA1+EUqO3F+EQl50QOH8aBznkOa2OWFct12Aoutjig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FJkZLx0G70kyLZrKIwdIByY2uJ8d6utnGBq5EP3730U=;
- b=LWG5SfXKr1DaoGO1ou4iYUCiRD6Vz3US7u8Z+cpOkmUdH5KqxKmBFx/btuQORicifWLemr+uYptJPzRQDE2uILJqoU9F+HOnfG+Y5X/5Z3+usBPhhFSZbC+uoI9Dfa8dvZR4b4LpthmfSlVUdPcQjgjHGWaoBiidetbzLUqsWeuN/C5KpAJbOhAmOUK8qPMCPIhvK71KJ622lngXvakX7fcTsQ0KLxV1HUhrySRoReQDTZrzTkguBOvwQifSyH+v0NzW1cqRcWZ95ehynFetgGu0n/9EUP9B6CvDKVm/VTM2tgBuql+n2geatoYIGX5p7hmCnxTDFlXtD57RPsATPg==
+ bh=NCQalB+9+B5iijTQNgOIPK107xlHC+JJC1ZGak4b/nE=;
+ b=YRpuA83iDyc8hi5CHn6Joq1ngZGYEhNG6mtxOHcKkAQ+aBQAi7sipp4f2FZ679WdSoTka8Vy6Ap5gqciu7S+6nffKIzAUffM1cEIK+3Lq/CEgum6Dra2di0DbO+9dYcHf5oq8+c9mkTP6IpBoctn3+VEHunCl6JqogslWHDg/0q/5G7FP5ahYIEhOgAltISSDql89ZsqRyTFJFeJicna+tKMgRxchFnH1CaoSJIparPVg6MNSEJSb17wx0Zriung4JNtxJgCdlACNH+pESr+DvqZAV7TB8XJ9Vof1lRsfzIuM0Q+R3pfcTdy+xtt9/XsWEL9jP6QoL0ooeIcWlAWzg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FJkZLx0G70kyLZrKIwdIByY2uJ8d6utnGBq5EP3730U=;
- b=peH/Xc1heB/QKdsYoKPEKQaqFEQhBFtiRzW/J68fzDoi53cPn480PvSvGBRXiC5jqdkH2rA0wlBWzBjnvQdrq8m8kvQuEsDLfqW/dEaDS/lK79j8ATk+7TOzsLfLMBqh1kn4Oj+9TteZ/jWOIuBLBDTh7BMfsoa3FbVo0ZgliRw=
-Received: from MWHPR1801MB1966.namprd18.prod.outlook.com
- (2603:10b6:301:66::20) by MWHPR1801MB2029.namprd18.prod.outlook.com
- (2603:10b6:301:63::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.22; Fri, 27 Mar
- 2020 05:50:26 +0000
-Received: from MWHPR1801MB1966.namprd18.prod.outlook.com
- ([fe80::b417:ff60:caba:11a1]) by MWHPR1801MB1966.namprd18.prod.outlook.com
- ([fe80::b417:ff60:caba:11a1%7]) with mapi id 15.20.2856.019; Fri, 27 Mar 2020
- 05:50:26 +0000
-From: Bharat Bhushan <bbhushan2@marvell.com>
-To: Alex Williamson <alex.williamson@redhat.com>, Auger Eric
- <eric.auger@redhat.com>
-Subject: RE: [EXT] Re: [PATCH v9 1/9] hw/vfio/common: Remove error print on
- mmio region translation by viommu
-Thread-Topic: [EXT] Re: [PATCH v9 1/9] hw/vfio/common: Remove error print on
- mmio region translation by viommu
-Thread-Index: AQHWAO+QkxQYttOMmkGEh3oW5XA+3qhWzhWAgARaBACAAATkAIAAyCOg
-Date: Fri, 27 Mar 2020 05:50:26 +0000
-Message-ID: <MWHPR1801MB1966D4593BF88C59A7748319E3CC0@MWHPR1801MB1966.namprd18.prod.outlook.com>
-References: <20200323084617.1782-1-bbhushan2@marvell.com>
- <20200323084617.1782-2-bbhushan2@marvell.com>
- <20200323170835.5021f845@w520.home>
- <8ec6af3c-6bd7-a3dc-c531-16db6b2089c5@redhat.com>
- <20200326115318.094ab79a@x1.home>
-In-Reply-To: <20200326115318.094ab79a@x1.home>
-Accept-Language: en-IN, en-US
+ bh=NCQalB+9+B5iijTQNgOIPK107xlHC+JJC1ZGak4b/nE=;
+ b=nL1wb7T3oll++wt+E5WQQA62PSYqsIjyYdfsxPtPCR51ClRuWI4mzCfA7ZIslQc0XTOPSOZsd1Xrugmiw5U9LzQSfeab/Lmuysn/lSd8qwubtXp6Z5JBDeopuge35NLni5bPXqmgQBw3u3Vqzt7yYPLB2rs3rbh7oBe0A+NJ2BE=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5461.eurprd08.prod.outlook.com (10.141.174.137) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2835.20; Fri, 27 Mar 2020 06:00:25 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::9057:6f5a:378c:7533]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::9057:6f5a:378c:7533%6]) with mapi id 15.20.2835.023; Fri, 27 Mar 2020
+ 06:00:25 +0000
+Subject: Re: [PATCH v2 1/3] backup: don't acquire aio_context in backup_clean
+To: Stefan Reiter <s.reiter@proxmox.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <20200326155628.859862-1-s.reiter@proxmox.com>
+ <20200326155628.859862-2-s.reiter@proxmox.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200327090023209
+Message-ID: <ec317e02-1f34-9219-e2c5-13d352f64d82@virtuozzo.com>
+Date: Fri, 27 Mar 2020 09:00:23 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200326155628.859862-2-s.reiter@proxmox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [122.182.231.48]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b974b0eb-ebd6-499f-0660-08d7d212bfeb
-x-ms-traffictypediagnostic: MWHPR1801MB2029:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR1801MB2029DA3A2450C6D519CD945FE3CC0@MWHPR1801MB2029.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:364;
-x-forefront-prvs: 0355F3A3AE
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10009020)(4636009)(346002)(136003)(396003)(366004)(39860400002)(376002)(66476007)(81156014)(5660300002)(81166006)(66946007)(66556008)(478600001)(8936002)(71200400001)(7416002)(66446008)(6506007)(2906002)(64756008)(33656002)(7696005)(53546011)(52536014)(76116006)(4326008)(186003)(26005)(86362001)(54906003)(8676002)(316002)(9686003)(110136005)(55016002);
- DIR:OUT; SFP:1101; SCL:1; SRVR:MWHPR1801MB2029;
- H:MWHPR1801MB1966.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; 
-received-spf: None (protection.outlook.com: marvell.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5O8YBNSXKLHZfv2r5AoPp5N27mK1hySvJo1zCAjWf8ItNI6xjaFawRAOkfQFxb6M/lS2v+Zp3BZahQH84yQwiMzmjhXAYmquaAz+kn822uUsz2QykcjE54tulkz6V5LEJLhNyJWlzgfBDduwLrYOt5WpjB/+g62eFa65bdD6m0Oymk87rs5rRU/XOWaSEl143Nz/Ya7u/F1elwcGf3nZMD1o3ElZfmLVK0BgBrfsNEYZXyRlA53CyJFgFjg+dPyNnR7itKPYfg/J+SJl+BesIRg1du5j8h4gY4zV3ahKKyJMZQgLHTYg7jY5sG0eYTPKsrRTT84GY6NNWGAZRQ0zs3MlK8ege4N/QFpHHv/mpTa2y6vkgJygg3nxIn2v7h4FBP0o/JOpAxnESCEvFWDmD1MViLXSEY2vp3IaleAD306OA16ROlHQvK1DL04e8Xv9
-x-ms-exchange-antispam-messagedata: if/LTvVjKuwp1DCLsATh1qj2NoItq07ykcW4OR5AfL+L3Ehs1OMRPVHxKVuFWo9QeuxLIpfEVj1QboD5XOiigbkMm1jL3Xwm9NXSaDNao0GEfUTB5kehwNOp8zG9XMvs1xTnP5b3ItbLucOOQw3a9A==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR07CA0024.eurprd07.prod.outlook.com
+ (2603:10a6:208:ac::37) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: b974b0eb-ebd6-499f-0660-08d7d212bfeb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2020 05:50:26.5990 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7EVrQ4e3c+RueOPxkPMQNs5UN1s6frEYK/gbszQUUrVtpr1VHtEglOtj/WbpUKwxpTPDfud35fLzZ64BoK/zIA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1801MB2029
-X-OriginatorOrg: marvell.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-26_14:2020-03-26,
- 2020-03-26 signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 67.231.156.173
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.35) by
+ AM0PR07CA0024.eurprd07.prod.outlook.com (2603:10a6:208:ac::37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.11 via Frontend Transport; Fri, 27 Mar 2020 06:00:24 +0000
+X-Tagtoolbar-Keys: D20200327090023209
+X-Originating-IP: [185.215.60.35]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 420c0eb4-f4d9-4e32-41fd-08d7d2142471
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5461:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5461E7D93953B55879372B17C1CC0@AM7PR08MB5461.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
+X-Forefront-PRVS: 0355F3A3AE
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(376002)(346002)(396003)(39850400004)(136003)(366004)(8676002)(316002)(16576012)(31696002)(86362001)(6486002)(66556008)(8936002)(4326008)(66946007)(81166006)(66476007)(81156014)(186003)(956004)(2616005)(16526019)(52116002)(36756003)(2906002)(26005)(5660300002)(31686004)(478600001);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mbyGXv047+104pnw0e6ZZoP5svNgWCfT4ie+ea30ta8UdHIQIPH463Q2JfyCvlh0hFNUCTvI5o55P3IhsemHvSoi0LArFQKrkqgdzDJCc/OZM03usCiQYNyfjrzkRRzZbv3+i4tvBbHwDqZhPQF74eH4USxqTl0Q8m1aAcMEtg1Bm5CVWzIaV0/w91lrWu1xUxa/JR/62VESkl2ulDwnN1e0n502l35Fyy2l9Tm9iz47bMLTZu2m8Mt3ZZb7UH4PMfBTVGbMOhaQt1YBQwmxE61Sj05FL7QEPbKnGl9IFotX23iXoQKe0Aa6t5EvXzV0kbKqjjJGwT8lHoTl/DYCHzCly5lgfzHCvVvLR/c1Ab+2npWcB99v2eBtoxA8l7V5TIDW+JBOMymr7ADnbAa6ef1NVgqb+OCwqZWT9YakrESqOWB6s4wKYG9fuLo3CxZS
+X-MS-Exchange-AntiSpam-MessageData: qQv5Z4tUshih0BTXoxrKMvIOKu18yUTnN+cN9eI/Yi/Umbldw11LSTBPETMxWnpnsJpNS33x8OWq9OF5gA066UtgJQlo9s9Plf/NQEClnDo5ymvlW7Lj+1P6sePvV/kZhZZt5MgDzo74J356JOM10g==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 420c0eb4-f4d9-4e32-41fd-08d7d2142471
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2020 06:00:24.9950 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +DGQ0KyMKLc4NGSKXl3lIEEAfONoWcKkgieHRIAVI42MA9nUsCRK81PotCU/ETG3ZkXhMqcFYv1wy1ZBytIVhNYns5zsN/GoBCwmFidboTk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5461
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.1.139
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,117 +126,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "yang.zhong@intel.com" <yang.zhong@intel.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- "Tomasz Nowicki \[C\]" <tnowicki@marvell.com>,
- "mst@redhat.com" <mst@redhat.com>, "drjones@redhat.com" <drjones@redhat.com>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "bharatb.linux@gmail.com" <bharatb.linux@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "linuc.decode@gmail.com" <linuc.decode@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Cc: kwolf@redhat.com, slp@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
+ jsnow@redhat.com, dietmar@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex, Eric,
+26.03.2020 18:56, Stefan Reiter wrote:
+> All code-paths leading to backup_clean (via job_clean) have the job's
+> context already acquired. The job's context is guaranteed to be the same
+> as the one used by backup_top via backup_job_create.
 
-> -----Original Message-----
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Thursday, March 26, 2020 11:23 PM
-> To: Auger Eric <eric.auger@redhat.com>
-> Cc: Bharat Bhushan <bbhushan2@marvell.com>; peter.maydell@linaro.org;
-> peterx@redhat.com; eric.auger.pro@gmail.com; kevin.tian@intel.com;
-> mst@redhat.com; Tomasz Nowicki [C] <tnowicki@marvell.com>;
-> drjones@redhat.com; linuc.decode@gmail.com; qemu-devel@nongnu.org; qemu-
-> arm@nongnu.org; bharatb.linux@gmail.com; jean-philippe@linaro.org;
-> yang.zhong@intel.com; David Gibson <david@gibson.dropbear.id.au>
-> Subject: [EXT] Re: [PATCH v9 1/9] hw/vfio/common: Remove error print on m=
-mio
-> region translation by viommu
->=20
-> External Email
->=20
-> ----------------------------------------------------------------------
-> On Thu, 26 Mar 2020 18:35:48 +0100
-> Auger Eric <eric.auger@redhat.com> wrote:
->=20
-> > Hi Alex,
-> >
-> > On 3/24/20 12:08 AM, Alex Williamson wrote:
-> > > [Cc +dwg who originated this warning]
-> > >
-> > > On Mon, 23 Mar 2020 14:16:09 +0530
-> > > Bharat Bhushan <bbhushan2@marvell.com> wrote:
-> > >
-> > >> On ARM, the MSI doorbell is translated by the virtual IOMMU.
-> > >> As such address_space_translate() returns the MSI controller MMIO
-> > >> region and we get an "iommu map to non memory area"
-> > >> message. Let's remove this latter.
-> > >>
-> > >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > >> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> > >> ---
-> > >>  hw/vfio/common.c | 2 --
-> > >>  1 file changed, 2 deletions(-)
-> > >>
-> > >> diff --git a/hw/vfio/common.c b/hw/vfio/common.c index
-> > >> 5ca11488d6..c586edf47a 100644
-> > >> --- a/hw/vfio/common.c
-> > >> +++ b/hw/vfio/common.c
-> > >> @@ -426,8 +426,6 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb,
-> void **vaddr,
-> > >>                                   &xlat, &len, writable,
-> > >>                                   MEMTXATTRS_UNSPECIFIED);
-> > >>      if (!memory_region_is_ram(mr)) {
-> > >> -        error_report("iommu map to non memory area %"HWADDR_PRIx"",
-> > >> -                     xlat);
-> > >>          return false;
-> > >>      }
-> > >>
-> > >
-> > > I'm a bit confused here, I think we need more justification beyond
-> > > "we hit this warning and we don't want to because it's ok in this
-> > > one special case, therefore remove it".  I assume the special case
-> > > is that the device MSI address is managed via the SET_IRQS ioctl and
-> > > therefore we won't actually get DMAs to this range.
-> > Yes exactly. The guest creates a mapping between one giova and this
-> > gpa (corresponding to the MSI controller doorbell) because MSIs are
-> > mapped on ARM. But practically the physical device is programmed with
-> > an host chosen iova that maps onto the physical MSI controller's
-> > doorbell. so the device never performs DMA accesses to this range.
-> >
-> >   But I imagine the case that
-> > > was in mind when adding this warning was general peer-to-peer
-> > > between and assigned and emulated device.
-> > yes makes sense.
-> >
-> >   Maybe there's an argument to be made
-> > > that such a p2p mapping might also be used in a non-vIOMMU case.  We
-> > > skip creating those mappings and drivers continue to work, maybe
-> > > because nobody attempts to do p2p DMA with the types of devices we
-> > > emulate, maybe because p2p DMA is not absolutely reliable on bare
-> > > metal and drivers test it before using it.
-> > MSI doorbells are mapped using the IOMMU_MMIO flag (dma-iommu.c
-> > iommu_dma_get_msi_page).
-> > One idea could be to pass that flag through the IOMMU Notifier
-> > mechanism into the iotlb->perm. Eventually when we get this in
-> > vfio_get_vaddr() we would not print the warning. Could that make sense?
->=20
-> Yeah, if we can identify a valid case that doesn't need a warning, that's=
- fine by me.
-> Thanks,
+As we already discussed, this is not quite right. So, may be this patch should
+be the last one...
 
-Will change as per above suggestion by Eric.
+> 
+> Since the previous logic effectively acquired the lock twice, this
+> broke cleanup of backups for disks using IO threads, since the BDRV_POLL_WHILE
+> in bdrv_backup_top_drop -> bdrv_do_drained_begin would only release the lock
+> once, thus deadlocking with the IO thread.
+> 
+> This is a partial revert of 0abf2581717a19.
+> 
+> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+> ---
+>   block/backup.c | 4 ----
+>   1 file changed, 4 deletions(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index 7430ca5883..a7a7dcaf4c 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -126,11 +126,7 @@ static void backup_abort(Job *job)
+>   static void backup_clean(Job *job)
+>   {
+>       BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
+> -    AioContext *aio_context = bdrv_get_aio_context(s->backup_top);
+> -
+> -    aio_context_acquire(aio_context);
+>       bdrv_backup_top_drop(s->backup_top);
+> -    aio_context_release(aio_context);
+>   }
+>   
+>   void backup_do_checkpoint(BlockJob *job, Error **errp)
+> 
 
-Thanks
--Bharat
 
->=20
-> Alex
-
+-- 
+Best regards,
+Vladimir
 
