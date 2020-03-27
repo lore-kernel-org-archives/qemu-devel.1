@@ -2,57 +2,128 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9D3C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FE7C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FF33206F8
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:02:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FF33206F8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD64E206F8
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:03:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTcu3/xW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD64E206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHlod-00017o-Ok
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:02:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48441)
+	id 1jHlpj-00024r-1n
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:03:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jHlne-0000fU-CU
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:15 -0400
+ (envelope-from <david@redhat.com>) id 1jHloD-0000xx-Kz
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jHlnZ-00073S-8r
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:14 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:13097)
+ (envelope-from <david@redhat.com>) id 1jHloC-0000A7-3m
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:49 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37189)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>)
- id 1jHlnS-0006fZ-Dy; Fri, 27 Mar 2020 06:01:02 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 3001C428FF;
- Fri, 27 Mar 2020 11:00:50 +0100 (CET)
-Date: Fri, 27 Mar 2020 11:00:48 +0100 (CET)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: Stefan Reiter <s.reiter@proxmox.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <626397594.17.1585303248535@webmail.proxmox.com>
-In-Reply-To: <20200326155628.859862-1-s.reiter@proxmox.com>
-References: <20200326155628.859862-1-s.reiter@proxmox.com>
-Subject: Re: [PATCH v2 0/3] Fix some AIO context locking in jobs
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHloB-00005m-Vq
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585303303;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9gc53uz+UnJn1NMBDdL6NuU+LEn2jScFeFzmLbOdXIo=;
+ b=fTcu3/xWvniBitoIE7iJFxZbeEZhvmOU1KD6okIz9i5JVYDqWi3AAZqPVkUO6VZOS3apvu
+ rmM+vr8zB4buwPdAf/69MpLi93Ypqpv6V9NnM0Cqs0hdQl0+Xu83fNCuMhCvIoBYEp/aBs
+ Vx4yXjAvZ160/1Z6Sj+Z0U7nn3amais=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-247-IyDacWDaPg2iL9z-bUEdFA-1; Fri, 27 Mar 2020 06:01:40 -0400
+X-MC-Unique: IyDacWDaPg2iL9z-bUEdFA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D39F107ACC7;
+ Fri, 27 Mar 2020 10:01:38 +0000 (UTC)
+Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4990A5E02A;
+ Fri, 27 Mar 2020 10:01:36 +0000 (UTC)
+Subject: Re: [PATCH] s390x/pv: Retry ioctls on -EINTR
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
+References: <20200327094339.26111-1-borntraeger@de.ibm.com>
+ <17439a57-46b1-d4d8-52fc-13516ae1db82@redhat.com>
+ <2c4613ec-6a56-4288-8aa8-5599f2624c3b@de.ibm.com>
+ <db0ca7f9-0ab7-f0c8-4b86-ce5bc2a0a14e@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <b59a2c64-8c54-c2b7-a076-f190758a87a0@redhat.com>
+Date: Fri, 27 Mar 2020 11:01:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev22
-X-Originating-Client: open-xchange-appsuite
+In-Reply-To: <db0ca7f9-0ab7-f0c8-4b86-ce5bc2a0a14e@de.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.186.127.180
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,75 +135,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, slp@redhat.com,
- mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com
+Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Marc Hartmayer <mhartmay@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> I *think* the second patch also fixes the hangs on backup abort that I and
-> Dietmar noticed in v1, but I'm not sure, they we're somewhat intermittent
-> before too.
+On 27.03.20 10:58, Christian Borntraeger wrote:
+>>> I fail to see where that is triggered in the kernel.
+>>>
+>>> t480s: ~/git/linux/arch/s390/kvm (HEAD losgel=C3=B6st bei next/master) =
+$ git
+>>> grep "EINTR"
+>>> kvm-s390.c:     if (exit_reason =3D=3D -EINTR) {
+>>> kvm-s390.c:             return -EINTR;
+>>> kvm-s390.c:             rc =3D -EINTR;
+>>> vsie.c: if (rc =3D=3D -EINTR) {
+>>>
+>>>
+>>> Can you help me out? Is that documented?
+>>
+>> It is related to the kernel patch.
+>> ksm_madvise->unmerge_ksm_pages has
+>>
+>>                 if (signal_pending(current))
+>>                         err =3D -ERESTARTSYS;
+>>
+>>
+>> entry.S will retranslate ERESTARTSYS into -EINTR.=20
+>>
+>=20
+> In the end both patches fixes an odd-ball case. Marc had a test running
+> that in parallel started guests and randomly killing QEMUs with pkill.
+> The QEMUs did end with=20
+>=20
+> qemu-system-s390x: KVM PV command 0 (KVM_PV_ENABLE) failed: header rc 0 r=
+rc 0 IOCTL rc: -12
+>=20
+> instead of
+>=20
+> qemu-system-s390x: terminating on signal 15 from pid 26495 (pkill)
+>=20
 
-After more test, I am 100% sure the bug (or another one) is still there. 
-Here is how to trigger:
+I guess the same can happen with a qemu_cpu_kick(), just that the BQL
+protects us from that to happen concurrently.
 
-1. use latest qemu sources from githup
-2. apply those 3 patches from Stefan
-2. create a VM with virtio-scsis-single drive using io-thread
-3. inside VM install Debian buster
-4. inside VM, run "stress -d 5"
+--=20
+Thanks,
 
-Then run a series of backups, aborting them after a few seconds:
-
-# start loop 
-
-qmp: { "execute": "drive-backup", "arguments": { "device": "drive-scsi0", "sync": "full", "target": "backup-scsi0.raw" } }
-
-sleep 3 second
-
-qmp: { "execute": "'block-job-cancel", "arguments": { "device": "drive-scsi0" } }
-
-# end loop
-
-After several iterations (mostly < 50) the VM freezes (this time somewhere 
-inside drive_backup_prepare):
-
-
-(gdb) bt
-#0  0x00007f61ea09e916 in __GI_ppoll (fds=0x7f6158130c40, nfds=2, timeout=<optimized out>, timeout@entry=0x0, sigmask=sigmask@entry=0x0)
-    at ../sysdeps/unix/sysv/linux/ppoll.c:39
-#1  0x000055f708401c79 in ppoll (__ss=0x0, __timeout=0x0, __nfds=<optimized out>, __fds=<optimized out>)
-    at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
-#2  0x000055f708401c79 in qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, timeout=timeout@entry=-1) at util/qemu-timer.c:335
-#3  0x000055f708404461 in fdmon_poll_wait (ctx=0x7f61dcd05e80, ready_list=0x7ffc4e7fbde8, timeout=-1) at util/fdmon-poll.c:79
-#4  0x000055f708403a47 in aio_poll (ctx=0x7f61dcd05e80, blocking=blocking@entry=true) at util/aio-posix.c:589
-#5  0x000055f708364c03 in bdrv_do_drained_begin (poll=<optimized out>, ignore_bds_parents=false, parent=0x0, recursive=false, bs=0x7f61dcd4c500)
-    at block/io.c:429
-#6  0x000055f708364c03 in bdrv_do_drained_begin
-    (bs=0x7f61dcd4c500, recursive=<optimized out>, parent=0x0, ignore_bds_parents=<optimized out>, poll=<optimized out>) at block/io.c:395
-#7  0x000055f7081016f9 in drive_backup_prepare (common=0x7f61d9a0c280, errp=0x7ffc4e7fbf28) at blockdev.c:1755
-#8  0x000055f708103e6a in qmp_transaction (dev_list=dev_list@entry=0x7ffc4e7fbfa0, has_props=has_props@entry=false, props=0x7f61d9a304e8, 
-    props@entry=0x0, errp=errp@entry=0x7ffc4e7fbfd8) at blockdev.c:2401
-#9  0x000055f708105322 in blockdev_do_action (errp=0x7ffc4e7fbfd8, action=0x7ffc4e7fbf90) at blockdev.c:1054
-#10 0x000055f708105322 in qmp_drive_backup (backup=backup@entry=0x7ffc4e7fbfe0, errp=errp@entry=0x7ffc4e7fbfd8) at blockdev.c:3129
-#11 0x000055f7082c0101 in qmp_marshal_drive_backup (args=<optimized out>, ret=<optimized out>, errp=0x7ffc4e7fc0b8)
-    at qapi/qapi-commands-block-core.c:555
-#12 0x000055f7083b7338 in qmp_dispatch (cmds=0x55f708904000 <qmp_commands>, request=<optimized out>, allow_oob=<optimized out>)
-    at qapi/qmp-dispatch.c:155
-#13 0x000055f7082a1bd1 in monitor_qmp_dispatch (mon=0x7f61dcd15d80, req=<optimized out>) at monitor/qmp.c:145
-#14 0x000055f7082a23ba in monitor_qmp_bh_dispatcher (data=<optimized out>) at monitor/qmp.c:234
-#15 0x000055f708400205 in aio_bh_call (bh=0x7f61dd28f960) at util/async.c:164
-#16 0x000055f708400205 in aio_bh_poll (ctx=ctx@entry=0x7f61dd33ef80) at util/async.c:164
-#17 0x000055f70840388e in aio_dispatch (ctx=0x7f61dd33ef80) at util/aio-posix.c:380
-#18 0x000055f7084000ee in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:298
-#19 0x00007f61ec069f2e in g_main_context_dispatch () at /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-#20 0x000055f708402af8 in glib_pollfds_poll () at util/main-loop.c:219
-#21 0x000055f708402af8 in os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:242
-#22 0x000055f708402af8 in main_loop_wait (nonblocking=nonblocking@entry=0) at util/main-loop.c:518
-#23 0x000055f70809e589 in qemu_main_loop () at /home/dietmar/pve5-devel/mirror_qemu/softmmu/vl.c:1665
-#24 0x000055f707fa2c3e in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
-    at /home/dietmar/pve5-devel/mirror_qemu/softmmu/main.c:49
+David / dhildenb
 
 
