@@ -2,128 +2,84 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FE7C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CDDC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:10:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD64E206F8
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:03:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09D66206F8
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:10:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTcu3/xW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD64E206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MWy/ZGIb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09D66206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHlpj-00024r-1n
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:03:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49061)
+	id 1jHlwh-0004N7-5Y
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:10:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jHloD-0000xx-Kz
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jHlw5-0003nz-Uj
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jHloC-0000A7-3m
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:49 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37189)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHloB-00005m-Vq
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:01:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585303303;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9gc53uz+UnJn1NMBDdL6NuU+LEn2jScFeFzmLbOdXIo=;
- b=fTcu3/xWvniBitoIE7iJFxZbeEZhvmOU1KD6okIz9i5JVYDqWi3AAZqPVkUO6VZOS3apvu
- rmM+vr8zB4buwPdAf/69MpLi93Ypqpv6V9NnM0Cqs0hdQl0+Xu83fNCuMhCvIoBYEp/aBs
- Vx4yXjAvZ160/1Z6Sj+Z0U7nn3amais=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-IyDacWDaPg2iL9z-bUEdFA-1; Fri, 27 Mar 2020 06:01:40 -0400
-X-MC-Unique: IyDacWDaPg2iL9z-bUEdFA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D39F107ACC7;
- Fri, 27 Mar 2020 10:01:38 +0000 (UTC)
-Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4990A5E02A;
- Fri, 27 Mar 2020 10:01:36 +0000 (UTC)
-Subject: Re: [PATCH] s390x/pv: Retry ioctls on -EINTR
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-References: <20200327094339.26111-1-borntraeger@de.ibm.com>
- <17439a57-46b1-d4d8-52fc-13516ae1db82@redhat.com>
- <2c4613ec-6a56-4288-8aa8-5599f2624c3b@de.ibm.com>
- <db0ca7f9-0ab7-f0c8-4b86-ce5bc2a0a14e@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <b59a2c64-8c54-c2b7-a076-f190758a87a0@redhat.com>
-Date: Fri, 27 Mar 2020 11:01:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <peter.maydell@linaro.org>) id 1jHlw4-0003vX-Ms
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:09:57 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36985)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jHlw4-0003qT-6i
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:09:56 -0400
+Received: by mail-oi1-x241.google.com with SMTP id u20so3550337oic.4
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 03:09:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=o+GzuiCKy/baE0bsoPkIfWsSEgMxRYKFOaKs/pOEY2M=;
+ b=MWy/ZGIbauoio9QkdKU1+O9D2gTEKJUh7Zbl5WpoAdVWoBlwAfMcKxx8zHUBN1dLmS
+ AaFFH+WfO6oXJf1GzDeBCk+pMxCvTl1njd9mOFtI5HQD8fXue5D4KPkVdGkuVJcNJsaa
+ b04ag00vNF/ahVaJXLECb2NrTWlzsRz7fLY3/YPnALuXJLBZ4560RryKhEkp1VYd8/5k
+ vqw+gzeZWJCqsDw3pfzt/RlqIGg6m4G5DkwBN4Je5CnWq5A0iU18UVtD+0m+Ux6i/1bT
+ fVeD2pj7PXIEv9JXCLQ2+qzKuPd2EgIO7Lo+7W7kxiNdg3dwdsY7IEXTmzMwCkFH+saZ
+ 6sDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=o+GzuiCKy/baE0bsoPkIfWsSEgMxRYKFOaKs/pOEY2M=;
+ b=ueDeIlHboy820lmwnZhSv0UBXXmpWzNTjrYKM4EqS4uhCLrzR2IKh3ocm10GNjAZdF
+ YU5Cin05Z3W85gf+yFq2H4uQQbn1g3WVKDkYHjVfpAx/T6SGQiyyOrRlYZbelE272mD9
+ gVl6xopFJmlj4B3h0Ao3Mffv3UdrLB96QcgPaZiuWJ7M5lnBFOchl/X0tuWWwixt1A9r
+ GTQY7O7uymFHGHmoO+Yk84zaLQ5tG7R7K65RqfJvwWGdtFRNMDb/HfsYR5wCNMu2MgOr
+ DNUnE552d3DcKYfE9zFoQInMAVVModYdGtiOswRvKWonOHJvS3iiQzImPjqdw+y8yfmX
+ VZQw==
+X-Gm-Message-State: ANhLgQ0QJ8ii142/PdyUuqxGUXBafU+DXe4tpq0vY/DpfUxZGbKjDgxB
+ IDVKkNa+Du+tLKKC3hQ+7Kc9TaxiikWao6Wfni4vCg==
+X-Google-Smtp-Source: ADFU+vtYgkB0Zd6ap1aBBijoA0IxCMX0p+SXb12fmrq/lkIcBPXELgHjBwUOFPvDwnnBlzHp6w0D4/GHzNFp334Cwp4=
+X-Received: by 2002:a05:6808:8cb:: with SMTP id
+ k11mr3174471oij.48.1585303794689; 
+ Fri, 27 Mar 2020 03:09:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <db0ca7f9-0ab7-f0c8-4b86-ce5bc2a0a14e@de.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <20200327094945.23768-1-alex.bennee@linaro.org>
+ <20200327094945.23768-6-alex.bennee@linaro.org>
+In-Reply-To: <20200327094945.23768-6-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Mar 2020 10:09:43 +0000
+Message-ID: <CAFEAcA8RvbdHMWCe101CyTWcA7T28-MtYwMFNZ5Fnh2=SuKcDw@mail.gmail.com>
+Subject: Re: [PATCH v1 5/7] fpu/softfloat: avoid undefined behaviour when
+ normalising empty sigs
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,55 +91,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Marc Hartmayer <mhartmay@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.03.20 10:58, Christian Borntraeger wrote:
->>> I fail to see where that is triggered in the kernel.
->>>
->>> t480s: ~/git/linux/arch/s390/kvm (HEAD losgel=C3=B6st bei next/master) =
-$ git
->>> grep "EINTR"
->>> kvm-s390.c:     if (exit_reason =3D=3D -EINTR) {
->>> kvm-s390.c:             return -EINTR;
->>> kvm-s390.c:             rc =3D -EINTR;
->>> vsie.c: if (rc =3D=3D -EINTR) {
->>>
->>>
->>> Can you help me out? Is that documented?
->>
->> It is related to the kernel patch.
->> ksm_madvise->unmerge_ksm_pages has
->>
->>                 if (signal_pending(current))
->>                         err =3D -ERESTARTSYS;
->>
->>
->> entry.S will retranslate ERESTARTSYS into -EINTR.=20
->>
->=20
-> In the end both patches fixes an odd-ball case. Marc had a test running
-> that in parallel started guests and randomly killing QEMUs with pkill.
-> The QEMUs did end with=20
->=20
-> qemu-system-s390x: KVM PV command 0 (KVM_PV_ENABLE) failed: header rc 0 r=
-rc 0 IOCTL rc: -12
->=20
-> instead of
->=20
-> qemu-system-s390x: terminating on signal 15 from pid 26495 (pkill)
->=20
+On Fri, 27 Mar 2020 at 09:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The undefined behaviour checker pointed out that a shift of 64 would
+> lead to undefined behaviour.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  fpu/softfloat.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 301ce3b537b..444d35920dd 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -3834,9 +3834,14 @@ void normalizeFloatx80Subnormal(uint64_t aSig, int=
+32_t *zExpPtr,
+>  {
+>      int8_t shiftCount;
+>
+> -    shiftCount =3D clz64(aSig);
+> -    *zSigPtr =3D aSig<<shiftCount;
+> -    *zExpPtr =3D 1 - shiftCount;
+> +    if (aSig) {
+> +        shiftCount =3D clz64(aSig);
+> +        *zSigPtr =3D aSig << shiftCount;
+> +        *zExpPtr =3D 1 - shiftCount;
+> +    } else {
+> +        *zSigPtr =3D 0;
+> +        *zExpPtr =3D 1 - 64;
+> +    }
+>  }
 
-I guess the same can happen with a qemu_cpu_kick(), just that the BQL
-protects us from that to happen concurrently.
+Ah yes, I saw this one in Coverity: CID 1421991.
 
---=20
-Thanks,
+RTH marked the Coverity issue as a false positive with the rationale
+"=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BFWe assume an out-of-range shift count =
+is merely IMPLEMENTATION DEFINED
+ and not UNDEFINED (in the Arm ARM sense), and so cannot turn a 0 value
+ into a non-zero value."
+but I think I disagree with that. We can assume that for the TCG IR
+where we get to define shift semantics because we're doing the codegen,
+but we can't assume it in C code, because it's not included in the set
+of extended guarantees provided by -fwrapv as far as I know.
 
-David / dhildenb
+That said, is it valid for this function to be called with a zero
+aSig value ? I think all these normalizeFloat*Subnormal() functions
+assume non-zero sig input, and the only callsite where it's not clearly
+obvious that this is obvious that the sig input is non-zero is the call to
+normalizeFloatx80Subnormal() from addFloatx80Sigs(). So perhaps we
+just need to check and fix that callsite ??
 
+thanks
+-- PMM
 
