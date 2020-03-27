@@ -1,84 +1,69 @@
 Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 544AEC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 12:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 476AAC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 12:50:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B23F206F2
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 12:49:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rtHEKBip"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B23F206F2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16F48206F2
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 12:50:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16F48206F2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHoQJ-0001iW-6d
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 08:49:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37495)
+	id 1jHoRS-0003IT-8Q
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 08:50:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jHoOU-0000N7-FO
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 08:47:27 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jHoQE-0001ts-56
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 08:49:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jHoOS-0000zk-FK
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 08:47:25 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51107)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jHoOQ-0000vG-F3
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 08:47:24 -0400
-Received: by mail-wm1-x343.google.com with SMTP id d198so11303016wmd.0
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 05:47:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VZ5x7/HUCsJaY8iSrLgpGeTwK3FkLxpzO7RxG0oinms=;
- b=rtHEKBipFIJChyFlK0GMcE4fy13RxL4utkDSbN+7PYOKEsCdidDZgea2leIlhRVCYt
- 1XN0kXUcCCjoCdlPEezFC/abBx1bDq4Ex/cT82w2ms3O1AXsda3V9gj7wX3sRCGWk8KK
- Zge8gs1xoarYWMllkxYdsIC76QFrriwQk4cMYQfdSXVZkgyNfdHnSq/Gloopc7oNiJcj
- yS9cC78E6U648RmHDI9T0pDSLrxvFE3JSKWljITFaPoZc16V6/GgiVT7xvoNcWvH0E7b
- Cp5fIzTEjABD7ZYrlhCP4eg7uQt/3VgOP8XhXzE8OeimGGMVdCV3dbdsMGE4UIJc3fe/
- S+Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VZ5x7/HUCsJaY8iSrLgpGeTwK3FkLxpzO7RxG0oinms=;
- b=Gz6Fs+/+T9GuZjXrVNPGWXmMqTletJqho9eVK4ynIzY8Ij2MQ0RNE1Conogl9vZYRG
- 33JDa1QMi0Je9UYPW4y31mQsWFzdEW+7UTwbDaKHpc2+pp0Dut97f9F9+J4y4pqX0ZKu
- inw/69N68UlwN/NHLsPU42X1yKJmkqZ9C5nbOFiLtpEgbvAW0AtnZY6AvJjSlRs02UU5
- tMORvH9lBcjVnSiwATJZduqqrPioOBLkP8F4nhJ3KyHB/1W9UbEDVzOJx35yO3ztvZng
- /gg6c8w9U/l+mF/xuCwbQeozEJWA819euYApw8xSTe0aopMFdiHpQiMTfmqsq8CD61xL
- 3ueQ==
-X-Gm-Message-State: ANhLgQ3r6M5eD981jk6qKbn4xc49y93awcuArgt2SsHFK7bSZc9b0Y4D
- zwu8mwBOlCajqPDi3e2tE0VpdGnUCabHgcs2nb0=
-X-Google-Smtp-Source: ADFU+vsouPRlRj4xFwvNsxExe19NJGVr5OV4PpV2zejqufEpcxmEu3yodDjl9dP1pJ+rcKFfC178o84t9wQXPSlUK3E=
-X-Received: by 2002:a7b:cd88:: with SMTP id y8mr4965274wmj.129.1585313235499; 
- Fri, 27 Mar 2020 05:47:15 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1jHoQC-000600-QM
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 08:49:14 -0400
+Resent-Date: Fri, 27 Mar 2020 08:49:14 -0400
+Resent-Message-Id: <E1jHoQC-000600-QM@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21146)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jHoQC-0005xB-H1
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 08:49:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1585313345; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=P7UpwBWSp2Ek0DlN3nim5BLx0SFMD0WehCiTR96HPgm+Icsg5B6rd+Ml0gqMRM9ZWzT2sWubE370tepCszFx7n1KVOsdGDE7Y9meYH2fUicr8JT5wHz4H+SDHBMQCVNIZL7+QROfpWAPzNgWXV4HxMRJX99e0vd+7ioNCUlFTPQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1585313345;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=I+Inte0WlAVaItb3HXxRZ28NzojKl5pDNaQ+hWEk/CU=; 
+ b=TNUon5X8NxbLWPMvZBzUr9/+JGWlC8PwNG99jGwI4ivg5ighmxpCrJmBjo/NO+j5gRaDo4CygtyRsa6Ebh47KfNl3fZpOgLWO6dOPKdautJRQUvBlBv8l83nXELg8UU5lHjN3ilc/IUEp5aDU809w788e0iKkMxrVl+khkgLFb0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1585313344386694.5867135750976;
+ Fri, 27 Mar 2020 05:49:04 -0700 (PDT)
+In-Reply-To: <20200327121111.1530-1-kraxel@redhat.com>
+Subject: Re: [PATCH 0/6] acpi: i386 tweaks
+Message-ID: <158531334306.31566.8317858781379992985@39012742ff91>
 MIME-Version: 1.0
-References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
- <aa622b1d-e28a-c3f1-d18a-73e8a67c8ccf@linaro.org>
- <CAHiYmc7R_Y7s5DaVHf=0rkxf7N2qTSLXdTdL_vy6mH+hVdwLqA@mail.gmail.com>
- <ef2899be-3abf-4f15-1d7c-796994e1ecdd@linaro.org>
-In-Reply-To: <ef2899be-3abf-4f15-1d7c-796994e1ecdd@linaro.org>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Fri, 27 Mar 2020 14:46:56 +0200
-Message-ID: <CAHiYmc6f4eJqxDnSY1X7tn0WqYAzsBmEq76ADtEKh8Jmub46hA@mail.gmail.com>
-Subject: Re: [PATCH for-5.0,
- v1] target/mips: Fix loongson multimedia condition instructions
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000042807a05a1d5803d"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kraxel@redhat.com
+Date: Fri, 27 Mar 2020 05:49:04 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,77 +75,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aurelien@aurel32.net, aleksandar.rikalo@rt-rk.com,
- QEMU Developers <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Huacai Chen <chenhc@lemote.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000042807a05a1d5803d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-03:30 =C4=8Cet, 26.03.2020. Richard Henderson <richard.henderson@linaro.org=
-> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On 3/25/20 3:44 AM, Aleksandar Markovic wrote:
-> > May I ask you, Richard, to select this patch for your next TCG-for-5.0
-queue,
-> > so that I don't go through a MIPS queue process for just a single patch=
-?
-> >
->
-> I suppose I could, but at present I have nothing in the tcg queue, so it
-would
-> be just the single patch.
->
-
-Yes, Richard, even if it is just a single pending patch to you at the
-moment, I would prefer you sending the pull request - in a way it
-represents the final completion touch of LMI module that was authored by
-you, but unclear docs prevented us from getting these last bits and pieces.
-Please go ahead with the pull request at any time convenient to you - at
-least it symbolically belongs to you (and I am sure you are glad about the
-patch).
-
-Yours, Aleksansar
-
->
-> r~
-
---00000000000042807a05a1d5803d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">03:30 =C4=8Cet, 26.03.2020. Richard Henderson &lt;<a href=3D=
-"mailto:richard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; =
-=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; On 3/25/20 3:44 AM, Aleksandar Markovic wrote:<br>
-&gt; &gt; May I ask you, Richard, to select this patch for your next TCG-fo=
-r-5.0 queue,<br>
-&gt; &gt; so that I don&#39;t go through a MIPS queue process for just a si=
-ngle patch?<br>
-&gt; &gt; <br>
-&gt;<br>
-&gt; I suppose I could, but at present I have nothing in the tcg queue, so =
-it would<br>
-&gt; be just the single patch.<br>
-&gt;</p>
-<p dir=3D"ltr">Yes, Richard, even if it is just a single pending patch to y=
-ou at the moment, I would prefer you sending the pull request - in a way it=
- represents the final completion touch of LMI module that was authored by y=
-ou, but unclear docs prevented us from getting these last bits and pieces. =
-Please go ahead with the pull request at any time convenient to you - at le=
-ast it symbolically belongs to you (and I am sure you are glad about the pa=
-tch).</p>
-<p dir=3D"ltr">Yours, Aleksansar</p>
-<p dir=3D"ltr">&gt;<br>
-&gt; r~<br>
-</p>
-
---00000000000042807a05a1d5803d--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyNzEyMTExMS4xNTMw
+LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
+T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
+IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKYWNwaS10ZXN0OiBXYXJuaW5nISBE
+U0RUIGJpbmFyeSBmaWxlIG1pc21hdGNoLiBBY3R1YWwgW2FtbDovdG1wL2FtbC1JNzQ2SDBdLCBF
+eHBlY3RlZCBbYW1sOnRlc3RzL2RhdGEvYWNwaS9wYy9EU0RUXS4KU2VlIHNvdXJjZSBmaWxlIHRl
+c3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYyBmb3IgaW5zdHJ1Y3Rpb25zIG9uIGhvdyB0byB1
+cGRhdGUgZXhwZWN0ZWQgZmlsZXMuCnRvIHNlZSBBU0wgZGlmZiBiZXR3ZWVuIG1pc21hdGNoZWQg
+ZmlsZXMgaW5zdGFsbCBJQVNMLCByZWJ1aWxkIFFFTVUgZnJvbSBzY3JhdGNoIGFuZCByZS1ydW4g
+dGVzdHMgd2l0aCBWPTEgZW52aXJvbm1lbnQgdmFyaWFibGUgc2V0KioKRVJST1I6L3RtcC9xZW11
+LXRlc3Qvc3JjL3Rlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzo0OTE6dGVzdF9hY3BpX2Fz
+bDogYXNzZXJ0aW9uIGZhaWxlZDogKGFsbF90YWJsZXNfbWF0Y2gpCkVSUk9SIC0gQmFpbCBvdXQh
+IEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6
+NDkxOnRlc3RfYWNwaV9hc2w6IGFzc2VydGlvbiBmYWlsZWQ6IChhbGxfdGFibGVzX21hdGNoKQpt
+YWtlOiAqKiogW2NoZWNrLXF0ZXN0LXg4Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMzAKICBURVNU
+ICAgIGlvdGVzdC1xY293MjogMDMxCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJl
+dGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3Vk
+bycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2Uu
+dXVpZD1kNGMwNmUxZGNkNmY0NGI0YmNmOTIyMWYyOWE1MzEwZicsICctdScsICcxMDAxJywgJy0t
+c2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdF
+VF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUn
+LCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FD
+SEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11
+LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLTNjemY0N3ltL3NyYy9kb2NrZXItc3JjLjIwMjAtMDMtMjctMDguMzUuMDAu
+MTU3MDU6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11
+L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZp
+bHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWQ0YzA2ZTFkY2Q2ZjQ0
+YjRiY2Y5MjIxZjI5YTUzMTBmCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtl
+WzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTNjemY0
+N3ltL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3Ig
+MgoKcmVhbCAgICAxNG0zLjQwOHMKdXNlciAgICAwbTguNzc1cwoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMjcxMjExMTEuMTUzMC0x
+LWtyYXhlbEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVz
+c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBz
+Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
+dmVsQHJlZGhhdC5jb20=
 
