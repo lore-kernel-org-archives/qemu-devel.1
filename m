@@ -2,84 +2,83 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CDDC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E43C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:14:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09D66206F8
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:10:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4930420705
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:14:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MWy/ZGIb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09D66206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbJJ/cBy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4930420705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHlwh-0004N7-5Y
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:10:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57082)
+	id 1jHm0o-0005bc-Dt
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:14:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34887)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jHlw5-0003nz-Uj
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:09:59 -0400
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jHm09-0005Bw-Vw
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:14:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jHlw4-0003vX-Ms
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:09:57 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36985)
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jHm08-00023M-V5
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:14:09 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34265)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jHlw4-0003qT-6i
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:09:56 -0400
-Received: by mail-oi1-x241.google.com with SMTP id u20so3550337oic.4
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 03:09:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jHm08-00020A-Oy
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:14:08 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 26so9752013wmk.1
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 03:14:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=o+GzuiCKy/baE0bsoPkIfWsSEgMxRYKFOaKs/pOEY2M=;
- b=MWy/ZGIbauoio9QkdKU1+O9D2gTEKJUh7Zbl5WpoAdVWoBlwAfMcKxx8zHUBN1dLmS
- AaFFH+WfO6oXJf1GzDeBCk+pMxCvTl1njd9mOFtI5HQD8fXue5D4KPkVdGkuVJcNJsaa
- b04ag00vNF/ahVaJXLECb2NrTWlzsRz7fLY3/YPnALuXJLBZ4560RryKhEkp1VYd8/5k
- vqw+gzeZWJCqsDw3pfzt/RlqIGg6m4G5DkwBN4Je5CnWq5A0iU18UVtD+0m+Ux6i/1bT
- fVeD2pj7PXIEv9JXCLQ2+qzKuPd2EgIO7Lo+7W7kxiNdg3dwdsY7IEXTmzMwCkFH+saZ
- 6sDw==
+ :cc; bh=S7BPeYs6eeqAts0ky3d4W6qIzgGWrYBgwji9K5y3h1Y=;
+ b=HbJJ/cByVywpvxkP8WZVZ/LFONgiIDux2oYwc2YWYSt+VdUUQifzzBDWxf2YrT5qmH
+ m0qz30B0wXSR8YOeHQ+AKIsl03ThIlFWBskknfIQK2Ek51wJznHPzcZiG05/BNOdIE6A
+ 2vvoaoLISJtpk6N9aSYzBeeAmSzXNJTilaL333+IeMhfRE1GlpR6wYPU/sD7jkwoMTK9
+ p0/Ug7E8n4XqWdIgJXezQwwU01gspuaE/ZWz2k3BZ9STE73YdJ7QEFhkRiiQ8AsLHaoB
+ QcecyQS5x+X3BSYhsupvO+/cSflbzJOcSAPhwDBxg5QGeo2BF6g8eAsEsNrGiHfE5KBG
+ kdPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=o+GzuiCKy/baE0bsoPkIfWsSEgMxRYKFOaKs/pOEY2M=;
- b=ueDeIlHboy820lmwnZhSv0UBXXmpWzNTjrYKM4EqS4uhCLrzR2IKh3ocm10GNjAZdF
- YU5Cin05Z3W85gf+yFq2H4uQQbn1g3WVKDkYHjVfpAx/T6SGQiyyOrRlYZbelE272mD9
- gVl6xopFJmlj4B3h0Ao3Mffv3UdrLB96QcgPaZiuWJ7M5lnBFOchl/X0tuWWwixt1A9r
- GTQY7O7uymFHGHmoO+Yk84zaLQ5tG7R7K65RqfJvwWGdtFRNMDb/HfsYR5wCNMu2MgOr
- DNUnE552d3DcKYfE9zFoQInMAVVModYdGtiOswRvKWonOHJvS3iiQzImPjqdw+y8yfmX
- VZQw==
-X-Gm-Message-State: ANhLgQ0QJ8ii142/PdyUuqxGUXBafU+DXe4tpq0vY/DpfUxZGbKjDgxB
- IDVKkNa+Du+tLKKC3hQ+7Kc9TaxiikWao6Wfni4vCg==
-X-Google-Smtp-Source: ADFU+vtYgkB0Zd6ap1aBBijoA0IxCMX0p+SXb12fmrq/lkIcBPXELgHjBwUOFPvDwnnBlzHp6w0D4/GHzNFp334Cwp4=
-X-Received: by 2002:a05:6808:8cb:: with SMTP id
- k11mr3174471oij.48.1585303794689; 
- Fri, 27 Mar 2020 03:09:54 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=S7BPeYs6eeqAts0ky3d4W6qIzgGWrYBgwji9K5y3h1Y=;
+ b=jb8ZhvoBImishmHKVovgs02tQBJms+9HHk+Uwar+Slo8xBVfNxv/mUOTMeIEeddYA0
+ +YkLDboZYh8PbRCXMlyvjTMQUI5ZhGysaQMG53Az/B2orbJwfxul05p2VOIViyO9X89K
+ Br7Xx2Ps9uBznIgoVJMD19hLXxT7Zqts1aFW1I5reCrqeghr/uGONGUauouB7q4w6kF1
+ f57cZfCKx+9COj9NtBP80IyKJnu05zVcdY+w0rIdjCtQt5aAPFuVD30YjsfXwAPlh2wU
+ ZNiZ1ZKYKgB7Ncl22Xm5gqa+QxPjegTWmPsezjzFvd5nPb4quCMKJxFLqTdxXTYeP/B/
+ 3UGw==
+X-Gm-Message-State: ANhLgQ2PNWgcrTOtgon7k8buEwb4fz+RHZbvabbq8nLLRFMdmlgga0q9
+ 3K4jDtiibKqPcoA8iSktF+4/taBY51vPHwVVoUw=
+X-Google-Smtp-Source: ADFU+vtVKKOXxWNWYPmvplrY6UjWa+yLzBvmCWkmzI7RJm+O2MQ9rCIRKjDOS+s7v5LOllcs6gDs0q8MOPvQYnRSPVA=
+X-Received: by 2002:a05:600c:2dd7:: with SMTP id
+ e23mr4464342wmh.159.1585304047613; 
+ Fri, 27 Mar 2020 03:14:07 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200327094945.23768-1-alex.bennee@linaro.org>
  <20200327094945.23768-6-alex.bennee@linaro.org>
 In-Reply-To: <20200327094945.23768-6-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Mar 2020 10:09:43 +0000
-Message-ID: <CAFEAcA8RvbdHMWCe101CyTWcA7T28-MtYwMFNZ5Fnh2=SuKcDw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Fri, 27 Mar 2020 12:13:48 +0200
+Message-ID: <CAHiYmc6kw1LYK=97zxvsKdY8VL4CgZMAcWGgRcuoEjHT=qX8zw@mail.gmail.com>
 Subject: Re: [PATCH v1 5/7] fpu/softfloat: avoid undefined behaviour when
  normalising empty sigs
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/alternative; boundary="0000000000009e7a9c05a1d35c76"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,16 +90,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 27 Mar 2020 at 09:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
+--0000000000009e7a9c05a1d35c76
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+11:53 Pet, 27.03.2020. Alex Benn=C3=A9e <alex.bennee@linaro.org> =D1=98=D0=
+=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >
-> The undefined behaviour checker pointed out that a shift of 64 would
+> The undefined behaviour checker
+
+Alex, what exactly is "undefined behaviour checker"? If this is a test, can
+you give us a link?
+
+Sincerely,
+Aleksandar
+
+> pointed out that a shift of 64 would
 > lead to undefined behaviour.
 >
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
@@ -112,8 +123,8 @@ te:
 > index 301ce3b537b..444d35920dd 100644
 > --- a/fpu/softfloat.c
 > +++ b/fpu/softfloat.c
-> @@ -3834,9 +3834,14 @@ void normalizeFloatx80Subnormal(uint64_t aSig, int=
-32_t *zExpPtr,
+> @@ -3834,9 +3834,14 @@ void normalizeFloatx80Subnormal(uint64_t aSig,
+int32_t *zExpPtr,
 >  {
 >      int8_t shiftCount;
 >
@@ -129,26 +140,68 @@ te:
 > +        *zExpPtr =3D 1 - 64;
 > +    }
 >  }
+>
+>
+ /*------------------------------------------------------------------------=
+----
+> --
+> 2.20.1
+>
+>
 
-Ah yes, I saw this one in Coverity: CID 1421991.
+--0000000000009e7a9c05a1d35c76
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-RTH marked the Coverity issue as a false positive with the rationale
-"=EF=BB=BF=EF=BB=BF=EF=BB=BF=EF=BB=BFWe assume an out-of-range shift count =
-is merely IMPLEMENTATION DEFINED
- and not UNDEFINED (in the Arm ARM sense), and so cannot turn a 0 value
- into a non-zero value."
-but I think I disagree with that. We can assume that for the TCG IR
-where we get to define shift semantics because we're doing the codegen,
-but we can't assume it in C code, because it's not included in the set
-of extended guarantees provided by -fwrapv as far as I know.
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">11:53 Pet, 27.03.2020. Alex Benn=C3=A9e &lt;<a href=3D"mailt=
+o:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; =D1=98=D0=B5 =D0=
+=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; The undefined behaviour checker</p>
+<p dir=3D"ltr">Alex, what exactly is &quot;undefined behaviour checker&quot=
+;? If this is a test, can you give us a link?</p>
+<p dir=3D"ltr">Sincerely,<br>
+Aleksandar<br></p>
+<p dir=3D"ltr">&gt; pointed out that a shift of 64 would<br>
+&gt; lead to undefined behaviour.<br>
+&gt;<br>
+&gt; Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@lina=
+ro.org">alex.bennee@linaro.org</a>&gt;<br>
+&gt; ---<br>
+&gt; =C2=A0fpu/softfloat.c | 11 ++++++++---<br>
+&gt; =C2=A01 file changed, 8 insertions(+), 3 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/fpu/softfloat.c b/fpu/softfloat.c<br>
+&gt; index 301ce3b537b..444d35920dd 100644<br>
+&gt; --- a/fpu/softfloat.c<br>
+&gt; +++ b/fpu/softfloat.c<br>
+&gt; @@ -3834,9 +3834,14 @@ void normalizeFloatx80Subnormal(uint64_t aSig, =
+int32_t *zExpPtr,<br>
+&gt; =C2=A0{<br>
+&gt; =C2=A0 =C2=A0 =C2=A0int8_t shiftCount;<br>
+&gt;<br>
+&gt; -=C2=A0 =C2=A0 shiftCount =3D clz64(aSig);<br>
+&gt; -=C2=A0 =C2=A0 *zSigPtr =3D aSig&lt;&lt;shiftCount;<br>
+&gt; -=C2=A0 =C2=A0 *zExpPtr =3D 1 - shiftCount;<br>
+&gt; +=C2=A0 =C2=A0 if (aSig) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 shiftCount =3D clz64(aSig);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 *zSigPtr =3D aSig &lt;&lt; shiftCount;<br=
+>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 *zExpPtr =3D 1 - shiftCount;<br>
+&gt; +=C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 *zSigPtr =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 *zExpPtr =3D 1 - 64;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; =C2=A0}<br>
+&gt;<br>
+&gt; =C2=A0/*--------------------------------------------------------------=
+--------------<br>
+&gt; -- <br>
+&gt; 2.20.1<br>
+&gt;<br>
+&gt;<br>
+</p>
 
-That said, is it valid for this function to be called with a zero
-aSig value ? I think all these normalizeFloat*Subnormal() functions
-assume non-zero sig input, and the only callsite where it's not clearly
-obvious that this is obvious that the sig input is non-zero is the call to
-normalizeFloatx80Subnormal() from addFloatx80Sigs(). So perhaps we
-just need to check and fix that callsite ??
-
-thanks
--- PMM
+--0000000000009e7a9c05a1d35c76--
 
