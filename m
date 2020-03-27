@@ -2,115 +2,132 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7060EC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:50:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF3FC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:51:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 451F520578
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:50:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 451F520578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 49CAE20578
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:51:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjBQx+ct"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CAE20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHmZe-00048m-G2
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:50:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44323)
+	id 1jHmak-00055V-3h
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:51:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jHmZ2-0003de-6V
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:50:13 -0400
+ (envelope-from <david@redhat.com>) id 1jHmZy-0004aW-Uz
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jHmZ0-0005mn-U7
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:50:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:46419)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jHmZ0-0005bh-Jt
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:50:10 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MCb2L-1j9I7S0PJb-009j5H; Fri, 27 Mar 2020 11:50:05 +0100
-Subject: Re: [PATCH v1 4/7] linux-user: more debug for init_guest_space
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200327094945.23768-1-alex.bennee@linaro.org>
- <20200327094945.23768-5-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <db45e9a1-1f2e-c03f-deac-992b848908c0@vivier.eu>
-Date: Fri, 27 Mar 2020 11:50:04 +0100
+ (envelope-from <david@redhat.com>) id 1jHmZx-00083o-6F
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:51:10 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24108)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHmZx-00082r-1Y
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:51:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585306268;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=0G89HAFhVDFZtAUvSa5w22L1Qv6aQQGMdJ7gszazqnE=;
+ b=ZjBQx+ctxqzEBqVfvySnnJ+HwueLcnluX3SvMKUTfbXwomIReiVZMWngaoXbhFs6lxWDj5
+ pK6502VyY0LVvjO/sEvwkVOaH6TD+GA7U9VugdatW81IcJBgzghbVqyykuB7jK04q3wEaP
+ y+HRsJDQGNqsalJrNy+UkTLJ8gqDcaM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-8lR_Vxs1O-SkMsHUfN1FeQ-1; Fri, 27 Mar 2020 06:51:00 -0400
+X-MC-Unique: 8lR_Vxs1O-SkMsHUfN1FeQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 350978018A6;
+ Fri, 27 Mar 2020 10:50:59 +0000 (UTC)
+Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85A335DA85;
+ Fri, 27 Mar 2020 10:50:49 +0000 (UTC)
+Subject: Re: [PATCH v5 07/18] s390x: protvirt: Inhibit balloon when switching
+ to protected mode
+To: Halil Pasic <pasic@linux.ibm.com>
+References: <20200226122038.61481-1-frankja@linux.ibm.com>
+ <20200226122038.61481-8-frankja@linux.ibm.com>
+ <ed51d194-1b63-1c54-953a-d2031336a90e@redhat.com>
+ <58a51f40-21c7-5737-4f4c-568fdd2477fa@linux.ibm.com>
+ <20200227132402.67a38047.pasic@linux.ibm.com>
+ <8622efeb-1a4a-338f-d363-53818b00d195@redhat.com>
+ <20200319164050.78a01702.pasic@linux.ibm.com>
+ <d7d91f47-19d3-06cf-879c-c9556a924a2f@redhat.com>
+ <20200320194317.1cf36b00.pasic@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <f29730ed-4327-3aa8-4057-fb6345632a92@redhat.com>
+Date: Fri, 27 Mar 2020 11:50:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200327094945.23768-5-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:23hJIGMFFXnEEXCLPm9a7eF4Z/q812btiIGNGXOupq2cRFRTcJD
- 0hMD1GknFc3CFOmiidwM6BI6WXGuSRdKTAgc8Mw9qr5TzEUKgxNfRdy9kKRFGwd5EIUJ/2C
- CEdYyMbJnE17VJ2VTbPEqqAk18VXth6DMStQ8nRbu59qlckYkMlBKX6am7D8giR4GAyaBEG
- FlZ/Wx4kCvUot/92Y5HRA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:rmJfPLgHR2o=:jSu1Ixb+pp3h10QGQ91Wu7
- G7DllOHUAidnYWZ7mYslUtghTMTqeuwuJc/kggaHkobq6sYTsx3YcVDc9XWTH1jj/O4fCfm3n
- x3Rj1Ufpzml3cxfpyUqqRtNNpjer+ITyQ6IXgD+hAb+9v1eD6xS8BxQnTK+JkIaEM6pzflGzS
- Uv527SDtfHo3CN2lMBeMdTg7bKpQKbktTZjTiZdPm1b+lbGNd8lJjrAHR8VRo7jHFuMFFVmQB
- UCAO/BEhs6qBdoUwI0XI4tLBUOOOMpeS5TB6650nxksEuLwBdxz8Y7APF1UhKTw3eVEUpG64u
- U3gFBbrIMB6ZEaWAZD5DQtxdz59EgpUIw8NOl5BYZDnDXW6/7eiHPBl5p4h+DIp8O5q2qjnJl
- G2pcUBEmUFZYh/DcAU9YonqKKwkBJUyl+pF1nEIgGtOjfaXDmJokIbiAAFbSShLpRdFpZHo3a
- I7B+LOiZj2eB/ctwhRnPjK/6yZKILpG7GyW5iQ0XQ5ugNSY/lIwyPh1YPbQhdYnpR0ssDbc1A
- 9cjk9EpySvgwKtwJ9DD7uwMzDYVPUkJT8/hOctSe+C2rqQx4MhTI7b76D7RrLBNjXtT029J8x
- 6iOnF1JKwAWgrlwNUSHu8hlFiZf/OAVf/1w8tfgiYrOehkvkGSB3P6+A7qmrGUYnulrrexCIg
- Tfqdl0wm/WkltTOojV1Bg6zm9V6WfZ1sNFrGzu5NTeOEHEdQcldGl2J9A3bvbwE0atg8XXtbf
- 3EDM+GKiTM/X9pDmfwyxC7BnJC3jSW6lCp+BX0SmFcP4+yD0NiVaEM/BbwdY9Fd3Uh5hjW1c5
- Hab4ZGNc/f6HMAqlW6urmdRFhUl4E5uYlqn2/tJXBR4y1MSnCxdMy06L4FkvrbTN0Zd8aw9
+In-Reply-To: <20200320194317.1cf36b00.pasic@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,50 +139,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+ Brijesh Singh <brijesh.singh@amd.com>, Janosch Frank <frankja@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 27/03/2020 à 10:49, Alex Bennée a écrit :
-> Searching for memory space can cause problems so lets extend the
-> CPU_LOG_PAGE output so you can watch init_guest_space fail to
-> allocate memory. A more involved fix is actually required to make this
-> function play nicely with the large guard pages the sanitiser likes to
-> use.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  linux-user/elfload.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 8198be04460..619c054cc48 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2172,6 +2172,8 @@ unsigned long init_guest_space(unsigned long host_start,
->  
->          /* Check to see if the address is valid.  */
->          if (host_start && real_start != current_start) {
-> +            qemu_log_mask(CPU_LOG_PAGE, "invalid %lx && %lx != %lx\n",
-> +                          host_start, real_start, current_start);
->              goto try_again;
->          }
->  
-> @@ -2240,7 +2242,11 @@ unsigned long init_guest_space(unsigned long host_start,
->           * probably a bad strategy if not, which means we got here
->           * because of trouble with ARM commpage setup.
->           */
-> -        munmap((void *)real_start, real_size);
-> +        if (munmap((void *)real_start, real_size) != 0) {
-> +            error_report("%s: failed to unmap %lx:%lx (%s)", __func__,
-> +                         real_start, real_size, strerror(errno));
-> +            abort();
-> +        }
->          current_start += align;
->          if (host_start == current_start) {
->              /* Theoretically possible if host doesn't have any suitably
-> 
+>> So, AFAIU, *any* virtio device (hypervisor side) has to present this
+>> flag when PV is enabled.=20
+>=20
+> Yes, and balloon says bye bye when running in PV mode is only a secondary
+> objective. I've compiled some references:
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Thanks!
+
+>=20
+> "To summarize, the necessary conditions for a hack along these lines
+> (using DMA API without VIRTIO_F_ACCESS_PLATFORM) are that we detect that:
+>=20
+>   - secure guest mode is enabled - so we know that since we don't share
+>     most memory regular virtio code won't
+>     work, even though the buggy hypervisor didn't set VIRTIO_F_ACCESS_PLA=
+TFORM"=20
+> (Michael Tsirkin, https://lkml.org/lkml/2020/2/20/1021)
+> I.e.: PV but !VIRTIO_F_ACCESS_PLATFORM \implies bugy hypervisor
+>=20
+>=20
+> "If VIRTIO_F_ACCESS_PLATFORM is set then things just work.  If
+> VIRTIO_F_ACCESS_PLATFORM is clear device is supposed to have access to
+> all of memory.  You can argue in various ways but it's easier to just
+> declare a behaviour that violates this a bug."
+> (Michael Tsirkin, https://lkml.org/lkml/2020/2/21/1626)
+> This one is about all memory guest, and not just the buffers transfered
+> via the virtqueue, which surprised me a bit at the beginning. But balloon
+> actually needs this.
+>=20
+> "A device SHOULD offer VIRTIO_F_ACCESS_PLATFORM if its access to memory
+> is through bus addresses distinct from and translated by the platform to
+> physical addresses used by the driver, and/or if it can only access
+> certain memory addresses with said access specified and/or granted by
+> the platform. A device MAY fail to operate further if
+> VIRTIO_F_ACCESS_PLATFORM is not accepted. "
+> (https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.htm=
+l#x1-4120002)
+>=20
+
+>=20
+>> In that regard, your patch makes perfect sense
+>> (although I am not sure it's a good idea to overwrite these feature
+>> bits
+>> - maybe they should be activated on the cmdline permanently instead
+>> when PV is to be used? (or enable )).
+>=20
+> I didn't understand the last part. I believe conserving the user
+> specified value when not running in PV mode is better than the hard
+> overwrite I did here. I wanted a discussion starter.
+>=20
+> I think the other option (with respect to let QEMU manage this for user,
+> i.e. what I try to do here) is to fence the conversion if virtio devices
+> that do not offer VIRTIO_F_ACCESS_PLATFORM are attached; and disallow
+> hotplug of such devices at some point during the conversion.
+>=20
+> I believe that alternative is even uglier.
+>=20
+> IMHO we don't want the end user to fiddle with iommu_platform, because
+> all the 'benefit' he gets from that is possibility to make a mistake.
+> For example, I got an internal bug report saying virtio is broken with
+> PV, which boiled down to an overlooked auto generated NIC, which of
+> course had iommu_platform (VIRTIO_F_ACCESS_PLATFORM) not set.
+>=20
+>>
+>>>
+>>> The actual problem is that the pages denoted by the buffer
+>>> transmitted via the virtqueue are normally not shared pages. I.e.
+>>> the hypervisor can not reuse them (what is the point of balloon
+>>> inflate). To make this work, the guest would need to share the pages
+>>> before saying 'host these are in my balloon, so you can use them'.
+>>> This is a piece of logic we
+>>
+>> What exactly would have to be done in the hypervisor to support it?
+>=20
+> AFAIK nothing. The guest needs to share the pages, and everything works.
+> Janosch, can you help me with this one?=20
+>=20
+
+See below, making this work on the hypervisor side would be much cleaner
+IMHO, but most probably not possible due to guest integrity.
+
+FWIW, "Free page reporting" will (never) work with PV, where there is
+basically no manual "deflation" step anymore.
+
+>>
+>> Assume we have to trigger sharing/unsharing - this sounds like a very
+>> architecture specific thing?
+>=20
+> It is, but any guest having sovereignty about its memory may need
+> something similar.
+>=20
+>> Or is this e.g., doing a map/unmap
+>> operation like mapping/unmapping the SG?
+>=20
+> No this is something different. We need stronger guarantees than the
+> streaming portion of the DMA API provides. And what we actually want
+> is not DMA but something very different.
+
+Right, that's what I was expecting ...
+
+>=20
+>>
+>> Right now it sounds to me "we have to do $ARCHSPECIFIC when
+>> inflating/deflating in the guest", which feels wrong.
+>>
+>=20
+> It is wrong in a sense. Drivers are mostly supposed to be portable. But
+> balloon is not a run of the mill device. I don't see any other way to
+> make this work.
+
+Well, it is mostly architecture independent until now ...
+
+>=20
+>>> need only if the host/the device does not have full access to the
+>>> guest RAM. That is in my opinion why the balloon driver fences
+>>> VIRTIO_F_ACCESS_PLATFORM.> Does that make sense?
+>>
+>> Yeah, I understood the "device has to set VIRTIO_F_ACCESS_PLATFORM"
+>> part. Struggling with the "what can the guest driver actually do" part.
+>>
+>=20
+> Let me try to reword this. The point of PV is that the guest has
+> exclusive access to his pages unless the guest decides to share some
+> of the using a dedicated ultravisor call.
+>=20
+> The point of the memballoon is, as far as I understand, to effectively
+> dynamically manage the guests memory size within given boundaries, and
+> without requiring memory hotplug. The basic idea is that the pages in
+> the balloon belong to the host. The host attempting to re-use a
+> non-shared page of a guest leads to problems. AFAIR the main problem
+> was that shall we ever want to deflate such a page (make it again
+> available for guest use) we would need to do an import, and that can
+> only work if we have the exact same content as when it was exported.
+> Otherwise integrity check fails as if we had a malicious hypervisor,
+> that is trying to inject stuff into the guest.
+>=20
+> I'm sure Janosch can provide a better explanation.
+>=20
+> I really don't see another way, how memory ballooning could work with
+> something like PV, without the balloon driver relinquishing the guests
+> ownership of the pages that are going to leave the guest via the balloon.=
+>
+> On that note ccing the AMD SEV people. Balloon is at this point
+> dysfunctional for them as well. @Tom: Right? If yes what problems need to
+> be solved so virtio-balloon can work under SEV?
+
+SEV even pins all guest memory, so it's useless and would be even
+dangerous to use.
+
+
+Some thoughts:
+
+
+1. I would really prefer if there is a way to zero-out+share a page and
+zero-out+unshare a page triggered by the hypervisor. Then only the
+hypervisor has to do "the right thing" when
+inflating/deflating/rebooting etc. I know we can "unshare all" via the
+UV - we e.g., have to do that on reboots. But I assume this might mess
+with "guest integrity" (being able to zero out random guest pages
+technically) and is therefore not possible.
+
+
+2. Have some other way to communicate "careful, ballooning won't work".
+E.g., the guest detecting *itself* that it is running inside a PV
+environment and not loading virtio-balloon until it properly
+shares/unshares. Again, piggy-backing on IOMMU/VIRTIO_F_ACCESS_PLATFORM
+somehow feels wrong.
+
+
+E.g., once you would support inflation/deflation in virtio-balloon, free
+page reporting could not be supported. So it's more than just a single
+arch specific inflation/deflation callback.
+
+
+And virtio-mem [1] will have similar issues once we want to use that on
+s390x. But there, an arch-specific share/unshare callback should be
+sufficient most probably. Still, there would have to be a way to block
+it on s390x PV until implemented. Ideally it will be the same as for
+virtio-balloon.
+
+Again, being able to do that in the hypervisor instead of in the guest
+would be much cleaner.
+
+[1] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
+
+--=20
+Thanks,
+
+David / dhildenb
+
 
