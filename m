@@ -2,81 +2,59 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DATE_IN_FUTURE_06_12,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD41C2D0EE
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 02:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8E6C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 02:29:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06B1A20774
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 02:24:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TOyDMVlk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B1A20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 508C62070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 02:29:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508C62070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHeg6-0002AU-2y
-	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 22:24:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44790)
+	id 1jHekH-0003OU-HZ
+	for qemu-devel@archiver.kernel.org; Thu, 26 Mar 2020 22:29:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jHefB-0001ju-UU
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 22:24:02 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jHejb-0002zT-Cz
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 22:28:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1jHefA-0005qh-GY
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 22:24:01 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32935)
+ (envelope-from <yan.y.zhao@intel.com>) id 1jHejZ-0003b0-7M
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 22:28:34 -0400
+Received: from mga09.intel.com ([134.134.136.24]:3746)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jHef9-0005nU-5g
- for qemu-devel@nongnu.org; Thu, 26 Mar 2020 22:23:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585275837;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hCU1fxZ1FBuYB9JEtBNyS4mOKsUWs2FXq5XKSUCrggQ=;
- b=TOyDMVlkBw3z/dAomxR9lA7PDWySa7zDFSuQa0YfNcRC3W/Vbr/Sz1BHiH76bmbJB2KFlf
- 5CjvlJgBBGaVffUcGYEogZNXnGwAlkU5DAcKMc5c5paUlIVdXdV3xVpb+QapnsAf0gOfG0
- 1VBe2yeiDTORmpQITcXIX2sJsPc41kU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-fWR0d1XgNPOp18LXToJeHg-1; Thu, 26 Mar 2020 22:23:53 -0400
-X-MC-Unique: fWR0d1XgNPOp18LXToJeHg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17393100726D;
- Fri, 27 Mar 2020 02:23:52 +0000 (UTC)
-Received: from [10.72.13.132] (ovpn-13-132.pek2.redhat.com [10.72.13.132])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4C37660304;
- Fri, 27 Mar 2020 02:23:46 +0000 (UTC)
-Subject: Re: [PATCH v6 0/7] reference implementation of RSS and hash report
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <20200320115751.19446-1-yuri.benditovich@daynix.com>
- <20200326093217-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9433decc-668c-6d35-c788-74677db54ee8@redhat.com>
-Date: Fri, 27 Mar 2020 10:23:45 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200326093217-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jHejY-0003Uf-VN
+ for qemu-devel@nongnu.org; Thu, 26 Mar 2020 22:28:33 -0400
+IronPort-SDR: IOedDJpSRYLd9osv3xPNnGyzmfiaPUF/6l8qJ5Oq32XmpDS7AJWjrfJS66YXp4gQCn9F8ACgAm
+ AZaUe6jhH2iQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 26 Mar 2020 19:28:29 -0700
+IronPort-SDR: uvhGRG1O0rRJTVS3RJ97k0hyZgxHA6nBr3AONuOK53pHjdSBcOrQOtCLp5nLGoPQSY+xjLyBj5
+ WWAvucfQGtSg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,310,1580803200"; d="scan'208";a="271404410"
+Received: from dpdk-zhirun.sh.intel.com ([10.67.119.121])
+ by fmsmga004.fm.intel.com with ESMTP; 26 Mar 2020 19:28:27 -0700
+From: yan.y.zhao@intel.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/vfio: let readonly flag take effect for mmaped regions
+Date: Fri, 27 Mar 2020 11:19:34 +0000
+Message-Id: <20200327111934.71066-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,54 +66,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- quintela@redhat.com
+Cc: pbonzini@redhat.com, alex.williamson@redhat.com,
+ Yan Zhao <yan.y.zhao@intel.com>, Xin Zeng <xin.zeng@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Yan Zhao <yan.y.zhao@intel.com>
 
-On 2020/3/26 =E4=B8=8B=E5=8D=889:32, Michael S. Tsirkin wrote:
-> On Fri, Mar 20, 2020 at 01:57:44PM +0200, Yuri Benditovich wrote:
->> Support for VIRTIO_NET_F_RSS and VIRTIO_NET_F_HASH_REPORT
->> features in QEMU for reference purpose.
->> Implements Toeplitz hash calculation for incoming
->> packets according to configuration provided by driver.
->> Uses calculated hash for decision on receive virtqueue
->> and/or reports the hash in the virtio header
-> Series:
->
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+currently, vfio regions without VFIO_REGION_INFO_FLAG_WRITE are only
+read-only when VFIO_REGION_INFO_FLAG_MMAP is not set.
 
+regions with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP
+are only read-only in host page table for qemu.
 
-Queued for 5.1.
+This patch sets corresponding ept page entries read-only for regions
+with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP.
 
-Thanks
+accordingly, it ignores guest write when guest writes to the read-only
+regions are trapped.
 
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+---
+ hw/vfio/common.c | 4 ++++
+ memory.c         | 3 +++
+ 2 files changed, 7 insertions(+)
 
->
->> Changes from v5:
->> RSS migration state moved to subsection and migrated
->> only if enabled (patch 7)
->> Updated sign off (patch 6)
->>
->> Yuri Benditovich (7):
->>    virtio-net: introduce RSS and hash report features
->>    virtio-net: implement RSS configuration command
->>    virtio-net: implement RX RSS processing
->>    tap: allow extended virtio header with hash info
->>    virtio-net: reference implementation of hash report
->>    vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC macro
->>    virtio-net: add migration support for RSS and hash report
->>
->>   hw/net/trace-events            |   3 +
->>   hw/net/virtio-net.c            | 448 +++++++++++++++++++++++++++++++--
->>   include/hw/virtio/virtio-net.h |  16 ++
->>   include/migration/vmstate.h    |  10 +
->>   net/tap.c                      |  11 +-
->>   5 files changed, 460 insertions(+), 28 deletions(-)
->>
->> --=20
->> 2.17.1
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 0b3593b3c0..e901621ca0 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -971,6 +971,10 @@ int vfio_region_mmap(VFIORegion *region)
+                                           name, region->mmaps[i].size,
+                                           region->mmaps[i].mmap);
+         g_free(name);
++
++        if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE)) {
++            memory_region_set_readonly(&region->mmaps[i].mem, true);
++        }
+         memory_region_add_subregion(region->mem, region->mmaps[i].offset,
+                                     &region->mmaps[i].mem);
+ 
+diff --git a/memory.c b/memory.c
+index 601b749906..4b1071dc74 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1313,6 +1313,9 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+     MemoryRegion *mr = opaque;
+ 
+     trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
++    if (mr->readonly) {
++        return;
++    }
+ 
+     switch (size) {
+     case 1:
+-- 
+2.17.1
 
 
