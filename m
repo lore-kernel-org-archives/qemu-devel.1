@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A68FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 11:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A17AC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 11:17:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DC5620675
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 11:17:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4094820675
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 11:17:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsBuIhKp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DC5620675
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZyarX6o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4094820675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHmzJ-0005gH-FE
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 07:17:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37763)
+	id 1jHmzS-0005yC-D7
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 07:17:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38084)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jHmwQ-0000ek-Vy
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 07:14:24 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jHmwh-0001FA-3M
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 07:14:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1jHmwP-0001VE-Rb
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 07:14:22 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39088)
+ (envelope-from <jasowang@redhat.com>) id 1jHmwf-00027r-OA
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 07:14:39 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54359)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jHmwP-0001TE-NQ
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 07:14:21 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jHmwf-00026Z-Jr
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 07:14:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585307661;
+ s=mimecast20190719; t=1585307677;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=paXF4BUdtUbKk4eCMDfsD2R4BGRN/BEYl8hEBt1HBS4=;
- b=RsBuIhKpkJCtLUWR6vu4Np2umNc9E0rByxtZaGvn0qt+9BBChc4IC9BF0nrX0D6/vp7L86
- ChL3yICp4MAfSc/ty9iqIW98wHax4Wsb8oN3/342bA7ert3673rjz9DsQPJmA0VUX7m7+z
- KQsmnBjaLQM+UumhWDUaWBfTBGrpFc0=
+ bh=uMenIUGdDmBnzKf4+9eU1fy5NRzIpPIs/nd9clirI9A=;
+ b=SZyarX6oU0bz0JxoE+hOcKoL/ERZF1zgJY/CMwDiH6zF80y2X+n5QpigxUBy0RT5xqGNn4
+ vSqAI4hmKL4sAERR22nnmHRtv/lTFTAyK1eq2QnZweFXcvKnUhlvchgmGhlAgj9veiV2TV
+ dxfk2MmpiPcvGW2wkoQeGBmT1VH/wqI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-ZNI5rlmEN4CVIge7hMCfWA-1; Fri, 27 Mar 2020 07:14:18 -0400
-X-MC-Unique: ZNI5rlmEN4CVIge7hMCfWA-1
+ us-mta-309-h2k1udPwMdyiFdT7T0jyfQ-1; Fri, 27 Mar 2020 07:14:35 -0400
+X-MC-Unique: h2k1udPwMdyiFdT7T0jyfQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA1A6800D4E;
- Fri, 27 Mar 2020 11:14:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A94D107ACC4;
+ Fri, 27 Mar 2020 11:14:33 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-77.pek2.redhat.com
  [10.72.12.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 07E475E030;
- Fri, 27 Mar 2020 11:14:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B7F25E01F;
+ Fri, 27 Mar 2020 11:14:31 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 03/13] Fixed integer overflow in e1000e
-Date: Fri, 27 Mar 2020 19:13:57 +0800
-Message-Id: <1585307647-24456-4-git-send-email-jasowang@redhat.com>
+Subject: [PULL 10/13] net/colo-compare.c: Expose "compare_timeout" to users
+Date: Fri, 27 Mar 2020 19:14:04 +0800
+Message-Id: <1585307647-24456-11-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1585307647-24456-1-git-send-email-jasowang@redhat.com>
 References: <1585307647-24456-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +86,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Melnychenko <andrew@daynix.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Melnychenko <andrew@daynix.com>
+From: Zhang Chen <chen.zhang@intel.com>
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1737400
-Fixed setting max_queue_num if there are no peers in
-NICConf. qemu_new_nic() creates NICState with 1 NetClientState(index
-0) without peers, set max_queue_num to 0 - It prevents undefined
-behavior and possible crashes, especially during pcie hotplug.
+The "compare_timeout" determines the maximum time to hold the primary net p=
+acket.
+This patch expose the "compare_timeout", make user have ability to
+adjest the value according to application scenarios.
 
-Fixes: 6f3fbe4ed06 ("net: Introduce e1000e device emulation")
-Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+QMP command demo:
+    { "execute": "qom-get",
+         "arguments": { "path": "/objects/comp0",
+                        "property": "compare_timeout" } }
+
+    { "execute": "qom-set",
+         "arguments": { "path": "/objects/comp0",
+                        "property": "compare_timeout",
+                        "value": 5000} }
+
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/e1000e.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/colo-compare.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
+ qemu-options.hx    |  8 +++++---
+ 2 files changed, 50 insertions(+), 5 deletions(-)
 
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index a91dbdc..f2cc155 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -328,7 +328,7 @@ e1000e_init_net_peer(E1000EState *s, PCIDevice *pci_dev=
-, uint8_t *macaddr)
-     s->nic =3D qemu_new_nic(&net_e1000e_info, &s->conf,
-         object_get_typename(OBJECT(s)), dev->id, s);
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 7ee17f2..ec09b2a 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -50,6 +50,7 @@ static NotifierList colo_compare_notifiers =3D
 =20
--    s->core.max_queue_num =3D s->conf.peers.queues - 1;
-+    s->core.max_queue_num =3D s->conf.peers.queues ? s->conf.peers.queues =
-- 1 : 0;
+ /* TODO: Should be configurable */
+ #define REGULAR_PACKET_CHECK_MS 3000
++#define DEFAULT_TIME_OUT_MS 3000
 =20
-     trace_e1000e_mac_set_permanent(MAC_ARG(macaddr));
-     memcpy(s->core.permanent_mac, macaddr, sizeof(s->core.permanent_mac));
+ static QemuMutex event_mtx;
+ static QemuCond event_complete_cond;
+@@ -92,6 +93,7 @@ typedef struct CompareState {
+     SocketReadState sec_rs;
+     SocketReadState notify_rs;
+     bool vnet_hdr;
++    uint32_t compare_timeout;
+=20
+     /*
+      * Record the connection that through the NIC
+@@ -607,10 +609,9 @@ static int colo_old_packet_check_one_conn(Connection *=
+conn,
+                                           CompareState *s)
+ {
+     GList *result =3D NULL;
+-    int64_t check_time =3D REGULAR_PACKET_CHECK_MS;
+=20
+     result =3D g_queue_find_custom(&conn->primary_list,
+-                                 &check_time,
++                                 &s->compare_timeout,
+                                  (GCompareFunc)colo_old_packet_check_one);
+=20
+     if (result) {
+@@ -984,6 +985,39 @@ static void compare_set_notify_dev(Object *obj, const =
+char *value, Error **errp)
+     s->notify_dev =3D g_strdup(value);
+ }
+=20
++static void compare_get_timeout(Object *obj, Visitor *v,
++                                const char *name, void *opaque,
++                                Error **errp)
++{
++    CompareState *s =3D COLO_COMPARE(obj);
++    uint32_t value =3D s->compare_timeout;
++
++    visit_type_uint32(v, name, &value, errp);
++}
++
++static void compare_set_timeout(Object *obj, Visitor *v,
++                                const char *name, void *opaque,
++                                Error **errp)
++{
++    CompareState *s =3D COLO_COMPARE(obj);
++    Error *local_err =3D NULL;
++    uint32_t value;
++
++    visit_type_uint32(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    if (!value) {
++        error_setg(&local_err, "Property '%s.%s' requires a positive value=
+",
++                   object_get_typename(obj), name);
++        goto out;
++    }
++    s->compare_timeout =3D value;
++
++out:
++    error_propagate(errp, local_err);
++}
++
+ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
+ {
+     CompareState *s =3D container_of(pri_rs, CompareState, pri_rs);
+@@ -1090,6 +1124,11 @@ static void colo_compare_complete(UserCreatable *uc,=
+ Error **errp)
+         return;
+     }
+=20
++    if (!s->compare_timeout) {
++        /* Set default value to 3000 MS */
++        s->compare_timeout =3D DEFAULT_TIME_OUT_MS;
++    }
++
+     if (find_and_check_chardev(&chr, s->pri_indev, errp) ||
+         !qemu_chr_fe_init(&s->chr_pri_in, chr, errp)) {
+         return;
+@@ -1185,6 +1224,10 @@ static void colo_compare_init(Object *obj)
+                             compare_get_notify_dev, compare_set_notify_dev=
+,
+                             NULL);
+=20
++    object_property_add(obj, "compare_timeout", "uint32",
++                        compare_get_timeout,
++                        compare_set_timeout, NULL, NULL, NULL);
++
+     s->vnet_hdr =3D false;
+     object_property_add_bool(obj, "vnet_hdr_support", compare_get_vnet_hdr=
+,
+                              compare_set_vnet_hdr, NULL);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 962a5eb..9e48e13 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4615,7 +4615,7 @@ SRST
+         stored. The file format is libpcap, so it can be analyzed with
+         tools such as tcpdump or Wireshark.
+=20
+-    ``-object colo-compare,id=3Did,primary_in=3Dchardevid,secondary_in=3Dc=
+hardevid,outdev=3Dchardevid,iothread=3Did[,vnet_hdr_support][,notify_dev=3D=
+id]``
++    ``-object colo-compare,id=3Did,primary_in=3Dchardevid,secondary_in=3Dc=
+hardevid,outdev=3Dchardevid,iothread=3Did[,vnet_hdr_support][,notify_dev=3D=
+id][,compare_timeout=3D@var{ms}]``
+         Colo-compare gets packet from primary\_inchardevid and
+         secondary\_inchardevid, than compare primary packet with
+         secondary packet. If the packets are same, we will output
+@@ -4624,8 +4624,10 @@ SRST
+         outdevchardevid. In order to improve efficiency, we need to put
+         the task of comparison in another thread. If it has the
+         vnet\_hdr\_support flag, colo compare will send/recv packet with
+-        vnet\_hdr\_len. If you want to use Xen COLO, will need the
+-        notify\_dev to notify Xen colo-frame to do checkpoint.
++        vnet\_hdr\_len. Then compare\_timeout=3D@var{ms} determines the
++        maximum delay colo-compare wait for the packet.
++        If you want to use Xen COLO, will need the notify\_dev to
++        notify Xen colo-frame to do checkpoint.
+=20
+         we must use it with the help of filter-mirror and
+         filter-redirector.
 --=20
 2.5.0
 
