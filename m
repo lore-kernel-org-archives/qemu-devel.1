@@ -2,81 +2,83 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C7DC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECE0C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:20:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FB9B20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:19:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D77B20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 19:20:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A8LQosPK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FB9B20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d8024E9p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D77B20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHuVj-0002q1-51
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 15:19:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50496)
+	id 1jHuWc-0003vq-FB
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 15:20:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50644)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jHuV2-0002Rb-HJ
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:18:37 -0400
+ (envelope-from <eblake@redhat.com>) id 1jHuW2-0003Ig-QX
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:19:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jHuV1-0003Iy-AP
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:18:36 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35784)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jHuV1-0003Ik-5Q
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:18:35 -0400
-Received: by mail-ot1-x341.google.com with SMTP id v2so6384401oto.2
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 12:18:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=7b8pd2PeUYEhhBSJLFprS4neuvrBP6ynD50ZhKLWaGY=;
- b=A8LQosPKI/wGGMDcW9ZT7P9yt2l0ZmXaCoTCA1ULPv3Cs3cz0ezYHNLMd4qYR9ppAb
- xfFUgVjxU8qIN+6uDF+4qAYPObLNAyCYbHJq8INlTprGRrxe4bBKin6dbjQnGtBxryv7
- aqSahcUkKWLbd4k3QA9ptzKdNdv6AhMIh7NomSSFYdICOe3PgCs8dPffOv5NPTQTbIz+
- +lKFMuu0f/NyFeOF7DJlMvytHWKiVU+OEe49rePetfDZDHnt0pp+qW2fEIg9bEFE0/vL
- DDSwlcJXDBXze1nDq7+Ss6NRIrkvkwTDdouPXP7SCPTDgUC6BWTSU01pkYrCXHL910Eo
- exVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=7b8pd2PeUYEhhBSJLFprS4neuvrBP6ynD50ZhKLWaGY=;
- b=pu4qRfK+QQqIjY4I+tz8BQi02FkMKek0IkUbpX0hGxCZ1gx8UTu16TdrzdEaEF59l0
- UWI6mqAA9111TBpmdU49lG3WgTqZHLeJSVqfyMVskQQaJnx2ObhYiyFpRRNZEKG5Vbm+
- kb8VfFkAuGcD0aK/tspjKk0f47OUWBZjG0z+g83+UWAW1n3iXF+0MPtt8pojJ1MjcwLd
- 2VTL69Weh9EGq9xZBwQQJdX/Lfk6gbpSDhKVUmWe5OHRWaC+dmF3AyYTzlKIPBlLX8Pp
- /XRtpGrdOQ4YIe9B0lHNEudiN7KHUQcol+RcPPh1FwgJV2tjEq/vzYGwaLDuMsCoqIkr
- qmsw==
-X-Gm-Message-State: ANhLgQ0TL94RW8/WQDvLuXbDPeEJKMFJHAx6sC9D8zRWQJPE5u+SVrFB
- jrYlm8hLQVtgE9rIVT/NOs8B8PySGxWbQK7Br0GhhA==
-X-Google-Smtp-Source: ADFU+vseEXbuq3RqLjMIyTOwgDL4J3B6y99uPnkxp0MNdXzXoU65ulCLhr9qV401tNjOKRSeRU3XC7jABe/KXk2eoaY=
-X-Received: by 2002:a4a:a226:: with SMTP id m38mr810191ool.94.1585336713903;
- Fri, 27 Mar 2020 12:18:33 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1jHuW1-0004GB-Bj
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:19:38 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:27686)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jHuW1-0004Ep-7e
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 15:19:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585336776;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=a5hYChqO8eGC5sfVCJjjy436q22PU8/2zpkmxNP5mhE=;
+ b=d8024E9p0EccAln+CTIEI1IQrITUoeb8jQRv1Z0fvqRJTFH71TEgFBQ5DVDdDqicS0ETlT
+ aOi3G44Gj7pI06HqnAf9l3IXTuCRL4Fv72d3Dv90MWMwUKltX6NQHII91nP1LujgGJAA/C
+ BhTJKGj39APJ2yq6kPpHhiBxvXRMZJM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-115-HyPp0aNpMrmnN4TlVaFMSQ-1; Fri, 27 Mar 2020 15:19:32 -0400
+X-MC-Unique: HyPp0aNpMrmnN4TlVaFMSQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40BE98017CC;
+ Fri, 27 Mar 2020 19:19:31 +0000 (UTC)
+Received: from [10.3.113.103] (ovpn-113-103.phx2.redhat.com [10.3.113.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A524960BF3;
+ Fri, 27 Mar 2020 19:19:30 +0000 (UTC)
+Subject: Re: [PATCH v4] qcow2: Forbid discard in qcow2 v2 images with backing
+ files
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <20200327185930.19493-1-berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <fcbe8039-2320-da99-d125-cf3d43928039@redhat.com>
+Date: Fri, 27 Mar 2020 14:19:29 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200327181320.23329-1-alex.bennee@linaro.org>
-In-Reply-To: <20200327181320.23329-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Mar 2020 19:18:22 +0000
-Message-ID: <CAFEAcA-5ZApvBLiDrAa5oea_tygX9vyA8n3SFwqjnS5zEekodw@mail.gmail.com>
-Subject: Re: [PULL v2 for 5.0 00/12] testing updates (+ one mttcg change)
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+In-Reply-To: <20200327185930.19493-1-berto@igalia.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,43 +90,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 27 Mar 2020 at 18:13, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> The following changes since commit cfe68ae025f704f336d7dd3d1903ce37b44583=
-1d:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0-p=
-ull-request' into staging (2020-03-26 20:55:54 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-testing-270320-2
->
-> for you to fetch changes up to 41e1f0e2256e4c21bc5671ecb64191e776477c35:
->
->   .travis.yml: Add a KVM-only s390x job (2020-03-27 13:43:20 +0000)
->
-> ----------------------------------------------------------------
-> Testing updates:
->
->   - docker updates (various dependencies)
->   - travis updates (s390x KVM build)
->   - tweak qemu/atomic.h headers in event of clash
->   - test/vm updates (NetBSD -> 9.0, FreeBSD -> 12.1)
->   - disable MTTCG for mips64/mips64el
->
+On 3/27/20 1:59 PM, Alberto Garcia wrote:
+> A discard request deallocates the selected clusters so they read back
+> as zeroes. This is done by clearing the cluster offset field and
+> setting QCOW_OFLAG_ZERO in the L2 entry.
+> 
+> This flag is however only supported when qcow_version >= 3. In older
+> images the cluster is simply deallocated, exposing any possible stale
+> data from the backing file.
+> 
+> Since discard is an advisory operation it's safer to simply forbid it
+> in this scenario.
+> 
+> Note that we are adding this check to qcow2_co_pdiscard() and not to
+> qcow2_cluster_discard() or discard_in_l2_slice() because the last
+> two are also used by qcow2_snapshot_create() to discard the clusters
+> used by the VM state. In this case there's no risk of exposing stale
+> data to the guest and we really want that the clusters are always
+> discarded.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+> v4:
+> - Show output of qemu-img map when there's no backing file [Eric]
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Applied, thanks.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
