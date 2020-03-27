@@ -2,81 +2,76 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B152C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CE1C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:29:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F3F420748
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:25:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L/+PPtZg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F3F420748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0B0120848
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:29:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B0120848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHqrH-0006Rm-Kx
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 11:25:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41507)
+	id 1jHqvB-0007tE-T1
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 11:29:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jHqmM-0006yY-BR
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:20:15 -0400
+ (envelope-from <bounces@canonical.com>) id 1jHqrs-00079l-Tv
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jHqmL-0005N1-37
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:20:14 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26510)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jHqmK-0005KX-Ug
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:20:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585322412;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=a260PcX5ZP8azlfxdqQzYQNlsh8Xo00rhXrMyOcYqUg=;
- b=L/+PPtZgSYyQvwTKKSalNGLw2CuCskUluiKHNwkajizKbYhcGEg0CknvWfQljRy1wMrb/A
- 5uIacmJ9JL3poI0yp7/C+5WUSFnHAZeA2Djh8dEJTj80YksAZUgYqM4uQPACmz3A4yiRyn
- ChKTQGoFF+YluG7W2c8U4S9VwHhnNZE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-k780iwY-PeO68ffKiFTePg-1; Fri, 27 Mar 2020 11:20:10 -0400
-X-MC-Unique: k780iwY-PeO68ffKiFTePg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59CB88017CE;
- Fri, 27 Mar 2020 15:20:09 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-113-253.ams2.redhat.com
- [10.36.113.253])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A03F177E5;
- Fri, 27 Mar 2020 15:20:08 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 3/6] nvme: Print 'cqid' for nvme_del_cq
-Date: Fri, 27 Mar 2020 16:19:47 +0100
-Message-Id: <20200327151950.11820-4-kwolf@redhat.com>
-In-Reply-To: <20200327151950.11820-1-kwolf@redhat.com>
-References: <20200327151950.11820-1-kwolf@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1jHqrr-0000o1-GX
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:25:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jHqrr-0000gi-70
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:25:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jHqro-0005lg-GQ
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 15:25:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 79D932E80C7
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 15:25:52 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 27 Mar 2020 15:19:09 -0000
+From: Manuel Reimer <manuel.reimer@gmx.de>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: linux-user syscall-abi
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dflogeras2 liuke manuel-reimer marcin-konarski+u1
+ philippe-vaucher pmaydell schneiderit
+X-Launchpad-Bug-Reporter: Kan Li (liuke)
+X-Launchpad-Bug-Modifier: Manuel Reimer (manuel-reimer)
+References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158532234938.20932.15434728289371680888.malone@gac.canonical.com>
+Subject: [Bug 1805913] Re: readdir() returns NULL (errno=EOVERFLOW) for 32-bit
+ user-static qemu on 64-bit host
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 67bfd2606546bedf40ed4570f4ab4ac35cd9c2e3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,45 +80,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Minwoo Im <minwoo.im.dev@gmail.com>
+I seem to have found another workaround. Knowing now what causes this my
+guess was: If I make the qemu-arm-static on the host a 32 bit binary and
+get "multilib" running to make my 64 bit Linux installation run this,
+then in theory this incompatibility should not happen. If it would, then
+32 bit x86 applications whould run into the same problem.
 
-The given argument for this trace should be cqid, not sqid.
+And at least according to my tries, I did so far, this seems to be the
+case. I was able to reproduce this with svn (no checkout possible from
+32 bit armv7h). If the qemu-arm-static binary is a 32 bit x86
+application, then SVN checkouts work well now.
 
-Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
-Message-Id: <20200324140646.8274-1-minwoo.im.dev@gmail.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- hw/block/trace-events | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So until there is a better solution it seems to be a good idea to make
+the emulation layer run through multilib for 32 bit target
+architectures, so the host kernel can switch to its 32 bit backwards
+compatibility mode.
 
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index f78939fa9d..bf6d11b58b 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -37,7 +37,7 @@ nvme_rw(const char *verb, uint32_t blk_count, uint64_t by=
-te_count, uint64_t lba)
- nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize=
-, uint16_t qflags) "create submission queue, addr=3D0x%"PRIx64", sqid=3D%"P=
-RIu16", cqid=3D%"PRIu16", qsize=3D%"PRIu16", qflags=3D%"PRIu16""
- nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t siz=
-e, uint16_t qflags, int ien) "create completion queue, addr=3D0x%"PRIx64", =
-cqid=3D%"PRIu16", vector=3D%"PRIu16", qsize=3D%"PRIu16", qflags=3D%"PRIu16"=
-, ien=3D%d"
- nvme_del_sq(uint16_t qid) "deleting submission queue sqid=3D%"PRIu16""
--nvme_del_cq(uint16_t cqid) "deleted completion queue, sqid=3D%"PRIu16""
-+nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=3D%"PRIu16""
- nvme_identify_ctrl(void) "identify controller"
- nvme_identify_ns(uint16_t ns) "identify namespace, nsid=3D%"PRIu16""
- nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=3D%"PRIu1=
-6""
---=20
-2.20.1
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805913
+
+Title:
+  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
+  on 64-bit host
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  This can be simply reproduced by compiling and running the attached C
+  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
+  static:
+
+  # Setup docker for user-static binfmt
+  docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  # Compile the code and run (readdir for / is fine, so create a new direct=
+ory /test).
+  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
+to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
+{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
+test && gcc /tmp/readdir-bug.c && ./a.out'
+  dir=3D0xff5b4150
+  readdir(dir)=3D(nil)
+  errno=3D75: Value too large for defined data type
+
+  Do remember to replace the /path/to/qemu-arm-static and /path/to
+  /readdir-bug.c to the actual paths of the files.
+
+  The root cause is in glibc:
+  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
+linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
+378c9256d18e582572b4315e8edfcbfb#l87
+
+  By C standard, the return type of readdir() is DIR*, in which the
+  inode number and offset are 32-bit integers, therefore, glibc calls
+  getdents64() and check if the inode number and offset fits the 32-bit
+  range, and reports EOVERFLOW if not.
+
+  The problem here is for 32-bit user-static qemu running on 64-bit
+  host, getdents64 simply passing through the inode number and offset
+  from underlying getdents64 syscall (from 64-bit kernel), which is very
+  likely to not fit into 32-bit range. On real hardware, the 32-bit
+  kernel creates 32-bit inode numbers, therefore works properly.
+
+  The glibc code makes sense to do the check to be conformant with C
+  standard, therefore ideally it should be a fix on qemu side. I admit
+  this is difficult because qemu has to maintain a mapping between
+  underlying 64-bit inode numbers and 32-bit inode numbers, which would
+  severely hurt the performance. I don't expect this could be fix
+  anytime soon (or even there would be a fix), but it would be
+  worthwhile to surface this issue.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
 
