@@ -2,80 +2,61 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD455C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48EA4C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:22:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FB1E20705
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:06:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FB1E20705
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1B50620714
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:22:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B50620714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHj50-0005m7-9u
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 03:06:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39622)
+	id 1jHjJd-0000Fn-7e
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 03:22:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jHj3z-0005MD-76
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:05:56 -0400
+ (envelope-from <dietmar@proxmox.com>) id 1jHjIs-0008Cs-5V
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jHj3x-0003VQ-I5
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:05:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34520)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jHj3x-0003JQ-9r
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:05:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jHj3w-00036k-Ad
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 07:05:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3DE752E80C7
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 07:05:52 +0000 (UTC)
+ (envelope-from <dietmar@proxmox.com>) id 1jHjIr-0001dc-0W
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:21:18 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:49022)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dietmar@proxmox.com>)
+ id 1jHjIo-0000ZU-7w; Fri, 27 Mar 2020 03:21:14 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 206EB426FE;
+ Fri, 27 Mar 2020 08:21:08 +0100 (CET)
+Date: Fri, 27 Mar 2020 08:21:06 +0100 (CET)
+From: Dietmar Maurer <dietmar@proxmox.com>
+To: Stefan Reiter <s.reiter@proxmox.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Message-ID: <582549904.3.1585293666627@webmail.proxmox.com>
+In-Reply-To: <1614642655.1.1585289232685@webmail.proxmox.com>
+References: <20200326155628.859862-1-s.reiter@proxmox.com>
+ <1614642655.1.1585289232685@webmail.proxmox.com>
+Subject: Re: [PATCH v2 0/3] Fix some AIO context locking in jobs
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Mar 2020 06:57:00 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1868116@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Triaged; importance=High; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
- status=Triaged; importance=Critical; assignee=ubuntu-desktop@lists.ubuntu.com; 
-X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
- server-next
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail leozinho29-eu paelzer
-X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158529222082.6466.12983581724865116933.malone@wampee.canonical.com>
-Subject: [Bug 1868116] Re: QEMU monitor no longer works
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: af481f61036e0c5474378f3476867eaa0d9dd9be
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Mailer: Open-Xchange Mailer v7.10.2-Rev22
+X-Originating-Client: open-xchange-appsuite
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 212.186.127.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,137 +65,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
+Reply-To: Dietmar Maurer <dietmar@proxmox.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, slp@redhat.com,
+ mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As Vte-upstream long term would want to get rid of this implementation
-style Christian Persch provided a qemu patch [1]. That is too much UI
-for me to really have an in-depth opinion, but I can say that it builds
-and input works fine with it.
+Wait - maybe this was a bug in my test setup - I am unable to reproduce now..
 
-I suggested on [2] to send it to qemu-devel, but in case that doesn't
-happen it might be great if Gerd Hoffmann and Cole Robinson could take a
-look at it.
+@Stefan Reiter: Are you able to trigger this?
 
-[1]: https://gitlab.gnome.org/GNOME/vte/uploads/1e8ccb6aaf2e8fcef91dd67d23f=
-47fae/qemu.patch
-[2]: https://gitlab.gnome.org/GNOME/vte/issues/222
+> > I *think* the second patch also fixes the hangs on backup abort that I and
+> > Dietmar noticed in v1, but I'm not sure, they we're somewhat intermittent
+> > before too.
+> 
+> No, I still get this freeze:
+> 
+> 0  0x00007f0aa4866916 in __GI_ppoll (fds=0x7f0a12935c40, nfds=2, timeout=<optimized out>, timeout@entry=0x0, sigmask=sigmask@entry=0x0)
+>     at ../sysdeps/unix/sysv/linux/ppoll.c:39
+> #1  0x000055d3a6c91d29 in ppoll (__ss=0x0, __timeout=0x0, __nfds=<optimized out>, __fds=<optimized out>)
+>     at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
+> #2  0x000055d3a6c91d29 in qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, timeout=timeout@entry=-1) at util/qemu-timer.c:335
+> #3  0x000055d3a6c94511 in fdmon_poll_wait (ctx=0x7f0a97505e80, ready_list=0x7fff67e5c358, timeout=-1) at util/fdmon-poll.c:79
+> #4  0x000055d3a6c93af7 in aio_poll (ctx=0x7f0a97505e80, blocking=blocking@entry=true) at util/aio-posix.c:589
+> #5  0x000055d3a6bf4cd3 in bdrv_do_drained_begin
+>     (poll=<optimized out>, ignore_bds_parents=false, parent=0x0, recursive=false, bs=0x7f0a9754c280) at block/io.c:429
+> #6  0x000055d3a6bf4cd3 in bdrv_do_drained_begin
+>     (bs=0x7f0a9754c280, recursive=<optimized out>, parent=0x0, ignore_bds_parents=<optimized out>, poll=<optimized out>) at block/io.c:395
+> #7  0x000055d3a6be5c87 in blk_drain (blk=0x7f0a97abcc00) at block/block-backend.c:1617
+> #8  0x000055d3a6be686d in blk_unref (blk=0x7f0a97abcc00) at block/block-backend.c:473
+> #9  0x000055d3a6b9e835 in block_job_free (job=0x7f0a15f44e00) at blockjob.c:89
+> #10 0x000055d3a6b9fe29 in job_unref (job=0x7f0a15f44e00) at job.c:376
+> #11 0x000055d3a6b9fe29 in job_unref (job=0x7f0a15f44e00) at job.c:368
+> #12 0x000055d3a6ba07aa in job_finish_sync (job=job@entry=0x7f0a15f44e00, finish=finish@entry=
+>     0x55d3a6ba0cd0 <job_cancel_err>, errp=errp@entry=0x0) at job.c:1004
+> #13 0x000055d3a6ba0cee in job_cancel_sync (job=job@entry=0x7f0a15f44e00) at job.c:947
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1868116
-
-Title:
-  QEMU monitor no longer works
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-Status in vte2.91 package in Ubuntu:
-  Triaged
-
-Bug description:
-  Repro:
-  VTE
-  $ meson _build && ninja -C _build && ninja -C _build install
-
-  qemu:
-  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
-r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
--enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
-sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
--disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
-disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
-opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
-irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
--pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
-vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
-sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
-le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
-e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
-utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
--disable-cap-ng
-  $ make
-
-  Test:
-  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
-uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
-le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
-rent/images/netboot/mini.iso
-  - switch to monitor with CTRL+ALT+2
-  - try to enter something
-
-  Affects head of both usptream git repos.
-
-  =
-
-  --- original bug ---
-
-  It was observed that the QEMU console (normally accessible using
-  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
-  problematic because there are cases where it's required to send
-  commands to the guest, or key combinations that the host would grab
-  (as Ctrl-Alt-F1 or Alt-F4).
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 20.04
-  Package: qemu 1:4.2-3ubuntu2
-  Uname: Linux 5.6.0-rc6+ x86_64
-  ApportVersion: 2.20.11-0ubuntu20
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Thu Mar 19 12:16:31 2020
-  Dependencies:
-
-  InstallationDate: Installed on 2017-06-13 (1009 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine:
-  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
-  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
-86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
-,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
-home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
-  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
--re]
-  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
-5]
-  MachineType: LENOVO 80UG
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
-4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
-rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
-ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
-enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
-7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
-scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
-_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
-  dmi.bios.date: 08/09/2018
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN45WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
