@@ -2,97 +2,65 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C1FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA6AC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:29:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE8D420658
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:27:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10B1B20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:29:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbkrAl83"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE8D420658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ZAW0I8Vq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10B1B20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHroz-0002fF-T9
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:27:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41852)
+	id 1jHrr8-0004Bf-6e
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:29:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1jHroL-000291-2e
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:26:22 -0400
+ (envelope-from <liq3ea@163.com>) id 1jHrqE-0003iw-Ek
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1jHroJ-0002Zj-GS
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:26:20 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:51650)
+ (envelope-from <liq3ea@163.com>) id 1jHrqA-0007mQ-Em
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:28:15 -0400
+Received: from m12-11.163.com ([220.181.12.11]:55806)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1jHroJ-0002Xq-Cw
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:26:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585326378;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ezOFnLzUADpyQ4GrkDQ00Tfq0u1WbZB2xcWvMfBtHDM=;
- b=cbkrAl83x5B3TR2erW46odLSflsQELgsTlM8G+aGDLrtzcth6XMNuo3LnORTuj5BucIVCw
- 4wmCGwZCkYjjUPEZ0tc/gSuie/hbwKHEcXmjPUB75D7N6n2MHVmtUieZ1gewLczLjLP69h
- aghxSfq1mLEGUUPf2snCsp64OQoY65E=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-MCnkKiPPPKKXKqptzfflZw-1; Fri, 27 Mar 2020 12:26:16 -0400
-X-MC-Unique: MCnkKiPPPKKXKqptzfflZw-1
-Received: by mail-wm1-f70.google.com with SMTP id s14so4038398wmj.9
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 09:26:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=FeDpo2CmL1gGY6sENPZxKlfP/U2QVlpoTA3tv+IamEM=;
- b=X85E3tlzclnUmlXpSifUjUtCXsoMHVjio4y84A/DONgMV2hmJKfaVHhh3YXn2CWuhz
- dBJcGci4X3J7RQDtnAq5jFHWHmhFK1xQNudknMUA0HXq00iMF1iXP6RHJb8BT3EO4xNt
- qYZEbi0cLbOE+YoslW5nKfCz3dyaTEe6F83lEGwvufNfB2nKEINUub0yca9kSJuC4EyH
- klol4WscN65VlSJyp3ggDHZiDeTAb+YR/sVQ3L2liDYB0eJBtnzcjEHwqrrFvBp2sUcl
- GWQdQ8W+DCdcvHmAO91augs++43ndxDWcPkBqIej95etT8fgldB8gpUMAKU8KKVi1gIN
- tsEA==
-X-Gm-Message-State: ANhLgQ2LaGQvRUmZOBkidhC03mSZjkjGmblFd56chs+G1w3iwA5uL/N9
- MgTYVJIeqsBPYIddbOJziODIxsIn4nbsuxtHWxC7gsszBvsLqCFRaodgky2VWiOsoK7BbiMu+eP
- RbWd5nkoGOD2ZwoE=
-X-Received: by 2002:adf:f8c1:: with SMTP id f1mr183712wrq.345.1585326375546;
- Fri, 27 Mar 2020 09:26:15 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtA9vW6/qwn891AaDNo88Nafyl4cml1tflw36Lh+4bZnhbzn2t+CBOv01wKwUJnjWP8gNb2XA==
-X-Received: by 2002:adf:f8c1:: with SMTP id f1mr183698wrq.345.1585326375361;
- Fri, 27 Mar 2020 09:26:15 -0700 (PDT)
-Received: from steredhat (host32-201-dynamic.27-79-r.retail.telecomitalia.it.
- [79.27.201.32])
- by smtp.gmail.com with ESMTPSA id i21sm9091175wmb.23.2020.03.27.09.26.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Mar 2020 09:26:14 -0700 (PDT)
-Date: Fri, 27 Mar 2020 17:26:12 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Subject: Re: [PATCH v3 2/2] virtio-iommu: delete vqs in unrealize to fix
- memleak
-Message-ID: <20200327162612.ic2ymmpfvyt5xbnp@steredhat>
-References: <20200327095642.18424-1-pannengyuan@huawei.com>
- <20200327095642.18424-3-pannengyuan@huawei.com>
-MIME-Version: 1.0
-In-Reply-To: <20200327095642.18424-3-pannengyuan@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+ (Exim 4.71) (envelope-from <liq3ea@163.com>) id 1jHrq8-0006eU-Jn
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:28:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=From:Subject:Date:Message-Id; bh=Aoh9M8PIytTEynGlfU
+ LDMXmI1griONF7C7l3NKr6Jzk=; b=ZAW0I8Vq8CY6hciCuL0d+ZtugYkYWk501F
+ oaGxmVPOyByHFREwpHlJBUXxUard3L6YrytZQmCh9f/vxoeTMJdXjNWXn4dEkBYI
+ JU0TnO2UPuyh/soDeZFH35iSxtC8rCRYMu8O/7y0lPUCgbGC8o6tJhm6gWPXGNCx
+ MMFAIQW7k=
+Received: from ubuntu.localdomain (unknown [183.159.64.111])
+ by smtp7 (Coremail) with SMTP id C8CowACXme3DJX5eQrFqBg--.31568S4;
+ Sat, 28 Mar 2020 00:11:48 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com,
+ jasowang@redhat.com
+Subject: [PATCH] qtest: add tulip test case
+Date: Fri, 27 Mar 2020 09:11:46 -0700
+Message-Id: <20200327161146.16402-1-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: C8CowACXme3DJX5eQrFqBg--.31568S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxCr4DAr1rCr45Cr17ZF15CFg_yoWrXw4UpF
+ yUA3s09r48AF13Xrnak3W7JFy5Ga93uw1UCFy3Xr18uFZ8J3srKwn7Kr9F9Fn5uFWkXF15
+ Aw1ktF1fGF18tF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UBv3nUUUUU=
+X-Originating-IP: [183.159.64.111]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiFATzbVaD4+gv1gAAsp
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 220.181.12.11
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,62 +72,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, zhang.zhanghailiang@huawei.com,
- mst@redhat.com, qemu-devel@nongnu.org, euler.robot@huawei.com
+Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 27, 2020 at 05:56:42PM +0800, Pan Nengyuan wrote:
-> req_vq/event_vq forgot to free in unrealize. Fix that.
-> And aslo do clean 's->as_by_busptr' hash table in unrealize to fix anothe=
-r leak.
+The tulip networking card emulation has an OOB issue in
+'tulip_copy_tx_buffers' when the guest provide malformed descriptor.
+This test will trigger a ASAN heap overflow crash.
 
-s/aslo/also
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ tests/qtest/Makefile.include |  1 +
+ tests/qtest/tulip-test.c     | 91 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
+ create mode 100644 tests/qtest/tulip-test.c
 
-Maybe we can also update the subject in something like this:
-"virtio-iommu: avoid memleak in the unrealize"
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index 10a28de8a3..9e5a51d033 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -217,6 +217,7 @@ qos-test-obj-y += tests/qtest/es1370-test.o
+ qos-test-obj-y += tests/qtest/ipoctal232-test.o
+ qos-test-obj-y += tests/qtest/megasas-test.o
+ qos-test-obj-y += tests/qtest/ne2000-test.o
++qos-test-obj-y += tests/qtest/tulip-test.o
+ qos-test-obj-y += tests/qtest/nvme-test.o
+ qos-test-obj-y += tests/qtest/pca9552-test.o
+ qos-test-obj-y += tests/qtest/pci-test.o
+diff --git a/tests/qtest/tulip-test.c b/tests/qtest/tulip-test.c
+new file mode 100644
+index 0000000000..d91ddfd765
+--- /dev/null
++++ b/tests/qtest/tulip-test.c
+@@ -0,0 +1,91 @@
++/*
++ * QTest testcase for DEC/Intel Tulip 21143
++ *
++ * Copyright (c) 2020 Li Qiang <liq3ea@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qemu/module.h"
++#include "libqos/qgraph.h"
++#include "libqos/pci.h"
++#include "qemu/bitops.h"
++#include "hw/net/tulip.h"
++
++typedef struct QTulip_pci QTulip_pci;
++
++struct QTulip_pci {
++    QOSGraphObject obj;
++    QPCIDevice dev;
++};
++
++static void *tulip_pci_get_driver(void *obj, const char *interface)
++{
++    QTulip_pci *tulip_pci = obj;
++
++    if (!g_strcmp0(interface, "pci-device")) {
++        return &tulip_pci->dev;
++    }
++
++    fprintf(stderr, "%s not present in tulip_pci\n", interface);
++    g_assert_not_reached();
++}
++
++static void *tulip_pci_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
++{
++    QTulip_pci *tulip_pci = g_new0(QTulip_pci, 1);
++    QPCIBus *bus = pci_bus;
++
++    qpci_device_init(&tulip_pci->dev, bus, addr);
++    tulip_pci->obj.get_driver = tulip_pci_get_driver;
++
++    return &tulip_pci->obj;
++}
++
++static void tulip_large_tx(void *obj, void *data, QGuestAllocator *alloc)
++{
++    QTulip_pci *tulip_pci = obj;
++    QPCIDevice *dev = &tulip_pci->dev;
++    QPCIBar bar;
++    struct tulip_descriptor context;
++    char guest_data[4096];
++    uint64_t context_pa;
++    uint64_t guest_pa;
++
++    qpci_device_enable(dev);
++    bar = qpci_iomap(dev, 0, NULL);
++    context_pa = guest_alloc(alloc, sizeof(context));
++    guest_pa = guest_alloc(alloc, 4096);
++    memset(guest_data, 'A', sizeof(guest_data));
++    context.status = TDES0_OWN;
++    context.control = TDES1_BUF2_SIZE_MASK << TDES1_BUF2_SIZE_SHIFT |
++                      TDES1_BUF1_SIZE_MASK << TDES1_BUF1_SIZE_SHIFT;
++    context.buf_addr2 = context_pa + sizeof(struct tulip_descriptor);
++    context.buf_addr1 = guest_pa;
++
++    qtest_memwrite(dev->bus->qts, context_pa, &context, sizeof(context));
++    qtest_memwrite(dev->bus->qts, guest_pa, guest_data, sizeof(guest_data));
++    qpci_io_writel(dev, bar, 0x20, context_pa);
++    qpci_io_writel(dev, bar, 0x30, 1 << 13);
++    guest_free(alloc, context_pa);
++    guest_free(alloc, guest_pa);
++}
++
++static void tulip_register_nodes(void)
++{
++    QOSGraphEdgeOptions opts = {
++        .extra_device_opts = "addr=04.0",
++    };
++    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
++
++    qos_node_create_driver("tulip", tulip_pci_create);
++    qos_node_consumes("tulip", "pci-bus", &opts);
++    qos_node_produces("tulip", "pci-device");
++
++    qos_add_test("tulip_large_tx", "tulip", tulip_large_tx, NULL);
++}
++
++libqos_init(tulip_register_nodes);
+-- 
+2.17.1
 
->=20
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> Acked-by: Eric Auger <eric.auger@redhat.com>
-> ---
-> Cc: Eric Auger <eric.auger@redhat.com>
-> ---
-> v3->v1/v2:
-> - Aslo clean 's->as_by_busptr' hash table in unrealize.(Suggested by Stef=
-ano Garzarella)
-> ---
->  hw/virtio/virtio-iommu.c | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> index 4cee8083bc..694698fa0f 100644
-> --- a/hw/virtio/virtio-iommu.c
-> +++ b/hw/virtio/virtio-iommu.c
-> @@ -696,7 +696,10 @@ static void virtio_iommu_device_unrealize(DeviceStat=
-e *dev, Error **errp)
->      g_tree_destroy(s->domains);
->      g_tree_destroy(s->endpoints);
-> =20
-> +    virtio_delete_queue(s->req_vq);
-> +    virtio_delete_queue(s->event_vq);
->      virtio_cleanup(vdev);
-> +    g_hash_table_destroy(s->as_by_busptr);
-
-If you need to respin, you could move g_hash_table_destroy()
-at the beggining of unrealize(), just to follow a reverse order of
-realize().
-
-Thanks,
-Stefano
-
->  }
-> =20
->  static void virtio_iommu_device_reset(VirtIODevice *vdev)
-> --=20
-> 2.18.2
->=20
->=20
 
 
