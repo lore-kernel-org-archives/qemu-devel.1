@@ -2,66 +2,69 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D06CAC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3137CC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A7572072F
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:52:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFB792072F
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:54:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MhhTeSwY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A7572072F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KsT2FI8g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB792072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHsDf-0001p2-Ng
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:52:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49647)
+	id 1jHsFX-0002rm-8A
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:54:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50196)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jHsCt-0001Hq-Ai
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:51:44 -0400
+ (envelope-from <david@redhat.com>) id 1jHsEw-0002RT-8V
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jHsCs-0008Dm-1M
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:51:43 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32208)
+ (envelope-from <david@redhat.com>) id 1jHsEv-0002yj-1C
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:53:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:59235)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHsCr-0008DQ-US
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:51:41 -0400
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHsEu-0002yG-TJ
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:53:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585327901;
+ s=mimecast20190719; t=1585328028;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=eMeuDM0BhnGET1jsxmA70Rs7pnvvZpO8N27MmgXKVeE=;
- b=MhhTeSwYqBI7+r4QRBOGuU2iILDPQJCSpINM7+MCzH1jKjjy5o40sPCmChE3vVPfehITVS
- lC0waD19+mgBcZmBaxJOMe+rF76MEvfQY+Y9jmkbgTjyNnbTZXc3xLIov6iRypxtVWtcua
- mv6WasaHZCl/JG/Wz+69M/XnQwuqmV0=
+ bh=UvPmOoIwljNGQdzw2gr+rt+loVLRlpBx3nybgp885MM=;
+ b=KsT2FI8gtAHbx8P8Ba8d4vIsV8+ofV/Yxt0YqyHQgsddq/8kPUwhlqIPpmxzvUB+izHewX
+ dCrw7fXXfRjIge51fx/vn22aRV7FI9nJK4uxKqKE85WjqexWHc1J6ILuxwHFo7q+nzRtOh
+ wH8/2Oh9OnUpyK9KNEJKhaUstF6AB+Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-RL8txHdUOzOPFs6fKGnvWw-1; Fri, 27 Mar 2020 12:51:37 -0400
-X-MC-Unique: RL8txHdUOzOPFs6fKGnvWw-1
+ us-mta-379-VbsOPjRqPuy-W6JPULXKpA-1; Fri, 27 Mar 2020 12:53:45 -0400
+X-MC-Unique: VbsOPjRqPuy-W6JPULXKpA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BD9C102C86E;
- Fri, 27 Mar 2020 16:51:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 743C8100551A;
+ Fri, 27 Mar 2020 16:53:43 +0000 (UTC)
 Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1247496F98;
- Fri, 27 Mar 2020 16:51:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DB9B7E303;
+ Fri, 27 Mar 2020 16:53:40 +0000 (UTC)
 Subject: Re: [PATCH v1] s390x: Reject unaligned RAM sizes
-To: Igor Mammedov <imammedo@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
 References: <20200327152930.66636-1-david@redhat.com>
- <20200327174823.48c523dc@redhat.com>
+ <64cefab8-f1e0-fbc7-27d3-4f28758c595a@de.ibm.com>
+ <d8fb50c1-639a-826c-0dce-e2ddc26ae5e1@redhat.com>
+ <24681aa0-9053-238f-89da-8ce08d34241d@de.ibm.com>
+ <20200327174620.06b9c324@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -107,20 +110,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <77067f3b-4fe6-f67a-d8f3-d3de1f3b5a85@redhat.com>
-Date: Fri, 27 Mar 2020 17:51:23 +0100
+Message-ID: <4c5e56fd-a5e2-efe0-9a1a-99acb91aaf71@redhat.com>
+Date: Fri, 27 Mar 2020 17:53:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200327174823.48c523dc@redhat.com>
+In-Reply-To: <20200327174620.06b9c324@redhat.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,85 +141,74 @@ Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
  Cornelia Huck <cohuck@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.03.20 17:48, Igor Mammedov wrote:
-> On Fri, 27 Mar 2020 16:29:30 +0100
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> Historically, we fixed up the RAM size (rounded it down), to fit into
->> storage increments. Since commit 3a12fc61af5c ("390x/s390-virtio-ccw: us=
-e
->> memdev for RAM"), we no longer consider the fixed-up size when
->> allcoating the RAM block - which will break migration.
+On 27.03.20 17:46, Igor Mammedov wrote:
+> On Fri, 27 Mar 2020 17:05:34 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> On 27.03.20 17:01, David Hildenbrand wrote:
+>>> On 27.03.20 16:34, Christian Borntraeger wrote:  
+>>>>
+>>>>
+>>>> On 27.03.20 16:29, David Hildenbrand wrote:  
+>>>>> Historically, we fixed up the RAM size (rounded it down), to fit into
+>>>>> storage increments. Since commit 3a12fc61af5c ("390x/s390-virtio-ccw: use
+>>>>> memdev for RAM"), we no longer consider the fixed-up size when
+>>>>> allcoating the RAM block - which will break migration.
+>>>>>
+>>>>> Let's simply drop that manual fixup code and let the user supply sane
+>>>>> RAM sizes. This will bail out early when trying to migrate (and make
+>>>>> an existing guest with e.g., 12345 MB non-migratable), but maybe we
+>>>>> should have rejected such RAM sizes right from the beginning.
+>>>>>
+>>>>> As we no longer fixup maxram_size as well, make other users use ram_size
+>>>>> instead. Keep using maxram_size when setting the maximum ram size in KVM,
+>>>>> as that will come in handy in the future when supporting memory hotplug
+>>>>> (in contrast, storage keys and storage attributes for hotplugged memory
+>>>>>  will have to be migrated per RAM block in the future).
+>>>>>
+>>>>> This fixes (or rather rejects early):
+>>>>>
+>>>>> 1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as the
+>>>>>    RAM block size changed.  
+>>>>
+>>>> Not sure I like this variant. Instead of breaking migration (that was 
+>>>> accidentially done by Igors changes) we now reject migration from older
+>>>> QEMUs to 5.0. This is not going to help those that still have such guests
+>>>> running and want to migrate.   
+>>>
+>>> As Igor mentioned on another channel, you most probably can migrate an
+>>> older guest by starting it on the target with a fixed-up size.
+>>>
+>>> E.g., migrate an old QEMU "-m 1235M" to a new QEMU "-m 1234M"  
 >>
->> Let's simply drop that manual fixup code and let the user supply sane
->> RAM sizes. This will bail out early when trying to migrate (and make
->> an existing guest with e.g., 12345 MB non-migratable), but maybe we
->> should have rejected such RAM sizes right from the beginning.
+>> Yes, that should probably work.
+> I'm in process of testing it.
+> 
+>>> Not sure how many such weird-size VMs we actually do have in practice.  
 >>
->> As we no longer fixup maxram_size as well, make other users use ram_size
->> instead. Keep using maxram_size when setting the maximum ram size in KVM=
-,
->> as that will come in handy in the future when supporting memory hotplug
->> (in contrast, storage keys and storage attributes for hotplugged memory
->>  will have to be migrated per RAM block in the future).
->>
->> This fixes (or rather rejects early):
->>
->> 1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as the
->>    RAM block size changed.
->>
->> 2. Migrating upstream QEMU to upstream QEMU (e.g., with "-m 1235M"), as
->>    we receive storage attributes for memory we don't expect (as we fixed=
- up
->>    ram_size and maxram_size).
->>
->> Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
->> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-skeys.c        |  4 +---
->>  hw/s390x/s390-stattrib-kvm.c |  7 ++-----
->>  hw/s390x/sclp.c              | 21 +++++++++++----------
->>  3 files changed, 14 insertions(+), 18 deletions(-)
->>
->> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
->> index 5da6e5292f..2545b1576b 100644
->> --- a/hw/s390x/s390-skeys.c
->> +++ b/hw/s390x/s390-skeys.c
->> @@ -11,7 +11,6 @@
->> =20
->>  #include "qemu/osdep.h"
->>  #include "qemu/units.h"
->> -#include "hw/boards.h"
->>  #include "hw/s390x/storage-keys.h"
->>  #include "qapi/error.h"
->>  #include "qapi/qapi-commands-misc-target.h"
->> @@ -174,9 +173,8 @@ out:
->>  static void qemu_s390_skeys_init(Object *obj)
->>  {
->>      QEMUS390SKeysState *skeys =3D QEMU_S390_SKEYS(obj);
->> -    MachineState *machine =3D MACHINE(qdev_get_machine());
->> =20
->> -    skeys->key_count =3D machine->maxram_size / TARGET_PAGE_SIZE;
->> +    skeys->key_count =3D ram_size / TARGET_PAGE_SIZE;
->=20
-> why are you dropping machine->foo all around and switching to global ram_=
-size?
-> (I'd rather do other way around)
+>> I am worried about some automated deployments where tooling has created
+>> these sizes for dozens or hundreds of containers in VMS and so.
 
-Not sure what the latest best practice is. I can also simply convert to
-machine->ram_size if that's the right thing to do.
+IIRC, e.g., Kata usually uses 2048MB. Not sure about others, but I'd be
+surprised if it's not multiples of, say, 128MB.
 
+> Yep, it's possible but then that tooling/configs should be fixed to work with
+> new QEMU that validates user's input.
+> 
 
---=20
+Yeah, and mention it in the cover letter, +eventually a "fixup" table
+(e.g., old_size < X, has to be aligned to Y).
+
+One alternative is to have an early fixup hack in QEMU, that fixes up
+the sizes as we did before (and eventually warns the user). Not sure if
+we really want/need that.
+
+-- 
 Thanks,
 
 David / dhildenb
