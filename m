@@ -2,73 +2,140 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F975C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE38C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:38:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26C0220578
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:30:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEyI2a7o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26C0220578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF0C220658
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:38:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF0C220658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHqwj-0000TJ-Ck
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 11:30:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45332)
+	id 1jHr3a-0004TV-1M
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 11:38:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jHqvX-0008Gn-8g
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:29:44 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jHr0e-0002XS-JC
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jHqvU-0000KT-P7
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:29:42 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:38670)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHqvU-0000GH-Hq
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:29:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585322979;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ydnVuGmQYjEbvoFcIok1R+sfGmYkbVA+qVRygdPKL3k=;
- b=JEyI2a7okxChnPuRdlLnfVtiyRE8fUGwetnuH+qc85F+iIo2KeyRW/MgSjy0u6akGAYbKT
- th7xlYj8vcvKHoDQd5A5GWxFUkDP+UWTUS6oAKWa3UiqMRLUxZaqo8+iIBl9GQzQhmxFlU
- P0p1t1NrlFxJlGjxXHuAwBVw+cpZdAU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-vd_AsrHuM3ux72jXmb5ZqQ-1; Fri, 27 Mar 2020 11:29:38 -0400
-X-MC-Unique: vd_AsrHuM3ux72jXmb5ZqQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5256800D5E;
- Fri, 27 Mar 2020 15:29:36 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-112-108.ams2.redhat.com [10.36.112.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BB3060C18;
- Fri, 27 Mar 2020 15:29:31 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1] s390x: Reject unaligned RAM sizes
-Date: Fri, 27 Mar 2020 16:29:30 +0100
-Message-Id: <20200327152930.66636-1-david@redhat.com>
+ (envelope-from <borntraeger@de.ibm.com>) id 1jHr0d-0004QG-C0
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:35:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15566)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jHr0d-0004MC-4d
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:34:59 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02RFXS7w133878
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 11:34:56 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 300jevfakm-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 11:34:56 -0400
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 27 Mar 2020 15:34:50 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 27 Mar 2020 15:34:46 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02RFYmsE53739674
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 27 Mar 2020 15:34:48 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9E44552051;
+ Fri, 27 Mar 2020 15:34:48 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.169.170])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0330252059;
+ Fri, 27 Mar 2020 15:34:47 +0000 (GMT)
+Subject: Re: [PATCH v1] s390x: Reject unaligned RAM sizes
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200327152930.66636-1-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Fri, 27 Mar 2020 16:34:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200327152930.66636-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 20032715-0012-0000-0000-000003992E8E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20032715-0013-0000-0000-000021D630D1
+Message-Id: <64cefab8-f1e0-fbc7-27d3-4f28758c595a@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-27_05:2020-03-27,
+ 2020-03-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 malwarescore=0
+ adultscore=0 phishscore=0 suspectscore=0 mlxlogscore=999 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003270141
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id 02RFXS7w133878
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,154 +147,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>,
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
  Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
  Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Historically, we fixed up the RAM size (rounded it down), to fit into
-storage increments. Since commit 3a12fc61af5c ("390x/s390-virtio-ccw: use
-memdev for RAM"), we no longer consider the fixed-up size when
-allcoating the RAM block - which will break migration.
 
-Let's simply drop that manual fixup code and let the user supply sane
-RAM sizes. This will bail out early when trying to migrate (and make
-an existing guest with e.g., 12345 MB non-migratable), but maybe we
-should have rejected such RAM sizes right from the beginning.
 
-As we no longer fixup maxram_size as well, make other users use ram_size
-instead. Keep using maxram_size when setting the maximum ram size in KVM,
-as that will come in handy in the future when supporting memory hotplug
-(in contrast, storage keys and storage attributes for hotplugged memory
- will have to be migrated per RAM block in the future).
+On 27.03.20 16:29, David Hildenbrand wrote:
+> Historically, we fixed up the RAM size (rounded it down), to fit into
+> storage increments. Since commit 3a12fc61af5c ("390x/s390-virtio-ccw: u=
+se
+> memdev for RAM"), we no longer consider the fixed-up size when
+> allcoating the RAM block - which will break migration.
+>=20
+> Let's simply drop that manual fixup code and let the user supply sane
+> RAM sizes. This will bail out early when trying to migrate (and make
+> an existing guest with e.g., 12345 MB non-migratable), but maybe we
+> should have rejected such RAM sizes right from the beginning.
+>=20
+> As we no longer fixup maxram_size as well, make other users use ram_siz=
+e
+> instead. Keep using maxram_size when setting the maximum ram size in KV=
+M,
+> as that will come in handy in the future when supporting memory hotplug
+> (in contrast, storage keys and storage attributes for hotplugged memory
+>  will have to be migrated per RAM block in the future).
+>=20
+> This fixes (or rather rejects early):
+>=20
+> 1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as th=
+e
+>    RAM block size changed.
 
-This fixes (or rather rejects early):
+Not sure I like this variant. Instead of breaking migration (that was=20
+accidentially done by Igors changes) we now reject migration from older
+QEMUs to 5.0. This is not going to help those that still have such guests
+running and want to migrate.=20
 
-1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as the
-   RAM block size changed.
-
-2. Migrating upstream QEMU to upstream QEMU (e.g., with "-m 1235M"), as
-   we receive storage attributes for memory we don't expect (as we fixed up
-   ram_size and maxram_size).
-
-Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-skeys.c        |  4 +---
- hw/s390x/s390-stattrib-kvm.c |  7 ++-----
- hw/s390x/sclp.c              | 21 +++++++++++----------
- 3 files changed, 14 insertions(+), 18 deletions(-)
-
-diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-index 5da6e5292f..2545b1576b 100644
---- a/hw/s390x/s390-skeys.c
-+++ b/hw/s390x/s390-skeys.c
-@@ -11,7 +11,6 @@
-=20
- #include "qemu/osdep.h"
- #include "qemu/units.h"
--#include "hw/boards.h"
- #include "hw/s390x/storage-keys.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc-target.h"
-@@ -174,9 +173,8 @@ out:
- static void qemu_s390_skeys_init(Object *obj)
- {
-     QEMUS390SKeysState *skeys =3D QEMU_S390_SKEYS(obj);
--    MachineState *machine =3D MACHINE(qdev_get_machine());
-=20
--    skeys->key_count =3D machine->maxram_size / TARGET_PAGE_SIZE;
-+    skeys->key_count =3D ram_size / TARGET_PAGE_SIZE;
-     skeys->keydata =3D g_malloc0(skeys->key_count);
- }
-=20
-diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-index c7e1f35524..ae88fbc32e 100644
---- a/hw/s390x/s390-stattrib-kvm.c
-+++ b/hw/s390x/s390-stattrib-kvm.c
-@@ -10,7 +10,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "hw/boards.h"
- #include "migration/qemu-file.h"
- #include "hw/s390x/storage-attributes.h"
- #include "qemu/error-report.h"
-@@ -84,8 +83,7 @@ static int kvm_s390_stattrib_set_stattr(S390StAttribState=
- *sa,
-                                         uint8_t *values)
- {
-     KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
--    MachineState *machine =3D MACHINE(qdev_get_machine());
--    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
-+    unsigned long max =3D ram_size / TARGET_PAGE_SIZE;
-=20
-     if (start_gfn + count > max) {
-         error_report("Out of memory bounds when setting storage attributes=
-");
-@@ -103,8 +101,7 @@ static int kvm_s390_stattrib_set_stattr(S390StAttribSta=
-te *sa,
- static void kvm_s390_stattrib_synchronize(S390StAttribState *sa)
- {
-     KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
--    MachineState *machine =3D MACHINE(qdev_get_machine());
--    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
-+    unsigned long max =3D ram_size / TARGET_PAGE_SIZE;
-     /* We do not need to reach the maximum buffer size allowed */
-     unsigned long cx, len =3D KVM_S390_SKEYS_MAX / 2;
-     int r;
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index af0bfbc2ec..6af471fb3f 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -326,8 +326,7 @@ out:
-=20
- static void sclp_memory_init(SCLPDevice *sclp)
- {
--    MachineState *machine =3D MACHINE(qdev_get_machine());
--    ram_addr_t initial_mem =3D machine->ram_size;
-+    uint64_t initial_mem =3D ram_size;
-     int increment_size =3D 20;
-=20
-     /* The storage increment size is a multiple of 1M and is a power of 2.
-@@ -339,15 +338,17 @@ static void sclp_memory_init(SCLPDevice *sclp)
-     }
-     sclp->increment_size =3D increment_size;
-=20
--    /* The core memory area needs to be aligned with the increment size.
--     * In effect, this can cause the user-specified memory size to be roun=
-ded
--     * down to align with the nearest increment boundary. */
-+    /*
-+     * The core memory area needs to be aligned to the increment size. In
-+     * case it's not aligned, bail out.
-+     */
-     initial_mem =3D initial_mem >> increment_size << increment_size;
--
--    machine->ram_size =3D initial_mem;
--    machine->maxram_size =3D initial_mem;
--    /* let's propagate the changed ram size into the global variable. */
--    ram_size =3D initial_mem;
-+    if (initial_mem !=3D ram_size) {
-+        error_report("RAM size not aligned to storage increments."
-+                     " Possible aligned RAM size: %" PRIu64 " MB",
-+                     initial_mem / MiB);
-+        exit(1);
-+    }
- }
-=20
- static void sclp_init(Object *obj)
---=20
-2.25.1
+>=20
+> 2. Migrating upstream QEMU to upstream QEMU (e.g., with "-m 1235M"), as
+>    we receive storage attributes for memory we don't expect (as we fixe=
+d up
+>    ram_size and maxram_size).
+>=20
+> Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
+> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
 
