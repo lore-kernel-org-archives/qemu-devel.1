@@ -2,83 +2,94 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F923C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 13:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E12DC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 13:36:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47646206DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 13:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D965D2082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 13:36:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hoURglPJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47646206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OAJ7y3EK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D965D2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHowN-00036q-Ha
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 09:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39108)
+	id 1jHp9j-0007ev-4b
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 09:36:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jHovo-0002iQ-66
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 09:21:53 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jHp96-0007GX-A3
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 09:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jHovm-0001Rb-Gy
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 09:21:51 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:53958)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jHovm-0001P3-DB
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 09:21:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585315309;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jskmgcEGZgw4NwlDApvAeHQMBMfbabxnEeGmi0PWzfs=;
- b=hoURglPJzo9JzkgaDEJq9/aa/gAM39dLanfjVqhk+nqXmUOtZeYtblQXq1QuHzLBMAtRqN
- i0KcZt4/O4CLoJikl2Fe3o5GopNQ6zsfkWZey+O2L4I8fbtjEP3dwtJUBMdpd2pshdNtlM
- SpCkGQevkXLLfjmpIny/6MkwB1Cjg1Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-eXyqRb9lNtO0q4E-A7eelA-1; Fri, 27 Mar 2020 09:21:45 -0400
-X-MC-Unique: eXyqRb9lNtO0q4E-A7eelA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CC791005509;
- Fri, 27 Mar 2020 13:21:39 +0000 (UTC)
-Received: from work-vm (ovpn-113-149.ams2.redhat.com [10.36.113.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B9B7CDBD6;
- Fri, 27 Mar 2020 13:21:38 +0000 (UTC)
-Date: Fri, 27 Mar 2020 13:21:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [PATCH] monitor/hmp-cmds: add units for mirate_parameters.
-Message-ID: <20200327132136.GH2786@work-vm>
-References: <20200327073210.198080-1-maozhongyi@cmss.chinamobile.com>
- <20200327092951.bu4ju7rh53ig5t3l@steredhat>
- <20200327112814.GD2786@work-vm>
- <20200327131253.3axcri54an4pmuzf@steredhat>
+ (envelope-from <richard.henderson@linaro.org>) id 1jHp95-0007Ew-0E
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 09:35:36 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45035)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jHp94-0007Am-Me
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 09:35:34 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 142so4570627pgf.11
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 06:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=lery+U2Q++rR6Hk5UMKsDjGxpSfo7NwMfwYr58mvgIo=;
+ b=OAJ7y3EKrqWXJjYetWQAOfkJ3tgazGamjAvUscW2avxoEaOwt6neVG47TrOo0hKQ9I
+ B4vFt+pM0FfTUr73tZynLRtAJvzyBQydgFAaN9UpcJhCASBZXRgsqyt6smJV+0XIzoXR
+ uz4vHDSeFxajb49W2Z6BJch1erMplv+b17Kc1dFPyqdBbmk2V/uZWsY6UxorBCbSQcM3
+ MYZm8fkrTPWa9NOksIiUwJGEo61oNtpmhsP9oGSPOn1X7d8O1oj+b5cgaNpN73XY5LEw
+ kALQJo2UVlkLmhNwdB0xbbrC1VsRp6GkvMj0SVkzsxBXykJNME854NPAqFbeocQC8YlI
+ 2LLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lery+U2Q++rR6Hk5UMKsDjGxpSfo7NwMfwYr58mvgIo=;
+ b=LH21o9k9fB/+mrD520dWHJMqjmszhJi0ml5HfcBK8dYAiPLxpiZvcc1yH5taw5Q9gw
+ c32isv+myh88RBXqmBDkXAWDF26EOkcoceIqDF8U1H7yyQGbRn77zOLyyNy4PdnNChvl
+ KkOXj8wXgIGmq1B7p6L6jylI1FfwlJOvqlF+wABVi6tA410Am6jA5OWg6bkHrwFj2yUA
+ UFHkAHRRSDZvAFMTHZI5pOUt+Me+JufgUipH7bzQ1S4Zj2NxNMO9CxOu/t3/oaP+eJz0
+ EJQHffnFYSE/wu9+gBYQ05GO0iFT/7JAZ46EoHjDavwmnauw7ARPrXjZpjpXGQBwXoAq
+ Xbjg==
+X-Gm-Message-State: ANhLgQ3Gl7cBYb/SDqf8RKaW20wd9MoKMWkqByyzlbEthEgRzzNz5GWC
+ CO9VWEqN2PHvOSpCR+Co+4ue0zMuhu8=
+X-Google-Smtp-Source: ADFU+vuxFcxM42uoQu3G5v9QJyWpfoUnZ5Fc6bhydC2nKdLEGqPj+UU5MsT2bxBjRI3vC1UVzEYClA==
+X-Received: by 2002:a63:1e4f:: with SMTP id p15mr14315431pgm.28.1585316132684; 
+ Fri, 27 Mar 2020 06:35:32 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
+ by smtp.gmail.com with ESMTPSA id v185sm4131944pfv.32.2020.03.27.06.35.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 27 Mar 2020 06:35:31 -0700 (PDT)
+Subject: Re: [PATCH] qemu/atomic.h: add #ifdef guards for stdatomic.h
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200326170121.13045-1-alex.bennee@linaro.org>
+ <CAFEAcA8Lo84gNk2tFCKsgM_O50bXTCs6Z9jH6aCvfDA56TDCmA@mail.gmail.com>
+ <ba33454a-6e57-960a-7114-fc71a9f09442@redhat.com>
+ <CAFEAcA_KSVHkVznGD=cxzLaHSbPmWLN6MSqWHBqB8_ux05gD7A@mail.gmail.com>
+ <87y2rmm8h6.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e10f27f8-a47f-2ebe-5cab-0c4eae43667c@linaro.org>
+Date: Fri, 27 Mar 2020 06:35:28 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200327131253.3axcri54an4pmuzf@steredhat>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+In-Reply-To: <87y2rmm8h6.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,76 +101,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefano Garzarella (sgarzare@redhat.com) wrote:
-> On Fri, Mar 27, 2020 at 11:28:14AM +0000, Dr. David Alan Gilbert wrote:
-> > * Stefano Garzarella (sgarzare@redhat.com) wrote:
-> > > Hi Mao,
-> > >=20
-> > > On Fri, Mar 27, 2020 at 03:32:10PM +0800, Mao Zhongyi wrote:
-> > > > When running:
-> > > > (qemu) info migrate_parameters
-> > > > announce-initial: 50 ms
-> > > > announce-max: 550 ms
-> > > > announce-step: 100 ms
-> > > > compress-wait-thread: on
-> > > > ...
-> > > > max-bandwidth: 33554432 bytes/second
-> > > > downtime-limit: 300 milliseconds
-> > > > x-checkpoint-delay: 20000
-> > > > ...
-> > > > xbzrle-cache-size: 67108864
-> > > >=20
-> > > > add units for the parameters 'x-checkpoint-delay' and
-> > > > 'xbzrle-cache-size', it's easier to read.
-> > > >=20
-> > > > Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-> > > > ---
-> > > >  monitor/hmp-cmds.c | 4 ++--
-> > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> > > > index 2a900a528a..8d22f96e57 100644
-> > > > --- a/monitor/hmp-cmds.c
-> > > > +++ b/monitor/hmp-cmds.c
-> > > > @@ -440,7 +440,7 @@ void hmp_info_migrate_parameters(Monitor *mon, =
-const QDict *qdict)
-> > > >              MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LI=
-MIT),
-> > > >              params->downtime_limit);
-> > > >          assert(params->has_x_checkpoint_delay);
-> > > > -        monitor_printf(mon, "%s: %u\n",
-> > > > +        monitor_printf(mon, "%s: %u" " milliseconds\n",
-> > >                                        ^
-> > > here we can remove the space and use a single string "%s: %u millisec=
-onds\n"
-> >=20
-> > Yes.
-> >=20
-> > > I've noticed that we use both ms or milliseconds, if you want to clea=
-n up in a
-> > > separate patch, maybe we could use one of these everywhere. (I vote f=
-or 'ms')
-> >=20
-> > I do prefer 'ms', however we do seem to just use milliseconds in
-> > info migrate
->=20
-> IIUC, currently with 'info migrate_parameters' we have:
-> - announce-initial, announce-max, and announce-step with 'ms'
-> - downtime-limit with 'milliseconds'
+On 3/27/20 2:51 AM, Alex Bennée wrote:
+> 
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> 
+>> On Thu, 26 Mar 2020 at 18:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>
+>>> On 26/03/20 18:14, Peter Maydell wrote:
+>>>>> +#ifndef atomic_fetch_add
+>>>>>  #define atomic_fetch_add(ptr, n) __atomic_fetch_add(ptr, n, __ATOMIC_SEQ_CST)
+>>>>>  #define atomic_fetch_sub(ptr, n) __atomic_fetch_sub(ptr, n, __ATOMIC_SEQ_CST)
+>>>>>  #define atomic_fetch_and(ptr, n) __atomic_fetch_and(ptr, n, __ATOMIC_SEQ_CST)
+>>>>>  #define atomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST)
+>>>>>  #define atomic_fetch_xor(ptr, n) __atomic_fetch_xor(ptr, n, __ATOMIC_SEQ_CST)
+>>>>> +#endif
+>>>>
+>>>> This will work around FreeBSD's current implementation in particular,
+>>>> but I don't think there's anything in the C11 spec that mandates that
+>>>> atomic_fetch_add() and friends have to be macros and not simply
+>>>> functions...
+>>>
+>>> That's not a problem as long as they are all functions, the macros would
+>>> simply override the function-based implementation.
+>>
+>> Oh yes, so it would. I think I was also vaguely thinking in terms
+>> of FreeBSD being the leading edge of "one day most or all of our
+>> hosts will have a full stdatomic.h", so maybe we should shift to
+>> use-host-stdatomic-by-default, with the use of the gcc __atomic*
+>> as the fallback at some point ?
+> 
+> At some point but I suspect not right now.
+> 
+> So what's the conclusion for this patch? Are people happy with it as a
+> sticking plaster I can apply to the bounced testing PR?
+> 
 
-You're right, so we do - in that case I agree, lets just move them all
-to 'ms'.
+I guess I'm happy with it.  Have a
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Dave
 
-> Stefano
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+r~
 
