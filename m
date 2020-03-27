@@ -2,89 +2,91 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B497FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 22:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6D18C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 22:12:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C87A2071B
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 22:12:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A49A12071B
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 22:12:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j1+rRHcG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C87A2071B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TAM9mPeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49A12071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHxD3-0003mB-M2
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 18:12:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49301)
+	id 1jHxDf-0004bL-SF
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 18:12:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jHx5C-0003Hq-FZ
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 18:04:07 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jHxCS-0003MX-Ij
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 18:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jHx5B-0000lO-ED
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 18:04:06 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39209)
+ (envelope-from <richard.henderson@linaro.org>) id 1jHxCR-0006K4-Ow
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 18:11:36 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44203)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jHx5B-0000iS-8i
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 18:04:05 -0400
-Received: by mail-pl1-x641.google.com with SMTP id m1so3953191pll.6
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 15:04:05 -0700 (PDT)
+ id 1jHxCR-0006JP-Jf
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 18:11:35 -0400
+Received: by mail-pf1-x441.google.com with SMTP id b72so5140729pfb.11
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 15:11:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=tgJO+PAqo3hq/ulVfkyK+PFQv1YttMuVGSUleyX1kKY=;
- b=j1+rRHcGn5E+TfXwHn9dOI5k/PPIjT4twOdWM7Bi5RcKw4kbudTEBZAj9cHSqQYh+P
- r1XUbNKGIAgIQ42pNAKN5dip/1Li2Kzj4ycffJksdk5HOiZ9bdZtOXhf/IRI7EcEXqRY
- tkl+qn+iGLOjPKeuFMjygLIIZQNa7/sLe9rq+86Az/xleBOZEUyTIyd92PO+vfv9GECE
- pcajirkSar1DYZ+TVWviQwod/nLneGkla0EFCYgPVaAQlnicgxkKzHmr3G4sYc0dAR+W
- F5Z1vwvc8LwaUGtAs3NF5fFfhyXSzKiDGUHzc+X+ofVWavi1LjRTY5gbzGSdOXSo8TWi
- tM3g==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=AhtDuOduRAGUkPFiU2x2IY78T59VTm/qwnkixYsUqxc=;
+ b=TAM9mPeMEuMFjmO/dB/mXXEbQf88rPlmXIm8eisi0YgeF2Yxw6wtNy8SjelRHUvlXh
+ puFJsaLYfxIRXfUR5CAbchB9Un4caCNydQ0VyqDrR1ZJzMONC4Rw8svNHCLE7vFt9uKH
+ Pn0VSV/9LelZNCYT4gk7H8Ok4L9DFuNRH0hJ8qjFsiJRSF8Xkxa692mNyTa/fPkF4mE/
+ CPVl+/w1xB2tpo5U00BS/+fKl1DiMEUH8GrhbHGKj8/32LgQsi4VtODzKu47UgAEwzX1
+ 6chjsjmo7Lx2DZ3gJMoMWBzKDkFQQWdxipIDvZPBYS7M6ju2qMERnC3K+RmPwPyXDlRs
+ guEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=tgJO+PAqo3hq/ulVfkyK+PFQv1YttMuVGSUleyX1kKY=;
- b=jDSNrGR/gsZ3cKZhZPs3rkSbY3jUN8NwHvr4uD3k/hrK41Wr8ZcgidZtjza/1AhwaA
- Zh23aX9qhOEoXwTHOkX4wxCeecsmvFYZ0GZqpox4kZk2DO7xvqoddGUJJBt8YuhnAHRW
- 4SkNxSoGHv5cBg9dcSkG2RvhE5f9OkJcieyEq8PoxZWCQ+VchiVUfbAUW567WItwkE3P
- Hq6m1Sww8BhmrQNhYfTX5Pz37NdY5CULOuerfne8JgOse4CXg3J/i67S5i+UOqQjuWVM
- OgisbTXqudCtjx48NDhjOJ+gbKtaAMjmkWUTEwepawMK9aFcd6NA4f7Dcr9xij0iKzcV
- TF/A==
-X-Gm-Message-State: ANhLgQ3s9ojJ3TbuanLDw8rxNowesiKxqrVcugqVgGHa93l42Uzbsd9R
- lvGE6Noc4rcw1nCbjTb8KLW9x2o0k4I=
-X-Google-Smtp-Source: ADFU+vstRWahSsEbMTfrxMdaoylQ1cLvjKhh5jogzPB0sNf4FHy2i4t6cVNlfhl3UedNEV4pV0L36A==
-X-Received: by 2002:a17:90a:d103:: with SMTP id
- l3mr1680163pju.91.1585346643818; 
- Fri, 27 Mar 2020 15:04:03 -0700 (PDT)
-Received: from localhost.localdomain (174-21-138-234.tukw.qwest.net.
- [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id y29sm4516929pge.22.2020.03.27.15.04.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Mar 2020 15:04:03 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=AhtDuOduRAGUkPFiU2x2IY78T59VTm/qwnkixYsUqxc=;
+ b=jazEPinHGqbHRvNwuZwzbkgF8+OmsOMXymWIHQqLKN6plKcHSs6CUSgke2PF7JnSgH
+ Amf0WE+mJqC5XdqQ4mEQxJ7tJTN6paJhAE6o56qvKH4I+HDhKsdOvcL7sBej7n5AguAl
+ oqFuNG9h5SmIl3PPY9bmVGIFJ61C8v1cU/ZjzVkDdDIHN+w8wltECfITLerLgVN9OuKr
+ W+T6wdCCgAxGENam5hOY+bnGR4i84vBE8JdjImnd/EcdIbLmVQ09PUtAeOeeDnZJkFgh
+ oVZspsq1hWraE+s2GbAbnEpHJOih3erlAfgfKzoynyoOKWLSWNXdcvQud7VTxVznUTh9
+ 6eaA==
+X-Gm-Message-State: ANhLgQ12CtqnH9o589L6nRf/T6MJUrzLuwBXu3wo6nfGwcIlHaeHP3pu
+ lzXGEA5+cwtqSUTCkZkRcuX+Cw==
+X-Google-Smtp-Source: ADFU+vsudAHUtlRofXIeyl/3TY7rxcXA8WowoW3xusbsbqd8eesC7hN+YWgqv0X9golCQrL+VJvy0g==
+X-Received: by 2002:a63:7517:: with SMTP id q23mr1516469pgc.54.1585347094536; 
+ Fri, 27 Mar 2020 15:11:34 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
+ by smtp.gmail.com with ESMTPSA id e7sm4889191pfj.97.2020.03.27.15.11.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 27 Mar 2020 15:11:33 -0700 (PDT)
+Subject: Re: [PATCH v1 3/7] tests/tcg: remove extraneous pasting macros
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200327094945.23768-1-alex.bennee@linaro.org>
+ <20200327094945.23768-4-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.0 v3 6/7] configure: Override the os default with
- --disable-pie
-Date: Fri, 27 Mar 2020 15:03:52 -0700
-Message-Id: <20200327220353.27233-7-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200327220353.27233-1-richard.henderson@linaro.org>
-References: <20200327220353.27233-1-richard.henderson@linaro.org>
+Message-ID: <cea362ac-6cee-f9f2-c86b-fae66f0ba4e6@linaro.org>
+Date: Fri, 27 Mar 2020 15:11:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200327094945.23768-4-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,66 +98,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dim@FreeBSD.org, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- alex.bennee@linaro.org, roger.pau@citrix.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some distributions, e.g. Ubuntu 19.10, enable PIE by default.
-If for some reason one wishes to build a non-pie binary, we
-must provide additional options to override.
+On 3/27/20 2:49 AM, Alex Bennée wrote:
+> We are not using them and they just get in the way.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/tcg/x86_64/system/boot.S | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 
-At the same time, reorg the code to an elif chain.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v3: Update for QEMU_LDFLAGS.
----
- configure | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
-
-diff --git a/configure b/configure
-index 4dead416ae..b304bd0cf8 100755
---- a/configure
-+++ b/configure
-@@ -2124,19 +2124,18 @@ if compile_prog "-Werror -fno-pie" "-no-pie"; then
-   LDFLAGS_NOPIE="-no-pie"
- fi
- 
--if test "$pie" != "no" ; then
--  if compile_prog "-fPIE -DPIE" "-pie"; then
--    QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
--    QEMU_LDFLAGS="-pie $QEMU_LDFLAGS"
--    pie="yes"
--  else
--    if test "$pie" = "yes"; then
--      error_exit "PIE not available due to missing toolchain support"
--    else
--      echo "Disabling PIE due to missing toolchain support"
--      pie="no"
--    fi
--  fi
-+if test "$pie" = "no"; then
-+  QEMU_CFLAGS="$CFLAGS_NOPIE $QEMU_CFLAGS"
-+  QEMU_LDFLAGS="$LDFLAGS_NOPIE $QEMU_LDFLAGS"
-+elif compile_prog "-fPIE -DPIE" "-pie"; then
-+  QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
-+  QEMU_LDFLAGS="-pie $QEMU_LDFLAGS"
-+  pie="yes"
-+elif test "$pie" = "yes"; then
-+  error_exit "PIE not available due to missing toolchain support"
-+else
-+  echo "Disabling PIE due to missing toolchain support"
-+  pie="no"
- fi
- 
- # Detect support for PT_GNU_RELRO + DT_BIND_NOW.
--- 
-2.20.1
-
+r~
 
