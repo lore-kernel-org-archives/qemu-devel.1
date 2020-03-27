@@ -2,91 +2,102 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62034C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A01D0C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:15:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A6C72072F
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:05:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66876206F2
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:15:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XeRjSsUt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A6C72072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="G/RBkNR7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66876206F2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHqXs-0000wE-CS
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 11:05:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34312)
+	id 1jHqi6-0004KU-Gy
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 11:15:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jHqXC-0000Wr-Ug
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:04:36 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jHqh4-0003p6-JA
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:14:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jHqXA-0006xh-Ok
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:04:33 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36464)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jHqXA-0006v2-Eb
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:04:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585321471;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=tqFnNqmh/cLwhrv6K9cYLlYhNKJkbHh29rYTgHO9MIY=;
- b=XeRjSsUtfV5AY+CdbrJrEEsGRfZNWL6vqoLdnL7WJprwMmqbYzPlKYu8884OgpFdpgibLF
- E0bQz91VMqJcHazrA/NC70chQuIk90JanruAk4NSocfriKTOAnplhE1IGu+alcjQWCNAd/
- E5LgDbnU6SnhYEXoUStaxXDweTejQ0A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-wqHyMb7tOLWhQeZln2_JLg-1; Fri, 27 Mar 2020 11:04:29 -0400
-X-MC-Unique: wqHyMb7tOLWhQeZln2_JLg-1
-Received: by mail-wr1-f71.google.com with SMTP id l17so4693252wro.3
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 08:04:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition;
- bh=ybA34o+Jc6eyHXL88GPXd4Mm+9SU6BExVshPxk1hmUk=;
- b=l7eYfnt9hWV6FjRk8l+9ytUd7t7zwIUvPNbSCOWRZo/DOFYr9yIDpOqs1f9krgTcDf
- qG6lEGBsXXW0IZWz/Byd261nVoNyc2QQf7vy0lsWP8wGfIJzVTF1nsT6jbNl03twWOPo
- f3yDUBp84qhGmpvqBBq8x5tYOjSIOUnPQgA62cCW1u4YOOwDGBUUXQOuGJmEZ4MYNiy0
- PuX+AnOWaq7eG+Ws4Wnt1rXavAQ8JS+bQnJcDcLxBxH3LWo5S8Z5H92aq1/cbJyYuV8C
- 2TvIwYVOGXmWtoW3+CjKnuYDbbs6pTCS/HQvyrARiiyrQk9UKrlsXx82qw6YZqzpEq6R
- mWDg==
-X-Gm-Message-State: ANhLgQ07EGDM2QYhjlwwLaFhYETzjU8jpo1QJHyKTfb5tXB6yWc0lBl+
- HZjnkWoxYhpQYYH7fAI76tXWfIy2B5tzSGcjEJicWZqOQq25LSQI0M3yIpJEOW2LrCvx7MHmoTc
- sKs44XaXCf7z7Org=
-X-Received: by 2002:a5d:4401:: with SMTP id z1mr15259717wrq.259.1585321468677; 
- Fri, 27 Mar 2020 08:04:28 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvzUbUF0c1L+BD5BmYp5YoPbCb/VB6Ns42a+ZcLybiygF7TVYKpLIps/r1AsHRTY46kOKag+Q==
-X-Received: by 2002:a5d:4401:: with SMTP id z1mr15259691wrq.259.1585321468292; 
- Fri, 27 Mar 2020 08:04:28 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id z129sm8508214wmb.7.2020.03.27.08.04.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Mar 2020 08:04:27 -0700 (PDT)
-Date: Fri, 27 Mar 2020 11:04:25 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Devel Mailing List <qemu-devel@nongnu.org>
-Subject: Question on dirty sync before kvm memslot removal
-Message-ID: <20200327150425.GJ422390@xz-x1>
+ (envelope-from <liran.alon@oracle.com>) id 1jHqh1-0002kx-QW
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:14:45 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56210)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jHqh1-0002Yr-HN
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:14:43 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02RFBTEn193357;
+ Fri, 27 Mar 2020 15:14:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=gO1NN8mZYVXj3V22/uOOljzOruo9HtA9uf/qRwMVaz4=;
+ b=G/RBkNR7PRAYQ7EsyiGAPKKYrG0XjTVIMAY2OOMRgguMbfAd2165WgoKpcKy7ODJTyzQ
+ VNVgfaTMchVfB/LRYJpxXoMU20XzYI613COAxI7cMkwUYr+NgvswUg+P5mX9VcE2qdFx
+ JzP0LqOUchU8147TXrxi4EeareEPBnW31dsK8NtHXdx/RAEQj4lHkOo/9UIKBnU3+uWQ
+ NKWb4/nokd73vnbHhwivhy8m9Zgbs0aBN9NBn0bqlehVbGOhruXRxcZ99cvLD+jBNXgX
+ b8+txsmZniTN/WcbJB89k8JTu/rffDQbuKnU8013KzaUcrOljTnjFKybJio+ZwHUHfTC qQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 3019veat3n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 27 Mar 2020 15:14:37 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02RF6g4a132311;
+ Fri, 27 Mar 2020 15:14:36 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3020.oracle.com with ESMTP id 30073gxybx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 27 Mar 2020 15:14:36 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02RFEY9n008674;
+ Fri, 27 Mar 2020 15:14:34 GMT
+Received: from [192.168.14.112] (/79.180.216.197)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 27 Mar 2020 08:14:34 -0700
+Subject: Re: [PATCH v2 2/3] acpi: Add Windows ACPI Emulated Device Table (WAET)
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200313145009.144820-1-liran.alon@oracle.com>
+ <20200313145009.144820-3-liran.alon@oracle.com>
+ <20200316112851.2364eb46@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <14ca89b0-b272-9efd-42f3-18d1224c679b@oracle.com>
+Date: Fri, 27 Mar 2020 18:14:26 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+In-Reply-To: <20200316112851.2364eb46@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9572
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ adultscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003270137
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9572
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ impostorscore=0 phishscore=0
+ clxscore=1015 adultscore=0 spamscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003270137
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,53 +109,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ Elad Gabay <elad.gabay@oracle.com>, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Paolo & all,
-
-I noticed something tricky in dirty logging when we want to remove a
-kvm memslot: kvm_set_phys_mem() will sync dirty log before the slot is
-removed to make sure dirty bits won't get lost.  IIUC that's majorly
-for system resets, because that's where the path should trigger very
-frequently.  The original commit does mention the system reset too.
-
-That makes perfect sense to me, however... What if the vcpu generates
-dirty bits _after_ we do KVM_GET_DIRTY_LOG but _before_ we send
-KVM_SET_USER_MEMORY_REGION to remove the memslot?  If the vcpu is in
-the userspace I think it's fine because BQL is needed so it won't be
-able to, however the vcpus running inside KVM should not be restricted
-to that.  I think those dirty bits will still get lost, but it should
-be extremely hard to trigger.
-
-I'm not sure whether I missed something above, but if I'm correct, I
-think the solution should be a flag for KVM_SET_USER_MEMORY_REGION to
-set the memslot as invalid (KVM_MEM_INVALID), then when removing the
-memslot which has KVM_MEM_LOG_DIRTY_PAGES enabled, we should:
-
-  - send KVM_SET_USER_MEMORY_REGION with KVM_MEM_INVALID to invalidate
-    the memslot, but keep the slot and bitmap in KVM
-
-  - send KVM_GET_DIRTY_LOG to fetch the bitmap for the slot
-
-  - send KVM_SET_USER_MEMORY_REGION with size=3D=3D0 to remove the slot
-
-However I don't know whether that'll worth it.
-
-(Side question which is irrelevant to this: for kvm dirty ring we now
- need to do similar thing to flush dirty bits before removing a
- memslot, however that's even trickier because flushing dirty ring
- needs to kick all vcpu out, currently the RFC series is using
- run_on_cpu() which will release the BQL and wait for all vcpus to
- quit into userspace, however that cannot be done inside
- kvm_set_phys_mem because it needs the BQL.  I'm still thinking about
- a good way to fix this, but any idea is greatly welcomed :)
+As almost two weeks have passed since this Reviewed-By comment, can I 
+assume this series is done from my perspective and ready to be merged?
+As I haven't seen a Reviewed-By for the rest of the patches of this series.
 
 Thanks,
+-Liran
 
---=20
-Peter Xu
-
+On 16/03/2020 12:28, Igor Mammedov wrote:
+> On Fri, 13 Mar 2020 16:50:08 +0200
+> Liran Alon <liran.alon@oracle.com> wrote:
+>
+>> Microsoft introduced this ACPI table to avoid Windows guests performing
+>> various workarounds for device erratas. As the virtual device emulated
+>> by VMM may not have the errata.
+>>
+>> Currently, WAET allows hypervisor to inform guest about two
+>> specific behaviors: One for RTC and the other for ACPI PM timer.
+>>
+>> Support for WAET have been introduced since Windows Vista. This ACPI
+>> table is also exposed by other common hypervisors by default, including:
+>> VMware, GCP and AWS.
+>>
+>> This patch adds WAET ACPI Table to QEMU.
+>>
+>> We set "ACPI PM timer good" bit in "Emualted Device Flags" field to
+>> indicate that the ACPI PM timer has been enhanced to not require
+>> multiple reads to obtain a reliable value.
+>> This results in improving the performance of Windows guests that use
+>> ACPI PM timer by avoiding unnecessary VMExits caused by these multiple
+>> reads.
+>>
+>> Co-developed-by: Elad Gabay <elad.gabay@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>
+>> ---
+>>   hw/i386/acpi-build.c | 31 +++++++++++++++++++++++++++++++
+>>   1 file changed, 31 insertions(+)
+>>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 9c4e46fa7466..1c3a2e8fcb3c 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2512,6 +2512,34 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
+>>       build_header(linker, table_data, (void *)(table_data->data + dmar_start),
+>>                    "DMAR", table_data->len - dmar_start, 1, NULL, NULL);
+>>   }
+>> +
+>> +/*
+>> + * Windows ACPI Emulated Devices Table
+>> + * (Version 1.0 - April 6, 2009)
+>> + * Spec: https://urldefense.com/v3/__http://download.microsoft.com/download/7/E/7/7E7662CF-CBEA-470B-A97E-CE7CE0D98DC2/WAET.docx__;!!GqivPVa7Brio!MpZ69-947P6dY4Rnd8Cvj0z_9yJ1QdS-SED39RJ5JvT7Rry_rwDpcLlUDJ_ZU7U$
+>> + *
+>> + * Helpful to speedup Windows guests and ignored by others.
+>> + */
+>> +static void
+>> +build_waet(GArray *table_data, BIOSLinker *linker)
+>> +{
+>> +    int waet_start = table_data->len;
+>> +
+>> +    /* WAET header */
+>> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+>> +    /*
+>> +     * Set "ACPI PM timer good" flag.
+>> +     *
+>> +     * Tells Windows guests that our ACPI PM timer is reliable in the
+>> +     * sense that guest can read it only once to obtain a reliable value.
+>> +     * Which avoids costly VMExits caused by guest re-reading it unnecessarily.
+>> +     */
+>> +    build_append_int_noprefix(table_data, 1 << 1 /* ACPI PM timer good */, 4);
+> this should work but, I'd use (1UL << 1) if you'll need to respin
+>
+>
+>> +
+>> +    build_header(linker, table_data, (void *)(table_data->data + waet_start),
+>> +                 "WAET", table_data->len - waet_start, 1, NULL, NULL);
+>> +}
+>> +
+>>   /*
+>>    *   IVRS table as specified in AMD IOMMU Specification v2.62, Section 5.2
+>>    *   accessible here https://urldefense.com/v3/__http://support.amd.com/TechDocs/48882_IOMMU.pdf__;!!GqivPVa7Brio!MpZ69-947P6dY4Rnd8Cvj0z_9yJ1QdS-SED39RJ5JvT7Rry_rwDpcLlUNZTUAnw$
+>> @@ -2859,6 +2887,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>                             machine->nvdimms_state, machine->ram_slots);
+>>       }
+>>   
+>> +    acpi_add_table(table_offsets, tables_blob);
+>> +    build_waet(tables_blob, tables->linker);
+>> +
+>>       /* Add tables supplied by user (if any) */
+>>       for (u = acpi_table_first(); u; u = acpi_table_next(u)) {
+>>           unsigned len = acpi_table_len(u);
 
