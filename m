@@ -2,125 +2,92 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D19C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD81C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:31:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5946920705
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66CEC20714
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:31:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZFrilWx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5946920705
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OiiUQybS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CEC20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHl7Z-0000X1-DN
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 05:17:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58276)
+	id 1jHlKX-0002w4-JG
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 05:31:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44222)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jHl5x-0007eQ-Hs
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:16:07 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1jHlJQ-0002IT-Cg
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:30:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jHl5v-00027v-PC
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:16:05 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:50469)
+ (envelope-from <sgarzare@redhat.com>) id 1jHlJO-0007Uq-N4
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:29:59 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46934)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHl5v-00027N-Lv
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:16:03 -0400
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1jHlJO-0007Tb-Gi
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:29:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585300563;
+ s=mimecast20190719; t=1585301397;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xBmu5Rde76tYnKJ/5pLUyUvwETqeFNgetVO2NbBf3cg=;
- b=XZFrilWxWa3Wlnj7wr5bI8FYdl9D0g9N/buJFaNHN/OaqMBjGm2lq1BxAqDRowjzF2Haxc
- aOwC6rj1SQyU9NV4mPsLUJasCYUgTm4ncSu2Ofm+0EOCAbrHdV0MoInXLrolID1apg2QCp
- r4KFOjgwXJriXb/4tDh/h0VHdRca/JM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-WzDTfcXDMmazKtlt-zyEmg-1; Fri, 27 Mar 2020 05:15:59 -0400
-X-MC-Unique: WzDTfcXDMmazKtlt-zyEmg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D045A8010EA;
- Fri, 27 Mar 2020 09:15:55 +0000 (UTC)
-Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B95CC5DA81;
- Fri, 27 Mar 2020 09:15:51 +0000 (UTC)
-Subject: Re: [PATCH 1/1] s390/ipl: fix off-by-one in
- update_machine_ipl_properties()
-To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200320143101.41764-1-pasic@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <170791e7-48c0-6ab7-8ca7-18b26b79cbcc@redhat.com>
-Date: Fri, 27 Mar 2020 10:15:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ in-reply-to:in-reply-to:references:references;
+ bh=TyXcrg91JyE2KbIL0MZEqnY9HdrKS+wvu0th9Q69f2M=;
+ b=OiiUQybSb0mSQ3QlCCJXpUT/s2tgqzVdbnaGGlXgK9ozkahfarl/sgk3s/smd0ZaQ7Zx1v
+ BQUll0c0SU/jBndMYC/bKL49rApjLo69kwmYFKeNBu/9EwnsFK0gihYMWBg1RBxrv42SIU
+ YS6/YterUp/Ee7oRkKZQjY7I7UkBB30=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-b3TLHKCtPM6B-UN4S0NjFw-1; Fri, 27 Mar 2020 05:29:55 -0400
+X-MC-Unique: b3TLHKCtPM6B-UN4S0NjFw-1
+Received: by mail-wm1-f71.google.com with SMTP id t22so3665852wmt.4
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 02:29:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=AL+lmiQ1hgrsCe5J3CjAM0u7Gx9sDIWLvlootjtZmD8=;
+ b=TgaTHcnD8E50/ZQSm6C47DpF8AI+kikIHiNrQ3z5OdTboJfA7j1UQ12/iT8iAw9aek
+ JbtwkM9TwkpIbrBdd+irGdP+Wjjro3V4N+9zPpsyAptJgEE43vdhXu5abQkmTjJaIWiQ
+ cM9dSROxvCz66fprCD/Vr3ZUvS3NCjZFnzB4rSyyrnUS39f72r5eJ2HomVLpXXLCzDIh
+ Ja0sLRKCkVW47zbMROMQPRgf6ukwRW5VyHRD76mtiIM3Wxl6/Ed9XfK8Tovchkqo4PBG
+ uA8IvHCjgxuFN4gV3kudiLfP46bu60Jlge/bzVSAgQ53Gi8nS4vsOqHNFQZpoAOcrhcR
+ UZRA==
+X-Gm-Message-State: ANhLgQ23YOvKUd47ud/CZGAroRTsdODbyU9MlWAvwa7/emNWiImPgFU3
+ osubnA5mUtCPHLGqPK2LjDyPZdqIsXfdnC5gFSqKOUvrraeVLVxeKWprbq7LZhLHnFn7fZU8RvF
+ bmL/WE09mziZ2v4E=
+X-Received: by 2002:a1c:8193:: with SMTP id c141mr4307488wmd.14.1585301394552; 
+ Fri, 27 Mar 2020 02:29:54 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvmj4lVlCSnxZp8tcUl6Qx4Y8TMqTReUcfwHbdAboU7WPPpxdwHeaBzS/lweCwhT3lxMg0tsQ==
+X-Received: by 2002:a1c:8193:: with SMTP id c141mr4307464wmd.14.1585301394243; 
+ Fri, 27 Mar 2020 02:29:54 -0700 (PDT)
+Received: from steredhat (host32-201-dynamic.27-79-r.retail.telecomitalia.it.
+ [79.27.201.32])
+ by smtp.gmail.com with ESMTPSA id o9sm7687145wrx.48.2020.03.27.02.29.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 27 Mar 2020 02:29:53 -0700 (PDT)
+Date: Fri, 27 Mar 2020 10:29:51 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Subject: Re: [PATCH] monitor/hmp-cmds: add units for mirate_parameters.
+Message-ID: <20200327092951.bu4ju7rh53ig5t3l@steredhat>
+References: <20200327073210.198080-1-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
-In-Reply-To: <20200320143101.41764-1-pasic@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200327073210.198080-1-maozhongyi@cmss.chinamobile.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 216.205.24.74
@@ -135,47 +102,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.03.20 15:31, Halil Pasic wrote:
-> In update_machine_ipl_properties() the array ascii_loadparm needs to
-> hold the 8 char lodparm and a string terminating zero char.
-> 
-> Let's increase the size of ascii_loadparm accordingly.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Fixes: 0a01e082a4 ("s390/ipl: sync back loadparm")
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Hi Mao,
+
+On Fri, Mar 27, 2020 at 03:32:10PM +0800, Mao Zhongyi wrote:
+> When running:
+> (qemu) info migrate_parameters
+> announce-initial: 50 ms
+> announce-max: 550 ms
+> announce-step: 100 ms
+> compress-wait-thread: on
+> ...
+> max-bandwidth: 33554432 bytes/second
+> downtime-limit: 300 milliseconds
+> x-checkpoint-delay: 20000
+> ...
+> xbzrle-cache-size: 67108864
+>=20
+> add units for the parameters 'x-checkpoint-delay' and
+> 'xbzrle-cache-size', it's easier to read.
+>=20
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 > ---
->  hw/s390x/ipl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index b81942e1e6..8c3e019571 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -546,7 +546,7 @@ static void update_machine_ipl_properties(IplParameterBlock *iplb)
->      /* Sync loadparm */
->      if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
->          uint8_t *ebcdic_loadparm = iplb->loadparm;
-> -        char ascii_loadparm[8];
-> +        char ascii_loadparm[9];
->          int i;
->  
->          for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
-> 
-> base-commit: 226cd20706e20264c176f8edbaf17d7c9b7ade4a
-> 
+>  monitor/hmp-cmds.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 2a900a528a..8d22f96e57 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -440,7 +440,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const =
+QDict *qdict)
+>              MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LIMIT),
+>              params->downtime_limit);
+>          assert(params->has_x_checkpoint_delay);
+> -        monitor_printf(mon, "%s: %u\n",
+> +        monitor_printf(mon, "%s: %u" " milliseconds\n",
+                                       ^
+here we can remove the space and use a single string "%s: %u milliseconds\n=
+"
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I've noticed that we use both ms or milliseconds, if you want to clean up i=
+n a
+separate patch, maybe we could use one of these everywhere. (I vote for 'ms=
+')
 
--- 
 Thanks,
+Stefano
 
-David / dhildenb
+>              MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELA=
+Y),
+>              params->x_checkpoint_delay);
+>          assert(params->has_block_incremental);
+> @@ -453,7 +453,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const =
+QDict *qdict)
+>          monitor_printf(mon, "%s: %s\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_COMPRESSI=
+ON),
+>              MultiFDCompression_str(params->multifd_compression));
+> -        monitor_printf(mon, "%s: %" PRIu64 "\n",
+> +        monitor_printf(mon, "%s: %" PRIu64 " bytes\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE=
+),
+>              params->xbzrle_cache_size);
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+> --=20
+> 2.17.1
+>=20
+>=20
+>=20
+>=20
 
 
