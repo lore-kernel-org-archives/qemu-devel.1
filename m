@@ -2,54 +2,68 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C374C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A594EC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:46:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7234F20578
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:33:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7234F20578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A4F320705
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 07:46:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A4F320705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHjV1-0003Nt-FW
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 03:33:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44655)
+	id 1jHjh1-0005ca-KH
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 03:46:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jHjTx-0002WF-I5
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:32:46 -0400
+ (envelope-from <chenyi.qiang@intel.com>) id 1jHjgO-0005AS-MD
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jHjTt-0005VC-Ml
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:32:43 -0400
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:11079)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jHjTp-0004Xj-Cb
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:32:39 -0400
-Received: from spf.mail.chinamobile.com (unknown[172.16.121.17]) by
- rmmx-syy-dmz-app08-12008 (RichMail) with SMTP id 2ee85e7dac01701-d55c3;
- Fri, 27 Mar 2020 15:32:18 +0800 (CST)
-X-RM-TRANSID: 2ee85e7dac01701-d55c3
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG: 00000000
-Received: from localhost.localdomain (unknown[112.25.154.146])
- by rmsmtp-syy-appsvr09-12009 (RichMail) with SMTP id 2ee95e7dabfc32c-971e9;
- Fri, 27 Mar 2020 15:32:17 +0800 (CST)
-X-RM-TRANSID: 2ee95e7dabfc32c-971e9
-From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] monitor/hmp-cmds: add units for mirate_parameters.
-Date: Fri, 27 Mar 2020 15:32:10 +0800
-Message-Id: <20200327073210.198080-1-maozhongyi@cmss.chinamobile.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 221.176.66.80
+ (envelope-from <chenyi.qiang@intel.com>) id 1jHjgM-0007va-Ph
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:45:35 -0400
+Received: from mga01.intel.com ([192.55.52.88]:38356)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <chenyi.qiang@intel.com>)
+ id 1jHjgM-0005du-DT
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 03:45:34 -0400
+IronPort-SDR: kUH5gKkSfEed0q3L4zGP1rTebUNbnL5CbOyv7VotODI6NdphYx9eavLjHUM7iov2sUTOUMQ12Q
+ lxEcejPeHxcA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 Mar 2020 00:45:24 -0700
+IronPort-SDR: 2LCRUCqaGuFgfVBqQm4wd6m9m/odBCJpZW9vXxQBvEb7u4H9XVOky+cFKbAhpJf5syXpbipAv7
+ plPYltoMt39g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,311,1580803200"; d="scan'208";a="448919288"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.4.174])
+ ([10.238.4.174])
+ by fmsmga006.fm.intel.com with ESMTP; 27 Mar 2020 00:45:23 -0700
+Subject: Re: [PATCH 0/3] Fix Skylake, Cascadelake and Icelake Server CPU models
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20200227090808.17686-1-chenyi.qiang@intel.com>
+ <03fb4682-8430-c792-028b-54f859da3dcb@intel.com>
+Message-ID: <84c91667-ccbf-2933-0530-46a81f8d002b@intel.com>
+Date: Fri, 27 Mar 2020 15:45:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <03fb4682-8430-c792-028b-54f859da3dcb@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,57 +75,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dgilbert@redhat.com, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When running:
-(qemu) info migrate_parameters
-announce-initial: 50 ms
-announce-max: 550 ms
-announce-step: 100 ms
-compress-wait-thread: on
-...
-max-bandwidth: 33554432 bytes/second
-downtime-limit: 300 milliseconds
-x-checkpoint-delay: 20000
-...
-xbzrle-cache-size: 67108864
+Hi Paolo and Eduardo,
 
-add units for the parameters 'x-checkpoint-delay' and
-'xbzrle-cache-size', it's easier to read.
+It seems I need to put the missing feature bits in the new version of 
+CPU model. I'll resend this patch set.
+BTW, what about the missing vmx feature bits? Also put in in new version 
+CPU model?
 
-Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
----
- monitor/hmp-cmds.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks,
+Chenyi
 
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 2a900a528a..8d22f96e57 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -440,7 +440,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-             MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LIMIT),
-             params->downtime_limit);
-         assert(params->has_x_checkpoint_delay);
--        monitor_printf(mon, "%s: %u\n",
-+        monitor_printf(mon, "%s: %u" " milliseconds\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELAY),
-             params->x_checkpoint_delay);
-         assert(params->has_block_incremental);
-@@ -453,7 +453,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "%s: %s\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_COMPRESSION),
-             MultiFDCompression_str(params->multifd_compression));
--        monitor_printf(mon, "%s: %" PRIu64 "\n",
-+        monitor_printf(mon, "%s: %" PRIu64 " bytes\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
-             params->xbzrle_cache_size);
-         monitor_printf(mon, "%s: %" PRIu64 "\n",
--- 
-2.17.1
-
-
-
+On 3/18/2020 4:02 PM, Chenyi Qiang wrote:
+> Ping.
+> 
+> On 2/27/2020 5:08 PM, Chenyi Qiang wrote:
+>> Current Skylake-Server, Cascadelake-Server and Icelake-Server CPU models
+>> lack several VMX features. Icelake-Server also lacks two features in
+>> FEAT_7_0_EBX. In addition, The model numbers of Icelake-Client and
+>> Icelake-Server need to be fixed.
+>>
+>> Chenyi Qiang (3):
+>>    target/i386: add missing vmx features for several CPU models
+>>    target/i386: add two missing features for Icelake-Server CPU model
+>>    target/i386: modify Icelake-Client and Icelake-Server CPU model number
+>>
+>>   target/i386/cpu.c | 13 +++++++++----
+>>   1 file changed, 9 insertions(+), 4 deletions(-)
+>>
+> 
 
