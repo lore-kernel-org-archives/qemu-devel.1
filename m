@@ -2,97 +2,68 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C13FAC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72811C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:54:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8755020578
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:53:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NimZY+33"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8755020578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4908220578
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:54:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4908220578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHmc8-0006Pc-Om
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:53:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45206)
+	id 1jHmcz-0007oG-FC
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:54:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47536)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jHmaH-0004oe-HW
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:51:30 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jHmcG-0006wA-5J
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jHmaG-0008Sw-Fu
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:51:29 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55769)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jHmaG-0008RV-BO
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:51:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585306287;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aP64TvKGtYSYekVYU86igQabgrto2kUewDkYxetacto=;
- b=NimZY+336wG5C1ySKNRCDcjrByijaL7ywyPhcSbJRQlkpPKiYZP1AG8AXI9Zh4GgTuYXgQ
- WACziyCTWW85xqXPWNaUVgdbbI5QSLa7U29cbW99eei8BfLK/LS9dKzP1JyCImwn9E8RHH
- b8zqkXQ/G365oBkTvowgMPTNW1wljcE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-ky8Y5ea0NdGG0x3Cknoc1w-1; Fri, 27 Mar 2020 06:51:26 -0400
-X-MC-Unique: ky8Y5ea0NdGG0x3Cknoc1w-1
-Received: by mail-ed1-f70.google.com with SMTP id bm26so7932507edb.4
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 03:51:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aP64TvKGtYSYekVYU86igQabgrto2kUewDkYxetacto=;
- b=g4HPZiSls3w+UmiB51Y7OuqBNcYwrCYy7zwk46SizMGbICj3XRh5aF77+4NL4RnDBF
- E6ysutzls/00hZb8L2qpPe+oNfWmMfOZmU/mY/ykwuk/yHbv7JdzEtzXGkiUgLjKwR4O
- QyDu9bl0EskM815g1Lvt/o4p4V5KTI0vplns8XytGX5d3L9ElrSAV0zrQ3+1xpOos8Yp
- Zl8w116MCl+KFkeP0f9XC9ehR2Xpmj5NRdpfXye2XoVhdbsWQ8MYQskXF+SQrKe1yo8R
- Ee6QEeNTNwMWqvIQEIDZ/Ko0sJ5epcEJNhaPkqvXdfa0QjzXKOVqWopLjc2uGa1bk0v3
- GORA==
-X-Gm-Message-State: ANhLgQ3+QJp/Nhqq4M+3js2XQpVE4XBmYDPA0qsEjjEams1py2MBnyEY
- QvCue4SskImug2Bj9vp8J0p5nxQeX0dOfpOW5Pc8euy5UEhK27nKQQnXag5I/X/elpzKj2rb8B8
- l10M+g+aeXBnGZc8=
-X-Received: by 2002:aa7:c595:: with SMTP id g21mr11833556edq.62.1585306284996; 
- Fri, 27 Mar 2020 03:51:24 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vujWmJv8yKUAW1itUMHzKfUcSXmPXH53eHXDzKi7SDO9nBYGSnD8pvR/22t2yn7XXJ8Vxfkmg==
-X-Received: by 2002:aa7:c595:: with SMTP id g21mr11833542edq.62.1585306284783; 
- Fri, 27 Mar 2020 03:51:24 -0700 (PDT)
-Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id u5sm788057edy.88.2020.03.27.03.51.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 27 Mar 2020 03:51:24 -0700 (PDT)
-Subject: Re: [PATCH] hw/vfio: let readonly flag take effect for mmaped regions
-To: yan.y.zhao@intel.com, qemu-devel@nongnu.org
-References: <20200327111934.71066-1-yan.y.zhao@intel.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <11c90e84-6c0c-9411-0d6c-7955136413c6@redhat.com>
-Date: Fri, 27 Mar 2020 11:51:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <no-reply@patchew.org>) id 1jHmcE-0000lr-NF
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:53:31 -0400
+Resent-Date: Fri, 27 Mar 2020 06:53:31 -0400
+Resent-Message-Id: <E1jHmcE-0000lr-NF@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21148)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jHmcE-0000TH-F3
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:53:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1585306404; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=BvHESnZb6C2M9eeC76Gf//Vb1I5T9lJCxuYIkMbK3TLeeWV5aK6Fh7W2txop6NcB+PLr3lwg8uF+ziZP9PGCsabpCYDtSsmWJVErJaLZiS1J+pFijAu4TpPZM5Zge342sZgwo9hjOEj9V47mTQcTux797sLhGYcKKKbgLfZ9brk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1585306404;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=RYo3vBUYFA5virESvxO5o/U3wzZLquIY1+mAaMApV2o=; 
+ b=fjM0OsE8b5ToTXvcW6X5VP9HcBcPucpG1ZO31TPzX4w94a/eHREfdd+wC3aG6sSys+5EUG69l6wB0FNm0I9S+zRy2Ed+led6JS+ry+Cb0kw1SQdbgPVv6qvPLvv1BPJhZJUd4qHyHBkTwA3v4ZriQttf5NszBD7HC6Ieb73gBSo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1585306401639374.1168679153302;
+ Fri, 27 Mar 2020 03:53:21 -0700 (PDT)
+In-Reply-To: <20200327094945.23768-1-alex.bennee@linaro.org>
+Subject: Re: [PATCH for 5.0 v1 0/7] A selection of sanitiser fixes
+Message-ID: <158530640036.31566.14252705933394264279@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <20200327111934.71066-1-yan.y.zhao@intel.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alex.bennee@linaro.org
+Date: Fri, 27 Mar 2020 03:53:21 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,71 +75,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.williamson@redhat.com,
- Xin Zeng <xin.zeng@intel.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yan,
-
-On 3/27/20 12:19 PM, yan.y.zhao@intel.com wrote:
-> From: Yan Zhao <yan.y.zhao@intel.com>
-> 
-> currently, vfio regions without VFIO_REGION_INFO_FLAG_WRITE are only
-> read-only when VFIO_REGION_INFO_FLAG_MMAP is not set.
-> 
-> regions with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP
-> are only read-only in host page table for qemu.
-> 
-> This patch sets corresponding ept page entries read-only for regions
-> with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP.
-> 
-> accordingly, it ignores guest write when guest writes to the read-only
-> regions are trapped.
-> 
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> ---
->   hw/vfio/common.c | 4 ++++
->   memory.c         | 3 +++
->   2 files changed, 7 insertions(+)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 0b3593b3c0..e901621ca0 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -971,6 +971,10 @@ int vfio_region_mmap(VFIORegion *region)
->                                             name, region->mmaps[i].size,
->                                             region->mmaps[i].mmap);
->           g_free(name);
-> +
-> +        if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE)) {
-> +            memory_region_set_readonly(&region->mmaps[i].mem, true);
-> +        }
->           memory_region_add_subregion(region->mem, region->mmaps[i].offset,
->                                       &region->mmaps[i].mem);
->   
-> diff --git a/memory.c b/memory.c
-> index 601b749906..4b1071dc74 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1313,6 +1313,9 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
->       MemoryRegion *mr = opaque;
->   
->       trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
-> +    if (mr->readonly) {
-> +        return;
-> +    }
-
-Shouldn't this be in memory_region_dispatch_write()?
-
-Please split this patch in 2, this (generic) hunk as first patch, then 
-the VFIO more specific change.
-
->   
->       switch (size) {
->       case 1:
-> 
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMyNzA5NDk0NS4yMzc2
+OC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0
+aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4g
+cHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEg
+Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9M
+SVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
+LzIwMjAwMzI3MDk0OTQ1LjIzNzY4LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy90ZXN0aW5nLmFz
+YW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
