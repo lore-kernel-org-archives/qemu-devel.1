@@ -2,92 +2,103 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B02D2C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5523DC2D0E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:00:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AF6A2072F
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 15:59:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2272520716
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:00:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xgxi7Osy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AF6A2072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UlZU1S2n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2272520716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHrO1-00065C-LF
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 11:59:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57865)
+	id 1jHrP4-0007U1-Tz
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:00:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jHrMw-0005Ss-Sr
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:58:04 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jHrO1-0006Ps-VD
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jHrMv-0001Qi-BW
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:58:02 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37747)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jHrMu-0001M3-Pm
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:58:01 -0400
-Received: by mail-wm1-x344.google.com with SMTP id d1so12892262wmb.2
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 08:57:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=MF8+Qqd2msWxCv20WFpcmq2jjN+E730xXd4UvxVFy7Y=;
- b=Xgxi7Osyz9ZRKFquXR2vWeXbWJI5hiB9unCQro35JX+s0CMuSqATFI2ArcFQDPTjmL
- /4yQMBGhqd5BYd2CtxxWv4p0IPZfPhpFeBuC82nTlkrSCoa0S26ZvbIKALVJFnB7+N5/
- eZ48nGZ/SEHuBdHQguWmqAZcTw256GKZD3m7dE5K21TpHmHiFglFmFwvcNEveXT7173l
- Iphhjq+tHCD0c3D6tNJN+j4F8y8CFzHb6k7EjtV9CT4PL0P3K+3CdJfgI8aTnkH53sbj
- blYuLigws2IIhWUL740Z73j5lfx0IbwoNu7GYdN4c01uvOKmosXel9a0gFtkhn0MeDaF
- eozw==
+ (envelope-from <pbonzini@redhat.com>) id 1jHrNy-0004bX-SE
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:59:09 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34190)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jHrNy-0004Ux-LM
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 11:59:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585324745;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=urPEWi8bNxhmPHyxhHCz5KMMw1qDmImArdNNtIqizm0=;
+ b=UlZU1S2ncN1d5lVB14JTJFmb3uGDiZ4CF4cnuoy4wKkmhGC/ee39EKspG2aIUWbRW7pJAD
+ JvEv/IhKqkdhAONgUufsfEXMENLOonvIzw6KM5tK9Y3zw+/1cwRoC1hf401mZq7XSdtEnE
+ AQVFZPFUTb4obnycgBf0XDLAa8NYVC8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-C03ubxcYOcq_ETCdEjOkIw-1; Fri, 27 Mar 2020 11:59:04 -0400
+X-MC-Unique: C03ubxcYOcq_ETCdEjOkIw-1
+Received: by mail-wm1-f69.google.com with SMTP id f9so4005782wme.7
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 08:59:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=MF8+Qqd2msWxCv20WFpcmq2jjN+E730xXd4UvxVFy7Y=;
- b=cL1QOiDs2zag8nbeoFCi+5BvwdWUVJ1gnKj3vBoI+T39VptLyyru4zNq3PjHIzG5SN
- jBCv6VXf30Q5pTZYsZesa62ZHQtMYMD87d+80+BGTB9BWWX4M99ekVBCfvxRQ9tw6WkM
- PZ60ihRBQYZns/uPPTzIyT+LgORSqIqep65JV48vzFn9KyI0FYkYMgUkK7caTVX7wzPv
- bqYZs75+2lNVRoaXpj/k+hPSSbTVKlWVOIWcVpnJj+ZZTHpjiTp+miR3t6B+adMAR6Yt
- KpMik/7Hg0xuxOWoSKjYqHtq6vsLBIJhr8l/fP+E02ujLCV5YQ3RFBGZ1P+82mxqbCUM
- jm0Q==
-X-Gm-Message-State: ANhLgQ2+D3qLmYbFIQ9DtzsJunZfDokOa9kWb4QGbXs3oac2byEZnWrr
- NFqhpiT9rP24uU835oACW6ydmw==
-X-Google-Smtp-Source: ADFU+vvt0RMATKPPlkR9oBd+TSfuiQ8AEThSb1kzKSIaH10TCr2rCJn0Wx3KmXAbqwlPrf8NplikDQ==
-X-Received: by 2002:a1c:3885:: with SMTP id f127mr2999439wma.134.1585324677519; 
- Fri, 27 Mar 2020 08:57:57 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n1sm8756576wrj.77.2020.03.27.08.57.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Mar 2020 08:57:56 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D392E1FF7E;
- Fri, 27 Mar 2020 15:57:54 +0000 (GMT)
-References: <20200326134316.36059-1-roger.pau@citrix.com>
- <f71f7cf8-af7d-7b45-a026-8ab87e106759@linaro.org>
- <20200327101600.GA28583@Air-de-Roger> <87sghum3zv.fsf@linaro.org>
- <20200327140839.GB28583@Air-de-Roger> <878sjln6og.fsf@linaro.org>
- <20200327154844.GN1619@redhat.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH] qemu-user: fix build with LLVM lld 10
-In-reply-to: <20200327154844.GN1619@redhat.com>
-Date: Fri, 27 Mar 2020 15:57:54 +0000
-Message-ID: <875zepn62l.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=urPEWi8bNxhmPHyxhHCz5KMMw1qDmImArdNNtIqizm0=;
+ b=Yy69bCIWNjOwgowCuQccja5LudINWZ6aGB00bfSzeSgA2NO3pnHwccE2TDMlM+J/XL
+ 4e8F4MNgtfG1mVxuGlb6HlRSUgE2yRoDp/hY3fXl38SaXs1R7vUZdwjAhi/QB1EfLRAk
+ 9Hmb6pQfjpB4GpsE4h3rs5wQKqaKSjZuJ0G2kjaeqB+ezsX1JMMsQtLyx8J4xf+wlzfN
+ 4p8NTDNuUOZGo/N5UHb8EoPXzGik5OGnyisd9IT5BuEyXJZ8ZkTPbo+KPG3ZFKotaaCh
+ 6Re9r+69YsPeXdspqA0mRsw8+Sc+sIUQXJwSdhVxJYL8HODi+T9HSL3wBb/4K7SZdtJR
+ bQfw==
+X-Gm-Message-State: ANhLgQ1km4N0H2lNfwULK2ikuI+y4uJCpqp5U/7m4lix7fkoGk5vJarw
+ sxR/Al8a8tKLYS16aThLFeTIsGZ7Eh706Byg92ZzoZypQNgX4bZajSd6SjfiA9+e4aasb8j+Rd+
+ JU93MIWkn4DbwY8c=
+X-Received: by 2002:a5d:474b:: with SMTP id o11mr122702wrs.4.1585324742696;
+ Fri, 27 Mar 2020 08:59:02 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvwUfLD+WlaFW7w59OhctCY7AmXuh1jLf8IA/Cd6U824rq9DnKlfc3aN8XSAb9JF5RsKEC8OA==
+X-Received: by 2002:a5d:474b:: with SMTP id o11mr122681wrs.4.1585324742443;
+ Fri, 27 Mar 2020 08:59:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea?
+ ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
+ by smtp.gmail.com with ESMTPSA id z16sm8947650wrr.56.2020.03.27.08.59.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 27 Mar 2020 08:59:01 -0700 (PDT)
+Subject: Re: [PATCH v4] piix: fix xenfv regression, add compat machine
+ xenfv-qemu4
+To: Olaf Hering <olaf@aepfle.de>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
+References: <20200113174521.3336-1-olaf@aepfle.de>
+ <20200327151841.13877-1-olaf@aepfle.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <90544ada-060e-169b-c0cb-94d869070d97@redhat.com>
+Date: Fri, 27 Mar 2020 16:59:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <20200327151841.13877-1-olaf@aepfle.de>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,81 +110,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Dimitry Andric <dim@freebsd.org>, Laurent Vivier <laurent@vivier.eu>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Roger Pau =?utf-8?Q?Monn=C3=A9?= <roger.pau@citrix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Looks good, I would just do the following adjustments to have more
+consistency between pc and xenfv machine types:
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index c565f41791..eb7b273508 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -948,26 +948,26 @@ DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
+ 
+ 
+ #ifdef CONFIG_XEN
+-static void xenfv_qemu_4_x_machine_options(MachineClass *m)
++static void xenfv_4_2_machine_options(MachineClass *m)
+ {
+     pc_i440fx_4_2_machine_options(m);
+-    m->desc = "Xen Fully-virtualized PC (qemu 4.x compat)";
++    m->desc = "Xen Fully-virtualized PC";
+     m->max_cpus = HVM_MAX_VCPUS;
+     m->default_machine_opts = "accel=xen";
+-    m->smbus_no_migration_support = false;
+ }
+ 
+-DEFINE_PC_MACHINE(xenfv_qemu4, "xenfv-qemu4", pc_xen_hvm_init,
+-                  xenfv_qemu_4_x_machine_options);
++DEFINE_PC_MACHINE(xenfv_4_2, "xenfv-4.2", pc_xen_hvm_init,
++                  xenfv_4_2_machine_options);
+ 
+-static void xenfv_machine_options(MachineClass *m)
++static void xenfv_3_1_machine_options(MachineClass *m)
+ {
+     pc_i440fx_3_1_machine_options(m);
+     m->desc = "Xen Fully-virtualized PC";
++    m->alias = "xenfv";
+     m->max_cpus = HVM_MAX_VCPUS;
+     m->default_machine_opts = "accel=xen";
+ }
+ 
+-DEFINE_PC_MACHINE(xenfv, "xenfv", pc_xen_hvm_init,
+-                  xenfv_machine_options);
++DEFINE_PC_MACHINE(xenfv, "xenfv-3.1", pc_xen_hvm_init,
++                  xenfv_3_1_machine_options);
+ #endif
 
-> On Fri, Mar 27, 2020 at 03:44:47PM +0000, Alex Benn=C3=A9e wrote:
->>=20
->> Roger Pau Monn=C3=A9 <roger.pau@citrix.com> writes:
->>=20
->> > On Fri, Mar 27, 2020 at 11:28:04AM +0000, Alex Benn=C3=A9e wrote:
->> >>=20
->> >> Roger Pau Monn=C3=A9 <roger.pau@citrix.com> writes:
->> >>=20
->> >> > On Thu, Mar 26, 2020 at 09:56:38AM -0700, Richard Henderson wrote:
->> >> >> On 3/26/20 6:43 AM, Roger Pau Monne wrote:
->> >> >> > lld 10.0.0 introduced a new linker option --image-base equivalen=
-t to
->> >> >> > the GNU -Ttext-segment one, hence use it when available.
->> >> >> >=20
->> >> >> > This fixes the build of QEMU on systems using lld 10 or greater.
->> >> >> >=20
->> >> >> > Signed-off-by: Dimitry Andric <dim@FreeBSD.org>
->> >> >> > Signed-off-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
->> >> >> > ---
->> >> >> > Cc: Laurent Vivier <laurent@vivier.eu>
->> >> >> > Cc: Richard Henderson <richard.henderson@linaro.org>
->> >> >> > Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
->> >> >> > Cc: Paolo Bonzini <pbonzini@redhat.com>
->> >> >> > Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
->> >> >> > ---
->> >> >>=20
->> >> >> The Plan is still to drop this whole section of code.
->> >> >>=20
->> >> >> However, it's still blocked on getting the x86_64 vsyscall patches=
- upstream.
->> >> >
->> >> > While this doesn't materialize, could it be possible to get this pa=
-tch
->> >> > accepted?
->> >> >
->> >> > This is currently blocking the build of QEMU on FreeBSD HEAD, which
->> >> > has already switched to LLVM 10.0.0.
->> >>=20
->> >> I think the vsyscall patch has just been merged, however way I don't
->> >> think targeting HEAD of a OS release during the rc phase is appropria=
-te.
->> >
->> > I'm not sure I understand what you mean. If QEMU doesn't build on
->> > FreeBSD HEAD it won't build on the next release. Also the LLVM
->> > toolchain used is not a development version AFAIK, but the actual
->> > 10.0.0 release, which QEMU should aim to support?
->>=20
->> QEMU's supported build platforms are based on what is currently shipping
->> as stable versions:
->>=20
->>   https://www.qemu.org/docs/master/system/build-platforms.html
->
-> FWIW, when I wrote that my intention was *not* to exclude the bleeding
-> edge distro development branches.
->
-> Obviously we can break on those distros at any time as they're moving
-> targets, but IMHO we should treat bugs as we would for any other
-> released distros and aim to fix them promptly when bugs occurr.
 
-Sure - I think there are now patches incoming from Richard to delete the
-linker code which should meet the criteria for an RC fix, especially if
-they solve the LLVM 10.0 problem as well.=20
+On 27/03/20 16:18, Olaf Hering wrote:
+> With qemu4 an incompatible change was added to pc_piix, which makes it
+> practical impossible to migrate domUs started with qemu2 or qemu3 to
+> newer qemu versions. Commit 7fccf2a06890e3bc3b30e29827ad3fb93fe88fea
+> added and enabled a new member "smbus_no_migration_support". In commit
+> 4ab2f2a8aabfea95cc53c64e13b3f67960b27fdf the vmstate_acpi got new
+> elements, which are conditionally filled. As a result, an incoming
+> migration expected smbus related data unless smbus migration was
+> disabled for a given MachineClass. Since first commit forgot to handle
+> 'xenfv', domUs started with qemu4 are incompatible with their qemu3
+> siblings.
+> 
+> Using other existing machine types, such as 'pc-i440fx-3.1', is not
+> possible because 'xenfv' creates the 'xen-platform' PCI device at
+> 00:02.0, while all other variants to run a domU would create it at
+> 00:04.0.
+> 
+> To cover both the existing and the broken case of 'xenfv' in a single
+> qemu binary, a new compatibility variant of 'xenfv-qemu4' must be added
+> which targets domUs started with qemu-4.0, qemu-4.1 and qemu-4.2. The
+> existing 'xenfv' restores compatibility of qemu5+ with qemu2/3.
+> 
+> Host admins who started domUs with qemu-4.x have to use a wrapper script
+> which appends '-machine xenfv-qemu4' to the device-model command line.
+> This is only required if there is no maintenance window which allows to
+> temporary shutdown the domU and restart it with a fixed device-model.
+> 
+> The wrapper script is as simple as this:
+>   #!/bin/sh
+>   exec /usr/bin/qemu-system-i386 "$@" -machine xenfv-qemu4
+> 
+> With xl this script will be enabled with device_model_override=, see
+> xl.cfg(5). To live migrate a domU, adjust the existing domU.cfg and pass
+> it to xl migrate or xl save/restore:
+>   xl migrate -C new-domU.cfg domU remote-host
+>   xl save domU CheckpointFile new-domU.cfg
+>   xl restore new-domU.cfg CheckpointFile
+> 
+> With libvirt this script will be enabled with the <emulator> element in
+> domU.xml. Use 'virsh edit' prior 'virsh migrate' to replace the existing
+> <emulator> element to point it to the wrapper script.
+> 
+> Signed-off-by: Olaf Hering <olaf@aepfle.de>
+> ---
+>  hw/i386/pc_piix.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index e6756216f9..c565f41791 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -948,8 +948,21 @@ DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
+>  
+>  
+>  #ifdef CONFIG_XEN
+> +static void xenfv_qemu_4_x_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_4_2_machine_options(m);
+> +    m->desc = "Xen Fully-virtualized PC (qemu 4.x compat)";
+> +    m->max_cpus = HVM_MAX_VCPUS;
+> +    m->default_machine_opts = "accel=xen";
+> +    m->smbus_no_migration_support = false;
+> +}
+> +
+> +DEFINE_PC_MACHINE(xenfv_qemu4, "xenfv-qemu4", pc_xen_hvm_init,
+> +                  xenfv_qemu_4_x_machine_options);
+> +
+>  static void xenfv_machine_options(MachineClass *m)
+>  {
+> +    pc_i440fx_3_1_machine_options(m);
+>      m->desc = "Xen Fully-virtualized PC";
+>      m->max_cpus = HVM_MAX_VCPUS;
+>      m->default_machine_opts = "accel=xen";
+> 
 
---=20
-Alex Benn=C3=A9e
 
