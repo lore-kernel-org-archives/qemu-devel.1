@@ -2,79 +2,86 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FORGED_YAHOO_RCVD,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E93AC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 20:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F3BC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 20:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 202B120714
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 20:22:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 246A9206DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 20:49:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/8+W8ku"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202B120714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="h3qrCuYH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 246A9206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHvUi-00018S-9F
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 16:22:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57895)
+	id 1jHvvI-0001fe-91
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 16:49:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jHvOC-0002TB-4C
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 16:15:37 -0400
+ (envelope-from <viktor.madarasz@yahoo.com>) id 1jHtrj-00064V-4T
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:38:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jHvOA-0003GT-Vw
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 16:15:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:20082)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jHvOA-0003Fa-Rg
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 16:15:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585340134;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HlEC6r3nGGTqkFYTMWughwRPS15kMqFsrxaGydRPwtM=;
- b=g/8+W8kuiGw9PeTTqfzJjLfcgkGIacQWx40LFqP7O4zDkyMZsdQI0pxkQyhX4+1OrdzCnM
- d6Py5y5fiL9N/g/G0zOF5JOqnGnLvXyDW6E/VfDZkocT/PRnQBivKk3XvjA0TyPw0vPOrA
- F7LHupWd4XKfxGVDqvurxO026xrtNZg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-wAfPHWDINoaLzZj_G7dV9A-1; Fri, 27 Mar 2020 16:15:32 -0400
-X-MC-Unique: wAfPHWDINoaLzZj_G7dV9A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D414100551A;
- Fri, 27 Mar 2020 20:15:30 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-113-210.rdu2.redhat.com [10.10.113.210])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A07C819C7F;
- Fri, 27 Mar 2020 20:15:27 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 5/5] cmd646-ide: use qdev gpio rather than qemu_allocate_irqs()
-Date: Fri, 27 Mar 2020 16:15:01 -0400
-Message-Id: <20200327201501.1417-6-jsnow@redhat.com>
-In-Reply-To: <20200327201501.1417-1-jsnow@redhat.com>
-References: <20200327201501.1417-1-jsnow@redhat.com>
+ (envelope-from <viktor.madarasz@yahoo.com>) id 1jHtrh-0001fj-LG
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:37:58 -0400
+Received: from sonic311-24.consmr.mail.ne1.yahoo.com ([66.163.188.205]:34607)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <viktor.madarasz@yahoo.com>)
+ id 1jHtrh-0001dn-AW
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:37:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
+ t=1585334275; bh=EePCCBDD/1H6QdgUXlHzl9dtFW2qcqAaGfbQKUuUrTk=;
+ h=To:From:Subject:Date:References:From:Subject;
+ b=h3qrCuYHfKSt+mfrSxW4pE0MIT4Qc9zU96VGE+lW1PTd/aAO63WI/iu5b2f1pJ93yjnJkXIazdhsOUEyUaUzv5VljzX7F3h2KJPUOUuCjNiiYEXSL3A74NnOGpia5CMwvO+vLvxgVWH9OlRH7xi7c53FSoN/OEEoux7N1O78cw4rE4PD2t29dc424otkkQbX8NvTUG4TYczqG6rYzccedGplMqT7D61mrphmS4tf7dYrXlsXfGiMJz6bv0ZKNkGREJEVRrfGWNyCGAKklu66xNiqv2GGjJ1cQ5KN5J5IyIQFKT2OVo3AHWXnxRCOy1QHS7FcvKQ0tPTF101mIAB7OA==
+X-YMail-OSG: XfqG2akVM1miypkg0e31Ov7cu5H4j9FFeOrT106OwjKV8.fTPOu0whAeyq0Z5be
+ .k3LwBL6X7MQ5of24DpPJdLUiKg5IR4shBtsPu2rMTjmYTyeKA0kMKFkHyezZWwzbDZXFgbPZxPq
+ VCXGi3XxH2J729Z8D8mP_Pi6Dbjud0OBKOEVn.dstddMpBm_EsEAx__.xmR3t4igjH_vEwWp1Z59
+ GdQzAEk7arbRTivWvGSl3YcnwsdwasUvzudGpDA.UggdTa_.TSkMoS.UpW1_qksQUjAGjbjKfF9S
+ CdJhCRjyQJ07KwPJD8ZmM6aLNeyL74LDhumYAmgdP73t6V9Y.64soJ.Tea6yVxFqE6lblCrwf4Yi
+ hESjRwHmCx3Ws_r0F8TtF1jwqPSY0nmfIQ6emnIIVbeQXLQjh_Xs_zm3f16Nm4FT.x8NEQZqMj5H
+ SmhWiqTWbBtJO.7hrTbBNOoyUym8jakhmYCUrH8Xo4_nQAHGAFSgeo7482HY0lJ2oJBQcEdc2_nQ
+ Y_K1zltSN8egs02FjeFYOuj0kvzlLzozoZPzNsCJUhn9vspw7CVO04Sdup6yDG9nAJGp2cQoFdzP
+ wZjQyJR7y3AK8b0M606OCr8IMkGHxzmRdRs5M7MUgNVAc8pZGZF0EO1jsNb6RDSAKEP4qq4Qsudq
+ CqWvbPFVzaCTGt_HnikKNMWlM1yvuD3fql1WfG4reXn7DT8TvNZ.5ffvGmhCZgbcfkLa9mi_91Qr
+ Z9sWd8JAII0xEdzj1F3emeSljo_Ix7nVxSTKfZO5fgULUP0ga5FIgJ56pWXiktAAaRbpCkH3Js7.
+ Q6BZE_cQ_WYs4PlavV4bfM67Na5aMU72dKqxFuXyc8AWyyISMNo6hq2W7LmLEFzeJhqfYahajY6D
+ 80n_Q1D8.adex2nBynKaIusv0nda2wHbT11eNal3JucZdPgLl6O7lZQwUUVqsaxO.QU2LfdWLZtL
+ CHgD3AGlb6DZ.uFh9NQ1JP1FTVPswKvitS8VRMN45ob7rMgw4GsPfa838Tz8hzv5oJCnHwu6ClIx
+ FNTYpDCVkg4TvyQ0hyLahl.w3Jvx_2UwDGTtSM7VEqQvYYUVokUIuXQ207h7MhcgttiNa8FqzW_U
+ s_jwwI1rjPI3fcja9iCrZPREPtIvKShj6IM0TWCaOlfqUVtBG.Av2aC4tu0qHGXd6UwTTE0PApbi
+ 58NWHnMuh5l8vlsYzBBIlxuKJXW6aHA2PSRV8nUpd2useXUPfzEBFYMg8yiw7xhXAxzcKMnKxXVc
+ sXyLLhihzlwOvXppvM8OioHp4BHYc2YThUCpI.YRiVONuES4qJ50nbnUosbnut11nenIDAZTFpX3
+ 4yX82vY1OtppQ3dP_4.lNbEiH2ZfXzra6fPY3zUYJv53o9DOpgrkPXagjDBfT4X3oCtBEDK_z0ym
+ qmHtZ
+Received: from sonic.gate.mail.ne1.yahoo.com by
+ sonic311.consmr.mail.ne1.yahoo.com with HTTP; Fri, 27 Mar 2020 18:37:55 +0000
+Received: by smtp414.mail.ir2.yahoo.com (Oath Hermes SMTP Server) with ESMTPA
+ ID 73d1b64f2eb1e97e26005612846e2b23; 
+ Fri, 27 Mar 2020 18:37:53 +0000 (UTC)
+To: qemu-devel@nongnu.org
+From: Viktor Madarasz <viktor.madarasz@yahoo.com>
+Subject: Error building Qemu 2.12.0 on Fedora 31 GCC 9.2.1 with the below error
+Message-ID: <6dbdab0f-93ff-1df0-bff8-dd720d990be3@yahoo.com>
+Date: Fri, 27 Mar 2020 19:37:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+References: <6dbdab0f-93ff-1df0-bff8-dd720d990be3.ref@yahoo.com>
+X-Mailer: WebService/1.1.15518 hermes Apache-HttpAsyncClient/4.1.4
+ (Java/1.8.0_242)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 66.163.188.205
+X-Mailman-Approved-At: Fri, 27 Mar 2020 16:48:52 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,72 +93,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-block@nongnu.org,
- Helge Deller <deller@gmx.de>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Hi
 
-This prevents the memory from qemu_allocate_irqs() from being leaked which
-can in some cases be spotted by Coverity (CID 1421984).
+Im trying to build Qemu 2.12.0 on Fedora 31 with GCC 9.2.1 as this 
+particular qemu version is the only one working for my 
+qemu-systems-ppc64 emulation I need
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-id: 20200324210519.2974-4-mark.cave-ayland@ilande.co.uk
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/cmd646.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+./configure runs with no problem but running make breaks at this point.
 
-diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
-index 699f25824d..c254631485 100644
---- a/hw/ide/cmd646.c
-+++ b/hw/ide/cmd646.c
-@@ -249,8 +249,8 @@ static void cmd646_pci_config_write(PCIDevice *d, uint3=
-2_t addr, uint32_t val,
- static void pci_cmd646_ide_realize(PCIDevice *dev, Error **errp)
- {
-     PCIIDEState *d =3D PCI_IDE(dev);
-+    DeviceState *ds =3D DEVICE(dev);
-     uint8_t *pci_conf =3D dev->config;
--    qemu_irq *irq;
-     int i;
-=20
-     pci_conf[PCI_CLASS_PROG] =3D 0x8f;
-@@ -291,16 +291,15 @@ static void pci_cmd646_ide_realize(PCIDevice *dev, Er=
-ror **errp)
-     /* TODO: RST# value should be 0 */
-     pci_conf[PCI_INTERRUPT_PIN] =3D 0x01; // interrupt on pin 1
-=20
--    irq =3D qemu_allocate_irqs(cmd646_set_irq, d, 2);
-+    qdev_init_gpio_in(ds, cmd646_set_irq, 2);
-     for (i =3D 0; i < 2; i++) {
--        ide_bus_new(&d->bus[i], sizeof(d->bus[i]), DEVICE(dev), i, 2);
--        ide_init2(&d->bus[i], irq[i]);
-+        ide_bus_new(&d->bus[i], sizeof(d->bus[i]), ds, i, 2);
-+        ide_init2(&d->bus[i], qdev_get_gpio_in(ds, i));
-=20
-         bmdma_init(&d->bus[i], &d->bmdma[i], d);
-         d->bmdma[i].bus =3D &d->bus[i];
-         ide_register_restart_cb(&d->bus[i]);
-     }
--    g_free(irq);
- }
-=20
- static void pci_cmd646_ide_exitfn(PCIDevice *dev)
---=20
-2.21.1
+--------------
+
+
+   CC      aarch64_be-linux-user/accel/tcg/cpu-exec-common.o
+   CC      aarch64_be-linux-user/accel/tcg/translate-all.o
+   CC      aarch64_be-linux-user/accel/tcg/translator.o
+   CC      aarch64_be-linux-user/accel/tcg/user-exec.o
+   CC      aarch64_be-linux-user/accel/tcg/user-exec-stub.o
+   CC      aarch64_be-linux-user/linux-user/main.o
+   CC      aarch64_be-linux-user/linux-user/syscall.o
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/ioctls.h:176:9: 
+error: ‘SIOCGSTAMP’ undeclared here (not in a function); did you mean 
+‘SIOCSRARP’?
+   176 |   IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
+       |         ^~~~~~~~~~
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/syscall.c:5678:23: 
+note: in definition of macro ‘IOCTL’
+  5678 |     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+       |                       ^~~
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/ioctls.h:177:9: 
+error: ‘SIOCGSTAMPNS’ undeclared here (not in a function); did you mean 
+‘SIOCGSTAMP_OLD’?
+   177 |   IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
+       |         ^~~~~~~~~~~~
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/syscall.c:5678:23: 
+note: in definition of macro ‘IOCTL’
+  5678 |     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+       |                       ^~~
+make[1]: *** [/home/viktormadarasz/Emulator/qemu-2.12.0/rules.mak:66: 
+linux-user/syscall.o] Error 1
+make: *** [Makefile:478: subdir-aarch64_be-linux-user] Error 2
+[viktormadarasz@m93pserver qemu-2.12.0]$ make >> makeerror
+make[1]: flex: Command not found
+make[1]: bison: Command not found
+make[1]: flex: Command not found
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/ioctls.h:176:9: 
+error: ‘SIOCGSTAMP’ undeclared here (not in a function); did you mean 
+‘SIOCSRARP’?
+   176 |   IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
+       |         ^~~~~~~~~~
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/syscall.c:5678:23: 
+note: in definition of macro ‘IOCTL’
+  5678 |     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+       |                       ^~~
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/ioctls.h:177:9: 
+error: ‘SIOCGSTAMPNS’ undeclared here (not in a function); did you mean 
+‘SIOCGSTAMP_OLD’?
+   177 |   IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
+       |         ^~~~~~~~~~~~
+/home/viktormadarasz/Emulator/qemu-2.12.0/linux-user/syscall.c:5678:23: 
+note: in definition of macro ‘IOCTL’
+  5678 |     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+       |                       ^~~
+make[1]: *** [/home/viktormadarasz/Emulator/qemu-2.12.0/rules.mak:66: 
+linux-user/syscall.o] Error 1
+make: *** [Makefile:478: subdir-aarch64_be-linux-user] Error 2
+
+
+-----------------
+
+
+Thanks a lot for helping
+
+
+Viktor
 
 
