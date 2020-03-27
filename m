@@ -2,83 +2,87 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFD7C2D0E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE90C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85587206E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:44:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 894DE2071B
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 17:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i07hCYtJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85587206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="lHB1FfuU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 894DE2071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHt24-0002iU-OX
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 13:44:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34327)
+	id 1jHt7j-0004A7-EQ
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 13:50:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jHt1F-00022R-Vd
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:43:47 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1jHt3y-0003SW-KB
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jHt1D-0003QW-Id
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:43:45 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:29756)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jHt1D-0003PY-F3
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:43:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585331023;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Df1wmJPe7pcCZDy7Uotd2ese4fGEJREVBHPfFC5JNag=;
- b=i07hCYtJ+3juBA8AyYYFBrkZHcrBSVPEWI7MviDQhHR9sy5/mwc/Q2UvyTcG/NlWM1d/l8
- qWsxdXscx8knqlv7TiGWUmJsaGzTYQ4fEPnfgqGqvR7gONaXPkJW1jC1pKqm9CVGjD0BiP
- UQjkSB9SCz/DrYM93ZCcKxx/uOaxMWI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-y0GMzuXKMzCejmGE9RbKRw-1; Fri, 27 Mar 2020 13:43:41 -0400
-X-MC-Unique: y0GMzuXKMzCejmGE9RbKRw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54D01477;
- Fri, 27 Mar 2020 17:43:40 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A01E15C1C3;
- Fri, 27 Mar 2020 17:43:38 +0000 (UTC)
-Date: Fri, 27 Mar 2020 17:43:34 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 2/3] io: Support shutdown of TLS channel
-Message-ID: <20200327174334.GT1619@redhat.com>
-References: <20200327161936.2225989-1-eblake@redhat.com>
- <20200327161936.2225989-3-eblake@redhat.com>
- <20200327164040.GQ1619@redhat.com>
- <aa9f40ee-450e-20f3-e860-2a56e5fd0b75@redhat.com>
+ (envelope-from <lukasstraub2@web.de>) id 1jHt3x-0002RA-CZ
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:46:34 -0400
+Received: from mout.web.de ([217.72.192.78]:53435)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1jHt3w-0002Me-Vk
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 13:46:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1585331162;
+ bh=4eXt0tATaAphBWh/+R39BciiDcuPbDdy9fMWMBLy54Q=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=lHB1FfuU/WurpSRDDNQPct/t95Otrxmb1c36I3j/0JGQ7fmJ8QOcxuDr34HFYgrAy
+ 7hA4K1JyRzsI49j6Lera3QgOrX8pQZEdLke0oxiUi8k2HuthN/wL2MVjCNWsoRJi7i
+ AE74XNdSD46TAYL+fF8Qt2/3YRx4TddbBmMe+LXg=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([87.123.206.1]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MJTdf-1jFOsc3xLX-0031eK; Fri, 27
+ Mar 2020 18:46:02 +0100
+Date: Fri, 27 Mar 2020 18:45:49 +0100
+From: Lukas Straub <lukasstraub2@web.de>
+To: Derek Su <dereksu@qnap.com>
+Subject: Re: [PATCH v3 2/2] net/colo-compare.c: handling of the full primary
+ or secondary queue
+Message-ID: <20200327184549.3802f959@luklap>
+In-Reply-To: <20200325094354.19677-3-dereksu@qnap.com>
+References: <20200325094354.19677-1-dereksu@qnap.com>
+ <20200325094354.19677-3-dereksu@qnap.com>
 MIME-Version: 1.0
-In-Reply-To: <aa9f40ee-450e-20f3-e860-2a56e5fd0b75@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: multipart/signed; boundary="Sig_/I7=fzM7rsi/1/tXjsdbNBbg";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:JjeieDB+ZsT/sscvdjHltPKo5pxKCsIpehGqsaSL7fCsMOhZ51N
+ 1tsFCO93OQ8f3nh2bWuNjH+zmo+vGmH2aVW6ZSeDzUQpC8/7g9sBAEp+kOfWDE2DdKwzfF4
+ 1YUQvhx00f+v6Et9nS8oqEwLFyVqo91+pReGt1w6l8fCMNz9rMJo4i0crkGs8wVB7nVMyBM
+ tQUZQhpnTRFDzzAZebGLw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:V+vmvwREi+s=:V7lcjG5pl9g/Dzgm7rVPdy
+ SIKXmtAV9lBaHiksthHse8cVcpqWrBFoNAJbXpxlzuBkMAX90Qh5z9VHeiyM989xcPDJJlURw
+ KTNMIr4qj/rpIC0/BW0VFNI0oWUKTHUvOZ4E3l5xv+QClIMlimquDwO+REVnI/GtebhGSRJWq
+ TFA102Zh8YbmkMEp3J1lWV6vrprlHtW/LxMZTfULe1hJBOpMtQwG7UJxDu4MFKqRS/p1L4Vh3
+ 3ZQMbavHOSxvoUizpUcUxDkqRXuqDwvYVY8+rwPRsNcLjJP0jEulycUhtpvTEJ9mQ8seg+k04
+ rgR+AtBz3joEmU16WaV1mV310eFfTC3qxivTrURj8WfVnuBvBpFDKxt5Ozlfu9nhdFkiDBElU
+ +TPAY+mFT50CFhHcbrtNoQlHR5yLsSUbkghlkVxtdxi5LnMXzA3md5kStIqm37Ip2KALxOOT3
+ bTF5QBYRV0FoIt1hyIvHqxKk5d9rGoqxOjXtU1cpg40ZNPSWPqUrw3sWU5sTNQznNX4+namxE
+ JBPq2XpzJpFhPfAYdgu3UE+5QTnOoOT2d5uTtGEpuUpEYEfgisbZZAiYABpidC1IYaVk4PgNt
+ 0yClSQro/NX9bYhxJCIOpl3gS53IjWcvMwoP29TaJE2EwYZTDA6oIbtPbTD/DNefMbuEKaPgC
+ K0+BkH0MiNoaioRftqgKHMQbX9ap8lx7GW8LuKelij1m+OsNxvOTg0upOv6hUgu18JZjS84Yl
+ cEZlQLUfZxu5txdFE2A6i0q0RrHCSIkZmL6Wshu1fCITA6KXqXbtxmTJztmIgw5Yt+zXnH5BJ
+ XfWxmD0JfBaBa3fDTjuuLB3zxKiMmUqZK1l57Hry5YzL2AuKbgcx2E0GFDXlMMRh0m7BkkeLB
+ m5RgtVQuMmj3U01NOBh+EkohsoJdOoCwlK/5BeGk+fJdN3c7ACeeIabt35UOXMvcTKQIF8PPC
+ 16XTOp+XkaKpCKxVyjH1Xj4Qt9LWTSQl4JdK/oqzqiH7TdXsCFLL08diHkIqMYG23vqGwrRy9
+ FK5Z96nsAhlprdReVCBbAYURL/llZ/hYJmLWakfkOHgV8JJjeiX3J3ESm6R6uw+NotD/fHTUF
+ K4047lKLmRXjCIlSqL47Ct0MuXr840fFXlU1r4vsKzFFyOldkThxd/2/wwg87qGl9JnWBkWmP
+ X9Lwzb1e9YOFkfDxab/2Stj9KzR59mjySrVJXjOYlhc6hf6lm2BryUzFKjsRyYAwsSc3TJeic
+ eLc+nO+y26D82VME7
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 217.72.192.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,120 +94,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: lizhijian@cn.fujitsu.com, chyang@qnap.com, jasowang@redhat.com,
+ qemu-devel@nongnu.org, ctcheng@qnap.com, chen.zhang@intel.com,
+ jwsu1986@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 27, 2020 at 12:29:39PM -0500, Eric Blake wrote:
-> On 3/27/20 11:40 AM, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Mar 27, 2020 at 11:19:35AM -0500, Eric Blake wrote:
-> > > Gnutls documents that while many apps simply yank out the underlying
-> > > transport at the end of communication in the name of efficiency, this
-> > > is indistinguishable from a malicious actor terminating the connectio=
-n
-> > > prematurely.  Since our channel I/O code already supports the notion =
-of
-> > > a graceful shutdown request, it is time to plumb that through to the
-> > > TLS layer, and wait for TLS to give the all clear before then
-> > > terminating traffic on the underlying channel.
-> > >=20
-> > > Note that channel-tls now always advertises shutdown support,
-> > > regardless of whether the underlying channel also has that support.
-> > >=20
-> > > Signed-off-by: Eric Blake <eblake@redhat.com>
-> > > ---
-> > >   io/channel-tls.c | 27 ++++++++++++++++++++++++++-
-> > >   1 file changed, 26 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/io/channel-tls.c b/io/channel-tls.c
-> > > index 7ec8ceff2f01..f90905823e1d 100644
-> > > --- a/io/channel-tls.c
-> > > +++ b/io/channel-tls.c
-> > > @@ -360,10 +360,35 @@ static int qio_channel_tls_shutdown(QIOChannel =
-*ioc,
-> > >                                       Error **errp)
-> > >   {
-> > >       QIOChannelTLS *tioc =3D QIO_CHANNEL_TLS(ioc);
-> > > +    int ret =3D 0;
-> > >=20
-> > >       tioc->shutdown |=3D how;
-> > >=20
-> > > -    return qio_channel_shutdown(tioc->master, how, errp);
-> > > +    do {
-> > > +        switch (how) {
-> > > +        case QIO_CHANNEL_SHUTDOWN_READ:
-> > > +            /* No TLS counterpart */
-> > > +            break;
-> > > +        case QIO_CHANNEL_SHUTDOWN_WRITE:
-> > > +            ret =3D qcrypto_tls_session_shutdown(tioc->session, QCRY=
-PTO_SHUT_WR);
-> > > +            break;
-> > > +        case QIO_CHANNEL_SHUTDOWN_BOTH:
-> > > +            ret =3D qcrypto_tls_session_shutdown(tioc->session,
-> > > +                                               QCRYPTO_SHUT_RDWR);
-> > > +            break;
-> > > +        default:
-> > > +            abort();
-> > > +        }
-> > > +    } while (ret =3D=3D -EAGAIN);
-> >=20
-> > I don't think it is acceptable to do this loop here. The gnutls_bye()
-> > function triggers several I/O operations which could block. Looping
-> > like this means we busy-wait, blocking this thread for as long as I/O
-> > is blocking on the socket.
+--Sig_/I7=fzM7rsi/1/tXjsdbNBbg
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 25 Mar 2020 17:43:54 +0800
+Derek Su <dereksu@qnap.com> wrote:
+
+> The pervious handling of the full primary or queue is only dropping
+> the packet. If there are lots of clients to the guest VM,
+> the "drop" will lead to the lost of the networking connection
+> until next checkpoint.
 >=20
-> Hmm, good point.  Should we give qio_channel_tls_shutdown a bool paramete=
-r
-> that says whether it should wait (good for use when we are being run in a
-> coroutine and can deal with the additional I/O) or just fail with -EAGAIN
-> (which the caller can ignore if it is not worried)?
-
-A bool would not be sufficient, because the caller would need to know
-which direction to wait for I/O on.
-
-Looking at the code it does a flush of outstanding data, then sends
-some bytes, and then receives some bytes. The write will probably
-work most of the time, but the receive is almost always going to
-return -EAGAIN. So I don't think that failing with EGAIN is going
-to be much of a benefit.
-
-> > If we must call gnutls_bye(), then it needs to be done in a way that
-> > can integrate with the main loop so it poll()'s / unblocks the current
-> > coroutine/thread.  This makes the whole thing significantly more
-> > complex to deal with, especially if the shutdown is being done in
-> > cleanup paths which ordinarily are expected to execute without
-> > blocking on I/O.  This is the big reason why i never made any attempt
-> > to use gnutls_bye().
+> To address the issue, this patch drops the packet firstly.
+> Then, send all queued primary packets, remove all queued secondary
+> packets and do checkpoint.
 >=20
-> We _are_ using gnutls_bye(GNUTLS_SHUT_RDWR) on the close() path (which is
+> Signed-off-by: Derek Su <dereksu@qnap.com>
+> ---
+>  net/colo-compare.c | 41 ++++++++++++++++++++++++++++++-----------
+>  1 file changed, 30 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index cdd87b2aa8..1a52f50fbe 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -125,6 +125,12 @@ static const char *colo_mode[] =3D {
+>      [SECONDARY_IN] =3D "secondary",
+>  };
+> =20
+> +enum {
+> +    QUEUE_INSERT_ERR =3D -1,
+> +    QUEUE_INSERT_OK =3D 0,
+> +    QUEUE_INSERT_FULL =3D 1,
+> +};
+> +
+>  static int compare_chr_send(CompareState *s,
+>                              const uint8_t *buf,
+>                              uint32_t size,
+> @@ -211,8 +217,10 @@ static int colo_insert_packet(GQueue *queue, Packet =
+*pkt, uint32_t *max_ack)
+>  }
+> =20
+>  /*
+> - * Return 0 on success, if return -1 means the pkt
+> - * is unsupported(arp and ipv6) and will be sent later
+> + * Return QUEUE_INSERT_OK on success.
+> + * If return QUEUE_INSERT_FULL means list is full, and
+> + * QUEUE_INSERT_ERR means the pkt is unsupported(arp and ipv6) and
+> + * will be sent later
+>   */
+>  static int packet_enqueue(CompareState *s, int mode, Connection **con)
+>  {
+> @@ -234,7 +242,7 @@ static int packet_enqueue(CompareState *s, int mode, =
+Connection **con)
+>      if (parse_packet_early(pkt)) {
+>          packet_destroy(pkt, NULL);
+>          pkt =3D NULL;
+> -        return -1;
+> +        return QUEUE_INSERT_ERR;
+>      }
+>      fill_connection_key(pkt, &key);
+> =20
+> @@ -258,11 +266,12 @@ static int packet_enqueue(CompareState *s, int mode=
+, Connection **con)
+>                       "drop packet", colo_mode[mode]);
+>          packet_destroy(pkt, NULL);
+>          pkt =3D NULL;
+> +        return QUEUE_INSERT_FULL;
+>      }
+> =20
+>      *con =3D conn;
+> =20
+> -    return 0;
+> +    return QUEUE_INSERT_OK;
+>  }
+> =20
+>  static inline bool after(uint32_t seq1, uint32_t seq2)
+> @@ -995,17 +1004,22 @@ static void compare_pri_rs_finalize(SocketReadStat=
+e *pri_rs)
+>  {
+>      CompareState *s =3D container_of(pri_rs, CompareState, pri_rs);
+>      Connection *conn =3D NULL;
+> +    int ret;
+> =20
+> -    if (packet_enqueue(s, PRIMARY_IN, &conn)) {
+> +    ret =3D packet_enqueue(s, PRIMARY_IN, &conn);
+> +    if (ret =3D=3D QUEUE_INSERT_OK) {
+> +        /* compare packet in the specified connection */
+> +        colo_compare_connection(conn, s);
+> +    } else if (ret =3D=3D QUEUE_INSERT_FULL) {
+> +        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+> +        colo_compare_inconsistency_notify(s);
+> +    } else {
+>          trace_colo_compare_main("primary: unsupported packet in");
+>          compare_chr_send(s,
+>                           pri_rs->buf,
+>                           pri_rs->packet_len,
+>                           pri_rs->vnet_hdr_len,
+>                           false);
+> -    } else {
+> -        /* compare packet in the specified connection */
+> -        colo_compare_connection(conn, s);
+>      }
+>  }
+> =20
+> @@ -1013,12 +1027,17 @@ static void compare_sec_rs_finalize(SocketReadSta=
+te *sec_rs)
+>  {
+>      CompareState *s =3D container_of(sec_rs, CompareState, sec_rs);
+>      Connection *conn =3D NULL;
+> +    int ret;
+> =20
+> -    if (packet_enqueue(s, SECONDARY_IN, &conn)) {
+> -        trace_colo_compare_main("secondary: unsupported packet in");
+> -    } else {
+> +    ret =3D packet_enqueue(s, SECONDARY_IN, &conn);
+> +    if (ret =3D=3D QUEUE_INSERT_OK) {
+>          /* compare packet in the specified connection */
+>          colo_compare_connection(conn, s);
+> +    } else if (ret =3D=3D QUEUE_INSERT_FULL) {
+> +        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+> +        colo_compare_inconsistency_notify(s);
+> +    } else {
+> +        trace_colo_compare_main("secondary: unsupported packet in");
+>      }
+>  }
+> =20
 
-Are you sure ?  AFAIK there is no existing usage of gnutls_bye() at all
-in QEMU.
-
-> indeed a cleanup path where not blocking is worthwhile) even without this
-> patch, but the question is whether using gnutls_bye(GNUTLS_SHUT_WR) in th=
-e
-> normal data path, where we are already using coroutines to manage callbac=
-ks,
-> can benefit the remote endpoint, giving them a chance to see clean shutdo=
-wn
-> instead of abrupt termination.
-
-I'm not convinced the clean shutdown at the TLS level does anything importa=
-nt
-given that we already have done a clean shutdown at the NBD level.
-
+Hi,
+I don't think we have to flush here because the (post-)checkpoint event wil=
+l flush the packets for us.
 
 Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Lukas Straub
 
+--Sig_/I7=fzM7rsi/1/tXjsdbNBbg
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl5+O80ACgkQNasLKJxd
+sljQYw/9G4iLQYgZa/61Sx9l/HGZNVLWmPYmJZLIdUXdnKcbYLJlfiCCLPLFTDtE
+oM4CZtuqRfQeqgALl30Q8/etgRjxESqLWvwoF1fJAuOx++oMCX2mTBxjRNa6FR8X
+RkG8IjlcTjtI9R5YmWFoluxmSxNv0rQjb9dp06iRoMFzDylL+NhhkiiTz13sD0Ye
+0x2W92sdOuMi1mB6AkeBipsmiJ4LFdc1s4dFTRNRjg9YAKlp5jJP3u51awdPsw9M
+7p8eWhN04i3BzsVV2gzAPNRh0gdWtF8EeBaj7XZC4oVvGBjwVZnu41mXIW5dFyPf
+oFwyrflZDbYlAOGwAbw3vS/+iAEEZHBC1HJc+583J5il06RDcmTdHOjAqR95bSYO
+zhjTMqGNU1bpXWdpHPAEjm6uwtCnXOmtE+IDjnljITHum4I7qM9ifL2zkdsufK+/
+oLKIT5o/tvy49IDQeTwz4tmA6uFioGQscQS4afnlOT9XonktRxQ0YqM2bTDlecDt
+PVJFsJVFetK9tyc91FB76ax+teFGOjbc8lAwqfunfiyxUxevSTr+8cnECCucPVKi
+kNU2M5PEbdVPBYH0VJiubPt4eWaJW29l9HfQcIU88IczUBLItVL97ovFGKXej4TE
+95PfwSqOk3ZU7RbT573pZpHxUyi1jZzUEKW0HyDsx6Ohe1FQxJ4=
+=6+Js
+-----END PGP SIGNATURE-----
+
+--Sig_/I7=fzM7rsi/1/tXjsdbNBbg--
 
