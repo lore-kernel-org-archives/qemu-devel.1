@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BF68C2D0ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77CDC2D0EE
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:14:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F214C20737
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:14:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9EF52072F
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:14:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TcPB++bP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F214C20737
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z9I6ODyF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9EF52072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHtUy-0003Ov-VL
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 14:14:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40439)
+	id 1jHtV0-0003V5-NX
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 14:14:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jHtTy-0001ip-9c
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jHtTz-0001kg-MS
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jHtTx-0000ds-0v
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:26 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:44030)
+ (envelope-from <alex.bennee@linaro.org>) id 1jHtTy-0000gk-Gw
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:27 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:44022)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jHtTw-0000Yr-Lt
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:24 -0400
-Received: by mail-wr1-x433.google.com with SMTP id m11so6663190wrx.10
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 11:13:24 -0700 (PDT)
+ id 1jHtTy-0000fp-AU
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:13:26 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id m11so6663353wrx.10
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 11:13:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=mknqnLXNdO3bv9jIJ1lrUIcyeKoH8TMNeDvGSd6HYu8=;
- b=TcPB++bPPZIvNvMS0exK3Uls0hzzw7XKDGUkqXGuYcIu0WifnP88RKYRT8dYyIVjd8
- jhKqOD5Uj5LRTy2cwLfni+dzvTfaKk2zcLa1n/GN8j3ZkPzL8CRdmaPCPnbI+UKBsHrx
- YeyimjLRdtGcXUcy6iMlXk35OXJqAOyha/4quV2hzOnNRG1nuYmAUHfFVYnhTYTt1+UT
- Mnu4x+UVlr03hxxuhW4PL0s7IOMdFZ6zw346UlSsN4PdEJPpx7eFhkWUynArYOGR7DkB
- b3Go3GMsNu3zNUboYwvKRSmsfizbQREYmxL4rZH/5bJCLBfZ/imPjT6nSvO7VyY0Wha8
- DoJA==
+ bh=BVjll0Btf0ZgFKbd+CxXv9O+AQAJq5w3JoNQuRDkfgk=;
+ b=Z9I6ODyFcuBBChjXasaT5mQtLEPar3QkRaY4PedHhvyIVj6ezyCUsX3oxY8Z2dpeGj
+ 3QLWECtZE4CTNhUSJUBqtsxM8R/G12+RSwRL9u8EewsucON4rwDkL4PRLD1wUOQSFJwd
+ 0b43TpXF6dFMfs7D+gaR2LsfD8r6EV3IYLJCuxFVh97sX1AGTj33np3hAuusRKhgFPfP
+ Wy8vpWf3HfxLvzjgVchD/tXf78NHRDlklhKUYwV1WoMCvZ2CUf9BQN4ozQm2Ui8engNS
+ dfkiBU8Mh1UT0gUUQibi+qRylLNbhLdEbmU1PPgULRX7NRD2Fo27GtU5nGkw002K8UAh
+ 0ukQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=mknqnLXNdO3bv9jIJ1lrUIcyeKoH8TMNeDvGSd6HYu8=;
- b=s9b8Q8V1fJB8WbHPTh6MlctvZX/jCZiRDBEsdot7gMRO5ED4MKmw0u6BzIEMmwHKLw
- O0BvI3kwda98fo2DTJ3bMfRDL1L4THekvqWtg6+XCSZTHSO7PBuK5PTQjJyI3nhUfVJy
- rE94dAUA/WsVxgHQM5IrjXLyIvo6+zgiIJLJF5Lwxi5vuI11p0783ajTVpdxCIsaF1JV
- ZhLdsNKt2FibQFD3KkDxt7TnzgVQ2gbdthxcYDM6OHVyDQrxISIOfLOMighOi5ddjJe1
- GlL/4zK+53hZhO2Keio25WtqmPZ0lRjOsvRZ6N58j1Co3w9Ysbn154+1Pir1D9NDtnDB
- r9eg==
-X-Gm-Message-State: ANhLgQ25kjmZxAikEBM00CqC+2EznntdRiTecLRgOCAGTDwYuFCg/sil
- NBfvvSzCxE6oeSncAQBrbQF4Kw==
-X-Google-Smtp-Source: ADFU+vsXYJT0AvkXU0gfE1V3v8Nz76W2W3rRyVfk57qyaaRFuStoiqTfGfGgsud95Tw5Q/43+SxItA==
-X-Received: by 2002:adf:9d8a:: with SMTP id p10mr663293wre.190.1585332802957; 
- Fri, 27 Mar 2020 11:13:22 -0700 (PDT)
+ bh=BVjll0Btf0ZgFKbd+CxXv9O+AQAJq5w3JoNQuRDkfgk=;
+ b=Md6jZnD/QA3IGVcRRVovzRdlKcY8d8HxrFE2ArErpCh7Owzl8AJuPvj/BfQkGh9gqT
+ mldnYSCAa3tnR/2rPdKwkanOCfFKKLAFxQOPhfJvD+UOaJc8GsrK0facKic7DsQHLLeF
+ frbEsoFwVZSkEm9MPVakk1I9Oxx41/yt6teWzFEUUMT/IZvqLv2RaBQWNB7FKnFSSRWB
+ O3VVNtjJPuwhDdKZJ51nLdNYchQWLmPbyDkROQgoQW8iaZjt7JPPniyA5TYiducWsAT+
+ NO7EHy81E9/IWfBjDMHUg9pvWOdaIWNHX0vy9EwHxInd6rJdv7xtPMEJ9A35NEgnDU4T
+ 648Q==
+X-Gm-Message-State: ANhLgQ3NMjeLnoaInf5StfnO3PkjKZTvH8H4ERTT4Yn0Kfhr2XV2gytD
+ GOHrVaLkxDipe6vI/piYLF9G+Q==
+X-Google-Smtp-Source: ADFU+vupHbLD/BOz056AJgq3ARrJWWNCY4FwvhkacMSFbt+fGPpJyNVpclMlX/z5xJ/r+izUGxhrjQ==
+X-Received: by 2002:adf:8182:: with SMTP id 2mr646042wra.37.1585332805271;
+ Fri, 27 Mar 2020 11:13:25 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z203sm9214902wmg.12.2020.03.27.11.13.21
+ by smtp.gmail.com with ESMTPSA id n124sm8489975wma.11.2020.03.27.11.13.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 27 Mar 2020 11:13:21 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5B4011FF87;
+ by zen.linaroharston (Postfix) with ESMTP id 8DA981FF8F;
  Fri, 27 Mar 2020 18:13:20 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 01/12] qemu/atomic.h: add #ifdef guards for stdatomic.h
-Date: Fri, 27 Mar 2020 18:13:09 +0000
-Message-Id: <20200327181320.23329-2-alex.bennee@linaro.org>
+Subject: [PULL v2 03/12] tests/vm: move vga setup
+Date: Fri, 27 Mar 2020 18:13:11 +0000
+Message-Id: <20200327181320.23329-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200327181320.23329-1-alex.bennee@linaro.org>
 References: <20200327181320.23329-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,55 +96,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Deep inside the FreeBSD netmap headers we end up including stdatomic.h
-which clashes with qemu's atomic functions which are modelled along
-the C11 standard. To avoid a massive rename lets just ifdef around the
-problem.
+From: Gerd Hoffmann <kraxel@redhat.com>
 
+Move '-device VGA' from basevm.py to the guests, so they have
+the chance to opt out and run without display device.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200326170121.13045-1-alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200310083218.26355-3-kraxel@redhat.com>
+Message-Id: <20200323161514.23952-3-alex.bennee@linaro.org>
 
-diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-index f9cd24c8994..ff72db51154 100644
---- a/include/qemu/atomic.h
-+++ b/include/qemu/atomic.h
-@@ -208,11 +208,14 @@
- /* Provide shorter names for GCC atomic builtins, return old value */
- #define atomic_fetch_inc(ptr)  __atomic_fetch_add(ptr, 1, __ATOMIC_SEQ_CST)
- #define atomic_fetch_dec(ptr)  __atomic_fetch_sub(ptr, 1, __ATOMIC_SEQ_CST)
-+
-+#ifndef atomic_fetch_add
- #define atomic_fetch_add(ptr, n) __atomic_fetch_add(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_sub(ptr, n) __atomic_fetch_sub(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_and(ptr, n) __atomic_fetch_and(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST)
- #define atomic_fetch_xor(ptr, n) __atomic_fetch_xor(ptr, n, __ATOMIC_SEQ_CST)
-+#endif
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index c53fd354d95..cffe7c4600e 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -179,7 +179,6 @@ class BaseVM(object):
  
- #define atomic_inc_fetch(ptr)    __atomic_add_fetch(ptr, 1, __ATOMIC_SEQ_CST)
- #define atomic_dec_fetch(ptr)    __atomic_sub_fetch(ptr, 1, __ATOMIC_SEQ_CST)
-@@ -392,11 +395,14 @@
- /* Provide shorter names for GCC atomic builtins.  */
- #define atomic_fetch_inc(ptr)  __sync_fetch_and_add(ptr, 1)
- #define atomic_fetch_dec(ptr)  __sync_fetch_and_add(ptr, -1)
-+
-+#ifndef atomic_fetch_add
- #define atomic_fetch_add(ptr, n) __sync_fetch_and_add(ptr, n)
- #define atomic_fetch_sub(ptr, n) __sync_fetch_and_sub(ptr, n)
- #define atomic_fetch_and(ptr, n) __sync_fetch_and_and(ptr, n)
- #define atomic_fetch_or(ptr, n) __sync_fetch_and_or(ptr, n)
- #define atomic_fetch_xor(ptr, n) __sync_fetch_and_xor(ptr, n)
-+#endif
- 
- #define atomic_inc_fetch(ptr)  __sync_add_and_fetch(ptr, 1)
- #define atomic_dec_fetch(ptr)  __sync_add_and_fetch(ptr, -1)
+     def boot(self, img, extra_args=[]):
+         args = self._args + [
+-            "-device", "VGA",
+             "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
+             "-device", "virtio-blk,drive=drive0,bootindex=0"]
+         args += self._data_args + extra_args
+diff --git a/tests/vm/fedora b/tests/vm/fedora
+index 4843b4175e0..bd9c6cf295c 100755
+--- a/tests/vm/fedora
++++ b/tests/vm/fedora
+@@ -82,6 +82,7 @@ class FedoraVM(basevm.BaseVM):
+         self.boot(img_tmp, extra_args = [
+             "-bios", "pc-bios/bios-256k.bin",
+             "-machine", "graphics=off",
++            "-device", "VGA",
+             "-cdrom", iso
+         ])
+         self.console_init(300)
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index 86770878b67..58166766d91 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -92,6 +92,7 @@ class FreeBSDVM(basevm.BaseVM):
+         self.boot(img_tmp, extra_args = [
+             "-bios", "pc-bios/bios-256k.bin",
+             "-machine", "graphics=off",
++            "-device", "VGA",
+             "-cdrom", iso
+         ])
+         self.console_init()
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index 55590f46015..f3257bc245a 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -86,6 +86,7 @@ class NetBSDVM(basevm.BaseVM):
+         self.boot(img_tmp, extra_args = [
+             "-bios", "pc-bios/bios-256k.bin",
+             "-machine", "graphics=off",
++            "-device", "VGA",
+             "-cdrom", iso
+         ])
+         self.console_init()
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index ab6abbedab5..0b705f49452 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -82,6 +82,7 @@ class OpenBSDVM(basevm.BaseVM):
+         self.boot(img_tmp, extra_args = [
+             "-bios", "pc-bios/bios-256k.bin",
+             "-machine", "graphics=off",
++            "-device", "VGA",
+             "-cdrom", iso
+         ])
+         self.console_init()
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index 3266038fbde..15707753353 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -36,7 +36,10 @@ class UbuntuX86VM(basevm.BaseVM):
+         img_tmp = img + ".tmp"
+         subprocess.check_call(["cp", "-f", cimg, img_tmp])
+         self.exec_qemu_img("resize", img_tmp, "50G")
+-        self.boot(img_tmp, extra_args = ["-cdrom", self.gen_cloud_init_iso()])
++        self.boot(img_tmp, extra_args = [
++            "-device", "VGA",
++            "-cdrom", self.gen_cloud_init_iso()
++        ])
+         self.wait_ssh()
+         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+         self.ssh_root_check("apt-get update")
 -- 
 2.20.1
 
