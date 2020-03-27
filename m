@@ -2,65 +2,81 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8AC0C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CFEC43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:36:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80648206E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:32:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6424E206E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 16:36:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ZvqfkxDG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80648206E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CpBE8v6T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6424E206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHruK-0006re-MI
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:32:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43462)
+	id 1jHryR-0000JN-LT
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 12:36:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jHrtU-0006Jl-HE
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:31:41 -0400
+ (envelope-from <berrange@redhat.com>) id 1jHrxh-00080M-QY
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:36:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jHrtT-00063I-5c
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:31:40 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:37476)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jHrtS-0005Kt-Ie; Fri, 27 Mar 2020 12:31:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=ZCCG9kSP0SJrJBQZPPPQeWt8eczXan67QrBQ5iUFrzU=; 
- b=ZvqfkxDGrIEvQjakAmIN4IaeHLB2dEDPf8uvWZVQfn1+OVFhu3DfQ2YZfnhYPNVNq/1EpGVoWoCimI14VLXYmbqlGuwxDUFcNy+/2AuG5O0lz11gE4G+W5uu1c6XoxXS4sXkTYiVob0I2SI58hAui+YekfrrkQ9wSwycJRioE1krn2A/2K5A8z8V0Vc9x4khkTkRwvm5YmYHMCin6QDzN/NzCBEJdTOCWFnaweY7gifHQ9k6+CD+/Qt2xvl3k6/vA5AqeiF2gye3xBD9WJigxlmTmYf9MaxWeZa0n9Ofd+xpCFpJH9sQFuX9AzHJY74HfY9atYmwk6/onS0wv1upWg==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jHrt9-0007qI-H2; Fri, 27 Mar 2020 17:31:19 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jHrt9-00044G-6P; Fri, 27 Mar 2020 17:31:19 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2] qcow2: Forbid discard in qcow2 v2 images with backing
- files
-In-Reply-To: <20200327141442.GA6901@linux.fritz.box>
-References: <20200324121636.24136-1-berto@igalia.com>
- <20200327141442.GA6901@linux.fritz.box>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Fri, 27 Mar 2020 17:31:19 +0100
-Message-ID: <w51h7y9hi94.fsf@maestria.local.igalia.com>
+ (envelope-from <berrange@redhat.com>) id 1jHrxg-0005Dq-Gt
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:36:01 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41523)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jHrxg-0005D3-DN
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 12:36:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585326960;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZGvmcFvskFL2QoyLFa/xybc/QFXFYo55FoW9kfBiyNk=;
+ b=CpBE8v6TC0WSKLzN+vi44IW0hB3L33N8lq6dZ0RWEYrRjiLJclNxwmfXu1ofh82LkSTSvq
+ RW1+ZTlhMzCuxsMKWdyYbrZidk/4GX4GBbt5cWs7TRQH1HlpL5/CCK/k06awqRO7XtM3Zo
+ HcP7sE0DoFBtc+aikBUxLlpQo9YGI2A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-n4AdHK_COFOthv1o3dWFww-1; Fri, 27 Mar 2020 12:35:56 -0400
+X-MC-Unique: n4AdHK_COFOthv1o3dWFww-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A6511007269;
+ Fri, 27 Mar 2020 16:35:54 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EE4219925;
+ Fri, 27 Mar 2020 16:35:51 +0000 (UTC)
+Date: Fri, 27 Mar 2020 16:35:48 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 3/3] nbd: Use shutdown(SHUT_WR) after last item sent
+Message-ID: <20200327163548.GP1619@redhat.com>
+References: <20200327161936.2225989-1-eblake@redhat.com>
+ <20200327161936.2225989-4-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+In-Reply-To: <20200327161936.2225989-4-eblake@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,28 +88,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri 27 Mar 2020 03:14:42 PM CET, Kevin Wolf wrote:
->> +echo "# Create a backing image and fill it with data"
->> +BACKING_IMG="$TEST_IMG.base"
->> +TEST_IMG="$BACKING_IMG" _make_test_img 128k
->> +$QEMU_IO -c 'write -P 0xff 0 128k' "$BACKING_IMG" | _filter_qemu_io
->> +
->> +for qcow2_compat in 0.10 1.1; do
->> +    echo "# Create an image with compat=$qcow2_compat and a backing file"
->> +    _make_test_img -o "compat=$qcow2_compat" -b "$BACKING_IMG"
->
-> I would write some non-zero data to the backing file so that you can
-> later distinguish zero clusters from unallocated clusters.
+On Fri, Mar 27, 2020 at 11:19:36AM -0500, Eric Blake wrote:
+> Although the remote end should always be tolerant of a socket being
+> arbitrarily closed, there are situations where it is a lot easier if
+> the remote end can be guaranteed to read EOF even before the socket
+> has closed.  In particular, when using gnutls, if we fail to inform
+> the remote end about an impending teardown, the remote end cannot
+> distinguish between our closing the socket as intended vs. a malicious
+> intermediary interrupting things, and may result in spurious error
+> messages.
 
-I'm doing that already (immediately before the 'for' loop).
+Does this actually matter in the NBD case ?
 
-I'll add the output of qemu-img map in v3.
+It has an explicit NBD command for requesting shutdown, and once
+that's processed, it is fine to just close the socket abruptly - I
+don't see a benefit to a TLS shutdown sequence on top.
+AFAIK, the TLS level clean shutdown is only required if the
+application protocol does not have any way to determine an
+unexpected shutdown itself.
 
-Berto
+This is relevant for HTTP where the connection data stream may not
+have a well defined end condition.
+
+In the NBD case though, we have an explicit NBD_CMD_DISC to trigger
+the disconnect. After processing that message, an EOF is acceptable
+regardless of whether ,
+before processing that message, any EOF is a unexpected.
+
+>           Or, we can end up with a deadlock where both ends are stuck
+> on a read() from the other end but neither gets an EOF.
+
+If the socket has been closed abruptly why would it get stuck in
+read() - it should see EOF surely ?
+
+>                                                          Thus, after
+> any time a client sends NBD_OPT_ABORT or NBD_CMD_DISC, or a server has
+> finished replying (where appropriate) to such a request, it is worth
+> informing the channel that we will not be transmitting anything else.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
