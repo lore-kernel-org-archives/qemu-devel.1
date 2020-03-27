@@ -2,102 +2,99 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C5AC43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB33C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 11:01:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0EDD20578
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 10:57:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9793C206F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 11:01:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JipiE4mC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0EDD20578
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UuMPQO8q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9793C206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHmgQ-00037P-UN
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 06:57:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51337)
+	id 1jHmkH-0005jF-Pp
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 07:01:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53771)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jHmfW-0002JZ-65
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:56:55 -0400
+ (envelope-from <philmd@redhat.com>) id 1jHmiK-00048t-B5
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:59:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jHmfV-0002in-11
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:56:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34877)
+ (envelope-from <philmd@redhat.com>) id 1jHmiI-00036s-H9
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:59:47 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40492)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jHmfU-0002ha-TC
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:56:52 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jHmiI-00034Z-Cy
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 06:59:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585306612;
+ s=mimecast20190719; t=1585306785;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=A6amK/Sa2qp1xeSx97bUS8GAL9a43ynVBrBIMtp6598=;
- b=JipiE4mCsJ1iGfcHcyNhC+ecDxXp5EUKvvW1DBnth7VYqH+N/E/V6AG4TOc+6jJBqD/gv/
- JqpkEG1HW00J4hHs+gSBNbQEL4oluv/GAS8gwddxrmMWyITrc/fkQ7VURKwN3Y8oqphpdH
- DhBIwILYiYrsSkRuJZubxRTY6xgInh4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-RmIyyl7VME-hx3Fccd8K3g-1; Fri, 27 Mar 2020 06:56:50 -0400
-X-MC-Unique: RmIyyl7VME-hx3Fccd8K3g-1
-Received: by mail-ed1-f72.google.com with SMTP id n15so3686825edq.6
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 03:56:50 -0700 (PDT)
+ bh=ufk87yFbYGigKRJxSoyKOY6KK/kdyJ9F3P/wisvwEWk=;
+ b=UuMPQO8qJGamB2Ea7NF8vjZ1aLmsEhi7ql9ZpoV3zObbAwwNrYOk7tsIfLwH95lU75Zwo7
+ pChz1mZU/o6cwxDzBi8WVG+M/gKCYO3zg2SDaxuQQG9rfc0UNdrm9RDG/0q2PFAYqRVbs9
+ 67WVK8yedzfDKAnf33i+2PF5qthHqoU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-9W3uQXaCOYWY7PU16wxUnQ-1; Fri, 27 Mar 2020 06:59:41 -0400
+X-MC-Unique: 9W3uQXaCOYWY7PU16wxUnQ-1
+Received: by mail-wr1-f71.google.com with SMTP id e10so4371141wru.6
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 03:59:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=o/ZrKlvJX0teutEm3jx6bETFz0QXQjIF4KqVkdYfUbU=;
- b=uJn2WfqniWRQ/9OP0jlXb+NwXeZwSCcEnIDVHpam/4U0F8crrXdBoOINNzs6Xzmewf
- i6omvqT5bqT8R68Xp83WrMk8UAzejuh3xlDuyfJ+Z+s0cW3e7AvLe2n+prGjw7ySxoJY
- NidKeDrcpWNNl6lnUPv7lPVOAzQSSqUl6kVN15HwqZgfMlvDKJj33imHvihAB6tGUx8Q
- Z9JsmuQ6zob9OgyL/1VFUo1NbHDPgC3/oLpI32eBdp9NdrInqmdtNJEsFo6zT4v/9GwR
- fhyu4oh0iOx9tBqF+lSq9ffMAlKmEIbkDDNus+FbNwUobW3ZV8/RIywxmKhWyVyCWP7P
- 2usA==
-X-Gm-Message-State: ANhLgQ335447v212L/YLyXrnMqU1QIp+DWqqabCDtx9/rTSUAUuL+LEe
- AefWcY81yxqwA7DIvRyNAXjT1lEqnu5Qz9iMdyLumFAYXaa45XT1sk5qZ+Reek+LO5qEXdVO8jr
- 6vDBDV5DD+dRTSJI=
-X-Received: by 2002:a17:906:d8b0:: with SMTP id
- qc16mr12198136ejb.64.1585306609593; 
- Fri, 27 Mar 2020 03:56:49 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vthgXJaqTdex4hGZorLMyJV5Ihjw3XQPP3Y3LNIOJ15iQKtJ4Mp4dQhft8OO4uUamgSXQvZdw==
-X-Received: by 2002:a17:906:d8b0:: with SMTP id
- qc16mr12198121ejb.64.1585306609343; 
- Fri, 27 Mar 2020 03:56:49 -0700 (PDT)
+ bh=/5j0vpi/k/KBX4hp7wthhv/dqFG9FJFACIbg+p3cWT8=;
+ b=l++Cd9Y/8idqAo9NqUU6H4vOgb6mE3w4k8TRQK3PU8iYqqHRPx+naZ1xicVgLCNZ01
+ JTJDAFsyIhzvMG4s3iMn1ClMrXYjVXNfWO4qPbborxcGfiWvsdslrFC+dsKX5wpbO+B9
+ k8c8Mtgmh9bmnsY/c53APEFVbmAvROYwP7uSFLFT6utOhhgCznYKkMX5Z/JIOPP7v94s
+ Nfe4rIzU12TPbjqb13YqLHvHkMlkm43bMXKeY0bEaqYQXFm5TZAgAvX+jJXzJBQ0hxd1
+ pnkC+wQ5xbrAAPhgZfoQwz/MpdLeuhA2s6p1l3qAiba2DuRJg2ElaeZPMt/F9avPxRqY
+ ksSQ==
+X-Gm-Message-State: ANhLgQ26vmmTDBn6Wyb/hk4cSeLvk0F6RY9joI+DFvRHSHXadsqU7k9c
+ XOcVGypkDMx27vdwvWaFrl9+3SSMasMzNMNdMgnt0k1pB4Oh+67K4RGl69iCIErh/tpAUF9JjtN
+ bObKstIThZQ8pFhE=
+X-Received: by 2002:a7b:cd88:: with SMTP id y8mr4538145wmj.129.1585306780099; 
+ Fri, 27 Mar 2020 03:59:40 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vv3UWRBzdztatBxMolVV/7xyeH33P2jfkZoKWU8uh8iEL4C5F9lUaOGg3xCM05p2z3IEEp44Q==
+X-Received: by 2002:a7b:cd88:: with SMTP id y8mr4538129wmj.129.1585306779839; 
+ Fri, 27 Mar 2020 03:59:39 -0700 (PDT)
 Received: from [192.168.1.35] (37.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.37])
- by smtp.gmail.com with ESMTPSA id w4sm697058ejz.44.2020.03.27.03.56.48
+ by smtp.gmail.com with ESMTPSA id i19sm7727579wmb.44.2020.03.27.03.59.38
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 27 Mar 2020 03:56:48 -0700 (PDT)
-Subject: Re: [PATCH v1 7/7] gdbstub: fix compiler complaining
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200327094945.23768-1-alex.bennee@linaro.org>
- <20200327094945.23768-8-alex.bennee@linaro.org>
+ Fri, 27 Mar 2020 03:59:39 -0700 (PDT)
+Subject: Re: [PATCH v8 00/74] per-CPU locks
+To: "Emilio G. Cota" <cota@braap.org>, Robert Foley
+ <robert.foley@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
+ <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200327051457.GA2815@t420>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <25bba445-f6a0-d73e-e06b-142af14c51a1@redhat.com>
-Date: Fri, 27 Mar 2020 11:56:47 +0100
+Message-ID: <8686a3e1-1a57-bfd3-11ec-b84d656bb0a0@redhat.com>
+Date: Fri, 27 Mar 2020 11:59:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200327094945.23768-8-alex.bennee@linaro.org>
+In-Reply-To: <20200327051457.GA2815@t420>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,59 +106,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Qun <kuhn.chenqun@huawei.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Euler Robot <euler.robot@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, peter.puhov@linaro.org,
+ Paolo Bonzini <pbonzini@redhat.com>, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/27/20 10:49 AM, Alex Benn=C3=A9e wrote:
-> From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+On 3/27/20 6:14 AM, Emilio G. Cota wrote:
+> (Apologies if I missed some Cc's; I was not Cc'ed in patch 0
+>   so I'm blindly crafting a reply.)
 >=20
->      ./gdbstub.c: In function =E2=80=98handle_query_thread_extra=E2=80=99=
-:
->          /usr/include/glib-2.0/glib/glib-autocleanups.h:28:10:
->      error: =E2=80=98cpu_name=E2=80=99 may be used uninitialized in this =
-function
->      [-Werror=3Dmaybe-uninitialized]
->          g_free (*pp);
->                 ^
->      ./gdbstub.c:2063:26: note: =E2=80=98cpu_name=E2=80=99 was declared h=
-ere
->          g_autofree char *cpu_name;
->                           ^
->      cc1: all warnings being treated as errors
+> On Thu, Mar 26, 2020 at 15:30:43 -0400, Robert Foley wrote:
+>> This is a continuation of the series created by Emilio Cota.
+>> We are picking up this patch set with the goal to apply
+>> any fixes or updates needed to get this accepted.
 >=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> Message-Id: <20200326151407.25046-1-dplotnikov@virtuozzo.com>
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Reported-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   gdbstub.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+> Thanks for picking this up!
 >=20
-> diff --git a/gdbstub.c b/gdbstub.c
-> index 013fb1ac0f1..171e1509509 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -2060,8 +2060,8 @@ static void handle_query_thread_extra(GdbCmdContext=
- *gdb_ctx, void *user_ctx)
->           /* Print the CPU model and name in multiprocess mode */
->           ObjectClass *oc =3D object_get_class(OBJECT(cpu));
->           const char *cpu_model =3D object_class_get_name(oc);
-> -        g_autofree char *cpu_name;
-> -        cpu_name  =3D object_get_canonical_path_component(OBJECT(cpu));
-> +        g_autofree char *cpu_name =3D
-> +            object_get_canonical_path_component(OBJECT(cpu));
->           g_string_printf(rs, "%s %s [%s]", cpu_model, cpu_name,
->                           cpu->halted ? "halted " : "running");
->       } else {
+>> Listed below are the changes for this version of the patch,
+>> aside from the merge related changes.
+>>
+>> Changes for V8:
+>> - Fixed issue where in rr mode we could destroy the BQL twice.
 >=20
+> I remember doing little to no testing in record-replay mode, so
+> there should be more bugs hiding in there :-)
+>=20
+>> - Found/fixed bug that had been hit in testing previously during
+>> the last consideration of this patch.
+>>   We reproduced the issue hit in the qtest: bios-tables-test.
+>>   The issue was introduced by dropping the BQL, and found us
+>>   (very rarely) missing the condition variable wakeup in
+>>   qemu_tcg_rr_cpu_thread_fn().
+>=20
+> Aah, this one:
+>    https://patchwork.kernel.org/patch/10838149/#22516931
+> How did you identify the problem? Was it code inspection or using a tool
+> like rr? I remember this being hard to reproduce reliably.
+>=20
+> On a related note, I've done some work to get QEMU-system to work
+> under thread sanitizer, since tsan now supports our longjmp-based
+> coroutines (hurrah!). My idea was to integrate tsan in QEMU (i.e.
+> bring tsan warnings to 0) before (re)trying to merge the
+> per-CPU lock patchset; this would minimize the potential for
+> regressions, which from my personal viewpoint seems like a reasonable
+> thing to do especially now that I have little time to work on QEMU.
+>=20
+> If there's interest in doing the tsan work first, then I'd be
+> happy to send to the list as soon as this weekend the changes that
+> I have so far [1].
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+I'm pretty sure Marc-Andr=E9 is interested (and also Stefan maybe), so=20
+Cc'ing them.
+
+>=20
+> Thanks,
+> =09=09Emilio
+>=20
+> [1] WIP branch: https://github.com/cota/qemu/commits/tsan
+>=20
 
 
