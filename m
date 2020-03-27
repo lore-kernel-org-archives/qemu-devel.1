@@ -2,66 +2,68 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62070C43331
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D19C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:17:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25F5220705
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:16:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5946920705
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 09:17:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFYiKytT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25F5220705
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZFrilWx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5946920705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHl6M-0007pj-Bt
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 05:16:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57910)
+	id 1jHl7Z-0000X1-DN
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 05:17:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jHl5M-0007Gg-Ov
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:15:29 -0400
+ (envelope-from <david@redhat.com>) id 1jHl5x-0007eQ-Hs
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jHl5K-0001CL-8n
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:15:27 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59120)
+ (envelope-from <david@redhat.com>) id 1jHl5v-00027v-PC
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:16:05 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:50469)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHl5G-0001AG-Qr
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:15:24 -0400
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jHl5v-00027N-Lv
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 05:16:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585300521;
+ s=mimecast20190719; t=1585300563;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=OyCbN95tBh7S+01p+JQkoDCaHrwoYRfmX6w5cBO7F1E=;
- b=CFYiKytT1Bb9iVRH4NqIKM/figDXUQcPdOnEtX6631HFLtxdkRGFBP8JRzpc/WJJoQtbkY
- /MGQV9tVPkbnDp4T5a+n/Wz7ukXdVUaxiSFbvGoxAg1v4NMwBtfdtwI/FOXN6LYjwgevA3
- 6U5Mf+n6yaI3y5QnNsd+Jyg5VqYuA2k=
+ bh=xBmu5Rde76tYnKJ/5pLUyUvwETqeFNgetVO2NbBf3cg=;
+ b=XZFrilWxWa3Wlnj7wr5bI8FYdl9D0g9N/buJFaNHN/OaqMBjGm2lq1BxAqDRowjzF2Haxc
+ aOwC6rj1SQyU9NV4mPsLUJasCYUgTm4ncSu2Ofm+0EOCAbrHdV0MoInXLrolID1apg2QCp
+ r4KFOjgwXJriXb/4tDh/h0VHdRca/JM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-ueQ3RPt5Nm6_P4MbRUpkrA-1; Fri, 27 Mar 2020 05:15:19 -0400
-X-MC-Unique: ueQ3RPt5Nm6_P4MbRUpkrA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-147-WzDTfcXDMmazKtlt-zyEmg-1; Fri, 27 Mar 2020 05:15:59 -0400
+X-MC-Unique: WzDTfcXDMmazKtlt-zyEmg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D46F8800D48;
- Fri, 27 Mar 2020 09:15:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D045A8010EA;
+ Fri, 27 Mar 2020 09:15:55 +0000 (UTC)
 Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F70D60C99;
- Fri, 27 Mar 2020 09:15:14 +0000 (UTC)
-Subject: Re: [PATCH] s390x: protvirt: Fix stray error_report_err in
- s390_machine_protect
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200326140505.2432-1-frankja@linux.ibm.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B95CC5DA81;
+ Fri, 27 Mar 2020 09:15:51 +0000 (UTC)
+Subject: Re: [PATCH 1/1] s390/ipl: fix off-by-one in
+ update_machine_ipl_properties()
+To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200320143101.41764-1-pasic@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -107,20 +109,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <6545ee17-9fdd-4e79-f4d1-a2086205f357@redhat.com>
-Date: Fri, 27 Mar 2020 10:15:12 +0100
+Message-ID: <170791e7-48c0-6ab7-8ca7-18b26b79cbcc@redhat.com>
+Date: Fri, 27 Mar 2020 10:15:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200326140505.2432-1-frankja@linux.ibm.com>
+In-Reply-To: <20200320143101.41764-1-pasic@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,38 +135,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.03.20 15:05, Janosch Frank wrote:
-> In case the protection of the machine fails at s390_pv_vm_enable(),
-> we'll currently report the local_error variable. Problem is that
-> there's no migration blocker error that we can report at this point so
-> the pointer is always NULL which leads to a SEGFAULT.
+On 20.03.20 15:31, Halil Pasic wrote:
+> In update_machine_ipl_properties() the array ascii_loadparm needs to
+> hold the 8 char lodparm and a string terminating zero char.
 > 
-> Let's remove the error report.
+> Let's increase the size of ascii_loadparm accordingly.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Fixes: 520935eedf941da3 ("s390x: protvirt: Add migration blocker")
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Fixes: 0a01e082a4 ("s390/ipl: sync back loadparm")
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/s390x/s390-virtio-ccw.c | 1 -
->  1 file changed, 1 deletion(-)
+>  hw/s390x/ipl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 3cf19c99f3468b7d..855ecf370d6e82fa 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -358,7 +358,6 @@ static int s390_machine_protect(S390CcwMachineState *ms)
->      rc = s390_pv_vm_enable();
->      if (rc) {
->          qemu_balloon_inhibit(false);
-> -        error_report_err(local_err);
->          migrate_del_blocker(pv_mig_blocker);
->          error_free_or_abort(&pv_mig_blocker);
->          return rc;
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index b81942e1e6..8c3e019571 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -546,7 +546,7 @@ static void update_machine_ipl_properties(IplParameterBlock *iplb)
+>      /* Sync loadparm */
+>      if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
+>          uint8_t *ebcdic_loadparm = iplb->loadparm;
+> -        char ascii_loadparm[8];
+> +        char ascii_loadparm[9];
+>          int i;
+>  
+>          for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
+> 
+> base-commit: 226cd20706e20264c176f8edbaf17d7c9b7ade4a
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
