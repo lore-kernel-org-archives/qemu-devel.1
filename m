@@ -2,100 +2,85 @@ Return-Path: <SRS0=t76e=5M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226BFC2D0E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87EB6C43331
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:21:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3CE72083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:20:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3CE72083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57C4E2083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Mar 2020 18:21:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t+Ly6fsF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57C4E2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHtbF-0005Xh-3U
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 14:20:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41519)
+	id 1jHtbk-0006fb-Hr
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 14:21:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42176)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1jHtXO-0007Yb-JJ
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:16:59 -0400
+ (envelope-from <jwsu1986@gmail.com>) id 1jHtau-0005DM-S6
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1jHtXN-0008DX-6V
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:16:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63744)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1jHtXM-0008Ac-UP
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:16:57 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02RI4D3W052928
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 14:16:55 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ywbtmmx2e-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 14:16:55 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Fri, 27 Mar 2020 18:16:47 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 27 Mar 2020 18:16:43 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02RIGle940304842
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 27 Mar 2020 18:16:47 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1F240A4040;
- Fri, 27 Mar 2020 18:16:47 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 86CFDA4051;
- Fri, 27 Mar 2020 18:16:46 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.186.193])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 27 Mar 2020 18:16:46 +0000 (GMT)
-Date: Fri, 27 Mar 2020 19:16:30 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1] s390x: Reject unaligned RAM sizes
-In-Reply-To: <20200327174620.06b9c324@redhat.com>
-References: <20200327152930.66636-1-david@redhat.com>
- <64cefab8-f1e0-fbc7-27d3-4f28758c595a@de.ibm.com>
- <d8fb50c1-639a-826c-0dce-e2ddc26ae5e1@redhat.com>
- <24681aa0-9053-238f-89da-8ce08d34241d@de.ibm.com>
- <20200327174620.06b9c324@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (envelope-from <jwsu1986@gmail.com>) id 1jHtat-000640-CK
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:20:36 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46756)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jwsu1986@gmail.com>) id 1jHtat-000639-6f
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 14:20:35 -0400
+Received: by mail-oi1-x241.google.com with SMTP id q204so9570153oia.13
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 11:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=kgfu25sOAGG/kz/ioKZadtyFeWYDObYKU2OTe3el3HA=;
+ b=t+Ly6fsFaXrr75GubwMBCsS/fLVpW2z0Blm5WsWWlMvwF8FeAcUUEJtn2RsqIvaGJ5
+ +JadEI4ol0HVGplBRFb/mZMsL+U5BPGg2zWh35jA2WXQExk5y22XMVcrqZM2izJKrTHe
+ Rqf2G+jdWcYy/ieFf67PPjrlhD9p3kcdgvScLDRderVEqB0xsBe2qDXZ9KKFZbi/9+ce
+ NqGiapMLtD2kUgzl15slrg3TkH4sVRDRo9W7aLBIzePbd0hvlvV9WKuxKEjhlNWZqGiw
+ T7AdOnLjry8OxW1eyfnrW1zR3dPgSVienD3Wks1n3CabH8k9/v4qJ+M85W8/stDzzTi0
+ naTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=kgfu25sOAGG/kz/ioKZadtyFeWYDObYKU2OTe3el3HA=;
+ b=BgR2wC5WWELIBqtBoli+csRhI8aqVe2kgqliiR7L0v5vNfcKen1iniOAqB5w78VxfO
+ fmNGR8zG3Blhc8KbI8cfUO3dO/am5eseLDoEILrU6qn3KrcVbpmcPcc+JigN2sFEJ+p+
+ 6CtbKHW0Z9rdh88jfGV6C4J2+Vsj0I+tx5DyYJ3eoeQSF3+WCbr5pN31uv48v95NtWf8
+ ON8kkqvEkpkC9aGy9TFfEs+wR4QHFo7QHaLFKG/vwBe//0XyYC+xsiN8pPxuF1xAItGg
+ YzvhgkmbnIELUiJhK4ziS/OibBHiIAV5TziniMvOxugdf5tLkP0gNeUjfW3Mmef44/F9
+ USQA==
+X-Gm-Message-State: ANhLgQ2YIkGD4I0+4Q1VHZLG5BT0/j/r7D0TfMPIKGCiBGSRdWgL6gzQ
+ kR5rJcekVEZ1fclXwua/nOTg87zuS7PZEjiBk4Y=
+X-Google-Smtp-Source: ADFU+vszSazor3zQy01UZqfMbBKj0ui0CrffgBughGwxW2Q5g/N6D4iBrLjxJAHACHkAfy4DfZGmhNX0dpjRX60crcI=
+X-Received: by 2002:a05:6808:b30:: with SMTP id
+ t16mr123716oij.66.1585333233716; 
+ Fri, 27 Mar 2020 11:20:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032718-0008-0000-0000-000003656C95
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032718-0009-0000-0000-00004A86E786
-Message-Id: <20200327191630.6d46e7a8.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-27_06:2020-03-27,
- 2020-03-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 malwarescore=0
- phishscore=0 impostorscore=0 priorityscore=1501 spamscore=0 bulkscore=0
- mlxlogscore=999 lowpriorityscore=0 clxscore=1015 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003270148
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+References: <20200325094354.19677-1-dereksu@qnap.com>
+ <20200325094354.19677-3-dereksu@qnap.com>
+ <20200327184549.3802f959@luklap>
+In-Reply-To: <20200327184549.3802f959@luklap>
+From: Derek Su <jwsu1986@gmail.com>
+Date: Sat, 28 Mar 2020 02:20:21 +0800
+Message-ID: <CAFKS8hUUC4LCDJDdRmiHXa2VHdhrcytJGyXFFxz85h4p1hiJRw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] net/colo-compare.c: handling of the full primary
+ or secondary queue
+To: Lukas Straub <lukasstraub2@web.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,79 +92,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, "Dr .
- David Alan Gilbert" <dgilbert@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>
+Cc: lizhijian@cn.fujitsu.com, chyang@qnap.com, Derek Su <dereksu@qnap.com>,
+ jasowang@redhat.com, qemu-devel@nongnu.org, ctcheng@qnap.com, "Zhang,
+ Chen" <chen.zhang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 27 Mar 2020 17:46:20 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
+Lukas Straub <lukasstraub2@web.de> =E6=96=BC 2020=E5=B9=B43=E6=9C=8828=E6=
+=97=A5 =E9=80=B1=E5=85=AD =E4=B8=8A=E5=8D=881:46=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Wed, 25 Mar 2020 17:43:54 +0800
+> Derek Su <dereksu@qnap.com> wrote:
+>
+> > The pervious handling of the full primary or queue is only dropping
+> > the packet. If there are lots of clients to the guest VM,
+> > the "drop" will lead to the lost of the networking connection
+> > until next checkpoint.
+> >
+> > To address the issue, this patch drops the packet firstly.
+> > Then, send all queued primary packets, remove all queued secondary
+> > packets and do checkpoint.
+> >
+> > Signed-off-by: Derek Su <dereksu@qnap.com>
+> > ---
+> >  net/colo-compare.c | 41 ++++++++++++++++++++++++++++++-----------
+> >  1 file changed, 30 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/net/colo-compare.c b/net/colo-compare.c
+> > index cdd87b2aa8..1a52f50fbe 100644
+> > --- a/net/colo-compare.c
+> > +++ b/net/colo-compare.c
+> > @@ -125,6 +125,12 @@ static const char *colo_mode[] =3D {
+> >      [SECONDARY_IN] =3D "secondary",
+> >  };
+> >
+> > +enum {
+> > +    QUEUE_INSERT_ERR =3D -1,
+> > +    QUEUE_INSERT_OK =3D 0,
+> > +    QUEUE_INSERT_FULL =3D 1,
+> > +};
+> > +
+> >  static int compare_chr_send(CompareState *s,
+> >                              const uint8_t *buf,
+> >                              uint32_t size,
+> > @@ -211,8 +217,10 @@ static int colo_insert_packet(GQueue *queue, Packe=
+t *pkt, uint32_t *max_ack)
+> >  }
+> >
+> >  /*
+> > - * Return 0 on success, if return -1 means the pkt
+> > - * is unsupported(arp and ipv6) and will be sent later
+> > + * Return QUEUE_INSERT_OK on success.
+> > + * If return QUEUE_INSERT_FULL means list is full, and
+> > + * QUEUE_INSERT_ERR means the pkt is unsupported(arp and ipv6) and
+> > + * will be sent later
+> >   */
+> >  static int packet_enqueue(CompareState *s, int mode, Connection **con)
+> >  {
+> > @@ -234,7 +242,7 @@ static int packet_enqueue(CompareState *s, int mode=
+, Connection **con)
+> >      if (parse_packet_early(pkt)) {
+> >          packet_destroy(pkt, NULL);
+> >          pkt =3D NULL;
+> > -        return -1;
+> > +        return QUEUE_INSERT_ERR;
+> >      }
+> >      fill_connection_key(pkt, &key);
+> >
+> > @@ -258,11 +266,12 @@ static int packet_enqueue(CompareState *s, int mo=
+de, Connection **con)
+> >                       "drop packet", colo_mode[mode]);
+> >          packet_destroy(pkt, NULL);
+> >          pkt =3D NULL;
+> > +        return QUEUE_INSERT_FULL;
+> >      }
+> >
+> >      *con =3D conn;
+> >
+> > -    return 0;
+> > +    return QUEUE_INSERT_OK;
+> >  }
+> >
+> >  static inline bool after(uint32_t seq1, uint32_t seq2)
+> > @@ -995,17 +1004,22 @@ static void compare_pri_rs_finalize(SocketReadSt=
+ate *pri_rs)
+> >  {
+> >      CompareState *s =3D container_of(pri_rs, CompareState, pri_rs);
+> >      Connection *conn =3D NULL;
+> > +    int ret;
+> >
+> > -    if (packet_enqueue(s, PRIMARY_IN, &conn)) {
+> > +    ret =3D packet_enqueue(s, PRIMARY_IN, &conn);
+> > +    if (ret =3D=3D QUEUE_INSERT_OK) {
+> > +        /* compare packet in the specified connection */
+> > +        colo_compare_connection(conn, s);
+> > +    } else if (ret =3D=3D QUEUE_INSERT_FULL) {
+> > +        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+> > +        colo_compare_inconsistency_notify(s);
+> > +    } else {
+> >          trace_colo_compare_main("primary: unsupported packet in");
+> >          compare_chr_send(s,
+> >                           pri_rs->buf,
+> >                           pri_rs->packet_len,
+> >                           pri_rs->vnet_hdr_len,
+> >                           false);
+> > -    } else {
+> > -        /* compare packet in the specified connection */
+> > -        colo_compare_connection(conn, s);
+> >      }
+> >  }
+> >
+> > @@ -1013,12 +1027,17 @@ static void compare_sec_rs_finalize(SocketReadS=
+tate *sec_rs)
+> >  {
+> >      CompareState *s =3D container_of(sec_rs, CompareState, sec_rs);
+> >      Connection *conn =3D NULL;
+> > +    int ret;
+> >
+> > -    if (packet_enqueue(s, SECONDARY_IN, &conn)) {
+> > -        trace_colo_compare_main("secondary: unsupported packet in");
+> > -    } else {
+> > +    ret =3D packet_enqueue(s, SECONDARY_IN, &conn);
+> > +    if (ret =3D=3D QUEUE_INSERT_OK) {
+> >          /* compare packet in the specified connection */
+> >          colo_compare_connection(conn, s);
+> > +    } else if (ret =3D=3D QUEUE_INSERT_FULL) {
+> > +        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+> > +        colo_compare_inconsistency_notify(s);
+> > +    } else {
+> > +        trace_colo_compare_main("secondary: unsupported packet in");
+> >      }
+> >  }
+> >
+>
+> Hi,
+> I don't think we have to flush here because the (post-)checkpoint event w=
+ill flush the packets for us.
+>
 
-> On Fri, 27 Mar 2020 17:05:34 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
-> > On 27.03.20 17:01, David Hildenbrand wrote:
-> > > On 27.03.20 16:34, Christian Borntraeger wrote:  
-> > >>
-> > >>
-> > >> On 27.03.20 16:29, David Hildenbrand wrote:  
-> > >>> Historically, we fixed up the RAM size (rounded it down), to fit into
-> > >>> storage increments. Since commit 3a12fc61af5c ("390x/s390-virtio-ccw: use
-> > >>> memdev for RAM"), we no longer consider the fixed-up size when
-> > >>> allcoating the RAM block - which will break migration.
-> > >>>
-> > >>> Let's simply drop that manual fixup code and let the user supply sane
-> > >>> RAM sizes. This will bail out early when trying to migrate (and make
-> > >>> an existing guest with e.g., 12345 MB non-migratable), but maybe we
-> > >>> should have rejected such RAM sizes right from the beginning.
-> > >>>
-> > >>> As we no longer fixup maxram_size as well, make other users use ram_size
-> > >>> instead. Keep using maxram_size when setting the maximum ram size in KVM,
-> > >>> as that will come in handy in the future when supporting memory hotplug
-> > >>> (in contrast, storage keys and storage attributes for hotplugged memory
-> > >>>  will have to be migrated per RAM block in the future).
-> > >>>
-> > >>> This fixes (or rather rejects early):
-> > >>>
-> > >>> 1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as the
-> > >>>    RAM block size changed.  
-> > >>
-> > >> Not sure I like this variant. Instead of breaking migration (that was 
-> > >> accidentially done by Igors changes) we now reject migration from older
-> > >> QEMUs to 5.0. This is not going to help those that still have such guests
-> > >> running and want to migrate.   
-> > > 
-> > > As Igor mentioned on another channel, you most probably can migrate an
-> > > older guest by starting it on the target with a fixed-up size.
-> > > 
-> > > E.g., migrate an old QEMU "-m 1235M" to a new QEMU "-m 1234M"  
-> > 
-> > Yes, that should probably work.
-> I'm in process of testing it.
-> 
-> > > Not sure how many such weird-size VMs we actually do have in practice.  
-> > 
-> > I am worried about some automated deployments where tooling has created
-> > these sizes for dozens or hundreds of containers in VMS and so.
-> Yep, it's possible but then that tooling/configs should be fixed to work with
-> new QEMU that validates user's input.
-> 
+Hi,
+Yes, the periodical checkpoint can flush the packets.
 
-@David: I'm a little confused. Is this fix about adding user input
-validation, or is it about changing what valid inputs are?
+But, if many clients send many packets to the vm,
+there is a high probability that packets are dropped because the
+primary/secondary queues are always full.
+It causes lots of re-transmission between clients and vm and
+deteriorate service response to clients.
 
-I don't see this alignment requirement documented, so my guess is the
-latter. And then, I'm not sure I'm sold on this.
+Sincerely,
+Derek Su
 
-Regards,
-Halil
-
-
-
+> Regards,
+> Lukas Straub
 
