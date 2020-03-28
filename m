@@ -2,83 +2,75 @@ Return-Path: <SRS0=dICq=5N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4C2C43331
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 09:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EE75C43331
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 12:31:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2BAC206F2
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 09:39:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tp1MJYUl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2BAC206F2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CB20320716
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 12:31:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB20320716
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jI7vo-0000a6-1v
-	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 05:39:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34638)
+	id 1jIAco-0001sh-VQ
+	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 08:31:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jI7v9-0008QM-RC
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 05:38:28 -0400
+ (envelope-from <bounces@canonical.com>) id 1jIAbt-0001GZ-7m
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 08:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jI7v8-0004BB-GQ
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 05:38:27 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:35438)
+ (envelope-from <bounces@canonical.com>) id 1jIAbr-0007oJ-WF
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 08:30:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49540)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jI7v8-0004AF-6g
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 05:38:26 -0400
-Received: by mail-ot1-x334.google.com with SMTP id v2so7923169oto.2
- for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 02:38:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=g/zJORtGY4if+gy9Ga/swdJYKKDNY5arpp6n5BZ1Pi8=;
- b=Tp1MJYUlfyNRlj33z2au5YZytKIsKLN/nJ/DKMT/pr4hjJSr5bhY+r23zTIoBDGAlu
- efCwMbWqeL6IJSrmcUUuX50xehFdBKtPj19kIk2F7HpBMLaGavCmCKiZc4ek6rWUttfc
- /SuuZalGPsx/uJ4/0nT8QzwWanspti56hC1Fn5bfozQ+8tGUHuBVvThXaP1l9OK1XrEK
- 9s0sYxL9VAwDW5ioxPKtzQ82rozh/+WUmO3FNYP3PY+Ll3gyDye9Sq771G7PrfFdbGm2
- XE3u7SsA3xbRuDGqgeElYIAk8YQufqaPOGwTeXyL43u8683FVK8i7UcHt1P09UgXruf3
- 1Q0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=g/zJORtGY4if+gy9Ga/swdJYKKDNY5arpp6n5BZ1Pi8=;
- b=UB3xeKAd09sTKbvd45Agnyzxh3Jq2RExBU+Pt0iyCY9sTNkrtZSiWQtFvcXO2/zgQc
- kxB8DWJTgdVS0EpYzBIruIabic5Eap9TOoXtRylOle6fsUzXOyXZSHf/MFuk1ybc2MHj
- zZ7yY14RpnPk4PU7LMUUrV1MiDmGQv0qpDkxErXM2pYNn9qb1l+BlpIKrL12qRxjrKbp
- tjHNdLcRgdumnl8/kR4n0TIKgeK0gp3ivI8AXbGAhd/CrBt+b3V9YhmLXuLL9VjgsSIv
- nG1Brx17b6RHj4ag1IUqDkt8bbZVdUACmRNllRSU6xeMx6kOwc6oyWEVYhHmzTk6BPLJ
- 4dWg==
-X-Gm-Message-State: ANhLgQ3FgZF6IPhPL61+36NcLyxRoNr89jbU0JWKfilA+/YPlrY952AS
- iKpHxOjnjbO60J+WxOW23WTBeEjdnS/yYXDjqvxclA==
-X-Google-Smtp-Source: ADFU+vvaefA+7W6YoMkg8og1ezhHYZlV+58tVW9N018g7dH01MdQxvIhwD13xMOhNgfRM/XsMYYVd0J57xTOaQRopvk=
-X-Received: by 2002:a05:6830:18f4:: with SMTP id
- d20mr2141644otf.91.1585388305202; 
- Sat, 28 Mar 2020 02:38:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jIAbr-0007nf-Qr
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 08:30:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jIAbq-0008SR-Dn
+ for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 12:30:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 633952E80C8
+ for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 12:30:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200327201501.1417-1-jsnow@redhat.com>
-In-Reply-To: <20200327201501.1417-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 28 Mar 2020 09:38:13 +0000
-Message-ID: <CAFEAcA9EGZZS+=BEtmCM=cnqyW2QcdfBQpkwxQL7O4Yz+t6OvA@mail.gmail.com>
-Subject: Re: [PULL 0/5] Ide patches
-To: John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::334
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 28 Mar 2020 12:23:12 -0000
+From: =?utf-8?q?Carlo_Marcelo_Arenas_Bel=C3=B3n?= <1821515@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: archimedesmp trofi
+X-Launchpad-Bug-Reporter: Sergei Trofimovich (trofi)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Carlo_Marcelo_Arenas_Bel=C3=B3n_=28care?=
+ =?utf-8?q?nasgm=29?=
+X-Launchpad-Bug-Duplicate: 1821444
+References: <155342942845.31965.16406839542937078170.malonedeb@soybean.canonical.com>
+Message-Id: <158539819272.11416.2911868336573471662.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1821515] Re: qemu-ppc (user) incorrectly converts
+ float(nan)->double(non-nan)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 83f1d8cf802957e009d327cbcdb457b6cab74756
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,48 +79,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Helge Deller <deller@gmx.de>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1821515 <1821515@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 27 Mar 2020 at 20:15, John Snow <jsnow@redhat.com> wrote:
->
-> The following changes since commit cfe68ae025f704f336d7dd3d1903ce37b445831d:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0-pull-request' into staging (2020-03-26 20:55:54 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to cbf4c9ac9c000f7caf1bfee031041b62d2b000c8:
->
->   cmd646-ide: use qdev gpio rather than qemu_allocate_irqs() (2020-03-27 14:30:08 -0400)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> ---------------------------------------------------------------
+*** This bug is a duplicate of bug 1821444 ***
+    https://bugs.launchpad.net/bugs/1821444
 
+** This bug has been marked a duplicate of bug 1821444
+   qemu-ppc (user) incorrectly translates float32 arithmetics
 
-Applied, thanks.
+-- =
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1821515
 
--- PMM
+Title:
+  qemu-ppc (user) incorrectly converts float(nan)->double(non-nan)
+
+Status in QEMU:
+  New
+
+Bug description:
+  Noticed on qemu-3.1.0 on GHC test suite where float32 comparisons didn't =
+work on NaNs.
+  Here is the minimal reproducer:
+
+  ```c
+  // cat a.c
+  #include <stdio.h>
+  #include <math.h>
+  #include <stdint.h>
+
+  int main() {
+      volatile float f1 =3D NAN;
+      volatile float f2 =3D NAN;
+      printf ("f1 (%e, %#x) >=3D f2 (%e, %#x): %s\n",
+          f1, *(volatile uint32_t*)&f1,
+          f2, *(volatile uint32_t*)&f2,
+          (f1 >=3D f2) ? "True"
+                     : "False");
+      volatile double d =3D f1;
+      printf ("d (%e, %#llx)\n",
+          d, *(volatile uint64_t*)&d);
+  }
+  ```
+
+  ```
+  # incorrect execution:
+  $ powerpc-unknown-linux-gnu-gcc -O2 a.c -o a -static && qemu-ppc ./a =
+
+  f1 (5.104236e+38, 0x7fc00000) >=3D f2 (5.104236e+38, 0x7fc00000): True
+  d (5.104236e+38, 0x47f8000000000000)
+
+  # correct execution
+  $ scp a timberdoodle.ppc64.dev.gentoo.org:~/;  ssh timberdoodle.ppc64.dev=
+.gentoo.org ./a
+  f1 (nan, 0x7fc00000) >=3D f2 (nan, 0x7fc00000): False
+  d (nan, 0x7ff8000000000000)
+  ```
+
+  Note: qemu-ppc handled float32 extension as it was not a NaN
+  (exp=3D111..1111) but a normalized number.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1821515/+subscriptions
 
