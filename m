@@ -6,87 +6,86 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9847C43331
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 03:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FD7C43331
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 03:58:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 705602073B
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 03:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0ECE42073B
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 03:58:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MjsgDJ9g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 705602073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CnOW+ofl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECE42073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jI2VH-0006hd-MZ
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 23:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60219)
+	id 1jI2cJ-00088P-9V
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 23:58:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60714)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jI2Uc-0006Gc-SD
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 23:50:44 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jI2bf-0007g9-40
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 23:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jI2Ub-0008BI-Ea
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 23:50:42 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46706)
+ (envelope-from <richard.henderson@linaro.org>) id 1jI2be-00058q-2Q
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 23:57:59 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34531)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jI2Ub-0008Ap-4v
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 23:50:41 -0400
-Received: by mail-pl1-x642.google.com with SMTP id s23so4234193plq.13
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 20:50:40 -0700 (PDT)
+ id 1jI2bd-00058C-PJ
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 23:57:58 -0400
+Received: by mail-pg1-x541.google.com with SMTP id d37so5123003pgl.1
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 20:57:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=vYSK+QZGTfqXcI0RKza85sUIJZRikjtw45NuTzVCe+E=;
- b=MjsgDJ9g/+E7oGWY8QpluUXI7fMtDnGU4T0RBbM11u8QQmtk2xMML8KHiQOr62B79A
- cv8yUuAwMyoUkQTfbjFB2m0mSHpqHfBi3YsPS35kUbyFesuQCkOj2MuDVd5YfgJ9RM1H
- 99IdMLVSO1KefxzvjWrzfkXyEBoGWNK8bOIg3QsQ19hD+Wq3NbxTK/dkY0cNiqy8LdWS
- JkU5F21S1owepNzoZBsoTdTlB1F/M2ziHeDG5tjypiN9b2Gq5oqkpV0rRT3VDkMBW9hU
- yfMq0z+gE+9poesU6q0NMq9dyAzUeERM3F2jUkBX9VyzhUSMUpZ7qzXA6dHhLkURGR65
- bFfA==
+ bh=v63jdjHMa34GweLIYpGjS74osC4ZDLGriEaDp/Ur9aw=;
+ b=CnOW+ofl9/VwkAMvx0mdOYgdfbWGjENgg770unos9KwR7xiofYjFVxvy+zmhTK22BU
+ Ppc+iGBWfjukMRLCmO7WHiv1YMdkON2uD9Uy52D5SpDRnIq5q1ZhZyDY1B7u6w+PIYha
+ OohLEllmqTqDBovt4BW+5vv+bxtXJGuILhDKqbWVgcUE0fQ7/aaIZDdwOB1uHz/ru1ih
+ 1auAM1ejMuOHcDi1lNVVGnDlrdGag9rS7n7nT07Czwp3OcyciC5a2evxU/hJ8Cm7+riK
+ 0kRNyYB+gNP2RYetbRg22fBIgyryzbffW+Dfo/wIlvgNMqEnYfytECiTlFAPy1vnozqL
+ zfVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=vYSK+QZGTfqXcI0RKza85sUIJZRikjtw45NuTzVCe+E=;
- b=gFWxL68rYBk0WeM3czw+FNbM46xFyvYa/xR8NDkxuKEXqXJ5a5kYuCuYaAF/yLwcpL
- fHy/UOzYXUGdit2tcJWWoFBBpPDoW+rh/5pfqDe6RxfHUGNiu6FbCA9zGEeqcqaG89Tr
- urs7fVONzuBjWYb4lLruixEiZREnHJ42CWcL+9r9MennvxGZxtptQBH2f72EpFn4kU/b
- ty9M6IemXKpyNGssiQ3rI5q8wzNnAPPP5Rc8LeVjSCo/5hQJDKv7sXRxX4bNzTwcElbS
- 7l9PWMtaoRymZeE6A/QrY9lKdQWvllASARmWF+YG3skiXAPl2R7jx8gHsx0u07FV6upp
- vguA==
-X-Gm-Message-State: ANhLgQ1GB92mSSHbFZwKH6T7YfT78aBATKtQCStasWqHlKYKINyDb88p
- GqJkOnhWgulhLLeDKa/TTq0i+Q==
-X-Google-Smtp-Source: ADFU+vveCbNEF7eiOG6NaXWevzWCYUPo6azrIL4HVTk01Bzy04OcqkJCIIHGeV+XiAJfbfkPl7tNGw==
-X-Received: by 2002:a17:902:7445:: with SMTP id
- e5mr2151242plt.308.1585367439744; 
- Fri, 27 Mar 2020 20:50:39 -0700 (PDT)
+ bh=v63jdjHMa34GweLIYpGjS74osC4ZDLGriEaDp/Ur9aw=;
+ b=gQkAizFEu9MljftLLhzSaRSPU+0WBfSdK2sAhqDaqhyumYDOvsJECLKDq7gpPjfWGl
+ G3msjDh87Qu9ccnYqmiZZq8/uSfrw2reI2laMHLXEn8n44d5VCwHsJm2gbIjOtH/xshw
+ 8pUhLOnwBMEYQwPVyYsgOlofJRuyYzKEsmzozJscB3HvH3JoX4XrgvW9AlYWSU2g1RU9
+ VqhoPZzhwR0gpzczumktfxFN7oV7MijmVeWs/StBp5P+bzUOTxQuzOn22Z/ML4ARZGXF
+ Lp17P2jnjDWICyTAYVGerTtS3xSN7gLeU7Hwfz9SmiInsP1P7o2ElbZDqp5R/p/tjXQ9
+ tLlg==
+X-Gm-Message-State: ANhLgQ3K4ApDDcnjURfZwfvY3hyPiimUQqlUFeMJrp5HYkzJN8WerJvY
+ IGvgOKGCgOHTxgKlWE80yeZtFw==
+X-Google-Smtp-Source: ADFU+vuGz8r2wvgnnr1w4ACd1lo9wb56yR0hiM/uwAxUmiYJ6x13KaGaihtrJUmrqsebhXWqeeOAhQ==
+X-Received: by 2002:aa7:9e42:: with SMTP id z2mr2493175pfq.109.1585367876286; 
+ Fri, 27 Mar 2020 20:57:56 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id w5sm5242658pfq.80.2020.03.27.20.50.38
+ by smtp.gmail.com with ESMTPSA id 144sm4938726pgd.29.2020.03.27.20.57.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 27 Mar 2020 20:50:38 -0700 (PDT)
-Subject: Re: [PATCH v6 58/61] target/riscv: vector slide instructions
+ Fri, 27 Mar 2020 20:57:55 -0700 (PDT)
+Subject: Re: [PATCH v6 59/61] target/riscv: vector register gather instruction
 To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
 References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
- <20200317150653.9008-59-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-60-zhiwei_liu@c-sky.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fb54142a-7e99-e456-f8b2-f7ca1c99ca80@linaro.org>
-Date: Fri, 27 Mar 2020 20:50:36 -0700
+Message-ID: <d2c3feba-9a54-79c6-cb2d-fbc7d7ca7dac@linaro.org>
+Date: Fri, 27 Mar 2020 20:57:53 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200317150653.9008-59-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-60-zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,11 +106,11 @@ Sender: "Qemu-devel"
 On 3/17/20 8:06 AM, LIU Zhiwei wrote:
 > Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 > ---
->  target/riscv/helper.h                   |  17 ++++
->  target/riscv/insn32.decode              |   7 ++
->  target/riscv/insn_trans/trans_rvv.inc.c |  17 ++++
->  target/riscv/vector_helper.c            | 128 ++++++++++++++++++++++++
->  4 files changed, 169 insertions(+)
+>  target/riscv/helper.h                   |   9 ++
+>  target/riscv/insn32.decode              |   3 +
+>  target/riscv/insn_trans/trans_rvv.inc.c | 127 ++++++++++++++++++++++++
+>  target/riscv/vector_helper.c            |  64 ++++++++++++
+>  4 files changed, 203 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
