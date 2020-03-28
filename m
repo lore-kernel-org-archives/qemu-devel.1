@@ -2,91 +2,91 @@ Return-Path: <SRS0=dICq=5N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 714FCC43331
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 00:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B07D0C43331
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 00:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35B7C206E6
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 00:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E706206F2
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 00:21:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fw0dPDSR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35B7C206E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NMSFGcTm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E706206F2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jHzC7-0004l8-8L
-	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 20:19:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37649)
+	id 1jHzEE-0006K0-Ho
+	for qemu-devel@archiver.kernel.org; Fri, 27 Mar 2020 20:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jHzB0-0004Hs-5H
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 20:18:15 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jHzDW-0005Uq-LN
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 20:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jHzAy-0006eM-Qd
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 20:18:13 -0400
-Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:34383)
+ (envelope-from <richard.henderson@linaro.org>) id 1jHzDV-0003Co-B5
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 20:20:50 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40148)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jHzAy-0006cJ-Fn
- for qemu-devel@nongnu.org; Fri, 27 Mar 2020 20:18:12 -0400
-Received: by mail-pg1-x535.google.com with SMTP id d37so4894789pgl.1
- for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 17:18:12 -0700 (PDT)
+ id 1jHzDU-00031k-R6
+ for qemu-devel@nongnu.org; Fri, 27 Mar 2020 20:20:49 -0400
+Received: by mail-pg1-x541.google.com with SMTP id t24so5401607pgj.7
+ for <qemu-devel@nongnu.org>; Fri, 27 Mar 2020 17:20:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Stdt4wZS8Bw1Pr/+C0ql/58da6XeGZWRl23JDh6f8gI=;
- b=fw0dPDSRqF7hvnzkx1Ke11TBvJgoTIjv4yp264rYGG3PRGdvPamo+rdoMpVYb2MA89
- hxmgpviuibELy6WPuFNmekHDSu1xzOBszD5IHMKoXRIWzKNJVWNK4oRg5Rn1QeTPz0GZ
- dzc/9JnyrcGRa5DbQADJlnTdUJanHm2lhFnEeegnE7wVHG7YKsqtRud5tIqYWRA0FFQK
- 3lduiAwLl5t5KG/jbLYRj9u3A43AG3uQTNYTxM+fNlY8yxo+h5PH336P7eB8RojRBszK
- blngCqI2sgf0kPX2cpTRmEFceUX8iyUb6gO0rnmOCsvpaBKbyWdy8WKEpgdintn6p8bK
- +eRw==
+ bh=kMnXvxoIDB6jHvcS3CzFeAgUuNu+ToAuP9j4ypZV71c=;
+ b=NMSFGcTmDLLi9AqiTuYH3K1iF2JbDzQxCA2M1HET0Z9KEwPdVCHkjfwk84KZBbGoXz
+ s9cdJxujHJbNtnrgpVzOj8FE+HO/JKtriQTUNoUAN+qLFdhyxtpgXIpUqEYLB1j/Tomr
+ ECfKI7hawvPmbhoTRP8ggNonroO3ynhUT4pToIKtoW51+hicP2onMG5M0QgP1pnWPhGD
+ NXR1de3/lLDMrZvmhYQwWa+hq45tYPdAQ5B6qk86MfQg/bRzMKgjGzvhCMa17EnBnxUr
+ Ncc6z5Et7WoLQfVrjJ2uHKTuWkPk2NEOCmYqO7cS+3+UVGk2c4yXCSpc1XXRU7hn3gaa
+ rHsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Stdt4wZS8Bw1Pr/+C0ql/58da6XeGZWRl23JDh6f8gI=;
- b=SZYgHe0bFilC81Mmn3UVUvF3kDnAeUoEowoq4fOMyJYcXS2E3tSJfAa/0/YnLfBQY8
- OgenuooLkNhu0YCr0oUyY+RTuJjoFI81k+Ughqia/uMHDPY8vIlLi7+O7TL1BElzTiMs
- fKfyNutUjEj80a2DXhW7yIjWbdhN9ST6gKUygfglPaRN1apHak2rwf8yLdhl0Nh4Hdg0
- +hueUKp0S4jQxObInhe/wg6CpisGSt7S1QPOmpGXaBbA43URXF63tlAdKEMz6wLxy5JW
- CK8AEUCX/q96j73w3pjUkWe62fq0SDo/VZ1q5G4FVjij7rARhlH7zLhKgtYeVvuLIH0a
- MwqQ==
-X-Gm-Message-State: ANhLgQ3kVL0k6Gx/xrtVtxOUV1nJd32XolFiIMesuuOJdc/nBwe7S1Pv
- lb7cJzi9se6gXaqwPEnV6gaHpA==
-X-Google-Smtp-Source: ADFU+vuMYuKRlqi+vtg1ODV2HWgA0WGftstjbpPQiLyzPXggPPduSK6xZpqoKa9KswWASAozU45pNg==
-X-Received: by 2002:a62:ae06:: with SMTP id q6mr1845983pff.137.1585354690898; 
- Fri, 27 Mar 2020 17:18:10 -0700 (PDT)
+ bh=kMnXvxoIDB6jHvcS3CzFeAgUuNu+ToAuP9j4ypZV71c=;
+ b=jF0dSDlqUFSTAGf+8Zcb9jQ1f7lTNnOS0yM+pGICou5Y3lmMHTgDVKBfmYWsOshHX2
+ QDrgWrDembE2s508G1uqw/IZS63/RUl8G5Hqe9Tfm90JwZFDmU0yTUj6CTVQ1nYfbfMh
+ O5npDl2L/n1shzdV33GYBiJWVOWNVJ1GekAZ/9Bkna1sTe5GzrsxqRStSXzgR6rA617F
+ LdIqGmEHG+VuWe9SbgpBBI//mnzhHf1CWDQ4HDgLczsJQk2q8xWFXvV1L243NqgIjG5G
+ EnfUFComuYCS0CS81pkZSKYaBiorpjpd46cN0ssIbchiZsf9hlapSREI7tMoL/+3HcDX
+ KarQ==
+X-Gm-Message-State: ANhLgQ0aplp+d+87VV2R600Z1YkB21Jo2ahJo5c1hVjU3WqwECnDLQmr
+ kF+Rc2werHGQ8uSgt4Xr04Cj+Q==
+X-Google-Smtp-Source: ADFU+vuRKN2A4Uv2+NkyoiojZEa7JKcAEufvZI7L1zwrmw9iAPrIui5evCwCldYuikIs+8JQy0xklQ==
+X-Received: by 2002:a63:82c6:: with SMTP id w189mr1835473pgd.357.1585354847206; 
+ Fri, 27 Mar 2020 17:20:47 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id l62sm4654340pgd.82.2020.03.27.17.18.09
+ by smtp.gmail.com with ESMTPSA id x70sm4611391pgd.37.2020.03.27.17.20.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 27 Mar 2020 17:18:10 -0700 (PDT)
-Subject: Re: [PATCH v6 23/61] target/riscv: vector integer merge and move
- instructions
+ Fri, 27 Mar 2020 17:20:46 -0700 (PDT)
+Subject: Re: [PATCH v6 24/61] target/riscv: vector single-width saturating add
+ and subtract
 To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
 References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
- <20200317150653.9008-24-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-25-zhiwei_liu@c-sky.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e89b1f3f-8395-31be-4ff5-2ab2a21c1adf@linaro.org>
-Date: Fri, 27 Mar 2020 17:18:08 -0700
+Message-ID: <3460b0f5-ab47-238e-181d-a74f3d135005@linaro.org>
+Date: Fri, 27 Mar 2020 17:20:44 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200317150653.9008-24-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200317150653.9008-25-zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::535
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,42 +105,17 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/17/20 8:06 AM, LIU Zhiwei wrote:
-> +        if (s->vl_eq_vlmax) {
-> +#ifdef TARGET_RISCV64
-> +            tcg_gen_gvec_dup_i64(s->sew, vreg_ofs(s, a->rd),
-> +                                 MAXSZ(s), MAXSZ(s), s1);
-> +#else
-> +            tcg_gen_gvec_dup_i32(s->sew, vreg_ofs(s, a->rd),
-> +                                 MAXSZ(s), MAXSZ(s), s1);
-> +#endif
-
-Note to self: Add tcg_gen_gvec_dup_tl to tcg-op-gvec.h.
-
-> +            switch (s->sew) {
-> +            case 0:
-> +                tcg_gen_gvec_dup8i(vreg_ofs(s, a->rd),
-> +                                   MAXSZ(s), MAXSZ(s), simm);
-> +                break;
-> +            case 1:
-> +                tcg_gen_gvec_dup16i(vreg_ofs(s, a->rd),
-> +                                    MAXSZ(s), MAXSZ(s), simm);
-> +                break;
-> +            case 2:
-> +                tcg_gen_gvec_dup32i(vreg_ofs(s, a->rd),
-> +                                    MAXSZ(s), MAXSZ(s), simm);
-> +                break;
-> +            default:
-> +                tcg_gen_gvec_dup64i(vreg_ofs(s, a->rd),
-> +                                    MAXSZ(s), MAXSZ(s), simm);
-> +                break;
-> +            }
-
-Note to self: Add tcg_gen_gvec_dup_imm(vece, ...).
-
-Neither are your problem, but we should remember to update this code.
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> ---
+>  target/riscv/helper.h                   |  33 ++
+>  target/riscv/insn32.decode              |  10 +
+>  target/riscv/insn_trans/trans_rvv.inc.c |  16 +
+>  target/riscv/vector_helper.c            | 389 ++++++++++++++++++++++++
+>  4 files changed, 448 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
+
 
