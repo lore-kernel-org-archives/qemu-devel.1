@@ -2,66 +2,83 @@ Return-Path: <SRS0=dICq=5N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55346C43331
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 15:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32C28C43331
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 16:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28AD2206F6
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 15:49:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28AD2206F6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 05E6D206DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 16:02:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E6D206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIDhj-0004gD-Bq
-	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 11:48:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42040)
+	id 1jIDux-0003qH-5N
+	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 12:02:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43266)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIDgw-0003oR-Jm
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:48:11 -0400
+ (envelope-from <bounces@canonical.com>) id 1jIDtE-00020V-2w
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:00:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIDgu-0006US-J7
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:48:10 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37105)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jIDgu-0006Ep-28; Sat, 28 Mar 2020 11:48:08 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.4277855|-1; CH=green; DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.0154129-9.47399e-05-0.984492;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16370; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=9; SR=0; TI=SMTPD_---.H6jJXbl_1585410477; 
-Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H6jJXbl_1585410477)
- by smtp.aliyun-inc.com(10.147.41.199);
- Sat, 28 Mar 2020 23:47:58 +0800
-Subject: Re: [PATCH v6 41/61] target/riscv: vector floating-point merge
- instructions
-To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
- <20200317150653.9008-42-zhiwei_liu@c-sky.com>
- <e0d4678b-1a24-3e90-768a-efd0f0311b68@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <623a1ba2-04f0-7e63-dfbd-ff02ed0acc9d@c-sky.com>
-Date: Sat, 28 Mar 2020 23:47:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <bounces@canonical.com>) id 1jIDtC-00052K-Ef
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:00:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38636)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jIDtC-00052A-80
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:00:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jIDtA-00032C-Ib
+ for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 16:00:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 870E42E802B
+ for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 16:00:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e0d4678b-1a24-3e90-768a-efd0f0311b68@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 28 Mar 2020 15:54:23 -0000
+From: Jakub Wilk <1868116@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Triaged; importance=High; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
+ status=Fix Released; importance=Critical;
+ assignee=ubuntu-desktop@lists.ubuntu.com; 
+X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
+ status=Unknown; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
+ server-next
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail janitor leozinho29-eu
+ paelzer seb128
+X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Jakub Wilk (jwilk)
+References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158541086455.12584.8821898484838681689.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1868116] Re: QEMU monitor no longer works
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 516067bc173e49ce29321325544d8cee1d5ac579
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,36 +87,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+** Bug watch added: Debian Bug tracker #954266
+   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D954266
 
+** Also affects: qemu (Debian) via
+   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D954266
+   Importance: Unknown
+       Status: Unknown
 
-On 2020/3/28 11:23, Richard Henderson wrote:
-> On 3/17/20 8:06 AM, LIU Zhiwei wrote:
->> +    for (i = 0; i < vl; i++) {                            \
->> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {        \
->> +            ETYPE s2 = *((ETYPE *)vs2 + H(i));            \
->> +            *((ETYPE *)vd + H1(i)) = s2;                  \
-> H1 should be H.
-Yes.
->
->> +        } else {                                          \
->> +            *((ETYPE *)vd + H(i)) = (ETYPE)s1;            \
->> +        }                                                 \
-> You can also hoist the s2 dereference out of the IF, and let the assignment be
-> unconditional.
->
->    *((ETYPE *)vd + H(i))
->      = (!vm && !vext_elem_mask(v0, mlen, i) ? s2 : s1);
-Yes, it's much better.
+-- =
 
-Zhiwei
->
->
-> r~
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1868116
 
+Title:
+  QEMU monitor no longer works
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
+Status in vte2.91 package in Ubuntu:
+  Fix Released
+Status in qemu package in Debian:
+  Unknown
+
+Bug description:
+  Repro:
+  VTE
+  $ meson _build && ninja -C _build && ninja -C _build install
+
+  qemu:
+  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
+r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
+-enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
+sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
+-disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
+disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
+opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
+irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
+-pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
+vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
+sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
+le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
+e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
+utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
+-disable-cap-ng
+  $ make
+
+  Test:
+  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
+uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
+le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
+rent/images/netboot/mini.iso
+  - switch to monitor with CTRL+ALT+2
+  - try to enter something
+
+  Affects head of both usptream git repos.
+
+  =
+
+  --- original bug ---
+
+  It was observed that the QEMU console (normally accessible using
+  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
+  problematic because there are cases where it's required to send
+  commands to the guest, or key combinations that the host would grab
+  (as Ctrl-Alt-F1 or Alt-F4).
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 20.04
+  Package: qemu 1:4.2-3ubuntu2
+  Uname: Linux 5.6.0-rc6+ x86_64
+  ApportVersion: 2.20.11-0ubuntu20
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Thu Mar 19 12:16:31 2020
+  Dependencies:
+
+  InstallationDate: Installed on 2017-06-13 (1009 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine:
+  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
+  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
+86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
+,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
+home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
+  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
+-re]
+  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
+5]
+  MachineType: LENOVO 80UG
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
+4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
+rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
+ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
+enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
+7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
+scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
+_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
+  dmi.bios.date: 08/09/2018
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN45WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
