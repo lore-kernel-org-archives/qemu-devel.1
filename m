@@ -2,72 +2,96 @@ Return-Path: <SRS0=dICq=5N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 287DCC2D0E5
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 15:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C120C43331
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 15:48:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0106220716
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 15:46:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0106220716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 87120206F6
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 15:48:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EtCKB9nU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87120206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIDfQ-0002Hb-39
-	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 11:46:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41655)
+	id 1jIDhL-000498-GE
+	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 11:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jIDeT-00011D-Tt
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:45:39 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jIDgN-0003OT-24
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jIDeS-00038N-M7
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:45:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35958)
+ (envelope-from <richard.henderson@linaro.org>) id 1jIDgL-0005TY-Nh
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:47:34 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35727)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jIDeS-00037T-GO
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:45:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jIDeR-0001mr-0C
- for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 15:45:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B77802E80D0
- for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 15:45:34 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jIDgL-0005SF-HH
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 11:47:33 -0400
+Received: by mail-pg1-x543.google.com with SMTP id k5so3993394pga.2
+ for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 08:47:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=MKbwnij1Ha6LFvUE+TJiFwc9ex2AHAFEXUHvJ/Nk2/Y=;
+ b=EtCKB9nUSZWH4LaiVi77fJ5e1tt/X5VQ0gFLAIlMT8agUeSyJtOvSRZ1po/S2uwpmj
+ HHytkgT5hbrkN5W0aouKxeDwKYvl3ZjXMo745TXhw8+H8lqLOoVWJhaQK3wLF8/ttlgN
+ m0Ka4t6+q/frvFQm2HXBO31HTzFiaLo/N1mgNmDdPcCU+OpNeGKPwWUuMmxJtM/dShMf
+ qWzOGLMLPViIHoULX01dxt1MEgvaSg4wfG3JCgptCQPmhydNgQKDCVXeHvPvyaHE1Dj+
+ z5CZQ6/qEGB0YEzabRaR/aWG4jsehyXcvhZyKwlIjkQkpn1+Od/pIi/ENcE9O0HB0EnN
+ GjcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MKbwnij1Ha6LFvUE+TJiFwc9ex2AHAFEXUHvJ/Nk2/Y=;
+ b=NNz6REXyrnYqJroT12xl3vRtPzFrkVL/2F///yWt5XrcGyjUn04CskHSDn9u4kztq3
+ TN7NHzV0TMBAwq+TyYBP6Ji79KrZxymtiVeItnxZZHCWV4ikQgV5kgVZ7AjvuZ3ZnUmB
+ v20/uSvuWh9jv+j3JXZMQmrnYf23X3fKcg8tbUsHh6hiLvuzUaf6Q4G2sUb1Je3Ipz2Y
+ GsS7FHP7GGtKWHf88kkT1Kfub0ECarBWXy+Pu8176c35D6qeBbQZKsdBLCK+9+s4F9fL
+ WOonqqturyPwmN4/k66Y3KnQYCmrE+WCVArQ6SWvW41hyeMU2+G1ezw10Q0fA06lFuyR
+ ECXA==
+X-Gm-Message-State: ANhLgQ0Yly2ckdAFWja9ofSfjH7tnaeFljJqn27tyQ6pDSa5YYD9iqkw
+ RLNuDNc93PwPqFZPtjyw4MBbEg==
+X-Google-Smtp-Source: ADFU+vv4P+rKlx09u8UdPUvWe42R01ortUoubS9w34kNzLyflGp33C1CKpcizn1WhKveHTvobtV1jQ==
+X-Received: by 2002:aa7:8ec1:: with SMTP id b1mr4706927pfr.125.1585410452262; 
+ Sat, 28 Mar 2020 08:47:32 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
+ by smtp.gmail.com with ESMTPSA id u21sm6112769pjy.8.2020.03.28.08.47.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 28 Mar 2020 08:47:31 -0700 (PDT)
+Subject: Re: [PATCH v6 18/61] target/riscv: vector single-width integer
+ multiply instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-19-zhiwei_liu@c-sky.com>
+ <1a5900d9-dc26-04f2-74b2-0bada246a0e7@linaro.org>
+ <8be612c0-4345-c1f2-3b82-73a9a1ea4133@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <53209745-9b54-00b3-2b1f-1271f0843021@linaro.org>
+Date: Sat, 28 Mar 2020 08:47:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Mar 2020 15:38:13 -0000
-From: Matt Wilbur <1869497@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mattwilbur
-X-Launchpad-Bug-Reporter: Matt Wilbur (mattwilbur)
-X-Launchpad-Bug-Modifier: Matt Wilbur (mattwilbur)
-Message-Id: <158540989331.24425.14224651637245896063.malonedeb@soybean.canonical.com>
-Subject: [Bug 1869497] [NEW] x86_cpu_gdb_read_register segfaults when gdb
- requests registers
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a296f04231dee355be5db73cc878b9e21689a253";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7394a06de9c01889ca289e63bf03ab377a54703e
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <8be612c0-4345-c1f2-3b82-73a9a1ea4133@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,71 +100,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1869497 <1869497@bugs.launchpad.net>
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 3/28/20 8:17 AM, LIU Zhiwei wrote:
+>> Missed the improvement here.  See tcg_gen_mulsu2_i64.
+> Though I have not gotten the principle, the code in tcg_gen_mulsu2_i64 is much
+> tidier.
 
-When attempting to attach to the gdbstub, a segfault occurs.
+Let A = signed operand,
+    B = unsigned operand
+    P = unsigned product
 
-I traced this down to a problem in a call to gdb_get_reg16 where the
-mem_buf was being treated like a uint8_t* instead of a GByteArray.  The
-buffer passed to gdb_get_reg16 ends up passing an invalid GByteArray
-pointer, which subsequentlycauses a segfault in memcpy.
+If the sign bit A is set, then P is too large.
+In that case we subtract 2**64 * B to fix that:
 
-I have a fix for this - just need to educate myself on how to submit a
-patch.
+    HI_P -= (A < 0 ? B : 0)
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+where the conditional is computed as (A >> 63) & B.
 
-** Description changed:
 
-  When attempting to attach to the gdbstub, a segfault occurs.
-  =
-
-- I traced this down to a problem in a call to gdb_get_reg16 where the mem_=
-buf
-- was being treated like a uint8_t* instead of a GByteArray.  The buffer pa=
-ssed
-- to gdb_get_reg16 ends up passing an invalid GByteArray pointer, which sub=
-sequently
-- causes a segfault in memcpy.
-+ I traced this down to a problem in a call to gdb_get_reg16 where the
-+ mem_buf was being treated like a uint8_t* instead of a GByteArray.  The
-+ buffer passed to gdb_get_reg16 ends up passing an invalid GByteArray
-+ pointer, which subsequentlycauses a segfault in memcpy.
-  =
-
-  I have a fix for this - just need to educate myself on how to submit a
-  patch.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1869497
-
-Title:
-  x86_cpu_gdb_read_register segfaults when gdb requests registers
-
-Status in QEMU:
-  New
-
-Bug description:
-  When attempting to attach to the gdbstub, a segfault occurs.
-
-  I traced this down to a problem in a call to gdb_get_reg16 where the
-  mem_buf was being treated like a uint8_t* instead of a GByteArray.
-  The buffer passed to gdb_get_reg16 ends up passing an invalid
-  GByteArray pointer, which subsequentlycauses a segfault in memcpy.
-
-  I have a fix for this - just need to educate myself on how to submit a
-  patch.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1869497/+subscriptions
+r~
 
