@@ -2,97 +2,65 @@ Return-Path: <SRS0=dICq=5N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8CAC43331
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 16:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89B4C43331
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 16:14:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A275206DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 16:13:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UAXrOIYV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A275206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A961F20716
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Mar 2020 16:14:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A961F20716
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIE5j-0008Vw-Lf
-	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 12:13:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44464)
+	id 1jIE6e-000127-T8
+	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 12:14:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44565)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jIE4l-00085k-Cl
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:12:48 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIE5v-0000MD-PT
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jIE4k-0002Xy-3r
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:12:46 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43056)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jIE4j-0002XK-Pu
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:12:46 -0400
-Received: by mail-pl1-x641.google.com with SMTP id v23so4714122ply.10
- for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 09:12:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=BFBYqfl5mOpw2gJNNjenxIqgocMZELC8ho+AYDOU/Lc=;
- b=UAXrOIYVQ4pd/Xa35juGobm0Fl9e1AdVJWK7om187c1YyIESH861AnU6NzcuWVPla2
- Re332fVKvyXWFTZmZrGRoonN3CTICIc53m2P+VSPMs85hLd22oGzLOoxZpEMgC92fOW3
- +EbQF/clIAOM7ARyn/niBO+ADznwDyly8DDojGhyQE3T7TmVyK4o9X6jEunRUZ05tNxy
- 6HP51ag4fR47WUy2os/0XADp6pqVxwkISDodMDJcBatW3HTU15mnPnih95MoQ6o1Q2KT
- 8/FaCbWnxblLQFo22gEeu2puBg6CYqKpiHkRaMt3lgCkSvXNngwmfsi5ArlvrXcDg1d8
- lJTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BFBYqfl5mOpw2gJNNjenxIqgocMZELC8ho+AYDOU/Lc=;
- b=G5gNpvYC+44TGjsKC9O9Kbn2GzY1Fv0bGC/CAvxVz7p2CbOShyUjZctV+PQIuyRpKO
- NiHMxmcWZfMoWoB9a/mgCXRvoUDMIVp2w6DzItWznz9NTGjCr0DuXdQLIskSJoNvjYyp
- zuea82dG5HnlnFXggTngxl4SuGZv5DnwYrhUJ4zcJ+n4Dn6EE/p10o0rFlQT1q3xCPhF
- suU8d72bDwzJGcjyjF0dHFI2KKiDEzkjOggrPzNMjUvsd3a7lFYLgNo0I4jNQWWiqzis
- 9F9e0GwE+Q5iTVwgJqeKa9iZoDgpyUxYipJmNhhIdvgeyKW8RBFKSlUWUb0p7cmjroR+
- ZWaQ==
-X-Gm-Message-State: ANhLgQ0m/zMp5Bz/lu3PA5GvMSxF0qlGojwNH1TGggr3rUBGEVuSVDqF
- C589K+Hc1X/AmCnOtKv7unEJsRuTryE=
-X-Google-Smtp-Source: ADFU+vsVj6tZqQ587azynyGNjksz+XiRQCsOnU09zfYVzi3Hi+46a1T2nkEm3zLr3UQxX7zzNzHCKg==
-X-Received: by 2002:a17:90a:3349:: with SMTP id
- m67mr5539392pjb.175.1585411963684; 
- Sat, 28 Mar 2020 09:12:43 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-138-234.tukw.qwest.net. [174.21.138.234])
- by smtp.gmail.com with ESMTPSA id w127sm6483158pfb.70.2020.03.28.09.12.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 28 Mar 2020 09:12:42 -0700 (PDT)
-Subject: Re: [PATCH v4 0/2] Replaced locks with lock guard macros
-To: Daniel Brodsky <dnbrdsky@gmail.com>
-References: <20200320123137.1937091-1-dnbrdsky@gmail.com>
- <158471180295.15515.1369533827289907154@39012742ff91>
- <20200323132556.GG261260@stefanha-x1.localdomain>
- <CA+ZmoZUFojqmMxNQ1bhGMzjML7OFgDt1GNbogGTw5rte5LD4iw@mail.gmail.com>
- <1b0fa063-6fe4-ad40-06b2-9c3f2f955a06@linaro.org>
- <04a411d6-72e7-d2d2-15f9-895f6a765d22@redhat.com>
- <CA+ZmoZXfrGh3+jnN4K-cfZitR+DVPL=ieZpTZGzH3cYSxko=eA@mail.gmail.com>
- <CAFXwXrkkOzuS=4Gfqm9XtkL5kc5m_5-9WmuziGgTfhFdm8VD0A@mail.gmail.com>
- <CA+ZmoZXvQ0iduKP_zWA0wTnpVSjjx=M6d5knWV-cayVuSQ2usA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9072334f-e4a9-cc6d-7c72-b97110e74cbc@linaro.org>
-Date: Sat, 28 Mar 2020 09:12:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIE5t-0002yW-Fq
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 12:13:58 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:60513)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jIE5s-0002rb-Vp; Sat, 28 Mar 2020 12:13:57 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.2579638|-1; CH=green; DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.0190046-0.000301582-0.980694;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03312; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.H6ju01._1585412024; 
+Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H6ju01._1585412024)
+ by smtp.aliyun-inc.com(10.147.42.253);
+ Sun, 29 Mar 2020 00:13:45 +0800
+Subject: Re: [PATCH v6 18/61] target/riscv: vector single-width integer
+ multiply instructions
+To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ <20200317150653.9008-19-zhiwei_liu@c-sky.com>
+ <1a5900d9-dc26-04f2-74b2-0bada246a0e7@linaro.org>
+ <8be612c0-4345-c1f2-3b82-73a9a1ea4133@c-sky.com>
+ <53209745-9b54-00b3-2b1f-1271f0843021@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <5dabf936-6a4f-5d76-0d16-ff357d1ee376@c-sky.com>
+Date: Sun, 29 Mar 2020 00:13:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <CA+ZmoZXvQ0iduKP_zWA0wTnpVSjjx=M6d5knWV-cayVuSQ2usA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <53209745-9b54-00b3-2b1f-1271f0843021@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,32 +72,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/27/20 11:38 PM, Daniel Brodsky wrote:
-> On Thu, Mar 26, 2020 at 11:01 AM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> My preference is to add -Wno-tautological-type-limit-compare in
->> configure, so we don't have to work around this same issue elsewhere
->> in the code base.
->>
->> r~
-> 
-> What do you think would be the best way to add this? I could change
-> all additions of the `-m32` flag to instead use `-m32
-> -Wno-tautological-type-limit-compare` or add the flag if qemu is being
-> compiled with clang and `-m32` already enabled.
-
-I was going to add it unconditionally, with all of the other warning flags.
-
-Except that it doesn't work -- clang-9 *still* warns.  Clearly a clang bug, but
-there doesn't seem to be any workaround at all except --disable-werror.
 
 
-r~
+On 2020/3/28 23:47, Richard Henderson wrote:
+> On 3/28/20 8:17 AM, LIU Zhiwei wrote:
+>>> Missed the improvement here.  See tcg_gen_mulsu2_i64.
+>> Though I have not gotten the principle, the code in tcg_gen_mulsu2_i64 is much
+>> tidier.
+> Let A = signed operand,
+>      B = unsigned operand
+>      P = unsigned product
+>
+> If the sign bit A is set, then P is too large.
+> In that case we subtract 2**64 * B to fix that:
+>
+>      HI_P -= (A < 0 ? B : 0)
+>
+> where the conditional is computed as (A >> 63) & B.
+
+I think I get it.
+
+LET  A = 2 ** 64  - X
+
+THEN
+
+X = 2 ** 64 - A
+SIGNED_P = -X * B
+
+if (A * B == P) then
+
+(2 ** 64  - X) * B == P
+2 **64 * B - X * B == P
+
+-X *B == P - 2**64*B
+
+HI_P -= (A < 0 ? B ：0）
+
+Zhiwei
+>
+> r~
+
 
