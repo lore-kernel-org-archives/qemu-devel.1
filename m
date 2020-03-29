@@ -8,70 +8,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1F5C43331
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 00:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 072E9C43331
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 00:19:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA68320732
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 00:19:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C67372076E
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 00:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4xfqWTo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA68320732
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tkj6uWMI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C67372076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jILfl-0003Pl-Tn
-	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 20:19:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48003)
+	id 1jILg1-00040l-19
+	for qemu-devel@archiver.kernel.org; Sat, 28 Mar 2020 20:19:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jILeW-00026M-Vg
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 20:18:14 -0400
+ (envelope-from <pauldzim@gmail.com>) id 1jILen-0002OT-Lf
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 20:18:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pauldzim@gmail.com>) id 1jILeV-0007Jo-4p
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 20:18:12 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46112)
+ (envelope-from <pauldzim@gmail.com>) id 1jILem-0007Pg-8C
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 20:18:29 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38279)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pauldzim@gmail.com>) id 1jILeU-0007JF-UF
- for qemu-devel@nongnu.org; Sat, 28 Mar 2020 20:18:11 -0400
-Received: by mail-pg1-x542.google.com with SMTP id k191so6729907pgc.13
- for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 17:18:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pauldzim@gmail.com>) id 1jILem-0007P9-2V
+ for qemu-devel@nongnu.org; Sat, 28 Mar 2020 20:18:28 -0400
+Received: by mail-pg1-x542.google.com with SMTP id x7so6749244pgh.5
+ for <qemu-devel@nongnu.org>; Sat, 28 Mar 2020 17:18:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=apGw4L+SdcECiQmTxIQiEVzc8C1ggVDixdm7C2WH9qY=;
- b=R4xfqWTo93T9lRlGmlG2aqRpxIQ/8992Du20TGRjk8IDbR8jm0l32n6arr+cnhAXiK
- Z9J3GZlNOhOLk79uMbGwdTd+Oget09zklia/hRi3YI2tu3heWPuMzDTvTHhjGuK3sTnS
- 3XKMFLKpvbYftNBwMuDGj3w6QwcNAiSllnNC/qjl2uNwPv305rWyB1ATzCV9mbO4nkYZ
- yiy6Ne3fH5rkD2wFl+Dfjeup8I8jtlocDh5Ig+c01E0ifJyW6Vgyy1z0XQ3a18qdnQzI
- bDqbVwyDJ46v0MaM0lEjBCIYcnSPyF7m15MNbYVFin5ax5MuHfFDQQJItV/wm1qyh9/q
- tAaw==
+ bh=8fsL0XhBWhFnnr1XVrc5f/CVK6jbax3HPezkpV/NUu4=;
+ b=Tkj6uWMIWcAViPPG6L0lLk4GtXzs5zzld1aG5yQIg48ZN3mUklFHj2pd3PeElSBFOj
+ kZ1Zpde9PhnhPZKJwOj1kKkiVEt0l1s+k28G+cBEnpmsxEtiVB7EdknnHyJCGdTvdF8C
+ ztHgIwJme7Kidco1h/FOAI5FTnQwsJNQ31+DFjfBQdVdFPxwilbD9uGqfgiTJ2Q/iw4b
+ X2bvb55knZCZ3OiA9+e6Jhb5W6Ebjbwh6O6B4XJqXiT1rFwXr3P02HoTO+X24g2Wy/4u
+ IIzPbUqEGCqDUlPM7bPWzH1ASamh/DxVWeLRFFQl6iLLtyqMS+Ee2NYTNJuOoZUyxDr6
+ IirA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=apGw4L+SdcECiQmTxIQiEVzc8C1ggVDixdm7C2WH9qY=;
- b=d2YpcFhsSH5qCuCSX52d8x61zWRQTrXTvJS1py7G0PGx37uGDFDi37tZ7GflU1HKf1
- 5dYWyqyJgyVcoJpJ2U4lTkS5cx3KUzsPXHUsRsYDSBUH+bKAaSZgd+xmEaFpNRpFfnVp
- NiQWPpgQD02eSyvbG9ccIDsYZCc336QD/7TfZJkDVakugB0E4KI/rrA7ErBhofOPIaTD
- BSzjbijRX0fErjA8jlq7fuFdCr2hy+mzlX+FtpvsllPSg9QcbXj17Uf3XnGC7m4T87b/
- vT6OTfR7d1h11O05IT5rTOmBBqE9Al5NB7I8BoBhn/rdmkwYydLK5dyfBmlxkdoOHWZ7
- 83ZQ==
-X-Gm-Message-State: ANhLgQ1ztyWepa4/pVFB9qFJqB4M6OzoCzDu21koSieOb/z2u56aguBN
- 7+pFlWvkcdTFiXXn/CqCe86lODvAFnhfEg==
-X-Google-Smtp-Source: ADFU+vtFQtXvMX+DtHe/eK2K1MQVUBgxGs09CfxyqsweUjgrpxUBCJnPihG90WgB5WyRYf7j01cEyw==
-X-Received: by 2002:a63:4707:: with SMTP id u7mr6444322pga.221.1585441088743; 
- Sat, 28 Mar 2020 17:18:08 -0700 (PDT)
+ bh=8fsL0XhBWhFnnr1XVrc5f/CVK6jbax3HPezkpV/NUu4=;
+ b=V7Un3kOjYKHJc2mVkQ18hHeBs6LopTxyF2gvQuTtNiJm8l5xOnhre4eIlkdyS6zIix
+ PsLVVL+nC+c+rpS+jB39AJQBpfyl0mO/cE+MW9pPK3ZO5dbrGB7cNjOGcfOjAuvdxMeu
+ 0Y78j0K/zqjgZPYxEwH5b6WgZK4TihQfs0E7GJGBeNPuvrQKb+dr9PMY3yL4GYLpm472
+ OGt0wa/+ZRjgArKXWd8EbfK2PVju1tcmNuqpEd472NReCoMEBNstKs3egpry/T6MgFco
+ 0jy6GMBjl2srpZ8/kU7vx/2/AAy6fP07ebF5K1luIzvuYbT1nkost/BvjNSVgJyWC0ep
+ LM4w==
+X-Gm-Message-State: ANhLgQ1lCLik+gpnvwJKca1BtMKtlnM+eZnAEPpm9qu6eYCzSxbFoGU0
+ vA8LiD6uJABI1d1+Cs45MG8=
+X-Google-Smtp-Source: ADFU+vtGsl6Ur255dJTMyFmkEtj5keVvgQhLj9Rb+V5lfBCAZBzo49HplIt62xeTPxeZR8V7rpkLgQ==
+X-Received: by 2002:a63:a601:: with SMTP id t1mr6489358pge.23.1585441106037;
+ Sat, 28 Mar 2020 17:18:26 -0700 (PDT)
 Received: from paulz-G33T-M.Home ([75.167.220.149])
- by smtp.gmail.com with ESMTPSA id u14sm6626890pgg.67.2020.03.28.17.18.07
+ by smtp.gmail.com with ESMTPSA id u14sm6626890pgg.67.2020.03.28.17.18.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 28 Mar 2020 17:18:08 -0700 (PDT)
+ Sat, 28 Mar 2020 17:18:25 -0700 (PDT)
 From: Paul Zimmerman <pauldzim@gmail.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v2 1/6] Add BCM2835 SOC MPHI emulation
-Date: Sat, 28 Mar 2020 17:17:00 -0700
-Message-Id: <20200329001705.15966-2-pauldzim@gmail.com>
+Subject: [PATCH v2 3/6] dwc-hsotg USB host controller state definitions
+Date: Sat, 28 Mar 2020 17:17:02 -0700
+Message-Id: <20200329001705.15966-4-pauldzim@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200329001705.15966-1-pauldzim@gmail.com>
 References: <20200329001705.15966-1-pauldzim@gmail.com>
@@ -97,80 +97,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add BCM2835 SOC MPHI emulation. It is very basic, only providing
-the FIQ interrupt needed to allow the dwc-otg USB host controller
-driver in the Raspbian kernel to function.
+Add the dwc-hsotg (dwc2) USB host controller state definitions.
+Mostly based on hw/usb/hcd-ehci.h.
 
 Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
 ---
- hw/arm/bcm2835_peripherals.c         |  17 +++
- hw/misc/Makefile.objs                |   1 +
- hw/misc/bcm2835_mphi.c               | 193 +++++++++++++++++++++++++++
- include/hw/arm/bcm2835_peripherals.h |   2 +
- include/hw/misc/bcm2835_mphi.h       |  50 +++++++
- 5 files changed, 263 insertions(+)
- create mode 100644 hw/misc/bcm2835_mphi.c
- create mode 100644 include/hw/misc/bcm2835_mphi.h
+ hw/usb/hcd-dwc2.h | 180 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 180 insertions(+)
+ create mode 100644 hw/usb/hcd-dwc2.h
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 17207ae07e..dd7e6883cb 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -123,6 +123,10 @@ static void bcm2835_peripherals_init(Object *obj)
-     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
-                           TYPE_BCM2835_GPIO);
- 
-+    /* Mphi */
-+    sysbus_init_child_obj(obj, "mphi", &s->mphi, sizeof(s->mphi),
-+                          TYPE_BCM2835_MPHI);
-+
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhci",
-                                    OBJECT(&s->sdhci.sdbus), &error_abort);
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhost",
-@@ -367,6 +371,19 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    /* Mphi */
-+    object_property_set_bool(OBJECT(&s->mphi), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    memory_region_add_subregion(&s->peri_mr, MPHI_OFFSET,
-+                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mphi), 0));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->mphi), 0,
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-+                               INTERRUPT_HOSTPORT));
-+
-     create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
-     create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
-     create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 68aae2eabb..91085cc21b 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -57,6 +57,7 @@ common-obj-$(CONFIG_OMAP) += omap_l4.o
- common-obj-$(CONFIG_OMAP) += omap_sdrc.o
- common-obj-$(CONFIG_OMAP) += omap_tap.o
- common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
-+common-obj-$(CONFIG_RASPI) += bcm2835_mphi.o
- common-obj-$(CONFIG_RASPI) += bcm2835_property.o
- common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
- common-obj-$(CONFIG_RASPI) += bcm2835_thermal.o
-diff --git a/hw/misc/bcm2835_mphi.c b/hw/misc/bcm2835_mphi.c
+diff --git a/hw/usb/hcd-dwc2.h b/hw/usb/hcd-dwc2.h
 new file mode 100644
-index 0000000000..2fdd39c138
+index 0000000000..80956fa318
 --- /dev/null
-+++ b/hw/misc/bcm2835_mphi.c
-@@ -0,0 +1,193 @@
++++ b/hw/usb/hcd-dwc2.h
+@@ -0,0 +1,180 @@
 +/*
-+ * BCM2835 SOC MPHI emulation
++ * dwc-hsotg (dwc2) USB host controller state definitions
 + *
-+ * Very basic emulation, only providing the FIQ interrupt needed to
-+ * allow the dwc-otg USB host controller driver in the Raspbian kernel
-+ * to function.
++ * Based on hw/usb/hcd-ehci.h
 + *
 + * Copyright (c) 2020 Paul Zimmerman <pauldzim@gmail.com>
 + *
@@ -185,253 +130,166 @@ index 0000000000..2fdd39c138
 + * GNU General Public License for more details.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/misc/bcm2835_mphi.h"
-+#include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
++#ifndef HW_USB_DWC2_H
++#define HW_USB_DWC2_H
 +
-+static inline void mphi_raise_irq(BCM2835MphiState *s)
-+{
-+    qemu_set_irq(s->irq, 1);
-+}
-+
-+static inline void mphi_lower_irq(BCM2835MphiState *s)
-+{
-+    qemu_set_irq(s->irq, 0);
-+}
-+
-+static uint64_t mphi_reg_read(void *ptr, hwaddr addr, unsigned size)
-+{
-+    BCM2835MphiState *s = ptr;
-+    uint32_t reg = s->regbase + addr;
-+    uint32_t val = 0;
-+
-+    switch (reg) {
-+    case 0x28:  /* outdda */
-+        val = s->outdda;
-+        break;
-+    case 0x2c:  /* outddb */
-+        val = s->outddb;
-+        break;
-+    case 0x4c:  /* ctrl */
-+        val = s->ctrl;
-+        val |= 1 << 17;
-+        break;
-+    case 0x50:  /* intstat */
-+        val = s->intstat;
-+        break;
-+    case 0x1f0: /* swirq_set */
-+        val = s->swirq_set;
-+        break;
-+    case 0x1f4: /* swirq_clr */
-+        val = s->swirq_clr;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    return val;
-+}
-+
-+static void mphi_reg_write(void *ptr, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    BCM2835MphiState *s = ptr;
-+    uint32_t reg = s->regbase + addr;
-+    uint32_t old;
-+    int do_irq = 0;
-+
-+    val &= 0xffffffff;
-+
-+    switch (reg) {
-+    case 0x28:  /* outdda */
-+        old = s->outdda;
-+        s->outdda = val;
-+        break;
-+    case 0x2c:  /* outddb */
-+        old = s->outddb;
-+        s->outddb = val;
-+        if (val & (1 << 29)) {
-+            do_irq = 1;
-+        }
-+        break;
-+    case 0x4c:  /* ctrl */
-+        old = s->ctrl;
-+        s->ctrl = val;
-+        if (val & (1 << 16)) {
-+            do_irq = -1;
-+        }
-+        break;
-+    case 0x50:  /* intstat */
-+        old = s->intstat;
-+        s->intstat = val;
-+        if (val & ((1 << 16) | (1 << 29))) {
-+            do_irq = -1;
-+        }
-+        break;
-+    case 0x1f0: /* swirq_set */
-+        old = s->swirq_set;
-+        s->swirq_set = val;
-+        do_irq = 1;
-+        break;
-+    case 0x1f4: /* swirq_clr */
-+        old = s->swirq_clr;
-+        s->swirq_clr = val;
-+        do_irq = -1;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    old = old;
-+    if (do_irq > 0) {
-+        mphi_raise_irq(s);
-+    } else if (do_irq < 0) {
-+        mphi_lower_irq(s);
-+    }
-+}
-+
-+static const MemoryRegionOps mphi_mmio_ops = {
-+    .read = mphi_reg_read,
-+    .write = mphi_reg_write,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void mphi_realize(BCM2835MphiState *s, DeviceState *dev, Error **errp)
-+{
-+    s->device = dev;
-+}
-+
-+static void mphi_init(BCM2835MphiState *s, DeviceState *dev)
-+{
-+    memory_region_init(&s->mem, OBJECT(dev), "mphi", MPHI_MMIO_SIZE);
-+    memory_region_init_io(&s->mem_reg, OBJECT(dev), &mphi_mmio_ops, s,
-+                          "global", 0x200);
-+    memory_region_add_subregion(&s->mem, s->regbase, &s->mem_reg);
-+}
-+
-+static void mphi_sysbus_reset(DeviceState *dev)
-+{
-+}
-+
-+static void mphi_sysbus_realize(DeviceState *dev, Error **errp)
-+{
-+    SysBusDevice *d = SYS_BUS_DEVICE(dev);
-+    BCM2835MphiState *s = BCM2835_MPHI(dev);
-+
-+    mphi_realize(s, dev, errp);
-+    sysbus_init_irq(d, &s->irq);
-+}
-+
-+static void mphi_sysbus_init(Object *obj)
-+{
-+    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-+    BCM2835MphiState *s = BCM2835_MPHI(obj);
-+
-+    s->regbase = 0;
-+    s->as = &address_space_memory;
-+    mphi_init(s, DEVICE(obj));
-+    sysbus_init_mmio(d, &s->mem);
-+}
-+
-+static void mphi_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = mphi_sysbus_realize;
-+    dc->reset = mphi_sysbus_reset;
-+}
-+
-+static const TypeInfo bcm2835_mphi_type_info = {
-+    .name          = TYPE_BCM2835_MPHI,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(BCM2835MphiState),
-+    .instance_init = mphi_sysbus_init,
-+    .class_init    = mphi_class_init,
-+};
-+
-+static void bcm2835_mphi_register_types(void)
-+{
-+    type_register_static(&bcm2835_mphi_type_info);
-+}
-+
-+type_init(bcm2835_mphi_register_types)
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 7859281e11..77958ca60e 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -20,6 +20,7 @@
- #include "hw/misc/bcm2835_property.h"
- #include "hw/misc/bcm2835_rng.h"
- #include "hw/misc/bcm2835_mbox.h"
-+#include "hw/misc/bcm2835_mphi.h"
- #include "hw/misc/bcm2835_thermal.h"
- #include "hw/sd/sdhci.h"
- #include "hw/sd/bcm2835_sdhost.h"
-@@ -41,6 +42,7 @@ typedef struct BCM2835PeripheralState {
-     qemu_irq irq, fiq;
- 
-     BCM2835SystemTimerState systmr;
-+    BCM2835MphiState mphi;
-     UnimplementedDeviceState armtmr;
-     UnimplementedDeviceState cprman;
-     UnimplementedDeviceState a2w;
-diff --git a/include/hw/misc/bcm2835_mphi.h b/include/hw/misc/bcm2835_mphi.h
-new file mode 100644
-index 0000000000..826ae2af3b
---- /dev/null
-+++ b/include/hw/misc/bcm2835_mphi.h
-@@ -0,0 +1,50 @@
-+/*
-+ * BCM2835 SOC MPHI state definitions
-+ *
-+ * Copyright (c) 2020 Paul Zimmerman <pauldzim@gmail.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#ifndef HW_MISC_BCM2835_MPHI_H
-+#define HW_MISC_BCM2835_MPHI_H
-+
++#include "qemu/timer.h"
 +#include "hw/irq.h"
 +#include "hw/sysbus.h"
++#include "hw/usb.h"
 +#include "sysemu/dma.h"
 +
-+#define MPHI_MMIO_SIZE      0x1000
++#define DWC2_MMIO_SIZE  0x11000
 +
-+typedef struct BCM2835MphiState BCM2835MphiState;
++#define NB_PORTS        1       /* Number of downstream ports */
++#define NB_CHAN         8       /* Number of host channels */
++#define MAX_XFER_SIZE   65536   /* Max transfer size expected in HCTSIZ */
 +
-+struct BCM2835MphiState {
-+    SysBusDevice parent_obj;
-+    DeviceState *device;
-+    qemu_irq irq;
-+    AddressSpace *as;
-+    MemoryRegion mem;
-+    MemoryRegion mem_reg;
-+    uint16_t regbase;
++typedef struct DWC2Packet DWC2Packet;
++typedef struct DWC2State DWC2State;
 +
-+    uint32_t outdda;
-+    uint32_t outddb;
-+    uint32_t ctrl;
-+    uint32_t intstat;
-+    uint32_t swirq_set;
-+    uint32_t swirq_clr;
++enum async_state {
++    DWC2_ASYNC_NONE = 0,
++    DWC2_ASYNC_INITIALIZED,
++    DWC2_ASYNC_INFLIGHT,
++    DWC2_ASYNC_FINISHED,
 +};
 +
-+#define TYPE_BCM2835_MPHI   "bcm2835-mphi"
++struct DWC2Packet {
++    USBPacket packet;
++    USBDevice *dev;
++    USBEndpoint *ep;
++    uint32_t index;
++    uint32_t epnum;
++    uint32_t mps;
++    uint32_t pid;
++    uint32_t pcnt;
++    uint32_t len;
++    bool small;
++    bool needs_service;
++    enum async_state async;
++};
 +
-+#define BCM2835_MPHI(obj) \
-+    OBJECT_CHECK(BCM2835MphiState, (obj), TYPE_BCM2835_MPHI)
++struct DWC2State {
++    SysBusDevice parent_obj;
++    USBBus bus;
++    DeviceState *device;
++    qemu_irq irq;
++    MemoryRegion *dma_mr;
++    AddressSpace *as;
++    AddressSpace dma_as;
++    MemoryRegion mem;
++    MemoryRegion mem_glbreg;
++    MemoryRegion mem_fszreg;
++    MemoryRegion mem_hreg0;
++    MemoryRegion mem_hreg1;
++    MemoryRegion mem_pcgreg;
++    MemoryRegion mem_hreg2;
++    uint16_t glbregbase;
++    uint16_t fszregbase;
++    uint16_t hreg0base;
++    uint16_t hreg1base;
++    uint16_t pcgregbase;
++    uint16_t hreg2base;
++    uint16_t portnr;
++
++    union {
++        uint32_t glbreg[0x70 / sizeof(uint32_t)];
++        struct {
++            uint32_t gotgctl;       /* 00 */
++            uint32_t gotgint;       /* 04 */
++            uint32_t gahbcfg;       /* 08 */
++            uint32_t gusbcfg;       /* 0c */
++            uint32_t grstctl;       /* 10 */
++            uint32_t gintsts;       /* 14 */
++            uint32_t gintmsk;       /* 18 */
++            uint32_t grxstsr;       /* 1c */
++            uint32_t grxstsp;       /* 20 */
++            uint32_t grxfsiz;       /* 24 */
++            uint32_t gnptxfsiz;     /* 28 */
++            uint32_t gnptxsts;      /* 2c */
++            uint32_t gi2cctl;       /* 30 */
++            uint32_t gpvndctl;      /* 34 */
++            uint32_t ggpio;         /* 38 */
++            uint32_t guid;          /* 3c */
++            uint32_t gsnpsid;       /* 40 */
++            uint32_t ghwcfg1;       /* 44 */
++            uint32_t ghwcfg2;       /* 48 */
++            uint32_t ghwcfg3;       /* 4c */
++            uint32_t ghwcfg4;       /* 50 */
++            uint32_t glpmcfg;       /* 54 */
++            uint32_t gpwrdn;        /* 58 */
++            uint32_t gdfifocfg;     /* 5c */
++            uint32_t gadpctl;       /* 60 */
++            uint32_t grefclk;       /* 64 */
++            uint32_t gintmsk2;      /* 68 */
++            uint32_t gintsts2;      /* 6c */
++        };
++    };
++
++    union {
++        uint32_t fszreg[0x4 / sizeof(uint32_t)];
++        struct {
++            uint32_t hptxfsiz;      /* 100 */
++        };
++    };
++
++    union {
++        uint32_t hreg0[0x44 / sizeof(uint32_t)];
++        struct {
++            uint32_t hcfg;          /* 400 */
++            uint32_t hfir;          /* 404 */
++            uint32_t hfnum;         /* 408 */
++            uint32_t rsvd0;         /* 40c */
++            uint32_t hptxsts;       /* 410 */
++            uint32_t haint;         /* 414 */
++            uint32_t haintmsk;      /* 418 */
++            uint32_t hflbaddr;      /* 41c */
++            uint32_t rsvd1[8];      /* 420-43c */
++            uint32_t hprt0;         /* 440 */
++        };
++    };
++
++    uint32_t hreg1[0x20 * NB_CHAN / sizeof(uint32_t)];
++#define hcchar(_ch)     hreg1[((_ch) << 3) + 0] /* 500, 520, ... */
++#define hcsplt(_ch)     hreg1[((_ch) << 3) + 1] /* 504, 524, ... */
++#define hcint(_ch)      hreg1[((_ch) << 3) + 2] /* 508, 528, ... */
++#define hcintmsk(_ch)   hreg1[((_ch) << 3) + 3] /* 50c, 52c, ... */
++#define hctsiz(_ch)     hreg1[((_ch) << 3) + 4] /* 510, 530, ... */
++#define hcdma(_ch)      hreg1[((_ch) << 3) + 5] /* 514, 534, ... */
++#define hcdmab(_ch)     hreg1[((_ch) << 3) + 7] /* 51c, 53c, ... */
++
++    union {
++        uint32_t pcgreg[0x8 / sizeof(uint32_t)];
++        struct {
++            uint32_t pcgctl;        /* e00 */
++            uint32_t pcgcctl1;      /* e04 */
++        };
++    };
++
++    /* TODO - implement FIFO registers for slave mode */
++
++    /*
++     *  Internal state
++     */
++    QEMUTimer *eof_timer;
++    QEMUTimer *frame_timer;
++    QEMUBH *async_bh;
++    int64_t sof_time;
++    int64_t usb_frame_time;
++    int64_t usb_bit_time;
++    uint16_t frame_number;
++    uint16_t fsmps;
++    uint16_t fi;
++    uint16_t next_chan;
++    bool working;
++    USBPort ports[NB_PORTS];
++    DWC2Packet packet[NB_CHAN];                 /* one packet per channel */
++    uint8_t usb_buf[NB_CHAN][MAX_XFER_SIZE];    /* one buffer per channel */
++};
++
++#define TYPE_DWC2_USB   "dwc2-usb"
++#define DWC2_USB(obj)   OBJECT_CHECK(DWC2State, (obj), TYPE_DWC2_USB)
 +
 +#endif
 -- 
