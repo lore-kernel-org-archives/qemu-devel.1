@@ -2,83 +2,99 @@ Return-Path: <SRS0=qvFP=5O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B3DC43331
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 16:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48733C43331
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 19:41:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24F962073B
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 16:47:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07E3320748
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 19:41:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GgClySdf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24F962073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iMvK1VeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07E3320748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIb5U-0001qN-64
-	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 12:47:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47321)
+	id 1jIdo9-0007Y2-4K
+	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 15:41:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37955)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jIb4a-0000yH-DH
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 12:46:09 -0400
+ (envelope-from <philmd@redhat.com>) id 1jIdnC-00070G-4E
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 15:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jIb4Z-0005zU-0F
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 12:46:08 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33702)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jIb4Y-0005wK-Q4
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 12:46:06 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a25so18128198wrd.0
- for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 09:46:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=32RFDUG2iUuXPaqvstuEq5n3CDg9D0f3SQaSBM4ZKoo=;
- b=GgClySdfKlxgyuDICDl1fwegtnZzFuN5Er2przTIs9XTkRv5313YeW81tPZPwPvA34
- tYCtbzRYNffR9NzbFXq8UN4MoI5PS5jWX6AkllADcfg+yAqpN+xdWESJtjzxgi1t+rQy
- h3MzrdAjzzo0XIEGe0XZwh06xVwMLsW9VhQi8DZ/SPCKgVe4WJunLzRLFj8lrdPZN+mh
- c43gC3uxL2CZha8ptfBzcnKHzTeFeB3aFMtXR8DbroYM2h4VkI/yi41XQfgu3Bs7tQ3G
- gnmVa9NY8zJ4NVZvPWIELuhtLW/IjX4LOTe/hPWbft0Ecpk9hf8WnueclVpgWc4FMlBg
- iV7Q==
+ (envelope-from <philmd@redhat.com>) id 1jIdnA-0000M5-8G
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 15:40:21 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36622)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jIdnA-0000Kk-3H
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 15:40:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585510818;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4oNGJEnWvgvWmYwy9R/t9+CrqOZpKYjlYzS/Hso2L9c=;
+ b=iMvK1VeMXPmcvojTiwSxfLY4qP8z3qSZZcDfU0syjwgYZcJ0mDg3A3J7J4OvpLklg/+4+Z
+ FIQjV18CZUM3h/Sx/XyCUC5aMfn1kdpyy0r3hgZetV8LvF7LlslHvosm/Rcjf07NoFg2GG
+ +EwbVz9ksfriY6JJixWqr/6guWNdG1M=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-n0hPDzPZOXuyb8piPTZFEQ-1; Sun, 29 Mar 2020 15:40:13 -0400
+X-MC-Unique: n0hPDzPZOXuyb8piPTZFEQ-1
+Received: by mail-ed1-f71.google.com with SMTP id a32so13527124edf.17
+ for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 12:40:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=32RFDUG2iUuXPaqvstuEq5n3CDg9D0f3SQaSBM4ZKoo=;
- b=FP2zFzMQPn6r6htSCX0JmfeUc9zVO7udQm0Mmc19pffrRBQPgUlLR0Y0BQPGPSYQMe
- ybEX4yKe9or8p/zsYZpXhrwDLIuqxMpkwgSdb04plsr7zk+kEgx40n1guNO50XrDv2Kv
- ygjqPc1c1soHhceUrdGAur0ozWujAkSD0gejOR/1m1EoSJ8LhJRMK+OGRON/ZToQ/ib4
- ZNyWUgPcVac07JxU64g1CRq9aqIAR7QmyEYItIhJaLf/XZy3P6BP5JtSjM0HVQ75EnF3
- u7MhpT9d7L5ztt/IlxHltDREsiWTfilIQQrYbheSaZqVM9UYOX4di3AV2BhAPYVst2g3
- VZkg==
-X-Gm-Message-State: ANhLgQ1ue/vlYGlRxkBRSGoT4SSNvfpnWx7cP9/3HNPEaPTMvKqPnq9a
- UIcbUUAvReYS1LfMP4jh/pD+iyUBJGPB+0Gihi4=
-X-Google-Smtp-Source: ADFU+vtwxxex3Y48M1F0+NdYTJg21Y3Kjr3qgoeDKuhy5Zv0hZTrC0lheT45ML1soUxEB2M8ofKX/8mKtOJqd+v/Se4=
-X-Received: by 2002:adf:e8c1:: with SMTP id k1mr10037413wrn.381.1585500365152; 
- Sun, 29 Mar 2020 09:46:05 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QbdDQdguYk+pB7fUGmRTI8Jj8L7gPLMff0Y6sa6ivCM=;
+ b=tQplzGJt77TNuTEM2N/ctqCtsx5QAbOe1KDKWl44lexUN53jKg3zTLyjUYXs1kq6ic
+ 0wIl4vJ+CUm1JlA+L5rp7A5UWL2wZyNTXawHJlD2MVHEH+iRpwqrr/UKrVqTMBMi7X0R
+ jzPXl97IKUBYhO4/3AiBPNBkDzTfEd8RXnnPBjU//cZcjK7K+PEH3Pw1ox/GVrR/yR21
+ qMkyOqI3VMveTpf094hx5No38urQHQspgzkaLKvgDc7P9sl67LsDUcH4PPeHKWDbizNK
+ jwc4b4KLfwc+no3fRG03IUfXTjqEW71m6SwSJD4qVMOnVXotY0JZih/hq9DOl2EoIvwX
+ SBhA==
+X-Gm-Message-State: ANhLgQ2wb8OH7BetP4BcRr6XGbQ0oxzPDnGuueuubGK8h8db8AE7BTO2
+ UeI+WlgHHrhK2iLKrXc+0HofVNaXUwYWnDKF+glCFdO4IOiXSiJoKEAQ7I7M9ixR5JOGd4I+wgT
+ GAHURZmjebjuwTHk=
+X-Received: by 2002:aa7:c251:: with SMTP id y17mr8557726edo.117.1585510812337; 
+ Sun, 29 Mar 2020 12:40:12 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvGUJrT0y+zQoSMiReM9ER57+1prQWhEozSuGng6etei2hqYNfvBe+1lYMLtXZ4MNRaeDeMtQ==
+X-Received: by 2002:aa7:c251:: with SMTP id y17mr8557706edo.117.1585510812132; 
+ Sun, 29 Mar 2020 12:40:12 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id j31sm141719edb.39.2020.03.29.12.40.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 29 Mar 2020 12:40:11 -0700 (PDT)
+Subject: Re: [PATCH v2] tests/acceptance/machine_sparc_leon3: Do not run
+ HelenOS test by default
+To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+References: <20200212203627.16592-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e52d2e63-f1fc-1d71-8abd-9cced388aa50@redhat.com>
+Date: Sun, 29 Mar 2020 21:40:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <5087037defe31df3abbcd677d206540247649b83.1582576372.git.jag.raman@oracle.com>
-In-Reply-To: <5087037defe31df3abbcd677d206540247649b83.1582576372.git.jag.raman@oracle.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sun, 29 Mar 2020 18:45:53 +0200
-Message-ID: <CAJ+F1CKa-EuY-mx2vKFvxW3Hoo_6T+-adHYdHR7eM9DWkoDcEg@mail.gmail.com>
-Subject: Re: [PATCH v5 02/50] multi-process: Refactor machine_init and exit
- notifiers
-To: Jagannathan Raman <jag.raman@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200212203627.16592-1-philmd@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,200 +106,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>, Fam Zheng <fam@euphon.net>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>, john.g.johnson@oracle.com,
- QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, kanth.ghatraju@oracle.com,
- Felipe Franciosi <felipe@nutanix.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, liran.alon@oracle.com,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Ross Lagerwall <ross.lagerwall@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Fabien Chouteau <chouteau@adacore.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+I just noticed I forgot to Cc Eduardo when posting this :S
 
-On Mon, Feb 24, 2020 at 9:56 PM Jagannathan Raman <jag.raman@oracle.com> wr=
-ote:
->
-> Relocate machine_int and exit notifiers into common code
+Eduardo, do you want me to prepare a pullreq for rc1 with this patch and=20
+Oksana other fix?
 
-utils/notify.c is not a good place to relocate those.
-
-eventually, add a new softmmu/notifiers.c ?
-
-And that patch broke make check test-char /char/mux, because it
-overrides machine_init_done from stubs/machine-init-done.c..
-
->
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+On 2/12/20 9:36 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> The www.helenos.org server is slow and downloading the Leon3 binary
+> takes too long [*]. Do not include this test in the default suite.
+>=20
+> Similarly to commit 471c97a69b:
+>=20
+>    Currently the Avocado framework does not distinct the time spent
+>    downloading assets vs. the time spent running a test. With big
+>    assets (like a full VM image) the tests likely fail.
+>=20
+>    This is a limitation known by the Avocado team.
+>    Until this issue get fixed, do not run this tests automatically.
+>=20
+>    Tests can still be run setting the AVOCADO_TIMEOUT_EXPECTED
+>    environment variable.
+>=20
+> [*] https://travis-ci.org/stsquad/qemu/jobs/649599880#L4198
+>=20
+> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  include/sysemu/sysemu.h |  2 ++
->  softmmu/vl.c            | 42 ------------------------------------------
->  util/notify.c           | 43 +++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 45 insertions(+), 42 deletions(-)
->
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index dec64fc..2f37e2b 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -17,11 +17,13 @@ extern bool qemu_uuid_set;
->
->  void qemu_add_exit_notifier(Notifier *notify);
->  void qemu_remove_exit_notifier(Notifier *notify);
-> +void qemu_run_exit_notifiers(void);
->
->  extern bool machine_init_done;
->
->  void qemu_add_machine_init_done_notifier(Notifier *notify);
->  void qemu_remove_machine_init_done_notifier(Notifier *notify);
-> +void qemu_run_machine_init_done_notifiers(void);
->
->  extern int autostart;
->
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 92c7b3a..94a7b93 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -173,12 +173,6 @@ int icount_align_option;
->  QemuUUID qemu_uuid;
->  bool qemu_uuid_set;
->
-> -static NotifierList exit_notifiers =3D
-> -    NOTIFIER_LIST_INITIALIZER(exit_notifiers);
-> -
-> -static NotifierList machine_init_done_notifiers =3D
-> -    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
-> -
->  bool xen_allowed;
->  uint32_t xen_domid;
->  enum xen_mode xen_mode =3D XEN_EMULATE;
-> @@ -2324,21 +2318,6 @@ static MachineClass *machine_parse(const char *nam=
-e, GSList *machines)
->      return mc;
->  }
->
-> -void qemu_add_exit_notifier(Notifier *notify)
-> -{
-> -    notifier_list_add(&exit_notifiers, notify);
-> -}
-> -
-> -void qemu_remove_exit_notifier(Notifier *notify)
-> -{
-> -    notifier_remove(notify);
-> -}
-> -
-> -static void qemu_run_exit_notifiers(void)
-> -{
-> -    notifier_list_notify(&exit_notifiers, NULL);
-> -}
-> -
->  static const char *pid_file;
->  static Notifier qemu_unlink_pidfile_notifier;
->
-> @@ -2349,27 +2328,6 @@ static void qemu_unlink_pidfile(Notifier *n, void =
-*data)
->      }
->  }
->
-> -bool machine_init_done;
-> -
-> -void qemu_add_machine_init_done_notifier(Notifier *notify)
-> -{
-> -    notifier_list_add(&machine_init_done_notifiers, notify);
-> -    if (machine_init_done) {
-> -        notify->notify(notify, NULL);
-> -    }
-> -}
-> -
-> -void qemu_remove_machine_init_done_notifier(Notifier *notify)
-> -{
-> -    notifier_remove(notify);
-> -}
-> -
-> -static void qemu_run_machine_init_done_notifiers(void)
-> -{
-> -    machine_init_done =3D true;
-> -    notifier_list_notify(&machine_init_done_notifiers, NULL);
-> -}
-> -
->  static const QEMUOption *lookup_opt(int argc, char **argv,
->                                      const char **poptarg, int *poptind)
->  {
-> diff --git a/util/notify.c b/util/notify.c
-> index 76bab21..0e7479b 100644
-> --- a/util/notify.c
-> +++ b/util/notify.c
-> @@ -15,6 +15,15 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu/notify.h"
-> +#include "sysemu/sysemu.h"
+> v2: Add missing staged hunk...
+> ---
+>   tests/acceptance/machine_sparc_leon3.py | 4 ++++
+>   1 file changed, 4 insertions(+)
+>=20
+> diff --git a/tests/acceptance/machine_sparc_leon3.py b/tests/acceptance/m=
+achine_sparc_leon3.py
+> index f77e210ccb..27e4717a51 100644
+> --- a/tests/acceptance/machine_sparc_leon3.py
+> +++ b/tests/acceptance/machine_sparc_leon3.py
+> @@ -5,6 +5,9 @@
+>   # This work is licensed under the terms of the GNU GPL, version 2 or
+>   # later. See the COPYING file in the top-level directory.
+>  =20
+> +import os
 > +
-> +bool machine_init_done;
-> +
-> +static NotifierList machine_init_done_notifiers =3D
-> +    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
-> +
-> +static NotifierList exit_notifiers =3D
-> +    NOTIFIER_LIST_INITIALIZER(exit_notifiers);
->
->  void notifier_list_init(NotifierList *list)
->  {
-> @@ -74,3 +83,37 @@ int notifier_with_return_list_notify(NotifierWithRetur=
-nList *list, void *data)
->      }
->      return ret;
->  }
-> +
-> +void qemu_add_machine_init_done_notifier(Notifier *notify)
-> +{
-> +    notifier_list_add(&machine_init_done_notifiers, notify);
-> +    if (machine_init_done) {
-> +        notify->notify(notify, NULL);
-> +    }
-> +}
-> +
-> +void qemu_remove_machine_init_done_notifier(Notifier *notify)
-> +{
-> +    notifier_remove(notify);
-> +}
-> +
-> +void qemu_run_machine_init_done_notifiers(void)
-> +{
-> +    machine_init_done =3D true;
-> +    notifier_list_notify(&machine_init_done_notifiers, NULL);
-> +}
-> +
-> +void qemu_add_exit_notifier(Notifier *notify)
-> +{
-> +    notifier_list_add(&exit_notifiers, notify);
-> +}
-> +
-> +void qemu_remove_exit_notifier(Notifier *notify)
-> +{
-> +    notifier_remove(notify);
-> +}
-> +
-> +void qemu_run_exit_notifiers(void)
-> +{
-> +    notifier_list_notify(&exit_notifiers, NULL);
-> +}
-> --
-> 1.8.3.1
->
+> +from avocado import skipUnless
+>   from avocado_qemu import Test
+>   from avocado_qemu import wait_for_console_pattern
+>  =20
+> @@ -13,6 +16,7 @@ class Leon3Machine(Test):
+>  =20
+>       timeout =3D 60
+>  =20
+> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeo=
+ut')
+>       def test_leon3_helenos_uimage(self):
+>           """
+>           :avocado: tags=3Darch:sparc
+>=20
 
-
---=20
-Marc-Andr=C3=A9 Lureau
 
