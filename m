@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F06C43331
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9799C43331
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:41:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6143B20748
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:31:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6143B20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9000C20748
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:41:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9000C20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIead-0003a4-Ha
-	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 16:31:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46050)
+	id 1jIekL-0006XA-NE
+	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 16:41:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jIeZz-0003Ar-Ry
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:30:48 -0400
+ (envelope-from <bounces@canonical.com>) id 1jIeji-00066F-BF
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jIeZy-0001JF-MT
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:30:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48394)
+ (envelope-from <bounces@canonical.com>) id 1jIejg-0002kp-Vk
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:40:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49472)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jIeZy-0001En-Gr
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:30:46 -0400
+ id 1jIejg-0002k8-Qi
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:40:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jIeZw-000729-0b
- for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 20:30:44 +0000
+ id 1jIejf-0007jj-Bu
+ for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 20:40:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E5E162E80C8
- for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 20:30:43 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 563EC2E80C7
+ for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 20:40:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 29 Mar 2020 20:22:51 -0000
-From: Matt Wilbur <1869497@bugs.launchpad.net>
+Date: Sun, 29 Mar 2020 20:33:57 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
@@ -52,11 +52,11 @@ X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mattwilbur
+X-Launchpad-Bug-Commenters: mattwilbur pmaydell
 X-Launchpad-Bug-Reporter: Matt Wilbur (mattwilbur)
-X-Launchpad-Bug-Modifier: Matt Wilbur (mattwilbur)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
 References: <158540989331.24425.14224651637245896063.malonedeb@soybean.canonical.com>
-Message-Id: <158551337267.22866.13100700457701104858.launchpad@wampee.canonical.com>
+Message-Id: <158551403766.20605.9886570301666642580.malone@gac.canonical.com>
 Subject: [Bug 1869497] Re: x86_cpu_gdb_read_register segfaults when gdb
  requests registers
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a296f04231dee355be5db73cc878b9e21689a253";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e4f32eb7114c1cc0a54e573aa0a615f31abccd73
+X-Launchpad-Hash: ca0123787fcae4782bb847ab8dfbcba369c04a79
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,8 +83,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Matt Wilbur (mattwilbur)
+Thanks for tracking down the source of the bug. Our 'submitting patches'
+policy is at https://wiki.qemu.org/Contribute/SubmitAPatch in case you
+haven't already found it. (It's quite long but for a simple one-shot
+bugfix patch the important stuff is just the summarized bits at the
+top.)
 
 -- =
 
