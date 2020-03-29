@@ -2,93 +2,74 @@ Return-Path: <SRS0=qvFP=5O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECB8C43331
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F06C43331
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:31:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AD53206E6
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:09:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AD53206E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 6143B20748
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Mar 2020 20:31:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6143B20748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIeFO-0005lo-Jm
-	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 16:09:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44235)
+	id 1jIead-0003a4-Ha
+	for qemu-devel@archiver.kernel.org; Sun, 29 Mar 2020 16:31:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jIeEi-0004nP-B8
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:08:49 -0400
+ (envelope-from <bounces@canonical.com>) id 1jIeZz-0003Ar-Ry
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jIeEh-0006vH-78
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:08:48 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:57110
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jIeEh-0006iJ-1e
- for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:08:47 -0400
-Received: from host86-141-71-240.range86-141.btcentralplus.com
- ([86.141.71.240] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jIeF8-0007WT-AK; Sun, 29 Mar 2020 21:09:18 +0100
-To: Chad Kennedy <chadkennedyonline@yahoo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1076116481.206160.1585413075911.ref@mail.yahoo.com>
- <1076116481.206160.1585413075911@mail.yahoo.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <62976e42-78a8-5973-edf2-5ae3a6586d7e@ilande.co.uk>
-Date: Sun, 29 Mar 2020 21:08:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <bounces@canonical.com>) id 1jIeZy-0001JF-MT
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:30:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48394)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jIeZy-0001En-Gr
+ for qemu-devel@nongnu.org; Sun, 29 Mar 2020 16:30:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jIeZw-000729-0b
+ for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 20:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E5E162E80C8
+ for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 20:30:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1076116481.206160.1585413075911@mail.yahoo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.141.71.240
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: Request for Wiki write access
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 29 Mar 2020 20:22:51 -0000
+From: Matt Wilbur <1869497@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
+ assignee=wilburm@gmail.com; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mattwilbur
+X-Launchpad-Bug-Reporter: Matt Wilbur (mattwilbur)
+X-Launchpad-Bug-Modifier: Matt Wilbur (mattwilbur)
+References: <158540989331.24425.14224651637245896063.malonedeb@soybean.canonical.com>
+Message-Id: <158551337267.22866.13100700457701104858.launchpad@wampee.canonical.com>
+Subject: [Bug 1869497] Re: x86_cpu_gdb_read_register segfaults when gdb
+ requests registers
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e4f32eb7114c1cc0a54e573aa0a615f31abccd73
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,29 +78,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1869497 <1869497@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/03/2020 16:31, Chad Kennedy wrote:
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Matt Wilbur (mattwilbur)
 
-> I'm getting started with building QEMU on Windows and, following the instructions
-> at  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I ran into some small
-> issues. I'd like to be able to tweak the wiki a bit to help save others who might
-> follow behind me some time.
-> 
-> Therefore, I'm requesting a wiki account per the bottom
-> of https://wiki.qemu.org/Main_Page
-> 
-> Thanks and best regards!
+-- =
 
-Hi Chad,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1869497
 
-Thanks for getting involved in the project! I've created a wiki account for you and
-emailed across the details.
+Title:
+  x86_cpu_gdb_read_register segfaults when gdb requests registers
 
+Status in QEMU:
+  New
 
-ATB,
+Bug description:
+  When attempting to attach to the gdbstub, a segfault occurs.
 
-Mark.
+  I traced this down to a problem in a call to gdb_get_reg16 where the
+  mem_buf was being treated like a uint8_t* instead of a GByteArray.
+  The buffer passed to gdb_get_reg16 ends up passing an invalid
+  GByteArray pointer, which subsequentlycauses a segfault in memcpy.
+
+  I have a fix for this - just need to educate myself on how to submit a
+  patch.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1869497/+subscriptions
 
