@@ -2,58 +2,83 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 437DEC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DFF2C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:39:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1E3B20578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:38:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E3B20578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA3DA20578
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:39:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cb+CKW7W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA3DA20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxQe-0005Ok-1t
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:38:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51045)
+	id 1jIxRd-0006nI-0R
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:39:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxPj-0004K7-S0
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:37:29 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jIxQr-0005rV-70
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxPh-0007mB-UX
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:37:27 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44965)
+ (envelope-from <dgilbert@redhat.com>) id 1jIxQp-0008U1-Cq
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:38:36 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41115)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jIxPh-0007hc-7X; Mon, 30 Mar 2020 12:37:25 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07612998|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.00777483-0.000127642-0.992097;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16370; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H7l-TP9_1585586238; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H7l-TP9_1585586238) by smtp.aliyun-inc.com(10.147.40.2);
- Tue, 31 Mar 2020 00:37:19 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v7 30/61] target/riscv: vector single-width floating-point
- add/subtract instructions
-Date: Mon, 30 Mar 2020 23:36:02 +0800
-Message-Id: <20200330153633.15298-31-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jIxQp-0008Sz-7Q
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:38:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585586314;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Eqh6QkStzsumL9GQqhPS/drHtOb2t7poIGAncc6tEY4=;
+ b=cb+CKW7Wb/sYM1NUVgxjBuhdtI/htyGmghPQ8plRSHC1UnVvH5oKBRZua5tDvB78RlHrUX
+ vHs7IDmO7ZGZ1W09+/kFEF142qTOi63t1+xKVhcJisDjWzx2whZLXtxjzNxVUa6P79BhA8
+ Ph3eoauddEanh1JqS24U+ovO821gC0o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-EEZRb2YxNIuwqxABoGK7kA-1; Mon, 30 Mar 2020 12:38:30 -0400
+X-MC-Unique: EEZRb2YxNIuwqxABoGK7kA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94927802563;
+ Mon, 30 Mar 2020 16:38:28 +0000 (UTC)
+Received: from work-vm (ovpn-114-162.ams2.redhat.com [10.36.114.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0629A96B60;
+ Mon, 30 Mar 2020 16:38:08 +0000 (UTC)
+Date: Mon, 30 Mar 2020 17:38:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0] qga-posix: Avoid crashing process when failing
+ to allocate memory
+Message-ID: <20200330163805.GB2843@work-vm>
+References: <20200324194836.21539-1-philmd@redhat.com>
+ <1242083041.1.1585117162620@webmail.proxmox.com>
+ <6be54d1f-e5fc-5b34-ba4d-fa050029f26b@redhat.com>
+ <87mu7yue35.fsf@dusky.pond.sub.org>
+ <81317f7f-7de9-f616-27dc-c389f06792c3@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <81317f7f-7de9-f616-27dc-c389f06792c3@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,313 +90,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>, qemu-stable@nongnu.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sameeh Jubran <sjubran@redhat.com>, Basil Salman <basil@daynix.com>,
+ Dietmar Maurer <dietmar@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  16 ++++
- target/riscv/insn32.decode              |   5 +
- target/riscv/insn_trans/trans_rvv.inc.c | 116 ++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 111 +++++++++++++++++++++++
- 4 files changed, 248 insertions(+)
+* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> Cc'ing the ppl who responded the thread you quoted.
+>=20
+> On 3/30/20 4:11 PM, Markus Armbruster wrote:
+> > Philippe Mathieu-Daud=E9 <philmd@redhat.com> writes:
+> > ---
+> >   qga/commands-posix.c | 8 +++++++-
+> >   1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> > index 93474ff770..8f127788e6 100644
+> > --- a/qga/commands-posix.c
+> > +++ b/qga/commands-posix.c
+> > @@ -493,7 +493,13 @@ struct GuestFileRead *qmp_guest_file_read(int64_t
+> handle, bool has_count,
+> >           gfh->state =3D RW_STATE_NEW;
+> >       }
+> >
+> > -    buf =3D g_malloc0(count+1);
+> > +    buf =3D g_try_malloc0(count + 1);
+> > +    if (!buf) {
+> > +        error_setg(errp,
+> > +                   "failed to allocate sufficient memory "
+> > +                   "to complete the requested service");
+> > +        return NULL;
+> > +    }
+> >       read_count =3D fread(buf, 1, count, fh);
+> >       if (ferror(fh)) {
+> >           error_setg_errno(errp, errno, "failed to read file");
+> >
+>=20
+> > > On 3/25/20 7:19 AM, Dietmar Maurer wrote:
+> > > > but error_setg() also calls malloc, so this does not help at all?
+> > >=20
+> > > IIUC the problem, you can send a QMP command to ask to read let's say
+> > > 3GB of a file, and QEMU crashes. But this doesn't mean there the .hea=
+p
+> > > is empty, there is probably few bytes still available, enough to
+> > > respond with an error message.
+> >=20
+> > We've discussed how to handle out-of-memory conditions many times.
+> > Here's one instance:
+> >=20
+> >      Subject: When it's okay to treat OOM as fatal?
+> >      Message-ID: <87efcqniza.fsf@dusky.pond.sub.org>
+> >      https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg03212.=
+html
+> >=20
+> > No improvement since then; there's no guidance on when to check for OOM=
+.
+> > Actual code tends to check only "large" allocations (for subjective
+> > values of "large").
+> >=20
+> > I reiterate my opinion that whatever OOM handling we have is too
+> > unreliable to be worth much, since it can only help when (1) allocation=
+s
+> > actually fail (they generally don't[*]), and (2) the allocation that
+> > fails is actually handled (they generally aren't), and (3) the handling
+> > actually works (we don't test OOM, so it generally doesn't).
+> >=20
+> >=20
+> > [*] Linux overcommits memory, which means malloc() pretty much always
+> > succeeds, but when you try to use "too much" of the memory you
+> > supposedly allocated, a lethal signal is coming your way.  Reasd the
+> > thread I quoted for examples.
+>=20
+> So this patch takes Stefan reasoning:
+> https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg03525.html
+>=20
+>   My thinking has been to use g_new() for small QEMU-internal structures
+>   and g_try_new() for large amounts of memory allocated in response to
+>   untrusted inputs.  (Untrusted inputs must never be used for unbounded
+>   allocation sizes but those bounded sizes can still be large.)
+>=20
+> In any cases (malloc/malloc_try) we have a denial of service
+> (https://www.openwall.com/lists/oss-security/2018/10/17/4) and the servic=
+e
+> is restarted.
+>=20
+> Daniel suggests such behavior should be catched by external firewall guar=
+d
+> (either on the process or on the network). This seems out of scope of QEM=
+U
+> and hard to fix.
+>=20
+> So, can we improve something? Or should we let this code as it?
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 7f7fdcb451..3031a941c2 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -797,3 +797,19 @@ DEF_HELPER_6(vnclipu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vnclip_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vnclip_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vnclip_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vfadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfadd_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfadd_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfadd_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 8b898f9bad..c8e3f10162 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -443,6 +443,11 @@ vnclipu_vi      101110 . ..... ..... 011 ..... 1010111 @r_vm
- vnclip_vv       101111 . ..... ..... 000 ..... 1010111 @r_vm
- vnclip_vx       101111 . ..... ..... 100 ..... 1010111 @r_vm
- vnclip_vi       101111 . ..... ..... 011 ..... 1010111 @r_vm
-+vfadd_vv        000000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfadd_vf        000000 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsub_vv        000010 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsub_vf        000010 . ..... ..... 101 ..... 1010111 @r_vm
-+vfrsub_vf       100111 . ..... ..... 101 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index d03ec2688f..9a8fb18adc 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1807,3 +1807,119 @@ GEN_OPIVX_NARROW_TRANS(vnclipu_vx)
- GEN_OPIVX_NARROW_TRANS(vnclip_vx)
- GEN_OPIVI_NARROW_TRANS(vnclipu_vi, 1, vnclipu_vx)
- GEN_OPIVI_NARROW_TRANS(vnclip_vi, 1, vnclip_vx)
-+
-+/*
-+ *** Vector Float Point Arithmetic Instructions
-+ */
-+/* Vector Single-Width Floating-Point Add/Subtract Instructions */
-+
-+/*
-+ * If the current SEW does not correspond to a supported IEEE floating-point
-+ * type, an illegal instruction exception is raised.
-+ */
-+static bool opfvv_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            (s->sew != 0));
-+}
-+
-+/* OPFVV without GVEC IR */
-+#define GEN_OPFVV_TRANS(NAME, CHECK)                               \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-+{                                                                  \
-+    if (CHECK(s, a)) {                                             \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_4_ptr * const fns[3] = {            \
-+            gen_helper_##NAME##_h,                                 \
-+            gen_helper_##NAME##_w,                                 \
-+            gen_helper_##NAME##_d,                                 \
-+        };                                                         \
-+        TCGLabel *over = gen_new_label();                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs1),                    \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fns[s->sew - 1]);    \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+GEN_OPFVV_TRANS(vfadd_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfsub_vv, opfvv_check)
-+
-+typedef void gen_helper_opfvf(TCGv_ptr, TCGv_ptr, TCGv_i64, TCGv_ptr,
-+                              TCGv_env, TCGv_i32);
-+
-+static bool opfvf_trans(uint32_t vd, uint32_t rs1, uint32_t vs2,
-+                        uint32_t data, gen_helper_opfvf *fn, DisasContext *s)
-+{
-+    TCGv_ptr dest, src2, mask;
-+    TCGv_i32 desc;
-+
-+    TCGLabel *over = gen_new_label();
-+    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+
-+    dest = tcg_temp_new_ptr();
-+    mask = tcg_temp_new_ptr();
-+    src2 = tcg_temp_new_ptr();
-+    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
-+
-+    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
-+    tcg_gen_addi_ptr(src2, cpu_env, vreg_ofs(s, vs2));
-+    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
-+
-+    fn(dest, mask, cpu_fpr[rs1], src2, cpu_env, desc);
-+
-+    tcg_temp_free_ptr(dest);
-+    tcg_temp_free_ptr(mask);
-+    tcg_temp_free_ptr(src2);
-+    tcg_temp_free_i32(desc);
-+    gen_set_label(over);
-+    return true;
-+}
-+
-+static bool opfvf_check(DisasContext *s, arg_rmrr *a)
-+{
-+/*
-+ * If the current SEW does not correspond to a supported IEEE floating-point
-+ * type, an illegal instruction exception is raised
-+ */
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            (s->sew != 0));
-+}
-+
-+/* OPFVF without GVEC IR */
-+#define GEN_OPFVF_TRANS(NAME, CHECK)                              \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)            \
-+{                                                                 \
-+    if (CHECK(s, a)) {                                            \
-+        uint32_t data = 0;                                        \
-+        static gen_helper_opfvf *const fns[3] = {                 \
-+            gen_helper_##NAME##_h,                                \
-+            gen_helper_##NAME##_w,                                \
-+            gen_helper_##NAME##_d,                                \
-+        };                                                        \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);            \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);            \
-+        return opfvf_trans(a->rd, a->rs1, a->rs2, data,           \
-+                           fns[s->sew - 1], s);                   \
-+    }                                                             \
-+    return false;                                                 \
-+}
-+
-+GEN_OPFVF_TRANS(vfadd_vf,  opfvf_check)
-+GEN_OPFVF_TRANS(vfsub_vf,  opfvf_check)
-+GEN_OPFVF_TRANS(vfrsub_vf,  opfvf_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 502656d005..af343e9bf9 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -21,6 +21,7 @@
- #include "exec/memop.h"
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
-+#include "fpu/softfloat.h"
- #include "tcg/tcg-gvec-desc.h"
- #include "internals.h"
- #include <math.h>
-@@ -3166,3 +3167,113 @@ RVVCALL(OPIVX2_RM, vnclipu_vx_w, NOP_UUU_W, H4, H8, vnclipu32)
- GEN_VEXT_VX_RM(vnclipu_vx_b, 1, 1, clearb)
- GEN_VEXT_VX_RM(vnclipu_vx_h, 2, 2, clearh)
- GEN_VEXT_VX_RM(vnclipu_vx_w, 4, 4, clearl)
-+
-+/*
-+ *** Vector Float Point Arithmetic Instructions
-+ */
-+/* Vector Single-Width Floating-Point Add/Subtract Instructions */
-+#define OPFVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)   \
-+static void do_##NAME(void *vd, void *vs1, void *vs2, int i,   \
-+                      CPURISCVState *env)                      \
-+{                                                              \
-+    TX1 s1 = *((T1 *)vs1 + HS1(i));                            \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                            \
-+    *((TD *)vd + HD(i)) = OP(s2, s1, &env->fp_status);         \
-+}
-+
-+#define GEN_VEXT_VV_ENV(NAME, ESZ, DSZ, CLEAR_FN)         \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
-+                  void *vs2, CPURISCVState *env,          \
-+                  uint32_t desc)                          \
-+{                                                         \
-+    uint32_t vlmax = vext_maxsz(desc) / ESZ;              \
-+    uint32_t mlen = vext_mlen(desc);                      \
-+    uint32_t vm = vext_vm(desc);                          \
-+    uint32_t vl = env->vl;                                \
-+    uint32_t i;                                           \
-+                                                          \
-+    for (i = 0; i < vl; i++) {                            \
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {        \
-+            continue;                                     \
-+        }                                                 \
-+        do_##NAME(vd, vs1, vs2, i, env);                  \
-+    }                                                     \
-+    CLEAR_FN(vd, vl, vl * DSZ,  vlmax * DSZ);             \
-+}
-+
-+RVVCALL(OPFVV2, vfadd_vv_h, OP_UUU_H, H2, H2, H2, float16_add)
-+RVVCALL(OPFVV2, vfadd_vv_w, OP_UUU_W, H4, H4, H4, float32_add)
-+RVVCALL(OPFVV2, vfadd_vv_d, OP_UUU_D, H8, H8, H8, float64_add)
-+GEN_VEXT_VV_ENV(vfadd_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfadd_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfadd_vv_d, 8, 8, clearq)
-+
-+#define OPFVF2(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)        \
-+static void do_##NAME(void *vd, uint64_t s1, void *vs2, int i, \
-+                      CPURISCVState *env)                      \
-+{                                                              \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                            \
-+    *((TD *)vd + HD(i)) = OP(s2, (TX1)(T1)s1, &env->fp_status);\
-+}
-+
-+#define GEN_VEXT_VF(NAME, ESZ, DSZ, CLEAR_FN)             \
-+void HELPER(NAME)(void *vd, void *v0, uint64_t s1,        \
-+                  void *vs2, CPURISCVState *env,          \
-+                  uint32_t desc)                          \
-+{                                                         \
-+    uint32_t vlmax = vext_maxsz(desc) / ESZ;              \
-+    uint32_t mlen = vext_mlen(desc);                      \
-+    uint32_t vm = vext_vm(desc);                          \
-+    uint32_t vl = env->vl;                                \
-+    uint32_t i;                                           \
-+                                                          \
-+    for (i = 0; i < vl; i++) {                            \
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {        \
-+            continue;                                     \
-+        }                                                 \
-+        do_##NAME(vd, s1, vs2, i, env);                   \
-+    }                                                     \
-+    CLEAR_FN(vd, vl, vl * DSZ,  vlmax * DSZ);             \
-+}
-+
-+RVVCALL(OPFVF2, vfadd_vf_h, OP_UUU_H, H2, H2, float16_add)
-+RVVCALL(OPFVF2, vfadd_vf_w, OP_UUU_W, H4, H4, float32_add)
-+RVVCALL(OPFVF2, vfadd_vf_d, OP_UUU_D, H8, H8, float64_add)
-+GEN_VEXT_VF(vfadd_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfadd_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfadd_vf_d, 8, 8, clearq)
-+
-+RVVCALL(OPFVV2, vfsub_vv_h, OP_UUU_H, H2, H2, H2, float16_sub)
-+RVVCALL(OPFVV2, vfsub_vv_w, OP_UUU_W, H4, H4, H4, float32_sub)
-+RVVCALL(OPFVV2, vfsub_vv_d, OP_UUU_D, H8, H8, H8, float64_sub)
-+GEN_VEXT_VV_ENV(vfsub_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsub_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsub_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsub_vf_h, OP_UUU_H, H2, H2, float16_sub)
-+RVVCALL(OPFVF2, vfsub_vf_w, OP_UUU_W, H4, H4, float32_sub)
-+RVVCALL(OPFVF2, vfsub_vf_d, OP_UUU_D, H8, H8, float64_sub)
-+GEN_VEXT_VF(vfsub_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsub_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsub_vf_d, 8, 8, clearq)
-+
-+static uint16_t float16_rsub(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return float16_sub(b, a, s);
-+}
-+
-+static uint32_t float32_rsub(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return float32_sub(b, a, s);
-+}
-+
-+static uint64_t float64_rsub(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return float64_sub(b, a, s);
-+}
-+
-+RVVCALL(OPFVF2, vfrsub_vf_h, OP_UUU_H, H2, H2, float16_rsub)
-+RVVCALL(OPFVF2, vfrsub_vf_w, OP_UUU_W, H4, H4, float32_rsub)
-+RVVCALL(OPFVF2, vfrsub_vf_d, OP_UUU_D, H8, H8, float64_rsub)
-+GEN_VEXT_VF(vfrsub_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfrsub_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfrsub_vf_d, 8, 8, clearq)
--- 
-2.23.0
+I'll agree with Stefan's description; we should use 'try' for anything
+'large' (badly defined) or user controlled.
+
+So I think this should switch to having the try.
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
