@@ -2,69 +2,89 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=1.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2185C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 05:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 254F9C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 05:54:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA85920786
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 05:42:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA85920786
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E2E02206F6
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 05:54:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tc7PDnHW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2E02206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jInBe-0000HN-OZ
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 01:42:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44985)
+	id 1jInND-0002Wm-WF
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 01:54:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jInAs-0008IR-PP
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 01:41:28 -0400
+ (envelope-from <dnbrdsky@gmail.com>) id 1jInMY-00026s-B1
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 01:53:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jInAr-0006Be-8o
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 01:41:26 -0400
-Resent-Date: Mon, 30 Mar 2020 01:41:26 -0400
-Resent-Message-Id: <E1jInAr-0006Be-8o@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21480)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jInAr-00068Z-19
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 01:41:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1585546857; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=C34N2nB/tlk+lVDIeyVGvQPeAjoCD+7AmajBqx4eNBZ/uyvwJiVO4breecvO6b/krjG9VF/b46+ySKWUF2/RjW5znIgoxDJ0hBw1rNwf5cjOmEZ69bGWBU8+/C56Hicqyq4RQb7ucjJlq7fJ6ee0+Lg+Rq4mhaSRVEC2TNoMLHw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1585546857;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=auM5Lxu5FhXCvl2DYuGr6iCOworLa+AkQiaDx/hYIvc=; 
- b=kCIaFdVLfOE2Wq3yb22zcoXeGo0BNV35vfO8CVkxsp9oYtUHD0RguPCmcfig+PNdM1zgFJeEPjJ31hP4EitMK4TSv0YOPcyBp7xJZrJgtZPOX0PeCcMuGEtQsD7j3K2iEnIPkzyTHx96fepssJKyTacdZo2oHz1d8Tn+hDf+XIU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1585546856664324.4193326771449;
- Sun, 29 Mar 2020 22:40:56 -0700 (PDT)
-In-Reply-To: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing to
- VMs
-Message-ID: <158554685438.10428.15390575450548713766@39012742ff91>
+ (envelope-from <dnbrdsky@gmail.com>) id 1jInMX-00033F-9A
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 01:53:30 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34604)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dnbrdsky@gmail.com>) id 1jInMX-00031t-2E
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 01:53:29 -0400
+Received: by mail-pl1-x641.google.com with SMTP id a23so6313239plm.1
+ for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 22:53:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IZgIX4hCq1yyGNnYP6FJkY61QsVVDSFodDb51aywDNY=;
+ b=tc7PDnHWpDVyPPFwFnkjxNi0Lj4csNMtAGCpyBJKL866+DFM1M47GzaioxmGCH5qXl
+ OQAPwJjRv4VbrLbhCeBRJPLiUbtXOIdS3dIS3Ta+zaXFQFDzGx38A3awLXJtHNl2e/eB
+ rx3SwUTrjD5DkyxVLDwNihMsOSRLYQW6wx9l0+i2ezAH8cC8LY2gpMqiVkP4gQtETJRV
+ rQbltlAnxHFVLirHXMxodIYeSr5jr6TZx05PiGURIm8t6hAeqpqCoq2WPp2aOI3EetVS
+ drRIdJmv7L5OzAINjtZKEvoXLCzdY72P/GniHFgxDHcy6s5WkaOZ9NaSpYoeT0p76zZJ
+ Qp9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IZgIX4hCq1yyGNnYP6FJkY61QsVVDSFodDb51aywDNY=;
+ b=DfVLaZjY0ldw8lI4zSMbSrXNfZJJXg/xQ73MW4ZX0HO97jctSRHhiJ0H5FdD190mKL
+ RbTVYL2tf7zEpelkDzjjipSGPI893Ina9MTdET2N8bygmhCDviv7KtDsug3CsJMXC7dZ
+ DXxV2U9TPnb1IM5cjRF2QryoX/COOV1Ztp4o3Db28WjWXT4YZnOOk7bgCGHnB3zAC7Br
+ wZ2cRCcmYyqh+kYF0agdIGnE45Ty0OWdQno32Ao9VAmXYwQlWyS6jsUK1t914gfLjAjm
+ zpNUz+QWEnWakc8SIWsv6O6MTwEeMzFhfQc83AuylTC/mCgdQSc11YL95/ACVnwRpcdS
+ QoFA==
+X-Gm-Message-State: ANhLgQ2pd3B3TYomL4VWOllYJAtCQgvdd1E/mMXMzkSNfY5ZQMkCp4HW
+ vsG7zqJhIw/WPGFywrqkxjYJzOtmgA4oTrLg6O0=
+X-Google-Smtp-Source: ADFU+vsthtKE2DhXY0qAfYWdcMYUXMDt0ee8h7HT4wp/F6b1iRXTDFvuCwj76KnQtxHNw9HzcSMvxTFLFs1k/XcfbPo=
+X-Received: by 2002:a17:90a:14f:: with SMTP id
+ z15mr13729645pje.137.1585547606637; 
+ Sun, 29 Mar 2020 22:53:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: yi.l.liu@intel.com
-Date: Sun, 29 Mar 2020 22:40:56 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+References: <20200320123137.1937091-1-dnbrdsky@gmail.com>
+ <158471180295.15515.1369533827289907154@39012742ff91>
+ <20200323132556.GG261260@stefanha-x1.localdomain>
+ <CA+ZmoZUFojqmMxNQ1bhGMzjML7OFgDt1GNbogGTw5rte5LD4iw@mail.gmail.com>
+ <1b0fa063-6fe4-ad40-06b2-9c3f2f955a06@linaro.org>
+ <04a411d6-72e7-d2d2-15f9-895f6a765d22@redhat.com>
+ <CA+ZmoZXfrGh3+jnN4K-cfZitR+DVPL=ieZpTZGzH3cYSxko=eA@mail.gmail.com>
+ <CAFXwXrkkOzuS=4Gfqm9XtkL5kc5m_5-9WmuziGgTfhFdm8VD0A@mail.gmail.com>
+ <CA+ZmoZXvQ0iduKP_zWA0wTnpVSjjx=M6d5knWV-cayVuSQ2usA@mail.gmail.com>
+ <9072334f-e4a9-cc6d-7c72-b97110e74cbc@linaro.org>
+In-Reply-To: <9072334f-e4a9-cc6d-7c72-b97110e74cbc@linaro.org>
+From: Daniel Brodsky <dnbrdsky@gmail.com>
+Date: Sun, 29 Mar 2020 22:53:14 -0700
+Message-ID: <CA+ZmoZUwTYsFv73sfhgexRDU-+qqk0P-Teje+mzu4Rn+D2=YQg@mail.gmail.com>
+Subject: Re: [PATCH v4 0/2] Replaced locks with lock guard macros
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,54 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au,
- yi.y.sun@intel.com, hao.wu@intel.com
+Cc: Stefan Hajnoczi <stefanha@gmail.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTg1NTQyMzAxLTg0MDg3LTEt
-Z2l0LXNlbmQtZW1haWwteWkubC5saXVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1h
-a2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
-ICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9ody9wY2kvcGNp
-X2J1cy5oOjQsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVk
-ZS9ody9wY2ktaG9zdC9pNDQwZnguaDoxNSwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAvcWVt
-dS10ZXN0L3NyYy9zdHVicy9wY2ktaG9zdC1waWl4LmM6MjoKL3RtcC9xZW11LXRlc3Qvc3JjL2lu
-Y2x1ZGUvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0Lmg6Mjg6MTA6IGZhdGFsIGVycm9yOiBs
-aW51eC9pb21tdS5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAjaW5jbHVkZSA8bGludXgv
-aW9tbXUuaD4KICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVk
-LgogIENDICAgICAgc2NzaS9wci1tYW5hZ2VyLXN0dWIubwptYWtlOiAqKiogWy90bXAvcWVtdS10
-ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHN0dWJzL3BjaS1ob3N0LXBpaXgub10gRXJyb3IgMQptYWtl
-OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIENDICAgICAgYmxvY2svY3Vy
-bC5vClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKLS0tCiAgICByYWlzZSBDYWxs
-ZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJv
-cjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdj
-b20ucWVtdS5pbnN0YW5jZS51dWlkPWE3MWNiYTU0N2IwYjQ3ZWY5MWY4NzRiNDJlMDBmODI4Jywg
-Jy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0t
-cm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScs
-ICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VO
-Vj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0
-Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
-Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1lbnA5bTdyci9zcmMvZG9ja2VyLXNyYy4yMDIw
-LTAzLTMwLTAxLjM4LjUzLjI0ODA6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywg
-Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
-dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
-YTcxY2JhNTQ3YjBiNDdlZjkxZjg3NGI0MmUwMGY4MjgKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
-XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtZW5wOW03cnIvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0Bm
-ZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMm0xLjg3MnMKdXNlciAgICAwbTguNDIycwoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU4NTU0MjMw
-MS04NDA4Ny0xLWdpdC1zZW5kLWVtYWlsLXlpLmwubGl1QGludGVsLmNvbS90ZXN0aW5nLmRvY2tl
-ci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Sat, Mar 28, 2020 at 9:12 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 3/27/20 11:38 PM, Daniel Brodsky wrote:
+> > On Thu, Mar 26, 2020 at 11:01 AM Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> My preference is to add -Wno-tautological-type-limit-compare in
+> >> configure, so we don't have to work around this same issue elsewhere
+> >> in the code base.
+> >>
+> >> r~
+> >
+> > What do you think would be the best way to add this? I could change
+> > all additions of the `-m32` flag to instead use `-m32
+> > -Wno-tautological-type-limit-compare` or add the flag if qemu is being
+> > compiled with clang and `-m32` already enabled.
+>
+> I was going to add it unconditionally, with all of the other warning flags.
+>
+> Except that it doesn't work -- clang-9 *still* warns.  Clearly a clang bug, but
+> there doesn't seem to be any workaround at all except --disable-werror.
+>
+>
+> r~
+Using `#pragma clang diagnostic ignored
+"-Wtautological-type-limit-compare"` suppresses the errors (on Clang
+9). I could go and drop that in for the problem areas? There's only a
+few so it wouldn't be a major change. I'm thinking of adding a macro
+like this:
+#define PRAGMA(x) _Pragma(stringify(x))
+#define IF_IGNORE_TYPE_LIMIT(statement) \
+        PRAGMA(clang diagnostic push) \
+        PRAGMA(clang diagnostic ignored "-Wtautological-type-limit-compare") \
+        if (statement) \
+        PRAGMA(clang diagnostic pop)
+
+and replacing the problem conditionals with it.
+
+Daniel
 
