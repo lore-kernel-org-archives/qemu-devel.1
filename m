@@ -2,59 +2,81 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E100C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 753E7C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:26:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 516822072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:26:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 516822072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3FD3D2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:26:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYseZT90"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD3D2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxEv-0006wu-Fk
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49011)
+	id 1jIxF4-0007FI-E0
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:26:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxE2-0005zn-B3
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:24 -0400
+ (envelope-from <berrange@redhat.com>) id 1jIxEA-00065Q-TX
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxDz-0002eS-U5
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:22 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:41755)
+ (envelope-from <berrange@redhat.com>) id 1jIxE9-0002kO-FK
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:30 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55053)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jIxDz-0002bQ-1u; Mon, 30 Mar 2020 12:25:19 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_regular_dialog|0.0435712-0.000606192-0.955823;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03294; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H7khsAH_1585585513; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H7khsAH_1585585513)
- by smtp.aliyun-inc.com(10.147.40.44); Tue, 31 Mar 2020 00:25:14 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v7 24/61] target/riscv: vector single-width saturating add and
- subtract
-Date: Mon, 30 Mar 2020 23:35:56 +0800
-Message-Id: <20200330153633.15298-25-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jIxE9-0002kA-An
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585585529;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VYCc39bvJPgwiYaAoHpsrecasJdUJg2PE7mHgSDENzs=;
+ b=RYseZT90VetQ+Xkj6Rl4I6DhiWzNUM6KSXir3K2h/xS2FosvZpimKhTOOe1yuT42cTOul8
+ 9gTLQ6EfZ+JlmsvWG2B2X3R4ofQ4bAxGv8M2I+EIzI+fU/pC+Q3m4FHdMvCfb5KUukFs2X
+ xlNsi45xUj6LqmNsL465xAAMxonomuI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-Fmz9TNGuMFC0-HtWKIJSmA-1; Mon, 30 Mar 2020 12:25:14 -0400
+X-MC-Unique: Fmz9TNGuMFC0-HtWKIJSmA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D617D1005509;
+ Mon, 30 Mar 2020 16:25:12 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 065D350C01;
+ Mon, 30 Mar 2020 16:25:07 +0000 (UTC)
+Date: Mon, 30 Mar 2020 17:25:05 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0] qga-posix: Avoid crashing process when failing
+ to allocate memory
+Message-ID: <20200330162505.GP236854@redhat.com>
+References: <20200324194836.21539-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <20200324194836.21539-1-philmd@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,502 +88,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-trivial@nongnu.org,
+ qemu-stable@nongnu.org, Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>,
+ qemu-devel@nongnu.org, Sameeh Jubran <sjubran@redhat.com>,
+ Basil Salman <basil@daynix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  33 ++
- target/riscv/insn32.decode              |  10 +
- target/riscv/insn_trans/trans_rvv.inc.c |  16 +
- target/riscv/vector_helper.c            | 385 ++++++++++++++++++++++++
- 4 files changed, 444 insertions(+)
+On Tue, Mar 24, 2020 at 08:48:36PM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+> Similarly to commit 807e2b6fce0 for Windows, kindly return a
+> QMP error message instead of crashing the whole process.
+>=20
+> Cc: qemu-stable@nongnu.org
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 279b2e049f..9416ebb090 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -686,3 +686,36 @@ DEF_HELPER_4(vmv_v_x_b, void, ptr, i64, env, i32)
- DEF_HELPER_4(vmv_v_x_h, void, ptr, i64, env, i32)
- DEF_HELPER_4(vmv_v_x_w, void, ptr, i64, env, i32)
- DEF_HELPER_4(vmv_v_x_d, void, ptr, i64, env, i32)
-+
-+DEF_HELPER_6(vsaddu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index adb76956c9..c9a4050adc 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -407,6 +407,16 @@ vmv_v_i         010111 1 00000 ..... 011 ..... 1010111 @r2
- vmerge_vvm      010111 0 ..... ..... 000 ..... 1010111 @r_vm_0
- vmerge_vxm      010111 0 ..... ..... 100 ..... 1010111 @r_vm_0
- vmerge_vim      010111 0 ..... ..... 011 ..... 1010111 @r_vm_0
-+vsaddu_vv       100000 . ..... ..... 000 ..... 1010111 @r_vm
-+vsaddu_vx       100000 . ..... ..... 100 ..... 1010111 @r_vm
-+vsaddu_vi       100000 . ..... ..... 011 ..... 1010111 @r_vm
-+vsadd_vv        100001 . ..... ..... 000 ..... 1010111 @r_vm
-+vsadd_vx        100001 . ..... ..... 100 ..... 1010111 @r_vm
-+vsadd_vi        100001 . ..... ..... 011 ..... 1010111 @r_vm
-+vssubu_vv       100010 . ..... ..... 000 ..... 1010111 @r_vm
-+vssubu_vx       100010 . ..... ..... 100 ..... 1010111 @r_vm
-+vssub_vv        100011 . ..... ..... 000 ..... 1010111 @r_vm
-+vssub_vx        100011 . ..... ..... 100 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 36c50f81c6..7f9ab4b8b7 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1755,3 +1755,19 @@ static bool trans_vmv_v_i(DisasContext *s, arg_vmv_v_i *a)
- GEN_OPIVV_TRANS(vmerge_vvm, opivv_vadc_check)
- GEN_OPIVX_TRANS(vmerge_vxm, opivx_vadc_check)
- GEN_OPIVI_TRANS(vmerge_vim, 0, vmerge_vxm, opivx_vadc_check)
-+
-+/*
-+ *** Vector Fixed-Point Arithmetic Instructions
-+ */
-+
-+/* Vector Single-Width Saturating Add and Subtract */
-+GEN_OPIVV_TRANS(vsaddu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vsadd_vv,  opivv_check)
-+GEN_OPIVV_TRANS(vssubu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vssub_vv,  opivv_check)
-+GEN_OPIVX_TRANS(vsaddu_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vsadd_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vssubu_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vssub_vx,  opivx_check)
-+GEN_OPIVI_TRANS(vsaddu_vi, 1, vsaddu_vx, opivx_check)
-+GEN_OPIVI_TRANS(vsadd_vi, 0, vsadd_vx, opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index b38e50e36f..7f34fcccce 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -2111,3 +2111,388 @@ GEN_VEXT_VMERGE_VX(vmerge_vxm_b, int8_t,  H1, clearb)
- GEN_VEXT_VMERGE_VX(vmerge_vxm_h, int16_t, H2, clearh)
- GEN_VEXT_VMERGE_VX(vmerge_vxm_w, int32_t, H4, clearl)
- GEN_VEXT_VMERGE_VX(vmerge_vxm_d, int64_t, H8, clearq)
-+
-+/*
-+ *** Vector Fixed-Point Arithmetic Instructions
-+ */
-+
-+/* Vector Single-Width Saturating Add and Subtract */
-+
-+/*
-+ * As fixed point instructions probably have round mode and saturation,
-+ * define common macros for fixed point here.
-+ */
-+typedef void opivv2_rm_fn(void *vd, void *vs1, void *vs2, int i,
-+                          CPURISCVState *env, int vxrm);
-+
-+#define OPIVV2_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)     \
-+static inline void                                                  \
-+do_##NAME(void *vd, void *vs1, void *vs2, int i,                    \
-+          CPURISCVState *env, int vxrm)                             \
-+{                                                                   \
-+    TX1 s1 = *((T1 *)vs1 + HS1(i));                                 \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-+    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, s1);                    \
-+}
-+
-+static inline void
-+vext_vv_rm_1(void *vd, void *v0, void *vs1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t vl, uint32_t vm, uint32_t mlen, int vxrm,
-+             opivv2_rm_fn *fn)
-+{
-+    for (uint32_t i = 0; i < vl; i++) {
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-+            continue;
-+        }
-+        fn(vd, vs1, vs2, i, env, vxrm);
-+    }
-+}
-+
-+static inline void
-+vext_vv_rm_2(void *vd, void *v0, void *vs1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t desc, uint32_t esz, uint32_t dsz,
-+             opivv2_rm_fn *fn, clear_fn *clearfn)
-+{
-+    uint32_t vlmax = vext_maxsz(desc) / esz;
-+    uint32_t mlen = vext_mlen(desc);
-+    uint32_t vm = vext_vm(desc);
-+    uint32_t vl = env->vl;
-+
-+    switch (env->vxrm) {
-+    case 0: /* rnu */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 0, fn);
-+        break;
-+    case 1: /* rne */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 1, fn);
-+        break;
-+    case 2: /* rdn */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 2, fn);
-+        break;
-+    default: /* rod */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 3, fn);
-+        break;
-+    }
-+
-+    clearfn(vd, vl, vl * dsz,  vlmax * dsz);
-+}
-+
-+/* generate helpers for fixed point instructions with OPIVV format */
-+#define GEN_VEXT_VV_RM(NAME, ESZ, DSZ, CLEAR_FN)                \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,     \
-+                  CPURISCVState *env, uint32_t desc)            \
-+{                                                               \
-+    vext_vv_rm_2(vd, v0, vs1, vs2, env, desc, ESZ, DSZ,         \
-+                 do_##NAME, CLEAR_FN);                          \
-+}
-+
-+static inline uint8_t saddu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
-+{
-+    uint8_t res = a + b;
-+    if (res < a) {
-+        res = UINT8_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint16_t saddu16(CPURISCVState *env, int vxrm, uint16_t a,
-+                               uint16_t b)
-+{
-+    uint16_t res = a + b;
-+    if (res < a) {
-+        res = UINT16_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint32_t saddu32(CPURISCVState *env, int vxrm, uint32_t a,
-+                               uint32_t b)
-+{
-+    uint32_t res = a + b;
-+    if (res < a) {
-+        res = UINT32_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint64_t saddu64(CPURISCVState *env, int vxrm, uint64_t a,
-+                               uint64_t b)
-+{
-+    uint64_t res = a + b;
-+    if (res < a) {
-+        res = UINT64_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vsaddu_vv_b, OP_UUU_B, H1, H1, H1, saddu8)
-+RVVCALL(OPIVV2_RM, vsaddu_vv_h, OP_UUU_H, H2, H2, H2, saddu16)
-+RVVCALL(OPIVV2_RM, vsaddu_vv_w, OP_UUU_W, H4, H4, H4, saddu32)
-+RVVCALL(OPIVV2_RM, vsaddu_vv_d, OP_UUU_D, H8, H8, H8, saddu64)
-+GEN_VEXT_VV_RM(vsaddu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vsaddu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vsaddu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vsaddu_vv_d, 8, 8, clearq)
-+
-+typedef void opivx2_rm_fn(void *vd, target_long s1, void *vs2, int i,
-+                          CPURISCVState *env, int vxrm);
-+
-+#define OPIVX2_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)          \
-+static inline void                                                  \
-+do_##NAME(void *vd, target_long s1, void *vs2, int i,               \
-+          CPURISCVState *env, int vxrm)                             \
-+{                                                                   \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-+    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, (TX1)(T1)s1);           \
-+}
-+
-+static inline void
-+vext_vx_rm_1(void *vd, void *v0, target_long s1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t vl, uint32_t vm, uint32_t mlen, int vxrm,
-+             opivx2_rm_fn *fn)
-+{
-+    for (uint32_t i = 0; i < vl; i++) {
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-+            continue;
-+        }
-+        fn(vd, s1, vs2, i, env, vxrm);
-+    }
-+}
-+
-+static inline void
-+vext_vx_rm_2(void *vd, void *v0, target_long s1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t desc, uint32_t esz, uint32_t dsz,
-+             opivx2_rm_fn *fn, clear_fn *clearfn)
-+{
-+    uint32_t vlmax = vext_maxsz(desc) / esz;
-+    uint32_t mlen = vext_mlen(desc);
-+    uint32_t vm = vext_vm(desc);
-+    uint32_t vl = env->vl;
-+
-+    switch (env->vxrm) {
-+    case 0: /* rnu */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 0, fn);
-+        break;
-+    case 1: /* rne */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 1, fn);
-+        break;
-+    case 2: /* rdn */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 2, fn);
-+        break;
-+    default: /* rod */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 3, fn);
-+        break;
-+    }
-+
-+    clearfn(vd, vl, vl * dsz,  vlmax * dsz);
-+}
-+
-+/* generate helpers for fixed point instructions with OPIVX format */
-+#define GEN_VEXT_VX_RM(NAME, ESZ, DSZ, CLEAR_FN)          \
-+void HELPER(NAME)(void *vd, void *v0, target_ulong s1,    \
-+        void *vs2, CPURISCVState *env, uint32_t desc)     \
-+{                                                         \
-+    vext_vx_rm_2(vd, v0, s1, vs2, env, desc, ESZ, DSZ,    \
-+                 do_##NAME, CLEAR_FN);                    \
-+}
-+
-+RVVCALL(OPIVX2_RM, vsaddu_vx_b, OP_UUU_B, H1, H1, saddu8)
-+RVVCALL(OPIVX2_RM, vsaddu_vx_h, OP_UUU_H, H2, H2, saddu16)
-+RVVCALL(OPIVX2_RM, vsaddu_vx_w, OP_UUU_W, H4, H4, saddu32)
-+RVVCALL(OPIVX2_RM, vsaddu_vx_d, OP_UUU_D, H8, H8, saddu64)
-+GEN_VEXT_VX_RM(vsaddu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vsaddu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vsaddu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vsaddu_vx_d, 8, 8, clearq)
-+
-+static inline int8_t sadd8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
-+{
-+    int8_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT8_MIN) {
-+        res = a > 0 ? INT8_MAX : INT8_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int16_t sadd16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
-+{
-+    int16_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT16_MIN) {
-+        res = a > 0 ? INT16_MAX : INT16_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int32_t sadd32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
-+{
-+    int32_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT32_MIN) {
-+        res = a > 0 ? INT32_MAX : INT32_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int64_t sadd64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-+{
-+    int64_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT64_MIN) {
-+        res = a > 0 ? INT64_MAX : INT64_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vsadd_vv_b, OP_SSS_B, H1, H1, H1, sadd8)
-+RVVCALL(OPIVV2_RM, vsadd_vv_h, OP_SSS_H, H2, H2, H2, sadd16)
-+RVVCALL(OPIVV2_RM, vsadd_vv_w, OP_SSS_W, H4, H4, H4, sadd32)
-+RVVCALL(OPIVV2_RM, vsadd_vv_d, OP_SSS_D, H8, H8, H8, sadd64)
-+GEN_VEXT_VV_RM(vsadd_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vsadd_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vsadd_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vsadd_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vsadd_vx_b, OP_SSS_B, H1, H1, sadd8)
-+RVVCALL(OPIVX2_RM, vsadd_vx_h, OP_SSS_H, H2, H2, sadd16)
-+RVVCALL(OPIVX2_RM, vsadd_vx_w, OP_SSS_W, H4, H4, sadd32)
-+RVVCALL(OPIVX2_RM, vsadd_vx_d, OP_SSS_D, H8, H8, sadd64)
-+GEN_VEXT_VX_RM(vsadd_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vsadd_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vsadd_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vsadd_vx_d, 8, 8, clearq)
-+
-+static inline uint8_t ssubu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
-+{
-+    uint8_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint16_t ssubu16(CPURISCVState *env, int vxrm, uint16_t a,
-+                               uint16_t b)
-+{
-+    uint16_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint32_t ssubu32(CPURISCVState *env, int vxrm, uint32_t a,
-+                               uint32_t b)
-+{
-+    uint32_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint64_t ssubu64(CPURISCVState *env, int vxrm, uint64_t a,
-+                               uint64_t b)
-+{
-+    uint64_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vssubu_vv_b, OP_UUU_B, H1, H1, H1, ssubu8)
-+RVVCALL(OPIVV2_RM, vssubu_vv_h, OP_UUU_H, H2, H2, H2, ssubu16)
-+RVVCALL(OPIVV2_RM, vssubu_vv_w, OP_UUU_W, H4, H4, H4, ssubu32)
-+RVVCALL(OPIVV2_RM, vssubu_vv_d, OP_UUU_D, H8, H8, H8, ssubu64)
-+GEN_VEXT_VV_RM(vssubu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vssubu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vssubu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vssubu_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vssubu_vx_b, OP_UUU_B, H1, H1, ssubu8)
-+RVVCALL(OPIVX2_RM, vssubu_vx_h, OP_UUU_H, H2, H2, ssubu16)
-+RVVCALL(OPIVX2_RM, vssubu_vx_w, OP_UUU_W, H4, H4, ssubu32)
-+RVVCALL(OPIVX2_RM, vssubu_vx_d, OP_UUU_D, H8, H8, ssubu64)
-+GEN_VEXT_VX_RM(vssubu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vssubu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vssubu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vssubu_vx_d, 8, 8, clearq)
-+
-+static inline int8_t ssub8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
-+{
-+    int8_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT8_MIN) {
-+        res = a > 0 ? INT8_MAX : INT8_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int16_t ssub16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
-+{
-+    int16_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT16_MIN) {
-+        res = a > 0 ? INT16_MAX : INT16_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int32_t ssub32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
-+{
-+    int32_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT32_MIN) {
-+        res = a > 0 ? INT32_MAX : INT32_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int64_t ssub64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-+{
-+    int64_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT64_MIN) {
-+        res = a > 0 ? INT64_MAX : INT64_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vssub_vv_b, OP_SSS_B, H1, H1, H1, ssub8)
-+RVVCALL(OPIVV2_RM, vssub_vv_h, OP_SSS_H, H2, H2, H2, ssub16)
-+RVVCALL(OPIVV2_RM, vssub_vv_w, OP_SSS_W, H4, H4, H4, ssub32)
-+RVVCALL(OPIVV2_RM, vssub_vv_d, OP_SSS_D, H8, H8, H8, ssub64)
-+GEN_VEXT_VV_RM(vssub_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vssub_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vssub_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vssub_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vssub_vx_b, OP_SSS_B, H1, H1, ssub8)
-+RVVCALL(OPIVX2_RM, vssub_vx_h, OP_SSS_H, H2, H2, ssub16)
-+RVVCALL(OPIVX2_RM, vssub_vx_w, OP_SSS_W, H4, H4, ssub32)
-+RVVCALL(OPIVX2_RM, vssub_vx_d, OP_SSS_D, H8, H8, ssub64)
-+GEN_VEXT_VX_RM(vssub_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vssub_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vssub_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vssub_vx_d, 8, 8, clearq)
--- 
-2.23.0
+I find that bug report pretty dubious
+
+   "The QEMU Guest Agent in QEMU is vulnerable to an integer=20
+    overflow in the qmp_guest_file_read(). An attacker could=20
+    exploit this by sending a crafted QMP command (including=20
+    guest-file-read with a large count value) to the agent via=20
+    the listening socket to trigger a g_malloc() call with a=20
+    large memory chunk resulting in a segmentation fault."
+
+"the attacker" in this case has to have access to the QEMU
+chardev associated with the guest agent. IOW, in any sensible
+configuration of the chardev, "the attacker" is the same person
+who launched QEMU in the first place.  There's no elevation of
+privilege here and any denial of service is inflicted against
+themselves. Finally it doesn't cause a segmentation fault,
+it causes an abort.
+
+This is *NOT* a security bug.
+
+In fact I'd call this NOTABUG entirely. It is just user error
+to set the "count" to such a huge value that it hits OOM.
+
+> Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  qga/commands-posix.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 93474ff770..8f127788e6 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -493,7 +493,13 @@ struct GuestFileRead *qmp_guest_file_read(int64_t ha=
+ndle, bool has_count,
+>          gfh->state =3D RW_STATE_NEW;
+>      }
+> =20
+> -    buf =3D g_malloc0(count+1);
+> +    buf =3D g_try_malloc0(count + 1);
+> +    if (!buf) {
+> +        error_setg(errp,
+> +                   "failed to allocate sufficient memory "
+> +                   "to complete the requested service");
+> +        return NULL;
+> +    }
+
+So you've prevented an OOM when we call fread() on the file.
+
+The contents of 'buf' now need to be turned into JSON which
+means the buffer need to be base64 encoded. This will consume
+even more memory than the original read.  So checking malloc
+here has achieved nothing AFAICT.
+
+>      read_count =3D fread(buf, 1, count, fh);
+>      if (ferror(fh)) {
+>          error_setg_errno(errp, errno, "failed to read file");
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
