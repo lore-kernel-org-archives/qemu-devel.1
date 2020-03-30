@@ -2,60 +2,73 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07543C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8497C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:53:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D328B2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:52:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D328B2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF59A2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:53:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cNgm9pbL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF59A2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxeg-0004hT-0r
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:52:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53583)
+	id 1jIxfN-0005zM-T3
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:53:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jIxcI-0001IP-Vn
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:50:28 -0400
+ (envelope-from <david@redhat.com>) id 1jIxdP-0002mk-2l
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:51:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jIxcH-0004uY-Az
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:50:26 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33396 helo=huawei.com)
+ (envelope-from <david@redhat.com>) id 1jIxdN-00069g-DN
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:51:34 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:20609)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jIxcD-0004p3-Dy; Mon, 30 Mar 2020 12:50:22 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 0FFDE718A468AA29B798;
- Tue, 31 Mar 2020 00:50:18 +0800 (CST)
-Received: from S00345302A-PC.china.huawei.com (10.47.27.100) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 31 Mar 2020 00:50:11 +0800
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
- <imammedo@redhat.com>
-Subject: [PATCH for-5.0 2/3] fw_cfg: Migrate ACPI table mr sizes separately
-Date: Mon, 30 Mar 2020 17:49:08 +0100
-Message-ID: <20200330164909.28324-3-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20200330164909.28324-1-shameerali.kolothum.thodi@huawei.com>
-References: <20200330164909.28324-1-shameerali.kolothum.thodi@huawei.com>
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jIxdN-00068P-8Z
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:51:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585587092;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=A7/w/rIoSm/HqUimSv+sanRXug3k4lzfdzGcY0nPkh0=;
+ b=cNgm9pbLpDbYFgzp157TB7wT4jVxLgU6O3DETz4lxGY+hmt9Trq7Lv4kZKlgVknZXqUwZS
+ 8x6E8y95AT0QOLz05laLF9WCHJjQoRW6Eb0IUh5+zzC+eAuKcq2sVHsE8sEsQMOPG0dqu4
+ yd+6pY0N1gRRwGSjmUqF72aQP9QYG+M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-XFQp1mv8NJKs_bgX0H0Gig-1; Mon, 30 Mar 2020 12:51:30 -0400
+X-MC-Unique: XFQp1mv8NJKs_bgX0H0Gig-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 352E6107BA99;
+ Mon, 30 Mar 2020 16:51:29 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-113-227.ams2.redhat.com [10.36.113.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D477C194BB;
+ Mon, 30 Mar 2020 16:51:23 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] s390x: Reject unaligned RAM sizes
+Date: Mon, 30 Mar 2020 18:51:22 +0200
+Message-Id: <20200330165122.34564-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.47.27.100]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,228 +80,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, david@redhat.com,
- mst@redhat.com, linuxarm@huawei.com, xuwei5@hisilicon.com,
- shannon.zhaosl@gmail.com, lersek@redhat.com
+Cc: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Any sub-page size update to ACPI MRs will be lost during
-migration, as we use aligned size in ram_load_precopy() ->
-qemu_ram_resize() path. This will result in inconsistency in
-FWCfgEntry sizes between source and destination. In order to avoid
-this, save and restore them separately during migration.
+Historically, we fixed up the RAM size (rounded it down), to fit into
+storage increments (maximum number of storage increments is 1020). Since
+commit 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM"), we no
+longer consider the fixed-up size when allcoating the RAM block - which
+will break migration.
 
-Up until now, this problem may not be that relevant for x86 as both
-ACPI table and Linker MRs gets padded and aligned. Also at present,
-qemu_ram_resize() doesn't invoke callback to update FWCfgEntry for
-unaligned size changes. But since we are going to fix the
-qemu_ram_resize() in the subsequent patch, the issue may become
-more serious especially for RSDP MR case.
+Let's simply drop that manual fixup code and let the user supply sane
+RAM sizes. This will bail out early when trying to migrate (and make
+an existing guest with e.g., 12345 MB non-migratable), but maybe we
+should have rejected such RAM sizes right from the beginning. One can
+consider it a BUG that we don't supply what the user asked for.
 
-Moreover, the issue will soon become prominent in arm/virt as well
-where the MRs are not padded or aligned at all and eventually have
-acpi table changes as part of future additions like NVDIMM hot-add
-feature.
+As we no longer fixup maxram_size as well, make other users use ram_size
+instead. Keep using maxram_size when setting the maximum ram size in KVM,
+as that will come in handy in the future when supporting memory hotplug
+(in contrast, storage keys and storage attributes for hotplugged memory
+ will have to be migrated per RAM block in the future).
 
-Suggested-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Acked-by: David Hildenbrand <david@redhat.com>
+This fixes (or rather rejects early):
+
+1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as the
+   RAM block size changed.
+
+2. Migrating upstream QEMU to upstream QEMU (e.g., with "-m 1235M"), as
+   we receive storage attributes for memory we don't expect (as we fixed up
+   ram_size and maxram_size).
+
+Note that a migration from older QEMU is still possible - the migration
+target has to be started with the properly (down) aligned size (e.g.,
+"-m 1234M" instead of "-m 1235M"). The following table can be used to write
+a conversion script to automate migration in environments where
+this is relevant.
+
+ VM size (<=3D) | Alignment
+--------------------------
+      1020M   |     1M
+      2040M   |     2M
+      4080M   |     4M
+      8160M   |     8M
+     16320M   |    16M
+     32640M   |    32M
+     65280M   |    64M
+    130560M   |   128M
+    261120M   |   256M
+    522240M   |   512M
+   1044480M   |     1G
+   2088960M   |     2G
+   4177920M   |     4G
+   8355840M   |     8G
+
+Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
+Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
-Please find previous discussions here,
-https://patchwork.kernel.org/patch/11339591/#23140343
+
+v1 -> v2:
+- Don't use global ram_size
+- Add more details how migration from older QEMU can still work, along
+  with a table.
+
 ---
+ hw/s390x/s390-skeys.c        |  2 +-
+ hw/s390x/s390-stattrib-kvm.c |  4 ++--
+ hw/s390x/sclp.c              | 20 +++++++++++---------
+ 3 files changed, 14 insertions(+), 12 deletions(-)
 
- hw/core/machine.c         |  1 +
- hw/nvram/fw_cfg.c         | 86 ++++++++++++++++++++++++++++++++++++++-
- include/hw/nvram/fw_cfg.h |  6 +++
- 3 files changed, 92 insertions(+), 1 deletion(-)
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index de0c425605..c1a444cb75 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -39,6 +39,7 @@ GlobalProperty hw_compat_4_2[] = {
-     { "usb-redir", "suppress-remote-wake", "off" },
-     { "qxl", "revision", "4" },
-     { "qxl-vga", "revision", "4" },
-+    { "fw_cfg", "acpi-mr-restore", "false" },
- };
- const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
- 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 179b302f01..36d1e32f83 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -39,6 +39,7 @@
- #include "qemu/config-file.h"
- #include "qemu/cutils.h"
- #include "qapi/error.h"
-+#include "hw/acpi/aml-build.h"
- 
- #define FW_CFG_FILE_SLOTS_DFLT 0x20
- 
-@@ -610,6 +611,50 @@ bool fw_cfg_dma_enabled(void *opaque)
-     return s->dma_enabled;
+diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+index 5da6e5292f..a9a4ae7b39 100644
+--- a/hw/s390x/s390-skeys.c
++++ b/hw/s390x/s390-skeys.c
+@@ -176,7 +176,7 @@ static void qemu_s390_skeys_init(Object *obj)
+     QEMUS390SKeysState *skeys =3D QEMU_S390_SKEYS(obj);
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+=20
+-    skeys->key_count =3D machine->maxram_size / TARGET_PAGE_SIZE;
++    skeys->key_count =3D machine->ram_size / TARGET_PAGE_SIZE;
+     skeys->keydata =3D g_malloc0(skeys->key_count);
  }
- 
-+static bool fw_cfg_acpi_mr_restore(void *opaque)
-+{
-+    FWCfgState *s = opaque;
-+    return s->acpi_mr_restore;
-+}
-+
-+static void fw_cfg_update_mr(FWCfgState *s, uint16_t key, size_t size)
-+{
-+    MemoryRegion *mr;
-+    ram_addr_t offset;
-+    int arch = !!(key & FW_CFG_ARCH_LOCAL);
-+    void *ptr;
-+
-+    key &= FW_CFG_ENTRY_MASK;
-+    assert(key < fw_cfg_max_entry(s));
-+
-+    ptr = s->entries[arch][key].data;
-+    mr = memory_region_from_host(ptr, &offset);
-+
-+    memory_region_ram_resize(mr, size, &error_abort);
-+}
-+
-+static int fw_cfg_acpi_mr_restore_post_load(void *opaque, int version_id)
-+{
-+    FWCfgState *s = opaque;
-+    int i, index;
-+
-+    assert(s->files);
-+
-+    index = be32_to_cpu(s->files->count);
-+
-+    for (i = 0; i < index; i++) {
-+        if (!strcmp(s->files->f[i].name, ACPI_BUILD_TABLE_FILE)) {
-+            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i, s->table_mr_size);
-+        } else if (!strcmp(s->files->f[i].name, ACPI_BUILD_LOADER_FILE)) {
-+            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i, s->linker_mr_size);
-+        } else if (!strcmp(s->files->f[i].name, ACPI_BUILD_RSDP_FILE)) {
-+            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i, s->rsdp_mr_size);
-+        }
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_fw_cfg_dma = {
-     .name = "fw_cfg/dma",
-     .needed = fw_cfg_dma_enabled,
-@@ -619,6 +664,20 @@ static const VMStateDescription vmstate_fw_cfg_dma = {
-     },
- };
- 
-+static const VMStateDescription vmstate_fw_cfg_acpi_mr = {
-+    .name = "fw_cfg/acpi_mr",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = fw_cfg_acpi_mr_restore,
-+    .post_load = fw_cfg_acpi_mr_restore_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(table_mr_size, FWCfgState),
-+        VMSTATE_UINT64(linker_mr_size, FWCfgState),
-+        VMSTATE_UINT64(rsdp_mr_size, FWCfgState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_fw_cfg = {
-     .name = "fw_cfg",
-     .version_id = 2,
-@@ -631,6 +690,7 @@ static const VMStateDescription vmstate_fw_cfg = {
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_fw_cfg_dma,
-+        &vmstate_fw_cfg_acpi_mr,
-         NULL,
-     }
- };
-@@ -815,6 +875,23 @@ static struct {
- #define FW_CFG_ORDER_OVERRIDE_LAST 200
- };
- 
-+/*
-+ * Any sub-page size update to these table MRs will be lost during migration,
-+ * as we use aligned size in ram_load_precopy() -> qemu_ram_resize() path.
-+ * In order to avoid the inconsistency in sizes save them seperately and
-+ * migrate over in vmstate post_load().
-+ */
-+static void fw_cfg_acpi_mr_save(FWCfgState *s, const char *filename, size_t len)
-+{
-+    if (!strcmp(filename, ACPI_BUILD_TABLE_FILE)) {
-+        s->table_mr_size = len;
-+    } else if (!strcmp(filename, ACPI_BUILD_LOADER_FILE)) {
-+        s->linker_mr_size = len;
-+    } else if (!strcmp(filename, ACPI_BUILD_RSDP_FILE)) {
-+        s->rsdp_mr_size = len;
-+    }
-+}
-+
- static int get_fw_cfg_order(FWCfgState *s, const char *name)
+=20
+diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
+index c7e1f35524..f89d8d9d16 100644
+--- a/hw/s390x/s390-stattrib-kvm.c
++++ b/hw/s390x/s390-stattrib-kvm.c
+@@ -85,7 +85,7 @@ static int kvm_s390_stattrib_set_stattr(S390StAttribState=
+ *sa,
  {
-     int i;
-@@ -914,6 +991,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
-     trace_fw_cfg_add_file(s, index, s->files->f[index].name, len);
- 
-     s->files->count = cpu_to_be32(count+1);
-+    fw_cfg_acpi_mr_save(s, filename, len);
- }
- 
- void fw_cfg_add_file(FWCfgState *s,  const char *filename,
-@@ -937,6 +1015,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
-             ptr = fw_cfg_modify_bytes_read(s, FW_CFG_FILE_FIRST + i,
-                                            data, len);
-             s->files->f[i].size   = cpu_to_be32(len);
-+            fw_cfg_acpi_mr_save(s, filename, len);
-             return ptr;
-         }
+     KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+-    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
++    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
+=20
+     if (start_gfn + count > max) {
+         error_report("Out of memory bounds when setting storage attributes=
+");
+@@ -104,7 +104,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttribS=
+tate *sa)
+ {
+     KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+-    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
++    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
+     /* We do not need to reach the maximum buffer size allowed */
+     unsigned long cx, len =3D KVM_S390_SKEYS_MAX / 2;
+     int r;
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index af0bfbc2ec..bbf6364511 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -327,7 +327,7 @@ out:
+ static void sclp_memory_init(SCLPDevice *sclp)
+ {
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+-    ram_addr_t initial_mem =3D machine->ram_size;
++    uint64_t initial_mem =3D machine->ram_size;
+     int increment_size =3D 20;
+=20
+     /* The storage increment size is a multiple of 1M and is a power of 2.
+@@ -339,15 +339,17 @@ static void sclp_memory_init(SCLPDevice *sclp)
      }
-@@ -973,7 +1052,10 @@ static void fw_cfg_machine_ready(struct Notifier *n, void *data)
-     qemu_register_reset(fw_cfg_machine_reset, s);
- }
- 
+     sclp->increment_size =3D increment_size;
+=20
+-    /* The core memory area needs to be aligned with the increment size.
+-     * In effect, this can cause the user-specified memory size to be roun=
+ded
+-     * down to align with the nearest increment boundary. */
++    /*
++     * The core memory area needs to be aligned to the increment size. In
++     * case it's not aligned, bail out.
++     */
+     initial_mem =3D initial_mem >> increment_size << increment_size;
 -
-+static Property fw_cfg_properties[] = {
-+    DEFINE_PROP_BOOL("acpi-mr-restore", FWCfgState, acpi_mr_restore, true),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
- 
- static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
- {
-@@ -1097,6 +1179,8 @@ static void fw_cfg_class_init(ObjectClass *klass, void *data)
- 
-     dc->reset = fw_cfg_reset;
-     dc->vmsd = &vmstate_fw_cfg;
-+
-+    device_class_set_props(dc, fw_cfg_properties);
+-    machine->ram_size =3D initial_mem;
+-    machine->maxram_size =3D initial_mem;
+-    /* let's propagate the changed ram size into the global variable. */
+-    ram_size =3D initial_mem;
++    if (initial_mem !=3D machine->ram_size) {
++        error_report("RAM size not aligned to storage increments."
++                     " Possible aligned RAM size: %" PRIu64 " MB",
++                     initial_mem / MiB);
++        exit(1);
++    }
  }
- 
- static const TypeInfo fw_cfg_info = {
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index b5291eefad..457fee7425 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -53,6 +53,12 @@ struct FWCfgState {
-     dma_addr_t dma_addr;
-     AddressSpace *dma_as;
-     MemoryRegion dma_iomem;
-+
-+    /* restore during migration */
-+    bool acpi_mr_restore;
-+    size_t table_mr_size;
-+    size_t linker_mr_size;
-+    size_t rsdp_mr_size;
- };
- 
- struct FWCfgIoState {
--- 
-2.17.1
-
+=20
+ static void sclp_init(Object *obj)
+--=20
+2.25.1
 
 
