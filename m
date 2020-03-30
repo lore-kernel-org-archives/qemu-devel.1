@@ -2,68 +2,60 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B2CC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4E3C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:22:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B569206CC
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:21:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="BoFtf3tX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B569206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F719206CC
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:22:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F719206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxAj-0001uE-Mk
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48231)
+	id 1jIxB0-0002KI-FQ
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:22:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48291)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jIx9o-0000wx-3r
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:21:01 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxA9-0001Oc-9d
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jIx9l-0006Xa-H5
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:20:59 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17858)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jIx9j-0006AN-Pa
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:20:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1585585123; 
- s=mail; d=flygoat.com; i=jiaxun.yang@flygoat.com;
- h=Date:In-Reply-To:References:MIME-Version:Content-Type:Content-Transfer-Encoding:Subject:To:CC:From:Message-ID;
- bh=NrPlIDA19h9Nln8bk9yxmkBDOzQK3Y2SsHhr904ZkCY=;
- b=BoFtf3tXkc6DVSKn4H2blf64X6bL/scnIizqXkmBL6grFSAMyuOFCaYqHzPtlXTV
- /7J8+S35DiBtnbZ7em4MqbQPBcSM/xqtl1zKbPp4GxMoIsedvgOp/dg9DYqyumTYjzi
- vo3ZWezKc9CpjlDQnnoRD0oLb4uIbpWM53APDW5E=
-Received: from [10.233.233.252] (183.156.33.130 [183.156.33.130]) by
- mx.zoho.com.cn with SMTPS id 1585585121863731.322921744283;
- Tue, 31 Mar 2020 00:18:41 +0800 (CST)
-Date: Tue, 31 Mar 2020 00:18:34 +0800
-User-Agent: K-9 Mail for Android
-In-Reply-To: <39c28108-5d85-d611-c2ea-abbbf913b981@redhat.com>
-References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
- <39c28108-5d85-d611-c2ea-abbbf913b981@redhat.com>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxA7-0006ra-Nd
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:21:21 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44206)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jIxA6-0006mq-T5; Mon, 30 Mar 2020 12:21:19 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08559697|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.727025-0.000620295-0.272354;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03300; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=11; RT=11; SR=0; TI=SMTPD_---.H7kPknP_1585585272; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H7kPknP_1585585272)
+ by smtp.aliyun-inc.com(10.147.41.178);
+ Tue, 31 Mar 2020 00:21:12 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v7 22/61] target/riscv: vector widening integer multiply-add
+ instructions
+Date: Mon, 30 Mar 2020 23:35:54 +0800
+Message-Id: <20200330153633.15298-23-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH for-5.0,
- v1] target/mips: Fix loongson multimedia condition instructions
-To: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <1B369970-E78B-4A05-A80E-D7AB527E3A4E@flygoat.com>
-X-ZohoCNMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 124.251.121.243
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,127 +67,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.qemu.devel@gmail.com,
- richard.henderson@linaro.org, aleksandar.rikalo@rt-rk.com,
- aurelien@aurel32.net
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 22 ++++++++++++
+ target/riscv/insn32.decode              |  7 ++++
+ target/riscv/insn_trans/trans_rvv.inc.c |  9 +++++
+ target/riscv/vector_helper.c            | 45 +++++++++++++++++++++++++
+ 4 files changed, 83 insertions(+)
 
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 08c2544b20..1a9495ceac 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -647,3 +647,25 @@ DEF_HELPER_6(vnmsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vnmsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vnmsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vnmsub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vwmaccu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b49b60aea1..9735ac3565 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -393,6 +393,13 @@ vmadd_vv        101001 . ..... ..... 010 ..... 1010111 @r_vm
+ vmadd_vx        101001 . ..... ..... 110 ..... 1010111 @r_vm
+ vnmsub_vv       101011 . ..... ..... 010 ..... 1010111 @r_vm
+ vnmsub_vx       101011 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccu_vv      111100 . ..... ..... 010 ..... 1010111 @r_vm
++vwmaccu_vx      111100 . ..... ..... 110 ..... 1010111 @r_vm
++vwmacc_vv       111101 . ..... ..... 010 ..... 1010111 @r_vm
++vwmacc_vx       111101 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccsu_vv     111110 . ..... ..... 010 ..... 1010111 @r_vm
++vwmaccsu_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccus_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 07e0c212ed..b2f57e2259 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1609,3 +1609,12 @@ GEN_OPIVX_TRANS(vmacc_vx, opivx_check)
+ GEN_OPIVX_TRANS(vnmsac_vx, opivx_check)
+ GEN_OPIVX_TRANS(vmadd_vx, opivx_check)
+ GEN_OPIVX_TRANS(vnmsub_vx, opivx_check)
++
++/* Vector Widening Integer Multiply-Add Instructions */
++GEN_OPIVV_WIDEN_TRANS(vwmaccu_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmacc_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmaccsu_vv, opivv_widen_check)
++GEN_OPIVX_WIDEN_TRANS(vwmaccu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmacc_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmaccsu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmaccus_vx)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 8c327cc070..2786fca52a 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -1978,3 +1978,48 @@ GEN_VEXT_VX(vnmsub_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vnmsub_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vnmsub_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vnmsub_vx_d, 8, 8, clearq)
++
++/* Vector Widening Integer Multiply-Add Instructions */
++RVVCALL(OPIVV3, vwmaccu_vv_b, WOP_UUU_B, H2, H1, H1, DO_MACC)
++RVVCALL(OPIVV3, vwmaccu_vv_h, WOP_UUU_H, H4, H2, H2, DO_MACC)
++RVVCALL(OPIVV3, vwmaccu_vv_w, WOP_UUU_W, H8, H4, H4, DO_MACC)
++RVVCALL(OPIVV3, vwmacc_vv_b, WOP_SSS_B, H2, H1, H1, DO_MACC)
++RVVCALL(OPIVV3, vwmacc_vv_h, WOP_SSS_H, H4, H2, H2, DO_MACC)
++RVVCALL(OPIVV3, vwmacc_vv_w, WOP_SSS_W, H8, H4, H4, DO_MACC)
++RVVCALL(OPIVV3, vwmaccsu_vv_b, WOP_SSU_B, H2, H1, H1, DO_MACC)
++RVVCALL(OPIVV3, vwmaccsu_vv_h, WOP_SSU_H, H4, H2, H2, DO_MACC)
++RVVCALL(OPIVV3, vwmaccsu_vv_w, WOP_SSU_W, H8, H4, H4, DO_MACC)
++GEN_VEXT_VV(vwmaccu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmaccu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmaccu_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmacc_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmacc_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmacc_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmaccsu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmaccsu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmaccsu_vv_w, 4, 8, clearq)
++
++RVVCALL(OPIVX3, vwmaccu_vx_b, WOP_UUU_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmaccu_vx_h, WOP_UUU_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmaccu_vx_w, WOP_UUU_W, H8, H4, DO_MACC)
++RVVCALL(OPIVX3, vwmacc_vx_b, WOP_SSS_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmacc_vx_h, WOP_SSS_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmacc_vx_w, WOP_SSS_W, H8, H4, DO_MACC)
++RVVCALL(OPIVX3, vwmaccsu_vx_b, WOP_SSU_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmaccsu_vx_h, WOP_SSU_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmaccsu_vx_w, WOP_SSU_W, H8, H4, DO_MACC)
++RVVCALL(OPIVX3, vwmaccus_vx_b, WOP_SUS_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmaccus_vx_h, WOP_SUS_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmaccus_vx_w, WOP_SUS_W, H8, H4, DO_MACC)
++GEN_VEXT_VX(vwmaccu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmaccu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmaccu_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmacc_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmacc_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmacc_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmaccsu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmaccsu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmaccsu_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmaccus_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmaccus_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmaccus_vx_w, 4, 8, clearq)
+-- 
+2.23.0
 
-=E4=BA=8E 2020=E5=B9=B43=E6=9C=8830=E6=97=A5 GMT+08:00 =E4=B8=8B=E5=8D=881=
-1:39:44, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat=2Ecom> =E5=86=99=E5=
-=88=B0:
->Hi Jiaxun Yang,
->
->On 3/24/20 1:22 PM, Jiaxun Yang wrote:
->> Loongson multimedia condition instructions were previously
->implemented as
->> write 0 to rd due to lack of documentation=2E So I just confirmed with
->Loongson
->> about their encoding and implemented them correctly=2E
->
->If you have a binary using loongson multimedia instructions, can you
->add=20
->a test? So this code won't bitrot=2E
-
-I know ffmpeg uses it=2E
-But I think that's too fat=2E
-
->
->I'm in particular interested by a test covering the MAC2008=20
->instructions=2E You can look at examples in the tests/tcg/mips/
->directory,=20
->Aleksandar added a lot of tests there=2E
-
-I'm going to try that=2E
-
-Thanks=2E
-
->
->Thanks,
->
->Phil=2E
->
->>=20
->> Signed-off-by: Jiaxun Yang <jiaxun=2Eyang@flygoat=2Ecom>
->> Acked-by: Huacai Chen <chenhc@lemote=2Ecom>
->> ---
->> v1: Use deposit opreations according to Richard's suggestion=2E
->> ---
->>   target/mips/translate=2Ec | 35 +++++++++++++++++++++++++++++++----
->>   1 file changed, 31 insertions(+), 4 deletions(-)
->>=20
->> diff --git a/target/mips/translate=2Ec b/target/mips/translate=2Ec
->> index d745bd2803=2E=2E25b595a17d 100644
->> --- a/target/mips/translate=2Ec
->> +++ b/target/mips/translate=2Ec
->> @@ -5529,6 +5529,7 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>   {
->>       uint32_t opc, shift_max;
->>       TCGv_i64 t0, t1;
->> +    TCGCond cond;
->>  =20
->>       opc =3D MASK_LMI(ctx->opcode);
->>       switch (opc) {
->> @@ -5862,14 +5863,39 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>  =20
->>       case OPC_SEQU_CP2:
->>       case OPC_SEQ_CP2:
->> +        cond =3D TCG_COND_EQ;
->> +        goto do_cc_cond;
->> +        break;
->>       case OPC_SLTU_CP2:
->> +        cond =3D TCG_COND_LTU;
->> +        goto do_cc_cond;
->> +        break;
->>       case OPC_SLT_CP2:
->> +        cond =3D TCG_COND_LT;
->> +        goto do_cc_cond;
->> +        break;
->>       case OPC_SLEU_CP2:
->> +        cond =3D TCG_COND_LEU;
->> +        goto do_cc_cond;
->> +        break;
->>       case OPC_SLE_CP2:
->> -        /*
->> -         * ??? Document is unclear: Set FCC[CC]=2E  Does that mean the
->> -         * FD field is the CC field?
->> -         */
->> +        cond =3D TCG_COND_LE;
->> +    do_cc_cond:
->> +        {
->> +            int cc =3D (ctx->opcode >> 8) & 0x7;
->> +            TCGv_i64 t64 =3D tcg_temp_new_i64();
->> +            TCGv_i32 t32 =3D tcg_temp_new_i32();
->> +
->> +            tcg_gen_setcond_i64(cond, t64, t0, t1);
->> +            tcg_gen_extrl_i64_i32(t32, t64);
->> +            tcg_gen_deposit_i32(fpu_fcr31, fpu_fcr31, t32,
->> +                                get_fp_bit(cc), 1);
->> +
->> +            tcg_temp_free_i32(t32);
->> +            tcg_temp_free_i64(t64);
->> +        }
->> +        goto no_rd;
->> +        break;
->>       default:
->>           MIPS_INVAL("loongson_cp2");
->>           generate_exception_end(ctx, EXCP_RI);
->> @@ -5878,6 +5904,7 @@ static void
->gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
->>  =20
->>       gen_store_fpr64(ctx, t0, rd);
->>  =20
->> +no_rd:
->>       tcg_temp_free_i64(t0);
->>       tcg_temp_free_i64(t1);
->>   }
->>=20
-
---=20
-Jiaxun Yang
 
