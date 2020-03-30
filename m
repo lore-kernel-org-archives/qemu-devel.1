@@ -2,79 +2,155 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3766C2D0E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B50C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 925DA20578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:28:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B9C42073B
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:29:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qqhaIQgw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 925DA20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+XJ5VBo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9C42073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIyDY-0000W2-PV
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:28:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60766)
+	id 1jIyEN-00027d-B8
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:29:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33282)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jIy9Z-0001Dt-Ma
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:52 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jIyCn-0007yy-Ks
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:28:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jIy9Y-0002nv-6W
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:49 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:3705)
+ (envelope-from <jsnow@redhat.com>) id 1jIyCm-00082X-Am
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:28:09 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:31570)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jIy9Y-0002mz-06
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:48 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e822b2e0000>; Mon, 30 Mar 2020 10:23:58 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate102.nvidia.com (PGP Universal service);
- Mon, 30 Mar 2020 10:24:46 -0700
-X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Mon, 30 Mar 2020 10:24:46 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 30 Mar
- 2020 17:24:46 +0000
-Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 30 Mar 2020 17:24:39 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v17 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-Date: Mon, 30 Mar 2020 22:20:42 +0530
-Message-ID: <1585587044-2408-6-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
-References: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jIyCm-00081D-6M
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:28:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585589287;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=nH7c3MdxmpChr0v9819sI35h8AP1+/pxELOHtHafuDo=;
+ b=i+XJ5VBoDufjtxeK81xE39pK0qcf8m3wOD+LZg8d+rvXXd2s0dFkZBXVYiQnatGumnEO8W
+ OioDa5CdJCf5k0+f57OBoIqfrdSTsUrJM08E5OPIjq3L3N2FuAZW0Eol/r92wdDxd84mRd
+ eSDQjRJZW0WqqUpwOuF0BL9fCenmt4E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-nmgYLekWNHyKNHGYei0GsA-1; Mon, 30 Mar 2020 13:28:06 -0400
+X-MC-Unique: nmgYLekWNHyKNHGYei0GsA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CA55800D5B;
+ Mon, 30 Mar 2020 17:28:05 +0000 (UTC)
+Received: from [10.10.113.210] (ovpn-113-210.rdu2.redhat.com [10.10.113.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BDF73D7664;
+ Mon, 30 Mar 2020 17:28:02 +0000 (UTC)
+Subject: Re: [PATCH v9 01/14] iotests: do a light delinting
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200324232103.4195-1-jsnow@redhat.com>
+ <20200324232103.4195-2-jsnow@redhat.com> <87d08tvree.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c8e770ea-f4de-71ae-c893-2910127a8887@redhat.com>
+Date: Mon, 30 Mar 2020 13:28:01 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1585589038; bh=e/OZF6MHKcqkzEX9czaNqm6WqbGebAvalycJVPVmido=;
- h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- In-Reply-To:References:X-NVConfidentiality:MIME-Version:
- Content-Type;
- b=qqhaIQgw8sW2QZjFU7L4KP8m0LZnhh/Smi//x61YPS5C0GmtM2X/4ntcc7u8Zg5uW
- was9g+K5oyukIDk4FvVSFo04UnFAu/ckhtL3QzXZ0W8Qauhs7w0QXv7b0CdW9n2MQQ
- +yZaW/RqRPHOmtP/E/sc6O8DfAJLH22Sg4Skm3g5zGUPKfdGTT13lhx2AkSg1UugR7
- lvnkXkUUqCt8Sj0yFWpSrOc3EupFxNeuKMUPQphiZoZHyZmSL82QqwJXcxIMRBdhac
- sAvqUdP2LyKN0uULsjfM4izyCVf/01Hqc+LjSj1H7h3ygMCHm1eVtLJo4qvw5WlEul
- +GvsdL7dTxbIQ==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.64
+In-Reply-To: <87d08tvree.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,165 +162,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
- ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DMA mapped pages, including those pinned by mdev vendor drivers, might
-get unpinned and unmapped while migration is active and device is still
-running. For example, in pre-copy phase while guest driver could access
-those pages, host device or vendor driver can dirty these mapped pages.
-Such pages should be marked dirty so as to maintain memory consistency
-for a user making use of dirty page tracking.
 
-To get bitmap during unmap, user should allocate memory for bitmap, set
-size of allocated memory, set page size to be considered for bitmap and
-set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
----
- drivers/vfio/vfio_iommu_type1.c | 55 ++++++++++++++++++++++++++++++++++++++---
- include/uapi/linux/vfio.h       | 10 ++++++++
- 2 files changed, 61 insertions(+), 4 deletions(-)
+On 3/30/20 10:39 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+>=20
+>> This doesn't fix everything in here, but it does help clean up the
+>> pylint report considerably.
+>>
+>> This should be 100% style changes only; the intent is to make pylint
+>> more useful by working on establishing a baseline for iotests that we
+>> can gate against in the future.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  tests/qemu-iotests/iotests.py | 83 ++++++++++++++++++-----------------
+>>  1 file changed, 43 insertions(+), 40 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.=
+py
+>> index 7bc4934cd2..886ae962ae 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+> [...]
+>> @@ -1062,6 +1063,7 @@ def func_wrapper(test_case: QMPTestCase, *args, **=
+kwargs):
+>>              if usf_list:
+>>                  test_case.case_skip('{}: formats {} are not whitelisted=
+'.format(
+>>                      test_case, usf_list))
+>> +                return None
+>>              else:
+>>                  return func(test_case, *args, **kwargs)
+>>          return func_wrapper
+>> @@ -1073,6 +1075,7 @@ def skip_if_user_is_root(func):
+>>      def func_wrapper(*args, **kwargs):
+>>          if os.getuid() =3D=3D 0:
+>>              case_notrun('{}: cannot be run as root'.format(args[0]))
+>> +            return None
+>>          else:
+>>              return func(*args, **kwargs)
+>>      return func_wrapper
+>=20
+> Observation, not demand: this trades one kind of pylint report for
+> another: inconsistent-return-statements for no-else-return.  PATCH 05
+> suppresses no-else-return.
+>=20
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 5efebc2b60e1..266550bd7307 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -983,7 +983,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
- }
- 
- static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
--			     struct vfio_iommu_type1_dma_unmap *unmap)
-+			     struct vfio_iommu_type1_dma_unmap *unmap,
-+			     struct vfio_bitmap *bitmap)
- {
- 	uint64_t mask;
- 	struct vfio_dma *dma, *dma_last = NULL;
-@@ -1034,6 +1035,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 	 * will be returned if these conditions are not met.  The v2 interface
- 	 * will only return success and a size of zero if there were no
- 	 * mappings within the range.
-+	 *
-+	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
-+	 * must be for single mapping. Multiple mappings with this flag set is
-+	 * not supported.
- 	 */
- 	if (iommu->v2) {
- 		dma = vfio_find_dma(iommu, unmap->iova, 1);
-@@ -1041,6 +1046,14 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 			ret = -EINVAL;
- 			goto unlock;
- 		}
-+
-+		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-+		    dma &&
-+		    (dma->iova != unmap->iova || dma->size != unmap->size)) {
-+			ret = -EINVAL;
-+			goto unlock;
-+		}
-+
- 		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
- 		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
- 			ret = -EINVAL;
-@@ -1058,6 +1071,11 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 		if (dma->task->mm != current->mm)
- 			break;
- 
-+		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-+		     iommu->dirty_page_tracking)
-+			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
-+						bitmap->pgsize, bitmap->data);
-+
- 		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
- 			struct vfio_iommu_type1_dma_unmap nb_unmap;
- 
-@@ -2419,17 +2437,46 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
- 		struct vfio_iommu_type1_dma_unmap unmap;
--		long ret;
-+		struct vfio_bitmap bitmap = { 0 };
-+		int ret;
- 
- 		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
- 
- 		if (copy_from_user(&unmap, (void __user *)arg, minsz))
- 			return -EFAULT;
- 
--		if (unmap.argsz < minsz || unmap.flags)
-+		if (unmap.argsz < minsz ||
-+		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
- 			return -EINVAL;
- 
--		ret = vfio_dma_do_unmap(iommu, &unmap);
-+		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-+			unsigned long pgshift;
-+			size_t iommu_pgsize =
-+				(size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
-+
-+			if (unmap.argsz < (minsz + sizeof(bitmap)))
-+				return -EINVAL;
-+
-+			if (copy_from_user(&bitmap,
-+					   (void __user *)(arg + minsz),
-+					   sizeof(bitmap)))
-+				return -EFAULT;
-+
-+			/* allow only min supported pgsize */
-+			if (bitmap.pgsize != iommu_pgsize)
-+				return -EINVAL;
-+			if (!access_ok((void __user *)bitmap.data, bitmap.size))
-+				return -EINVAL;
-+
-+			pgshift = __ffs(bitmap.pgsize);
-+			ret = verify_bitmap_size(unmap.size >> pgshift,
-+						 bitmap.size);
-+			if (ret)
-+				return ret;
-+
-+		}
-+
-+		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
- 		if (ret)
- 			return ret;
- 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 5f359c63f5ef..e3cbf8b78623 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -1048,12 +1048,22 @@ struct vfio_bitmap {
-  * field.  No guarantee is made to the user that arbitrary unmaps of iova
-  * or size different from those used in the original mapping call will
-  * succeed.
-+ * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
-+ * before unmapping IO virtual addresses. When this flag is set, user must
-+ * provide data[] as structure vfio_bitmap. User must allocate memory to get
-+ * bitmap and must set size of allocated memory in vfio_bitmap.size field.
-+ * A bit in bitmap represents one page of user provided page size in 'pgsize',
-+ * consecutively starting from iova offset. Bit set indicates page at that
-+ * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
-+ * returned in vfio_bitmap.data
-  */
- struct vfio_iommu_type1_dma_unmap {
- 	__u32	argsz;
- 	__u32	flags;
-+#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
- 	__u64	iova;				/* IO virtual address */
- 	__u64	size;				/* Size of mapping (bytes) */
-+	__u8    data[];
- };
- 
- #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
--- 
-2.7.0
+Hm, yeah. I think there was some light consensus that "no-else-return"
+was perfectly fine, so this patch builds towards that specific pylintrc.
+
+It isn't, in my opinion, a regression or lateral movement as there isn't
+a pylintrc baseline yet.
+
+--js
 
 
