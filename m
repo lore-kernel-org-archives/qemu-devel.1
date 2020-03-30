@@ -2,80 +2,58 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2616C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE17C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:30:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EFE320578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:29:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DwIy9Uvk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EFE320578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A19CD20776
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:30:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A19CD20776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxI6-0002lz-LV
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:29:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49488)
+	id 1jIxJG-0004W6-Nu
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jIxG8-0008Tw-Pn
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:27:33 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxI9-00033t-BJ
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:29:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jIxG7-000549-H8
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:27:32 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27530)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxI7-0007CT-Vo
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:29:37 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56732)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jIxG7-00053B-D0
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:27:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585585651;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9rMpOUraWkxMhkhCUHL/Gm625UVwcDWCyeVTKmouIHY=;
- b=DwIy9Uvkd9yuxBnR4ysqMGSzGIU02ytgGzj0PGgZqyyckhrbV6Bg1YYEhZisls1fUnlvfb
- nyvVjrvYUH4aNmPG6aCjsjMQsOAh/xu55i2JqkBoZlRRLEu6xkyidkNy0iZ80LnFvW5Ikp
- LFcP7vHDKHIRGtlGneY48jTdUH977SY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-vEVIMPoSMDyJ_fPv95Bgvw-1; Mon, 30 Mar 2020 12:27:27 -0400
-X-MC-Unique: vEVIMPoSMDyJ_fPv95Bgvw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 500FD107ACC4;
- Mon, 30 Mar 2020 16:27:26 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-66.ams2.redhat.com [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AEC2096B79;
- Mon, 30 Mar 2020 16:27:24 +0000 (UTC)
-Date: Mon, 30 Mar 2020 18:27:23 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v9 10/14] iotests: add hmp helper with logging
-Message-ID: <20200330162723.GH6139@linux.fritz.box>
-References: <20200324232103.4195-1-jsnow@redhat.com>
- <20200324232103.4195-11-jsnow@redhat.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jIxI7-00072o-Gp; Mon, 30 Mar 2020 12:29:35 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0758711|-1; CH=green; DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.13812-0.000813233-0.861067;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03310; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H7kiJAD_1585585755; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H7kiJAD_1585585755)
+ by smtp.aliyun-inc.com(10.147.42.16); Tue, 31 Mar 2020 00:29:15 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v7 26/61] target/riscv: vector single-width fractional
+ multiply with rounding and saturation
+Date: Mon, 30 Mar 2020 23:35:58 +0800
+Message-Id: <20200330153633.15298-27-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200324232103.4195-11-jsnow@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,80 +65,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- philmd@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 25.03.2020 um 00:20 hat John Snow geschrieben:
-> Just a mild cleanup while I was here.
->=20
-> Although we now have universal qmp logging on or off, many existing
-> callers to hmp functions don't expect that output to be logged, which
-> causes quite a few changes in the test output.
->=20
-> For now, just offer a use_log parameter.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/iotests.py | 30 +++++++++++++++++-------------
->  1 file changed, 17 insertions(+), 13 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-> index e12d6e533e..4faee06f14 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -540,25 +540,29 @@ def add_incoming(self, addr):
->          self._args.append(addr)
->          return self
-> =20
-> -    def pause_drive(self, drive, event=3DNone):
-> -        '''Pause drive r/w operations'''
-> +    def hmp(self, command_line: str, use_log: bool =3D False):
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+ target/riscv/helper.h                   |   9 ++
+ target/riscv/insn32.decode              |   2 +
+ target/riscv/insn_trans/trans_rvv.inc.c |   4 +
+ target/riscv/vector_helper.c            | 107 ++++++++++++++++++++++++
+ 4 files changed, 122 insertions(+)
 
-Missing return type. Should probably be Dict[str, Any]?
-
-> +        cmd =3D 'human-monitor-command'
-> +        kwargs =3D {'command-line': command_line}
-> +        if use_log:
-> +            return self.qmp_log(cmd, **kwargs)
-> +        else:
-> +            return self.qmp(cmd, **kwargs)
-> +
-> +    def pause_drive(self, drive: str, event: Optional[str] =3D None) -> =
-None:
-> +        """Pause drive r/w operations"""
->          if not event:
->              self.pause_drive(drive, "read_aio")
->              self.pause_drive(drive, "write_aio")
->              return
-> -        self.qmp('human-monitor-command',
-> -                 command_line=3D'qemu-io %s "break %s bp_%s"'
-> -                 % (drive, event, drive))
-> +        self.hmp(f'qemu-io {drive} "break {event} bp_{drive}"')
-> =20
-> -    def resume_drive(self, drive):
-> -        self.qmp('human-monitor-command',
-> -                 command_line=3D'qemu-io %s "remove_break bp_%s"'
-> -                 % (drive, drive))
-> +    def resume_drive(self, drive: str) -> None:
-> +        """Resume drive r/w operations"""
-> +        self.hmp(f'qemu-io {drive} "remove_break bp_{drive}"')
-> =20
-> -    def hmp_qemu_io(self, drive, cmd):
-> -        '''Write to a given drive using an HMP command'''
-> -        return self.qmp('human-monitor-command',
-> -                        command_line=3D'qemu-io %s "%s"' % (drive, cmd))
-> +    def hmp_qemu_io(self, drive: str, cmd: str, use_log: bool =3D False)=
- -> None:
-> +        """Write to a given drive using an HMP command"""
-> +        return self.hmp(f'qemu-io {drive} "{cmd}"', use_log=3Duse_log)
-
-Once you have a non-Any return type for hmp(), this would report that
-you return something for a function declared to return None.
-
-Kevin
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 32d549ce36..e6cae1b59c 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -736,3 +736,12 @@ DEF_HELPER_6(vasub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vasub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vasub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vasub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vsmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index e617d7bd60..633f782fbf 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -422,6 +422,8 @@ vaadd_vx        100100 . ..... ..... 100 ..... 1010111 @r_vm
+ vaadd_vi        100100 . ..... ..... 011 ..... 1010111 @r_vm
+ vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
+ vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
++vsmul_vv        100111 . ..... ..... 000 ..... 1010111 @r_vm
++vsmul_vx        100111 . ..... ..... 100 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index a7cf4f4614..08a8444b46 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1778,3 +1778,7 @@ GEN_OPIVV_TRANS(vasub_vv, opivv_check)
+ GEN_OPIVX_TRANS(vaadd_vx,  opivx_check)
+ GEN_OPIVX_TRANS(vasub_vx,  opivx_check)
+ GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
++
++/* Vector Single-Width Fractional Multiply with Rounding and Saturation */
++GEN_OPIVV_TRANS(vsmul_vv, opivv_check)
++GEN_OPIVX_TRANS(vsmul_vx,  opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 784993b5f6..23868fb1b2 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -2596,3 +2596,110 @@ GEN_VEXT_VX_RM(vasub_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX_RM(vasub_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX_RM(vasub_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX_RM(vasub_vx_d, 8, 8, clearq)
++
++/* Vector Single-Width Fractional Multiply with Rounding and Saturation */
++static inline int8_t vsmul8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
++{
++    uint8_t round;
++    int16_t res;
++
++    res = (int16_t)a * (int16_t)b;
++    round = get_round(vxrm, res, 7);
++    res   = (res >> 7) + round;
++
++    if (res > INT8_MAX) {
++        env->vxsat = 0x1;
++        return INT8_MAX;
++    } else if (res < INT8_MIN) {
++        env->vxsat = 0x1;
++        return INT8_MIN;
++    } else {
++        return res;
++    }
++}
++
++static int16_t vsmul16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
++{
++    uint8_t round;
++    int32_t res;
++
++    res = (int32_t)a * (int32_t)b;
++    round = get_round(vxrm, res, 15);
++    res   = (res >> 15) + round;
++
++    if (res > INT16_MAX) {
++        env->vxsat = 0x1;
++        return INT16_MAX;
++    } else if (res < INT16_MIN) {
++        env->vxsat = 0x1;
++        return INT16_MIN;
++    } else {
++        return res;
++    }
++}
++
++static int32_t vsmul32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    uint8_t round;
++    int64_t res;
++
++    res = (int64_t)a * (int64_t)b;
++    round = get_round(vxrm, res, 31);
++    res   = (res >> 31) + round;
++
++    if (res > INT32_MAX) {
++        env->vxsat = 0x1;
++        return INT32_MAX;
++    } else if (res < INT32_MIN) {
++        env->vxsat = 0x1;
++        return INT32_MIN;
++    } else {
++        return res;
++    }
++}
++
++static int64_t vsmul64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
++{
++    uint8_t round;
++    uint64_t hi_64, lo_64;
++    int64_t res;
++
++    if (a == INT64_MIN && b == INT64_MIN) {
++        env->vxsat = 1;
++        return INT64_MAX;
++    }
++
++    muls64(&lo_64, &hi_64, a, b);
++    round = get_round(vxrm, lo_64, 63);
++    /*
++     * Cannot overflow, as there are always
++     * 2 sign bits after multiply.
++     */
++    res = (hi_64 << 1) | (lo_64 >> 63);
++    if (round) {
++        if (res == INT64_MAX) {
++            env->vxsat = 1;
++        } else {
++            res += 1;
++        }
++    }
++    return res;
++}
++
++RVVCALL(OPIVV2_RM, vsmul_vv_b, OP_SSS_B, H1, H1, H1, vsmul8)
++RVVCALL(OPIVV2_RM, vsmul_vv_h, OP_SSS_H, H2, H2, H2, vsmul16)
++RVVCALL(OPIVV2_RM, vsmul_vv_w, OP_SSS_W, H4, H4, H4, vsmul32)
++RVVCALL(OPIVV2_RM, vsmul_vv_d, OP_SSS_D, H8, H8, H8, vsmul64)
++GEN_VEXT_VV_RM(vsmul_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vsmul_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vsmul_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vsmul_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vsmul_vx_b, OP_SSS_B, H1, H1, vsmul8)
++RVVCALL(OPIVX2_RM, vsmul_vx_h, OP_SSS_H, H2, H2, vsmul16)
++RVVCALL(OPIVX2_RM, vsmul_vx_w, OP_SSS_W, H4, H4, vsmul32)
++RVVCALL(OPIVX2_RM, vsmul_vx_d, OP_SSS_D, H8, H8, vsmul64)
++GEN_VEXT_VX_RM(vsmul_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vsmul_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vsmul_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vsmul_vx_d, 8, 8, clearq)
+-- 
+2.23.0
 
 
