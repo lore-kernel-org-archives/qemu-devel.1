@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7020DC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71547C2D0ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:22:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41490206F6
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:22:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41490206F6
+	by mail.kernel.org (Postfix) with ESMTPS id 49EEC206F6
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:22:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49EEC206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIlwn-00068a-CA
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 00:22:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37836)
+	id 1jIlwp-0006Dk-B5
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 00:22:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jIltT-0000qu-IO
+ (envelope-from <yi.l.liu@intel.com>) id 1jIltS-0000qe-LA
  for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jIltR-0007rq-WA
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:23 -0400
-Received: from mga07.intel.com ([134.134.136.100]:12564)
+ (envelope-from <yi.l.liu@intel.com>) id 1jIltP-0007oO-H8
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:22 -0400
+Received: from mga01.intel.com ([192.55.52.88]:18787)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jIltR-0007lr-Mg
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:21 -0400
-IronPort-SDR: 4cwxRCCvKpqsPFIJGho1lQZBLNvPuo7n3qPLUZl1XhLwE1zyiL75jntu3qygZ7Pm8TbqqUqdnS
- rBQcueRtM3ng==
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jIltP-0007mU-8Z
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:19 -0400
+IronPort-SDR: xzsKzNd4p8erqmFAP9yfrR/CqY9D4j4r3Lxmto8j27CmrUUSWQhmqb2FcxbWgBxwlt3heRAShe
+ LfI/FINmNDIw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Mar 2020 21:19:15 -0700
-IronPort-SDR: ZLu7dwmd3UX/hNHIm1tfGJHHzCIBeDN9DLDn6liq+1ASuA8Kazf5kf/F6h0rOrNs3WEHQzBkb6
- 4iEMKxsuqWfQ==
+ by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 29 Mar 2020 21:19:16 -0700
+IronPort-SDR: 8AuPz3n5vDxx5X0yJbnIPoxzxD7YdloS1wPUiSu0nxnOO50u347KzvfslERG6rieMjzVAodbk9
+ 7Rquhbd4Cjpg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,322,1580803200"; d="scan'208";a="327632036"
+X-IronPort-AV: E=Sophos;i="5.72,322,1580803200"; d="scan'208";a="327632077"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga001.jf.intel.com with ESMTP; 29 Mar 2020 21:19:15 -0700
+ by orsmga001.jf.intel.com with ESMTP; 29 Mar 2020 21:19:16 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [PATCH v2 09/22] vfio/common: init HostIOMMUContext per-container
-Date: Sun, 29 Mar 2020 21:24:48 -0700
-Message-Id: <1585542301-84087-10-git-send-email-yi.l.liu@intel.com>
+Subject: [PATCH v2 22/22] intel_iommu: modify x-scalable-mode to be string
+ option
+Date: Sun, 29 Mar 2020 21:25:01 -0700
+Message-Id: <1585542301-84087-23-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
 References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.100
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,151 +70,134 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, david@gibson.dropbear.id.au
+ hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In this patch, QEMU firstly gets iommu info from kernel to check the
-supported capabilities by a VFIO_IOMMU_TYPE1_NESTING iommu. And inits
-HostIOMMUContet instance.
+Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
+related to scalable mode translation, thus there are multiple combinations.
+While this vIOMMU implementation wants simplify it for user by providing
+typical combinations. User could config it by "x-scalable-mode" option. The
+usage is as below:
+
+"-device intel-iommu,x-scalable-mode=["legacy"|"modern"|"off"]"
+
+ - "legacy": gives support for SL page table
+ - "modern": gives support for FL page table, pasid, virtual command
+ - "off": no scalable mode support
+ -  if not configured, means no scalable mode support, if not proper
+    configured, will throw error
+
+Note: this patch is supposed to be merged when  the whole vSVA patch series
+were merged.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 ---
- hw/vfio/common.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 99 insertions(+)
+ hw/i386/intel_iommu.c          | 30 ++++++++++++++++++++++++++++--
+ hw/i386/intel_iommu_internal.h |  4 ++++
+ include/hw/i386/intel_iommu.h  |  2 ++
+ 3 files changed, 34 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 5f3534d..44b142c 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1226,10 +1226,89 @@ static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
-     return 0;
- }
- 
-+/**
-+ * Get iommu info from host. Caller of this funcion should free
-+ * the memory pointed by the returned pointer stored in @info
-+ * after a successful calling when finished its usage.
-+ */
-+static int vfio_get_iommu_info(VFIOContainer *container,
-+                         struct vfio_iommu_type1_info **info)
-+{
-+
-+    size_t argsz = sizeof(struct vfio_iommu_type1_info);
-+
-+    *info = g_malloc0(argsz);
-+
-+retry:
-+    (*info)->argsz = argsz;
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
-+        g_free(*info);
-+        *info = NULL;
-+        return -errno;
-+    }
-+
-+    if (((*info)->argsz > argsz)) {
-+        argsz = (*info)->argsz;
-+        *info = g_realloc(*info, argsz);
-+        goto retry;
-+    }
-+
-+    return 0;
-+}
-+
-+static struct vfio_info_cap_header *
-+vfio_get_iommu_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    void *ptr = info;
-+
-+    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
-+        return NULL;
-+    }
-+
-+    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-+        if (hdr->id == id) {
-+            return hdr;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static int vfio_get_nesting_iommu_cap(VFIOContainer *container,
-+                   struct vfio_iommu_type1_info_cap_nesting *cap_nesting)
-+{
-+    struct vfio_iommu_type1_info *info;
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_iommu_type1_info_cap_nesting *cap;
-+    int ret;
-+
-+    ret = vfio_get_iommu_info(container, &info);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    hdr = vfio_get_iommu_info_cap(info,
-+                        VFIO_IOMMU_TYPE1_INFO_CAP_NESTING);
-+    if (!hdr) {
-+        g_free(info);
-+        return -errno;
-+    }
-+
-+    cap = container_of(hdr,
-+                struct vfio_iommu_type1_info_cap_nesting, header);
-+    *cap_nesting = *cap;
-+
-+    g_free(info);
-+    return 0;
-+}
-+
- static int vfio_init_container(VFIOContainer *container, int group_fd,
-                                Error **errp)
- {
-     int iommu_type, ret;
-+    uint64_t flags = 0;
- 
-     iommu_type = vfio_get_iommu_type(container, errp);
-     if (iommu_type < 0) {
-@@ -1257,6 +1336,26 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
-         return -errno;
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index e8877d4..2e745e8 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -4056,7 +4056,7 @@ static Property vtd_properties[] = {
+     DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+                       VTD_HOST_ADDRESS_WIDTH),
+     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+-    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
++    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode_str),
+     DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -4688,8 +4688,12 @@ static void vtd_init(IntelIOMMUState *s)
      }
  
-+    if (iommu_type == VFIO_TYPE1_NESTING_IOMMU) {
-+        struct vfio_iommu_type1_info_cap_nesting nesting = {
-+                                         .nesting_capabilities = 0x0,
-+                                         .stage1_formats = 0, };
-+
-+        ret = vfio_get_nesting_iommu_cap(container, &nesting);
-+        if (ret) {
-+            error_setg_errno(errp, -ret,
-+                             "Failed to get nesting iommu cap");
-+            return ret;
-+        }
-+
-+        flags |= (nesting.nesting_capabilities & VFIO_IOMMU_PASID_REQS) ?
-+                 HOST_IOMMU_PASID_REQUEST : 0;
-+        host_iommu_ctx_init(&container->iommu_ctx,
-+                            sizeof(container->iommu_ctx),
-+                            TYPE_VFIO_HOST_IOMMU_CONTEXT,
-+                            flags);
+     /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+-    if (s->scalable_mode) {
++    if (s->scalable_mode && !s->scalable_modern) {
+         s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
++    } else if (s->scalable_mode && s->scalable_modern) {
++        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
++                   | VTD_ECAP_FLTS | VTD_ECAP_PSS | VTD_ECAP_VCS;
++        s->vccap |= VTD_VCCAP_PAS;
+     }
+ 
+     vtd_reset_caches(s);
+@@ -4821,6 +4825,28 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+         return false;
+     }
+ 
++    if (s->scalable_mode_str &&
++        (strcmp(s->scalable_mode_str, "off") &&
++         strcmp(s->scalable_mode_str, "modern") &&
++         strcmp(s->scalable_mode_str, "legacy"))) {
++        error_setg(errp, "Invalid x-scalable-mode config,"
++                         "Please use \"modern\", \"legacy\" or \"off\"");
++        return false;
 +    }
 +
-     container->iommu_type = iommu_type;
-     return 0;
++    if (s->scalable_mode_str &&
++        !strcmp(s->scalable_mode_str, "legacy")) {
++        s->scalable_mode = true;
++        s->scalable_modern = false;
++    } else if (s->scalable_mode_str &&
++        !strcmp(s->scalable_mode_str, "modern")) {
++        s->scalable_mode = true;
++        s->scalable_modern = true;
++    } else {
++        s->scalable_mode = false;
++        s->scalable_modern = false;
++    }
++
+     return true;
  }
+ 
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 4910e63..e0719bc 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -196,8 +196,12 @@
+ #define VTD_ECAP_PT                 (1ULL << 6)
+ #define VTD_ECAP_MHMV               (15ULL << 20)
+ #define VTD_ECAP_SRS                (1ULL << 31)
++#define VTD_ECAP_PSS                (19ULL << 35)
++#define VTD_ECAP_PASID              (1ULL << 40)
+ #define VTD_ECAP_SMTS               (1ULL << 43)
++#define VTD_ECAP_VCS                (1ULL << 44)
+ #define VTD_ECAP_SLTS               (1ULL << 46)
++#define VTD_ECAP_FLTS               (1ULL << 47)
+ 
+ /* CAP_REG */
+ /* (offset >> 4) << 24 */
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 626c1cd..3831ba7 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -263,6 +263,8 @@ struct IntelIOMMUState {
+ 
+     bool caching_mode;              /* RO - is cap CM enabled? */
+     bool scalable_mode;             /* RO - is Scalable Mode supported? */
++    char *scalable_mode_str;        /* RO - admin's Scalable Mode config */
++    bool scalable_modern;           /* RO - is modern SM supported? */
+ 
+     dma_addr_t root;                /* Current root table pointer */
+     bool root_scalable;             /* Type of root table (scalable or not) */
 -- 
 2.7.4
 
