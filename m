@@ -2,93 +2,68 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E553BC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 19:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05130C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:01:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B169F20675
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 19:49:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mva0r84X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B169F20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D1EFA2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:01:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1EFA2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ0Pm-0002LD-R5
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 15:49:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58700)
+	id 1jJ0bK-0001cQ-0Z
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 16:01:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jJ0NS-0000L8-J7
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:47:20 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jJ0a5-0000Eg-29
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jJ0NP-00079T-TB
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:47:18 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36911)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jJ0NP-00074w-CX
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:47:15 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w10so23244706wrm.4
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 12:47:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=6CNWyF1t/H8TJ1kexfrAAfUZIKUptVCqfnEyF6Ek0Xk=;
- b=Mva0r84Xkc0E2Nw1E6aEUegU1WqX8fIP0dkMaOmojpAyZKXSdsOw/tTUHI21YLoZ40
- XXvoPNbfmYgzAjcACQRNkpCVp1p8Ru+h0Lh3bv23PvZrG7Ym6xea39bmQEW2LcPFnrpQ
- OYJBVVzS94CbFJnH0LSDoy15iwNTSpkMY1b1gUkZFUpvGrXZ76DIElh3ItkVy6l6kQFl
- bvMwUOtgLp27B16VP9sEaJslx7+OtoDr/wYHjAayFznTYtTe6BNs53R1K4MFDZ6MAZNM
- xBACfhncKu+6JjNSdPAnJ0OhWPQPeFSy7G2D/cXSgU70EdvJOGo3UQXAaGC5MuheaKQf
- L2hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=6CNWyF1t/H8TJ1kexfrAAfUZIKUptVCqfnEyF6Ek0Xk=;
- b=Wtw0B9AQPecUrn+JHlz2c3JhwfJ1HNpdWvPJ8US5TfgdM2llrzyaWfdQH09IeAVMRk
- 2kHdna6Pp2mRf+8KtEgcJVGTX8U5jXPXa7f2owudnE1PXSMzmMKbbB5EgeJpFpgkXP4q
- L6ybiTyw0cna0Gsb/iRnczi63fm1qK3igxZ7da+49Jas/IiJB5ECCrhGJahoxOrd5EsN
- gZ0qjrQhpiEWp/dALxLXFMNC1xcGuTT83TLd9tVLlri5WlsKFzDnLLeaV2UQDqH0mqHs
- PiUHbXczDbesaY694xr6SeVH+ISDtI6w2goMlDyWB6zJ8wMehvsqIWb+vENt4TIo2MiC
- e1Og==
-X-Gm-Message-State: ANhLgQ2JBD4gfvg/tcGzSkCY8a8g7qxPXNwUUljEK05F6LkqUNC/mYgu
- VWqqce6D2YQ+nJRFvJfRHVVdcg==
-X-Google-Smtp-Source: ADFU+vuFZfpyjyjaXJQ27C2bQv/I9IA7vS1B02tk7QAcCzQ9wBV7xj0L4NvM7D4IsMTbLsc6kaWXLw==
-X-Received: by 2002:a5d:5447:: with SMTP id w7mr16337639wrv.299.1585597634241; 
- Mon, 30 Mar 2020 12:47:14 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 19sm674950wmi.32.2020.03.30.12.47.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 30 Mar 2020 12:47:13 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4533F1FF7E;
- Mon, 30 Mar 2020 20:47:12 +0100 (BST)
-References: <20200307010051.97022-1-yuanzi@google.com>
- <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
- <87imizidwc.fsf@linaro.org>
- <CADjx4CJJdQep+K3ibfhjin7Eo6uCEFGQ6R6yVC0OcNo8MsfvJw@mail.gmail.com>
- <87d095u804.fsf@linaro.org>
- <CADjx4CKhoikcZanqYCs11ubGY+6tOeNjToiCgjnp8V_rzZcDHw@mail.gmail.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Lirong Yuan <yuanzi@google.com>
-Subject: Re: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
-In-reply-to: <CADjx4CKhoikcZanqYCs11ubGY+6tOeNjToiCgjnp8V_rzZcDHw@mail.gmail.com>
-Date: Mon, 30 Mar 2020 20:47:12 +0100
-Message-ID: <87tv25fwvz.fsf@linaro.org>
+ (envelope-from <no-reply@patchew.org>) id 1jJ0a3-00029i-4F
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:00:20 -0400
+Resent-Date: Mon, 30 Mar 2020 16:00:20 -0400
+Resent-Message-Id: <E1jJ0a3-00029i-4F@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21448)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jJ0a2-00024o-Uk; Mon, 30 Mar 2020 16:00:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1585598392; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=BhyoMIqAmnKoRV+GFqSrJGJ/Ln8KOPEk4Xt2BS9XQUcgpvaX3rXVZ870soUp8pFGopySwCnH8zftNGgNr22ysmWf4OSrf60gIHO8K+VRLw2aZfarbq+iDLfqrShyMUEDDzrUIL/Lwkx3RVmowF5XCTcyQBTPrU1Bn2bAQ58UnA4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1585598392;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=csLclqeDsiSiRcvsOCidlujRoAsKZYbsu2f153rCCR0=; 
+ b=GPqLOjxoRIFRsh8Q27NGMLcuv14huNbQZXb/gIQDzfxI+Q8/4mtAJSAQg80OpC9G7VNifWne95Rzs2rTVSpyuRu9ECU4QMMgpWHkyBx8BeZ1SJ29gKYc0DPnXRvl+tbNELJ39HsyJVpocJr/kHhNOmK2ZIlFvFdyYENtk3xsiYs=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1585598389649695.1731931413614;
+ Mon, 30 Mar 2020 12:59:49 -0700 (PDT)
+In-Reply-To: <20200330164909.28324-1-shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH for-5.0 0/3] acpi: Fixes for inconsistency in ACPI MR size
+ during migration
+Message-ID: <158559838781.14168.4660132133802021028@39012742ff91>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: shameerali.kolothum.thodi@huawei.com
+Date: Mon, 30 Mar 2020 12:59:49 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,130 +75,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>,
- Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Shu-Chun Weng <scw@google.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, david@redhat.com,
+ shannon.zhaosl@gmail.com, mst@redhat.com, qemu-devel@nongnu.org,
+ xuwei5@hisilicon.com, linuxarm@huawei.com, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, imammedo@redhat.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Lirong Yuan <yuanzi@google.com> writes:
-
-> On Sat, Mar 21, 2020 at 6:56 AM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->
->>
->> Lirong Yuan <yuanzi@google.com> writes:
->>
->> > On Fri, Mar 20, 2020 at 2:17 AM Alex Benn=C3=A9e <alex.bennee@linaro.o=
-rg>
->> wrote:
->> <snip>
->> >>
->> >> Sorry I missed this on my radar. There was a minor re-factor of gdbst=
-ub
->> >> that was just merged which will mean this patch needs a re-base to use
->> >> g_string_* functions to expand stings.
->> >>
->> >> Also we have some simple gdbstub tests now - could we come up with a
->> >> multiarch gdbstub test to verify this is working properly?
->> >>
->> <snip>
->> > For sure, I will re-base this patch to use g_string_* functions.
->> >
->> > Currently we are using qemu aarch64. I am not sure how to do this yet,
->> but
->> > I could try to add something to
->> > https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbstub
->>
->> If the auxv support is appropriate to all linux-user targets you can
->> plumb it into the multiarch tests - you can even use the existing
->> binaries.
->>
->> So you need:
->>
->>   - a stanza in the makefiles to launch the test (see
->>     tests/tcg/aarch64/Makefile.target)
->>
->>   - a .py test script that manipulates gdbstub to check things are worki=
-ng
->>
->> So something like:
->>
->> .PHONY: gdbstub-foo-binary
->> run-gdbstub-foo-binary: foo-binary
->>         $(call run-test, $@, $(GDB_SCRIPT) \
->>                 --gdb $(HAVE_GDB_BIN) \
->>                 --qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
->>                 --bin $< --test $(MULTIARCH_SRC)/gdbstub/test-foo.py, \
->>         "basic gdbstub FOO support")
->>
->>
->> >
->> > Does this sound good?
->>
->> Hope that helps.
->>
->> >
->> > Thanks!
->> > Lirong
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
->
-> Hi Alex,
->
-> Thanks for the instructions, very helpful!
->
-> I rebased this patch to use g_string_* functions, and the link to patchwo=
-rk
-> is:
-> http://patchwork.ozlabs.org/patch/1264125/
-> Could you help take another look?
->
-> Regarding testing, I looked at some instructions for running tests, e.g.
-> https://github.com/qemu/qemu/blob/master/docs/devel/testing.rst
-> https://wiki.qemu.org/Testing
-> However I still could not get the tests for aarch64 to run. Do you know h=
-ow
-> to run the aarch64 or multi-arch tests?
-
-The aarch64 ones run with "make run-tcg-tests-aarch64-linux-user" add
-V=3D1 to see the details.
-
-> Also there aren't any existing gdb stub tests that try to read
-> uninterpreted bytes from the target=E2=80=99s special data area identifie=
-d by a
-> keyword:
-> https://sourceware.org/gdb/current/onlinedocs/gdb/General-Query-Packets.h=
-tml#qXfer-auxiliary-vector-read
-> I looked at some other gdb stub tests, but they did not seem to send any
-> queries:
-> https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbstub
-> So I am not sure how to set up one for "Xfer:auxv:read:" packets...
-> Are there plans to add more tests for other packets like
-> "Xfer:features:read:"?
-> I'd be happy to add a test if there is an example of how to do it. :)
-
-What would you do from a normal gdb command line. At the very least you
-run the same command with gdb.execute(), e.g.:
-
-  gdb.execute("set confirm off")
-
-is the same as typing
-
-  set confirm off
-
-at the gdb command prompt.
-
->
-> Thanks,
-> Lirong
-
-
---=20
-Alex Benn=C3=A9e
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMzMDE2NDkwOS4yODMy
+NC0xLXNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNl
+cmllcyBmYWlsZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZp
+bmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhh
+dmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxs
+eS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4
+Nl82NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9j
+a2VyLXRlc3QtbWluZ3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgogIENDICAgICAgaHcvc21iaW9zL3NtYmlvcy5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAv
+dG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11L29zZGVwLmg6NTEsCiAgICAgICAgICAgICAg
+ICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvbnZyYW0vZndfY2ZnLmM6MjU6Ci90bXAvcWVt
+dS10ZXN0L3NyYy9pbmNsdWRlL3FlbXUvY29tcGlsZXIuaDo4MTozNTogZXJyb3I6IGludmFsaWQg
+b3BlcmFuZHMgdG8gYmluYXJ5IC0gKGhhdmUgJ3VpbnQ2NF90IConIHtha2EgJ2xvbmcgbG9uZyB1
+bnNpZ25lZCBpbnQgKid9IGFuZCAnc2l6ZV90IConIHtha2EgJ3Vuc2lnbmVkIGludCAqJ30pCiAj
+ZGVmaW5lIHR5cGVfY2hlY2sodDEsdDIpICgodDEqKTAgLSAodDIqKTApCiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9taWdyYXRp
+b24vdm1zdGF0ZS5oOjI1NDo2OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8gJ3R5cGVfY2hl
+Y2snCi0tLQovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbnZyYW0vZndfY2ZnLmM6Njc0Ojk6IG5vdGU6
+IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnVk1TVEFURV9VSU5UNjQnCiAgICAgICAgIFZNU1RBVEVf
+VUlOVDY0KHRhYmxlX21yX3NpemUsIEZXQ2ZnU3RhdGUpLAogICAgICAgICBefn5+fn5+fn5+fn5+
+fgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6ODE6MzU6IGVycm9y
+OiBpbnZhbGlkIG9wZXJhbmRzIHRvIGJpbmFyeSAtIChoYXZlICd1aW50NjRfdCAqJyB7YWthICds
+b25nIGxvbmcgdW5zaWduZWQgaW50IConfSBhbmQgJ3NpemVfdCAqJyB7YWthICd1bnNpZ25lZCBp
+bnQgKid9KQogI2RlZmluZSB0eXBlX2NoZWNrKHQxLHQyKSAoKHQxKikwIC0gKHQyKikwKQogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1
+ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDoyNTQ6Njogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3Jv
+ICd0eXBlX2NoZWNrJwotLS0KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L252cmFtL2Z3X2NmZy5jOjY3
+NTo5OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8gJ1ZNU1RBVEVfVUlOVDY0JwogICAgICAg
+ICBWTVNUQVRFX1VJTlQ2NChsaW5rZXJfbXJfc2l6ZSwgRldDZmdTdGF0ZSksCiAgICAgICAgIF5+
+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FlbXUvY29tcGlsZXIuaDo4
+MTozNTogZXJyb3I6IGludmFsaWQgb3BlcmFuZHMgdG8gYmluYXJ5IC0gKGhhdmUgJ3VpbnQ2NF90
+IConIHtha2EgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQgKid9IGFuZCAnc2l6ZV90IConIHtha2Eg
+J3Vuc2lnbmVkIGludCAqJ30pCiAjZGVmaW5lIHR5cGVfY2hlY2sodDEsdDIpICgodDEqKTAgLSAo
+dDIqKTApCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVz
+dC9zcmMvaW5jbHVkZS9taWdyYXRpb24vdm1zdGF0ZS5oOjI1NDo2OiBub3RlOiBpbiBleHBhbnNp
+b24gb2YgbWFjcm8gJ3R5cGVfY2hlY2snCi0tLQovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbnZyYW0v
+ZndfY2ZnLmM6Njc2Ojk6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnVk1TVEFURV9VSU5U
+NjQnCiAgICAgICAgIFZNU1RBVEVfVUlOVDY0KHJzZHBfbXJfc2l6ZSwgRldDZmdTdGF0ZSksCiAg
+ICAgICAgIF5+fn5+fn5+fn5+fn5+Cm1ha2U6ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVz
+Lm1hazo2OTogaHcvbnZyYW0vZndfY2ZnLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9y
+IHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgog
+IEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgot
+LS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3Mu
+Q2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1
+bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZTk3NWRhZmNlMThjNGQ4ZDhi
+ZGMxYWVjY2ZlMmMzZmUnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21w
+PXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFf
+Q09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9
+JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScs
+ICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAv
+Y2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWQ4czZjeXJsL3Ny
+Yy9kb2NrZXItc3JjLjIwMjAtMDMtMzAtMTUuNTQuMjYuMzA0OTovdmFyL3RtcC9xZW11Onoscm8n
+LCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1
+cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1lOTc1ZGFmY2UxOGM0ZDhkOGJkYzFhZWNjZmUyYzNmZQptYWtlWzFd
+OiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1kOHM2Y3lybC9zcmMnCm1ha2U6ICoqKiBbZG9ja2Vy
+LXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICA1bTIyLjIwMnMKdXNlciAg
+ICAwbTguNTk5cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
+b3JnL2xvZ3MvMjAyMDAzMzAxNjQ5MDkuMjgzMjQtMS1zaGFtZWVyYWxpLmtvbG90aHVtLnRob2Rp
+QGh1YXdlaS5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
 
