@@ -2,83 +2,50 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BCF3C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 07:48:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3D39C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 08:01:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 399F02073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 07:48:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QL+gmB76"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 399F02073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A899206E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 08:01:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A899206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIpA8-0001tu-El
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 03:48:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55244)
+	id 1jIpMg-00067X-MS
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 04:01:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jIp9Q-0001Qn-QK
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:48:06 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jIpLc-0005At-E7
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jIp9O-0005Qm-Bl
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:48:03 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35527)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jIpLY-0002I6-EY
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:00:40 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44752)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jIp9O-0005Pw-66
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:48:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585554481;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7HEDpGZ5majIM+hzxD+isba/LokrsDUXtNCzMHlgknU=;
- b=QL+gmB76b6NJMGPNcE9O2SJdGHb0RQWojSt+o1JZRyP4JwwJdvAznCyef9LFegcYxW+8En
- Z8gG+gQIHZQmlKBnBW0idgbYGoE8Zqv9ba1ZjBGNIycKeVQ+GQtR5YyvjVjO5y7/3HiGHq
- k73OVs0Be7oZwDeJe9+lMi8a9zW9uYc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-R_Q9k03gNMyfqnviKw9KZQ-1; Mon, 30 Mar 2020 03:47:57 -0400
-X-MC-Unique: R_Q9k03gNMyfqnviKw9KZQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68F39107ACC7;
- Mon, 30 Mar 2020 07:47:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8722619925;
- Mon, 30 Mar 2020 07:47:54 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0718E11385E2; Mon, 30 Mar 2020 09:47:53 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Oleksiy Obitotskyy <oobitots@cisco.com>
-Subject: Re: [PATCH] qemu: Do not include file if not exists
-References: <eda4c24f-2805-67b9-4fa0-931d7b03090c@redhat.com>
- <20200325085246.21118-1-oobitots@cisco.com>
-Date: Mon, 30 Mar 2020 09:47:53 +0200
-In-Reply-To: <20200325085246.21118-1-oobitots@cisco.com> (Oleksiy Obitotskyy's
- message of "Wed, 25 Mar 2020 01:52:46 -0700")
-Message-ID: <87wo72xp06.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jIpLY-0002FR-5g; Mon, 30 Mar 2020 04:00:36 -0400
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jIpLP-0000He-0z; Mon, 30 Mar 2020 11:00:27 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 2/4] qcow2: rework the cluster compression routine
+Date: Mon, 30 Mar 2020 10:59:54 +0300
+Message-Id: <20200330075956.6791-3-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200330075956.6791-1-dplotnikov@virtuozzo.com>
+References: <20200330075956.6791-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,27 +57,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing maintainers.
+The patch enables processing the image compression type defined
+for the image and chooses an appropriate method for image clusters
+(de)compression.
 
-Oleksiy, this looks like a respin of your patch.  Since it is buried in
-the original thread, our patch processing automation won't pick it up,
-and humans may well miss it, too.  Next time, start a new thread, with
-proper [PATCH v2] versioning in the subject, and cc: the maintainers
-(use scripts/get_maintainer.pl to find them).  Also collect the
-Reviewed-by tags, if any, and explain what changed since the previous
-version.
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-threads.c | 71 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 60 insertions(+), 11 deletions(-)
 
-https://wiki.qemu.org/Contribute/SubmitAPatch
-
-I know getting everything just right seems overwhelming at first.  Don't
-worry about making innocent mistakes, just learn from them :)
-
-Thanks for your fix!
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index a68126f291..7dbaf53489 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -74,7 +74,9 @@ typedef struct Qcow2CompressData {
+ } Qcow2CompressData;
+ 
+ /*
+- * qcow2_compress()
++ * qcow2_zlib_compress()
++ *
++ * Compress @src_size bytes of data using zlib compression method
+  *
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+@@ -83,8 +85,8 @@ typedef struct Qcow2CompressData {
+  *          -ENOMEM destination buffer is not enough to store compressed data
+  *          -EIO    on any other error
+  */
+-static ssize_t qcow2_compress(void *dest, size_t dest_size,
+-                              const void *src, size_t src_size)
++static ssize_t qcow2_zlib_compress(void *dest, size_t dest_size,
++                                   const void *src, size_t src_size)
+ {
+     ssize_t ret;
+     z_stream strm;
+@@ -119,10 +121,10 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+ }
+ 
+ /*
+- * qcow2_decompress()
++ * qcow2_zlib_decompress()
+  *
+  * Decompress some data (not more than @src_size bytes) to produce exactly
+- * @dest_size bytes.
++ * @dest_size bytes using zlib compression method
+  *
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+@@ -130,8 +132,8 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+  * Returns: 0 on success
+  *          -EIO on fail
+  */
+-static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+-                                const void *src, size_t src_size)
++static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size)
+ {
+     int ret;
+     z_stream strm;
+@@ -191,20 +193,67 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+     return arg.ret;
+ }
+ 
++/*
++ * qcow2_co_compress()
++ *
++ * Compress @src_size bytes of data using the compression
++ * method defined by the image compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: compressed size on success
++ *          a negative error code on failure
++ */
+ ssize_t coroutine_fn
+ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+                   const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_compress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_compress;
++        break;
++
++    default:
++        abort();
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
++/*
++ * qcow2_co_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes using the compression method defined by the image
++ * compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          a negative error code on failure
++ */
+ ssize_t coroutine_fn
+ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+                     const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_decompress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_decompress;
++        break;
++
++    default:
++        abort();
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
+ 
+-- 
+2.17.0
 
 
