@@ -2,74 +2,79 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F15A5C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E61C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:26:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE8E320578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:26:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 717B720578
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:26:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="dYC532dx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE8E320578
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="rD2Cojl1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 717B720578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIyAu-0004Ez-Su
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:26:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60572)
+	id 1jIyB6-0004em-K7
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:26:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1jIy91-0008ID-UO
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:17 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jIy9T-0000zM-T5
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1jIy8y-0002Ta-KQ
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:15 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:8288)
+ (envelope-from <kwankhede@nvidia.com>) id 1jIy9R-0002kU-O1
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:43 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:1379)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1jIy8y-0002SO-Cw
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:12 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e822b2d0001>; Mon, 30 Mar 2020 10:23:57 -0700
+ id 1jIy9R-0002jx-Hg
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:41 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e822af80000>; Mon, 30 Mar 2020 10:23:04 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Mon, 30 Mar 2020 10:24:10 -0700
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Mon, 30 Mar 2020 10:24:40 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Mon, 30 Mar 2020 10:24:10 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 30 Mar
- 2020 17:24:10 +0000
+ by hqpgpgate102.nvidia.com on Mon, 30 Mar 2020 10:24:40 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 30 Mar
+ 2020 17:24:39 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 30 Mar 2020 17:24:02 +0000
+ Transport; Mon, 30 Mar 2020 17:24:32 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v17 Kernel 0/7] KABIs to support migration for VFIO devices
-Date: Mon, 30 Mar 2020 22:20:37 +0530
-Message-ID: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v17 Kernel 4/7] vfio iommu: Implementation of ioctl for dirty
+ pages tracking.
+Date: Mon, 30 Mar 2020 22:20:41 +0530
+Message-ID: <1585587044-2408-5-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
+References: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
 X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1585589037; bh=DvNeGxAeMhTCRZQ/kuBWYEWHNPHBX2kE7v0Xp4AgxCo=;
+ t=1585588984; bh=CEPD9pUL0GFf507UksFIz9chWhwNy1GH0cdlvE9DwTk=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- X-NVConfidentiality:MIME-Version:Content-Type;
- b=dYC532dxGbdkjZCz2sZw6yZtQeDcpesITSyis0fjZ8i/mV590FdVebX92aN/s7PJc
- khjhA7CdpQ2VxsNKy/GYku1Jn7To+d28QbeBfWJNU10YQy3dE7F/SOYF60onE8JVuJ
- yqzE9Vxfa+0lALKzSw0eiJ3Z6aa0k9Sc6fHGovWGVZH/VmqDPkwHC0hImL3lefx6kL
- a8btLJ+kfIe4WYvTEKeuNsJi7gqYCYqHa2GlgT0FR+19G/IRPEH5tzzlKNCdW1ZAco
- 9/DUHe0Ys0oPz6GRPOhQjAxuS0Ntoyz2irIXkTvly+b0fXMfwe/pJXMsl3W8bsTRIY
- lD50K9s1/saJw==
+ In-Reply-To:References:X-NVConfidentiality:MIME-Version:
+ Content-Type;
+ b=rD2Cojl1aTD5ZmxOrI4/Y/cWVVI8bZUTp/Z7g/VrZAvvS7dM5bndoB15DDt4X0eAw
+ cSyJftK53g40he597NruZfpqU74a6T8juR5FXHXvupLrsbJy8W1teuX/xVfY5/22+N
+ 3AypoUqH8mapK1eBzxbekUCsI6kk0KzOtSdCPq+qOhoWZr6uV04pUzkv17+ldl9X2/
+ wayo7N9AjfMyE911YtgbxTq9BmeWrhDnO1CqxM3HVzVKm/irZqTvmhvYgQz6fc1ilE
+ ui4ouV12ZoIiZ/hIMv4ZyJh1t4/F9clYlM8FFh/zXYUBJAduTbZwMv0yHKykEbj+PR
+ sLI0e+5xqVzjA==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.65
+X-Received-From: 216.228.121.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,180 +97,401 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+- Start dirty pages tracking while migration is active
+- Stop dirty pages tracking.
+- Get dirty pages bitmap. Its user space application's responsibility to
+  copy content of dirty pages from source to destination during migration.
 
-This patch set adds:
-* New IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
-  respect to IOMMU container rather than per device. All pages pinned by
-  vendor driver through vfio_pin_pages external API has to be marked as
-  dirty during  migration. When IOMMU capable device is present in the
-  container and all pages are pinned and mapped, then all pages are marked
-  dirty.
-  When there are CPU writes, CPU dirty page tracking can identify dirtied
-  pages, but any page pinned by vendor driver can also be written by
-  device. As of now there is no device which has hardware support for
-  dirty page tracking. So all pages which are pinned should be considered
-  as dirty.
-  This ioctl is also used to start/stop dirty pages tracking for pinned and
-  unpinned pages while migration is active.
+To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+structure. Bitmap size is calculated considering smallest supported page
+size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
 
-* Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
-  unmapping IO virtual address range.
-  With vIOMMU, during pre-copy phase of migration, while CPUs are still
-  running, IO virtual address unmap can happen while device still keeping
-  reference of guest pfns. Those pages should be reported as dirty before
-  unmap, so that VFIO user space application can copy content of those
-  pages from source to destination.
+Bitmap is populated for already pinned pages when bitmap is allocated for
+a vfio_dma with the smallest supported page size. Update bitmap from
+pinning functions when tracking is enabled. When user application queries
+bitmap, check if requested page size is same as page size used to
+populated bitmap. If it is equal, copy bitmap, but if not equal, return
+error.
 
-* Patch 7 detect if IOMMU capable device driver is smart to report pages
-  to be marked dirty by pinning pages using vfio_pin_pages() API.
+Fixed below error by changing pgsize type from uint64_t to size_t.
+Reported-by: kbuild test robot <lkp@intel.com>
 
+All errors:
+drivers/vfio/vfio_iommu_type1.c:197: undefined reference to `__udivdi3'
 
-Yet TODO:
-Since there is no device which has hardware support for system memmory
-dirty bitmap tracking, right now there is no other API from vendor driver
-to VFIO IOMMU module to report dirty pages. In future, when such hardware
-support will be implemented, an API will be required such that vendor
-driver could report dirty pages to VFIO module during migration phases.
+drivers/vfio/vfio_iommu_type1.c:225: undefined reference to `__udivdi3'
 
-Adding revision history from previous QEMU patch set to understand KABI
-changes done till now
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 260 insertions(+), 6 deletions(-)
 
-v16 -> v17
-- Fixed errors reported by kbuild test robot <lkp@intel.com> on i386
-
-v15 -> v16
-- Minor edits and nit picks (Auger Eric)
-- On copying bitmap to user, re-populated bitmap only for pinned pages,
-  excluding unmapped pages and CPU dirtied pages.
-- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
-  https://lkml.org/lkml/2020/3/12/1255
-
-v14 -> v15
-- Minor edits and nit picks.
-- In the verification of user allocated bitmap memory, added check of
-   maximum size.
-- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
-  https://lkml.org/lkml/2020/3/12/1255
-
-v13 -> v14
-- Added struct vfio_bitmap to kabi. updated structure
-  vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
-- All small changes suggested by Alex.
-- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
-  https://lkml.org/lkml/2020/3/12/1255
-
-v12 -> v13
-- Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
-- Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
-- Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
-  field.
-
-v11 -> v12
-- Changed bitmap allocation in vfio_iommu_type1.
-- Remove atomicity of ref_count.
-- Updated comments for migration device state structure about error
-  reporting.
-- Nit picks from v11 reviews
-
-v10 -> v11
-- Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
-- Added proposal to detect if IOMMU capable device calls external pin pages
-  API to mark pages dirty.
-- Nit picks from v10 reviews
-
-v9 -> v10:
-- Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
-  during unmap while migration is active
-- Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
-  tracking.
-- If iommu_mapped, mark all pages dirty.
-- Added unpinned pages tracking while migration is active.
-- Updated comments for migration device state structure with bit
-  combination table and state transition details.
-
-v8 -> v9:
-- Split patch set in 2 sets, Kernel and QEMU.
-- Dirty pages bitmap is queried from IOMMU container rather than from
-  vendor driver for per device. Added 2 ioctls to achieve this.
-
-v7 -> v8:
-- Updated comments for KABI
-- Added BAR address validation check during PCI device's config space load
-  as suggested by Dr. David Alan Gilbert.
-- Changed vfio_migration_set_state() to set or clear device state flags.
-- Some nit fixes.
-
-v6 -> v7:
-- Fix build failures.
-
-v5 -> v6:
-- Fix build failure.
-
-v4 -> v5:
-- Added decriptive comment about the sequence of access of members of
-  structure vfio_device_migration_info to be followed based on Alex's
-  suggestion
-- Updated get dirty pages sequence.
-- As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
-  get_object, save_config and load_config.
-- Fixed multiple nit picks.
-- Tested live migration with multiple vfio device assigned to a VM.
-
-v3 -> v4:
-- Added one more bit for _RESUMING flag to be set explicitly.
-- data_offset field is read-only for user space application.
-- data_size is read for every iteration before reading data from migration,
-  that is removed assumption that data will be till end of migration
-  region.
-- If vendor driver supports mappable sparsed region, map those region
-  during setup state of save/load, similarly unmap those from cleanup
-  routines.
-- Handles race condition that causes data corruption in migration region
-  during save device state by adding mutex and serialiaing save_buffer and
-  get_dirty_pages routines.
-- Skip called get_dirty_pages routine for mapped MMIO region of device.
-- Added trace events.
-- Split into multiple functional patches.
-
-v2 -> v3:
-- Removed enum of VFIO device states. Defined VFIO device state with 2
-  bits.
-- Re-structured vfio_device_migration_info to keep it minimal and defined
-  action on read and write access on its members.
-
-v1 -> v2:
-- Defined MIGRATION region type and sub-type which should be used with
-  region type capability.
-- Re-structured vfio_device_migration_info. This structure will be placed
-  at 0th offset of migration region.
-- Replaced ioctl with read/write for trapped part of migration region.
-- Added both type of access support, trapped or mmapped, for data section
-  of the region.
-- Moved PCI device functions to pci file.
-- Added iteration to get dirty page bitmap until bitmap for all requested
-  pages are copied.
-
-Thanks,
-Kirti
-
-
-Kirti Wankhede (7):
-  vfio: UAPI for migration interface for device state
-  vfio iommu: Remove atomicity of ref_count of pinned pages
-  vfio iommu: Add ioctl definition for dirty pages tracking.
-  vfio iommu: Implementation of ioctl for dirty pages tracking.
-  vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
-  vfio iommu: Adds flag to indicate dirty pages tracking capability
-    support
-  vfio: Selective dirty page tracking if IOMMU backed device pins pages
-
- drivers/vfio/vfio.c             |  13 +-
- drivers/vfio/vfio_iommu_type1.c | 423 ++++++++++++++++++++++++++++++++++++++--
- include/linux/vfio.h            |   4 +-
- include/uapi/linux/vfio.h       | 299 +++++++++++++++++++++++++++-
- 4 files changed, 717 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 70aeab921d0f..5efebc2b60e1 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -71,6 +71,7 @@ struct vfio_iommu {
+ 	unsigned int		dma_avail;
+ 	bool			v2;
+ 	bool			nesting;
++	bool			dirty_page_tracking;
+ };
+ 
+ struct vfio_domain {
+@@ -91,6 +92,7 @@ struct vfio_dma {
+ 	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+ 	struct task_struct	*task;
+ 	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
++	unsigned long		*bitmap;
+ };
+ 
+ struct vfio_group {
+@@ -125,7 +127,21 @@ struct vfio_regions {
+ #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+ 					(!list_empty(&iommu->domain_list))
+ 
++#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
++
++/*
++ * Input argument of number of bits to bitmap_set() is unsigned integer, which
++ * further casts to signed integer for unaligned multi-bit operation,
++ * __bitmap_set().
++ * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
++ * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
++ * system.
++ */
++#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
++#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
++
+ static int put_pfn(unsigned long pfn, int prot);
++static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+ 
+ /*
+  * This code handles mapping and unmapping of user data buffers
+@@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+ 	rb_erase(&old->node, &iommu->dma_list);
+ }
+ 
++
++static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
++{
++	uint64_t npages = dma->size / pgsize;
++
++	if (npages > DIRTY_BITMAP_PAGES_MAX)
++		return -EINVAL;
++
++	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
++	if (!dma->bitmap)
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void vfio_dma_bitmap_free(struct vfio_dma *dma)
++{
++	kfree(dma->bitmap);
++	dma->bitmap = NULL;
++}
++
++static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
++{
++	struct rb_node *p;
++
++	if (RB_EMPTY_ROOT(&dma->pfn_list))
++		return;
++
++	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
++		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
++
++		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
++	}
++}
++
++static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
++{
++	struct rb_node *n = rb_first(&iommu->dma_list);
++
++	for (; n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++		int ret;
++
++		ret = vfio_dma_bitmap_alloc(dma, pgsize);
++		if (ret) {
++			struct rb_node *p = rb_prev(n);
++
++			for (; p; p = rb_prev(p)) {
++				struct vfio_dma *dma = rb_entry(n,
++							struct vfio_dma, node);
++
++				vfio_dma_bitmap_free(dma);
++			}
++			return ret;
++		}
++		vfio_dma_populate_bitmap(dma, pgsize);
++	}
++	return 0;
++}
++
++static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
++{
++	struct rb_node *n = rb_first(&iommu->dma_list);
++
++	for (; n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++
++		vfio_dma_bitmap_free(dma);
++	}
++}
++
+ /*
+  * Helper Functions for host iova-pfn list
+  */
+@@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 			vfio_unpin_page_external(dma, iova, do_accounting);
+ 			goto pin_unwind;
+ 		}
++
++		if (iommu->dirty_page_tracking) {
++			unsigned long pgshift =
++					 __ffs(vfio_pgsize_bitmap(iommu));
++
++			/*
++			 * Bitmap populated with the smallest supported page
++			 * size
++			 */
++			bitmap_set(dma->bitmap,
++				   (vpfn->iova - dma->iova) >> pgshift, 1);
++		}
+ 	}
+ 
+ 	ret = i;
+@@ -801,6 +900,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ 	vfio_unmap_unpin(iommu, dma, true);
+ 	vfio_unlink_dma(iommu, dma);
+ 	put_task_struct(dma->task);
++	vfio_dma_bitmap_free(dma);
+ 	kfree(dma);
+ 	iommu->dma_avail++;
+ }
+@@ -831,6 +931,57 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+ 	return bitmap;
+ }
+ 
++static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
++				  size_t size, size_t pgsize,
++				  u64 __user *bitmap)
++{
++	struct vfio_dma *dma;
++	unsigned long pgshift = __ffs(pgsize);
++	unsigned int npages, bitmap_size;
++
++	dma = vfio_find_dma(iommu, iova, 1);
++
++	if (!dma)
++		return -EINVAL;
++
++	if (dma->iova != iova || dma->size != size)
++		return -EINVAL;
++
++	npages = dma->size >> pgshift;
++	bitmap_size = DIRTY_BITMAP_BYTES(npages);
++
++	/* mark all pages dirty if all pages are pinned and mapped. */
++	if (dma->iommu_mapped)
++		bitmap_set(dma->bitmap, 0, npages);
++
++	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
++		return -EFAULT;
++
++	/*
++	 * Re-populate bitmap to include all pinned pages which are considered
++	 * as dirty but exclude pages which are unpinned and pages which are
++	 * marked dirty by vfio_dma_rw()
++	 */
++	bitmap_clear(dma->bitmap, 0, npages);
++	vfio_dma_populate_bitmap(dma, pgsize);
++	return 0;
++}
++
++static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
++{
++	uint64_t bsize;
++
++	if (!npages || !bitmap_size || (bitmap_size > DIRTY_BITMAP_SIZE_MAX))
++		return -EINVAL;
++
++	bsize = DIRTY_BITMAP_BYTES(npages);
++
++	if (bitmap_size < bsize)
++		return -EINVAL;
++
++	return 0;
++}
++
+ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 			     struct vfio_iommu_type1_dma_unmap *unmap)
+ {
+@@ -1038,16 +1189,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	unsigned long vaddr = map->vaddr;
+ 	size_t size = map->size;
+ 	int ret = 0, prot = 0;
+-	uint64_t mask;
++	size_t pgsize;
+ 	struct vfio_dma *dma;
+ 
+ 	/* Verify that none of our __u64 fields overflow */
+ 	if (map->size != size || map->vaddr != vaddr || map->iova != iova)
+ 		return -EINVAL;
+ 
+-	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
++	pgsize = (size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
+ 
+-	WARN_ON(mask & PAGE_MASK);
++	WARN_ON((pgsize - 1) & PAGE_MASK);
+ 
+ 	/* READ/WRITE from device perspective */
+ 	if (map->flags & VFIO_DMA_MAP_FLAG_WRITE)
+@@ -1055,7 +1206,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+ 		prot |= IOMMU_READ;
+ 
+-	if (!prot || !size || (size | iova | vaddr) & mask)
++	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1))
+ 		return -EINVAL;
+ 
+ 	/* Don't allow IOVA or virtual address wrap */
+@@ -1130,6 +1281,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	else
+ 		ret = vfio_pin_map_dma(iommu, dma, size);
+ 
++	if (!ret && iommu->dirty_page_tracking) {
++		ret = vfio_dma_bitmap_alloc(dma, pgsize);
++		if (ret)
++			vfio_remove_dma(iommu, dma);
++	}
++
+ out_unlock:
+ 	mutex_unlock(&iommu->lock);
+ 	return ret;
+@@ -2278,6 +2435,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 
+ 		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+ 			-EFAULT : 0;
++	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
++		struct vfio_iommu_type1_dirty_bitmap dirty;
++		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
++				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
++				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
++		int ret = 0;
++
++		if (!iommu->v2)
++			return -EACCES;
++
++		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
++				    flags);
++
++		if (copy_from_user(&dirty, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (dirty.argsz < minsz || dirty.flags & ~mask)
++			return -EINVAL;
++
++		/* only one flag should be set at a time */
++		if (__ffs(dirty.flags) != __fls(dirty.flags))
++			return -EINVAL;
++
++		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
++			size_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
++
++			mutex_lock(&iommu->lock);
++			if (!iommu->dirty_page_tracking) {
++				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
++				if (!ret)
++					iommu->dirty_page_tracking = true;
++			}
++			mutex_unlock(&iommu->lock);
++			return ret;
++		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
++			mutex_lock(&iommu->lock);
++			if (iommu->dirty_page_tracking) {
++				iommu->dirty_page_tracking = false;
++				vfio_dma_bitmap_free_all(iommu);
++			}
++			mutex_unlock(&iommu->lock);
++			return 0;
++		} else if (dirty.flags &
++				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
++			struct vfio_iommu_type1_dirty_bitmap_get range;
++			unsigned long pgshift;
++			size_t data_size = dirty.argsz - minsz;
++			size_t iommu_pgsize =
++				 (size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
++
++			if (!data_size || data_size < sizeof(range))
++				return -EINVAL;
++
++			if (copy_from_user(&range, (void __user *)(arg + minsz),
++					   sizeof(range)))
++				return -EFAULT;
++
++			/* allow only smallest supported pgsize */
++			if (range.bitmap.pgsize != iommu_pgsize)
++				return -EINVAL;
++			if (range.iova & (iommu_pgsize - 1))
++				return -EINVAL;
++			if (!range.size || range.size & (iommu_pgsize - 1))
++				return -EINVAL;
++			if (range.iova + range.size < range.iova)
++				return -EINVAL;
++			if (!access_ok((void __user *)range.bitmap.data,
++				       range.bitmap.size))
++				return -EINVAL;
++
++			pgshift = __ffs(range.bitmap.pgsize);
++			ret = verify_bitmap_size(range.size >> pgshift,
++						 range.bitmap.size);
++			if (ret)
++				return ret;
++
++			mutex_lock(&iommu->lock);
++			if (iommu->dirty_page_tracking)
++				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
++						range.size, range.bitmap.pgsize,
++						range.bitmap.data);
++			else
++				ret = -EINVAL;
++			mutex_unlock(&iommu->lock);
++
++			return ret;
++		}
+ 	}
+ 
+ 	return -ENOTTY;
+@@ -2345,10 +2589,20 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+ 
+ 	vaddr = dma->vaddr + offset;
+ 
+-	if (write)
++	if (write) {
+ 		*copied = __copy_to_user((void __user *)vaddr, data,
+ 					 count) ? 0 : count;
+-	else
++		if (*copied && iommu->dirty_page_tracking) {
++			unsigned long pgshift =
++				__ffs(vfio_pgsize_bitmap(iommu));
++			/*
++			 * Bitmap populated with the smallest supported page
++			 * size
++			 */
++			bitmap_set(dma->bitmap, offset >> pgshift,
++				   *copied >> pgshift);
++		}
++	} else
+ 		*copied = __copy_from_user(data, (void __user *)vaddr,
+ 					   count) ? 0 : count;
+ 	if (kthread)
 -- 
 2.7.0
 
