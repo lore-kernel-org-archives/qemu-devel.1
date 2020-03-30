@@ -2,84 +2,79 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D01C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:25:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C4A4C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:26:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F66220578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:25:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0203620578
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:26:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HNfHbE+O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F66220578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="RKVOJIxZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0203620578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIyA5-0001b2-J6
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:25:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60550)
+	id 1jIyAj-0003ke-5B
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:26:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60629)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <programmingkidx@gmail.com>) id 1jIy8z-0008Dw-41
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:13 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jIy98-00006m-B7
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <programmingkidx@gmail.com>) id 1jIy8x-0002Se-QY
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:12 -0400
-Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:42500)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
- id 1jIy8x-0002SF-KR
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:11 -0400
-Received: by mail-qt1-x82f.google.com with SMTP id t9so15756318qto.9
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 10:24:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:content-transfer-encoding:mime-version:subject:message-id:date
- :cc:to; bh=uL60V5wofLmL6JK+6Z3GSWdruUZ4x5g/c3jPk5EtCfI=;
- b=HNfHbE+O3ryTgw+wz1AwiKezYWYiFMDq8REQM9L9b0RiZ8AWmN9UhQbt+auoWfU1bB
- jGuEmqLCMd/b9u7Awp/7E+ODJxECvnJopKmcta16QrXdq08utdXvqAGOyPuTWk+J6/qQ
- p3nGUwneK+rfGIuySUVxfPSEuydx7cuTbnfR2fK/rr0x81efCuAz0j+t7OK2oih1qoUT
- rnjXAij9KN5vTQSHiWD1eqHf4vM3FVTq8o5YT4oGK5iUgW8EnThQaUuJT+cmXkO4Wuwg
- E2+ef09ao7B8QScAVYHGKrWdjLknHQxLEJl9h/Dm1jdOiNyVLafTEjKzfxMmYEtDqJzu
- I7EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:content-transfer-encoding:mime-version
- :subject:message-id:date:cc:to;
- bh=uL60V5wofLmL6JK+6Z3GSWdruUZ4x5g/c3jPk5EtCfI=;
- b=ic7nv6iqjHbBblMlMI8EUR8ZhmB3C8rjpJ6kra5ugUQFLGdwCQg8+IfGacDV3rgNfm
- 2yFnZ3VLRR9kK7IEm36FKb4fg4vdCUPzxkob0w62ztT9ks934QA7xSnRu2PT2UcFZ2Iz
- FhYD40a34v8CEn3tYApd1GV3cBOqUzE6atAkc15v6c7UopvM/sMk9747KuAPsUi+8ljO
- YTaKPuCO9TSEYqpdC3lAHrfKxFLVF7eX9rJVorctXTtxW7K5bbXUj0HvkTKGPDs1rS3O
- S02R0TZVagpX+uBKNNv27562gwcO90T0zaEjDp3ahHDORkoHUXwwIfWJ2ED+43RnizZm
- IkYA==
-X-Gm-Message-State: ANhLgQ1RDOrIseJTaVYzUiuQ4wkenCzLrbB9R7nNTDIFTxTiLqYS0Bx3
- RxWUd0VMFzz0slIaa2+PcL+cH9hh
-X-Google-Smtp-Source: ADFU+vsM03cJ/5IivQS4NHSMN1X4d2HeAtzwzxrC15UFxtLVbacDAMw/sdrZwHiP+G7gbT81SkqTvw==
-X-Received: by 2002:ac8:3550:: with SMTP id z16mr1035552qtb.217.1585589050398; 
- Mon, 30 Mar 2020 10:24:10 -0700 (PDT)
-Received: from [192.168.0.7] (d149-67-30-58.try.wideopenwest.com.
- [67.149.58.30])
- by smtp.gmail.com with ESMTPSA id h47sm11985818qtb.75.2020.03.30.10.24.09
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 30 Mar 2020 10:24:09 -0700 (PDT)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Sound support for Mac OS guests
-Message-Id: <17987AFB-512F-4EAC-851D-A346DD859029@gmail.com>
-Date: Mon, 30 Mar 2020 13:24:08 -0400
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-X-Mailer: Apple Mail (2.3273)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::82f
+ (envelope-from <kwankhede@nvidia.com>) id 1jIy96-0002aJ-7a
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:22 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:8299)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1jIy95-0002Zp-V5
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:24:20 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e822b350000>; Mon, 30 Mar 2020 10:24:05 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Mon, 30 Mar 2020 10:24:18 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Mon, 30 Mar 2020 10:24:18 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 30 Mar
+ 2020 17:24:18 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 30 Mar 2020 17:24:10 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v17 Kernel 1/7] vfio: UAPI for migration interface for device
+ state
+Date: Mon, 30 Mar 2020 22:20:38 +0530
+Message-ID: <1585587044-2408-2-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
+References: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
+MIME-Version: 1.0
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1585589045; bh=s4Iv0GJDj+1bhl4jbE8YcxRvsfl81dyjXBeOzB1RdI0=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ In-Reply-To:References:X-NVConfidentiality:MIME-Version:
+ Content-Type;
+ b=RKVOJIxZStD/QfvLMeWvFg5J735yuaJ4AV/HmIKtj4lg+PO5FmSWKEb1Ktk3cMHVJ
+ A7gt4kSa4Mt08fPfVRVGbuNDDYCMf+xc7GURwC/ECUQfBbaGeVFPcOiHxWfkUZX5Zb
+ A0NfBLOyJXBwLxulERBdDgFgwjbtKgMVae5H0oqA5Y/NWYyRgnW3HEz2A0XcaBvckN
+ N0oA8KNck7jcyXBldqYarLLT88SdhKx13UD60mhvz43Bt6Rz+lc1dfpHNG2x8ohv8B
+ za6REsOtEelBfv8JVMFsHv/xAM/tOEvyPfJcyOGIAHexLK146GuiH3tGeRJtaqI+he
+ uq2fG62HxYwXg==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,15 +86,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Mark,=20
+- Defined MIGRATION region type and sub-type.
 
-I was just wondering what it is going to take to have Mac OS sound =
-support in qemu-system-ppc? I have made four versions of my Screamer =
-sound chip patch and you ignored each one. Did you plan on committing =
-your version of Screamer?=20=
+- Defined vfio_device_migration_info structure which will be placed at the
+  0th offset of migration region to get/set VFIO device related
+  information. Defined members of structure and usage on read/write access.
+
+- Defined device states and state transition details.
+
+- Defined sequence to be followed while saving and resuming VFIO device.
+
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+---
+ include/uapi/linux/vfio.h | 228 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 228 insertions(+)
+
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 015516bcfaa3..ad9bb5af3463 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+ #define VFIO_REGION_TYPE_GFX                    (1)
+ #define VFIO_REGION_TYPE_CCW			(2)
++#define VFIO_REGION_TYPE_MIGRATION              (3)
+ 
+ /* sub-types for VFIO_REGION_TYPE_PCI_* */
+ 
+@@ -379,6 +380,233 @@ struct vfio_region_gfx_edid {
+ /* sub-types for VFIO_REGION_TYPE_CCW */
+ #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+ 
++/* sub-types for VFIO_REGION_TYPE_MIGRATION */
++#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
++
++/*
++ * The structure vfio_device_migration_info is placed at the 0th offset of
++ * the VFIO_REGION_SUBTYPE_MIGRATION region to get and set VFIO device related
++ * migration information. Field accesses from this structure are only supported
++ * at their native width and alignment. Otherwise, the result is undefined and
++ * vendor drivers should return an error.
++ *
++ * device_state: (read/write)
++ *      - The user application writes to this field to inform the vendor driver
++ *        about the device state to be transitioned to.
++ *      - The vendor driver should take the necessary actions to change the
++ *        device state. After successful transition to a given state, the
++ *        vendor driver should return success on write(device_state, state)
++ *        system call. If the device state transition fails, the vendor driver
++ *        should return an appropriate -errno for the fault condition.
++ *      - On the user application side, if the device state transition fails,
++ *	  that is, if write(device_state, state) returns an error, read
++ *	  device_state again to determine the current state of the device from
++ *	  the vendor driver.
++ *      - The vendor driver should return previous state of the device unless
++ *        the vendor driver has encountered an internal error, in which case
++ *        the vendor driver may report the device_state VFIO_DEVICE_STATE_ERROR.
++ *      - The user application must use the device reset ioctl to recover the
++ *        device from VFIO_DEVICE_STATE_ERROR state. If the device is
++ *        indicated to be in a valid device state by reading device_state, the
++ *        user application may attempt to transition the device to any valid
++ *        state reachable from the current state or terminate itself.
++ *
++ *      device_state consists of 3 bits:
++ *      - If bit 0 is set, it indicates the _RUNNING state. If bit 0 is clear,
++ *        it indicates the _STOP state. When the device state is changed to
++ *        _STOP, driver should stop the device before write() returns.
++ *      - If bit 1 is set, it indicates the _SAVING state, which means that the
++ *        driver should start gathering device state information that will be
++ *        provided to the VFIO user application to save the device's state.
++ *      - If bit 2 is set, it indicates the _RESUMING state, which means that
++ *        the driver should prepare to resume the device. Data provided through
++ *        the migration region should be used to resume the device.
++ *      Bits 3 - 31 are reserved for future use. To preserve them, the user
++ *      application should perform a read-modify-write operation on this
++ *      field when modifying the specified bits.
++ *
++ *  +------- _RESUMING
++ *  |+------ _SAVING
++ *  ||+----- _RUNNING
++ *  |||
++ *  000b => Device Stopped, not saving or resuming
++ *  001b => Device running, which is the default state
++ *  010b => Stop the device & save the device state, stop-and-copy state
++ *  011b => Device running and save the device state, pre-copy state
++ *  100b => Device stopped and the device state is resuming
++ *  101b => Invalid state
++ *  110b => Error state
++ *  111b => Invalid state
++ *
++ * State transitions:
++ *
++ *              _RESUMING  _RUNNING    Pre-copy    Stop-and-copy   _STOP
++ *                (100b)     (001b)     (011b)        (010b)       (000b)
++ * 0. Running or default state
++ *                             |
++ *
++ * 1. Normal Shutdown (optional)
++ *                             |------------------------------------->|
++ *
++ * 2. Save the state or suspend
++ *                             |------------------------->|---------->|
++ *
++ * 3. Save the state during live migration
++ *                             |----------->|------------>|---------->|
++ *
++ * 4. Resuming
++ *                  |<---------|
++ *
++ * 5. Resumed
++ *                  |--------->|
++ *
++ * 0. Default state of VFIO device is _RUNNNG when the user application starts.
++ * 1. During normal shutdown of the user application, the user application may
++ *    optionally change the VFIO device state from _RUNNING to _STOP. This
++ *    transition is optional. The vendor driver must support this transition but
++ *    must not require it.
++ * 2. When the user application saves state or suspends the application, the
++ *    device state transitions from _RUNNING to stop-and-copy and then to _STOP.
++ *    On state transition from _RUNNING to stop-and-copy, driver must stop the
++ *    device, save the device state and send it to the application through the
++ *    migration region. The sequence to be followed for such transition is given
++ *    below.
++ * 3. In live migration of user application, the state transitions from _RUNNING
++ *    to pre-copy, to stop-and-copy, and to _STOP.
++ *    On state transition from _RUNNING to pre-copy, the driver should start
++ *    gathering the device state while the application is still running and send
++ *    the device state data to application through the migration region.
++ *    On state transition from pre-copy to stop-and-copy, the driver must stop
++ *    the device, save the device state and send it to the user application
++ *    through the migration region.
++ *    Vendor drivers must support the pre-copy state even for implementations
++ *    where no data is provided to the user before the stop-and-copy state. The
++ *    user must not be required to consume all migration data before the device
++ *    transitions to a new state, including the stop-and-copy state.
++ *    The sequence to be followed for above two transitions is given below.
++ * 4. To start the resuming phase, the device state should be transitioned from
++ *    the _RUNNING to the _RESUMING state.
++ *    In the _RESUMING state, the driver should use the device state data
++ *    received through the migration region to resume the device.
++ * 5. After providing saved device data to the driver, the application should
++ *    change the state from _RESUMING to _RUNNING.
++ *
++ * reserved:
++ *      Reads on this field return zero and writes are ignored.
++ *
++ * pending_bytes: (read only)
++ *      The number of pending bytes still to be migrated from the vendor driver.
++ *
++ * data_offset: (read only)
++ *      The user application should read data_offset field from the migration
++ *      region. The user application should read the device data from this
++ *      offset within the migration region during the _SAVING state or write
++ *      the device data during the _RESUMING state. See below for details of
++ *      sequence to be followed.
++ *
++ * data_size: (read/write)
++ *      The user application should read data_size to get the size in bytes of
++ *      the data copied in the migration region during the _SAVING state and
++ *      write the size in bytes of the data copied in the migration region
++ *      during the _RESUMING state.
++ *
++ * The format of the migration region is as follows:
++ *  ------------------------------------------------------------------
++ * |vfio_device_migration_info|    data section                      |
++ * |                          |     ///////////////////////////////  |
++ * ------------------------------------------------------------------
++ *   ^                              ^
++ *  offset 0-trapped part        data_offset
++ *
++ * The structure vfio_device_migration_info is always followed by the data
++ * section in the region, so data_offset will always be nonzero. The offset
++ * from where the data is copied is decided by the kernel driver. The data
++ * section can be trapped, mmapped, or partitioned, depending on how the kernel
++ * driver defines the data section. The data section partition can be defined
++ * as mapped by the sparse mmap capability. If mmapped, data_offset must be
++ * page aligned, whereas initial section which contains the
++ * vfio_device_migration_info structure, might not end at the offset, which is
++ * page aligned. The user is not required to access through mmap regardless
++ * of the capabilities of the region mmap.
++ * The vendor driver should determine whether and how to partition the data
++ * section. The vendor driver should return data_offset accordingly.
++ *
++ * The sequence to be followed while in pre-copy state and stop-and-copy state
++ * is as follows:
++ * a. Read pending_bytes, indicating the start of a new iteration to get device
++ *    data. Repeated read on pending_bytes at this stage should have no side
++ *    effects.
++ *    If pending_bytes == 0, the user application should not iterate to get data
++ *    for that device.
++ *    If pending_bytes > 0, perform the following steps.
++ * b. Read data_offset, indicating that the vendor driver should make data
++ *    available through the data section. The vendor driver should return this
++ *    read operation only after data is available from (region + data_offset)
++ *    to (region + data_offset + data_size).
++ * c. Read data_size, which is the amount of data in bytes available through
++ *    the migration region.
++ *    Read on data_offset and data_size should return the offset and size of
++ *    the current buffer if the user application reads data_offset and
++ *    data_size more than once here.
++ * d. Read data_size bytes of data from (region + data_offset) from the
++ *    migration region.
++ * e. Process the data.
++ * f. Read pending_bytes, which indicates that the data from the previous
++ *    iteration has been read. If pending_bytes > 0, go to step b.
++ *
++ * The user application can transition from the _SAVING|_RUNNING
++ * (pre-copy state) to the _SAVING (stop-and-copy) state regardless of the
++ * number of pending bytes. The user application should iterate in _SAVING
++ * (stop-and-copy) until pending_bytes is 0.
++ *
++ * The sequence to be followed while _RESUMING device state is as follows:
++ * While data for this device is available, repeat the following steps:
++ * a. Read data_offset from where the user application should write data.
++ * b. Write migration data starting at the migration region + data_offset for
++ *    the length determined by data_size from the migration source.
++ * c. Write data_size, which indicates to the vendor driver that data is
++ *    written in the migration region. Vendor driver must return this write
++ *    operations on consuming data. Vendor driver should apply the
++ *    user-provided migration region data to the device resume state.
++ *
++ * If an error occurs during the above sequences, the vendor driver can return
++ * an error code for next read() or write() operation, which will terminate the
++ * loop. The user application should then take the next necessary action, for
++ * example, failing migration or terminating the user application.
++ *
++ * For the user application, data is opaque. The user application should write
++ * data in the same order as the data is received and the data should be of
++ * same transaction size at the source.
++ */
++
++struct vfio_device_migration_info {
++	__u32 device_state;         /* VFIO device state */
++#define VFIO_DEVICE_STATE_STOP      (0)
++#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
++#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
++#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
++#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
++				     VFIO_DEVICE_STATE_SAVING |  \
++				     VFIO_DEVICE_STATE_RESUMING)
++
++#define VFIO_DEVICE_STATE_VALID(state) \
++	(state & VFIO_DEVICE_STATE_RESUMING ? \
++	(state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
++
++#define VFIO_DEVICE_STATE_IS_ERROR(state) \
++	((state & VFIO_DEVICE_STATE_MASK) == (VFIO_DEVICE_STATE_SAVING | \
++					      VFIO_DEVICE_STATE_RESUMING))
++
++#define VFIO_DEVICE_STATE_SET_ERROR(state) \
++	((state & ~VFIO_DEVICE_STATE_MASK) | VFIO_DEVICE_SATE_SAVING | \
++					     VFIO_DEVICE_STATE_RESUMING)
++
++	__u32 reserved;
++	__u64 pending_bytes;
++	__u64 data_offset;
++	__u64 data_size;
++};
++
+ /*
+  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+  * which allows direct access to non-MSIX registers which happened to be within
+-- 
+2.7.0
+
 
