@@ -2,64 +2,81 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84780C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD2DC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:28:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 577FE2073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:19:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577FE2073B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id CA0FC20733
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:27:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YaP5p7uB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA0FC20733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIuJu-0002E3-EZ
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 09:19:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46282)
+	id 1jIuSM-0007PR-VS
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 09:27:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47874)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuzenghui@huawei.com>) id 1jIuIq-00018Q-C1
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:18:09 -0400
+ (envelope-from <armbru@redhat.com>) id 1jIuR2-0006R7-5e
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuzenghui@huawei.com>) id 1jIuIp-0006SU-9U
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:18:08 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3731 helo=huawei.com)
+ (envelope-from <armbru@redhat.com>) id 1jIuR0-0006nq-2F
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:26:35 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:47316)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
- id 1jIuIi-0006Dn-V3; Mon, 30 Mar 2020 09:18:01 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 6D6481EB6A23AB42A64A;
- Mon, 30 Mar 2020 21:17:54 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
- 21:17:48 +0800
-Subject: Re: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table
- migration test
-To: Auger Eric <eric.auger@redhat.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-14-eric.auger@redhat.com>
- <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
- <ea74559c-2ab4-752c-e587-2bf40eab14b0@redhat.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <0e73fd13-ca18-2d17-2267-fd5d852e3ac8@huawei.com>
-Date: Mon, 30 Mar 2020 21:17:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jIuQz-0006kk-T8
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:26:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585574793;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7gJlPOL1Z+hxa4i8A/fTq6lrhFzYdyDRoYnXLJtaQ24=;
+ b=YaP5p7uBUpY3VJmjeb6UWwbLRR3Dnek2xX9raQZRpuFzTi4bdGsSqAa4eDW1AYTH8fyaWJ
+ nSIloV/l3pid2KcVCQ4Cn91ZFmO5jc6Clc/Obs8DirInkANjCa8er6wU5kRMfoziC7F7zm
+ lkbV5ZU5HvbzhpCF0c0zQlC7uBT5StA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-Rh7LK2uyNxiHOhr3mwMtyw-1; Mon, 30 Mar 2020 09:26:28 -0400
+X-MC-Unique: Rh7LK2uyNxiHOhr3mwMtyw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0B801005509;
+ Mon, 30 Mar 2020 13:26:26 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53E4F60BE2;
+ Mon, 30 Mar 2020 13:26:26 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D7CA411385E2; Mon, 30 Mar 2020 15:26:24 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: deprecation of in-tree builds
+References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+Date: Mon, 30 Mar 2020 15:26:24 +0200
+In-Reply-To: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+ (Peter Maydell's message of "Sat, 21 Mar 2020 20:50:34 +0000")
+Message-ID: <87v9mmug73.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <ea74559c-2ab4-752c-e587-2bf40eab14b0@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,52 +88,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, thuth@redhat.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/3/30 20:38, Auger Eric wrote:
-> Hi Zenghui,
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-[...]
+> AIUI from Paolo, the intention is to deprecate and eventually
+> stop supporting "in-tree" builds, so that the only option is
+> building in a separate build directory. I thought we should
+> probably mention that in the 5.0 changelog, so I wrote up some
+> text:
+>
+> https://wiki.qemu.org/ChangeLog/5.0#Build_Information
 
->>> +
->>> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe0] + GICR_PENDBA=
-SER;
->>> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
->>> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe1] + GICR_PENDBA=
-SER;
->>> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
->>> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe0);
->>> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe1);
->>
->> I don't know how the migration gets implemented in kvm-unit-tests.
->> But is there any guarantee that the LPIs will only be triggered on the
->> destination side? As once the EnableLPIs bit becomes 1, VGIC will star=
-t
->> reading the pending bit in guest memory and potentially injecting LPIs
->> into the target vcpu (in the source side).
->=20
-> I expect some LPIs to hit on source and some others to hit on the
-> destination. To me, this does not really matter as long as the handlers
-> gets called and accumulate the stats. Given the number of LPIs, we will
-> at least test the migration of some of the pending bits and especially
-> adjacent ones. It does work as it allows to test your fix:
->=20
-> ca185b260951  KVM: arm/arm64: vgic: Don't rely on the wrong pending tab=
-le
+Overdue.  Thanks for doing this!
 
-Fair enough. Thanks for your explanation!
+> Suggestions for changes/comments etc welcome.
 
+Looks fine to me.
 
-Zenghui
+> (One thing we will need to fix before we can do separate build
+> tree is the Coverity Scan build process, which (a) does an
+> in-tree build (b) can't be easily switched to a builddir because
+> all the source paths get baked into the scan results and moving
+> to a builddir changes them all...)
+>
+> We could also make configure actively warn if used in
+> the source tree.
+
+Unless we commit to automatically creating a default out-of-tree build
+directory for this usage.  I wouldn't bother myself.
 
 
