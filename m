@@ -2,62 +2,81 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9253CC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B671CC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AECA20733
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:03:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AECA20733
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 85B8920733
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 13:08:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q2DRcg00"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85B8920733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIu4G-00060G-ID
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 09:03:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42847)
+	id 1jIu97-00027q-M9
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 09:08:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1jIu2n-0004cA-0N
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:01:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jIu8L-0001B6-PI
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:07:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1jIu2l-0005Js-MY
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:01:32 -0400
-Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:38532)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jIu2l-0005Hv-FZ
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:01:31 -0400
-Received: from player758.ha.ovh.net (unknown [10.108.35.185])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 378A11234C5
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 15:01:28 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player758.ha.ovh.net (Postfix) with ESMTPSA id 3003A10F36B8C;
- Mon, 30 Mar 2020 13:01:21 +0000 (UTC)
-Date: Mon, 30 Mar 2020 15:01:20 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 2/7] target/ppc: Introduce a relocation bool in
- ppc_radix64_handle_mmu_fault()
-Message-ID: <20200330150120.760cef6e@bahia.lan>
-In-Reply-To: <20200330094946.24678-3-clg@kaod.org>
-References: <20200330094946.24678-1-clg@kaod.org>
- <20200330094946.24678-3-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <peter.maydell@linaro.org>) id 1jIu8K-0003kw-C2
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:07:17 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:32781)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jIu8K-0003jy-1y
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 09:07:16 -0400
+Received: by mail-oi1-x241.google.com with SMTP id m14so15623250oic.0
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 06:07:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=N9kafDzItByaOJgeiXXAocdwy9zkWyh6uH03myYBXi8=;
+ b=q2DRcg003lIzIt4qr4qLLzhprWqRI72/HbDgA7X060z0UO53Yyd7qoCk5w/Dz1sfyE
+ hYLNCETWlHSTapt6kLIZWvqwYdyhSxKEck6RSovl0orEeGuhDIvB5py0E2VEN0yl57bX
+ XwSMuYBqto++M7gAF3kib4Q7h+bZhXxesfzAQPbyam9RTd+jWALgGHoj62HIgqvpcEsY
+ D9NRtAn9Boshc80WG/AWhtlRdldQL5qfhAgUzW8vTmESTdDHic+ZXe4baYmt1DKV/mRi
+ mHEds3aR/F0PMRj5CUWtRUY3jIPa1gQ0Gzu2QM32vvAcifwWZMSncAmJ64sznE3VEVle
+ SwAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=N9kafDzItByaOJgeiXXAocdwy9zkWyh6uH03myYBXi8=;
+ b=t3qYASMY6e3PjOaTDGtNRgJ8D6G4KB71hL5YHg0urMm/rzuHImvX0IBHOgaApEkZb9
+ UrGFcOh0pM6IFNXZ35wMnGXCa0p1hvvhmTwnDMp7EoatsWBW8OWhTWY6TXI94dDfXQHc
+ x2TBIStycc3icvFoz0rvFc8P+h4ZTiFsCE6CYULjI4FMu0azKAsxrk9vQM41TdoGxt75
+ VUr6kgypeoPNmMbpk8/BIiH3KQGW/2k6MEDFGy0QDpWWnugXDEYHjYBdl15hccVDUf9A
+ 4qHYGz4/X8GvGXYPGjzC8cIIunpDoXRsB5S1UTjLf8BPPFnfue/7tRLk8veoSGDrVsX1
+ TmTw==
+X-Gm-Message-State: ANhLgQ3MEVxIzTGCMF3gAk03YOLsCHrfB0RjzEh3MSd8FcIR11OoyopF
+ zXOy67Tw+vle6TmrmzoTAOdX66NGJZjBbnj3R40cQA==
+X-Google-Smtp-Source: ADFU+vsGj8ysKF96hHAylAfIGqiljqkHSf2FyDYUSEq79ErldEXuppocUJjy50G/llp5kgQBFeoTGcxQ9MOppHEzlnc=
+X-Received: by 2002:a05:6808:64c:: with SMTP id
+ z12mr7187724oih.146.1585573634743; 
+ Mon, 30 Mar 2020 06:07:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 17124937586992585099
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeihedgheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejheekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.73.133
+References: <20200328140232.17278-1-changbin.du@gmail.com>
+In-Reply-To: <20200328140232.17278-1-changbin.du@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Mar 2020 14:07:03 +0100
+Message-ID: <CAFEAcA8B=WB9ow3ZU4jcf7Z+dXizPRpsGp_BB7KPG4hfhH-cUw@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: fix incorrect current EL bug in aarch32
+ exception emulation
+To: Changbin Du <changbin.du@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,50 +88,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 30 Mar 2020 11:49:41 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-
-> It will ease the introduction of new routines for partition-scoped
-> Radix translation.
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On Sat, 28 Mar 2020 at 14:02, Changbin Du <changbin.du@gmail.com> wrote:
+>
+> The arm_current_el() should be invoked after mode switching. Otherwise, we
+> get a wrong current EL value, since current EL is also determined by
+> current mode.
+>
+> Fixes: 4a2696c0d4 ("target/arm: Set PAN bit as required on exception entry")
+> Signed-off-by: Changbin Du <changbin.du@gmail.com>
 > ---
+>  target/arm/helper.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b7b6887241..163c91a1cc 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -9172,7 +9172,6 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+>
+>      /* Change the CPU state so as to actually take the exception. */
+>      switch_mode(env, new_mode);
+> -    new_el = arm_current_el(env);
+>
+>      /*
+>       * For exceptions taken to AArch32 we must clear the SS bit in both
+> @@ -9184,6 +9183,10 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+>      env->condexec_bits = 0;
+>      /* Switch to the new mode, and to the correct instruction set.  */
+>      env->uncached_cpsr = (env->uncached_cpsr & ~CPSR_M) | new_mode;
+> +
+> +    /* This must be after mode switching. */
+> +    new_el = arm_current_el(env);
+> +
+>      /* Set new mode endianness */
+>      env->uncached_cpsr &= ~CPSR_E;
+>      if (env->cp15.sctlr_el[new_el] & SCTLR_EE) {
+> --
+> 2.25.1
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
 
->  target/ppc/mmu-radix64.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-> index 99678570581b..f6007e956569 100644
-> --- a/target/ppc/mmu-radix64.c
-> +++ b/target/ppc/mmu-radix64.c
-> @@ -229,12 +229,13 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, v=
-addr eaddr, int rwx,
->      uint64_t lpid =3D 0, pid =3D 0, offset, size, prtbe0, pte;
->      int page_size, prot, fault_cause =3D 0;
->      ppc_v3_pate_t pate;
-> +    bool relocation;
-> =20
->      assert((rwx =3D=3D 0) || (rwx =3D=3D 1) || (rwx =3D=3D 2));
-> =20
-> +    relocation =3D ((rwx =3D=3D 2) && (msr_ir =3D=3D 1)) || ((rwx !=3D 2=
-) && (msr_dr =3D=3D 1));
->      /* HV or virtual hypervisor Real Mode Access */
-> -    if ((msr_hv || cpu->vhyp) &&
-> -        (((rwx =3D=3D 2) && (msr_ir =3D=3D 0)) || ((rwx !=3D 2) && (msr_=
-dr =3D=3D 0)))) {
-> +    if (!relocation && (msr_hv || cpu->vhyp)) {
->          /* In real mode top 4 effective addr bits (mostly) ignored */
->          raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
-> =20
 
+Applied to target-arm.next, thanks.
+
+-- PMM
 
