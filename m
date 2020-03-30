@@ -2,90 +2,82 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF417C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B6AC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:37:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89720206E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 407BE20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:37:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r4FrTwHG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89720206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evy2x4vE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407BE20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIqfu-0003to-OM
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:25:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38871)
+	id 1jIqrQ-0006FQ-Cq
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:37:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jIqfH-0003TF-Pm
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:25:04 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jIqqm-0005q2-E8
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jIqfG-0000n1-5w
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:25:03 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33183)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jIqfF-0000mY-RS
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:25:02 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a25so20727122wrd.0
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 02:25:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=W5qnvgXrKg7gRZOgRs37VUCIGjEBPuxmiPn831ZnT+k=;
- b=r4FrTwHG0PTDSv65IWc87IVjerdeMXqU6CfkegjNQEescE14TB7dTNRo8rOzgf5Ckl
- WGmZe/y0i0aNKxf5qJZ1LNZHVIOVp3Arvx/gRjov/W0Xk7z7pTIn3yNKzXtIswOv3mil
- l6lzraWaCmRWxirTM0UVwu5lZV0/cyMCvTa7KhbRNA8Mxx1GK4q7L/Otk/oAJYuB/h0q
- gzW+vbK5kIy71N2I1mMEVXibSkQ+V6FNWFBCuOaRnJTw7cWC3thH5kbCtsXHcFsAZsR7
- sb2gsoOkBaQhHm9Sy75vQZl2ru2rHu5Z2i3yW2BHpgtj/KWSG3PpDNMe1aSYm5U6XR0U
- nU5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=W5qnvgXrKg7gRZOgRs37VUCIGjEBPuxmiPn831ZnT+k=;
- b=gLvtl/R3hOWdgZANx2PEHPwnyYoGA8/tKdI97mAMIhKxGkOLRskGEaWDKOG/TiVnsR
- DFn23SCi0Xa0YKpq29zHf6BcGHYijnPRzpygErqDGayS1Fv52g5ERlyWWKwbidrLpRFq
- G8C/pjoF8UPlZ8GfL2Ihaz+T4wL7A0+WDAsOEL/ROJiqwxwdqSEEExjQGCfdFyltBC+f
- rJnJ65f5aT4FBrIfH0ag8gQ8ZDk32rnpDFPHpmfTDgulgkma1f7mIJ22SOxFGQJrsC/H
- OKEutxqGyf7GEtAL/9dZhqwNhTT72AtkZbS+M9QSGtlPuOcX0SYPJZPsL2g+iq7nLUFA
- h9QA==
-X-Gm-Message-State: ANhLgQ2ffNCnEnrX7UBqGtdfmeZ1tXzZBku4klQqBvLQvZeQ9WHqHZIr
- Eugs41gVIVNrJtz99TEtPjOBLg==
-X-Google-Smtp-Source: ADFU+vtSLN8G1S3P4odmzUxU2awZ7SFX9XsYv0mPGJOjBrZc4WmhIvoGDtd01DiMsIG4qe0LfzvIGw==
-X-Received: by 2002:adf:eb51:: with SMTP id u17mr14770581wrn.29.1585560300296; 
- Mon, 30 Mar 2020 02:25:00 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k83sm9820838wma.3.2020.03.30.02.24.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 30 Mar 2020 02:24:58 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 12B8C1FF7E;
- Mon, 30 Mar 2020 10:24:58 +0100 (BST)
-References: <20200327220353.27233-1-richard.henderson@linaro.org>
- <20200327220353.27233-5-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH for-5.0 v3 4/7] configure: Always detect -no-pie
- toolchain support
-In-reply-to: <20200327220353.27233-5-richard.henderson@linaro.org>
-Date: Mon, 30 Mar 2020 10:24:57 +0100
-Message-ID: <87k132gpp2.fsf@linaro.org>
+ (envelope-from <eric.auger@redhat.com>) id 1jIqqk-0006ff-Jm
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:36:55 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60838)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jIqqk-0006fI-EA
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:36:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585561013;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GsQts7KdvM7OmuNRLhUrsthOkUg/qgVxfy93Ru1gfZY=;
+ b=evy2x4vEuSEzfOEfMOBk7XF0LlGg9RwTvNCG35I6npTYRAPhPaZ6QfS7xiTu8M55RWmvbq
+ vBQEFdfY5KPNoZiKFA0tpVgcqz4OHMXaKLms+LMZBThs+zYCl3YbTWQzK4CvkFUP8SabPF
+ boQ5wulj/gkF+fAld2GXv73tuee+HbY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-493-H-Aylf-TMzeyq1sp7BqO4w-1; Mon, 30 Mar 2020 05:36:52 -0400
+X-MC-Unique: H-Aylf-TMzeyq1sp7BqO4w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A0A6E6BAC;
+ Mon, 30 Mar 2020 09:36:43 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D17C9DA0FB;
+ Mon, 30 Mar 2020 09:36:23 +0000 (UTC)
+Subject: Re: [PATCH v2 03/22] vfio: check VFIO_TYPE1_NESTING_IOMMU support
+To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, peterx@redhat.com
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-4-git-send-email-yi.l.liu@intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2c65e531-1cc8-dc01-4b06-e7baff58addd@redhat.com>
+Date: Mon, 30 Mar 2020 11:36:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <1585542301-84087-4-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,74 +89,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, dim@FreeBSD.org, qemu-devel@nongnu.org,
- roger.pau@citrix.com
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+ pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Yi,
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> The CFLAGS_NOPIE and LDFLAGS_NOPIE variables are used
-> in pc-bios/optionrom/Makefile, which has nothing to do
-> with the PIE setting of the main qemu executables.
->
-> This overrides any operating system default to build
-> all executables as PIE, which is important for ROMs.
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 3/30/20 6:24 AM, Liu Yi L wrote:
+> VFIO needs to check VFIO_TYPE1_NESTING_IOMMU support with Kernel before
+> further using it. e.g. requires to check IOMMU UAPI version.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 > ---
->  configure | 18 ++++++++----------
->  1 file changed, 8 insertions(+), 10 deletions(-)
->
-> diff --git a/configure b/configure
-> index cbde833f6e..7ba18783cb 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2107,26 +2107,24 @@ if ! compile_prog "-Werror" "" ; then
->  	"Thread-Local Storage (TLS). Please upgrade to a version that does."
->  fi
->=20=20
-> -if test "$pie" !=3D "no" ; then
-> -  cat > $TMPC << EOF
-> +cat > $TMPC << EOF
->=20=20
->  #ifdef __linux__
->  #  define THREAD __thread
->  #else
->  #  define THREAD
->  #endif
-> -
->  static THREAD int tls_var;
-> -
->  int main(void) { return tls_var; }
-> -
->  EOF
-> -  # check we support --no-pie first...
-> -  if compile_prog "-Werror -fno-pie" "-no-pie"; then
-> -    CFLAGS_NOPIE=3D"-fno-pie"
-> -    LDFLAGS_NOPIE=3D"-nopie"
-> -  fi
->=20=20
-> +# Check we support --no-pie first; we will need this for building ROMs.
-> +if compile_prog "-Werror -fno-pie" "-no-pie"; then
-> +  CFLAGS_NOPIE=3D"-fno-pie"
-> +  LDFLAGS_NOPIE=3D"-no-pie"
-> +fi
-> +
-> +if test "$pie" !=3D "no" ; then
->    if compile_prog "-fPIE -DPIE" "-pie"; then
->      QEMU_CFLAGS=3D"-fPIE -DPIE $QEMU_CFLAGS"
->      QEMU_LDFLAGS=3D"-pie $QEMU_LDFLAGS"
+>  hw/vfio/common.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 0b3593b..c276732 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1157,12 +1157,21 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
+>  static int vfio_get_iommu_type(VFIOContainer *container,
+>                                 Error **errp)
+>  {
+> -    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
+> +    int iommu_types[] = { VFIO_TYPE1_NESTING_IOMMU,
+> +                          VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
+>                            VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
+> -    int i;
+> +    int i, version;
+>  
+>      for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
+>          if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
+> +            if (iommu_types[i] == VFIO_TYPE1_NESTING_IOMMU) {
+> +                version = ioctl(container->fd, VFIO_CHECK_EXTENSION,
+> +                                VFIO_NESTING_IOMMU_UAPI);
+> +                if (version < IOMMU_UAPI_VERSION) {
+> +                    info_report("IOMMU UAPI incompatible for nesting");
+> +                    continue;
+> +                }
+> +            }
+This means that by default VFIO_TYPE1_NESTING_IOMMU wwould be chosen. I
+don't think this what we want. On ARM this would mean that for a
+standard VFIO assignment without vIOMMU, SL will be used instead of FL.
+This may not be harmless.
 
+For instance, in "[RFC v6 09/24] vfio: Force nested if iommu requires
+it", I use nested only if I detect we have a vSMMU. Otherwise I keep the
+legacy VFIO_TYPE1v2_IOMMU.
 
---=20
-Alex Benn=C3=A9e
+Thanks
+
+Eric
+>              return iommu_types[i];
+>          }
+>      }
+> @@ -1278,6 +1287,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>      }
+>  
+>      switch (container->iommu_type) {
+> +    case VFIO_TYPE1_NESTING_IOMMU:
+>      case VFIO_TYPE1v2_IOMMU:
+>      case VFIO_TYPE1_IOMMU:
+>      {
+> 
+
 
