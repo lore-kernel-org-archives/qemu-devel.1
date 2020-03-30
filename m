@@ -2,81 +2,59 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 476B5C2D0EE
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F64AC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D11E20714
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:48:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d0gu+1Vm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D11E20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0EEEE20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:51:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EEEE20714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIr21-0008Cm-69
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:48:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42441)
+	id 1jIr4d-00023A-6a
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:51:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jIr1C-0007hA-2a
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:47:43 -0400
+ (envelope-from <clg@kaod.org>) id 1jIr3Z-0000QW-Jl
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:50:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1jIr1A-0003sd-Jl
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:47:41 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41910)
+ (envelope-from <clg@kaod.org>) id 1jIr3Y-0005Wv-2H
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:50:09 -0400
+Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:59005)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jIr1A-0003s1-9M
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:47:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585561659;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fGZ48B7G3BziEjDZPS6wc9j+vNKY5YihIl3COxIMS0U=;
- b=d0gu+1Vmqu/7N+ZSMSfK2w4LdmWbos4HKGTO3Vut4gW5mO639O/OGpENzL95DCDulnzsms
- 5dXaNWOuIPeDRt0lWBelomYQkSDeyqzEFMbdkKWFhHnnYshT0wN2fwSweJ3Wf+7cypm/A1
- 04mp7NUG3NAPQj0rQ/D+FhLidDjvsec=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-zT3dh9OCM-e4u_k9ykyjqw-1; Mon, 30 Mar 2020 05:47:36 -0400
-X-MC-Unique: zT3dh9OCM-e4u_k9ykyjqw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05DF71005509;
- Mon, 30 Mar 2020 09:47:35 +0000 (UTC)
-Received: from [10.72.13.226] (ovpn-13-226.pek2.redhat.com [10.72.13.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7E0D5E026;
- Mon, 30 Mar 2020 09:47:33 +0000 (UTC)
-Subject: Re: [PULL 00/13] Net patches
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1585307647-24456-1-git-send-email-jasowang@redhat.com>
- <CAFEAcA-u-vp6ETypJLTakc0bCTYfg7_9ONF6Za7GsmOtz6qXVQ@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <463a4d56-d843-a1a2-f078-b82c922730d9@redhat.com>
-Date: Mon, 30 Mar 2020 17:47:32 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jIr3X-0005TY-O3
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:50:08 -0400
+Received: from player729.ha.ovh.net (unknown [10.110.103.132])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 433532744B4
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 11:49:59 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player729.ha.ovh.net (Postfix) with ESMTPSA id 6C50E110F4F99;
+ Mon, 30 Mar 2020 09:49:52 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH 0/7] target/ppc: Add support for Radix partition-scoped
+ translation
+Date: Mon, 30 Mar 2020 11:49:39 +0200
+Message-Id: <20200330094946.24678-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-u-vp6ETypJLTakc0bCTYfg7_9ONF6Za7GsmOtz6qXVQ@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 13890790104737156070
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeihedgvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 46.105.40.108
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,110 +66,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Nicholas Piggin <npiggin@gmail.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello,
 
-On 2020/3/27 =E4=B8=8B=E5=8D=887:36, Peter Maydell wrote:
-> On Fri, 27 Mar 2020 at 11:14, Jason Wang <jasowang@redhat.com> wrote:
->> The following changes since commit cfe68ae025f704f336d7dd3d1903ce37b4458=
-31d:
->>
->>    Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0=
--pull-request' into staging (2020-03-26 20:55:54 +0000)
->>
->> are available in the git repository at:
->>
->>    https://github.com/jasowang/qemu.git tags/net-pull-request
->>
->> for you to fetch changes up to f3b364f4f77fcb24cec468f518bf5e093dc27cb7:
->>
->>    hw/net/allwinner-sun8i-emac.c: Fix REG_ADDR_HIGH/LOW reads (2020-03-2=
-7 18:59:47 +0800)
->>
->> ----------------------------------------------------------------
->>
->> ----------------------------------------------------------------
-> Hi; this fails to compile (all platforms):
+The Radix tree translation model currently supports process-scoped
+translation for the PowerNV machine (Hypervisor mode) and for the
+pSeries machine (Guest mode). Guests running under an emulated
+Hypervisor (PowerNV machine) require a new type of Radix translation,
+called partition-scoped, which is missing today.
 
+The Radix tree translation is a 2 steps process. The first step,
+process-scoped translation, converts an effective Address to a guest
+real address, and the second step, partition-scoped translation,
+converts a guest real address to a host real address.
 
-My bad, forget to run full docker test before sending the pull request.
+There are difference cases to covers :=20
 
+* Hypervisor real mode access: no Radix translation.
 
->
-> /home/petmay01/qemu-for-merges/hw/net/allwinner-sun8i-emac.c:773:20:
-> error: initialization from incompatible pointer type
-> [-Werror=3Dincompatible-pointer-types]
->       .can_receive =3D allwinner_sun8i_emac_can_receive,
->                      ^
-> /home/petmay01/qemu-for-merges/hw/net/allwinner-sun8i-emac.c:773:20:
-> note: (near initialization for
-> 'net_allwinner_sun8i_emac_info.can_receive')
->
->
-> There's also this one, though not every compiler picked it up:
->
-> /home/peter.maydell/qemu/hw/net/i82596.c: In function 'i82596_receive':
-> /home/peter.maydell/qemu/hw/net/i82596.c:657:30: error: comparison of
-> unsigned expression >=3D 0 is always true [-Werror=3Dtype-limits]
->                   assert(bufsz >=3D 0);
->                                ^
-> /home/peter.maydell/qemu/hw/net/i82596.c:657:30: error: comparison of
-> unsigned expression >=3D 0 is always true [-Werror=3Dtype-limits]
->                   assert(bufsz >=3D 0);
->                                ^
->
->
-> For the first error, I think this needs squashing into
-> "hw/net: Make NetCanReceive() return a boolean":
->
-> diff --git a/hw/net/allwinner-sun8i-emac.c b/hw/net/allwinner-sun8i-emac.=
-c
-> index fc67a1be70..28637ff4c1 100644
-> --- a/hw/net/allwinner-sun8i-emac.c
-> +++ b/hw/net/allwinner-sun8i-emac.c
-> @@ -395,7 +395,7 @@ static void
-> allwinner_sun8i_emac_flush_desc(FrameDescriptor *desc,
->       cpu_physical_memory_write(phys_addr, desc, sizeof(*desc));
->   }
->
-> -static int allwinner_sun8i_emac_can_receive(NetClientState *nc)
-> +static bool allwinner_sun8i_emac_can_receive(NetClientState *nc)
->   {
->       AwSun8iEmacState *s =3D qemu_get_nic_opaque(nc);
->       FrameDescriptor desc;
->
->
-> Squashing this into my
-> "hw/net/i82596.c: Avoid reading off end of buffer in i82596_receive()"
-> commit fixes the second error.
->
-> diff --git a/hw/net/i82596.c b/hw/net/i82596.c
-> index a9bdbac339..055c3a1470 100644
-> --- a/hw/net/i82596.c
-> +++ b/hw/net/i82596.c
-> @@ -653,8 +653,8 @@ ssize_t i82596_receive(NetClientState *nc, const
-> uint8_t *buf, size_t sz)
->
->               if (bufcount > 0) {
->                   /* Still some of the actual data buffer to transfer */
-> +                assert(bufsz >=3D bufcount);
->                   bufsz -=3D bufcount;
-> -                assert(bufsz >=3D 0);
->                   address_space_write(&address_space_memory, rba,
->                                       MEMTXATTRS_UNSPECIFIED, buf, bufcou=
-nt);
->                   rba +=3D bufcount;
->
-> thanks
-> -- PMM
->
+* Hypervisor or host application access (quadrant 0 and 3) with
+  relocation on: process-scoped translation.
 
-Right, will fix them.
+* Guest OS real mode access: only partition-scoped translation.
 
-Thanks
+* Guest OS real or guest application access (quadrant 0 and 3) with
+  relocation on: both process-scoped translation and partition-scoped
+  translations.
 
+* Hypervisor access in quadrant 1 and 2 with relocation on: both
+  process-scoped translation and partition-scoped translations.
+
+The radix tree partition-scoped translation is performed using tables
+pointed to by the first double-word of the Partition Table Entries and
+process-scoped translation uses tables pointed to by the Process Table
+Entries (second double-word of the Partition Table Entries).
+
+Both partition-scoped and process-scoped translations process are
+identical and thus the radix tree traversing code is largely reused.
+However, errors in partition-scoped translations generate hypervisor
+exceptions.
+
+Based on work from Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+Thanks,
+
+C.
+
+C=C3=A9dric Le Goater (6):
+  target/ppc: Introduce a relocation bool in  ppc_radix64_handle_mmu_faul=
+t()
+  target/ppc: Assert if HV mode is set when running under a pseries machi=
+ne
+  target/ppc: Introduce ppc_radix64_xlate() for Radix tree translation
+  target/ppc: Rework ppc_radix64_walk_tree() for partition-scoped transla=
+tion
+  target/ppc: Extend ppc_radix64_check_prot() with a 'partition_scoped' b=
+ool
+  target/ppc: Add support for Radix partition-scoped translation
+
+Suraj Jitindar Singh (1):
+  target/ppc: Enforce that the root page directory size must be at least
+    5
+
+ target/ppc/cpu.h         |   3 +
+ target/ppc/excp_helper.c |   3 +-
+ target/ppc/mmu-radix64.c | 411 +++++++++++++++++++++++++++++----------
+ 3 files changed, 308 insertions(+), 109 deletions(-)
+
+--=20
+2.21.1
 
 
