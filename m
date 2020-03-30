@@ -2,59 +2,80 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DF6C2D0E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B9FC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 892C4206CC
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:20:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 892C4206CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6DFE0206CC
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:21:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POKiuXfR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DFE0206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIx8t-00086s-Na
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:20:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47990)
+	id 1jIx9n-0000nZ-Km
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIx8D-0007dV-Qq
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:19:23 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jIx8m-0008AL-FZ
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIx8B-0004tr-RX
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:19:21 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:50093)
+ (envelope-from <kwolf@redhat.com>) id 1jIx8k-0005RE-QC
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:19:55 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:58327)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jIx8A-0004ok-Vn; Mon, 30 Mar 2020 12:19:19 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1278404|-1; CH=green; DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.466062-0.0104836-0.523454;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03295; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=11; RT=11; SR=0; TI=SMTPD_---.H7kV-tp_1585585151; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H7kV-tp_1585585151)
- by smtp.aliyun-inc.com(10.147.42.198);
- Tue, 31 Mar 2020 00:19:11 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v7 21/61] target/riscv: vector single-width integer
- multiply-add instructions
-Date: Mon, 30 Mar 2020 23:35:53 +0800
-Message-Id: <20200330153633.15298-22-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jIx8k-0005QW-IJ
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:19:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585585194;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NHEAqRCYnJ/yCYLxc5/xSwCe24zmb5UFzAafIhc4Ztc=;
+ b=POKiuXfRp3AM9QxdiIyCmfLGoYIhJ4lQyzbl30ery89UyXitL7H5eWRwH7kLvFGM+jXB+7
+ xQQx4MD+KLI0REQ6AUdB0BZvk+ofqsHgComesRL1y0QLvCUOyi/XWVOAG4r010f0+NNGJd
+ wvGMR88NWVMrMO+sVvu7qBxw66SgcM0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-VfsL5pJQOXCNA9h0V-K0ng-1; Mon, 30 Mar 2020 12:19:49 -0400
+X-MC-Unique: VfsL5pJQOXCNA9h0V-K0ng-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45AEE18C8C01;
+ Mon, 30 Mar 2020 16:19:48 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-66.ams2.redhat.com [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B16E5C1B5;
+ Mon, 30 Mar 2020 16:19:46 +0000 (UTC)
+Date: Mon, 30 Mar 2020 18:19:45 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v9 08/14] iotests: touch up log function signature
+Message-ID: <20200330161945.GG6139@linux.fritz.box>
+References: <20200324232103.4195-1-jsnow@redhat.com>
+ <20200324232103.4195-9-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <20200324232103.4195-9-jsnow@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,198 +87,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
+ philmd@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   | 33 ++++++++++
- target/riscv/insn32.decode              |  8 +++
- target/riscv/insn_trans/trans_rvv.inc.c | 10 +++
- target/riscv/vector_helper.c            | 88 +++++++++++++++++++++++++
- 4 files changed, 139 insertions(+)
+Am 25.03.2020 um 00:20 hat John Snow geschrieben:
+> Representing nested, recursive data structures in mypy is notoriously
+> difficult; the best we can reliably do right now is denote the atom
+> types as "Any" while describing the general shape of the data.
+>=20
+> Regardless, this fully annotates the log() function.
+>=20
+> Typing notes:
+>=20
+> TypeVar is a Type variable that can optionally be constrained by a
+> sequence of possible types. This variable is bound per-invocation such
+> that the signature for filter=3D() requires that its callables take e.g. =
+a
+> str and return a str.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index e5c3a66903..08c2544b20 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -614,3 +614,36 @@ DEF_HELPER_6(vwmulu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwmulsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwmulsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwmulsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index ae7cfa3e28..b49b60aea1 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -385,6 +385,14 @@ vwmulsu_vv      111010 . ..... ..... 010 ..... 1010111 @r_vm
- vwmulsu_vx      111010 . ..... ..... 110 ..... 1010111 @r_vm
- vwmul_vv        111011 . ..... ..... 010 ..... 1010111 @r_vm
- vwmul_vx        111011 . ..... ..... 110 ..... 1010111 @r_vm
-+vmacc_vv        101101 . ..... ..... 010 ..... 1010111 @r_vm
-+vmacc_vx        101101 . ..... ..... 110 ..... 1010111 @r_vm
-+vnmsac_vv       101111 . ..... ..... 010 ..... 1010111 @r_vm
-+vnmsac_vx       101111 . ..... ..... 110 ..... 1010111 @r_vm
-+vmadd_vv        101001 . ..... ..... 010 ..... 1010111 @r_vm
-+vmadd_vx        101001 . ..... ..... 110 ..... 1010111 @r_vm
-+vnmsub_vv       101011 . ..... ..... 010 ..... 1010111 @r_vm
-+vnmsub_vx       101011 . ..... ..... 110 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index cd28c135b8..07e0c212ed 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1599,3 +1599,13 @@ GEN_OPIVV_WIDEN_TRANS(vwmulsu_vv, opivv_widen_check)
- GEN_OPIVX_WIDEN_TRANS(vwmul_vx)
- GEN_OPIVX_WIDEN_TRANS(vwmulu_vx)
- GEN_OPIVX_WIDEN_TRANS(vwmulsu_vx)
-+
-+/* Vector Single-Width Integer Multiply-Add Instructions */
-+GEN_OPIVV_TRANS(vmacc_vv, opivv_check)
-+GEN_OPIVV_TRANS(vnmsac_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmadd_vv, opivv_check)
-+GEN_OPIVV_TRANS(vnmsub_vv, opivv_check)
-+GEN_OPIVX_TRANS(vmacc_vx, opivx_check)
-+GEN_OPIVX_TRANS(vnmsac_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmadd_vx, opivx_check)
-+GEN_OPIVX_TRANS(vnmsub_vx, opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 0af2acb8ad..8c327cc070 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1890,3 +1890,91 @@ GEN_VEXT_VX(vwmulu_vx_w, 4, 8, clearq)
- GEN_VEXT_VX(vwmulsu_vx_b, 1, 2, clearh)
- GEN_VEXT_VX(vwmulsu_vx_h, 2, 4, clearl)
- GEN_VEXT_VX(vwmulsu_vx_w, 4, 8, clearq)
-+
-+/* Vector Single-Width Integer Multiply-Add Instructions */
-+#define OPIVV3(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)   \
-+static void do_##NAME(void *vd, void *vs1, void *vs2, int i)       \
-+{                                                                  \
-+    TX1 s1 = *((T1 *)vs1 + HS1(i));                                \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
-+    TD d = *((TD *)vd + HD(i));                                    \
-+    *((TD *)vd + HD(i)) = OP(s2, s1, d);                           \
-+}
-+
-+#define DO_MACC(N, M, D) (M * N + D)
-+#define DO_NMSAC(N, M, D) (-(M * N) + D)
-+#define DO_MADD(N, M, D) (M * D + N)
-+#define DO_NMSUB(N, M, D) (-(M * D) + N)
-+RVVCALL(OPIVV3, vmacc_vv_b, OP_SSS_B, H1, H1, H1, DO_MACC)
-+RVVCALL(OPIVV3, vmacc_vv_h, OP_SSS_H, H2, H2, H2, DO_MACC)
-+RVVCALL(OPIVV3, vmacc_vv_w, OP_SSS_W, H4, H4, H4, DO_MACC)
-+RVVCALL(OPIVV3, vmacc_vv_d, OP_SSS_D, H8, H8, H8, DO_MACC)
-+RVVCALL(OPIVV3, vnmsac_vv_b, OP_SSS_B, H1, H1, H1, DO_NMSAC)
-+RVVCALL(OPIVV3, vnmsac_vv_h, OP_SSS_H, H2, H2, H2, DO_NMSAC)
-+RVVCALL(OPIVV3, vnmsac_vv_w, OP_SSS_W, H4, H4, H4, DO_NMSAC)
-+RVVCALL(OPIVV3, vnmsac_vv_d, OP_SSS_D, H8, H8, H8, DO_NMSAC)
-+RVVCALL(OPIVV3, vmadd_vv_b, OP_SSS_B, H1, H1, H1, DO_MADD)
-+RVVCALL(OPIVV3, vmadd_vv_h, OP_SSS_H, H2, H2, H2, DO_MADD)
-+RVVCALL(OPIVV3, vmadd_vv_w, OP_SSS_W, H4, H4, H4, DO_MADD)
-+RVVCALL(OPIVV3, vmadd_vv_d, OP_SSS_D, H8, H8, H8, DO_MADD)
-+RVVCALL(OPIVV3, vnmsub_vv_b, OP_SSS_B, H1, H1, H1, DO_NMSUB)
-+RVVCALL(OPIVV3, vnmsub_vv_h, OP_SSS_H, H2, H2, H2, DO_NMSUB)
-+RVVCALL(OPIVV3, vnmsub_vv_w, OP_SSS_W, H4, H4, H4, DO_NMSUB)
-+RVVCALL(OPIVV3, vnmsub_vv_d, OP_SSS_D, H8, H8, H8, DO_NMSUB)
-+GEN_VEXT_VV(vmacc_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmacc_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmacc_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmacc_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vnmsac_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vnmsac_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vnmsac_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vnmsac_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmadd_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmadd_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmadd_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmadd_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vnmsub_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vnmsub_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vnmsub_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vnmsub_vv_d, 8, 8, clearq)
-+
-+#define OPIVX3(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)             \
-+static void do_##NAME(void *vd, target_long s1, void *vs2, int i)   \
-+{                                                                   \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-+    TD d = *((TD *)vd + HD(i));                                     \
-+    *((TD *)vd + HD(i)) = OP(s2, (TX1)(T1)s1, d);                   \
-+}
-+
-+RVVCALL(OPIVX3, vmacc_vx_b, OP_SSS_B, H1, H1, DO_MACC)
-+RVVCALL(OPIVX3, vmacc_vx_h, OP_SSS_H, H2, H2, DO_MACC)
-+RVVCALL(OPIVX3, vmacc_vx_w, OP_SSS_W, H4, H4, DO_MACC)
-+RVVCALL(OPIVX3, vmacc_vx_d, OP_SSS_D, H8, H8, DO_MACC)
-+RVVCALL(OPIVX3, vnmsac_vx_b, OP_SSS_B, H1, H1, DO_NMSAC)
-+RVVCALL(OPIVX3, vnmsac_vx_h, OP_SSS_H, H2, H2, DO_NMSAC)
-+RVVCALL(OPIVX3, vnmsac_vx_w, OP_SSS_W, H4, H4, DO_NMSAC)
-+RVVCALL(OPIVX3, vnmsac_vx_d, OP_SSS_D, H8, H8, DO_NMSAC)
-+RVVCALL(OPIVX3, vmadd_vx_b, OP_SSS_B, H1, H1, DO_MADD)
-+RVVCALL(OPIVX3, vmadd_vx_h, OP_SSS_H, H2, H2, DO_MADD)
-+RVVCALL(OPIVX3, vmadd_vx_w, OP_SSS_W, H4, H4, DO_MADD)
-+RVVCALL(OPIVX3, vmadd_vx_d, OP_SSS_D, H8, H8, DO_MADD)
-+RVVCALL(OPIVX3, vnmsub_vx_b, OP_SSS_B, H1, H1, DO_NMSUB)
-+RVVCALL(OPIVX3, vnmsub_vx_h, OP_SSS_H, H2, H2, DO_NMSUB)
-+RVVCALL(OPIVX3, vnmsub_vx_w, OP_SSS_W, H4, H4, DO_NMSUB)
-+RVVCALL(OPIVX3, vnmsub_vx_d, OP_SSS_D, H8, H8, DO_NMSUB)
-+GEN_VEXT_VX(vmacc_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmacc_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmacc_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmacc_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vnmsac_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vnmsac_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vnmsac_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vnmsac_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmadd_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmadd_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmadd_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmadd_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vnmsub_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vnmsub_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vnmsub_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vnmsub_vx_d, 8, 8, clearq)
--- 
-2.23.0
+I like it. Does your version of mypy accept this? I actually get a
+warning that doesn't make sense to me:
+
+    iotests.py:392: error: Argument 1 to "info" of "Logger" has incompatibl=
+e type "Dict[str, Any]"; expected "str"
+
+The code looks like this:
+
+    if isinstance(msg, (dict, list)):
+        # Don't sort if it's already sorted
+        do_sort =3D not isinstance(msg, OrderedDict)
+        test_logger.info(json.dumps(msg, sort_keys=3Ddo_sort, indent=3Dinde=
+nt))
+    else:
+        test_logger.info(msg)
+
+I have no idea why it would think it can still be Dict[str, Any] in the
+else branch. Even after adding an 'assert not instanceof(msg, dict), it
+still thinks so.
+
+Probably time to update for me...
+
+Kevin
 
 
