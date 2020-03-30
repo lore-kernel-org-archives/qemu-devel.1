@@ -1,82 +1,82 @@
 Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753E7C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:26:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68351C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FD3D2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:26:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F7862072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:28:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYseZT90"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD3D2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2VLl+V0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F7862072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxF4-0007FI-E0
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:26:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49092)
+	id 1jIxGf-0000aW-9P
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jIxEA-00065Q-TX
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:32 -0400
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jIxFQ-0007u7-7X
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jIxE9-0002kO-FK
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:30 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55053)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jIxE9-0002kA-An
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:25:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585585529;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VYCc39bvJPgwiYaAoHpsrecasJdUJg2PE7mHgSDENzs=;
- b=RYseZT90VetQ+Xkj6Rl4I6DhiWzNUM6KSXir3K2h/xS2FosvZpimKhTOOe1yuT42cTOul8
- 9gTLQ6EfZ+JlmsvWG2B2X3R4ofQ4bAxGv8M2I+EIzI+fU/pC+Q3m4FHdMvCfb5KUukFs2X
- xlNsi45xUj6LqmNsL465xAAMxonomuI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-Fmz9TNGuMFC0-HtWKIJSmA-1; Mon, 30 Mar 2020 12:25:14 -0400
-X-MC-Unique: Fmz9TNGuMFC0-HtWKIJSmA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D617D1005509;
- Mon, 30 Mar 2020 16:25:12 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 065D350C01;
- Mon, 30 Mar 2020 16:25:07 +0000 (UTC)
-Date: Mon, 30 Mar 2020 17:25:05 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.0] qga-posix: Avoid crashing process when failing
- to allocate memory
-Message-ID: <20200330162505.GP236854@redhat.com>
-References: <20200324194836.21539-1-philmd@redhat.com>
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jIxFP-00045q-5G
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:26:48 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jIxFO-00041u-Up
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:26:47 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id s1so22429260wrv.5
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 09:26:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hipaFijxDpWnJJLB9FttQE4iVLVI5yEayDwAAUiqp4I=;
+ b=S2VLl+V0mmVhHXyvO0/cWUBmRuXsiV51ycvbpAicA39UiwF5wigSTQ9RoEvQ/iJqBY
+ iyR/sqEGZdgah/zehloAWXbMo9aQ0S2XWfBmcOeXl1wLDUBJg3DJJpmouYPYrG2t4uZ3
+ f6qUu7zl77d6ZIE/Gd8Le1GwHMURK7I1/VxKmECnpEKr/mbXoooP0jvVemqkBsbBkCtv
+ NzULaCi8Mv/WeVU4rNw0vNhPL7hzyQe99jC+y68RWmK0tjjGlyFDasZctCUMu000CN/M
+ +zSwHeQzNSpcPjRx9r4IrWu92Q8fMYBSgKCqbokbpF376BY7S9xQaadsz8zY32H/JrWj
+ uNgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hipaFijxDpWnJJLB9FttQE4iVLVI5yEayDwAAUiqp4I=;
+ b=lHndlXRSt1eUrev2/84IOh1JkotH2e7lDwyX1ullHggTKVSQQNOEI8FvwMRExUDZ+O
+ /SUb2zh+NlfiT5Bdg8QJP8J83rfksJjL6eqXy0CVHny1RtDOp1Idiv2H75MjfcXg9yQi
+ 7ljc+9eLAH0GCTST1Fc4E6zN7xjhn0ae7DPXLnJpC5ngWK34hF0EqbD/oPP4nuXIs+r5
+ jgTNKa5Mnw7KWZ1pLVSylJk4bSgQ85sUSevtYgGthJmP+2+KgGwz67ILvPX5cynKquwG
+ lMLBxvO0aDkjKsahtm1MqX/8+P7PKwHKK5ecE0AXwBvhsTU1gwi+dLsPL2BMdMq5gBDf
+ /d2w==
+X-Gm-Message-State: ANhLgQ0rI15pWqsS+7OCD+DeGKzwh8CrH/jZd38sn6MwgamCvuJwZjaT
+ 08/zzuuvHn8MelpqoA+iJiVRhfEi1RTmUTqqNT8=
+X-Google-Smtp-Source: ADFU+vtDmegPXC5OLEOmrU2juJJCeDMeHEGvryDBTFYAqjuwOBZiCXbcaBxhji6ASlmVLdBYotMBkjB1EjAmIgHQmd8=
+X-Received: by 2002:adf:e282:: with SMTP id v2mr15651301wri.329.1585585602073; 
+ Mon, 30 Mar 2020 09:26:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200324194836.21539-1-philmd@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+ <87v9mmug73.fsf@dusky.pond.sub.org>
+ <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Mon, 30 Mar 2020 18:25:27 +0200
+Message-ID: <CAHiYmc7ga5Kaxg_Wi6TMu+E-HErUHZE94naynkMoFRDirFVP0g@mail.gmail.com>
+Subject: Re: deprecation of in-tree builds
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="00000000000092990405a214ea5f"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,88 +88,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-trivial@nongnu.org,
- qemu-stable@nongnu.org, Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>,
- qemu-devel@nongnu.org, Sameeh Jubran <sjubran@redhat.com>,
- Basil Salman <basil@daynix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 24, 2020 at 08:48:36PM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
-:
-> Similarly to commit 807e2b6fce0 for Windows, kindly return a
-> QMP error message instead of crashing the whole process.
->=20
-> Cc: qemu-stable@nongnu.org
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
+--00000000000092990405a214ea5f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I find that bug report pretty dubious
+15:32 Pon, 30.03.2020. Peter Maydell <peter.maydell@linaro.org> =D1=98=D0=
+=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Consensus in the thread seemed to lean towards having
+> the 'configure/make' runes auto-create a build directory;
+> if we want to do that we should probably not say anything in
+> the release notes, because we'll cause people to change
+> unnecessarily. Or at least have them say "We recommend
+> out-of-tree builds. In future we might make the commands
+> that currently do an in-tree build automatically create
+> and use a build directory for you." rather than a blanket
+> "we're going to drop this and you should change what you
+> do now".
+>
 
-   "The QEMU Guest Agent in QEMU is vulnerable to an integer=20
-    overflow in the qmp_guest_file_read(). An attacker could=20
-    exploit this by sending a crafted QMP command (including=20
-    guest-file-read with a large count value) to the agent via=20
-    the listening socket to trigger a g_malloc() call with a=20
-    large memory chunk resulting in a segmentation fault."
+My vote is for the former, rather than for the latter. I fact, if I may
+suggest, I would use some longer and stronger wording, just for the simple
+reason that the warning is less likely to be ignored (as Zoltan, I think
+rightfully, noted to potentially be quite frequent case in reality):
 
-"the attacker" in this case has to have access to the QEMU
-chardev associated with the guest agent. IOW, in any sensible
-configuration of the chardev, "the attacker" is the same person
-who launched QEMU in the first place.  There's no elevation of
-privilege here and any denial of service is inflicted against
-themselves. Finally it doesn't cause a segmentation fault,
-it causes an abort.
-
-This is *NOT* a security bug.
-
-In fact I'd call this NOTABUG entirely. It is just user error
-to set the "count" to such a huge value that it hits OOM.
-
-> Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  qga/commands-posix.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 93474ff770..8f127788e6 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -493,7 +493,13 @@ struct GuestFileRead *qmp_guest_file_read(int64_t ha=
-ndle, bool has_count,
->          gfh->state =3D RW_STATE_NEW;
->      }
-> =20
-> -    buf =3D g_malloc0(count+1);
-> +    buf =3D g_try_malloc0(count + 1);
-> +    if (!buf) {
-> +        error_setg(errp,
-> +                   "failed to allocate sufficient memory "
-> +                   "to complete the requested service");
-> +        return NULL;
-> +    }
-
-So you've prevented an OOM when we call fread() on the file.
-
-The contents of 'buf' now need to be turned into JSON which
-means the buffer need to be base64 encoded. This will consume
-even more memory than the original read.  So checking malloc
-here has achieved nothing AFAICT.
-
->      read_count =3D fread(buf, 1, count, fh);
->      if (ferror(fh)) {
->          error_setg_errno(errp, errno, "failed to read file");
+"We strongly recommend
+out-of-tree builds. In future we might make the commands that currently do
+an in-tree build automatically create and use a separate build directory
+for you. Still, our recommentation is that you change all your build
+procedures to use only out-of-tree builds as soon as it is possible for
+you."
 
 Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Aleksandar
 
+> Thoughts?
+>
+> thanks
+> -- PMM
+>
+
+--00000000000092990405a214ea5f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">15:32 Pon, 30.03.2020. Peter Maydell &lt;<a href=3D"mailto:p=
+eter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; =D1=98=D0=B5 =D0=
+=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; Consensus in the thread seemed to lean towards having<br>
+&gt; the &#39;configure/make&#39; runes auto-create a build directory;<br>
+&gt; if we want to do that we should probably not say anything in<br>
+&gt; the release notes, because we&#39;ll cause people to change<br>
+&gt; unnecessarily. Or at least have them say &quot;We recommend<br>
+&gt; out-of-tree builds. In future we might make the commands<br>
+&gt; that currently do an in-tree build automatically create<br>
+&gt; and use a build directory for you.&quot; rather than a blanket<br>
+&gt; &quot;we&#39;re going to drop this and you should change what you<br>
+&gt; do now&quot;.<br>
+&gt;</p>
+<p dir=3D"ltr">My vote is for the former, rather than for the latter. I fac=
+t, if I may suggest, I would use some longer and stronger wording, just for=
+ the simple reason that the warning is less likely to be ignored (as Zoltan=
+, I think rightfully, noted to potentially be quite frequent case in realit=
+y):</p>
+<p dir=3D"ltr">&quot;We strongly recommend<br>
+out-of-tree builds. In future we might make the commands that currently do =
+an in-tree build automatically create and use a separate build directory fo=
+r you. Still, our recommentation is that you change all your build procedur=
+es to use only out-of-tree builds as soon as it is possible for you.&quot; =
+</p>
+<p dir=3D"ltr">Regards,<br>
+Aleksandar<br></p>
+<p dir=3D"ltr">&gt; Thoughts?<br>
+&gt;<br>
+&gt; thanks<br>
+&gt; -- PMM<br>
+&gt;<br>
+</p>
+
+--00000000000092990405a214ea5f--
 
