@@ -2,61 +2,81 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB243C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0DCC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:25:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81BEF20786
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:16:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81BEF20786
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id DB726206CC
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:25:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KRMwxi8o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB726206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ0pS-0005gi-KE
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 16:16:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35306)
+	id 1jJ0y2-0008JK-TG
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 16:25:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jJ0oj-0005Ae-MV
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:15:31 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jJ0xK-0007a9-9W
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jJ0oh-0007fC-HM
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:15:28 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:22134)
+ (envelope-from <eric.auger@redhat.com>) id 1jJ0xH-0001fj-VV
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:24:21 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44451)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1jJ0og-0007Zc-LJ
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:15:27 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 6D239747EA5;
- Mon, 30 Mar 2020 22:15:24 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 3C5B9747EA3; Mon, 30 Mar 2020 22:15:24 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 39BF6747E00;
- Mon, 30 Mar 2020 22:15:24 +0200 (CEST)
-Date: Mon, 30 Mar 2020 22:15:24 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Michal_Such=E1nek?= <msuchanek@suse.de>
-Subject: Re: deprecation of in-tree builds
-In-Reply-To: <20200330172955.GQ25468@kitsune.suse.cz>
-Message-ID: <alpine.BSF.2.22.395.2003302201020.33183@zero.eik.bme.hu>
-References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
- <87v9mmug73.fsf@dusky.pond.sub.org>
- <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
- <20200330134212.GO236854@redhat.com> <20200330143759.GD6139@linux.fritz.box>
- <20200330172955.GQ25468@kitsune.suse.cz>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jJ0xH-0001d0-Mf
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:24:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585599859;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UfQISzj/ilt4GyJFjxI4+6LKkBOP9h7E1fZIhpfx85M=;
+ b=KRMwxi8oaxGo57UKvxZ1x6lDfOS27MsZJsbrAMnVLMA0dAaa7O2iSiJh8LxaTl8hSY4vRZ
+ /exQsierIVET266XNhnnuzEJIbatglrKkmZLUrKNx6jenoarh+ZWYSfsHjjoSTuGBMGHD7
+ HbKvYPPQEpyz1zXv7UQOT2d5WmGeSJs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468--zE0xz2LN4SjOxIkd46I-w-1; Mon, 30 Mar 2020 16:24:16 -0400
+X-MC-Unique: -zE0xz2LN4SjOxIkd46I-w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 385E28010E5;
+ Mon, 30 Mar 2020 20:24:14 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 012E35DDA5;
+ Mon, 30 Mar 2020 20:23:55 +0000 (UTC)
+Subject: Re: [PATCH v2 07/22] intel_iommu: add set/unset_iommu_context callback
+To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, peterx@redhat.com
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-8-git-send-email-yi.l.liu@intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <a444318b-32c7-d43c-112a-d35a870b162d@redhat.com>
+Date: Mon, 30 Mar 2020 22:23:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1349375325-1585599324=:33183"
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <1585542301-84087-8-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,104 +88,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, yi.y.sun@intel.com, pbonzini@redhat.com,
+ hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Yi,
 
---3866299591-1349375325-1585599324=:33183
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
+On 3/30/20 6:24 AM, Liu Yi L wrote:
+> This patch adds set/unset_iommu_context() impelementation in Intel
+This patch implements the set/unset_iommu_context() ops for Intel vIOMMU.
+> vIOMMU. For Intel platform, pass-through modules (e.g. VFIO) could
+> set HostIOMMUContext to Intel vIOMMU emulator.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  hw/i386/intel_iommu.c         | 71 ++++++++++++++++++++++++++++++++++++++++---
+>  include/hw/i386/intel_iommu.h | 21 ++++++++++---
+>  2 files changed, 83 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 4b22910..fd349c6 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3354,23 +3354,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
+>      },
+>  };
+>  
+> -VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+> +/**
+> + * Fetch a VTDBus instance for given PCIBus. If no existing instance,
+> + * allocate one.
+> + */
+> +static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
+>  {
+>      uintptr_t key = (uintptr_t)bus;
+>      VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
+> -    VTDAddressSpace *vtd_dev_as;
+> -    char name[128];
+>  
+>      if (!vtd_bus) {
+>          uintptr_t *new_key = g_malloc(sizeof(*new_key));
+>          *new_key = (uintptr_t)bus;
+>          /* No corresponding free() */
+> -        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
+> -                            PCI_DEVFN_MAX);
+> +        vtd_bus = g_malloc0(sizeof(VTDBus));
+>          vtd_bus->bus = bus;
+>          g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
+>      }
+> +    return vtd_bus;
+> +}
+>  
+> +VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+> +{
+> +    VTDBus *vtd_bus;
+> +    VTDAddressSpace *vtd_dev_as;
+> +    char name[128];
+> +
+> +    vtd_bus = vtd_find_add_bus(s, bus);
+>      vtd_dev_as = vtd_bus->dev_as[devfn];
+>  
+>      if (!vtd_dev_as) {
+> @@ -3436,6 +3446,55 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>      return vtd_dev_as;
+>  }
+>  
+> +static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
+> +                                     int devfn,
+> +                                     HostIOMMUContext *iommu_ctx)
+> +{
+> +    IntelIOMMUState *s = opaque;
+> +    VTDBus *vtd_bus;
+> +    VTDHostIOMMUContext *vtd_dev_icx;
+> +
+> +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
+> +
+> +    vtd_bus = vtd_find_add_bus(s, bus);
+> +
+> +    vtd_iommu_lock(s);
+> +
+> +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
+> +
+> +    assert(!vtd_dev_icx);
+> +
+> +    vtd_bus->dev_icx[devfn] = vtd_dev_icx =
+> +                    g_malloc0(sizeof(VTDHostIOMMUContext));
+> +    vtd_dev_icx->vtd_bus = vtd_bus;
+> +    vtd_dev_icx->devfn = (uint8_t)devfn;
+> +    vtd_dev_icx->iommu_state = s;
+> +    vtd_dev_icx->iommu_ctx = iommu_ctx;
+> +
+> +    vtd_iommu_unlock(s);
+> +
+> +    return 0;
+> +}
+> +
+> +static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
+> +{
+> +    IntelIOMMUState *s = opaque;
+> +    VTDBus *vtd_bus;
+> +    VTDHostIOMMUContext *vtd_dev_icx;
+> +
+> +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
+> +
+> +    vtd_bus = vtd_find_add_bus(s, bus);
+> +
+> +    vtd_iommu_lock(s);
+> +
+> +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
+> +    g_free(vtd_dev_icx);
+> +    vtd_bus->dev_icx[devfn] = NULL;
+> +
+> +    vtd_iommu_unlock(s);
+> +}
+> +
+>  static uint64_t get_naturally_aligned_size(uint64_t start,
+>                                             uint64_t size, int gaw)
+>  {
+> @@ -3731,6 +3790,8 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+>  
+>  static PCIIOMMUOps vtd_iommu_ops = {
+>      .get_address_space = vtd_host_dma_iommu,
+> +    .set_iommu_context = vtd_dev_set_iommu_context,
+> +    .unset_iommu_context = vtd_dev_unset_iommu_context,
+>  };
+>  
+>  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 3870052..b5fefb9 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -64,6 +64,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+>  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+>  typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
+>  typedef struct VTDPASIDEntry VTDPASIDEntry;
+> +typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
+>  
+>  /* Context-Entry */
+>  struct VTDContextEntry {
+> @@ -112,10 +113,20 @@ struct VTDAddressSpace {
+>      IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
+>  };
+>  
+> +struct VTDHostIOMMUContext {
 
-On Mon, 30 Mar 2020, Michal Such=E1nek wrote:
-> On Mon, Mar 30, 2020 at 04:37:59PM +0200, Kevin Wolf wrote:
->> Am 30.03.2020 um 15:42 hat Daniel P. Berrang=E9 geschrieben:
->>> On Mon, Mar 30, 2020 at 02:31:52PM +0100, Peter Maydell wrote:
->>>> On Mon, 30 Mar 2020 at 14:26, Markus Armbruster <armbru@redhat.com> =
-wrote:
->>>>>
->>>>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>>>
->>>>>> AIUI from Paolo, the intention is to deprecate and eventually
->>>>>> stop supporting "in-tree" builds, so that the only option is
->>>>>> building in a separate build directory. I thought we should
->>>>>> probably mention that in the 5.0 changelog, so I wrote up some
->>>>>> text:
->>>>>>
->>>>>> https://wiki.qemu.org/ChangeLog/5.0#Build_Information
->>>>>
->>>>> Overdue.  Thanks for doing this!
->>>>>
->>>>>> Suggestions for changes/comments etc welcome.
->>>>>
->>>>> Looks fine to me.
->>>>
->>>> Consensus in the thread seemed to lean towards having
->>>> the 'configure/make' runes auto-create a build directory;
->>>> if we want to do that we should probably not say anything in
->>>> the release notes, because we'll cause people to change
->>>> unnecessarily. Or at least have them say "We recommend
->>>> out-of-tree builds. In future we might make the commands
->>>> that currently do an in-tree build automatically create
->>>> and use a build directory for you." rather than a blanket
->>>> "we're going to drop this and you should change what you
->>>> do now".
->>>>
->>>> Thoughts?
->>>
->>> When the time comes to switch to Meson, we'll be forcing a
->>> separate build directory & that will also potentially involve
->>> a change in build instructions for users.
->>>
->>> So if we expect Meson will arrive in QEMU soon (say before end
->>> of this year), then I'd try to keep changes related to make to
->>> the bare minimum, and have Meson switch as the "flag day" when
->>> developers are forced to adapt their build process.
->>>
->>> IOW, merely warn people that in-tree builds are deprecated and
->>> not tested by the project and enourage switching to out of tree
->>> builds. Dont try to magically create a separate build dir now.
->>
->> If manually dealing with separate build directories is inconvenient
->> today, it will still be inconvenient with Meson, so this would mean
->> introducing the automatic directly creation together with the other
->> changes to enable Meson. Which is fine by me, as long as it is really
->> done when the external directory becomes mandatory, so that people won=
-'t
->> have to switch back and forth between directories.
->
-> From packaging point of view if something has auto* files the default i=
-s
-> IIRC to do in-tree build with most package managers. You have to adjust
-> manually for out-of-tree build. I am not sure what is state of Meson
-> support in packaging scripts across distributions. Most likely it will
-> not be picked automagically so you have to provide a custom build scrip=
-t
-> anyway. Then it is the time to look up the canonical build instructions=
-.
->
-> In other words dealing with Meson is inconvenient either way. Building
-> in-tree or out-of-tree becomes a non-issue whan you switch to exotic
-> build system anyway.
->
-> That's not to say that auto* tools are great. It's just the replacement=
-s
-> have issues that are not well understood by average Joe Packager while
-> the auto* tools have good old issues people know how to deal with.
 
-Actually QEMU does not use auto* tools, it just has a configure script=20
-that mimics that. This may not be the best way to do it but this is=20
-convenient for people trying to compile it and works as expected so I=20
-think this behaviour should be preserved if possible just to not upset=20
-developers and packagers unnecessarily.
+> +    VTDBus *vtd_bus;
+> +    uint8_t devfn;
+> +    HostIOMMUContext *iommu_ctx;
+I don't get why we don't have standard QOM inheritance instead of this
+handle?
+VTDHostContext parent_obj;
 
-Regards,
-BALATON Zoltan
---3866299591-1349375325-1585599324=:33183--
+like IOMMUMemoryRegion <- MemoryRegion <- Object
+> +    IntelIOMMUState *iommu_state;
+> +};
+> +
+>  struct VTDBus {
+> -    PCIBus* bus;		/* A reference to the bus to provide translation for */
+> +    /* A reference to the bus to provide translation for */
+> +    PCIBus *bus;
+>      /* A table of VTDAddressSpace objects indexed by devfn */
+> -    VTDAddressSpace *dev_as[];
+> +    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
+> +    /* A table of VTDHostIOMMUContext objects indexed by devfn */
+> +    VTDHostIOMMUContext *dev_icx[PCI_DEVFN_MAX];
+At this point of the review, it is unclear to me why the context is
+associated to a device. Up to now you have not explained it should. If
+so why isn't it part of VTDAddressSpace?
+
+Thanks
+
+Eric
+>  };
+>  
+>  struct VTDIOTLBEntry {
+> @@ -269,8 +280,10 @@ struct IntelIOMMUState {
+>      bool dma_drain;                 /* Whether DMA r/w draining enabled */
+>  
+>      /*
+> -     * Protects IOMMU states in general.  Currently it protects the
+> -     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
+> +     * iommu_lock protects below:
+> +     * - per-IOMMU IOTLB caches
+> +     * - context entry cache in VTDAddressSpace
+> +     * - HostIOMMUContext pointer cached in vIOMMU
+>       */
+>      QemuMutex iommu_lock;
+>  };
+> 
+
 
