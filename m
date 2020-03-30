@@ -6,79 +6,90 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A49C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 07:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3B7C2D0EB
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 07:25:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B882120733
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 07:19:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CEF520781
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 07:25:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYnFmus8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B882120733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DoE3F/zb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CEF520781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIohP-0003ui-RM
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 03:19:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52782)
+	id 1jIoo0-0005oc-57
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 03:25:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jIoge-0003PM-T7
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:18:21 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1jIon2-0004zE-9H
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jIogc-0005O7-Ot
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:18:19 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:24938)
+ (envelope-from <sgarzare@redhat.com>) id 1jIon1-00034e-8g
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:24:56 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39805)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jIogc-0005NO-Iv
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:18:18 -0400
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1jIon1-000341-4z
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 03:24:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585552697;
+ s=mimecast20190719; t=1585553093;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3zK0nQxaVFmfonIppuHaseEGtO/9VENvsnKIbieDEfE=;
- b=EYnFmus87P7ATglc9BcOccbzxx0SRpH4p2pm2IKgf7AutZ5t0M7dYfMrUqSH4nIFrcx4Ni
- HZhXAEH/Wrdj5cyeryIhVKwsf9A7z8R3F6BtIcLyeALcqdss/kIaSca71HaPcpJfjuOR3v
- NttI3St7J5GTWO20/Bo5N7gQGLUjcAM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-UDJuIzWeMX2ILyOFVFpOKw-1; Mon, 30 Mar 2020 03:18:15 -0400
-X-MC-Unique: UDJuIzWeMX2ILyOFVFpOKw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E71261005514;
- Mon, 30 Mar 2020 07:18:12 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E98019756;
- Mon, 30 Mar 2020 07:18:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 87B6F11385E2; Mon, 30 Mar 2020 09:18:08 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v2] migration: use "" instead of (null) for tls-authz
-References: <0a9dc2fcb78da13eb326992384bc4e57de83d9f9.1584797648.git.maozhongyi@cmss.chinamobile.com>
- <20200324100823.GB2645@work-vm>
-Date: Mon, 30 Mar 2020 09:18:08 +0200
-In-Reply-To: <20200324100823.GB2645@work-vm> (David Alan Gilbert's message of
- "Tue, 24 Mar 2020 10:08:23 +0000")
-Message-ID: <875zemz4y7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ bh=AXAhUACDM2gZxnq1V3wP9OEXZS/SK+u9IN3fA/0nlG0=;
+ b=DoE3F/zbAWZV8Sbp3tQ7t+EDJXGMc9L0EPzjGYnHxKOM5iRdrwOdHQglF0E+BvzXER8WVV
+ aTN8YWmI66552dbd7oQ6hAQE3uhVKtCddgr01We8AtME5f6vbsVwqKLwhovAQfVDn/sqIp
+ jc7rf9PEpEd2pd2AvlfP5Kvl2Zf2QWk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-eeIO9pJWO3ub-a6GxsUAXQ-1; Mon, 30 Mar 2020 03:24:51 -0400
+X-MC-Unique: eeIO9pJWO3ub-a6GxsUAXQ-1
+Received: by mail-wr1-f69.google.com with SMTP id i18so10585390wrx.17
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 00:24:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=QN6u9uAOnnJUD5pu7QxV4bk6WRt95TwhOwf2Vb059P0=;
+ b=jUlWArB96MiTdIhrU6yTSQixl6CzvqsDTlhXApg0rOJsUQr9rlO47FsAzWZaV5OQ9M
+ 7Rui3UvW+ejfR5OJRXzJ3gNXyoRyXmkrtS6eA/MiphMaISXLNTVKe1yJPtxMJ+Wu8ytv
+ 5Jous7cHmKKJTJzkhHDFJgqhVgu4VX9Dvq0CEX9hkVL2jmUGDec1jL3BhJxAPRS8LQ4r
+ /L23xlH0+PskNQi6r307sxNE+BrjZ/hGVb1Jgw0b+ZMQVB3U/23sOFlzzantNfzBWSit
+ RhW/4lqH2RQZ5xy4CvWzfi2Sq0goBCCPnKFnyHnC/CsLP3n90VEuLCUrh5xsyBhN1TZK
+ 1pVw==
+X-Gm-Message-State: ANhLgQ3vmgtIM724XXlenaZ3DqOis5kHAyqpomxRCPJQmgzsNhMgpu+h
+ FwUMO6QkR9AIb/PvGnLBUQ8gL1/ZUkVJfoDe8bi5Bg7g9zsfAbqkRuJRju8Ee/H8DEeqPre87Pn
+ zyyeRFwYHB5+EvTg=
+X-Received: by 2002:adf:b258:: with SMTP id y24mr10635863wra.318.1585553090438; 
+ Mon, 30 Mar 2020 00:24:50 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuuYB5mYl486JhTzPCB/FkrS0wX/SzCtSrxT0O2y3r6xAih+iu06h867bqQwXxn/XrcoZmU9g==
+X-Received: by 2002:adf:b258:: with SMTP id y24mr10635846wra.318.1585553090235; 
+ Mon, 30 Mar 2020 00:24:50 -0700 (PDT)
+Received: from steredhat (host32-201-dynamic.27-79-r.retail.telecomitalia.it.
+ [79.27.201.32])
+ by smtp.gmail.com with ESMTPSA id d6sm20548636wrw.10.2020.03.30.00.24.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Mar 2020 00:24:49 -0700 (PDT)
+Date: Mon, 30 Mar 2020 09:24:47 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Subject: Re: [PATCH v4 2/2] virtio-iommu: avoid memleak in the unrealize
+Message-ID: <20200330072447.lcstsuhcswl2sxmu@steredhat>
+References: <20200328005705.29898-1-pannengyuan@huawei.com>
+ <20200328005705.29898-3-pannengyuan@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200328005705.29898-3-pannengyuan@huawei.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,72 +101,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, qemu-devel@nongnu.org,
- Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, quintela@redhat.com
+Cc: zhang.zhanghailiang@huawei.com, mst@redhat.com, qemu-devel@nongnu.org,
+ Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On Sat, Mar 28, 2020 at 08:57:05AM +0800, Pan Nengyuan wrote:
+> req_vq/event_vq forgot to free in unrealize. Fix that.
+> And also do clean 's->as_by_busptr' hash table in unrealize to fix anothe=
+r leak.
+>=20
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> Acked-by: Eric Auger <eric.auger@redhat.com>
+> ---
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v3->v1/v2:
+> - Also clean 's->as_by_busptr' hash table in unrealize.(Suggested by Stef=
+ano Garzarella)
+> v4->v3:
+> - update subject msg and move g_hash_table_destroy to the beginning of un=
+realize.
+> ---
+>  hw/virtio/virtio-iommu.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-> * Mao Zhongyi (maozhongyi@cmss.chinamobile.com) wrote:
->> run:
->> (qemu) info migrate_parameters
->> announce-initial: 50 ms
->> ...
->> announce-max: 550 ms
->> multifd-compression: none
->> xbzrle-cache-size: 4194304
->> max-postcopy-bandwidth: 0
->>  tls-authz: '(null)'
->>=20
->> Migration parameter 'tls-authz' is used to provide the QOM ID
->> of a QAuthZ subclass instance that provides the access control
->> check, default is NULL. But the empty string is not a valid
->> object ID, so use "" instead of the default. Although it will
->> fail when lookup an object with ID "", it is harmless, just
->> consistent with tls_creds.
->
-> Yes, it's probably the best we can do given Dan's explanation that
-> we can't change tls_authz to be non-null.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-As I explained in Message-ID: <878sjv11xm.fsf@dusky.pond.sub.org>, this
-is actually a crash bug on some systems.  The commit message neglects to
-mention that.  Too late to fix now.  Next time :)
+Thanks,
+Stefano
 
->> Also fixed the bad indentation on the last line.
->>=20
->> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
->> ---
->>  migration/migration.c | 3 ++-
->>  monitor/hmp-cmds.c    | 2 +-
->>  2 files changed, 3 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/migration/migration.c b/migration/migration.c
->> index c1d88ace7f..b060153ef7 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -790,7 +790,8 @@ MigrationParameters *qmp_query_migrate_parameters(Er=
-ror **errp)
->>      params->has_tls_hostname =3D true;
->>      params->tls_hostname =3D g_strdup(s->parameters.tls_hostname);
->>      params->has_tls_authz =3D true;
->> -    params->tls_authz =3D g_strdup(s->parameters.tls_authz);
->> +    params->tls_authz =3D s->parameters.tls_authz ? \
->> +                        g_strdup(s->parameters.tls_authz) : g_strdup(""=
-);
->
-> The \ is unneeded; this isn't a macro; it's also a little shorter to do
-> it as:
->     params->tls_authz =3D g_strdup(s->parameters.tls_authz ?
->                                  s->parameters.tls_authz : "");
-
-Even shorter:
-
-      params->tls_authz =3D g_strdup(s->parameters.tls_authz ?: "");
-
-?: is a GNU C extension.  We use it all over the place.
-
-Just FYI.  I'm *not* asking for the code to be changed.
+>=20
+> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+> index 4cee8083bc..22ba8848c2 100644
+> --- a/hw/virtio/virtio-iommu.c
+> +++ b/hw/virtio/virtio-iommu.c
+> @@ -693,9 +693,12 @@ static void virtio_iommu_device_unrealize(DeviceStat=
+e *dev, Error **errp)
+>      VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>      VirtIOIOMMU *s =3D VIRTIO_IOMMU(dev);
+> =20
+> +    g_hash_table_destroy(s->as_by_busptr);
+>      g_tree_destroy(s->domains);
+>      g_tree_destroy(s->endpoints);
+> =20
+> +    virtio_delete_queue(s->req_vq);
+> +    virtio_delete_queue(s->event_vq);
+>      virtio_cleanup(vdev);
+>  }
+> =20
+> --=20
+> 2.18.2
+>=20
+>=20
 
 
