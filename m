@@ -2,62 +2,79 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F39FC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E820C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:33:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1508220732
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:32:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1508220732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69B9C20732
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:33:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="Oaz6u8lJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B9C20732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIm6E-0004p2-5Z
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 00:32:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38022)
+	id 1jIm7G-0005rH-KH
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 00:33:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38238)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jIlu9-0002D1-O5
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:20:06 -0400
+ (envelope-from <anup@brainfault.org>) id 1jIlxh-0000PP-K8
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:23:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jIlu7-0008V0-UF
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:20:05 -0400
-Received: from mga07.intel.com ([134.134.136.100]:12564)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jIlu7-0007lr-LE
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:20:03 -0400
-IronPort-SDR: 5/WggoJ5m6OPbJucKYax4KwuEQTgfVBj4Q+sOG4tOyWLOZgdKYdrt4k06T/hkM15M/tK9LrWUT
- hv91oGYzc0OQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Mar 2020 21:19:16 -0700
-IronPort-SDR: bhSR2WyRyj9S55bWdsPAwjhbTN9BWNgjEQo2AuhhQg28ji+jubcVq9EZ1/ou47rvzb4xHZPGv3
- X1tJNHQGOYtA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,322,1580803200"; d="scan'208";a="327632074"
-Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga001.jf.intel.com with ESMTP; 29 Mar 2020 21:19:16 -0700
-From: Liu Yi L <yi.l.liu@intel.com>
-To: qemu-devel@nongnu.org,
-	alex.williamson@redhat.com,
-	peterx@redhat.com
-Subject: [PATCH v2 21/22] intel_iommu: process PASID-based Device-TLB
- invalidation
-Date: Sun, 29 Mar 2020 21:25:00 -0700
-Message-Id: <1585542301-84087-22-git-send-email-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.100
+ (envelope-from <anup@brainfault.org>) id 1jIlxg-0003oV-KC
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:23:45 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34592)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <anup@brainfault.org>) id 1jIlxg-0003mR-A6
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:23:44 -0400
+Received: by mail-wr1-x443.google.com with SMTP id 65so19850870wrl.1
+ for <qemu-devel@nongnu.org>; Sun, 29 Mar 2020 21:23:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HzG7oyXt/nsBgTi6zmit0T++IzWCAHZ7qmuGbPyQKFo=;
+ b=Oaz6u8lJqj2lr0brqtHiA/sBxIkaIKveNonoyhGZWwOBo1q0ZSntJE/7YX7uxL8D0p
+ TkccxD5+PflOPfefCd0T76a5e3kfoLxQdr6FI2T+zfYVrACB21rhDyi/pQFAV/XCZyou
+ ONwPZwZ5c+dM8OW9GqAgXa6URTx/sAQtG9s82QkSn0aCqH0Wz/EQL8ePv12yp+TdK8tj
+ hwcumrjQI71pSyEUnmIUpIA1EL6reJi2XE0A4zJmncQBLS+CtOn8aQpZmOqDvwVbbT6v
+ h+EfBl7zpLfBvWlBmW86Eo5eVVNcUBiQl14nPnjeMFvtoKIH0RbgW7rtb3J2dFXLeYXM
+ jNRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HzG7oyXt/nsBgTi6zmit0T++IzWCAHZ7qmuGbPyQKFo=;
+ b=DG0OtOfumlyEQMsJ13Rr7M2Xt+hefn77rulOxg5BCrcMjWUiKz4k98cOZwVxBvK0ND
+ t9u14ITxVa4QlUrZimpkrelvh7+ibq2O3f0sUCCrjaZQ3fTRqirb0wfGgcguK8pQfi4Z
+ 6+GCz4k6LqGUC6jPof6f6uB1ctaTcoEuQnr/mxVBEsx8sk0498MGXdx/L19qK9+4xO+X
+ X28HuIy9Ybtio7v5wQH8ee4rByV88h8C/QScq5LXm7IhSNyWT4C6hOu/Q1ua/GizLrlZ
+ PP0SsA7sgJyt4N6e9r+S0kTUotLaGE7w3jQmegxX6/iZBcclraO8WJFf/vX3F3xaD27Z
+ lmLg==
+X-Gm-Message-State: ANhLgQ3PwwgrkNP84qmeuwQu55VXx6rVPwQOp3gSbK/OEuQd60yusN3/
+ Bv67c+hKQJ8Pp6SxZFYlH3tYjlmRE0h87zucUMJstg==
+X-Google-Smtp-Source: ADFU+vshWyqLWpOrJ9xdCfB6ck/+0gAWWbuyILfFoD+Z2kMBSFsFceasLZxT529BjjoapKRl6E/1UmsBmrDgBmgHztI=
+X-Received: by 2002:adf:8187:: with SMTP id 7mr13325645wra.358.1585542222325; 
+ Sun, 29 Mar 2020 21:23:42 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1585262586.git.alistair.francis@wdc.com>
+ <mhng-f7361188-1bb2-4ea3-bc25-3076f877aa64@palmerdabbelt-glaptop1>
+In-Reply-To: <mhng-f7361188-1bb2-4ea3-bc25-3076f877aa64@palmerdabbelt-glaptop1>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 30 Mar 2020 09:53:30 +0530
+Message-ID: <CAAhSdy2PNi-XE94kzSVRZLc_iJOKkBvwB6eo8qu=byBOUH9DDw@mail.gmail.com>
+Subject: Re: [PATCH for 5.0 v1 0/2] RISC-V: Fix Hypervisor guest user space
+To: Palmer Dabbelt <palmer@dabbelt.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,85 +86,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
- david@gibson.dropbear.id.au
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds an empty handling for PASID-based Device-TLB
-invalidation. For now it is enough as it is not necessary to
-propagate it to host for passthru device and also there is no
-emulated device has device tlb.
+Hi Palmer,
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
----
- hw/i386/intel_iommu.c          | 18 ++++++++++++++++++
- hw/i386/intel_iommu_internal.h |  1 +
- 2 files changed, 19 insertions(+)
+On Fri, Mar 27, 2020 at 5:30 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
+>
+> On Thu, 26 Mar 2020 15:44:04 PDT (-0700), Alistair Francis wrote:
+> > This series fixes two bugs in the RISC-V two stage lookup
+> > implementation. This fixes the Hypervisor userspace failing to start.
+> >
+> > Alistair Francis (2):
+> >   riscv: Don't use stage-2 PTE lookup protection flags
+> >   riscv: AND stage-1 and stage-2 protection flags
+> >
+> >  target/riscv/cpu_helper.c | 11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> Thanks, these are in the queue.
+>
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 02ad90a..e8877d4 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3224,6 +3224,17 @@ static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
-     return true;
- }
- 
-+static bool vtd_process_device_piotlb_desc(IntelIOMMUState *s,
-+                                           VTDInvDesc *inv_desc)
-+{
-+    /*
-+     * no need to handle it for passthru device, for emulated
-+     * devices with device tlb, it may be required, but for now,
-+     * return is enough
-+     */
-+    return true;
-+}
-+
- static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
-                                           VTDInvDesc *inv_desc)
- {
-@@ -3345,6 +3356,13 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
-         }
-         break;
- 
-+    case VTD_INV_DESC_DEV_PIOTLB:
-+        trace_vtd_inv_desc("device-piotlb", inv_desc.hi, inv_desc.lo);
-+        if (!vtd_process_device_piotlb_desc(s, &inv_desc)) {
-+            return false;
-+        }
-+        break;
-+
-     case VTD_INV_DESC_DEVICE:
-         trace_vtd_inv_desc("device", inv_desc.hi, inv_desc.lo);
-         if (!vtd_process_device_iotlb_desc(s, &inv_desc)) {
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 85ebaa5..4910e63 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -386,6 +386,7 @@ typedef union VTDInvDesc VTDInvDesc;
- #define VTD_INV_DESC_WAIT               0x5 /* Invalidation Wait Descriptor */
- #define VTD_INV_DESC_PIOTLB             0x6 /* PASID-IOTLB Invalidate Desc */
- #define VTD_INV_DESC_PC                 0x7 /* PASID-cache Invalidate Desc */
-+#define VTD_INV_DESC_DEV_PIOTLB         0x8 /* PASID-based-DIOTLB inv_desc*/
- #define VTD_INV_DESC_NONE               0   /* Not an Invalidate Descriptor */
- 
- /* Masks for Invalidation Wait Descriptor*/
--- 
-2.7.4
+I have tested this patch series on latest QEMU master without
+"target/riscv: Don't set write permissions on dirty PTEs" workaround
+patch. It works fine now.
 
+Tested-by: Anup Patel <anup@brainfault.org>
+
+Please drop the work-around patch  "target/riscv: Don't set write
+permissions on dirty PTEs" from your for-next.
+
+Regards,
+Anup
 
