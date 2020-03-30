@@ -2,82 +2,98 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85143C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A33E7C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:46:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5116C20675
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:39:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6ED8C206F6
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:46:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jei6MkZo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5116C20675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQdmsOIO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ED8C206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIthX-00034X-Db
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 08:39:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40042)
+	id 1jItod-0005uU-Jx
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 08:46:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jItgl-0002ZY-Dl
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:38:48 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jItky-0004av-5u
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jItgj-0008IY-VK
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:38:47 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:52157)
+ (envelope-from <pbonzini@redhat.com>) id 1jItkw-00022y-Gc
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:43:07 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44535)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jItgj-0008IM-RG
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:38:45 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jItkw-000227-Cf
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:43:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585571925;
+ s=mimecast20190719; t=1585572185;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Z4cUzeidLCschmMx+521qeR+2AGe9fkhbWsqAhHXFkg=;
- b=Jei6MkZohwWkaJ0GFaOPY+9Wyuch94fZKKz9l/VPvrNx7L66Ahn45CvhnAYmYUu3pFt7C6
- JDq9n8Dt6Veurj2Hkx7F1+EqAurISyI1pD/VQcwynZuezHaHizoT+7eddi1kxwmQMLpOS3
- QuXk5q/T9LzJ51K/TLzeUwlEFUWBOoA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-e6d9mGMXOOW6hD0m0hqhTQ-1; Mon, 30 Mar 2020 08:38:41 -0400
-X-MC-Unique: e6d9mGMXOOW6hD0m0hqhTQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A27618AB2C4;
- Mon, 30 Mar 2020 12:38:40 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 89E3C5DA66;
- Mon, 30 Mar 2020 12:38:34 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table
- migration test
-To: Zenghui Yu <yuzenghui@huawei.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-14-eric.auger@redhat.com>
- <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ea74559c-2ab4-752c-e587-2bf40eab14b0@redhat.com>
-Date: Mon, 30 Mar 2020 14:38:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ bh=pcrFptVGfoSj3ap6kbIVgPnC4c8cKboLtH4qynP+4fE=;
+ b=jQdmsOIOdajOWJTAKxwasThbgiXGJqI4oS53RQgEBYeN45RXztk32bI+Ejpfr/aoQkigcY
+ xAIp+P+r6yYRHYcxFG4CgPHDVRTGN6nlRExEBkJVlWcVVTukuHi8LeYtv1UDy0ETA8iflG
+ sEVyUpQLjMe09+NmNjjks816gI293G0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-DQasrH9dNHmP5iFPgnAykg-1; Mon, 30 Mar 2020 08:43:03 -0400
+X-MC-Unique: DQasrH9dNHmP5iFPgnAykg-1
+Received: by mail-wr1-f71.google.com with SMTP id r15so3392586wrm.22
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 05:43:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pcrFptVGfoSj3ap6kbIVgPnC4c8cKboLtH4qynP+4fE=;
+ b=OZigKSOw8ARqmVihWZBBtgCBIlOdcr0DFa3PH9EIzh9RWQpb2xtRIU6OSt1ErSX1FZ
+ ABZkwdSVho0WDJFwG9EmwAILjGLQkVoPKycK8zs9Spezmh/zS5evzgip0aQam/fXJDlA
+ xQm/Lr35u7ucz8fUjWhbYURYPzzK04XEL0kL5ol1xiwEg4tqee+kqnyM+f1YwGrE2zps
+ xYhs11ERQjnViWS1NrPZolXm3v6x3BcnMOG1GfqF3G9TWwIbPW41QSTauHkUJVEg/YsI
+ 1Y0ktBiJTMPB51U8iuITz6pTh/X8NT2WIany+x7TvPARV1i1YyrjwdPvPtD8i1hjyQ7h
+ 1iKA==
+X-Gm-Message-State: ANhLgQ3TO80D12+d4P5rgxvwFDJXYRXQWHQrunTqYe8+RQ4HF5etty7J
+ jPqlScgHDQwa/g2lBZAIDfU5mzQ7NbqVMnP39HPijM0nOxnXuo6u1hfhg8m92FTxnEQarKthae2
+ 0g9/6QnFmAY+UtC0=
+X-Received: by 2002:a5d:4cc4:: with SMTP id c4mr14532668wrt.346.1585572182661; 
+ Mon, 30 Mar 2020 05:43:02 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvyhOC4V2M/6JX/si7fj+5gw8IZRUOjbQcqZz+w6Im/n3OQVVkYd6/5CM6j59DSp6n8ao7Brw==
+X-Received: by 2002:a5d:4cc4:: with SMTP id c4mr14532647wrt.346.1585572182338; 
+ Mon, 30 Mar 2020 05:43:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea?
+ ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
+ by smtp.gmail.com with ESMTPSA id n11sm18201469wrg.72.2020.03.30.05.43.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 30 Mar 2020 05:43:01 -0700 (PDT)
+Subject: Re: [PATCH] i386: hvf: Reset IRQ inhibition after moving RIP
+To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+References: <20200328174411.51491-1-r.bolshakov@yadro.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f013fab5-7a78-5c1c-6070-c23fd2f7ea53@redhat.com>
+Date: Mon, 30 Mar 2020 14:43:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200328174411.51491-1-r.bolshakov@yadro.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,206 +105,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, thuth@redhat.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Zenghui,
+On 28/03/20 18:44, Roman Bolshakov wrote:
+> The sequence of instructions exposes an issue:
+>   sti
+>   hlt
+> 
+> Interrupts cannot be delivered to hvf after hlt instruction cpu because
+> HF_INHIBIT_IRQ_MASK is set just before hlt is handled and never reset
+> after moving instruction pointer beyond hlt.
+> 
+> So, after hvf_vcpu_exec() returns, CPU thread gets locked up forever in
+> qemu_wait_io_event() (cpu_thread_is_idle() evaluates inhibition
+> flag and considers the CPU idle if the flag is set).
+> 
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+>  target/i386/hvf/vmx.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
+> index 03d2c79b9c..ce2a1532d5 100644
+> --- a/target/i386/hvf/vmx.h
+> +++ b/target/i386/hvf/vmx.h
+> @@ -167,6 +167,8 @@ static inline void macvm_set_cr4(hv_vcpuid_t vcpu, uint64_t cr4)
+>  
+>  static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+>  {
+> +    X86CPU *x86_cpu = X86_CPU(cpu);
+> +    CPUX86State *env = &x86_cpu->env;
+>      uint64_t val;
+>  
+>      /* BUG, should take considering overlap.. */
+> @@ -176,6 +178,7 @@ static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+>     val = rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+>     if (val & (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+>                 VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING)) {
+> +        env->hflags &= ~HF_INHIBIT_IRQ_MASK;
+>          wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY,
+>                 val & ~(VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+>                 VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING));
+> 
 
-On 3/30/20 2:06 PM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/20 17:24, Eric Auger wrote:
->> Add two new migration tests. One testing the migration of
->> a topology where collection were unmapped. The second test
->> checks the migration of the pending table.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->=20
-> [...]
->=20
->> @@ -659,6 +678,15 @@ static int its_prerequisites(int nb_cpus)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->> =C2=A0 }
->> =C2=A0 +static void set_lpi(struct its_device *dev, u32 eventid, u32 p=
-hysid,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 st=
-ruct its_collection *col)
->> +{
->> +=C2=A0=C2=A0=C2=A0 assert(dev && col);
->> +
->> +=C2=A0=C2=A0=C2=A0 its_send_mapti(dev, physid, eventid, col);
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
->> +}
->=20
-> I'd say we can just drop this helper and open-code it anywhere
-> necessarily. The name 'set_lpi' doesn't tell me too much about
-> what has been implemented inside the helper.
->=20
->> +
->> =C2=A0 /*
->> =C2=A0=C2=A0 * Setup the configuration for those mappings:
->> =C2=A0=C2=A0 * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
->> @@ -790,6 +818,108 @@ static void test_its_migration(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev7/eventid=3D255 tri=
-ggers LPI 8196 on PE #2
->> after migration");
->> =C2=A0 }
->> +
->> +static void test_migrate_unmapped_collection(void)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct its_collection *col;
->> +=C2=A0=C2=A0=C2=A0 struct its_device *dev2, *dev7;
->> +=C2=A0=C2=A0=C2=A0 int pe0 =3D 0;
->> +=C2=A0=C2=A0=C2=A0 u8 config;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (its_setup1())
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +
->> +=C2=A0=C2=A0=C2=A0 col =3D its_create_collection(pe0, pe0);
->> +=C2=A0=C2=A0=C2=A0 dev2 =3D its_get_device(2);
->> +=C2=A0=C2=A0=C2=A0 dev7 =3D its_get_device(7);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* MAPTI with the collection unmapped */
->> +=C2=A0=C2=A0=C2=A0 set_lpi(dev2, 0, 8192, col);
->=20
-> ... and it's only invoked here.
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 puts("Now migrate the VM, then press a key to cont=
-inue...\n");
->> +=C2=A0=C2=A0=C2=A0 (void)getchar();
->> +=C2=A0=C2=A0=C2=A0 report_info("Migration complete");
->> +
->> +=C2=A0=C2=A0=C2=A0 /* on the destination, map the collection */
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(col, true);
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(col);
->> +
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(2, 8196);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev7/eventid=3D 255 triggered LPI=
- 8196 on PE #2");
->> +
->> +=C2=A0=C2=A0=C2=A0 config =3D gicv3_lpi_get_config(8192);
->> +=C2=A0=C2=A0=C2=A0 report(config =3D=3D LPI_PROP_DEFAULT,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Config =
-of LPI 8192 was properly migrated");
->> +
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(pe0, 8192);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 0);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev2/eventid =3D 0 triggered LPI =
-8192 on PE0");
->> +}
->> +
->> +static void test_its_pending_migration(void)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct its_device *dev;
->> +=C2=A0=C2=A0=C2=A0 struct its_collection *collection[2];
->> +=C2=A0=C2=A0=C2=A0 int *expected =3D malloc(nr_cpus * sizeof(int));
->> +=C2=A0=C2=A0=C2=A0 int pe0 =3D nr_cpus - 1, pe1 =3D nr_cpus - 2;
->> +=C2=A0=C2=A0=C2=A0 u64 pendbaser;
->> +=C2=A0=C2=A0=C2=A0 void *ptr;
->> +=C2=A0=C2=A0=C2=A0 int i;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (its_prerequisites(4))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +
->> +=C2=A0=C2=A0=C2=A0 dev =3D its_create_device(2 /* dev id */, 8 /* nb_=
-ites */);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapd(dev, true);
->> +
->> +=C2=A0=C2=A0=C2=A0 collection[0] =3D its_create_collection(pe0, pe0);
->> +=C2=A0=C2=A0=C2=A0 collection[1] =3D its_create_collection(pe1, pe1);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(collection[0], true);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(collection[1], true);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* disable lpi at redist level */
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_disable(pe0);
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_disable(pe1);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* lpis are interleaved inbetween the 2 PEs */
->> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < 256; i++) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_collection *col=
- =3D i % 2 ? collection[0] :
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 collection[1];
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int vcpu =3D col->target_a=
-ddress >> 16;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 its_send_mapti(dev, LPI(i)=
-, i, col);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(LPI(i=
-), LPI_PROP_DEFAULT);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_clr_pending(=
-vcpu, LPI(i), true);
->> +=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(collection[0]);
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(collection[1]);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* Clear the PTZ bit on each pendbaser */
->> +
->> +=C2=A0=C2=A0=C2=A0 expected[pe0] =3D 128;
->> +=C2=A0=C2=A0=C2=A0 expected[pe1] =3D 128;
->=20
-> Do we need to initialize expected[] for other PEs? Or it has always
-> been zeroed by the kvm-unit-tests implementation of malloc()?
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe0] + GICR_PENDBAS=
-ER;
->> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
->> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe1] + GICR_PENDBAS=
-ER;
->> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
->> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe0);
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe1);
->=20
-> I don't know how the migration gets implemented in kvm-unit-tests.
-> But is there any guarantee that the LPIs will only be triggered on the
-> destination side? As once the EnableLPIs bit becomes 1, VGIC will start
-> reading the pending bit in guest memory and potentially injecting LPIs
-> into the target vcpu (in the source side).
+Queued, thanks!
 
-I expect some LPIs to hit on source and some others to hit on the
-destination. To me, this does not really matter as long as the handlers
-gets called and accumulate the stats. Given the number of LPIs, we will
-at least test the migration of some of the pending bits and especially
-adjacent ones. It does work as it allows to test your fix:
-
-ca185b260951  KVM: arm/arm64: vgic: Don't rely on the wrong pending table
-
-Thanks
-
-Eric
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 puts("Now migrate the VM, then press a key to cont=
-inue...\n");
->> +=C2=A0=C2=A0=C2=A0 (void)getchar();
->> +=C2=A0=C2=A0=C2=A0 report_info("Migration complete");
->> +
->> +=C2=A0=C2=A0=C2=A0 /* let's wait for the 256 LPIs to be handled */
->> +=C2=A0=C2=A0=C2=A0 mdelay(1000);
->> +
->> +=C2=A0=C2=A0=C2=A0 check_lpi_hits(expected, "128 LPIs on both PE0 and=
- PE1 after
->> migration");
->> +}
->=20
->=20
-> Thanks,
-> Zenghui
->=20
->=20
+Paolo
 
 
