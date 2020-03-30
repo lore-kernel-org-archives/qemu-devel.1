@@ -2,59 +2,79 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82889C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:42:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37087C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:42:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 573842072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:42:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573842072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0250D2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:42:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gTMj9InS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0250D2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIwYQ-0005pG-IP
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 11:42:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40853)
+	id 1jIwYv-00072B-5O
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 11:42:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40943)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIwXC-0004Li-Um
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:41:08 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jIwXu-0005QG-Ny
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:41:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIwXB-0004ZY-8Y
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:41:06 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34002)
+ (envelope-from <kwolf@redhat.com>) id 1jIwXr-0006YH-Mp
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:41:49 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39310)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jIwX9-0004F0-92; Mon, 30 Mar 2020 11:41:05 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07502313|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_alarm|0.0133074-0.000161227-0.986531;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16378; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=11; RT=11; SR=0; TI=SMTPD_---.H7jUD8L_1585582855; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H7jUD8L_1585582855)
- by smtp.aliyun-inc.com(10.147.41.178);
- Mon, 30 Mar 2020 23:40:56 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v7 02/61] target/riscv: implementation-defined constant
- parameters
-Date: Mon, 30 Mar 2020 23:35:34 +0800
-Message-Id: <20200330153633.15298-3-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jIwXr-0006Ut-EZ
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:41:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585582906;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3uidjaBkqtj4/4grd9VI6Un3UwGaxGlgtGagN+4fy2c=;
+ b=gTMj9InS9nGlhbA72ME9U2Gn9RGT+S2MQfmgCovEM6JSTy8cTW6yQSFFx9dwz3k/MxeMCA
+ 69UJuvcfjagdDaT3oY7dsXPpyd3Dk8Kjk8dykbz61Lsl+cnwOkoscI5K1zJANFeDeGLTEc
+ jwi4VieEijTD5jj76yIMgsjCflU9M4o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-oAfz0UbGONS4LQpN-Ifz0Q-1; Mon, 30 Mar 2020 11:41:41 -0400
+X-MC-Unique: oAfz0UbGONS4LQpN-Ifz0Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53A78149D5;
+ Mon, 30 Mar 2020 15:41:40 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-66.ams2.redhat.com [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AFF2819925;
+ Mon, 30 Mar 2020 15:41:38 +0000 (UTC)
+Date: Mon, 30 Mar 2020 17:41:37 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v9 01/14] iotests: do a light delinting
+Message-ID: <20200330154137.GE6139@linux.fritz.box>
+References: <20200324232103.4195-1-jsnow@redhat.com>
+ <20200324232103.4195-2-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <20200324232103.4195-2-jsnow@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,88 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
+ philmd@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vlen is the vector register length in bits.
-elen is the max element size in bits.
-vext_spec is the vector specification version, default value is v0.7.1.
+Am 25.03.2020 um 00:20 hat John Snow geschrieben:
+> This doesn't fix everything in here, but it does help clean up the
+> pylint report considerably.
+>=20
+> This should be 100% style changes only; the intent is to make pylint
+> more useful by working on establishing a baseline for iotests that we
+> can gate against in the future.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/cpu.c | 7 +++++++
- target/riscv/cpu.h | 5 +++++
- 2 files changed, 12 insertions(+)
+> @@ -550,8 +546,8 @@ def flatten_qmp_object(self, obj, output=3DNone, base=
+str=3D''):
+>          if output is None:
+>              output =3D dict()
+>          if isinstance(obj, list):
+> -            for i in range(len(obj)):
+> -                self.flatten_qmp_object(obj[i], output, basestr + str(i)=
+ + '.')
+> +            for i, atom in enumerate(obj):
+> +                self.flatten_qmp_object(atom, output, basestr + str(i) +=
+ '.')
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 4e578239d3..077a32526e 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -106,6 +106,11 @@ static void set_priv_version(CPURISCVState *env, int priv_ver)
-     env->priv_ver = priv_ver;
- }
- 
-+static void set_vext_version(CPURISCVState *env, int vext_ver)
-+{
-+    env->vext_ver = vext_ver;
-+}
-+
- static void set_feature(CPURISCVState *env, int feature)
- {
-     env->features |= (1ULL << feature);
-@@ -365,6 +370,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-     CPURISCVState *env = &cpu->env;
-     RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
-     int priv_version = PRIV_VERSION_1_11_0;
-+    int vext_version = VEXT_VERSION_0_07_1;
-     target_ulong target_misa = 0;
-     Error *local_err = NULL;
- 
-@@ -390,6 +396,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-     }
- 
-     set_priv_version(env, priv_version);
-+    set_vext_version(env, vext_version);
-     set_resetvec(env, DEFAULT_RSTVEC);
- 
-     if (cpu->cfg.mmu) {
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 6663ee8b8c..5c75734188 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -84,6 +84,8 @@ enum {
- #define PRIV_VERSION_1_10_0 0x00011000
- #define PRIV_VERSION_1_11_0 0x00011100
- 
-+#define VEXT_VERSION_0_07_1 0x00000701
-+
- #define TRANSLATE_PMP_FAIL 2
- #define TRANSLATE_FAIL 1
- #define TRANSLATE_SUCCESS 0
-@@ -119,6 +121,7 @@ struct CPURISCVState {
-     target_ulong guest_phys_fault_addr;
- 
-     target_ulong priv_ver;
-+    target_ulong vext_ver;
-     target_ulong misa;
-     target_ulong misa_mask;
- 
-@@ -281,6 +284,8 @@ typedef struct RISCVCPU {
- 
-         char *priv_spec;
-         char *user_spec;
-+        uint16_t vlen;
-+        uint16_t elen;
-         bool mmu;
-         bool pmp;
-     } cfg;
--- 
-2.23.0
+I think atom isn't strictly the right word because we expect nested data
+structures (as shown by the recursive call). If I understand correctly,
+what Python calls things in lists is "items".
+
+Kevin
 
 
