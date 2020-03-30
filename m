@@ -2,82 +2,81 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B6AC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 476B5C2D0EE
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:48:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 407BE20714
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:37:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D11E20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:48:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evy2x4vE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407BE20714
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d0gu+1Vm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D11E20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIqrQ-0006FQ-Cq
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:37:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41562)
+	id 1jIr21-0008Cm-69
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:48:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jIqqm-0005q2-E8
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:36:57 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jIr1C-0007hA-2a
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jIqqk-0006ff-Jm
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:36:55 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60838)
+ (envelope-from <jasowang@redhat.com>) id 1jIr1A-0003sd-Jl
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:47:41 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41910)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jIqqk-0006fI-EA
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:36:54 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jIr1A-0003s1-9M
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:47:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585561013;
+ s=mimecast20190719; t=1585561659;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GsQts7KdvM7OmuNRLhUrsthOkUg/qgVxfy93Ru1gfZY=;
- b=evy2x4vEuSEzfOEfMOBk7XF0LlGg9RwTvNCG35I6npTYRAPhPaZ6QfS7xiTu8M55RWmvbq
- vBQEFdfY5KPNoZiKFA0tpVgcqz4OHMXaKLms+LMZBThs+zYCl3YbTWQzK4CvkFUP8SabPF
- boQ5wulj/gkF+fAld2GXv73tuee+HbY=
+ bh=fGZ48B7G3BziEjDZPS6wc9j+vNKY5YihIl3COxIMS0U=;
+ b=d0gu+1Vmqu/7N+ZSMSfK2w4LdmWbos4HKGTO3Vut4gW5mO639O/OGpENzL95DCDulnzsms
+ 5dXaNWOuIPeDRt0lWBelomYQkSDeyqzEFMbdkKWFhHnnYshT0wN2fwSweJ3Wf+7cypm/A1
+ 04mp7NUG3NAPQj0rQ/D+FhLidDjvsec=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-H-Aylf-TMzeyq1sp7BqO4w-1; Mon, 30 Mar 2020 05:36:52 -0400
-X-MC-Unique: H-Aylf-TMzeyq1sp7BqO4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-210-zT3dh9OCM-e4u_k9ykyjqw-1; Mon, 30 Mar 2020 05:47:36 -0400
+X-MC-Unique: zT3dh9OCM-e4u_k9ykyjqw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A0A6E6BAC;
- Mon, 30 Mar 2020 09:36:43 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D17C9DA0FB;
- Mon, 30 Mar 2020 09:36:23 +0000 (UTC)
-Subject: Re: [PATCH v2 03/22] vfio: check VFIO_TYPE1_NESTING_IOMMU support
-To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
- alex.williamson@redhat.com, peterx@redhat.com
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-4-git-send-email-yi.l.liu@intel.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <2c65e531-1cc8-dc01-4b06-e7baff58addd@redhat.com>
-Date: Mon, 30 Mar 2020 11:36:19 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05DF71005509;
+ Mon, 30 Mar 2020 09:47:35 +0000 (UTC)
+Received: from [10.72.13.226] (ovpn-13-226.pek2.redhat.com [10.72.13.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7E0D5E026;
+ Mon, 30 Mar 2020 09:47:33 +0000 (UTC)
+Subject: Re: [PULL 00/13] Net patches
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <1585307647-24456-1-git-send-email-jasowang@redhat.com>
+ <CAFEAcA-u-vp6ETypJLTakc0bCTYfg7_9ONF6Za7GsmOtz6qXVQ@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <463a4d56-d843-a1a2-f078-b82c922730d9@redhat.com>
+Date: Mon, 30 Mar 2020 17:47:32 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-4-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAFEAcA-u-vp6ETypJLTakc0bCTYfg7_9ONF6Za7GsmOtz6qXVQ@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,81 +88,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
- pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yi,
 
-On 3/30/20 6:24 AM, Liu Yi L wrote:
-> VFIO needs to check VFIO_TYPE1_NESTING_IOMMU support with Kernel before
-> further using it. e.g. requires to check IOMMU UAPI version.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
->  hw/vfio/common.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 0b3593b..c276732 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1157,12 +1157,21 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
->  static int vfio_get_iommu_type(VFIOContainer *container,
->                                 Error **errp)
->  {
-> -    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
-> +    int iommu_types[] = { VFIO_TYPE1_NESTING_IOMMU,
-> +                          VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
->                            VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
-> -    int i;
-> +    int i, version;
->  
->      for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
->          if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
-> +            if (iommu_types[i] == VFIO_TYPE1_NESTING_IOMMU) {
-> +                version = ioctl(container->fd, VFIO_CHECK_EXTENSION,
-> +                                VFIO_NESTING_IOMMU_UAPI);
-> +                if (version < IOMMU_UAPI_VERSION) {
-> +                    info_report("IOMMU UAPI incompatible for nesting");
-> +                    continue;
-> +                }
-> +            }
-This means that by default VFIO_TYPE1_NESTING_IOMMU wwould be chosen. I
-don't think this what we want. On ARM this would mean that for a
-standard VFIO assignment without vIOMMU, SL will be used instead of FL.
-This may not be harmless.
+On 2020/3/27 =E4=B8=8B=E5=8D=887:36, Peter Maydell wrote:
+> On Fri, 27 Mar 2020 at 11:14, Jason Wang <jasowang@redhat.com> wrote:
+>> The following changes since commit cfe68ae025f704f336d7dd3d1903ce37b4458=
+31d:
+>>
+>>    Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0=
+-pull-request' into staging (2020-03-26 20:55:54 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>    https://github.com/jasowang/qemu.git tags/net-pull-request
+>>
+>> for you to fetch changes up to f3b364f4f77fcb24cec468f518bf5e093dc27cb7:
+>>
+>>    hw/net/allwinner-sun8i-emac.c: Fix REG_ADDR_HIGH/LOW reads (2020-03-2=
+7 18:59:47 +0800)
+>>
+>> ----------------------------------------------------------------
+>>
+>> ----------------------------------------------------------------
+> Hi; this fails to compile (all platforms):
 
-For instance, in "[RFC v6 09/24] vfio: Force nested if iommu requires
-it", I use nested only if I detect we have a vSMMU. Otherwise I keep the
-legacy VFIO_TYPE1v2_IOMMU.
+
+My bad, forget to run full docker test before sending the pull request.
+
+
+>
+> /home/petmay01/qemu-for-merges/hw/net/allwinner-sun8i-emac.c:773:20:
+> error: initialization from incompatible pointer type
+> [-Werror=3Dincompatible-pointer-types]
+>       .can_receive =3D allwinner_sun8i_emac_can_receive,
+>                      ^
+> /home/petmay01/qemu-for-merges/hw/net/allwinner-sun8i-emac.c:773:20:
+> note: (near initialization for
+> 'net_allwinner_sun8i_emac_info.can_receive')
+>
+>
+> There's also this one, though not every compiler picked it up:
+>
+> /home/peter.maydell/qemu/hw/net/i82596.c: In function 'i82596_receive':
+> /home/peter.maydell/qemu/hw/net/i82596.c:657:30: error: comparison of
+> unsigned expression >=3D 0 is always true [-Werror=3Dtype-limits]
+>                   assert(bufsz >=3D 0);
+>                                ^
+> /home/peter.maydell/qemu/hw/net/i82596.c:657:30: error: comparison of
+> unsigned expression >=3D 0 is always true [-Werror=3Dtype-limits]
+>                   assert(bufsz >=3D 0);
+>                                ^
+>
+>
+> For the first error, I think this needs squashing into
+> "hw/net: Make NetCanReceive() return a boolean":
+>
+> diff --git a/hw/net/allwinner-sun8i-emac.c b/hw/net/allwinner-sun8i-emac.=
+c
+> index fc67a1be70..28637ff4c1 100644
+> --- a/hw/net/allwinner-sun8i-emac.c
+> +++ b/hw/net/allwinner-sun8i-emac.c
+> @@ -395,7 +395,7 @@ static void
+> allwinner_sun8i_emac_flush_desc(FrameDescriptor *desc,
+>       cpu_physical_memory_write(phys_addr, desc, sizeof(*desc));
+>   }
+>
+> -static int allwinner_sun8i_emac_can_receive(NetClientState *nc)
+> +static bool allwinner_sun8i_emac_can_receive(NetClientState *nc)
+>   {
+>       AwSun8iEmacState *s =3D qemu_get_nic_opaque(nc);
+>       FrameDescriptor desc;
+>
+>
+> Squashing this into my
+> "hw/net/i82596.c: Avoid reading off end of buffer in i82596_receive()"
+> commit fixes the second error.
+>
+> diff --git a/hw/net/i82596.c b/hw/net/i82596.c
+> index a9bdbac339..055c3a1470 100644
+> --- a/hw/net/i82596.c
+> +++ b/hw/net/i82596.c
+> @@ -653,8 +653,8 @@ ssize_t i82596_receive(NetClientState *nc, const
+> uint8_t *buf, size_t sz)
+>
+>               if (bufcount > 0) {
+>                   /* Still some of the actual data buffer to transfer */
+> +                assert(bufsz >=3D bufcount);
+>                   bufsz -=3D bufcount;
+> -                assert(bufsz >=3D 0);
+>                   address_space_write(&address_space_memory, rba,
+>                                       MEMTXATTRS_UNSPECIFIED, buf, bufcou=
+nt);
+>                   rba +=3D bufcount;
+>
+> thanks
+> -- PMM
+>
+
+Right, will fix them.
 
 Thanks
 
-Eric
->              return iommu_types[i];
->          }
->      }
-> @@ -1278,6 +1287,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->      }
->  
->      switch (container->iommu_type) {
-> +    case VFIO_TYPE1_NESTING_IOMMU:
->      case VFIO_TYPE1v2_IOMMU:
->      case VFIO_TYPE1_IOMMU:
->      {
-> 
 
 
