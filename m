@@ -2,73 +2,101 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8497C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5F0C2D0E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:54:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF59A2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A92420776
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:54:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cNgm9pbL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF59A2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="bSiesSCi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A92420776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxfN-0005zM-T3
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:53:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53990)
+	id 1jIxfm-0006lE-8x
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:54:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jIxdP-0002mk-2l
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:51:36 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1jIxej-0005Dm-1p
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jIxdN-00069g-DN
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:51:34 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:20609)
+ (envelope-from <anthony.perard@citrix.com>) id 1jIxei-00077O-0a
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:52:56 -0400
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:29728)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jIxdN-00068P-8Z
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:51:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585587092;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=A7/w/rIoSm/HqUimSv+sanRXug3k4lzfdzGcY0nPkh0=;
- b=cNgm9pbLpDbYFgzp157TB7wT4jVxLgU6O3DETz4lxGY+hmt9Trq7Lv4kZKlgVknZXqUwZS
- 8x6E8y95AT0QOLz05laLF9WCHJjQoRW6Eb0IUh5+zzC+eAuKcq2sVHsE8sEsQMOPG0dqu4
- yd+6pY0N1gRRwGSjmUqF72aQP9QYG+M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-XFQp1mv8NJKs_bgX0H0Gig-1; Mon, 30 Mar 2020 12:51:30 -0400
-X-MC-Unique: XFQp1mv8NJKs_bgX0H0Gig-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 352E6107BA99;
- Mon, 30 Mar 2020 16:51:29 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-227.ams2.redhat.com [10.36.113.227])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D477C194BB;
- Mon, 30 Mar 2020 16:51:23 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] s390x: Reject unaligned RAM sizes
-Date: Mon, 30 Mar 2020 18:51:22 +0200
-Message-Id: <20200330165122.34564-1-david@redhat.com>
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1jIxeh-00074C-M5
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:52:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1585587175;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=AXeXsNTJMmSF+e5xX73xlrc4D7iLGMTcVw8qDrghgG8=;
+ b=bSiesSCiH8oGL2mo3G1u58m1RuSYi/Aeq/7QHwUNvDPEWYG77WuI6sy+
+ v1YpYH+GB9x+wKwKjADpigHjgS+fdM64qaKae4fAb6C4H4KrN8Nd+ztUh
+ 7YvyHK3BR3ZKTuVqI3Z8FMDEWElzQjarIgUdMw1cTUY6Pvxqj7qlJEZ41 0=;
+Authentication-Results: esa5.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+ ip4:168.245.78.127 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: alVgjttp/oTsW9TdYs19l7wdvB+3cs1GznlA+oYXnaT5Q/owL4ou6u0BslnelCDbS3pqC8TXF3
+ hFO/H34OuO/D5zY0ZQjGbgYLItqYvDXKpZLUjIR4H933aoyCUVDB3SRzv+aCWcIU3PwLYHV9J/
+ vXFA7CLxnemE99TBh2I7yFyK4nEEOtw0vNZ4G0Z8cufyMM3GXcS7DVBNk8EPqdQMViz8Ja1MGj
+ cc49yqFxEimdMMBzApz3pHIGjOfQgG5ynMjsSfENeIWZXDnS+EAsXHrnjb9SVaR282h7JOIcXP
+ UwA=
+X-SBRS: 2.7
+X-MesageID: 15201099
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.72,325,1580792400"; d="scan'208";a="15201099"
+Date: Mon, 30 Mar 2020 17:52:48 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH for-5.0] xen: fixup RAM memory region initialization
+Message-ID: <20200330165248.GR4088@perard.uk.xensource.com>
+References: <20200327104828.12647-1-imammedo@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200327104828.12647-1-imammedo@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.155.168
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,165 +108,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Historically, we fixed up the RAM size (rounded it down), to fit into
-storage increments (maximum number of storage increments is 1020). Since
-commit 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM"), we no
-longer consider the fixed-up size when allcoating the RAM block - which
-will break migration.
+On Fri, Mar 27, 2020 at 06:48:28AM -0400, Igor Mammedov wrote:
+> Since bd457782b3b0 ("x86/pc: use memdev for RAM") Xen
+> machine fails to start with:
+>    qemu-system-i386: xen: failed to populate ram at 0
+> 
+> The reason is that xen_ram_alloc() which is called by
+> memory_region_init_ram(), compares memory region with
+> statically allocated 'global' ram_memory memory region
+> that it uses for RAM, and does nothing in case it matches.
+> 
+> While it's possible feed machine->ram to xen_ram_alloc()
+> in the same manner to keep that hack working, I'd prefer
+> not to keep that circular dependency and try to untangle that.
+> 
+> However it doesn't look trivial to fix, so as temporary
+> fixup opt out Xen machine from memdev based RAM allocation,
+> and let xen_ram_alloc() do its trick for now.
+> 
+> Reported-by: Anthony PERARD <anthony.perard@citrix.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Let's simply drop that manual fixup code and let the user supply sane
-RAM sizes. This will bail out early when trying to migrate (and make
-an existing guest with e.g., 12345 MB non-migratable), but maybe we
-should have rejected such RAM sizes right from the beginning. One can
-consider it a BUG that we don't supply what the user asked for.
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-As we no longer fixup maxram_size as well, make other users use ram_size
-instead. Keep using maxram_size when setting the maximum ram size in KVM,
-as that will come in handy in the future when supporting memory hotplug
-(in contrast, storage keys and storage attributes for hotplugged memory
- will have to be migrated per RAM block in the future).
+That should work on most configs. But we also sometime use the "pc"
+machine with accel=xen, to run without the "xen-platform" pci device,
+but that would be less common.
 
-This fixes (or rather rejects early):
+Thanks,
 
-1. Migrating older QEMU to upstream QEMU (e.g., with "-m 1235M"), as the
-   RAM block size changed.
-
-2. Migrating upstream QEMU to upstream QEMU (e.g., with "-m 1235M"), as
-   we receive storage attributes for memory we don't expect (as we fixed up
-   ram_size and maxram_size).
-
-Note that a migration from older QEMU is still possible - the migration
-target has to be started with the properly (down) aligned size (e.g.,
-"-m 1234M" instead of "-m 1235M"). The following table can be used to write
-a conversion script to automate migration in environments where
-this is relevant.
-
- VM size (<=3D) | Alignment
---------------------------
-      1020M   |     1M
-      2040M   |     2M
-      4080M   |     4M
-      8160M   |     8M
-     16320M   |    16M
-     32640M   |    32M
-     65280M   |    64M
-    130560M   |   128M
-    261120M   |   256M
-    522240M   |   512M
-   1044480M   |     1G
-   2088960M   |     2G
-   4177920M   |     4G
-   8355840M   |     8G
-
-Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-
-v1 -> v2:
-- Don't use global ram_size
-- Add more details how migration from older QEMU can still work, along
-  with a table.
-
----
- hw/s390x/s390-skeys.c        |  2 +-
- hw/s390x/s390-stattrib-kvm.c |  4 ++--
- hw/s390x/sclp.c              | 20 +++++++++++---------
- 3 files changed, 14 insertions(+), 12 deletions(-)
-
-diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-index 5da6e5292f..a9a4ae7b39 100644
---- a/hw/s390x/s390-skeys.c
-+++ b/hw/s390x/s390-skeys.c
-@@ -176,7 +176,7 @@ static void qemu_s390_skeys_init(Object *obj)
-     QEMUS390SKeysState *skeys =3D QEMU_S390_SKEYS(obj);
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-=20
--    skeys->key_count =3D machine->maxram_size / TARGET_PAGE_SIZE;
-+    skeys->key_count =3D machine->ram_size / TARGET_PAGE_SIZE;
-     skeys->keydata =3D g_malloc0(skeys->key_count);
- }
-=20
-diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-index c7e1f35524..f89d8d9d16 100644
---- a/hw/s390x/s390-stattrib-kvm.c
-+++ b/hw/s390x/s390-stattrib-kvm.c
-@@ -85,7 +85,7 @@ static int kvm_s390_stattrib_set_stattr(S390StAttribState=
- *sa,
- {
-     KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
-     MachineState *machine =3D MACHINE(qdev_get_machine());
--    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
-+    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
-=20
-     if (start_gfn + count > max) {
-         error_report("Out of memory bounds when setting storage attributes=
-");
-@@ -104,7 +104,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttribS=
-tate *sa)
- {
-     KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
-     MachineState *machine =3D MACHINE(qdev_get_machine());
--    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
-+    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
-     /* We do not need to reach the maximum buffer size allowed */
-     unsigned long cx, len =3D KVM_S390_SKEYS_MAX / 2;
-     int r;
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index af0bfbc2ec..bbf6364511 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -327,7 +327,7 @@ out:
- static void sclp_memory_init(SCLPDevice *sclp)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
--    ram_addr_t initial_mem =3D machine->ram_size;
-+    uint64_t initial_mem =3D machine->ram_size;
-     int increment_size =3D 20;
-=20
-     /* The storage increment size is a multiple of 1M and is a power of 2.
-@@ -339,15 +339,17 @@ static void sclp_memory_init(SCLPDevice *sclp)
-     }
-     sclp->increment_size =3D increment_size;
-=20
--    /* The core memory area needs to be aligned with the increment size.
--     * In effect, this can cause the user-specified memory size to be roun=
-ded
--     * down to align with the nearest increment boundary. */
-+    /*
-+     * The core memory area needs to be aligned to the increment size. In
-+     * case it's not aligned, bail out.
-+     */
-     initial_mem =3D initial_mem >> increment_size << increment_size;
--
--    machine->ram_size =3D initial_mem;
--    machine->maxram_size =3D initial_mem;
--    /* let's propagate the changed ram size into the global variable. */
--    ram_size =3D initial_mem;
-+    if (initial_mem !=3D machine->ram_size) {
-+        error_report("RAM size not aligned to storage increments."
-+                     " Possible aligned RAM size: %" PRIu64 " MB",
-+                     initial_mem / MiB);
-+        exit(1);
-+    }
- }
-=20
- static void sclp_init(Object *obj)
---=20
-2.25.1
-
+-- 
+Anthony PERARD
 
