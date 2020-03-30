@@ -2,62 +2,62 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDB0C2D0EB
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD560C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:46:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B637020578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:44:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B637020578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B32A2205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:46:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B32A2205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIruH-0004TB-T1
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 06:44:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50725)
+	id 1jIrwU-0005oM-Sw
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 06:46:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuzenghui@huawei.com>) id 1jIrte-0003wA-Up
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:43:59 -0400
+ (envelope-from <groug@kaod.org>) id 1jIrvT-00059v-BY
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuzenghui@huawei.com>) id 1jIrtd-0001SZ-Ml
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:43:58 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:41442 helo=huawei.com)
+ (envelope-from <groug@kaod.org>) id 1jIrvR-00037j-WC
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:45:51 -0400
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:37710)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
- id 1jIrtZ-0001N7-5E; Mon, 30 Mar 2020 06:43:54 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id C80DCD5780820CED5358;
- Mon, 30 Mar 2020 18:43:46 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
- 18:43:38 +0800
-Subject: Re: [kvm-unit-tests PATCH v7 10/13] arm/arm64: ITS: INT functional
- tests
-To: Eric Auger <eric.auger@redhat.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-11-eric.auger@redhat.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <f7f1d7c4-2321-9123-2394-528af737bfa7@huawei.com>
-Date: Mon, 30 Mar 2020 18:43:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jIrvR-000301-Qk
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:45:49 -0400
+Received: from player738.ha.ovh.net (unknown [10.110.171.50])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 5AD5815E0A6
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 12:45:41 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player738.ha.ovh.net (Postfix) with ESMTPSA id D2383110750D2;
+ Mon, 30 Mar 2020 10:45:34 +0000 (UTC)
+Date: Mon, 30 Mar 2020 12:45:33 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 1/7] target/ppc: Enforce that the root page directory
+ size must be at least 5
+Message-ID: <20200330124533.5ace0a0f@bahia.lan>
+In-Reply-To: <20200330094946.24678-2-clg@kaod.org>
+References: <20200330094946.24678-1-clg@kaod.org>
+ <20200330094946.24678-2-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200320092428.20880-11-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 14831479474975185291
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeihedgfedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 46.105.56.76
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,83 +69,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, thuth@redhat.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
+On Mon, 30 Mar 2020 11:49:40 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-On 2020/3/20 17:24, Eric Auger wrote:
-> Triggers LPIs through the INT command.
-> 
-> the test checks the LPI hits the right CPU and triggers
-> the right LPI intid, ie. the translation is correct.
-> 
-> Updates to the config table also are tested, along with inv
-> and invall commands.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>=20
+> According to the ISA the root page directory size of a radix tree for
+> either process- or partition-scoped translation must be >=3D 5.
+>=20
+> Thus add this to the list of conditions checked when validating the
+> partition table entry in validate_pate();
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
 
-[...]
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-So I've tested this series and found that the "INT" test will sometimes
-fail.
-
-"not ok 12 - gicv3: its-migration: dev2/eventid=20 triggers LPI 8195 en 
-PE #3 after migration
-not ok 13 - gicv3: its-migration: dev7/eventid=255 triggers LPI 8196 on 
-PE #2 after migration"
-
- From logs:
-"INFO: gicv3: its-migration: Migration complete
-INT dev_id=2 event_id=20
-INFO: gicv3: its-migration: No LPI received whereas (cpuid=3, 
-intid=8195) was expected
-FAIL: gicv3: its-migration: dev2/eventid=20 triggers LPI 8195 en PE #3 
-after migration
-INT dev_id=7 event_id=255
-INFO: gicv3: its-migration: No LPI received whereas (cpuid=2, 
-intid=8196) was expected
-FAIL: gicv3: its-migration: dev7/eventid=255 triggers LPI 8196 on PE #2 
-after migration"
-
-> +static void check_lpi_stats(const char *msg)
-> +{
-> +	bool pass = false;
-> +
-> +	mdelay(100);
-
-After changing this to 'mdelay(1000)', the above error doesn't show up
-anymore. But it sounds strange that 100ms is not enough to deliver a
-single LPI. I haven't dig it further but will get back here later.
-
-> +	smp_rmb(); /* pairs with wmb in lpi_handler */
-> +	if (lpi_stats.observed.cpu_id != lpi_stats.expected.cpu_id ||
-> +	    lpi_stats.observed.lpi_id != lpi_stats.expected.lpi_id) {
-> +		if (lpi_stats.observed.cpu_id == -1 &&
-> +		    lpi_stats.observed.lpi_id == -1) {
-> +			report_info("No LPI received whereas (cpuid=%d, intid=%d) "
-> +				    "was expected", lpi_stats.expected.cpu_id,
-> +				    lpi_stats.expected.lpi_id);
-> +		} else {
-> +			report_info("Unexpected LPI (cpuid=%d, intid=%d)",
-> +				    lpi_stats.observed.cpu_id,
-> +				    lpi_stats.observed.lpi_id);
-> +		}
-> +	} else {
-> +		pass = true;
-> +	}
-> +	report(pass, "%s", msg);
-> +}
-
-This patch itself looks good to me,
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-
-
-Thanks
+>  target/ppc/mmu-radix64.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+> index 224e646c5094..99678570581b 100644
+> --- a/target/ppc/mmu-radix64.c
+> +++ b/target/ppc/mmu-radix64.c
+> @@ -212,6 +212,9 @@ static bool validate_pate(PowerPCCPU *cpu, uint64_t l=
+pid, ppc_v3_pate_t *pate)
+>      if (lpid =3D=3D 0 && !msr_hv) {
+>          return false;
+>      }
+> +    if ((pate->dw0 & PATE1_R_PRTS) < 5) {
+> +        return false;
+> +    }
+>      /* More checks ... */
+>      return true;
+>  }
 
 
