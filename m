@@ -7,88 +7,88 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A40E9C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 650A0C2D0E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:23:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E61B2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33B222072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YM08QKdI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E61B2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/ojmwYo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B222072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxC7-0003gu-Lu
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48273)
+	id 1jIxCU-0004Ck-Al
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:23:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jIxA3-0001EV-JS
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:21:16 -0400
+ (envelope-from <philmd@redhat.com>) id 1jIxBa-0003GB-Cj
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jIxA1-0006lg-Cy
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:21:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:43210)
+ (envelope-from <philmd@redhat.com>) id 1jIxBZ-0008KO-5w
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:22:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:22402)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jIxA1-0006lC-98
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:21:13 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jIxBZ-0008JW-1z
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:22:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585585272;
+ s=mimecast20190719; t=1585585368;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=M+omyROmdHfnkTAOx9RIP7ynC/Ydzm/9FJPPDkBV2TI=;
- b=YM08QKdIAHheI9Vi5FphYb18/EFz9cmDRt2pi6v1CyXLSiXJV8wTzps0brsTh8ALLNimqe
- /FpEG0MSbFXHnTgjGfIhUU43kFodoXdkNDY2WcLKdWoR84UKc5JvChKnyPCfoEd0tjWSdO
- vbFa1ieMRH0CzboTar+ge0ByiNq0HTg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-9o22zyl4Om2x33AYi5yq4A-1; Mon, 30 Mar 2020 12:21:03 -0400
-X-MC-Unique: 9o22zyl4Om2x33AYi5yq4A-1
-Received: by mail-wr1-f71.google.com with SMTP id e10so11641788wrm.2
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 09:21:03 -0700 (PDT)
+ bh=5pBqpeKzq2ywabEjb9lKo2BkzSGZFe49tkKDRe5IeJQ=;
+ b=Z/ojmwYoOzOpAYgAG7KrtL6UbazvyueziUZKOePVDF6v8zWh1LniCUvw4+MIZmwwJvTPpE
+ xSULS5DToEnXUIrpwyHWP9QYG4nniHtm3Z9xEfZQ9XmK3FeJsGh+FE7UZVjRdtglvehq9c
+ KA2psP+K+ma+WjYBmXywxuoF5EepwHw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-kWrqcXo9Mk-D94nT7_jtCQ-1; Mon, 30 Mar 2020 12:22:46 -0400
+X-MC-Unique: kWrqcXo9Mk-D94nT7_jtCQ-1
+Received: by mail-wm1-f71.google.com with SMTP id w8so2162560wmk.5
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 09:22:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=1vwOwwMgEKNaU8XJpTGrUidaroBgwI0S525mFxGv9Hg=;
- b=JWliQocXgTQ5OvH1NjuGL8of/JYyLp7UJ9dPFoQYhVM3/8zJqEEh6llyHUL5O7rCAk
- AP3nKPfjCozLnUy5l4VkHi+9uGcw0ihca/YdujjBdzx0/2/zyJXRsjWfaMShJ0NJqLp0
- ClYTQgPLdvTit0+tANsfE9U29ibd1uGckaorBxx8Gwy5PS1EOJYTEpfMHDZF1UM501Mg
- ZasPCH9/fWsTzrECziynqJU+0dAXjDyWUZKZe8tEDDAmM92BFNE9I70hOuCEkJDjTOLf
- XgduY8QYynfiouMRoSJMziO6oCrhvxqb/8lNA3PsC/j94W43wgQeBw/wdlj38iHfirJW
- m/lw==
-X-Gm-Message-State: ANhLgQ16R+UdLRwTuOpe1aw+VZcjROh0+8GMIS8Zd/HmHlsWT0zpZE8W
- tXumpmUkyqWMn/iUt5rQQkc97m9drGujwfCnOEbFm25vdPjUagYebD7NSzh4W7xAPWBz2ac6N3l
- 0+TXJdkBbhLg0CUg=
-X-Received: by 2002:a1c:2d4b:: with SMTP id t72mr48406wmt.171.1585585262551;
- Mon, 30 Mar 2020 09:21:02 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsFkOfz38UtKS23BkuaLdvnukd9qLyQgNKm84fF9dhS6PAm5vbv/Pa5zaLMBVxwGRZAOh/fnQ==
-X-Received: by 2002:a1c:2d4b:: with SMTP id t72mr48384wmt.171.1585585262309;
- Mon, 30 Mar 2020 09:21:02 -0700 (PDT)
+ bh=sW1FXFB42oMy9eotetjDDuXszctfAe/UkJB6bFgGQ2c=;
+ b=I0s1P30ehZmpx4E3Sou/h2VNqa5oNwsRfGCSMbNYV0+J2AKqeWOsLJ87lNJAVgsTcb
+ 4nYtP7EMQ3c0HHkrHh4umSjBzteqZ5LML/10Dt5YOIlVfSiIoNQhHfYmmfBzIXRlB/2D
+ 34nQC4na94klQHPBH6O9CJhrSOtlezGML/Y5jct+LPUU+3dEkL3/FvoYXpAp2jQlF6+B
+ nTZV1yx78LDuDfnWRjt1pHfVRFR4TnRSTS2UQ9jB+zx+GZVAtPZ2ht0BswRdD3DbyS1y
+ zNji6zseEDGg9UNXaaZLdilKN+1f49Wc/6peignSZErWzf+7Z9JH0Z1JrFVTIcVrcSy/
+ vIng==
+X-Gm-Message-State: ANhLgQ18HIrwnIvbIdKXCY2jZivbN2Ha7LJu4tTLdz8kHkjHoVuM7cUf
+ 0fYJajyPP6Fz+Cry7S9YPQPY+frntaOTDQydnLCpVLISpc9uK+7m768ErW54cT2ejxywzF/Nfh1
+ MVyac6PaZQDiserA=
+X-Received: by 2002:a1c:e109:: with SMTP id y9mr111140wmg.62.1585585365387;
+ Mon, 30 Mar 2020 09:22:45 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuRlR5gmgMtdu6AM+uf/Sk5XYAnk0HghX29GWFh2dxqFH4RRO1YOyYZzPM8Bac2dRnNfMykvQ==
+X-Received: by 2002:a1c:e109:: with SMTP id y9mr111123wmg.62.1585585365060;
+ Mon, 30 Mar 2020 09:22:45 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id u13sm22953962wru.88.2020.03.30.09.21.01
+ by smtp.gmail.com with ESMTPSA id n11sm87191wmi.10.2020.03.30.09.22.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 30 Mar 2020 09:21:01 -0700 (PDT)
-Subject: Re: [PATCH-for-5.0] gdbstub: Use correct address space with
- Qqemu.PhyMemMode packet
-To: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200330153016.2959-1-f4bug@amsat.org>
- <CAFEAcA8i1W7ss2hQjaFbVHXzqhV81M8U4Fkaj_Te5JK8JO8+mg@mail.gmail.com>
+ Mon, 30 Mar 2020 09:22:44 -0700 (PDT)
+Subject: Re: [PATCH for-5.0, v1] target/mips: Fix loongson multimedia
+ condition instructions
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org
+References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
+ <39c28108-5d85-d611-c2ea-abbbf913b981@redhat.com>
+ <1B369970-E78B-4A05-A80E-D7AB527E3A4E@flygoat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f1fd3384-8653-c2e2-7248-457ae873cc27@redhat.com>
-Date: Mon, 30 Mar 2020 18:21:00 +0200
+Message-ID: <bbf10da2-76ee-a4c6-275d-fa1c8fc59e1e@redhat.com>
+Date: Mon, 30 Mar 2020 18:22:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8i1W7ss2hQjaFbVHXzqhV81M8U4Fkaj_Te5JK8JO8+mg@mail.gmail.com>
+In-Reply-To: <1B369970-E78B-4A05-A80E-D7AB527E3A4E@flygoat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -107,79 +107,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Jon Doron <arilou@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.qemu.devel@gmail.com,
+ richard.henderson@linaro.org, aleksandar.rikalo@rt-rk.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/30/20 6:08 PM, Peter Maydell wrote:
-> On Mon, 30 Mar 2020 at 16:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->>
->> Since commit 3f940dc98, we added support for vAttach packet
->> to select a particular thread/cpu/core. However when using
->> the GDB physical memory mode, it is not clear which CPU
->> address space is used.
->> Since the CPU address space is stored in CPUState::as, use
->> address_space_rw() instead of cpu_physical_memory_rw().
->>
->> Fixes: ab4752ec8d9
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>   gdbstub.c | 7 ++-----
->>   1 file changed, 2 insertions(+), 5 deletions(-)
->>
->> diff --git a/gdbstub.c b/gdbstub.c
->> index 013fb1ac0f..3baaef50e3 100644
->> --- a/gdbstub.c
->> +++ b/gdbstub.c
->> @@ -69,11 +69,8 @@ static inline int target_memory_rw_debug(CPUState *cp=
-u, target_ulong addr,
->>
->>   #ifndef CONFIG_USER_ONLY
->>       if (phy_memory_mode) {
->> -        if (is_write) {
->> -            cpu_physical_memory_write(addr, buf, len);
->> -        } else {
->> -            cpu_physical_memory_read(addr, buf, len);
->> -        }
->> +        address_space_rw(cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
->> +                         buf, len, is_write);
->>           return 0;
+On 3/30/20 6:18 PM, Jiaxun Yang wrote:
 >=20
-> There's an argument here for using
->     int asidx =3D cpu_asidx_from_attrs(cpu, MEMTXATTRS_UNSPECIFIED);
->     AddressSpace *as =3D cpu_get_address_space(cpu, asidx);
 >=20
-> though it will effectively boil down to the same thing in the end
-> as there's no way for the gdbstub to specify whether it wanted
-> eg the Arm secure or non-secure physical address space.
+> =E4=BA=8E 2020=E5=B9=B43=E6=9C=8830=E6=97=A5 GMT+08:00 =E4=B8=8B=E5=8D=88=
+11:39:44, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> =E5=86=99=E5=88=
+=B0:
+>> Hi Jiaxun Yang,
+>>
+>> On 3/24/20 1:22 PM, Jiaxun Yang wrote:
+>>> Loongson multimedia condition instructions were previously
+>> implemented as
+>>> write 0 to rd due to lack of documentation. So I just confirmed with
+>> Loongson
+>>> about their encoding and implemented them correctly.
+>>
+>> If you have a binary using loongson multimedia instructions, can you
+>> add
+>> a test? So this code won't bitrot.
+>=20
+> I know ffmpeg uses it.
+> But I think that's too fat.
 
-https://static.docs.arm.com/ihi0074/a/debug_interface_v6_0_architecture_spe=
-cification_IHI0074A.pdf
+Looks perfect to me!
 
-* Configuration of hypervisor noninvasive debug.
+It'll be simpler if you use a pre-build binary from a known distribution.
 
-This field can have one of the following values:
-
-- 0b00
-Separate controls for hypervisor noninvasive debug are not implemented,=20
-or no hypervisor is implemented. For ARMv7 PEs that implement the=20
-Virtualization Extensions, and for ARMv8 PEs that implement EL2, if=20
-separate controls for hypervisor debug visibility are not implemented,=20
-the hypervisor debug visibility is indicated by the relevant Non-secure=20
-debug visibility fields NSNID and NSID.
-
-OK so for ARM "noninvasive debug is not implemented" and we would use=20
-the core secure address space?
-
-Instead of MEMTXATTRS_UNSPECIFIED I should use a crafted MemTxAttrs with=20
-.secure =3D 1, .unspecified =3D 1? The idea of this command is to use the=
-=20
-CPU AS but not the MMU/MPU, maybe it doesn't make sense...
+>=20
+>>
+>> I'm in particular interested by a test covering the MAC2008
+>> instructions. You can look at examples in the tests/tcg/mips/
+>> directory,
+>> Aleksandar added a lot of tests there.
+>=20
+> I'm going to try that.
+>=20
+> Thanks.
+>=20
+>>
+>> Thanks,
+>>
+>> Phil.
+>>
+>>>
+>>> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>>> Acked-by: Huacai Chen <chenhc@lemote.com>
+>>> ---
+>>> v1: Use deposit opreations according to Richard's suggestion.
+>>> ---
+>>>    target/mips/translate.c | 35 +++++++++++++++++++++++++++++++----
+>>>    1 file changed, 31 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/target/mips/translate.c b/target/mips/translate.c
+>>> index d745bd2803..25b595a17d 100644
+>>> --- a/target/mips/translate.c
+>>> +++ b/target/mips/translate.c
+>>> @@ -5529,6 +5529,7 @@ static void
+>> gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
+>>>    {
+>>>        uint32_t opc, shift_max;
+>>>        TCGv_i64 t0, t1;
+>>> +    TCGCond cond;
+>>>   =20
+>>>        opc =3D MASK_LMI(ctx->opcode);
+>>>        switch (opc) {
+>>> @@ -5862,14 +5863,39 @@ static void
+>> gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
+>>>   =20
+>>>        case OPC_SEQU_CP2:
+>>>        case OPC_SEQ_CP2:
+>>> +        cond =3D TCG_COND_EQ;
+>>> +        goto do_cc_cond;
+>>> +        break;
+>>>        case OPC_SLTU_CP2:
+>>> +        cond =3D TCG_COND_LTU;
+>>> +        goto do_cc_cond;
+>>> +        break;
+>>>        case OPC_SLT_CP2:
+>>> +        cond =3D TCG_COND_LT;
+>>> +        goto do_cc_cond;
+>>> +        break;
+>>>        case OPC_SLEU_CP2:
+>>> +        cond =3D TCG_COND_LEU;
+>>> +        goto do_cc_cond;
+>>> +        break;
+>>>        case OPC_SLE_CP2:
+>>> -        /*
+>>> -         * ??? Document is unclear: Set FCC[CC].  Does that mean the
+>>> -         * FD field is the CC field?
+>>> -         */
+>>> +        cond =3D TCG_COND_LE;
+>>> +    do_cc_cond:
+>>> +        {
+>>> +            int cc =3D (ctx->opcode >> 8) & 0x7;
+>>> +            TCGv_i64 t64 =3D tcg_temp_new_i64();
+>>> +            TCGv_i32 t32 =3D tcg_temp_new_i32();
+>>> +
+>>> +            tcg_gen_setcond_i64(cond, t64, t0, t1);
+>>> +            tcg_gen_extrl_i64_i32(t32, t64);
+>>> +            tcg_gen_deposit_i32(fpu_fcr31, fpu_fcr31, t32,
+>>> +                                get_fp_bit(cc), 1);
+>>> +
+>>> +            tcg_temp_free_i32(t32);
+>>> +            tcg_temp_free_i64(t64);
+>>> +        }
+>>> +        goto no_rd;
+>>> +        break;
+>>>        default:
+>>>            MIPS_INVAL("loongson_cp2");
+>>>            generate_exception_end(ctx, EXCP_RI);
+>>> @@ -5878,6 +5904,7 @@ static void
+>> gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
+>>>   =20
+>>>        gen_store_fpr64(ctx, t0, rd);
+>>>   =20
+>>> +no_rd:
+>>>        tcg_temp_free_i64(t0);
+>>>        tcg_temp_free_i64(t1);
+>>>    }
+>>>
+>=20
 
 
