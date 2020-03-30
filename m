@@ -2,93 +2,82 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 154A6C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 14:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9512BC2D0EE
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 14:49:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1FDB20787
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 14:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64EC920781
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 14:49:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JfZEEIQW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1FDB20787
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BBmCGdey"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64EC920781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIvhf-0007on-2H
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 10:47:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60349)
+	id 1jIvjh-0000X8-Fx
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 10:49:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60725)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jIvgk-0007L4-I1
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 10:46:55 -0400
+ (envelope-from <armbru@redhat.com>) id 1jIviu-0008Vo-2D
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 10:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jIvgj-0001bm-Jm
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 10:46:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26006)
+ (envelope-from <armbru@redhat.com>) id 1jIvis-0004Bx-Ox
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 10:49:07 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24161)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jIvgj-0001ai-G7
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 10:46:53 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jIvis-0004BX-LV
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 10:49:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585579613;
+ s=mimecast20190719; t=1585579746;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vP2cKtinFs+lAQbb7BBjTB8lAFgZM4t9uQiiQWM7h44=;
- b=JfZEEIQWDlVK4wKMHLDg5DOHT+O2jvxQxlOpUH07bIiv7v8rNw2eVrVn24o++xYVwrooHs
- RWo3c+Bx37Gj0jKN1NZCvFLe47s40iQ0YBYr1uLW2OCF6EtBJ31MAD9w3wbBR8RUMiwyff
- GFSJsAHxRgiHYoTSm1Hma66Tjwktrqg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-9hK7_o31Mo2CnOmifTAa_g-1; Mon, 30 Mar 2020 10:46:49 -0400
-X-MC-Unique: 9hK7_o31Mo2CnOmifTAa_g-1
-Received: by mail-wr1-f72.google.com with SMTP id f8so11382962wrp.1
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 07:46:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=FPOODXZeqHak8yNUsaPvPmUoEMONp5wZGn66sHTps20=;
- b=GwDWv8Jf9tUr90F0411k/iY1Z1WU9lAdeHdQoiHgEAHll6ai+gk4GM0P86L/D7al76
- oVXBi71yO3w8PHTfj1aN5mqJ5nRKMztDnbMrRDqdJVKhZaHt5H1aj9EwUWZqE4jbNYSB
- ex+8z3SgMRo0sche/6oquHZlWJ13TtlzX4ZAfKd8kW10Inw042etVwxGAjClndBnxAld
- mDX6pV1MMAjaHPF6W1T+2bQ8pqzvNad0LRviWDioXlLA02IMlh6o/R0ovUt8DgKltjUW
- RMxy9NR5O4cCH4O182MGT8Z7MXTspJ4v2HLa3i+oFRCouTqgliufEq/GYeBc14xA0vz/
- ZnaA==
-X-Gm-Message-State: ANhLgQ0eYYBdlbyKw+vCcfIGM2CXjw6V7i2lkqnlxw+ecXAEGKzEdT3H
- VZfhb2A/OSogn5q1FUt9C6ug1Y/ErZZLycoqdxf28FlZjMF9PKQZwIfiwsnHYNpKPFpgnTu/EzK
- 77kntjAPKI2iKLcg=
-X-Received: by 2002:a1c:4645:: with SMTP id t66mr13970589wma.6.1585579608038; 
- Mon, 30 Mar 2020 07:46:48 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu11Bf/4QJ0PMAXy7op2XTLz+TvVZsEHoWaya5YO1UeYVBfTuMaKjTcgmjpUGV7NkTe5j/1dA==
-X-Received: by 2002:a1c:4645:: with SMTP id t66mr13970564wma.6.1585579607779; 
- Mon, 30 Mar 2020 07:46:47 -0700 (PDT)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
- [72.137.123.47])
- by smtp.gmail.com with ESMTPSA id w7sm22220373wrr.60.2020.03.30.07.46.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 30 Mar 2020 07:46:46 -0700 (PDT)
-Date: Mon, 30 Mar 2020 10:46:40 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VMs
-Message-ID: <20200330144640.GC522868@xz-x1>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <e709e36f-dc50-2e70-3a1e-62f08533e454@redhat.com>
+ bh=Rg7swnQ6/9ZAVR+PcNppVJxVV6HZOaAiZlO7vioByPM=;
+ b=BBmCGdeyIJU0HsT3AlVQRxWg4Vgl//e1eSnLXrDY5gkMsIQpVcCQjJZ8pwoLJ4AtbZQSUR
+ y5iBBrJYgNAnhUjD6/iYNX2Tr+7lzadmJq7b4Fj1kLs5eEDB2kGHI1V1YqUsVI8SFKhrX4
+ hvkKmI36PeWzK1dHF+VOqg6oVWq7sN8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38-LhEPoEIfPTeRGjk8fAHsTA-1; Mon, 30 Mar 2020 10:49:04 -0400
+X-MC-Unique: LhEPoEIfPTeRGjk8fAHsTA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF7B619251A0;
+ Mon, 30 Mar 2020 14:49:03 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D955010002A9;
+ Mon, 30 Mar 2020 14:49:00 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 847C411385E2; Mon, 30 Mar 2020 16:48:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH for-5.0 3/3] object-add: don't create return value if
+ failed
+References: <20200325184723.2029630-1-marcandre.lureau@redhat.com>
+ <20200325184723.2029630-4-marcandre.lureau@redhat.com>
+ <c408ed09-3740-bc5d-2e39-318bb5beff3f@redhat.com>
+Date: Mon, 30 Mar 2020 16:48:59 +0200
+In-Reply-To: <c408ed09-3740-bc5d-2e39-318bb5beff3f@redhat.com> (Paolo
+ Bonzini's message of "Thu, 26 Mar 2020 10:42:08 +0100")
+Message-ID: <87wo71ucdg.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <e709e36f-dc50-2e70-3a1e-62f08533e454@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,32 +91,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
- Liu Yi L <yi.l.liu@intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, alex.williamson@redhat.com,
- pbonzini@redhat.com, hao.wu@intel.com, yi.y.sun@intel.com,
- david@gibson.dropbear.id.au
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 30, 2020 at 12:36:23PM +0200, Auger Eric wrote:
-> I think in general, as long as the kernel dependencies are not resolved,
-> the QEMU series is supposed to stay in RFC state.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Yeah I agree. I think the subject is not extremely important, but we
-definitely should wait for the kernel part to be ready before merging
-the series.
+> On 25/03/20 19:47, Marc-Andr=C3=A9 Lureau wrote:
+>> If object-add failed, no need to create a return value that may later
+>> be leaked.
+>>=20
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  qom/qom-qmp-cmds.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+>> index 435193b036..6bd137ccbf 100644
+>> --- a/qom/qom-qmp-cmds.c
+>> +++ b/qom/qom-qmp-cmds.c
+>> @@ -287,8 +287,8 @@ void qmp_object_add(QDict *qdict, QObject **ret_data=
+, Error **errp)
+>>      visit_free(v);
+>>      if (obj) {
+>>          object_unref(obj);
+>> +        *ret_data =3D QOBJECT(qdict_new());
+>>      }
+>> -    *ret_data =3D QOBJECT(qdict_new());
+>>  }
+>> =20
+>>  void qmp_object_del(const char *id, Error **errp)
+>>=20
+>
+> It can be slightly simplified:
+>
+> ------------------- 8< ----------------------
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> Subject: [PATCH] object-add: don't create return value if failed
+>    =20
+> No need to return an empty value from object-add (it would also leak
+> if the command failed).  While at it, remove the "if" around object_unref
+> since object_unref handles NULL arguments just fine.
+>    =20
+> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+> diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+> index 435193b036..e47ebe8ed1 100644
+> --- a/qom/qom-qmp-cmds.c
+> +++ b/qom/qom-qmp-cmds.c
+> @@ -285,10 +285,7 @@ void qmp_object_add(QDict *qdict, QObject **ret_data=
+, Error **errp)
+>      v =3D qobject_input_visitor_new(QOBJECT(qdict));
+>      obj =3D user_creatable_add_type(type, id, qdict, v, errp);
+>      visit_free(v);
+> -    if (obj) {
+> -        object_unref(obj);
+> -    }
+> -    *ret_data =3D QOBJECT(qdict_new());
+> +    object_unref(obj);
+>  }
+> =20
+>  void qmp_object_del(const char *id, Error **errp)
 
-Side note: I offered quite a few r-bs for the series (and I still plan
-to move on reading it this week since there's a new version, and try
-to offer more r-bs when I still have some context in my brain-cache),
-however they're mostly only for myself to avoid re-reading the whole
-series again in the future especially because it's huge... :)
+Yes, that's better.
 
-Thanks,
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
---=20
-Peter Xu
+> I queued this patch and your other two.  Thanks,
+>
+> Paolo
 
 
