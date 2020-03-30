@@ -2,77 +2,86 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 701AFC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42FCC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B42B206CC
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:10:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C59E206CC
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:10:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O7vVmfhG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B42B206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QrLcJzsw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C59E206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIqQk-0003dF-7k
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:10:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37190)
+	id 1jIqRF-0004Ma-LL
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:10:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jIqPp-0002yZ-Ib
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:09:06 -0400
+ (envelope-from <changbin.du@gmail.com>) id 1jIqQF-0003G2-QF
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jIqPn-0005Gq-Qf
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:09:04 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39945)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jIqPn-0005Ag-Kd
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:09:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585559343;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Mgm7dkzU96qHvtvICenV4ybCNYmWZCvzW5mut0PHz2I=;
- b=O7vVmfhGzcqMhNAvqmrjPlZU5MtfARUm+ruyWl+zT4TMc19MeKcqtR4ZoLL3+EGPuyMi77
- FApdOf43q4OPT1devqz8yM5IufEgbSlvFHIwXVzjIWAFvT083l+7+q/tjRVCM6Ocz6IstN
- j2cJPzx9G/1+jQrkqRbzUVMR6EF+0dk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-446-j4BbSrWlMreUUonI7d6cBA-1; Mon, 30 Mar 2020 05:09:00 -0400
-X-MC-Unique: j4BbSrWlMreUUonI7d6cBA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 968FB1005512;
- Mon, 30 Mar 2020 09:08:59 +0000 (UTC)
-Received: from localhost (ovpn-115-1.ams2.redhat.com [10.36.115.1])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B84A760BE2;
- Mon, 30 Mar 2020 09:08:58 +0000 (UTC)
-Date: Mon, 30 Mar 2020 10:08:57 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: AIO_WAIT_WHILE questions
-Message-ID: <20200330090857.GD73285@stefanha-x1.localdomain>
-References: <1242491200.59.1585326983523@webmail.proxmox.com>
- <87o8sexnzq.fsf@dusky.pond.sub.org>
+ (envelope-from <changbin.du@gmail.com>) id 1jIqQE-0007i2-Ns
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:09:31 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:37410)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <changbin.du@gmail.com>)
+ id 1jIqQC-0007P2-Am; Mon, 30 Mar 2020 05:09:28 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id o12so7058908pjs.2;
+ Mon, 30 Mar 2020 02:09:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=o90aux+gJuYZZ35aBpKAauPQDQOQmxZUCFQGlqjLIsc=;
+ b=QrLcJzsw1dwKUcw3n2EIP8FAS5disqHLjkybsna47wFVst4lQ9Qx/j2DNFn9Rx2CuX
+ NlPiX0RtPCie7oP4ZSQngoC6duOW7MtDm7aIBscxKV+ZDdW1tXnC5+JnWertMIkICY94
+ BfwCLLpf7RNuZoXLbREzmdOhFljI5xTGhgfTVS/R5cWVUfyktqtzqlDjQUt1dhxmmyMi
+ BrTrnXiRvrbexSXtUyC2YytjJyqq6rchuQo2HZo/87gvPuueL+OUweeyoct1MuQiVER7
+ dz6C6PNE6cSZBftzbAfNdI63kiQNfz3/qcUKBSWqc8J/Pxj5mBxfoL3aBw2MiSFYKoRq
+ X2Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=o90aux+gJuYZZ35aBpKAauPQDQOQmxZUCFQGlqjLIsc=;
+ b=FCedm1/q5qtyKF1IwKaeK2KI+3iFg4lId1UlIus2CQtNewmg9tVhH0KW60bjqixlpa
+ E+JMEpX5cXfdTzNMbZM4lA0/BgkcTCUvrJK13BHpVIWFNfC5In6SoOurzZmkVgIe11KV
+ D+okeoaDhDigxTpl40a9QlGaMSdjAeEsZpRglXjyu1M6+k603avLswVKy9P5FdvmUyIW
+ i+Zg7CxmIl01+VYVQbINjBmPSfNUs1GyUutWDUdUpK6iCQxwk2ZfVy0HNVEgOw/XGzGk
+ qevhhniA0Bvi8grJsI5gbovkWxQOnxuODSW2ws6PirZotMkelkrQFdkFSwKay8ZBkYJS
+ p9XA==
+X-Gm-Message-State: ANhLgQ0LkHNxzDG6ojtKfWXAKE27l7+NEY61+mjeEz/4vXx1SfsPs1lp
+ 9Z2UgfyxFWVoMTGN0VUY2Xc=
+X-Google-Smtp-Source: ADFU+vsDvZ7YdcNFMVD8nSBMoO6AFiQSYjXgtntv+ibAVAHHvnbYSf4cpu6of2ETu1jITeOQHe8EzQ==
+X-Received: by 2002:a17:90a:8e84:: with SMTP id
+ f4mr14347349pjo.72.1585559363826; 
+ Mon, 30 Mar 2020 02:09:23 -0700 (PDT)
+Received: from mail.google.com ([149.248.10.52])
+ by smtp.gmail.com with ESMTPSA id x11sm3791086pfp.204.2020.03.30.02.09.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Mar 2020 02:09:23 -0700 (PDT)
+Date: Mon, 30 Mar 2020 17:09:17 +0800
+From: Changbin Du <changbin.du@gmail.com>
+To: Changbin Du <changbin.du@gmail.com>
+Subject: Re: [PATCH] target/arm: fix incorrect current EL bug in aarch32
+ exception emulation
+Message-ID: <20200330090917.kovajpwnb3mxbtc7@mail.google.com>
+References: <20200328140232.17278-1-changbin.du@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87o8sexnzq.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="76DTJ5CE0DCVQemd"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <20200328140232.17278-1-changbin.du@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,88 +93,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Dietmar Maurer <dietmar@proxmox.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---76DTJ5CE0DCVQemd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi, Peter,
+Could you take this fix as high priority? This bug has made qemu-system-arm
+broken.
 
-On Mon, Mar 30, 2020 at 10:09:45AM +0200, Markus Armbruster wrote:
-> Cc'ing people based on output of "scripts/get_maintainer.pl -f
-> include/block/aio-wait.h".
->=20
-> Dietmar Maurer <dietmar@proxmox.com> writes:
->=20
-> > Hi all,
-> >
-> > I have a question about AIO_WAIT_WHILE. The docs inside the code say:
-> >
-> >  * The caller's thread must be the IOThread that owns @ctx or the main =
-loop
-> >  * thread (with @ctx acquired exactly once).
-> >
-> > I wonder if that "with @ctx acquired exactly once" is always required?
-> >
-> > I have done a quick test (see code below) and this reveals that the con=
-dition is not
-> > always met.
-> >
-> > Or is my test wrong (or the docs)?
-> >
-> > ---debug helper---
-> > diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
-> > index afeeb18f95..cf78dca9f9 100644
-> > --- a/include/block/aio-wait.h
-> > +++ b/include/block/aio-wait.h
-> > @@ -82,6 +82,8 @@ extern AioWait global_aio_wait;
-> >      atomic_inc(&wait_->num_waiters);                               \
-> >      if (ctx_ && in_aio_context_home_thread(ctx_)) {                \
-> >          while ((cond)) {                                           \
-> > +            printf("AIO_WAIT_WHILE %p %d\n", ctx, ctx_->lock_count);  =
-   \
-> > +            assert(ctx_->lock_count =3D=3D 1);                   \
-> >              aio_poll(ctx_, true);                                  \
-> >              waited_ =3D true;                                        \
-> >          }                                                          \
+On Sat, Mar 28, 2020 at 10:02:32PM +0800, Changbin Du wrote:
+> The arm_current_el() should be invoked after mode switching. Otherwise, we
+> get a wrong current EL value, since current EL is also determined by
+> current mode.
+> 
+> Fixes: 4a2696c0d4 ("target/arm: Set PAN bit as required on exception entry")
+> Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> ---
+>  target/arm/helper.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b7b6887241..163c91a1cc 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -9172,7 +9172,6 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+>  
+>      /* Change the CPU state so as to actually take the exception. */
+>      switch_mode(env, new_mode);
+> -    new_el = arm_current_el(env);
+>  
+>      /*
+>       * For exceptions taken to AArch32 we must clear the SS bit in both
+> @@ -9184,6 +9183,10 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+>      env->condexec_bits = 0;
+>      /* Switch to the new mode, and to the correct instruction set.  */
+>      env->uncached_cpsr = (env->uncached_cpsr & ~CPSR_M) | new_mode;
+> +
+> +    /* This must be after mode switching. */
+> +    new_el = arm_current_el(env);
+> +
+>      /* Set new mode endianness */
+>      env->uncached_cpsr &= ~CPSR_E;
+>      if (env->cp15.sctlr_el[new_el] & SCTLR_EE) {
+> -- 
+> 2.25.1
+> 
 
-In this case it doesn't matter.  Handlers invoked by aio_poll() that
-acquire ctx's recursive mutex will succeed.
-
-The "exactly once" requirement is there because nested locking is not
-supported when waiting for an AioContext that runs in a different
-thread:
-
-    } else {                                                       \
-        assert(qemu_get_current_aio_context() =3D=3D                   \
-               qemu_get_aio_context());                            \
-        while ((cond)) {                                           \
-            if (ctx_) {                                            \
-                aio_context_release(ctx_);                         \
-=09=09^--- doesn't work if we have acquired it multiple times
-
-I think it would be okay to update the documentation to make this clear.
-
---76DTJ5CE0DCVQemd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6BtykACgkQnKSrs4Gr
-c8h5Rgf+PuuSS4D0jUkI8wY8TK9WZfUNvOyEs+FU9RoCDofA9wJP+2cvA9RbTpH+
-wbGPnhV+5Izim+CQIqe6ThdknDEcnLqFpH/40qCZ1aw9IeVM8wHFajWIKalRey1J
-bXVOPd/oarfnxGm9vMsURuzeEw7Sw6grCmnOagenV8YerxfeJ4GQXMBIYbDb/b6k
-RBdjaokGrHHZqF4eBq+3KkJA9755Kt5monWgwS5xKRuST3i/znPtwmj5pT+V2dgL
-opaaFBIGXGMAyvuoa1lffP0IA5cJOfxpQKweNbZgGrNzzY/DSqiNzbBiaOY9Ckbx
-MHGtAenuYrl+lurNoC2w5Uq/6UUfnQ==
-=lP8J
------END PGP SIGNATURE-----
-
---76DTJ5CE0DCVQemd--
-
+-- 
+Cheers,
+Changbin Du
 
