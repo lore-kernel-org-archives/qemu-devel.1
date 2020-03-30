@@ -2,88 +2,59 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DE7C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C48C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8D7420578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:15:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aq5QaIAR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D7420578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id 60D3320578
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:16:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D3320578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIy0B-0005al-1s
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:15:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58464)
- by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
- <3pCiCXgYKCvcxtZmyhfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--yuanzi.bounces.google.com>)
- id 1jIxyK-0003CD-Cv
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:13:14 -0400
+	id 1jIy1n-0007t2-JL
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:16:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59004)
+ by lists.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIy0n-0006jJ-1X
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:15:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from
- <3pCiCXgYKCvcxtZmyhfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--yuanzi.bounces.google.com>)
- id 1jIxyJ-0000BK-65
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:13:12 -0400
-Received: from mail-pl1-x64a.google.com ([2607:f8b0:4864:20::64a]:39300)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from
- <3pCiCXgYKCvcxtZmyhfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--yuanzi.bounces.google.com>)
- id 1jIxyI-000074-U2
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:13:11 -0400
-Received: by mail-pl1-x64a.google.com with SMTP id d11so13445754pll.6
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 10:13:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc
- :content-transfer-encoding;
- bh=V2/yr/VBBSMjsJvpyuugUBT+oN88BgSB7L0XM+2U0UY=;
- b=aq5QaIARv5Yyi0jPYXtoM1OtUv0J4rBLvjVohBxRcKqKy4dVlPYtpplxIxGt28prf7
- KMjfmZPo1IxahMyQ1YMlqxCn55fp1K0q6rNxy1U/TSAfDS9w2d+R1qXHfGqiy6vDUtfG
- 1e1LGg1c4mmBiTEUX0nT95pVPdvaRFgSxlU31lPuLVUMJZFn+6bmj/O0IEKP5CdXgEhI
- qHE9I2J0fWpdMjxEuxK9VdZo+nd+EXMQ+jx8NhCMmgPy2yZ4ThlLMPw4jgUx/zCyAFHf
- 7geql4WIhQ7ayP2s5BLy+Fa+dZfIAAwASc32dJ51lRvMnO6mvXzbPsF1pRgoIHulUZQB
- yTlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
- :content-transfer-encoding;
- bh=V2/yr/VBBSMjsJvpyuugUBT+oN88BgSB7L0XM+2U0UY=;
- b=bImhV7AEP52De2cHedEYgxMrZeEpEsZlkMM7d5gEqsnH9hIDJe8E1qCm1gJaMf+tVf
- 8itEYTGu2JO/gqX7eLcEjBa58dTApRa4AlL38kPKzHfMi+mkhUUbOc3n5jaJ1AsyHN8l
- hjvnxymLAIjWfA1TLyBzONu6ppC/QGcc85SyGR9JTEDv5tHzD7UJd0kRL6+6k4rVORJ+
- b9xDUVkw9GeG5IDQ7IcLAvEBXvHO4t13BohlqEclqYCEzj1/50rVE92vqRgR9LFQ6+i2
- IAPvIHMmhvOv6QVDQ5P2gl7QWwYP3Ra6sy4fW7Ib6oO77ElorcFL6WqFrmzDvOtQf5Oh
- I+IA==
-X-Gm-Message-State: AGi0PuaOOZKhamg7+FYjKg2vxWBnvwcbfqbiYAZ9sTwbgVtmOcv0G0Ko
- wdtqA2bFlnt21UfCe2R9AnHWOd+Ts3/4a4JHN5LDHS1Pbm2pLtb7Uj7smZPKf9ZGBVRcEe6F629
- AIPyTaNiiT6VIiJVKuQZB1PPVvV31rNsvM9NWktmA0o7ayvkmzSx0hp9/JcsP
-X-Google-Smtp-Source: APiQypJTSUXcxSr57qAhMq1a5XW5qIrIQDmdOVzh/ndFvg8yesJQRAgILLvzPPbm8SeK8K68HcNlRJfAhbE=
-X-Received: by 2002:a17:90a:cb0e:: with SMTP id
- z14mr376555pjt.156.1585588388226; 
- Mon, 30 Mar 2020 10:13:08 -0700 (PDT)
-Date: Mon, 30 Mar 2020 13:13:03 -0400
-Message-Id: <20200330171303.107131-1-yuanzi@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.0.rc2.310.g2932bb562d-goog
-Subject: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
-From: Lirong Yuan <yuanzi@google.com>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, philmd@redhat.com, scw@google.com, jkz@google.com, 
- Lirong Yuan <yuanzi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::64a
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIy0l-0002xQ-Nl
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:15:44 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:47469)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jIy0l-0002mm-AX; Mon, 30 Mar 2020 13:15:43 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08785036|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.0164755-7.95024e-05-0.983445;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16368; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H7lbeaq_1585588533; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H7lbeaq_1585588533)
+ by smtp.aliyun-inc.com(10.147.42.197);
+ Tue, 31 Mar 2020 01:15:33 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v7 49/61] target/riscv: vector mask-register logical
+ instructions
+Date: Mon, 30 Mar 2020 23:36:21 +0800
+Message-Id: <20200330153633.15298-50-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,103 +66,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows gdb to access the target=E2=80=99s auxiliary vector,
-which can be helpful for telling system libraries important details
-about the hardware, operating system, and process.
-
-Signed-off-by: Lirong Yuan <yuanzi@google.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- gdbstub.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ target/riscv/helper.h                   |  9 ++++++
+ target/riscv/insn32.decode              |  8 +++++
+ target/riscv/insn_trans/trans_rvv.inc.c | 35 ++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 40 +++++++++++++++++++++++++
+ 4 files changed, 92 insertions(+)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 013fb1ac0f..f7a08263c6 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2125,6 +2125,12 @@ static void handle_query_supported(GdbCmdContext *gd=
-b_ctx, void *user_ctx)
-         g_string_append(gdbserver_state.str_buf, ";qXfer:features:read+");
-     }
-=20
-+#ifdef CONFIG_USER_ONLY
-+    if (gdbserver_state.c_cpu->opaque) {
-+        g_string_append(gdbserver_state.str_buf, ";qXfer:auxv:read+");
-+    }
-+#endif
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 6b932b444d..9bb4d8efd5 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1086,3 +1086,12 @@ DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+ 
+ DEF_HELPER_6(vfwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
 +
-     if (gdb_ctx->num_params &&
-         strstr(gdb_ctx->params[0].data, "multiprocess+")) {
-         gdbserver_state.multiprocess =3D true;
-@@ -2186,6 +2192,48 @@ static void handle_query_xfer_features(GdbCmdContext=
- *gdb_ctx, void *user_ctx)
-                       gdbserver_state.str_buf->len, true);
- }
-=20
-+#ifdef CONFIG_USER_ONLY
-+static void handle_query_xfer_auxv(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    TaskState *ts;
-+    unsigned long offset, len, saved_auxv, auxv_len;
-+    const char *mem;
++DEF_HELPER_6(vmand_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmnand_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmandnot_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmxor_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmor_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmornot_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmxnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 526a964d28..a4128c26a0 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -545,6 +545,14 @@ vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
+ vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
+ # Vector widening ordered and unordered float reduction sum
+ vfwredsum_vs    1100-1 . ..... ..... 001 ..... 1010111 @r_vm
++vmand_mm        011001 - ..... ..... 010 ..... 1010111 @r
++vmnand_mm       011101 - ..... ..... 010 ..... 1010111 @r
++vmandnot_mm     011000 - ..... ..... 010 ..... 1010111 @r
++vmxor_mm        011011 - ..... ..... 010 ..... 1010111 @r
++vmor_mm         011010 - ..... ..... 010 ..... 1010111 @r
++vmnor_mm        011110 - ..... ..... 010 ..... 1010111 @r
++vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
++vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 48c1e8819c..257d1a43b0 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2369,3 +2369,38 @@ GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
+ 
+ /* Vector Widening Floating-Point Reduction Instructions */
+ GEN_OPFVV_WIDEN_TRANS(vfwredsum_vs, reduction_check)
 +
-+    if (gdb_ctx->num_params < 2) {
-+        put_packet("E22");
-+        return;
-+    }
++/*
++ *** Vector Mask Operations
++ */
 +
-+    offset =3D gdb_ctx->params[0].val_ul;
-+    len =3D gdb_ctx->params[1].val_ul;
-+
-+    ts =3D gdbserver_state.c_cpu->opaque;
-+    saved_auxv =3D ts->info->saved_auxv;
-+    auxv_len =3D ts->info->auxv_len;
-+    mem =3D (const char *)(saved_auxv + offset);
-+
-+    if (offset >=3D auxv_len) {
-+        put_packet("E22");
-+        return;
-+    }
-+
-+    if (len > (MAX_PACKET_LENGTH - 5) / 2) {
-+        len =3D (MAX_PACKET_LENGTH - 5) / 2;
-+    }
-+
-+    if (len < auxv_len - offset) {
-+        g_string_assign(gdbserver_state.str_buf, "m");
-+        memtox(gdbserver_state.str_buf, mem, len);
-+    } else {
-+        g_string_assign(gdbserver_state.str_buf, "l");
-+        memtox(gdbserver_state.str_buf, mem, auxv_len - offset);
-+    }
-+
-+    put_packet_binary(gdbserver_state.str_buf->str,
-+                      gdbserver_state.str_buf->len, true);
++/* Vector Mask-Register Logical Instructions */
++#define GEN_MM_TRANS(NAME)                                         \
++static bool trans_##NAME(DisasContext *s, arg_r *a)                \
++{                                                                  \
++    if (vext_check_isa_ill(s)) {                                   \
++        uint32_t data = 0;                                         \
++        gen_helper_gvec_4_ptr *fn = gen_helper_##NAME;             \
++        TCGLabel *over = gen_new_label();                          \
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
++                                                                   \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
++                           vreg_ofs(s, a->rs1),                    \
++                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
++                           s->vlen / 8, data, fn);                 \
++        gen_set_label(over);                                       \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
 +}
-+#endif
 +
- static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-     put_packet(GDB_ATTACHED);
-@@ -2291,6 +2339,14 @@ static GdbCmdParseEntry gdb_gen_query_table[] =3D {
-         .cmd_startswith =3D 1,
-         .schema =3D "s:l,l0"
-     },
-+#ifdef CONFIG_USER_ONLY
-+    {
-+        .handler =3D handle_query_xfer_auxv,
-+        .cmd =3D "Xfer:auxv:read:",
-+        .cmd_startswith =3D 1,
-+        .schema =3D "l,l0"
-+    },
-+#endif
-     {
-         .handler =3D handle_query_attached,
-         .cmd =3D "Attached:",
---=20
-2.26.0.rc2.310.g2932bb562d-goog
++GEN_MM_TRANS(vmand_mm)
++GEN_MM_TRANS(vmnand_mm)
++GEN_MM_TRANS(vmandnot_mm)
++GEN_MM_TRANS(vmxor_mm)
++GEN_MM_TRANS(vmor_mm)
++GEN_MM_TRANS(vmnor_mm)
++GEN_MM_TRANS(vmornot_mm)
++GEN_MM_TRANS(vmxnor_mm)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 0074d12538..f36b8f8913 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4501,3 +4501,43 @@ void HELPER(vfwredsum_vs_w)(void *vd, void *v0, void *vs1,
+     *((uint64_t *)vd) = s1;
+     clearq(vd, 1, sizeof(uint64_t), tot);
+ }
++
++/*
++ *** Vector Mask Operations
++ */
++/* Vector Mask-Register Logical Instructions */
++#define GEN_VEXT_MASK_VV(NAME, OP)                        \
++void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
++                  void *vs2, CPURISCVState *env,          \
++                  uint32_t desc)                          \
++{                                                         \
++    uint32_t mlen = vext_mlen(desc);                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;   \
++    uint32_t vl = env->vl;                                \
++    uint32_t i;                                           \
++    int a, b;                                             \
++                                                          \
++    for (i = 0; i < vl; i++) {                            \
++        a = vext_elem_mask(vs1, mlen, i);                 \
++        b = vext_elem_mask(vs2, mlen, i);                 \
++        vext_set_elem_mask(vd, mlen, i, OP(b, a));        \
++    }                                                     \
++    for (; i < vlmax; i++) {                              \
++        vext_set_elem_mask(vd, mlen, i, 0);               \
++    }                                                     \
++}
++
++#define DO_NAND(N, M)  (!(N & M))
++#define DO_ANDNOT(N, M)  (N & !M)
++#define DO_NOR(N, M)  (!(N | M))
++#define DO_ORNOT(N, M)  (N | !M)
++#define DO_XNOR(N, M)  (!(N ^ M))
++
++GEN_VEXT_MASK_VV(vmand_mm, DO_AND)
++GEN_VEXT_MASK_VV(vmnand_mm, DO_NAND)
++GEN_VEXT_MASK_VV(vmandnot_mm, DO_ANDNOT)
++GEN_VEXT_MASK_VV(vmxor_mm, DO_XOR)
++GEN_VEXT_MASK_VV(vmor_mm, DO_OR)
++GEN_VEXT_MASK_VV(vmnor_mm, DO_NOR)
++GEN_VEXT_MASK_VV(vmornot_mm, DO_ORNOT)
++GEN_VEXT_MASK_VV(vmxnor_mm, DO_XNOR)
+-- 
+2.23.0
 
 
