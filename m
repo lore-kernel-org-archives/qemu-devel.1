@@ -2,153 +2,80 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C86C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 278A5C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:32:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7185B2073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:30:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E93CD2073B
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:32:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZfnE5z9Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7185B2073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eT9IF9g1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E93CD2073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIyFD-0003P7-Iw
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:30:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32863)
+	id 1jIyGn-0005d7-0A
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:32:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jIyAc-00047B-SU
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:25:55 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jIyFR-0004CB-B6
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jIyAb-000459-Ng
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:25:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:48995)
+ (envelope-from <eric.auger@redhat.com>) id 1jIyFP-0005Em-RO
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:30:53 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59262)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jIyAb-00042f-IY
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:25:53 -0400
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jIyFP-0005E0-Mp
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:30:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585589152;
+ s=mimecast20190719; t=1585589451;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=CwdPRT3X/WPuZrp+5o4m/wErImtLIBQvvc01rgdPPPg=;
- b=ZfnE5z9YEN/TsInW1a3f2xFf/SVXsOGmBwBBkLqLXOF9uXyKIFO1VF8p4Fjj0TEvV3nYrv
- eVjTGmNhz2FEQXuTrgNcEyE0ML6lN/xC4dWyk7UKczIHbLCWNmoI7jE6ZRIEhkCWjOEl26
- NH3rgkRcr2P5L0aLBevcKHfp2/TufEM=
+ in-reply-to:in-reply-to:references:references;
+ bh=IV/RlnuWDyVAq/CY6VloTUUQJCsYYqNTqzlcq2lSUms=;
+ b=eT9IF9g1Fk3ojHSP5vhUIlbHqdDIwOdO3gaA9k3gV9JJHuoB0D1AJhXHRzYT/6ICDKoM9Q
+ 4kkcocbvRAgKEMySspRKJG0eiQulkHki2EUmdyTKKbVnOEONptsNnn/1uM1awANKQWuesp
+ IvnYkL7xEsB6yX5Ih2lXBBZ8UbLKrXI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-XoRRWy9LMyOPWZHWbgiPMw-1; Mon, 30 Mar 2020 13:25:50 -0400
-X-MC-Unique: XoRRWy9LMyOPWZHWbgiPMw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-486-BF3CDHVkMCuqbqSNNoh2sA-1; Mon, 30 Mar 2020 13:30:49 -0400
+X-MC-Unique: BF3CDHVkMCuqbqSNNoh2sA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D47F5107ACC4;
- Mon, 30 Mar 2020 17:25:49 +0000 (UTC)
-Received: from [10.10.113.210] (ovpn-113-210.rdu2.redhat.com [10.10.113.210])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3DA7D60BEC;
- Mon, 30 Mar 2020 17:25:46 +0000 (UTC)
-Subject: Re: [PATCH v9 01/14] iotests: do a light delinting
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200324232103.4195-1-jsnow@redhat.com>
- <20200324232103.4195-2-jsnow@redhat.com>
- <20200330154137.GE6139@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <92315c93-7df2-765d-01d8-cb3a785e4d3a@redhat.com>
-Date: Mon, 30 Mar 2020 13:25:45 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7246A1005516;
+ Mon, 30 Mar 2020 17:30:47 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6387D5D9E2;
+ Mon, 30 Mar 2020 17:30:31 +0000 (UTC)
+Subject: Re: [PATCH v2 06/22] hw/pci: introduce
+ pci_device_set/unset_iommu_context()
+To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, peterx@redhat.com
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-7-git-send-email-yi.l.liu@intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <01381db5-6f5f-8022-6891-e1a8dd7c3e65@redhat.com>
+Date: Mon, 30 Mar 2020 19:30:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200330154137.GE6139@linux.fritz.box>
+In-Reply-To: <1585542301-84087-7-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -162,47 +89,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- philmd@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+ pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Yi,
+On 3/30/20 6:24 AM, Liu Yi L wrote:
+> This patch adds pci_device_set/unset_iommu_context() to set/unset
+> host_iommu_context for a given device. New callback is added in
+> PCIIOMMUOps. As such, vIOMMU could make use of host IOMMU capability.
+> e.g setup nested translation.
 
+I think you need to explain what this practically is supposed to do.
+such as: by attaching such context to a PCI device (for example VFIO
+assigned?), you tell the host that this PCIe device is protected by a FL
+stage controlled by the guest or something like that - if this is
+correct understanding (?) -
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  hw/pci/pci.c         | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/pci/pci.h | 10 ++++++++++
+>  2 files changed, 54 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index aa9025c..af3c1a1 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2638,7 +2638,8 @@ static void pci_device_class_base_init(ObjectClass *klass, void *data)
+>      }
+>  }
+>  
+> -AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
+> +static void pci_device_get_iommu_bus_devfn(PCIDevice *dev,
+> +                              PCIBus **pbus, uint8_t *pdevfn)
+>  {
+>      PCIBus *bus = pci_get_bus(dev);
+>      PCIBus *iommu_bus = bus;
+> @@ -2683,14 +2684,52 @@ AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
+>  
+>          iommu_bus = parent_bus;
+>      }
+> -    if (iommu_bus && iommu_bus->iommu_ops &&
+> -                     iommu_bus->iommu_ops->get_address_space) {
+> -        return iommu_bus->iommu_ops->get_address_space(bus,
+> -                                 iommu_bus->iommu_opaque, devfn);
+> +    *pbus = iommu_bus;
+> +    *pdevfn = devfn;
+> +}
+> +
+> +AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
+> +{
+> +    PCIBus *bus;
+> +    uint8_t devfn;
+> +
+> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
+> +    if (bus && bus->iommu_ops &&
+> +        bus->iommu_ops->get_address_space) {
+> +        return bus->iommu_ops->get_address_space(bus,
+> +                                bus->iommu_opaque, devfn);
+>      }
+>      return &address_space_memory;
+>  }
+>  
+> +int pci_device_set_iommu_context(PCIDevice *dev,
+> +                                 HostIOMMUContext *iommu_ctx)
+> +{
+> +    PCIBus *bus;
+> +    uint8_t devfn;
+> +
+> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
+> +    if (bus && bus->iommu_ops &&
+> +        bus->iommu_ops->set_iommu_context) {
+> +        return bus->iommu_ops->set_iommu_context(bus,
+> +                              bus->iommu_opaque, devfn, iommu_ctx);
+> +    }
+> +    return -ENOENT;
+> +}
+> +
+> +void pci_device_unset_iommu_context(PCIDevice *dev)
+> +{
+> +    PCIBus *bus;
+> +    uint8_t devfn;
+> +
+> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
+> +    if (bus && bus->iommu_ops &&
+> +        bus->iommu_ops->unset_iommu_context) {
+> +        bus->iommu_ops->unset_iommu_context(bus,
+> +                                 bus->iommu_opaque, devfn);
+> +    }
+> +}
+> +
+>  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *ops, void *opaque)
+>  {
+>      bus->iommu_ops = ops;
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index ffe192d..0ec5680 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -9,6 +9,8 @@
+>  
+>  #include "hw/pci/pcie.h"
+>  
+> +#include "hw/iommu/host_iommu_context.h"
+> +
+>  extern bool pci_available;
+>  
+>  /* PCI bus */
+> @@ -489,9 +491,17 @@ typedef struct PCIIOMMUOps PCIIOMMUOps;
+>  struct PCIIOMMUOps {
+>      AddressSpace * (*get_address_space)(PCIBus *bus,
+>                                  void *opaque, int32_t devfn);
+> +    int (*set_iommu_context)(PCIBus *bus, void *opaque,
+> +                             int32_t devfn,
+> +                             HostIOMMUContext *iommu_ctx);
+> +    void (*unset_iommu_context)(PCIBus *bus, void *opaque,
+> +                                int32_t devfn);
+>  };
+>  
+>  AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
+> +int pci_device_set_iommu_context(PCIDevice *dev,
+> +                                 HostIOMMUContext *iommu_ctx);
+> +void pci_device_unset_iommu_context(PCIDevice *dev);
+>  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *iommu_ops, void *opaque);
+>  
+>  static inline void
+> 
+Thanks
 
-On 3/30/20 11:41 AM, Kevin Wolf wrote:
-> Am 25.03.2020 um 00:20 hat John Snow geschrieben:
->> This doesn't fix everything in here, but it does help clean up the
->> pylint report considerably.
->>
->> This should be 100% style changes only; the intent is to make pylint
->> more useful by working on establishing a baseline for iotests that we
->> can gate against in the future.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->=20
->> @@ -550,8 +546,8 @@ def flatten_qmp_object(self, obj, output=3DNone, bas=
-estr=3D''):
->>          if output is None:
->>              output =3D dict()
->>          if isinstance(obj, list):
->> -            for i in range(len(obj)):
->> -                self.flatten_qmp_object(obj[i], output, basestr + str(i=
-) + '.')
->> +            for i, atom in enumerate(obj):
->> +                self.flatten_qmp_object(atom, output, basestr + str(i) =
-+ '.')
->=20
-> I think atom isn't strictly the right word because we expect nested data
-> structures (as shown by the recursive call). If I understand correctly,
-> what Python calls things in lists is "items".
->=20
-
-I can't imagine how the philosophers felt when they discovered subatomic
-particles.
-
---js
+Eric
 
 
