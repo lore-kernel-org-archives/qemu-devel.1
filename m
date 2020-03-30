@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1719DC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 19:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE2FCC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 19:19:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E406A2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 19:08:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E406A2072E
+	by mail.kernel.org (Postfix) with ESMTPS id AA1D92072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 19:19:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA1D92072E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIzmI-0002Bh-Sg
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 15:08:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51959)
+	id 1jIzwv-00073F-IH
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 15:19:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jIzjB-0001Ti-9Y
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:05:42 -0400
+ (envelope-from <bounces@canonical.com>) id 1jIzst-0005XR-Mu
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jIzjA-0001LI-7a
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:05:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52552)
+ (envelope-from <bounces@canonical.com>) id 1jIzss-0003j8-HI
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:15:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55564)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jIzjA-0001Jz-2A
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:05:40 -0400
+ id 1jIzss-0003fa-BK
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 15:15:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jIzj8-0001PO-ID
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 19:05:38 +0000
+ id 1jIzsq-00030V-LI
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 19:15:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 86C362E80C3
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 19:05:38 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 91BD22E80C8
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 19:15:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 30 Mar 2020 18:59:47 -0000
+Date: Mon, 30 Mar 2020 19:04:54 -0000
 From: Manuel Reimer <manuel.reimer@gmx.de>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -51,11 +51,12 @@ X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: manuel-reimer
+X-Launchpad-Bug-Commenters: manuel-reimer pmaydell
 X-Launchpad-Bug-Reporter: Manuel Reimer (manuel-reimer)
 X-Launchpad-Bug-Modifier: Manuel Reimer (manuel-reimer)
-Message-Id: <158559478745.21027.13296208481863226077.malonedeb@gac.canonical.com>
-Subject: [Bug 1869782] [NEW] qemu-arm-static crashes "segmentation fault" when
+References: <158559478745.21027.13296208481863226077.malonedeb@gac.canonical.com>
+Message-Id: <158559509480.12209.4493045409136536182.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1869782] Re: qemu-arm-static crashes "segmentation fault" when
  running "svn checkout"
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -63,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a296f04231dee355be5db73cc878b9e21689a253";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d7bbb863a234f51c0eca22d3218829ca86a522c4
+X-Launchpad-Hash: 1e3ef62f84e70dca4af3e75f0f852ee34a98c3d9
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,30 +82,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+** Description changed:
 
-I'm not actually sure how far I can help as I so far failed to reproduce
-the issue on my local VM but I get it on Travis CI every time. I even
-went through the hassle of hacking a Debian repository into their Ubuntu
-Bionic VM to get qemu 4.2 as I hoped a new version could fix this.
+  I'm not actually sure how far I can help as I so far failed to reproduce
+  the issue on my local VM but I get it on Travis CI every time. I even
+  went through the hassle of hacking a Debian repository into their Ubuntu
+  Bionic VM to get qemu 4.2 as I hoped a new version could fix this.
+  =
 
-This build runs in an armv6h chroot. I don't get the segfault if I do
-the same on an armv7h chroot for some reason.
++ This build runs in an armv6h chroot. I don't get the segfault if I do
++ the same on an armv7h chroot for some reason.
++ =
 
-Here is where the error occured: https://travis-
-ci.com/github/VDR4Arch/vdr4arch/jobs/309106220#L5420
+  Here is where the error occured: https://travis-
+  ci.com/github/VDR4Arch/vdr4arch/jobs/309106220#L5420
+- =
 
-Maybe now I'll just try to remove all uses of svn in my build scripts...
+- I don't get this error with an armv7h chroot.
+  =
 
-Is it actually a viable solution to cross-build with qemu? I'm starting
-to doubt it...
+  Maybe now I'll just try to remove all uses of svn in my build scripts...
+  =
 
-Would it help if I manage to get this core dump out of Travis somehow
-(maybe make Travis push it to some GIT or upload it to my webserver)?
+  Is it actually a viable solution to cross-build with qemu? I'm starting
+  to doubt it...
+  =
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+  Would it help if I manage to get this core dump out of Travis somehow
+  (maybe make Travis push it to some GIT or upload it to my webserver)?
 
 -- =
 
