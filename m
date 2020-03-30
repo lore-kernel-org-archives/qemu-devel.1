@@ -2,80 +2,60 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5820C2D0EE
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F468C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:53:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F082205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:51:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="No+fWyJF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F082205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02AE1205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:53:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02AE1205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIwhc-00073E-KR
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 11:51:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42043)
+	id 1jIwik-0000Ys-3r
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 11:53:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42292)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jIwfg-0004gc-Be
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:49:53 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIwgw-000637-6K
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jIwfe-00084A-PJ
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:49:51 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:50422)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIwgt-0001ae-R1
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:51:10 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:53193)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jIwfe-00082x-K6
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:49:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585583389;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Nl3rvreKZ3ibQy4KkFIG6RhjLc6X2haJmssVoGcPPjU=;
- b=No+fWyJFeXxSoNzz+wPeLMBc5fIaSSPX600gE1KDBpFiO20R6sKPEQDfZqTqZ1JLgMrflr
- 2Se5+NZAVt5M1sYam1S0zoiL1eE2CYyBa8HrU3LJ22NZHgnMAV2FFnCwxe+LM3WOYFI/52
- C6cVIF25nxLUyW7RU7hqVv8kzyWZoio=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-zk6g-NzYMMOeOU8jSH9mWQ-1; Mon, 30 Mar 2020 11:49:46 -0400
-X-MC-Unique: zk6g-NzYMMOeOU8jSH9mWQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49D9F18CA240;
- Mon, 30 Mar 2020 15:49:45 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-66.ams2.redhat.com [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A146660BE1;
- Mon, 30 Mar 2020 15:49:43 +0000 (UTC)
-Date: Mon, 30 Mar 2020 17:49:42 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v9 05/14] iotests: add pylintrc file
-Message-ID: <20200330154942.GF6139@linux.fritz.box>
-References: <20200324232103.4195-1-jsnow@redhat.com>
- <20200324232103.4195-6-jsnow@redhat.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jIwgs-0001Rg-IU; Mon, 30 Mar 2020 11:51:07 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.146678-0.00649423-0.846828;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=11; RT=11; SR=0; TI=SMTPD_---.H7jun4T_1585583459; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H7jun4T_1585583459)
+ by smtp.aliyun-inc.com(10.147.41.120);
+ Mon, 30 Mar 2020 23:51:00 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v7 07/61] target/riscv: add vector index load and store
+ instructions
+Date: Mon, 30 Mar 2020 23:35:39 +0800
+Message-Id: <20200330153633.15298-8-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200324232103.4195-6-jsnow@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,24 +67,356 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- philmd@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 25.03.2020 um 00:20 hat John Snow geschrieben:
-> This allows others to get repeatable results with pylint. If you run
-> `pylint iotests.py`, you should see a 100% pass.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+Vector indexed operations add the contents of each element of the
+vector offset operand specified by vs2 to the base effective address
+to give the effective address of each element.
 
-I see you said "should" and not "will", but I still get two warnings:
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  35 +++++++
+ target/riscv/insn32.decode              |  13 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 129 ++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 116 +++++++++++++++++++++
+ 4 files changed, 293 insertions(+)
 
-iotests.py:405:22: W0613: Unused argument 'signum' (unused-argument)
-iotests.py:405:30: W0613: Unused argument 'frame' (unused-argument)
-
-Kevin
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 87dfa90609..f9b3da60ca 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -183,3 +183,38 @@ DEF_HELPER_6(vsse_v_b, void, ptr, ptr, tl, tl, env, i32)
+ DEF_HELPER_6(vsse_v_h, void, ptr, ptr, tl, tl, env, i32)
+ DEF_HELPER_6(vsse_v_w, void, ptr, ptr, tl, tl, env, i32)
+ DEF_HELPER_6(vsse_v_d, void, ptr, ptr, tl, tl, env, i32)
++DEF_HELPER_6(vlxb_v_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxb_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxb_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxb_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxh_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxh_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxh_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxw_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxe_v_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxe_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxe_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxe_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxbu_v_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxbu_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxbu_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxbu_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxhu_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxhu_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxhu_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxwu_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vlxwu_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxb_v_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxb_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxb_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxb_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxh_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxh_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxh_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxw_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxe_v_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxe_v_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxe_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsxe_v_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index ef521152c5..bc36df33b5 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -241,6 +241,19 @@ vssh_v     ... 010 . ..... ..... 101 ..... 0100111 @r_nfvm
+ vssw_v     ... 010 . ..... ..... 110 ..... 0100111 @r_nfvm
+ vsse_v     ... 010 . ..... ..... 111 ..... 0100111 @r_nfvm
+ 
++vlxb_v     ... 111 . ..... ..... 000 ..... 0000111 @r_nfvm
++vlxh_v     ... 111 . ..... ..... 101 ..... 0000111 @r_nfvm
++vlxw_v     ... 111 . ..... ..... 110 ..... 0000111 @r_nfvm
++vlxe_v     ... 011 . ..... ..... 111 ..... 0000111 @r_nfvm
++vlxbu_v    ... 011 . ..... ..... 000 ..... 0000111 @r_nfvm
++vlxhu_v    ... 011 . ..... ..... 101 ..... 0000111 @r_nfvm
++vlxwu_v    ... 011 . ..... ..... 110 ..... 0000111 @r_nfvm
++# Vector ordered-indexed and unordered-indexed store insns.
++vsxb_v     ... -11 . ..... ..... 000 ..... 0100111 @r_nfvm
++vsxh_v     ... -11 . ..... ..... 101 ..... 0100111 @r_nfvm
++vsxw_v     ... -11 . ..... ..... 110 ..... 0100111 @r_nfvm
++vsxe_v     ... -11 . ..... ..... 111 ..... 0100111 @r_nfvm
++
+ # *** new major opcode OP-V ***
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index e90f956c0f..98abc1b657 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -432,3 +432,132 @@ GEN_VEXT_TRANS(vssb_v, 0, rnfvm, st_stride_op, st_stride_check)
+ GEN_VEXT_TRANS(vssh_v, 1, rnfvm, st_stride_op, st_stride_check)
+ GEN_VEXT_TRANS(vssw_v, 2, rnfvm, st_stride_op, st_stride_check)
+ GEN_VEXT_TRANS(vsse_v, 3, rnfvm, st_stride_op, st_stride_check)
++
++/*
++ *** index load and store
++ */
++typedef void gen_helper_ldst_index(TCGv_ptr, TCGv_ptr, TCGv,
++                                   TCGv_ptr, TCGv_env, TCGv_i32);
++
++static bool ldst_index_trans(uint32_t vd, uint32_t rs1, uint32_t vs2,
++                             uint32_t data, gen_helper_ldst_index *fn,
++                             DisasContext *s)
++{
++    TCGv_ptr dest, mask, index;
++    TCGv base;
++    TCGv_i32 desc;
++
++    TCGLabel *over = gen_new_label();
++    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++    dest = tcg_temp_new_ptr();
++    mask = tcg_temp_new_ptr();
++    index = tcg_temp_new_ptr();
++    base = tcg_temp_new();
++    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
++
++    gen_get_gpr(base, rs1);
++    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
++    tcg_gen_addi_ptr(index, cpu_env, vreg_ofs(s, vs2));
++    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
++
++    fn(dest, mask, base, index, cpu_env, desc);
++
++    tcg_temp_free_ptr(dest);
++    tcg_temp_free_ptr(mask);
++    tcg_temp_free_ptr(index);
++    tcg_temp_free(base);
++    tcg_temp_free_i32(desc);
++    gen_set_label(over);
++    return true;
++}
++
++static bool ld_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
++{
++    uint32_t data = 0;
++    gen_helper_ldst_index *fn;
++    static gen_helper_ldst_index * const fns[7][4] = {
++        { gen_helper_vlxb_v_b,  gen_helper_vlxb_v_h,
++          gen_helper_vlxb_v_w,  gen_helper_vlxb_v_d },
++        { NULL,                 gen_helper_vlxh_v_h,
++          gen_helper_vlxh_v_w,  gen_helper_vlxh_v_d },
++        { NULL,                 NULL,
++          gen_helper_vlxw_v_w,  gen_helper_vlxw_v_d },
++        { gen_helper_vlxe_v_b,  gen_helper_vlxe_v_h,
++          gen_helper_vlxe_v_w,  gen_helper_vlxe_v_d },
++        { gen_helper_vlxbu_v_b, gen_helper_vlxbu_v_h,
++          gen_helper_vlxbu_v_w, gen_helper_vlxbu_v_d },
++        { NULL,                 gen_helper_vlxhu_v_h,
++          gen_helper_vlxhu_v_w, gen_helper_vlxhu_v_d },
++        { NULL,                 NULL,
++          gen_helper_vlxwu_v_w, gen_helper_vlxwu_v_d },
++    };
++
++    fn =  fns[seq][s->sew];
++    if (fn == NULL) {
++        return false;
++    }
++
++    data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++    data = FIELD_DP32(data, VDATA, VM, a->vm);
++    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++    data = FIELD_DP32(data, VDATA, NF, a->nf);
++    return ldst_index_trans(a->rd, a->rs1, a->rs2, data, fn, s);
++}
++
++static bool ld_index_check(DisasContext *s, arg_rnfvm* a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_nf(s, a->nf));
++}
++
++GEN_VEXT_TRANS(vlxb_v, 0, rnfvm, ld_index_op, ld_index_check)
++GEN_VEXT_TRANS(vlxh_v, 1, rnfvm, ld_index_op, ld_index_check)
++GEN_VEXT_TRANS(vlxw_v, 2, rnfvm, ld_index_op, ld_index_check)
++GEN_VEXT_TRANS(vlxe_v, 3, rnfvm, ld_index_op, ld_index_check)
++GEN_VEXT_TRANS(vlxbu_v, 4, rnfvm, ld_index_op, ld_index_check)
++GEN_VEXT_TRANS(vlxhu_v, 5, rnfvm, ld_index_op, ld_index_check)
++GEN_VEXT_TRANS(vlxwu_v, 6, rnfvm, ld_index_op, ld_index_check)
++
++static bool st_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
++{
++    uint32_t data = 0;
++    gen_helper_ldst_index *fn;
++    static gen_helper_ldst_index * const fns[4][4] = {
++        { gen_helper_vsxb_v_b,  gen_helper_vsxb_v_h,
++          gen_helper_vsxb_v_w,  gen_helper_vsxb_v_d },
++        { NULL,                 gen_helper_vsxh_v_h,
++          gen_helper_vsxh_v_w,  gen_helper_vsxh_v_d },
++        { NULL,                 NULL,
++          gen_helper_vsxw_v_w,  gen_helper_vsxw_v_d },
++        { gen_helper_vsxe_v_b,  gen_helper_vsxe_v_h,
++          gen_helper_vsxe_v_w,  gen_helper_vsxe_v_d }
++    };
++
++    fn =  fns[seq][s->sew];
++    if (fn == NULL) {
++        return false;
++    }
++
++    data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++    data = FIELD_DP32(data, VDATA, VM, a->vm);
++    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++    data = FIELD_DP32(data, VDATA, NF, a->nf);
++    return ldst_index_trans(a->rd, a->rs1, a->rs2, data, fn, s);
++}
++
++static bool st_index_check(DisasContext *s, arg_rnfvm* a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_nf(s, a->nf));
++}
++
++GEN_VEXT_TRANS(vsxb_v, 0, rnfvm, st_index_op, st_index_check)
++GEN_VEXT_TRANS(vsxh_v, 1, rnfvm, st_index_op, st_index_check)
++GEN_VEXT_TRANS(vsxw_v, 2, rnfvm, st_index_op, st_index_check)
++GEN_VEXT_TRANS(vsxe_v, 3, rnfvm, st_index_op, st_index_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 2027164b7c..d2baec30b6 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -461,3 +461,119 @@ GEN_VEXT_ST_US(vse_v_b, int8_t,  int8_t , ste_b)
+ GEN_VEXT_ST_US(vse_v_h, int16_t, int16_t, ste_h)
+ GEN_VEXT_ST_US(vse_v_w, int32_t, int32_t, ste_w)
+ GEN_VEXT_ST_US(vse_v_d, int64_t, int64_t, ste_d)
++
++/*
++ *** index: access vector element from indexed memory
++ */
++typedef target_ulong vext_get_index_addr(target_ulong base,
++        uint32_t idx, void *vs2);
++
++#define GEN_VEXT_GET_INDEX_ADDR(NAME, ETYPE, H)        \
++static target_ulong NAME(target_ulong base,            \
++                         uint32_t idx, void *vs2)      \
++{                                                      \
++    return (base + *((ETYPE *)vs2 + H(idx)));          \
++}
++
++GEN_VEXT_GET_INDEX_ADDR(idx_b, int8_t,  H1)
++GEN_VEXT_GET_INDEX_ADDR(idx_h, int16_t, H2)
++GEN_VEXT_GET_INDEX_ADDR(idx_w, int32_t, H4)
++GEN_VEXT_GET_INDEX_ADDR(idx_d, int64_t, H8)
++
++static inline void
++vext_ldst_index(void *vd, void *v0, target_ulong base,
++                void *vs2, CPURISCVState *env, uint32_t desc,
++                vext_get_index_addr get_index_addr,
++                vext_ldst_elem_fn *ldst_elem,
++                clear_fn *clear_elem,
++                uint32_t esz, uint32_t msz, uintptr_t ra,
++                MMUAccessType access_type)
++{
++    uint32_t i, k;
++    uint32_t nf = vext_nf(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++
++    /* probe every access*/
++    for (i = 0; i < env->vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        probe_pages(env, get_index_addr(base, i, vs2), nf * msz, ra,
++                    access_type);
++    }
++    /* load bytes from guest memory */
++    for (i = 0; i < env->vl; i++) {
++        k = 0;
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        while (k < nf) {
++            abi_ptr addr = get_index_addr(base, i, vs2) + k * msz;
++            ldst_elem(env, addr, i + k * vlmax, vd, ra);
++            k++;
++        }
++    }
++    /* clear tail elements */
++    if (clear_elem) {
++        for (k = 0; k < nf; k++) {
++            clear_elem(vd, env->vl + k * vlmax, env->vl * esz, vlmax * esz);
++        }
++    }
++}
++
++#define GEN_VEXT_LD_INDEX(NAME, MTYPE, ETYPE, INDEX_FN, LOAD_FN, CLEAR_FN) \
++void HELPER(NAME)(void *vd, void *v0, target_ulong base,                   \
++                  void *vs2, CPURISCVState *env, uint32_t desc)            \
++{                                                                          \
++    vext_ldst_index(vd, v0, base, vs2, env, desc, INDEX_FN,                \
++                    LOAD_FN, CLEAR_FN, sizeof(ETYPE), sizeof(MTYPE),       \
++                    GETPC(), MMU_DATA_LOAD);                               \
++}
++
++GEN_VEXT_LD_INDEX(vlxb_v_b,  int8_t,   int8_t,   idx_b, ldb_b,  clearb)
++GEN_VEXT_LD_INDEX(vlxb_v_h,  int8_t,   int16_t,  idx_h, ldb_h,  clearh)
++GEN_VEXT_LD_INDEX(vlxb_v_w,  int8_t,   int32_t,  idx_w, ldb_w,  clearl)
++GEN_VEXT_LD_INDEX(vlxb_v_d,  int8_t,   int64_t,  idx_d, ldb_d,  clearq)
++GEN_VEXT_LD_INDEX(vlxh_v_h,  int16_t,  int16_t,  idx_h, ldh_h,  clearh)
++GEN_VEXT_LD_INDEX(vlxh_v_w,  int16_t,  int32_t,  idx_w, ldh_w,  clearl)
++GEN_VEXT_LD_INDEX(vlxh_v_d,  int16_t,  int64_t,  idx_d, ldh_d,  clearq)
++GEN_VEXT_LD_INDEX(vlxw_v_w,  int32_t,  int32_t,  idx_w, ldw_w,  clearl)
++GEN_VEXT_LD_INDEX(vlxw_v_d,  int32_t,  int64_t,  idx_d, ldw_d,  clearq)
++GEN_VEXT_LD_INDEX(vlxe_v_b,  int8_t,   int8_t,   idx_b, lde_b,  clearb)
++GEN_VEXT_LD_INDEX(vlxe_v_h,  int16_t,  int16_t,  idx_h, lde_h,  clearh)
++GEN_VEXT_LD_INDEX(vlxe_v_w,  int32_t,  int32_t,  idx_w, lde_w,  clearl)
++GEN_VEXT_LD_INDEX(vlxe_v_d,  int64_t,  int64_t,  idx_d, lde_d,  clearq)
++GEN_VEXT_LD_INDEX(vlxbu_v_b, uint8_t,  uint8_t,  idx_b, ldbu_b, clearb)
++GEN_VEXT_LD_INDEX(vlxbu_v_h, uint8_t,  uint16_t, idx_h, ldbu_h, clearh)
++GEN_VEXT_LD_INDEX(vlxbu_v_w, uint8_t,  uint32_t, idx_w, ldbu_w, clearl)
++GEN_VEXT_LD_INDEX(vlxbu_v_d, uint8_t,  uint64_t, idx_d, ldbu_d, clearq)
++GEN_VEXT_LD_INDEX(vlxhu_v_h, uint16_t, uint16_t, idx_h, ldhu_h, clearh)
++GEN_VEXT_LD_INDEX(vlxhu_v_w, uint16_t, uint32_t, idx_w, ldhu_w, clearl)
++GEN_VEXT_LD_INDEX(vlxhu_v_d, uint16_t, uint64_t, idx_d, ldhu_d, clearq)
++GEN_VEXT_LD_INDEX(vlxwu_v_w, uint32_t, uint32_t, idx_w, ldwu_w, clearl)
++GEN_VEXT_LD_INDEX(vlxwu_v_d, uint32_t, uint64_t, idx_d, ldwu_d, clearq)
++
++#define GEN_VEXT_ST_INDEX(NAME, MTYPE, ETYPE, INDEX_FN, STORE_FN)\
++void HELPER(NAME)(void *vd, void *v0, target_ulong base,         \
++                  void *vs2, CPURISCVState *env, uint32_t desc)  \
++{                                                                \
++    vext_ldst_index(vd, v0, base, vs2, env, desc, INDEX_FN,      \
++                    STORE_FN, NULL, sizeof(ETYPE), sizeof(MTYPE),\
++                    GETPC(), MMU_DATA_STORE);                    \
++}
++
++GEN_VEXT_ST_INDEX(vsxb_v_b, int8_t,  int8_t,  idx_b, stb_b)
++GEN_VEXT_ST_INDEX(vsxb_v_h, int8_t,  int16_t, idx_h, stb_h)
++GEN_VEXT_ST_INDEX(vsxb_v_w, int8_t,  int32_t, idx_w, stb_w)
++GEN_VEXT_ST_INDEX(vsxb_v_d, int8_t,  int64_t, idx_d, stb_d)
++GEN_VEXT_ST_INDEX(vsxh_v_h, int16_t, int16_t, idx_h, sth_h)
++GEN_VEXT_ST_INDEX(vsxh_v_w, int16_t, int32_t, idx_w, sth_w)
++GEN_VEXT_ST_INDEX(vsxh_v_d, int16_t, int64_t, idx_d, sth_d)
++GEN_VEXT_ST_INDEX(vsxw_v_w, int32_t, int32_t, idx_w, stw_w)
++GEN_VEXT_ST_INDEX(vsxw_v_d, int32_t, int64_t, idx_d, stw_d)
++GEN_VEXT_ST_INDEX(vsxe_v_b, int8_t,  int8_t,  idx_b, ste_b)
++GEN_VEXT_ST_INDEX(vsxe_v_h, int16_t, int16_t, idx_h, ste_h)
++GEN_VEXT_ST_INDEX(vsxe_v_w, int32_t, int32_t, idx_w, ste_w)
++GEN_VEXT_ST_INDEX(vsxe_v_d, int64_t, int64_t, idx_d, ste_d)
+-- 
+2.23.0
 
 
