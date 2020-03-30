@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2CBC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A47ACC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6553420716
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:13:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F26820716
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 12:14:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhpMBdoS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6553420716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrYARTkA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F26820716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jItHq-0007Gp-GE
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 08:13:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36997)
+	id 1jItIo-0008Iy-Ks
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 08:14:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jItHB-0006fo-Hs
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:12:22 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jItFz-00063e-3F
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jItHA-0000Bv-5z
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:12:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:38206)
+ (envelope-from <mreitz@redhat.com>) id 1jItFy-0007lI-6O
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:11:07 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:29790)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jItHA-0000BI-1S
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:12:20 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jItFy-0007l9-2g
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 08:11:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585570339;
+ s=mimecast20190719; t=1585570265;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=b4Ib0f7H/LLKwpGldntdEyrh78ix2u0AhRVbHonUwTM=;
- b=BhpMBdoSKUKM9V/pwcv4uJkivcPg6pr33k3VTKIQSWhp8Ic9splNwfk6arJhALbeoe2Ys2
- sKrqnA2xvcx3vzc570huWV5gOvfXkGkgi26CiYsX1Z7ClZMaFcHJB9f8yHad768x8L/Vly
- GBU4sW3DtzOvJOuXZGeKWkmmggJpwKQ=
+ bh=BIAcFNnwfX+KF9iwlFUT275Wy6sCf7xSQASyTXyXQPY=;
+ b=UrYARTkA6lWdBaK7+tt341SRH3Uj8WJtnYFAT8OY8VpTCiy5dWvoBMbrzCcQ0vgWlkgfAN
+ No92ExeqiGO4l/ROzeA7nDvwaeZZtUgsrdo4Nav7duqWN3Jj6oc792sAeRJdgJptWRYbjq
+ bZlWDhngfGaKU5QUg2fSjIty2xlVJHY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-z_0wcTkjMLets6daMVqCMA-1; Mon, 30 Mar 2020 08:12:17 -0400
-X-MC-Unique: z_0wcTkjMLets6daMVqCMA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-353-Zqjv8XxXPvCrXnYz4J-nng-1; Mon, 30 Mar 2020 08:11:03 -0400
+X-MC-Unique: Zqjv8XxXPvCrXnYz4J-nng-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C15B1DB20;
- Mon, 30 Mar 2020 12:12:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB4BD800EB6;
+ Mon, 30 Mar 2020 12:11:02 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-93.ams2.redhat.com
  [10.36.113.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7961365F40;
- Mon, 30 Mar 2020 12:12:08 +0000 (UTC)
-Subject: Re: [PATCH v9 07/14] iotests: drop pre-Python 3.4 compatibility code
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55EF197B1F;
+ Mon, 30 Mar 2020 12:10:59 +0000 (UTC)
+Subject: Re: [PATCH v9 06/14] iotests: alphabetize standard imports
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20200324232103.4195-1-jsnow@redhat.com>
- <20200324232103.4195-8-jsnow@redhat.com>
+ <20200324232103.4195-7-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,18 +86,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <bb263d17-3623-9ce9-3d37-7b8fb4b90f9e@redhat.com>
-Date: Mon, 30 Mar 2020 14:12:06 +0200
+Message-ID: <391f9900-6982-97e7-3386-2c51d902e3c4@redhat.com>
+Date: Mon, 30 Mar 2020 14:10:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200324232103.4195-8-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200324232103.4195-7-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="WzBtxKLEsa5KkvW2iGtbhgEBH0Wx6nLgo"
+ boundary="VRDC9Cavh3LDOJeZU2i5hSzGv4NlFOWar"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 216.205.24.74
@@ -119,48 +119,45 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WzBtxKLEsa5KkvW2iGtbhgEBH0Wx6nLgo
-Content-Type: multipart/mixed; boundary="La0dxDfJcDLAEvPZpGobbpmtzE6Xy7fZT"
+--VRDC9Cavh3LDOJeZU2i5hSzGv4NlFOWar
+Content-Type: multipart/mixed; boundary="xeEdSmSBzdwPrOaHsOV1YYl65sVmkRIku"
 
---La0dxDfJcDLAEvPZpGobbpmtzE6Xy7fZT
+--xeEdSmSBzdwPrOaHsOV1YYl65sVmkRIku
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 25.03.20 00:20, John Snow wrote:
-> We no longer need to accommodate 3.4, drop this code.
-> (The lines were > 79 chars and it stood out.)
+> I had to fix a merge conflict, so do this tiny harmless thing while I'm
+> here.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-I did say I wouldn=E2=80=99t complain about the unrelated change!
-
-*shrug*
+>  tests/qemu-iotests/iotests.py | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---La0dxDfJcDLAEvPZpGobbpmtzE6Xy7fZT--
+--xeEdSmSBzdwPrOaHsOV1YYl65sVmkRIku--
 
---WzBtxKLEsa5KkvW2iGtbhgEBH0Wx6nLgo
+--VRDC9Cavh3LDOJeZU2i5hSzGv4NlFOWar
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6B4hYACgkQ9AfbAGHV
-z0B+0gf/ZLYbImD+DDV4H9Ia5Zx/LcITu+iNqvdoYoYxJmEgO8Ve5I480IzEa1Ls
-TeVcYCOjLxDNQ3Zc15hx/VzGXQcE1yzNAtmFoAdCyvgI7E1DBnpV4S865MqIXn4M
-+DWXUDB5COZ4csqKERJTVBYkTmCiKTmFXfK36X79FL5yvbckU7dbXz8CtSv1+BJB
-uKqUOBZz+zSRPuA90XyAzSUfIzECWEfLdkAfCA/VxC/bc5Xcwl4ZUDwRc/0f7u4Y
-Vxg0w7qQSS7ZyoZrpFfFNeIDAaG6+g66YyhQ3iC9fVEUlZjdfEdXpY46rRjzW01J
-Xw24t9diuW5vYaUDWVcWU1uh8kwoiw==
-=cwTf
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6B4dIACgkQ9AfbAGHV
+z0A/Ewf/Q462RVsgILpzJVx1/t5XiWn/b1Ugd+EUsojkarJ8ulctp9ewEWTszWQy
+fAah64+lRCDF3Hzzg2NCrD88f0XAT8LmCQVftWqTcajtksYJCs0wam3fC0SQYS95
+/DMsp4Dk97x8aFNgBWMIlVN40BL8oWMQ22GF/vXA2b+8jqxjTYxZjwBwW6ygZv8k
+U51POTR5fa/5Nnr4Yj9zJeS5oCCAboAPrJYzfBJbBu/3B9l10KZrU7llhehUU2u6
+yWg1vRzv2ZbOO0tTJbpHp17byC1paaJJ3eC3fzz4oRO4Tye5XMVuQBth/5ZcraYw
+SkWnmPtweHqf/HTFwdaBEs0CX5a7yw==
+=WaGE
 -----END PGP SIGNATURE-----
 
---WzBtxKLEsa5KkvW2iGtbhgEBH0Wx6nLgo--
+--VRDC9Cavh3LDOJeZU2i5hSzGv4NlFOWar--
 
 
