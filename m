@@ -2,81 +2,63 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46866C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 08:10:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA9CDC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 08:25:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1140820732
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 08:10:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J29cI6Hp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1140820732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ACDE4206CC
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 08:25:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACDE4206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIpVJ-0003QF-33
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 04:10:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58132)
+	id 1jIpjB-0006Wd-RG
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 04:25:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jIpUc-0002qa-5F
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:09:59 -0400
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jIpiY-0005nt-Ll
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jIpUb-0002j5-36
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:09:58 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32607)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jIpUb-0002i1-01
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:09:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585555796;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=p3jnxmCb4UMXan50BeAyp+fJOVbc6faP6uDFVZKYd9A=;
- b=J29cI6HpP2rM9LRCgrqrGZYMqAhMJBob3D7tJzYMghtDdfcc1g0OtXjMnArzOB0ij04R0Y
- gLLq1uVoIc+oqdB3EhiI8K8VbiPjvBtvwM/oQrtLo1xcJ8K9AalNn3b4+PwD2a6xE0ryHT
- qDKI+bAxCQ+xV+Prz1ELL5Z0xTh6wUs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-CIWUM-vzMd6danoAanVWbg-1; Mon, 30 Mar 2020 04:09:52 -0400
-X-MC-Unique: CIWUM-vzMd6danoAanVWbg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C4C313FA;
- Mon, 30 Mar 2020 08:09:51 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BDD0260C63;
- Mon, 30 Mar 2020 08:09:47 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EB9F311385E2; Mon, 30 Mar 2020 10:09:45 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Dietmar Maurer <dietmar@proxmox.com>
-Subject: Re: AIO_WAIT_WHILE questions
-References: <1242491200.59.1585326983523@webmail.proxmox.com>
-Date: Mon, 30 Mar 2020 10:09:45 +0200
-In-Reply-To: <1242491200.59.1585326983523@webmail.proxmox.com> (Dietmar
- Maurer's message of "Fri, 27 Mar 2020 17:36:23 +0100 (CET)")
-Message-ID: <87o8sexnzq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jIpiX-0003S4-6q
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:24:22 -0400
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:2393)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jIpiW-0003Jm-Je
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 04:24:21 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.1]) by
+ rmmx-syy-dmz-app10-12010 (RichMail) with SMTP id 2eea5e81ac9d4c7-0b563;
+ Mon, 30 Mar 2020 16:23:57 +0800 (CST)
+X-RM-TRANSID: 2eea5e81ac9d4c7-0b563
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from [172.20.144.199] (unknown[112.25.154.146])
+ by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee15e81ac9c974-2943a;
+ Mon, 30 Mar 2020 16:23:57 +0800 (CST)
+X-RM-TRANSID: 2ee15e81ac9c974-2943a
+Subject: Re: [PATCH v2] migration: use "" instead of (null) for tls-authz
+To: Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <0a9dc2fcb78da13eb326992384bc4e57de83d9f9.1584797648.git.maozhongyi@cmss.chinamobile.com>
+ <20200324100823.GB2645@work-vm> <875zemz4y7.fsf@dusky.pond.sub.org>
+From: maozy <maozhongyi@cmss.chinamobile.com>
+Message-ID: <4c37b60d-f296-e813-4395-7414dfcab1ba@cmss.chinamobile.com>
+Date: Mon, 30 Mar 2020 16:23:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <875zemz4y7.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 221.176.66.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,78 +70,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing people based on output of "scripts/get_maintainer.pl -f
-include/block/aio-wait.h".
+Hi Markus,
 
-Dietmar Maurer <dietmar@proxmox.com> writes:
+On 3/30/20 3:18 PM, Markus Armbruster wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> 
+>> * Mao Zhongyi (maozhongyi@cmss.chinamobile.com) wrote:
+>>> run:
+>>> (qemu) info migrate_parameters
+>>> announce-initial: 50 ms
+>>> ...
+>>> announce-max: 550 ms
+>>> multifd-compression: none
+>>> xbzrle-cache-size: 4194304
+>>> max-postcopy-bandwidth: 0
+>>>   tls-authz: '(null)'
+>>>
+>>> Migration parameter 'tls-authz' is used to provide the QOM ID
+>>> of a QAuthZ subclass instance that provides the access control
+>>> check, default is NULL. But the empty string is not a valid
+>>> object ID, so use "" instead of the default. Although it will
+>>> fail when lookup an object with ID "", it is harmless, just
+>>> consistent with tls_creds.
+>>
+>> Yes, it's probably the best we can do given Dan's explanation that
+>> we can't change tls_authz to be non-null.
+> 
+> As I explained in Message-ID: <878sjv11xm.fsf@dusky.pond.sub.org>, this
+> is actually a crash bug on some systems.  The commit message neglects to
+> mention that.  Too late to fix now.  Next time :)
 
-> Hi all,
->
-> I have a question about AIO_WAIT_WHILE. The docs inside the code say:
->
->  * The caller's thread must be the IOThread that owns @ctx or the main lo=
-op
->  * thread (with @ctx acquired exactly once).
->
-> I wonder if that "with @ctx acquired exactly once" is always required?
->
-> I have done a quick test (see code below) and this reveals that the condi=
-tion is not
-> always met.
->
-> Or is my test wrong (or the docs)?
->
-> ---debug helper---
-> diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
-> index afeeb18f95..cf78dca9f9 100644
-> --- a/include/block/aio-wait.h
-> +++ b/include/block/aio-wait.h
-> @@ -82,6 +82,8 @@ extern AioWait global_aio_wait;
->      atomic_inc(&wait_->num_waiters);                               \
->      if (ctx_ && in_aio_context_home_thread(ctx_)) {                \
->          while ((cond)) {                                           \
-> +            printf("AIO_WAIT_WHILE %p %d\n", ctx, ctx_->lock_count);    =
- \
-> +            assert(ctx_->lock_count =3D=3D 1);                   \
->              aio_poll(ctx_, true);                                  \
->              waited_ =3D true;                                        \
->          }                                                          \
-> diff --git a/include/block/aio.h b/include/block/aio.h
-> index cb1989105a..51ef20e2f0 100644
-> --- a/include/block/aio.h
-> +++ b/include/block/aio.h
-> @@ -125,6 +125,7 @@ struct AioContext {
-> =20
->      /* Used by AioContext users to protect from multi-threaded access.  =
-*/
->      QemuRecMutex lock;
-> +    int lock_count;
-> =20
->      /* The list of registered AIO handlers.  Protected by ctx->list_lock=
-. */
->      AioHandlerList aio_handlers;
-> diff --git a/util/async.c b/util/async.c
-> index b94518b948..9804c6c64f 100644
-> --- a/util/async.c
-> +++ b/util/async.c
-> @@ -594,9 +594,11 @@ void aio_context_unref(AioContext *ctx)
->  void aio_context_acquire(AioContext *ctx)
->  {
->      qemu_rec_mutex_lock(&ctx->lock);
-> +    ctx->lock_count++;
->  }
-> =20
->  void aio_context_release(AioContext *ctx)
->  {
-> +    ctx->lock_count--;
->      qemu_rec_mutex_unlock(&ctx->lock);
->  }
+Oops, I will continue to follow up on this issue.
+> 
+>>> Also fixed the bad indentation on the last line.
+>>>
+>>> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+>>> ---
+>>>   migration/migration.c | 3 ++-
+>>>   monitor/hmp-cmds.c    | 2 +-
+>>>   2 files changed, 3 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/migration/migration.c b/migration/migration.c
+>>> index c1d88ace7f..b060153ef7 100644
+>>> --- a/migration/migration.c
+>>> +++ b/migration/migration.c
+>>> @@ -790,7 +790,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>>>       params->has_tls_hostname = true;
+>>>       params->tls_hostname = g_strdup(s->parameters.tls_hostname);
+>>>       params->has_tls_authz = true;
+>>> -    params->tls_authz = g_strdup(s->parameters.tls_authz);
+>>> +    params->tls_authz = s->parameters.tls_authz ? \
+>>> +                        g_strdup(s->parameters.tls_authz) : g_strdup("");
+>>
+>> The \ is unneeded; this isn't a macro; it's also a little shorter to do
+>> it as:
+>>      params->tls_authz = g_strdup(s->parameters.tls_authz ?
+>>                                   s->parameters.tls_authz : "");
+> 
+> Even shorter:
+> 
+>        params->tls_authz = g_strdup(s->parameters.tls_authz ?: "");
+> 
+> ?: is a GNU C extension.  We use it all over the place.
+> 
+> Just FYI.  I'm *not* asking for the code to be changed.
+
+Yes, it does look cooler, thanks for the clarification. I would prefer
+to use this syntax in future patches.
+
+Thanks,
+Mao
+
+> 
+> 
+
 
 
