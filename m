@@ -2,81 +2,105 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39325C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 179F2C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:06:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02B85206E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:02:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3DC6206E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 10:06:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gItIWjKz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02B85206E6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZR2gvZS3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3DC6206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIrFd-0008JU-3l
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 06:02:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44297)
+	id 1jIrIz-0001BW-0k
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 06:06:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jIrBL-0005MJ-Ai
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:58:12 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jIrIG-0000gQ-ED
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jIrBK-0001Ea-1c
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:58:11 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32906)
+ (envelope-from <mreitz@redhat.com>) id 1jIrIF-0005Qm-2n
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:05:20 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:28361)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jIrBJ-0001E8-UE
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:58:09 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jIrIE-0005QQ-VM
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 06:05:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585562289;
+ s=mimecast20190719; t=1585562718;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QMWF8QuFs4FdQnn5PR+iMqYMNcjozcoCRuj7TDfrrJM=;
- b=gItIWjKzRvXje15THpQcrK+vY2ecNdx1hqwGq7j0itykDEVv3Lt1h5QW364bXcmhfboWR0
- zOT3OWTYL39kW+VBwF7CB5mzdTsPWB7WyGQJL3eaQF9NU0SgNHJpkjzdjfg0insaXfzBYF
- y2uoCQuI+8sOaBafVl4Xy+J2OhG1JMs=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=r+jHRfKtJw2/TFzdXkdLiqhhr52K/eH/Zxia8Ily9b0=;
+ b=ZR2gvZS3wnAlwVCzHOZPefk6o2V/YtBzpRT8Jl90yMnLrCJmZWSh3Wc+dvW+zq3WG3hhFx
+ w9lopAylWmb9YY4n8BKzM5VUrj5byMSIyUOHdsAwkVn57py55rddQk1acEV0gWmqC+6kmO
+ 1oO76MvhSBOYCFoqe/7OTLPAPHIs4U8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-a80OJPh6OOmn0-tzar3j5w-1; Mon, 30 Mar 2020 05:58:02 -0400
-X-MC-Unique: a80OJPh6OOmn0-tzar3j5w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-185-DH7SwklqPO6kWLsL18Lceg-1; Mon, 30 Mar 2020 06:05:10 -0400
+X-MC-Unique: DH7SwklqPO6kWLsL18Lceg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72A47800D50;
- Mon, 30 Mar 2020 09:58:00 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CFC05C1B5;
- Mon, 30 Mar 2020 09:57:57 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 09/13] arm/arm64: ITS: Commands
-To: Zenghui Yu <yuzenghui@huawei.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-10-eric.auger@redhat.com>
- <84493416-7b0d-df3e-df56-cedcbdd72010@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <885f656f-08a4-7e7b-f2b8-0e3921a58bb9@redhat.com>
-Date: Mon, 30 Mar 2020 11:57:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8585ADB20;
+ Mon, 30 Mar 2020 10:05:09 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-93.ams2.redhat.com
+ [10.36.113.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E1E6219925;
+ Mon, 30 Mar 2020 10:05:05 +0000 (UTC)
+Subject: Re: [PATCH v4] qcow2: Forbid discard in qcow2 v2 images with backing
+ files
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <20200327185930.19493-1-berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <81e31d93-8bd6-476b-ff92-080da8a2cd67@redhat.com>
+Date: Mon, 30 Mar 2020 12:05:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <84493416-7b0d-df3e-df56-cedcbdd72010@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200327185930.19493-1-berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="rQFnKquS4irUhbkqjPWBkbVcaB8Dj5guh"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,157 +112,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, thuth@redhat.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Zenghui,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rQFnKquS4irUhbkqjPWBkbVcaB8Dj5guh
+Content-Type: multipart/mixed; boundary="7rWjHRDAWQiQh5cy4mYVBO3Q2lYs00eoe"
 
-On 3/30/20 11:22 AM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/20 17:24, Eric Auger wrote:
->> Implement main ITS commands. The code is largely inherited from
->> the ITS driver.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->=20
-> [...]
->=20
->> +/* ITS COMMANDS */
->> +
->> +static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] &=3D ~0xffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] |=3D cmd_nr;
->> +}
->> +
->> +static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] &=3D BIT_ULL(32) - 1;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] |=3D ((u64)devid) << 32;
->> +}
->> +
->> +static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] &=3D ~0xffffffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] |=3D id;
->> +}
->> +
->> +static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id=
-)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] &=3D 0xffffffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] |=3D ((u64)phys_id) << 32;
->> +}
->> +
->> +static void its_encode_size(struct its_cmd_block *cmd, u8 size)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] &=3D ~0x1fUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] |=3D size & 0x1f;
->> +}
->> +
->> +static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~0xffffffffffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D itt_addr & 0xffffffffff00UL;
->> +}
->> +
->> +static void its_encode_valid(struct its_cmd_block *cmd, int valid)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~(1UL << 63);
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D ((u64)!!valid) << 63;
->> +}
->> +
->> +static void its_encode_target(struct its_cmd_block *cmd, u64
->> target_addr)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~(0xfffffffffUL << 16);
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D (target_addr & (0xffffffffUL =
-<< 16));
->> +}
->> +
->> +static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~0xffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D col;
->> +}
->=20
-> The command encoding can be refactored like:
->=20
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D4d36f136d57aea6f6440886106e246bb7e5918d8
->=20
->=20
-> which will look much clearer.
-OK
->=20
-> [...]
->=20
->> +static void its_send_single_command(its_cmd_builder_t builder,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_desc *desc)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct its_cmd_block *cmd, *next_cmd;
->> +
->> +=C2=A0=C2=A0=C2=A0 cmd =3D its_allocate_entry();
->> +=C2=A0=C2=A0=C2=A0 builder(cmd, desc);
->> +=C2=A0=C2=A0=C2=A0 next_cmd =3D its_post_commands();
->> +
->> +=C2=A0=C2=A0=C2=A0 its_wait_for_range_completion(cmd, next_cmd);
->> +}
->> +
->> +
->=20
-> extra line.
-OK
->=20
->> +static void its_build_mapd_cmd(struct its_cmd_block *cmd,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_desc *desc)
->> +{
->> +=C2=A0=C2=A0=C2=A0 unsigned long itt_addr;
->> +=C2=A0=C2=A0=C2=A0 u8 size =3D 12; /* 4096 eventids */
->=20
-> Maybe use desc->its_mapd_cmd.dev->nr_ites instead as we already have it=
-?
-OK
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 itt_addr =3D (unsigned
->> long)(virt_to_phys(desc->its_mapd_cmd.dev->itt));
->> +=C2=A0=C2=A0=C2=A0 itt_addr =3D ALIGN(itt_addr, ITS_ITT_ALIGN);
->> +
->> +=C2=A0=C2=A0=C2=A0 its_encode_cmd(cmd, GITS_CMD_MAPD);
->> +=C2=A0=C2=A0=C2=A0 its_encode_devid(cmd, desc->its_mapd_cmd.dev->devi=
-ce_id);
->> +=C2=A0=C2=A0=C2=A0 its_encode_size(cmd, size - 1);
->> +=C2=A0=C2=A0=C2=A0 its_encode_itt(cmd, itt_addr);
->> +=C2=A0=C2=A0=C2=A0 its_encode_valid(cmd, desc->its_mapd_cmd.valid);
->> +=C2=A0=C2=A0=C2=A0 its_fixup_cmd(cmd);
->> +=C2=A0=C2=A0=C2=A0 if (desc->verbose)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 printf("ITS: MAPD devid=3D=
-%d size =3D 0x%x itt=3D0x%lx valid=3D%d\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 de=
-sc->its_mapd_cmd.dev->device_id,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 si=
-ze, itt_addr, desc->its_mapd_cmd.valid);
->> +
->=20
-> extra line.
->=20
-> All of these are trivial things and feel free to ignore them,
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-thanks!
+--7rWjHRDAWQiQh5cy4mYVBO3Q2lYs00eoe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Eric
+On 27.03.20 19:59, Alberto Garcia wrote:
+> A discard request deallocates the selected clusters so they read back
+> as zeroes. This is done by clearing the cluster offset field and
+> setting QCOW_OFLAG_ZERO in the L2 entry.
 >=20
+> This flag is however only supported when qcow_version >=3D 3. In older
+> images the cluster is simply deallocated, exposing any possible stale
+> data from the backing file.
 >=20
-> Thanks
+> Since discard is an advisory operation it's safer to simply forbid it
+> in this scenario.
 >=20
+> Note that we are adding this check to qcow2_co_pdiscard() and not to
+> qcow2_cluster_discard() or discard_in_l2_slice() because the last
+> two are also used by qcow2_snapshot_create() to discard the clusters
+> used by the VM state. In this case there's no risk of exposing stale
+> data to the guest and we really want that the clusters are always
+> discarded.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+> v4:
+> - Show output of qemu-img map when there's no backing file [Eric]
+>=20
+> v3:
+> - Rebase and change iotest number
+> - Show output of qemu-img map in iotest 290 [Kevin]
+> - Use the l2_offset and rb_offset variables in iotest 060
+>=20
+> v2:
+>=20
+> - Don't create the image with compat=3D0.10 in iotest 060 [Max]
+> - Use $TEST_IMG.base for the backing image name in iotest 289 [Max]
+> - Add list of unsupported options to iotest 289 [Max]
+>=20
+>  block/qcow2.c              |  6 +++
+>  tests/qemu-iotests/060     | 12 ++---
+>  tests/qemu-iotests/060.out |  2 -
+>  tests/qemu-iotests/290     | 97 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/290.out | 61 ++++++++++++++++++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  6 files changed, 170 insertions(+), 9 deletions(-)
+>  create mode 100755 tests/qemu-iotests/290
+>  create mode 100644 tests/qemu-iotests/290.out
+
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
+
+
+--7rWjHRDAWQiQh5cy4mYVBO3Q2lYs00eoe--
+
+--rQFnKquS4irUhbkqjPWBkbVcaB8Dj5guh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6BxE8ACgkQ9AfbAGHV
+z0Ag2Af9HiCaluxDv8xE/lrjm0FgAJDJcM3UMcw0wcVaI4Kugt7NICYsWKaC6nJ6
+OH5h6A7OSguz5wcZU2Xeup+5VcDpoTJabYnmUVrvHwNwMQgC6cvv6coMazm0pHz6
+XDSu2OaKg5qbir6McLYlmOePkgIVMSVVeysTuqXWGBOgGKsDfrKjLR0bmDVG+SUE
+EtGdTLj3cn+a3MuHZtZlug75T8Op3aTRR4wztL3PXXKH5vMbqwEPsO4SVcI6sCVb
+m/NjgnXwr53NltmuhNTEtQAn1PbEz+xFiWA4ZGaONLzEUjxnfrQ9QfOOs10r9UJu
+8qeczkkHCLkSIC3jkcHldQsNkq0FeA==
+=TI+h
+-----END PGP SIGNATURE-----
+
+--rQFnKquS4irUhbkqjPWBkbVcaB8Dj5guh--
 
 
