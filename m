@@ -2,65 +2,89 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2E9C2D0EE
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C05BC2D0EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:16:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F00D020786
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:09:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37DCE206F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 15:16:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="A5v7+2Ue"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F00D020786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W/1+8QaV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37DCE206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIw2L-0004dr-5b
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 11:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35688)
+	id 1jIw9l-0007hD-8m
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 11:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@163.com>) id 1jIw1W-00048i-OL
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:08:25 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jIw8o-0006fu-62
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@163.com>) id 1jIw1R-0003eT-2m
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:08:18 -0400
-Received: from m12-15.163.com ([220.181.12.15]:51624)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liq3ea@163.com>) id 1jIw1O-0003TK-RA
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:08:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=stO3J/KMOFYfQQJVoI
- sdSLk7ULyKnQE/lroD5QxL4sg=; b=A5v7+2UeDsKibyfF2u2TKb/vd+8a/xoLhC
- pleyrbkrrQjhkHPMefFAF9keCYeFyF5Vj7U1M7ekwTcMEf2v1QKk1sgfZV+jxRoq
- W9D/kQIpW31LCVpZsHpr4/8HC5lU2qVrJWD1njfo4VP9NO/iNbS7x0hBz5i2xOJy
- YF4UMrDy4=
-Received: from localhost.localdomain (unknown [183.159.74.161])
- by smtp11 (Coremail) with SMTP id D8CowAAnbmqUB4JefFAUBw--.32567S4;
- Mon, 30 Mar 2020 22:52:05 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com,
- jasowang@redhat.com
-Subject: [PATCH v2] qtest: add tulip test case
-Date: Mon, 30 Mar 2020 07:52:01 -0700
-Message-Id: <20200330145201.32534-1-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: D8CowAAnbmqUB4JefFAUBw--.32567S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW3WF15CrWDZrW7uF1fCrWxWFg_yoW7tF1DpF
- yDA3ZI9r48JF13Xrn7C3W2yF15Ga9a93W7CFW7uF18urZxX3srKan7Kr9FvFsY9FWkXr15
- Cw18tFn3GF1DtF7anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UCJmUUUUUU=
-X-Originating-IP: [183.159.74.161]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBoRb2bVQHJQ6w6gAAsO
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 220.181.12.15
+ (envelope-from <alex.bennee@linaro.org>) id 1jIw8m-0002UZ-If
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:15:54 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:34046)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jIw8m-0002Qu-9F
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 11:15:52 -0400
+Received: by mail-wr1-x429.google.com with SMTP id 65so22154766wrl.1
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 08:15:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=YeNU6gFjHk71zB0/YjJOaAKbB3hRj/4gDWw2AYq/tWY=;
+ b=W/1+8QaV4meLB951lru0PAC3kJ6g8QTYsUH1FdCKpwE4fa8PQ8wNawpls9yEJ7iqrQ
+ V/uiQ7CJu5chtbHoVzDjIcRN+RiB+L2VW4oHo0tHkGrsYYZhEm+KXV+KH4lYn2zlNQM5
+ kJwaDGVrqBYRazJijFbP7JiWibv09IiosPfTo9+0h+S48iF08IB6dZCwW92Zi/QIPG5W
+ 8Kvq3nnuDJkYSan6pda6/tvJzLCgDBbGVPy1qO6v7C2Wg2pA6uQX4iJlftefdLVUPc8j
+ EnMCmbdVphyuw0ewusCl0+jPAMae4DvFqJt4laoLiog27FsW7escFGkpdrk7A02ZhCVO
+ mCsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=YeNU6gFjHk71zB0/YjJOaAKbB3hRj/4gDWw2AYq/tWY=;
+ b=DO9hUZ57cY4zb3gk2n3bs1cYVIuec+QUPDPrfuV4GH/iidY7EHWn0PjnncgWPJ+Biu
+ TZfo1PkM8DUmdXNnA1aqPqv9Qa0Sky6HoC2JtCczGeFtLHe574/SsKPeYI020hHgJ8i6
+ X4Dsim1odmE+8Ij11EFZ6wEVvA9A+O7tpK3OFMzFeeTszc8ru9I2nZTxjsxjjE+K3Qm6
+ POFAbiFbq/CnmMtZM/yNvVcOieCPGEV1Pu3+lwWrPxtRjrLb9W50pzpS5Sq/44xu5zdc
+ XmJHKk7px6SWmOGnWC6RvBcI2gUpRavapGIY3bjSTXK3+LwcVaPHG10whLcz5i0pIJ0T
+ McVA==
+X-Gm-Message-State: ANhLgQ37RVznlxaeSRpAWAKwipTdYgKO0n5po30mbICg74OWCRhI71Fj
+ NElNdeUoqCg7C1m4pQUe3UTtPF0YtKU=
+X-Google-Smtp-Source: ADFU+vuQd73Q+uYIxfhiZYEq50Aj7o7U9OvWlx4BTBbhDqFT8I9XM2zb1bDe9Dw0sD2qxSkFCHwByQ==
+X-Received: by 2002:adf:feca:: with SMTP id q10mr15197773wrs.199.1585581349948; 
+ Mon, 30 Mar 2020 08:15:49 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x11sm16198171wru.62.2020.03.30.08.15.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Mar 2020 08:15:48 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 83FD11FF7E;
+ Mon, 30 Mar 2020 16:15:47 +0100 (BST)
+References: <CAOragkw8XgbEOiaE9n=wKzPAMkzdOcqA5VA5ihN80v-g7V8TRw@mail.gmail.com>
+ <20200329111311.272958fe@luklap>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: Qemu TCG Plugins - how to access guest registers?
+In-reply-to: <20200329111311.272958fe@luklap>
+Date: Mon, 30 Mar 2020 16:15:47 +0100
+Message-ID: <878sjhho0s.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,168 +96,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: Benjamin <benjamin@thatjames.org>, qemu-devel@nongnu.org,
+ qemu-discuss@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The tulip networking card emulation has an OOB issue in
-'tulip_copy_tx_buffers' when the guest provide malformed descriptor.
-This test will trigger a ASAN heap overflow crash. To trigger this
-issue we can construct the data as following:
 
-1. construct a 'tulip_descriptor'. Its control is set to
-'0x7ff | 0x7ff << 11', this will make the 'tulip_copy_tx_buffers's
-'len1' and 'len2' to 0x7ff(2047). So 'len1+len2' will overflow
-'TULIPState's 'tx_frame' field. This descriptor's 'buf_addr1' and
-'buf_addr2' should set to a guest address.
+Lukas Straub <lukasstraub2@web.de> writes:
 
-2. write this descriptor to tulip device's CSR4 register. This will
-set the 'TULIPState's 'current_tx_desc' field.
+> On Fri, 27 Mar 2020 15:40:38 -0600
+> Benjamin <benjamin@thatjames.org> wrote:
+>
+>> Qemu version 4.2.0 includes new functionality for something called TCG
+>> Plugins. There are a few examples in the tests/plugins directory, and the
+>> API is more or less defined in qemu-plugin.h.
+>>=20
+>> This file defines two enumerated types, "qemu_plugin_cb_flags" and
+>> "qemu_plugin_mem_rw", which are passed into functions that register
+>> callbacks. These enums seem to indicate whether the callbacks will read =
+or
+>> write CPU registers or memory. However, all of the example plugins use
+>> "QEMU_PLUGIN_CB_NO_REGS", and only 2 of the plugins use the memory access
+>> enum. hotpages.c and mem.c use "QEMU_PLUGIN_MEM_RW" as the default for
+>> registering a memory callback (qemu_plugin_register_vcpu_mem_cb). mem.c =
+has
+>> an argument when the plugin is loaded to choose if it's read or write,
+>> however, it doesn't seem to make any difference in the callback
+>> function.
 
-3. write 'CSR6_ST' to tulip device's CSR6 register. This will trigger
-'tulip_xmit_list_update' and finally calls 'tulip_copy_tx_buffers'.
+You are quite right the flags exist so the TCG can be told if the
+callback is going to mess with machine state - they map to the internal
+TCG_CALL_* flags which are used for the same reason for the internal
+helper functions.
 
-Following shows the backtrack of crash:
+>> My question is, how do I access the guest memory and registers from the
+>> plugin callback function? The API seems to indicate that it is possible,
+>> since the callback registering requires you to say if you will access th=
+em,
+>> and if it's RW or just read.
 
-==31781==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x628000007cd0 at pc 0x7fe03c5a077a bp 0x7fff05b46770 sp 0x7fff05b45f18
-WRITE of size 2047 at 0x628000007cd0 thread T0
-    #0 0x7fe03c5a0779  (/usr/lib/x86_64-linux-gnu/libasan.so.4+0x79779)
-    #1 0x5575fb6daa6a in flatview_read_continue /home/test/qemu/exec.c:3194
-    #2 0x5575fb6daccb in flatview_read /home/test/qemu/exec.c:3227
-    #3 0x5575fb6dae66 in address_space_read_full /home/test/qemu/exec.c:3240
-    #4 0x5575fb6db0cb in address_space_rw /home/test/qemu/exec.c:3268
-    #5 0x5575fbdfd460 in dma_memory_rw_relaxed /home/test/qemu/include/sysemu/dma.h:87
-    #6 0x5575fbdfd4b5 in dma_memory_rw /home/test/qemu/include/sysemu/dma.h:110
-    #7 0x5575fbdfd866 in pci_dma_rw /home/test/qemu/include/hw/pci/pci.h:787
-    #8 0x5575fbdfd8a3 in pci_dma_read /home/test/qemu/include/hw/pci/pci.h:794
-    #9 0x5575fbe02761 in tulip_copy_tx_buffers hw/net/tulip.c:585
-    #10 0x5575fbe0366b in tulip_xmit_list_update hw/net/tulip.c:678
-    #11 0x5575fbe04073 in tulip_write hw/net/tulip.c:783
+Currently we document what plugins can do in docs/devel/tcg-plugins.rst:
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
-Change since v1:
+  TCG plugins are unable to change the system state only monitor it
+  passively. However they can do this down to an individual instruction
+  granularity including potentially subscribing to all load and store
+  operations.
 
-Add detail descriptor construction to trigger the crash.
-Use CSR6_ST to replace the magic value.
+This was a conscious decision to avoid plugins being used as an end-run
+around the GPL to implement proprietary out-of-tree extensions.
 
- tests/qtest/Makefile.include |  1 +
- tests/qtest/tulip-test.c     | 91 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 92 insertions(+)
- create mode 100644 tests/qtest/tulip-test.c
+That is not to say we might relax the rules in the future - it was a
+topic of discussion at the maintainers summit and we wanted to document
+some guidelines around interfacing with QEMU so people didn't get the
+wrong idea about what these APIs provide (c.f. multi-process qemu and
+vhost-user which could also be abused in similar ways).
 
-diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
-index 10a28de8a3..9e5a51d033 100644
---- a/tests/qtest/Makefile.include
-+++ b/tests/qtest/Makefile.include
-@@ -217,6 +217,7 @@ qos-test-obj-y += tests/qtest/es1370-test.o
- qos-test-obj-y += tests/qtest/ipoctal232-test.o
- qos-test-obj-y += tests/qtest/megasas-test.o
- qos-test-obj-y += tests/qtest/ne2000-test.o
-+qos-test-obj-y += tests/qtest/tulip-test.o
- qos-test-obj-y += tests/qtest/nvme-test.o
- qos-test-obj-y += tests/qtest/pca9552-test.o
- qos-test-obj-y += tests/qtest/pci-test.o
-diff --git a/tests/qtest/tulip-test.c b/tests/qtest/tulip-test.c
-new file mode 100644
-index 0000000000..2fb6c4d5a7
---- /dev/null
-+++ b/tests/qtest/tulip-test.c
-@@ -0,0 +1,91 @@
-+/*
-+ * QTest testcase for DEC/Intel Tulip 21143
-+ *
-+ * Copyright (c) 2020 Li Qiang <liq3ea@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qemu/module.h"
-+#include "libqos/qgraph.h"
-+#include "libqos/pci.h"
-+#include "qemu/bitops.h"
-+#include "hw/net/tulip.h"
-+
-+typedef struct QTulip_pci QTulip_pci;
-+
-+struct QTulip_pci {
-+    QOSGraphObject obj;
-+    QPCIDevice dev;
-+};
-+
-+static void *tulip_pci_get_driver(void *obj, const char *interface)
-+{
-+    QTulip_pci *tulip_pci = obj;
-+
-+    if (!g_strcmp0(interface, "pci-device")) {
-+        return &tulip_pci->dev;
-+    }
-+
-+    fprintf(stderr, "%s not present in tulip_pci\n", interface);
-+    g_assert_not_reached();
-+}
-+
-+static void *tulip_pci_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
-+{
-+    QTulip_pci *tulip_pci = g_new0(QTulip_pci, 1);
-+    QPCIBus *bus = pci_bus;
-+
-+    qpci_device_init(&tulip_pci->dev, bus, addr);
-+    tulip_pci->obj.get_driver = tulip_pci_get_driver;
-+
-+    return &tulip_pci->obj;
-+}
-+
-+static void tulip_large_tx(void *obj, void *data, QGuestAllocator *alloc)
-+{
-+    QTulip_pci *tulip_pci = obj;
-+    QPCIDevice *dev = &tulip_pci->dev;
-+    QPCIBar bar;
-+    struct tulip_descriptor context;
-+    char guest_data[4096];
-+    uint64_t context_pa;
-+    uint64_t guest_pa;
-+
-+    qpci_device_enable(dev);
-+    bar = qpci_iomap(dev, 0, NULL);
-+    context_pa = guest_alloc(alloc, sizeof(context));
-+    guest_pa = guest_alloc(alloc, 4096);
-+    memset(guest_data, 'A', sizeof(guest_data));
-+    context.status = TDES0_OWN;
-+    context.control = TDES1_BUF2_SIZE_MASK << TDES1_BUF2_SIZE_SHIFT |
-+                      TDES1_BUF1_SIZE_MASK << TDES1_BUF1_SIZE_SHIFT;
-+    context.buf_addr2 = guest_pa;
-+    context.buf_addr1 = guest_pa;
-+
-+    qtest_memwrite(dev->bus->qts, context_pa, &context, sizeof(context));
-+    qtest_memwrite(dev->bus->qts, guest_pa, guest_data, sizeof(guest_data));
-+    qpci_io_writel(dev, bar, 0x20, context_pa);
-+    qpci_io_writel(dev, bar, 0x30, CSR6_ST);
-+    guest_free(alloc, context_pa);
-+    guest_free(alloc, guest_pa);
-+}
-+
-+static void tulip_register_nodes(void)
-+{
-+    QOSGraphEdgeOptions opts = {
-+        .extra_device_opts = "addr=04.0",
-+    };
-+    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
-+
-+    qos_node_create_driver("tulip", tulip_pci_create);
-+    qos_node_consumes("tulip", "pci-bus", &opts);
-+    qos_node_produces("tulip", "pci-device");
-+
-+    qos_add_test("tulip_large_tx", "tulip", tulip_large_tx, NULL);
-+}
-+
-+libqos_init(tulip_register_nodes);
--- 
-2.17.1
+Indeed Emilio's original tree did contain these more invasive hooks and
+while we deliberate upstream it will hopefully not be as hard to
+maintain a light out-of-tree fork should you need such functionality now.
+
+>> Are there any examples of using this part of the API? I realize this is a
+>> very new part of Qemu functionality.
+
+So far the examples represent the totality of the API that has been
+exercised and I'm keen we add more as new extensions to the API are
+added. As to the specific question about accessing register values that
+is exactly down to the newness of the API.
+
+Register access is a tricky problem because of the fact that QEMU
+supports so many guest architectures. I wasn't keen on slapping in a
+functional but ugly API that hard-coded values like gdb register ids so
+I left it out for the time being. I'd happily accept patches to add that
+functionality assuming it meets the projects quality and taste
+guidelines.
+
+Some approaches we could take include:
+
+  - hook into tcg_global_*_new and allow plugin to introspect registers
+  - hook into gdbstub in some way
+
+The first approach elides over the fact that a lot of registers aren't
+actually known to the TCG - pretty much all vector registers tend to be
+loaded into anonymous TCG temps as we go. Maybe this could just be fixed
+by just providing a few more registrations functions at the start even
+if the TCG itself wouldn't use that knowledge.
+
+The gdbstub provides a lot more visibility of register state and for
+some architectures this can be quite comprehensive - for example in
+system mode you can access pretty much every ARM co-processor register.
+However the gdb interface is a little clunky as there are a lot of magic
+register id numbers and the canonical way to enumerate this is to chew
+through a bunch of XML that each target generates (see
+gdb_register_coprocessor). I'm not keen on exposing that pile of XML via
+the register interface. Maybe there is scope to improve our internal
+APIs so the enumeration of registers can be handled by helpers that
+record mappings and ids and generate the XML for the gdbstub centrally?
+
+There may be other approaches we could take and I'm open to suggestions.
+
+>>=20
+>> Thanks
+>
+> CC'ing the maintainer of TCG Plugins.
 
 
+--=20
+Alex Benn=C3=A9e
 
