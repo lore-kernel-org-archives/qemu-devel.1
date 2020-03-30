@@ -2,82 +2,81 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 051C0C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:48:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7EBC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:59:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B426E20757
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:48:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A657F206CC
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 20:59:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJe3hN4x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B426E20757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jQoWKUeE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A657F206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ1KX-0006sX-SD
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 16:48:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39004)
+	id 1jJ1Us-0002Qo-Ij
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 16:59:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1jJ1Jm-0006Lw-OK
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:47:37 -0400
+ (envelope-from <scw@google.com>) id 1jJ1UB-000202-H9
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:58:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1jJ1Jj-0006Br-89
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:47:33 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:21832)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1jJ1Jj-0006B6-00
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:47:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585601250;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sG8KNtc3LRxetOHPGpqOLQR9KpP4ESb77XynbjpbwgE=;
- b=cJe3hN4x/GJOQswrE7/VFyVUWMcKGdQyqgRFnAKj3vX+/8YQVhGUo/2o9JNpSryyPZciWg
- 089enL1PXWBasBle1gSeLmuK7WgguqzN4nuVPGFFAr+yGOkdIbgQAVpWfHbeJ7G69ytStG
- OIFcAGzCucqspng1+kL1lLPcSe/x4Eg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-K6Ala95xMZSIhSlVuRQpoA-1; Mon, 30 Mar 2020 16:47:27 -0400
-X-MC-Unique: K6Ala95xMZSIhSlVuRQpoA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 233A7800D50;
- Mon, 30 Mar 2020 20:47:25 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 063866031F;
- Mon, 30 Mar 2020 20:47:20 +0000 (UTC)
-Date: Mon, 30 Mar 2020 14:47:20 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200330144720.18acf66d@w520.home>
-In-Reply-To: <20200330020708.GB30683@joy-OptiPlex-7040>
-References: <1585084732-18473-1-git-send-email-kwankhede@nvidia.com>
- <20200325021135.GB20109@joy-OptiPlex-7040>
- <33d38629-aeaf-1c30-26d4-958b998620b0@nvidia.com>
- <20200327003055.GB26419@joy-OptiPlex-7040>
- <0fdf19d4-a45b-d0b1-b630-1ee9df087c15@nvidia.com>
- <20200330020708.GB30683@joy-OptiPlex-7040>
+ (envelope-from <scw@google.com>) id 1jJ1UA-0004wr-7f
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:58:19 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:43314)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <scw@google.com>) id 1jJ1U9-0004uw-Vq
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 16:58:18 -0400
+Received: by mail-io1-xd43.google.com with SMTP id x9so12942771iom.10
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 13:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Zw5SfoHViZzIJrh/e8QJf4+nGpQl9J6Oc9y+FNv/NlE=;
+ b=jQoWKUeERQa81D1gr5sSOlWflmk7gNFWTO3u0R5oDFqc8/rXSt4nVxcYZUpA0LEHGv
+ s2wQjEwfFncykaLB2xyyeNX7OPs3lBPAbscS+ST2lVSyBvkT5zKqX3ME7Ozm6jbb2jbR
+ 20Fh2t7VAxseIx8SgwJc2oB6nmiGqGW/ovr171EULZOsp+FWEiisroZTtXTpOfNuM/Ak
+ TXT5bF7TeZR7HtvCWelMZDFdi9OntMYEVix/iehuySRo/1rfybdC5Z+drklqqCtb4rML
+ Fuc30EvG2UOwQikISdIOwFZWrZrS4BEFtYzV9T0mt+RZk32PYBmkrCFTSFE6NXV6pDzc
+ UoCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Zw5SfoHViZzIJrh/e8QJf4+nGpQl9J6Oc9y+FNv/NlE=;
+ b=pwtdhzAie7TYtJIlv/YPT4ADZDcB8QOqiKWSwUGuNtKeu4F5vPxZmnH1pQd7ruJLx5
+ YnzLo/yyby6hyNiJdVr77sNi3C0Sw1yeR5puNtYIAey/Gw8mf4xeZbmy6+z1lZRG8HE+
+ 0ArKY+xJLoSArpNVrn6OZw4vwOlp/YFaCi8LbNNQwvhy5rqGxcgT4xFYsjw6vzGenQZq
+ 6GYE7zFmxPnOSkpOgKn1fCczkc/7NoxqOdnIocqfGJu63VhggiL4tTykMfNT5rkx1nVu
+ n3UyXzwiILvOMCTHlmNe7MtpGLWypavEgTuE+BdRdg0ftQB7eEzZF5kDW0K7puWv1wNu
+ x9Ew==
+X-Gm-Message-State: ANhLgQ1C5iHXm61GSSJSnH8xCaps+FYCBe3H1uwet3GFF0sQOZvP4NcU
+ XX4kxZQW+2YY4DQ1xXU4p9Sxkj4DvSUqtKCsXUXe6w==
+X-Google-Smtp-Source: ADFU+vssCyHA7TQxzGuUps3qEKU1uV3nO7yg5wBt/kUwWxNGoRzUi/fWEXr48Zu+eeFOWUgOKvXyUg6w3pyq8Ea21Yo=
+X-Received: by 2002:a02:7a18:: with SMTP id a24mr12796771jac.54.1585601894974; 
+ Mon, 30 Mar 2020 13:58:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200318062057.224953-1-scw@google.com>
+In-Reply-To: <20200318062057.224953-1-scw@google.com>
+From: Shu-Chun Weng <scw@google.com>
+Date: Mon, 30 Mar 2020 13:58:03 -0700
+Message-ID: <CAF3nBxj_8GXyGziVu3iEtz6gYidMFk6joZayUCAwQ4-xKB6T0w@mail.gmail.com>
+Subject: Re: [PATCH] Makes softmmu compile with clang at HEAD
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature";
+ micalg=sha-256; boundary="000000000000bb9c0d05a218b540"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,378 +88,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi
- L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 29 Mar 2020 22:07:08 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+--000000000000bb9c0d05a218b540
+Content-Type: multipart/alternative; boundary="000000000000b5337305a218b5b1"
 
-> On Fri, Mar 27, 2020 at 01:07:38PM +0800, Kirti Wankhede wrote:
-> > 
-> > 
-> > On 3/27/2020 6:00 AM, Yan Zhao wrote:  
-> > > On Fri, Mar 27, 2020 at 05:39:01AM +0800, Kirti Wankhede wrote:  
-> > >>
-> > >>
-> > >> On 3/25/2020 7:41 AM, Yan Zhao wrote:  
-> > >>> On Wed, Mar 25, 2020 at 05:18:52AM +0800, Kirti Wankhede wrote:  
-> > >>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> > >>>> - Start dirty pages tracking while migration is active
-> > >>>> - Stop dirty pages tracking.
-> > >>>> - Get dirty pages bitmap. Its user space application's responsibility to
-> > >>>>     copy content of dirty pages from source to destination during migration.
-> > >>>>
-> > >>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> > >>>> structure. Bitmap size is calculated considering smallest supported page
-> > >>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> > >>>>
-> > >>>> Bitmap is populated for already pinned pages when bitmap is allocated for
-> > >>>> a vfio_dma with the smallest supported page size. Update bitmap from
-> > >>>> pinning functions when tracking is enabled. When user application queries
-> > >>>> bitmap, check if requested page size is same as page size used to
-> > >>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> > >>>> error.
-> > >>>>
-> > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > >>>> ---
-> > >>>>    drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
-> > >>>>    1 file changed, 260 insertions(+), 6 deletions(-)
-> > >>>>
-> > >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > >>>> index 70aeab921d0f..874a1a7ae925 100644
-> > >>>> --- a/drivers/vfio/vfio_iommu_type1.c
-> > >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
-> > >>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
-> > >>>>    	unsigned int		dma_avail;
-> > >>>>    	bool			v2;
-> > >>>>    	bool			nesting;
-> > >>>> +	bool			dirty_page_tracking;
-> > >>>>    };
-> > >>>>    
-> > >>>>    struct vfio_domain {
-> > >>>> @@ -91,6 +92,7 @@ struct vfio_dma {
-> > >>>>    	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
-> > >>>>    	struct task_struct	*task;
-> > >>>>    	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> > >>>> +	unsigned long		*bitmap;
-> > >>>>    };
-> > >>>>    
-> > >>>>    struct vfio_group {
-> > >>>> @@ -125,7 +127,21 @@ struct vfio_regions {
-> > >>>>    #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
-> > >>>>    					(!list_empty(&iommu->domain_list))
-> > >>>>    
-> > >>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> > >>>> +
-> > >>>> +/*
-> > >>>> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
-> > >>>> + * further casts to signed integer for unaligned multi-bit operation,
-> > >>>> + * __bitmap_set().
-> > >>>> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
-> > >>>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-> > >>>> + * system.
-> > >>>> + */
-> > >>>> +#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
-> > >>>> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> > >>>> +
-> > >>>>    static int put_pfn(unsigned long pfn, int prot);
-> > >>>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
-> > >>>>    
-> > >>>>    /*
-> > >>>>     * This code handles mapping and unmapping of user data buffers
-> > >>>> @@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
-> > >>>>    	rb_erase(&old->node, &iommu->dma_list);
-> > >>>>    }
-> > >>>>    
-> > >>>> +
-> > >>>> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, uint64_t pgsize)
-> > >>>> +{
-> > >>>> +	uint64_t npages = dma->size / pgsize;
-> > >>>> +
-> > >>>> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
-> > >>>> +		return -EINVAL;
-> > >>>> +
-> > >>>> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-> > >>>> +	if (!dma->bitmap)
-> > >>>> +		return -ENOMEM;
-> > >>>> +
-> > >>>> +	return 0;
-> > >>>> +}
-> > >>>> +
-> > >>>> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
-> > >>>> +{
-> > >>>> +	kfree(dma->bitmap);
-> > >>>> +	dma->bitmap = NULL;
-> > >>>> +}
-> > >>>> +
-> > >>>> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, uint64_t pgsize)
-> > >>>> +{
-> > >>>> +	struct rb_node *p;
-> > >>>> +
-> > >>>> +	if (RB_EMPTY_ROOT(&dma->pfn_list))
-> > >>>> +		return;
-> > >>>> +
-> > >>>> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> > >>>> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
-> > >>>> +
-> > >>>> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
-> > >>>> +	}
-> > >>>> +}
-> > >>>> +
-> > >>>> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, uint64_t pgsize)
-> > >>>> +{
-> > >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> > >>>> +
-> > >>>> +	for (; n; n = rb_next(n)) {
-> > >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> > >>>> +		int ret;
-> > >>>> +
-> > >>>> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> > >>>> +		if (ret) {
-> > >>>> +			struct rb_node *p = rb_prev(n);
-> > >>>> +
-> > >>>> +			for (; p; p = rb_prev(p)) {
-> > >>>> +				struct vfio_dma *dma = rb_entry(n,
-> > >>>> +							struct vfio_dma, node);
-> > >>>> +
-> > >>>> +				vfio_dma_bitmap_free(dma);
-> > >>>> +			}
-> > >>>> +			return ret;
-> > >>>> +		}
-> > >>>> +		vfio_dma_populate_bitmap(dma, pgsize);
-> > >>>> +	}
-> > >>>> +	return 0;
-> > >>>> +}
-> > >>>> +
-> > >>>> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
-> > >>>> +{
-> > >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> > >>>> +
-> > >>>> +	for (; n; n = rb_next(n)) {
-> > >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> > >>>> +
-> > >>>> +		vfio_dma_bitmap_free(dma);
-> > >>>> +	}
-> > >>>> +}
-> > >>>> +
-> > >>>>    /*
-> > >>>>     * Helper Functions for host iova-pfn list
-> > >>>>     */
-> > >>>> @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> > >>>>    			vfio_unpin_page_external(dma, iova, do_accounting);
-> > >>>>    			goto pin_unwind;
-> > >>>>    		}
-> > >>>> +
-> > >>>> +		if (iommu->dirty_page_tracking) {
-> > >>>> +			unsigned long pgshift =
-> > >>>> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> > >>>> +
-> > >>>> +			/*
-> > >>>> +			 * Bitmap populated with the smallest supported page
-> > >>>> +			 * size
-> > >>>> +			 */
-> > >>>> +			bitmap_set(dma->bitmap,
-> > >>>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
-> > >>>> +		}
-> > >>>>    	}
-> > >>>>    
-> > >>>>    	ret = i;
-> > >>>> @@ -801,6 +900,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
-> > >>>>    	vfio_unmap_unpin(iommu, dma, true);
-> > >>>>    	vfio_unlink_dma(iommu, dma);
-> > >>>>    	put_task_struct(dma->task);
-> > >>>> +	vfio_dma_bitmap_free(dma);
-> > >>>>    	kfree(dma);
-> > >>>>    	iommu->dma_avail++;
-> > >>>>    }
-> > >>>> @@ -831,6 +931,57 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
-> > >>>>    	return bitmap;
-> > >>>>    }
-> > >>>>    
-> > >>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> > >>>> +				  size_t size, uint64_t pgsize,
-> > >>>> +				  u64 __user *bitmap)
-> > >>>> +{
-> > >>>> +	struct vfio_dma *dma;
-> > >>>> +	unsigned long pgshift = __ffs(pgsize);
-> > >>>> +	unsigned int npages, bitmap_size;
-> > >>>> +
-> > >>>> +	dma = vfio_find_dma(iommu, iova, 1);
-> > >>>> +
-> > >>>> +	if (!dma)
-> > >>>> +		return -EINVAL;
-> > >>>> +
-> > >>>> +	if (dma->iova != iova || dma->size != size)
-> > >>>> +		return -EINVAL;
-> > >>>> +  
-> > >>> Still don't sure if it's a good practice.
-> > >>> I saw the qemu implementation.
-> > >>> Qemu just iterates the whole IOVA address space,
-> > >>> It needs to find IOTLB entry for an IOVA
-> > >>> (1) if it can find an IOTLB for an IOVA, do the DIRTY_PAGES IOCTL and
-> > >>> increment IOVA by (iotlb.addr_mask + 1)
-> > >>>
-> > >>> (2) if no existing IOTLB found, the imrc->translate needs to go searching shadow
-> > >>> page table to try to generate one.
-> > >>> if it still fails,(most probably case, as IOMMU only maps a small part in its address
-> > >>> space).  increment IOVA by 1 page.
-> > >>>
-> > >>> So, if the address space width is 39bit, and if there's only one page
-> > >>> mapped, you still have to translate IOVA for around 2^27 times in each
-> > >>> query. Isn't it too inefficient?
-> > >>>  
-> > >>
-> > >> This is Qemu side implementation, let discuss it on QEMU patches.
-> > >>  
-> > > But kernel has to support it first, right?
-> > >   
-> > 
-> > Shadow page table will be in QEMU (?), as long as we support map and   
-> Yes, shadow page table in QEMU.
-> 
-> > unmap in kernel space, QEMU part of changes should work. That shouldn't 
-> > block kernel side patches.  
-> Not sure whether this assertion is right:)
-> I just want to raise the issue out.
+--000000000000b5337305a218b5b1
+Content-Type: text/plain; charset="UTF-8"
 
-And I think we need to make sure that we have a path to an efficient
-userspace implementation.  Walking a shadow page table to unmap and
-collect individual dirty bits is clearly better than blindly walking
-every page of a 39 bit address space, but it would be an obvious
-improvement if the QEMU code could zap entire levels at once.
+Ping.
 
-The issues we raised before about combining multiple bitmaps are not
-insurmountable, they're just complicated and potentially something that
-we can defer for the initial implementation.  We can change the
-implementation of the dirty bitmap without affecting the user, but we
-would need to use another flag bit of the IOMMU_GET_INFO ioctl or expose
-it via the CHECK_EXTENSION ioctl to indicate multi-mapping dirty bitmap
-support.  In fact, the flags field on IOMMU_GET_INFO so far only
-describes fields returned by the ioctl, not support for other ioctls.
-Would the CHECK_EXTENSION ioctl be a better choice for both exposing
-this initial support as well as a v2 when we have multi-mapping?
+On Tue, Mar 17, 2020 at 11:21 PM Shu-Chun Weng <scw@google.com> wrote:
 
-> > >>> So, IMHO, why we could not just save an rb tree specific for dirty pages, then generate
-> > >>> a bitmap for each query?  
+> With clang at HEAD, linking fails with "undefined symbol:
+> qemu_build_not_reached". It's because `store_helper` and
+> `helper_ret_stb_mmu` are mutually recursive and clang inlined latter
+> inside the former, making `store_helper` a recursive function and no
+> longer fully inlineable preventing constant propogation.
+>
+> Signed-off-by: Shu-Chun Weng <scw@google.com>
+> ---
+>  accel/tcg/cputlb.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index e3b5750c3b..a7c812ed72 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -2050,6 +2050,7 @@ store_helper(CPUArchState *env, target_ulong addr,
+> uint64_t val,
+>      store_memop(haddr, val, op);
+>  }
+>
+> +__attribute__((noinline))
+>  void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
+>                          TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> --
+> 2.25.1.481.gfbce0eb801-goog
+>
+>
 
-I'm curious to know how this might work, I was strongly encouraging
-that we must have a bitmap mechanism that supports copy_to_user(),
-otherwise we don't have an efficient way to push the bits to the user.
-We'd need to copy_from_user() a chunk of their bitmap, set bits, then
-push it back with copy_to_user().  If you're thinking of an rb-tree, do
-we have a node per dirty page?  The overhead for that seem excessive.
-I think we could support multi-mapping dirty bits using __bitmap_and(),
-__bitmap_or(), and __bitmap_shift_left/right() to extract the unaligned
-portion of the bitmap, or it into a previous segment, then shift the
-remainder of the bitmap so that we could use copy_to_user() with it.
+--000000000000b5337305a218b5b1
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > >> This is looping back to implentation in v10 - v12 version. There are
-> > >> problems discussed during v10 to v12 version of patches with this approach.
-> > >> - populating dirty bitmap at the time of query will add more CPU cycles.
-> > >> - If we save these CPU cyles means dirty pages need to be tracked when
-> > >> they are pinned or dirtied by CPU, that is, inttoduced per vfio_dma
-> > >> bitmap. If ranges are not vfio_dma aligned, then copying bitmap to user
-> > >> space becomes complicated and unefficient.
-> > >>
-> > >> So we decided to go with the approach implemented here.  
-> > > 
-> > > I checked v12, it's not like what I said.
-> > > In v12, bitmaps are generated per vfio_dma, and combination of the
-> > > bitmaps are required in order to generate a big bitmap suiting for dirty
-> > > query. It can cause problem when offset not aligning.
-> > > But what I propose here is to generate an rb tree orthogonal to the tree
-> > > of vfio_dma.
-> > > 
-> > > as to CPU cycles saving, I don't think iterating/translating page by page
-> > > would achieve that purpose.
-> > > 
-> > >   
-> > 
-> > 
-> >   
-> > >   
-> > >>>  
-> > >>>> +	npages = dma->size >> pgshift;
-> > >>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> > >>>> +
-> > >>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> > >>>> +	if (dma->iommu_mapped)
-> > >>>> +		bitmap_set(dma->bitmap, 0, npages);
-> > >>>> +
-> > >>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> > >>>> +		return -EFAULT;
-> > >>>> +
-> > >>>> +	/*
-> > >>>> +	 * Re-populate bitmap to include all pinned pages which are considered
-> > >>>> +	 * as dirty but exclude pages which are unpinned and pages which are
-> > >>>> +	 * marked dirty by vfio_dma_rw()
-> > >>>> +	 */
-> > >>>> +	bitmap_clear(dma->bitmap, 0, npages);
-> > >>>> +	vfio_dma_populate_bitmap(dma, pgsize);  
-> > >>> will this also repopulate bitmap for pinned pages set by pass-through devices in
-> > >>> patch 07 ?
-> > >>>  
-> > >>
-> > >> If pass through device's driver pins pages using vfio_pin_pages and all
-> > >> devices in the group pins pages through vfio_pin_pages, then
-> > >> iommu->pinned_page_dirty_scope is set true, then bitmap is repolutated.
-> > >>
-> > >>  
-> > > pass-through devices already have all guest memory pinned, it would have
-> > > no reason to call vfio_pin_pages if not attempting to mark page dirty.
-> > > Then if it calls vfio_pin_pages, it means "the pages are accessed, please
-> > > mark them dirty, feel free to clean it when you get it",  
-> > 
-> > if you see vfio_dma_populate_bitmap() function, then if vfio_pin_pages 
-> > is called, dma->pfn_list rb_tree will be non-empty and bitmap gets 
-> > populates as per pinned pages.
-> >   
-> > > not "the pages will be accesses, please mark them dirty continuously"
-> > >  
-> > 
-> > if vfio_pin_pages is not called, dma->pfn_list is empty, then it returns 
-> > early.
-> > If suppose there are 2 deviced in the group, one is IOMMU backed device 
-> > and other non-IOMMU mdev device. In that case, all pages are pinned, 
-> > iommu->pinned_page_dirty_scope is false, but dma->pfn_list is also not 
-> > empty since non-IOMMU backed device pins pages using external API. We 
-> > still have to populate bitmap according to dma->pfn_list here, because 
-> > in prec-copy phase on first bitmap query, IOMMU backed device might pin 
-> > pages using external API - with that iommu->pinned_page_dirty_scope will 
-> > get updated to 'true', which means during next iteration report pinned 
-> > pages by external API only.
-> >  
-> ok, I previously thought vfio_pin_pages for IOMMU backed device is to set
-> dirty pages after it has write access to them. Looks your intention here
-> is presume pinned pages are dirty so you have to re-fill them until they
-> are unpinned.
-> Maybe you can leave it as is, and we can add mark dirty interface later for
-> the purpose I said above (mark dirty after write access).
+<div dir=3D"ltr">Ping.</div><br><div class=3D"gmail_quote"><div dir=3D"ltr"=
+ class=3D"gmail_attr">On Tue, Mar 17, 2020 at 11:21 PM Shu-Chun Weng &lt;<a=
+ href=3D"mailto:scw@google.com">scw@google.com</a>&gt; wrote:<br></div><blo=
+ckquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left=
+:1px solid rgb(204,204,204);padding-left:1ex">With clang at HEAD, linking f=
+ails with &quot;undefined symbol:<br>
+qemu_build_not_reached&quot;. It&#39;s because `store_helper` and<br>
+`helper_ret_stb_mmu` are mutually recursive and clang inlined latter<br>
+inside the former, making `store_helper` a recursive function and no<br>
+longer fully inlineable preventing constant propogation.<br>
+<br>
+Signed-off-by: Shu-Chun Weng &lt;<a href=3D"mailto:scw@google.com" target=
+=3D"_blank">scw@google.com</a>&gt;<br>
+---<br>
+=C2=A0accel/tcg/cputlb.c | 1 +<br>
+=C2=A01 file changed, 1 insertion(+)<br>
+<br>
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c<br>
+index e3b5750c3b..a7c812ed72 100644<br>
+--- a/accel/tcg/cputlb.c<br>
++++ b/accel/tcg/cputlb.c<br>
+@@ -2050,6 +2050,7 @@ store_helper(CPUArchState *env, target_ulong addr, ui=
+nt64_t val,<br>
+=C2=A0 =C2=A0 =C2=A0store_memop(haddr, val, op);<br>
+=C2=A0}<br>
+<br>
++__attribute__((noinline))<br>
+=C2=A0void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t=
+ val,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0TCGMemOpIdx oi, uintptr_t retaddr)<br>
+=C2=A0{<br>
+-- <br>
+2.25.1.481.gfbce0eb801-goog<br>
+<br>
+</blockquote></div>
 
-Yes, just as with non-iommu backed devices, pinned pages are assumed to
-be continuously dirtied.  A pin followed by unpin could be used by a
-driver to indicate a transient dirty page, but I think we'd want to
-think about a lower overhead interface when we have such a driver.
-We'd essentially need vfio_dma_rw with only the portion that sets the
-dirty bit on write.  Thanks,
+--000000000000b5337305a218b5b1--
 
-Alex
+--000000000000bb9c0d05a218b540
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
+MIIPAAYJKoZIhvcNAQcCoIIO8TCCDu0CAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ggxjMIIEkjCCA3qgAwIBAgINAewckktV4F6Q7sAtGDANBgkqhkiG9w0BAQsFADBMMSAwHgYDVQQL
+ExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMK
+R2xvYmFsU2lnbjAeFw0xODA2MjAwMDAwMDBaFw0yODA2MjAwMDAwMDBaMEsxCzAJBgNVBAYTAkJF
+MRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSEwHwYDVQQDExhHbG9iYWxTaWduIFNNSU1FIENB
+IDIwMTgwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCUeobu8FdB5oJg6Fz6SFf8YsPI
+dNcq4rBSiSDAwqMNYbeTpRrINMBdWuPqVWaBX7WHYMsKQwCOvAF1b7rkD+ROo+CCTJo76EAY25Pp
+jt7TYP/PxoLesLQ+Ld088+BeyZg9pQaf0VK4tn23fOCWbFWoM8hdnF86Mqn6xB6nLsxJcz4CUGJG
+qAhC3iedFiCfZfsIp2RNyiUhzPAqalkrtD0bZQvCgi5aSNJseNyCysS1yA58OuxEyn2e9itZJE+O
+sUeD8VFgz+nAYI5r/dmFEXu5d9npLvTTrSJjrEmw2/ynKn6r6ONueZnCfo6uLmP1SSglhI/SN7dy
+L1rKUCU7R1MjAgMBAAGjggFyMIIBbjAOBgNVHQ8BAf8EBAMCAYYwJwYDVR0lBCAwHgYIKwYBBQUH
+AwIGCCsGAQUFBwMEBggrBgEFBQcDCTASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBRMtwWJ
+1lPNI0Ci6A94GuRtXEzs0jAfBgNVHSMEGDAWgBSP8Et/qC5FJK5NUPpjmove4t0bvDA+BggrBgEF
+BQcBAQQyMDAwLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9yb290cjMw
+NgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIzLmNybDBn
+BgNVHSAEYDBeMAsGCSsGAQQBoDIBKDAMBgorBgEEAaAyASgKMEEGCSsGAQQBoDIBXzA0MDIGCCsG
+AQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG9w0B
+AQsFAAOCAQEAwREs1zjtnFIIWorsx5XejqZtqaq5pomEvpjM98ebexngUmd7hju2FpYvDvzcnoGu
+tjm0N3Sqj5vvwEgvDGB5CxDOBkDlmUT+ObRpKbP7eTafq0+BAhEd3z2tHFm3sKE15o9+KjY6O5bb
+M30BLgvKlLbLrDDyh8xigCPZDwVI7JVuWMeemVmNca/fidKqOVg7a16ptQUyT5hszqpj18MwD9U0
+KHRcR1CfVa+3yjK0ELDS+UvTufoB9wp2BoozsqD0yc2VOcZ7SzcwOzomSFfqv7Vdj88EznDbdy4s
+fq6QvuNiUs8yW0Vb0foCVRNnSlb9T8//uJqQLHxrxy2j03cvtTCCA18wggJHoAMCAQICCwQAAAAA
+ASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9vdCBDQSAtIFIz
+MRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5MDMxODEwMDAw
+MFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzAR
+BgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqGSIb3DQEBAQUA
+A4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0EXyTLLkvhYIJG
+4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+JJ5U4nwbXPsnL
+JlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8unPvQu7/1PQDh
+BjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTvriBJ/K1AFUjR
+AjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGjQjBAMA4GA1Ud
+DwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5NUPpjmove4t0b
+vDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigHM8pr5nS5ugAt
+rqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmUY/vcU2hnVj6D
+uM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V14qWtNPeTCek
+TBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcya5QBqJnnLDMf
+Ojsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/XzCCBGYwggNO
+oAMCAQICEAEPBpZrm31HcC42M9nHjrwwDQYJKoZIhvcNAQELBQAwSzELMAkGA1UEBhMCQkUxGTAX
+BgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExITAfBgNVBAMTGEdsb2JhbFNpZ24gU01JTUUgQ0EgMjAx
+ODAeFw0yMDAyMjEwMjA3NTdaFw0yMDA4MTkwMjA3NTdaMB8xHTAbBgkqhkiG9w0BCQEWDnNjd0Bn
+b29nbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw7RE5mTw5Vz+lLNQrurP
+VKreT78lJBsJGO1Wdi0HKIg4oxK7nrQk/QNPwSWN2RtXEEZfNcBhMqMygNicb3V0NSxa0qIoTA3B
+5X4CeaQaTX2t0xeLWE9BAoseWnqslvYLHbHNi5hNEWpr2M93NktgCvO7pfRzXR6uU3+pDv4Emuov
+h3NUoiGshJ2qs3PJiir/5KSV2PBR5l7NAbny/UNZUnLtJJlWq7zh9dI8AUG4WdmddIVZA3h/RBb/
+RNyLps4kF0YETy8ShBJaBCSHzKirM2raDLG3jmjQg7azWeH7xqZy2a76NO9oAUJzB6sBMVeiQ9P+
+8kIIlFBGE54fmDKywwIDAQABo4IBcDCCAWwwGQYDVR0RBBIwEIEOc2N3QGdvb2dsZS5jb20wDgYD
+VR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMEBggrBgEFBQcDAjAdBgNVHQ4EFgQUQhHc
+xJOnKxU7ZTVE6BvAXlJOUNkwTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYm
+aHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wUQYIKwYBBQUHAQEERTBDMEEG
+CCsGAQUFBzAChjVodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc3NtaW1lY2Ey
+MDE4LmNydDAfBgNVHSMEGDAWgBRMtwWJ1lPNI0Ci6A94GuRtXEzs0jA/BgNVHR8EODA2MDSgMqAw
+hi5odHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2NhL2dzc21pbWVjYTIwMTguY3JsMA0GCSqGSIb3
+DQEBCwUAA4IBAQCIS5x6oSNiy9rVVvWM1LLGW/GJRuJqJjxTQRX0vB8Q2dt69IcOdxtPuO4m8xHB
+JUG51zkwLknBPKsjWa307RYEPJOng+V/YkhYd8/FJYYj5cvcPtZys4LgWnebcinz5cV/FGzif0om
+WukAzW4F/rvex3DtFWhC6W8vD4poQ0HnzS117oY4t84ZR8SQXMQWXIy0cl+QFVRL8pHmK244DhTY
+ltAJnpTivF5qP4pfd1EBBqKyzJO+mFMTXAjpaYWNvAERovIgY49pcMqTvJTox1M6zxR/OkIFVSz0
++bxYtfeghScGty7r3QGM8j8v+gy/AmZVkKEF/J248G47GOX6REviMYICYTCCAl0CAQEwXzBLMQsw
+CQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEhMB8GA1UEAxMYR2xvYmFsU2ln
+biBTTUlNRSBDQSAyMDE4AhABDwaWa5t9R3AuNjPZx468MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqG
+SIb3DQEJBDEiBCCBwe+YncqFCajWZS25s0BejHfNqRsI7wtIaM1Q2Kx7ZDAYBgkqhkiG9w0BCQMx
+CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMDAzMzAyMDU4MTVaMGkGCSqGSIb3DQEJDzFc
+MFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJ
+KoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAVYjr
+anG87Dz4LYnxz8gPXqRAcIVCdsUSdBf5Vnizwo93X7+K/+I34D6anh59ZiipnV5Kc1Sv1zBcQ8np
+cbNLr0sEk1h5hp3utLaBn2VPxjEPt4cDXB+8BXeVhU7V67q9DYlQNahCqgEHsRutdKHopoiV3sv2
+uxan3tBITsoQ6qW8bSgwjShJpp1CR7EWwFKRNjxD8zoowhcTu1FtMHSEGjZOQHedv6kseH4rfBYE
+eM/IRD10Op9cTSQWFwsNyXDljRQUVNVCXDCc4GtAlfbG7va/9cUfM4QQiZ+AgXc52oRqTX/dnltE
+TOQlMOR8hrNPsCT5LMqul7iXd9KEd+Uipg==
+--000000000000bb9c0d05a218b540--
 
