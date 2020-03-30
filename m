@@ -2,82 +2,57 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 278A5C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EAAC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:32:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E93CD2073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:32:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eT9IF9g1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E93CD2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CDF2F2073B
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 17:32:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDF2F2073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIyGn-0005d7-0A
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:32:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33880)
+	id 1jIyH4-0005z5-T3
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 13:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jIyFR-0004CB-B6
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:30:54 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIyAV-0003oP-2h
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jIyFP-0005Em-RO
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:30:53 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59262)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jIyAT-0003qy-N4
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:25:46 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:52699)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jIyFP-0005E0-Mp
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 13:30:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585589451;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IV/RlnuWDyVAq/CY6VloTUUQJCsYYqNTqzlcq2lSUms=;
- b=eT9IF9g1Fk3ojHSP5vhUIlbHqdDIwOdO3gaA9k3gV9JJHuoB0D1AJhXHRzYT/6ICDKoM9Q
- 4kkcocbvRAgKEMySspRKJG0eiQulkHki2EUmdyTKKbVnOEONptsNnn/1uM1awANKQWuesp
- IvnYkL7xEsB6yX5Ih2lXBBZ8UbLKrXI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-BF3CDHVkMCuqbqSNNoh2sA-1; Mon, 30 Mar 2020 13:30:49 -0400
-X-MC-Unique: BF3CDHVkMCuqbqSNNoh2sA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7246A1005516;
- Mon, 30 Mar 2020 17:30:47 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6387D5D9E2;
- Mon, 30 Mar 2020 17:30:31 +0000 (UTC)
-Subject: Re: [PATCH v2 06/22] hw/pci: introduce
- pci_device_set/unset_iommu_context()
-To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
- alex.williamson@redhat.com, peterx@redhat.com
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-7-git-send-email-yi.l.liu@intel.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <01381db5-6f5f-8022-6891-e1a8dd7c3e65@redhat.com>
-Date: Mon, 30 Mar 2020 19:30:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jIyAT-0003dV-8f; Mon, 30 Mar 2020 13:25:45 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07679904|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.643886-0.000311504-0.355802;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H7ljhv._1585589137; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H7ljhv._1585589137)
+ by smtp.aliyun-inc.com(10.147.42.22); Tue, 31 Mar 2020 01:25:37 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v7 54/61] target/riscv: vector element index instruction
+Date: Mon, 30 Mar 2020 23:36:26 +0800
+Message-Id: <20200330153633.15298-55-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-7-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,146 +64,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
- pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yi,
-On 3/30/20 6:24 AM, Liu Yi L wrote:
-> This patch adds pci_device_set/unset_iommu_context() to set/unset
-> host_iommu_context for a given device. New callback is added in
-> PCIIOMMUOps. As such, vIOMMU could make use of host IOMMU capability.
-> e.g setup nested translation.
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  5 +++++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 25 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 24 ++++++++++++++++++++++++
+ 4 files changed, 56 insertions(+)
 
-I think you need to explain what this practically is supposed to do.
-such as: by attaching such context to a PCI device (for example VFIO
-assigned?), you tell the host that this PCIe device is protected by a FL
-stage controlled by the guest or something like that - if this is
-correct understanding (?) -
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/pci/pci.c         | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
->  include/hw/pci/pci.h | 10 ++++++++++
->  2 files changed, 54 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index aa9025c..af3c1a1 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2638,7 +2638,8 @@ static void pci_device_class_base_init(ObjectClass *klass, void *data)
->      }
->  }
->  
-> -AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-> +static void pci_device_get_iommu_bus_devfn(PCIDevice *dev,
-> +                              PCIBus **pbus, uint8_t *pdevfn)
->  {
->      PCIBus *bus = pci_get_bus(dev);
->      PCIBus *iommu_bus = bus;
-> @@ -2683,14 +2684,52 @@ AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
->  
->          iommu_bus = parent_bus;
->      }
-> -    if (iommu_bus && iommu_bus->iommu_ops &&
-> -                     iommu_bus->iommu_ops->get_address_space) {
-> -        return iommu_bus->iommu_ops->get_address_space(bus,
-> -                                 iommu_bus->iommu_opaque, devfn);
-> +    *pbus = iommu_bus;
-> +    *pdevfn = devfn;
-> +}
-> +
-> +AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-> +{
-> +    PCIBus *bus;
-> +    uint8_t devfn;
-> +
-> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
-> +    if (bus && bus->iommu_ops &&
-> +        bus->iommu_ops->get_address_space) {
-> +        return bus->iommu_ops->get_address_space(bus,
-> +                                bus->iommu_opaque, devfn);
->      }
->      return &address_space_memory;
->  }
->  
-> +int pci_device_set_iommu_context(PCIDevice *dev,
-> +                                 HostIOMMUContext *iommu_ctx)
-> +{
-> +    PCIBus *bus;
-> +    uint8_t devfn;
-> +
-> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
-> +    if (bus && bus->iommu_ops &&
-> +        bus->iommu_ops->set_iommu_context) {
-> +        return bus->iommu_ops->set_iommu_context(bus,
-> +                              bus->iommu_opaque, devfn, iommu_ctx);
-> +    }
-> +    return -ENOENT;
-> +}
-> +
-> +void pci_device_unset_iommu_context(PCIDevice *dev)
-> +{
-> +    PCIBus *bus;
-> +    uint8_t devfn;
-> +
-> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
-> +    if (bus && bus->iommu_ops &&
-> +        bus->iommu_ops->unset_iommu_context) {
-> +        bus->iommu_ops->unset_iommu_context(bus,
-> +                                 bus->iommu_opaque, devfn);
-> +    }
-> +}
-> +
->  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *ops, void *opaque)
->  {
->      bus->iommu_ops = ops;
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index ffe192d..0ec5680 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -9,6 +9,8 @@
->  
->  #include "hw/pci/pcie.h"
->  
-> +#include "hw/iommu/host_iommu_context.h"
-> +
->  extern bool pci_available;
->  
->  /* PCI bus */
-> @@ -489,9 +491,17 @@ typedef struct PCIIOMMUOps PCIIOMMUOps;
->  struct PCIIOMMUOps {
->      AddressSpace * (*get_address_space)(PCIBus *bus,
->                                  void *opaque, int32_t devfn);
-> +    int (*set_iommu_context)(PCIBus *bus, void *opaque,
-> +                             int32_t devfn,
-> +                             HostIOMMUContext *iommu_ctx);
-> +    void (*unset_iommu_context)(PCIBus *bus, void *opaque,
-> +                                int32_t devfn);
->  };
->  
->  AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
-> +int pci_device_set_iommu_context(PCIDevice *dev,
-> +                                 HostIOMMUContext *iommu_ctx);
-> +void pci_device_unset_iommu_context(PCIDevice *dev);
->  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *iommu_ops, void *opaque);
->  
->  static inline void
-> 
-Thanks
-
-Eric
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 90e6d31d78..9e80e4ca23 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1108,3 +1108,8 @@ DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_4(vid_v_b, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_h, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_w, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_d, void, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 37756fa76d..1231628cb2 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -70,6 +70,7 @@
+ @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+ @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
+ @r2_vm   ...... vm:1 ..... ..... ... ..... ....... &rmr %rs2 %rd
++@r1_vm   ...... vm:1 ..... ..... ... ..... ....... %rd
+ @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
+ @r_vm    ...... vm:1 ..... ..... ... ..... ....... &rmrr %rs2 %rs1 %rd
+ @r_vm_1  ...... . ..... ..... ... ..... .......    &rmrr vm=1 %rs2 %rs1 %rd
+@@ -559,6 +560,7 @@ vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
+ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
+ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
+ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
++vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 21d286bcb1..3dac7ae8e7 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2523,3 +2523,28 @@ static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
+     }
+     return false;
+ }
++
++/* Vector Element Index Instruction */
++static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
++{
++    if (vext_check_isa_ill(s) &&
++        vext_check_reg(s, a->rd, false) &&
++        vext_check_overlap_mask(s, a->rd, a->vm, false)) {
++        uint32_t data = 0;
++        TCGLabel *over = gen_new_label();
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, VM, a->vm);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++        static gen_helper_gvec_2_ptr * const fns[4] = {
++            gen_helper_vid_v_b, gen_helper_vid_v_h,
++            gen_helper_vid_v_w, gen_helper_vid_v_d,
++        };
++        tcg_gen_gvec_2_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
++                           cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
++        gen_set_label(over);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 004d04c7d8..3e1f286b50 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4672,3 +4672,27 @@ GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
+ GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
+ GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
+ GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
++
++/* Vector Element Index Instruction */
++#define GEN_VEXT_VID_V(NAME, ETYPE, H, CLEAR_FN)                          \
++void HELPER(NAME)(void *vd, void *v0, CPURISCVState *env, uint32_t desc)  \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    int i;                                                                \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        *((ETYPE *)vd + H(i)) = i;                                        \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
++}
++
++GEN_VEXT_VID_V(vid_v_b, uint8_t, H1, clearb)
++GEN_VEXT_VID_V(vid_v_h, uint16_t, H2, clearh)
++GEN_VEXT_VID_V(vid_v_w, uint32_t, H4, clearl)
++GEN_VEXT_VID_V(vid_v_d, uint64_t, H8, clearq)
+-- 
+2.23.0
 
 
