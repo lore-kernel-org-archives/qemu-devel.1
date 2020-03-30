@@ -1,81 +1,75 @@
 Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A06C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 22:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D0CAC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 22:21:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50D2A205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 22:19:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=corp-zubrcom-net.20150623.gappssmtp.com header.i=@corp-zubrcom-net.20150623.gappssmtp.com header.b="AGIXpndy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50D2A205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=corp.zubrcom.net
+	by mail.kernel.org (Postfix) with ESMTPS id E859F20658
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 22:21:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E859F20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ2kx-00081h-Go
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 18:19:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47629)
+	id 1jJ2mm-0000zU-5j
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 18:21:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex@corp.zubrcom.net>) id 1jJ2To-0002Jx-Gu
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 18:02:01 -0400
+ (envelope-from <bounces@canonical.com>) id 1jJ2m5-0000Zf-DO
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 18:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex@corp.zubrcom.net>) id 1jJ2Tn-0003wN-I6
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 18:02:00 -0400
-Received: from mail-lj1-x234.google.com ([2a00:1450:4864:20::234]:35715)
+ (envelope-from <bounces@canonical.com>) id 1jJ2m4-00087y-6c
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 18:20:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41354)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex@corp.zubrcom.net>)
- id 1jJ2Tn-0003vk-5S
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 18:01:59 -0400
-Received: by mail-lj1-x234.google.com with SMTP id k21so19894457ljh.2
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 15:01:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corp-zubrcom-net.20150623.gappssmtp.com; s=20150623;
- h=mime-version:from:date:message-id:subject:to;
- bh=7TmK0qeIjAXyqRG/tCr/XXErnN5DXokZjtcg9k9/E8M=;
- b=AGIXpndykFHoP2vZVXe/sEzuTzO5P+UQXq4OTemE2mvKlfVUFYtPCxdy/awP/slc2e
- JvNfh4EXJM9rIk+OOsbWsNNSa8j2O3b042X05vBjEDFzjaVRbSoG+wMX4GP9gc65gXlN
- 5DDOloo6lCk5+/xEzJRZfwoMA9/4oO2JKV51YUnjfkS8QeUJRvIi9eAJRLIq9Z+qPuoO
- kuM6+6z7lgcvwFn56an/Gwn+tPmHTTqKsBnMtYgfRXzYxSRptpyY6vjebsBwOBxPyXTg
- yZTtLNHU8ugMCBwii5axUpOWDRjPK0vDc4o56lqTBmwcW88oXS8aKOTddCGQ/6y/uf7o
- tfKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=7TmK0qeIjAXyqRG/tCr/XXErnN5DXokZjtcg9k9/E8M=;
- b=PaoOALaW29X1vjx0lV1C+ehXNh+/TBlUrR4OH9HbgfdkFwXJU0KxYRXQEPbG6GehLE
- 1E9awe7ws3B9Ta+zPYwRMYbzdMJSrmAsvQw7HtgoWlmWqOkfIFha5fcYjl8XZdw29kRb
- VrBpEzhL/dGhupFbbPJVU/4XIcN1+gJ1HbXRA9yqqNEiM8nZwgYfBTUQkpcKKTe16LXm
- AzUKSdbDaIoLHOtd+3XWHaPnDDi2eldQai8A3kSvvWMaDnv+0WrO3kQGJETNGgKwY4Pe
- iD2pkXtZ7LrqyZICDXxZY0zAUBypYI1ffaPc8i9P0uV4V6MSg1Z71RYFSt3/Mpn6jidW
- DrnQ==
-X-Gm-Message-State: AGi0PuZjN3uSVS0mQ6yZBeaVAN1nfGn0FpjoaS8w6Zk758gcAA6sTnyL
- GnoId1ADrCJrVDAurk/AjFsA1HrDXRuf+Dk2Zdr3O5d6
-X-Google-Smtp-Source: APiQypIoU77f+Qgwt4ZgAsIiwqrzOcwUOH1Lo7ipqJJGe1INMNNP+yb8HJLfDnK5/QU+IBVQOslbC8tixivuPSt6HGE=
-X-Received: by 2002:a2e:a584:: with SMTP id m4mr8413771ljp.194.1585605717032; 
- Mon, 30 Mar 2020 15:01:57 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jJ2m4-00086I-0Z
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 18:20:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jJ2m0-0001PX-7F
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 22:20:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B310D2E80E0
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 22:20:47 +0000 (UTC)
 MIME-Version: 1.0
-From: Alexander Yuriev <alex@corp.zubrcom.net>
-Date: Mon, 30 Mar 2020 18:02:33 -0400
-Message-ID: <CAJRb792WE-mhTDOCdEtP3kQJK8ie7v3LRJ3y28F2DMSabvfyMg@mail.gmail.com>
-Subject: Massive memory leak in 4.2.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 30 Mar 2020 22:09:32 -0000
+From: carlosedp <carlosedp@gmail.com>
 To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="00000000000084b75405a2199931"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::234
-X-Mailman-Approved-At: Mon, 30 Mar 2020 18:18:49 -0400
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: carlosedp laurent-vivier
+X-Launchpad-Bug-Reporter: carlosedp (carlosedp)
+X-Launchpad-Bug-Modifier: carlosedp (carlosedp)
+References: <158445595923.20060.16174990100496488911.malonedeb@wampee.canonical.com>
+Message-Id: <158560617254.21451.12752717327663807871.malone@gac.canonical.com>
+Subject: [Bug 1867786] Re: Qemu PPC64 freezes with multi-core CPU
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: bc4915e9e4e2bb27af31bb9185fc29da528bbfe9
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,42 +78,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1867786 <1867786@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000084b75405a2199931
-Content-Type: text/plain; charset="UTF-8"
+Hi, any news about this? Can I provide any additional info since it might b=
+e a Mac issue.
+Thanks
 
-Hello,
+-- =
 
-I was wondering if there is any interest in getting detailed reports/having
-a tester for a reproducible massive memory leak in qemu 4.2.0 running a
-guest with X11 via virgl-0.8.1 acceleration to host using sdl.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1867786
 
-Guest limited to 2Gb has qemu RES grow to over 10Gb with while running
-Chrome within hours ( single gmail.tab + qemu archive page over last 20
-minutes expanded qemu res from 1.9gb to 2.6 gb).
+Title:
+  Qemu PPC64 freezes with multi-core CPU
 
-Both host and guest are amd64 debian 10. Qemu is built from source.
+Status in QEMU:
+  New
 
-Thanks,
-Alex
+Bug description:
+  I installed Debian 10 on a Qemu PPC64 VM running with the following
+  flags:
 
---00000000000084b75405a2199931
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+  qemu-system-ppc64 \
+       -nographic -nodefaults -monitor pty -serial stdio \
+       -M pseries -cpu POWER9 -smp cores=3D4,threads=3D1 -m 4G \
+       -drive file=3Ddebian-ppc64el-qemu.qcow2,format=3Dqcow2,if=3Dvirtio \
+       -netdev user,id=3Dnetwork01,$ports -device rtl8139,netdev=3Dnetwork0=
+1 \
 
-<div dir=3D"auto">Hello,<div dir=3D"auto"><br></div><div dir=3D"auto">I was=
- wondering if there is any interest in getting detailed reports/having a te=
-ster for a reproducible massive memory leak in qemu 4.2.0 running a guest w=
-ith X11 via virgl-0.8.1 acceleration to host using sdl.</div><div dir=3D"au=
-to"><br></div><div dir=3D"auto">Guest limited to 2Gb has qemu RES grow to o=
-ver 10Gb with while running Chrome within hours ( single gmail.tab + qemu a=
-rchive page over last 20 minutes expanded qemu res from 1.9gb to 2.6 gb).</=
-div><div dir=3D"auto"><br></div><div dir=3D"auto">Both host and guest are a=
-md64 debian 10. Qemu is built from source.</div><div dir=3D"auto"><br></div=
-><div dir=3D"auto">Thanks,</div><div dir=3D"auto">Alex</div></div>
+  =
 
---00000000000084b75405a2199931--
+  Within a couple minutes on any operation (could be a Go application or si=
+mply changing the hostname with hostnamectl, the VM freezes and prints this=
+ on the console:
+
+  ```
+  root@debian:~# [  950.428255] rcu: INFO: rcu_sched self-detected stall on=
+ CPU
+  [  950.428453] rcu:     3-....: (5318 ticks this GP) idle=3D8e2/1/0x40000=
+00000000004 softirq=3D5957/5960 fqs=3D2544
+  [  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! [zsh:462]
+
+  Message from syslogd@debian at Mar 17 11:35:24 ...
+   kernel:[  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! =
+[zsh:462]
+  [  980.110018] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tas=
+ks: { 3-... } 5276 jiffies s: 93 root: 0x8/.
+  [  980.111177] rcu: blocking rcu_node structures:
+  [ 1013.442268] rcu: INFO: rcu_sched self-detected stall on CPU
+  [ 1013.442365] rcu:     3-....: (21071 ticks this GP) idle=3D8e2/1/0x4000=
+000000000004 softirq=3D5957/5960 fqs=3D9342
+  ```
+
+  If I change to 1 core on the command line, I haven't seen these
+  freezes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1867786/+subscriptions
 
