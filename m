@@ -2,59 +2,84 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D6FC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A263C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:42:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8406920578
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:40:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8406920578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id E708B2073B
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 16:42:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YTlyn18b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E708B2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIxSj-0007xG-Hk
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51503)
+	id 1jIxUI-0001Aq-4F
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 12:42:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51941)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxRh-00074R-CU
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:39:31 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jIxTV-0000Lk-K5
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jIxRf-0000XQ-3d
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:39:28 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:59191)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jIxRe-0000Qq-9M; Mon, 30 Mar 2020 12:39:27 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07608286|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0267904-6.01599e-05-0.973149;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H7khNB2_1585586359; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H7khNB2_1585586359)
- by smtp.aliyun-inc.com(10.147.42.197);
- Tue, 31 Mar 2020 00:39:19 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v7 31/61] target/riscv: vector widening floating-point
- add/subtract instructions
-Date: Mon, 30 Mar 2020 23:36:03 +0800
-Message-Id: <20200330153633.15298-32-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jIxTT-0002cY-R1
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:41:21 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40543)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jIxTT-0002bN-DH
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 12:41:19 -0400
+Received: by mail-ot1-x342.google.com with SMTP id r19so12907891otn.7
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 09:41:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=pziit0ywMJXo6zW7dH47iRdtfxoC3d6yj8KaYdXDC/E=;
+ b=YTlyn18b8UIwL5XcdTm0FD3gJokYcaL9GrAdkPH0IRVyNfdoqpvfT2S634EOv/lgKF
+ 1ExQ+MdCfpDYd7rfhZWubGkmesbxcdPAiERzlXXU7uJazwEvXgWaUzGz1q99hZZjXA+t
+ PHa2EwujabqBF+eT0F0vZPX5E7L6B0TzOUhhA8b/YDne/nENbMytECGLHMWunYqdIT3A
+ GIttaeshJFxytzeCTyNXRyNQ6pfrI41B4JK1MQd1daWpoHIVcekA+mNr/j137ddO/P12
+ 0zjGTPfIxFEuTFsBcdebPuk2c7jzy5tYZa3qi6SIiClY6S89RtqsqQXLx28vUzF2VE++
+ REUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=pziit0ywMJXo6zW7dH47iRdtfxoC3d6yj8KaYdXDC/E=;
+ b=HVxGcQ9eu7sd+XfPJDuC+585B3TJtndVdECZTaMwDhCrpS2WgEMjD+vekoxRSvynef
+ WkajIUZ5afETuZWUxFqoCwvr8k06U09QjkJabqVUOvBbfz829DGfV4mELJipT3CXXGPV
+ 7OTX+4k8Tc5N62Q+jq7ZGADuQfuLLutXawUqaRXKUtGRFwiNcTDjZTXEJaRgYJF7FKl0
+ Moa1f/x18bHYvOLvqXiV/RCGxCQmo9qaRvBDiPBQoX0HTa6sFQoXoJ3d8XxfVgBoJdOI
+ cOBp1BHl0cg7Eti9J0UDX6o4pxbjbWFY8WnHGbW/v1x0af1eqQNHgoPgyqeFtagEFWtq
+ 5xKA==
+X-Gm-Message-State: ANhLgQ3EAwKb4zjZ8THjpYaiS0rBN4GvFelPj2TKwmbz8ao5BAgyyoLK
+ mCqkWZS1+0Mkiw1qklbY1LElZ5DmAopdnfhOI6/Z9g==
+X-Google-Smtp-Source: ADFU+vvhxVAL8hlgp7KES036l3wzu0KvcnXKlqBud3uWU5JdmQNeJRF4MKO1RO3mh+4JO9G6tec5wOwPAuRs82Sd3x0=
+X-Received: by 2002:a05:6830:18f4:: with SMTP id
+ d20mr10009800otf.91.1585586476537; 
+ Mon, 30 Mar 2020 09:41:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+References: <20200330153016.2959-1-f4bug@amsat.org>
+ <CAFEAcA8i1W7ss2hQjaFbVHXzqhV81M8U4Fkaj_Te5JK8JO8+mg@mail.gmail.com>
+ <f1fd3384-8653-c2e2-7248-457ae873cc27@redhat.com>
+In-Reply-To: <f1fd3384-8653-c2e2-7248-457ae873cc27@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Mar 2020 17:41:04 +0100
+Message-ID: <CAFEAcA_BJf3k-O4j73kNaPtSHfhqmgtm9LH=nAmNj46kMjbkCA@mail.gmail.com>
+Subject: Re: [PATCH-for-5.0] gdbstub: Use correct address space with
+ Qqemu.PhyMemMode packet
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,311 +91,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Jon Doron <arilou@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  17 +++
- target/riscv/insn32.decode              |   8 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 145 ++++++++++++++++++++++++
- target/riscv/vector_helper.c            |  83 ++++++++++++++
- 4 files changed, 253 insertions(+)
+On Mon, 30 Mar 2020 at 17:21, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 3/30/20 6:08 PM, Peter Maydell wrote:
+> > On Mon, 30 Mar 2020 at 16:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org> wrote:
+> >>
+> >> Since commit 3f940dc98, we added support for vAttach packet
+> >> to select a particular thread/cpu/core. However when using
+> >> the GDB physical memory mode, it is not clear which CPU
+> >> address space is used.
+> >> Since the CPU address space is stored in CPUState::as, use
+> >> address_space_rw() instead of cpu_physical_memory_rw().
+> >>
+> >> Fixes: ab4752ec8d9
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> ---
+> >>   gdbstub.c | 7 ++-----
+> >>   1 file changed, 2 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/gdbstub.c b/gdbstub.c
+> >> index 013fb1ac0f..3baaef50e3 100644
+> >> --- a/gdbstub.c
+> >> +++ b/gdbstub.c
+> >> @@ -69,11 +69,8 @@ static inline int target_memory_rw_debug(CPUState *=
+cpu, target_ulong addr,
+> >>
+> >>   #ifndef CONFIG_USER_ONLY
+> >>       if (phy_memory_mode) {
+> >> -        if (is_write) {
+> >> -            cpu_physical_memory_write(addr, buf, len);
+> >> -        } else {
+> >> -            cpu_physical_memory_read(addr, buf, len);
+> >> -        }
+> >> +        address_space_rw(cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> >> +                         buf, len, is_write);
+> >>           return 0;
+> >
+> > There's an argument here for using
+> >     int asidx =3D cpu_asidx_from_attrs(cpu, MEMTXATTRS_UNSPECIFIED);
+> >     AddressSpace *as =3D cpu_get_address_space(cpu, asidx);
+> >
+> > though it will effectively boil down to the same thing in the end
+> > as there's no way for the gdbstub to specify whether it wanted
+> > eg the Arm secure or non-secure physical address space.
+>
+> https://static.docs.arm.com/ihi0074/a/debug_interface_v6_0_architecture_s=
+pecification_IHI0074A.pdf
+>
+> * Configuration of hypervisor noninvasive debug.
+>
+> This field can have one of the following values:
+>
+> - 0b00
+> Separate controls for hypervisor noninvasive debug are not implemented,
+> or no hypervisor is implemented. For ARMv7 PEs that implement the
+> Virtualization Extensions, and for ARMv8 PEs that implement EL2, if
+> separate controls for hypervisor debug visibility are not implemented,
+> the hypervisor debug visibility is indicated by the relevant Non-secure
+> debug visibility fields NSNID and NSID.
+>
+> OK so for ARM "noninvasive debug is not implemented" and we would use
+> the core secure address space?
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 3031a941c2..73fc7a5a00 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -813,3 +813,20 @@ DEF_HELPER_6(vfsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfrsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfrsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfrsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+
-+DEF_HELPER_6(vfwadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwadd_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwadd_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwadd_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwadd_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwadd_wf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwadd_wf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_wf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwsub_wf_w, void, ptr, ptr, i64, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index c8e3f10162..68e9448842 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -448,6 +448,14 @@ vfadd_vf        000000 . ..... ..... 101 ..... 1010111 @r_vm
- vfsub_vv        000010 . ..... ..... 001 ..... 1010111 @r_vm
- vfsub_vf        000010 . ..... ..... 101 ..... 1010111 @r_vm
- vfrsub_vf       100111 . ..... ..... 101 ..... 1010111 @r_vm
-+vfwadd_vv       110000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfwadd_vf       110000 . ..... ..... 101 ..... 1010111 @r_vm
-+vfwadd_wv       110100 . ..... ..... 001 ..... 1010111 @r_vm
-+vfwadd_wf       110100 . ..... ..... 101 ..... 1010111 @r_vm
-+vfwsub_vv       110010 . ..... ..... 001 ..... 1010111 @r_vm
-+vfwsub_vf       110010 . ..... ..... 101 ..... 1010111 @r_vm
-+vfwsub_wv       110110 . ..... ..... 001 ..... 1010111 @r_vm
-+vfwsub_wf       110110 . ..... ..... 101 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 9a8fb18adc..a539849fab 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1923,3 +1923,148 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)            \
- GEN_OPFVF_TRANS(vfadd_vf,  opfvf_check)
- GEN_OPFVF_TRANS(vfsub_vf,  opfvf_check)
- GEN_OPFVF_TRANS(vfrsub_vf,  opfvf_check)
-+
-+/* Vector Widening Floating-Point Add/Subtract Instructions */
-+static bool opfvv_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
-+                                     1 << s->lmul) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
-+                                     1 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-+}
-+
-+/* OPFVV with WIDEN */
-+#define GEN_OPFVV_WIDEN_TRANS(NAME, CHECK)                       \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
-+{                                                                \
-+    if (CHECK(s, a)) {                                           \
-+        uint32_t data = 0;                                       \
-+        static gen_helper_gvec_4_ptr * const fns[2] = {          \
-+            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
-+        };                                                       \
-+        TCGLabel *over = gen_new_label();                        \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);        \
-+                                                                 \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),   \
-+                           vreg_ofs(s, a->rs1),                  \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,      \
-+                           s->vlen / 8, data, fns[s->sew - 1]);  \
-+        gen_set_label(over);                                     \
-+        return true;                                             \
-+    }                                                            \
-+    return false;                                                \
-+}
-+
-+GEN_OPFVV_WIDEN_TRANS(vfwadd_vv, opfvv_widen_check)
-+GEN_OPFVV_WIDEN_TRANS(vfwsub_vv, opfvv_widen_check)
-+
-+static bool opfvf_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
-+                                     1 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-+}
-+
-+/* OPFVF with WIDEN */
-+#define GEN_OPFVF_WIDEN_TRANS(NAME)                              \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
-+{                                                                \
-+    if (opfvf_widen_check(s, a)) {                               \
-+        uint32_t data = 0;                                       \
-+        static gen_helper_opfvf *const fns[2] = {                \
-+            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
-+        };                                                       \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
-+        return opfvf_trans(a->rd, a->rs1, a->rs2, data,          \
-+                           fns[s->sew - 1], s);                  \
-+    }                                                            \
-+    return false;                                                \
-+}
-+
-+GEN_OPFVF_WIDEN_TRANS(vfwadd_vf)
-+GEN_OPFVF_WIDEN_TRANS(vfwsub_vf)
-+
-+static bool opfwv_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
-+                                     1 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-+}
-+
-+/* WIDEN OPFVV with WIDEN */
-+#define GEN_OPFWV_WIDEN_TRANS(NAME)                                \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-+{                                                                  \
-+    if (opfwv_widen_check(s, a)) {                                 \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_4_ptr * const fns[2] = {            \
-+            gen_helper_##NAME##_h, gen_helper_##NAME##_w,          \
-+        };                                                         \
-+        TCGLabel *over = gen_new_label();                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs1),                    \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fns[s->sew - 1]);    \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+
-+GEN_OPFWV_WIDEN_TRANS(vfwadd_wv)
-+GEN_OPFWV_WIDEN_TRANS(vfwsub_wv)
-+
-+static bool opfwf_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-+}
-+
-+/* WIDEN OPFVF with WIDEN */
-+#define GEN_OPFWF_WIDEN_TRANS(NAME)                              \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
-+{                                                                \
-+    if (opfwf_widen_check(s, a)) {                               \
-+        uint32_t data = 0;                                       \
-+        static gen_helper_opfvf *const fns[2] = {                \
-+            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
-+        };                                                       \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
-+        return opfvf_trans(a->rd, a->rs1, a->rs2, data,          \
-+                           fns[s->sew - 1], s);                  \
-+    }                                                            \
-+    return false;                                                \
-+}
-+
-+GEN_OPFWF_WIDEN_TRANS(vfwadd_wf)
-+GEN_OPFWF_WIDEN_TRANS(vfwsub_wf)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index af343e9bf9..08e59b0e29 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -3277,3 +3277,86 @@ RVVCALL(OPFVF2, vfrsub_vf_d, OP_UUU_D, H8, H8, float64_rsub)
- GEN_VEXT_VF(vfrsub_vf_h, 2, 2, clearh)
- GEN_VEXT_VF(vfrsub_vf_w, 4, 4, clearl)
- GEN_VEXT_VF(vfrsub_vf_d, 8, 8, clearq)
-+
-+/* Vector Widening Floating-Point Add/Subtract Instructions */
-+static uint32_t vfwadd16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return float32_add(float16_to_float32(a, true, s),
-+            float16_to_float32(b, true, s), s);
-+}
-+
-+static uint64_t vfwadd32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return float64_add(float32_to_float64(a, s),
-+            float32_to_float64(b, s), s);
-+
-+}
-+
-+RVVCALL(OPFVV2, vfwadd_vv_h, WOP_UUU_H, H4, H2, H2, vfwadd16)
-+RVVCALL(OPFVV2, vfwadd_vv_w, WOP_UUU_W, H8, H4, H4, vfwadd32)
-+GEN_VEXT_VV_ENV(vfwadd_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vfwadd_vv_w, 4, 8, clearq)
-+RVVCALL(OPFVF2, vfwadd_vf_h, WOP_UUU_H, H4, H2, vfwadd16)
-+RVVCALL(OPFVF2, vfwadd_vf_w, WOP_UUU_W, H8, H4, vfwadd32)
-+GEN_VEXT_VF(vfwadd_vf_h, 2, 4, clearl)
-+GEN_VEXT_VF(vfwadd_vf_w, 4, 8, clearq)
-+
-+static uint32_t vfwsub16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return float32_sub(float16_to_float32(a, true, s),
-+            float16_to_float32(b, true, s), s);
-+}
-+
-+static uint64_t vfwsub32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return float64_sub(float32_to_float64(a, s),
-+            float32_to_float64(b, s), s);
-+
-+}
-+
-+RVVCALL(OPFVV2, vfwsub_vv_h, WOP_UUU_H, H4, H2, H2, vfwsub16)
-+RVVCALL(OPFVV2, vfwsub_vv_w, WOP_UUU_W, H8, H4, H4, vfwsub32)
-+GEN_VEXT_VV_ENV(vfwsub_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vfwsub_vv_w, 4, 8, clearq)
-+RVVCALL(OPFVF2, vfwsub_vf_h, WOP_UUU_H, H4, H2, vfwsub16)
-+RVVCALL(OPFVF2, vfwsub_vf_w, WOP_UUU_W, H8, H4, vfwsub32)
-+GEN_VEXT_VF(vfwsub_vf_h, 2, 4, clearl)
-+GEN_VEXT_VF(vfwsub_vf_w, 4, 8, clearq)
-+
-+static uint32_t vfwaddw16(uint32_t a, uint16_t b, float_status *s)
-+{
-+    return float32_add(a, float16_to_float32(b, true, s), s);
-+}
-+
-+static uint64_t vfwaddw32(uint64_t a, uint32_t b, float_status *s)
-+{
-+    return float64_add(a, float32_to_float64(b, s), s);
-+}
-+
-+RVVCALL(OPFVV2, vfwadd_wv_h, WOP_WUUU_H, H4, H2, H2, vfwaddw16)
-+RVVCALL(OPFVV2, vfwadd_wv_w, WOP_WUUU_W, H8, H4, H4, vfwaddw32)
-+GEN_VEXT_VV_ENV(vfwadd_wv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vfwadd_wv_w, 4, 8, clearq)
-+RVVCALL(OPFVF2, vfwadd_wf_h, WOP_WUUU_H, H4, H2, vfwaddw16)
-+RVVCALL(OPFVF2, vfwadd_wf_w, WOP_WUUU_W, H8, H4, vfwaddw32)
-+GEN_VEXT_VF(vfwadd_wf_h, 2, 4, clearl)
-+GEN_VEXT_VF(vfwadd_wf_w, 4, 8, clearq)
-+
-+static uint32_t vfwsubw16(uint32_t a, uint16_t b, float_status *s)
-+{
-+    return float32_sub(a, float16_to_float32(b, true, s), s);
-+}
-+
-+static uint64_t vfwsubw32(uint64_t a, uint32_t b, float_status *s)
-+{
-+    return float64_sub(a, float32_to_float64(b, s), s);
-+}
-+
-+RVVCALL(OPFVV2, vfwsub_wv_h, WOP_WUUU_H, H4, H2, H2, vfwsubw16)
-+RVVCALL(OPFVV2, vfwsub_wv_w, WOP_WUUU_W, H8, H4, H4, vfwsubw32)
-+GEN_VEXT_VV_ENV(vfwsub_wv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vfwsub_wv_w, 4, 8, clearq)
-+RVVCALL(OPFVF2, vfwsub_wf_h, WOP_WUUU_H, H4, H2, vfwsubw16)
-+RVVCALL(OPFVF2, vfwsub_wf_w, WOP_WUUU_W, H8, H4, vfwsubw32)
-+GEN_VEXT_VF(vfwsub_wf_h, 2, 4, clearl)
-+GEN_VEXT_VF(vfwsub_wf_w, 4, 8, clearq)
--- 
-2.23.0
+I'm not very familiar with the debug interface (we don't model
+it in QEMU), but I think that is the wrong end of it. These
+are bits in AUTHSTATUS, which is a read-only register provided
+by the CPU to the debugger. It basically says "am I, the CPU,
+going to permit you, the debugger, to debug code running
+in secure mode, or in EL2". (The CPU gets to decide this:
+for security some h/w will not want any random with access
+to the jtag debug port to be able to just read out code from
+the secure world, for instance.)
 
+What the debugger gets to control is bits in the CSW register
+in the "MEM-AP"; it can use these to specify the size of
+a memory access it wants to make to the guest, and also
+the 'type', which is IMPDEF but typically lets the debugger
+say "code access vs data access", "privileged vs usermode"
+and "secure vs non-secure".
+
+The equivalent in the QEMU world is that the debugger can
+specify the memory transaction attributes. The question is
+whether the gdb protocol provides any equivalent of that:
+if it doesn't then gdbstub.c has to make up an attribute and
+use that.
+
+> Instead of MEMTXATTRS_UNSPECIFIED I should use a crafted MemTxAttrs with
+> .secure =3D 1, .unspecified =3D 1?
+
+You shouldn't set 'unspecified =3D 1', because that indicates
+"this is MEMTXATTRS_UNSPECIFIED". The default set of
+unspecified-attributes are probably good enough,
+though, so you can just use MEMTXATTRS_UNSPECIFIED.
+
+> The idea of this command is to use the
+> CPU AS but not the MMU/MPU, maybe it doesn't make sense...
+
+The trouble is that the command isn't precise enough.
+"read/write to physical memory" is fine if the CPU has
+exactly one physical address space, but it's ambiguous if the CPU
+has more than one physical address space. Either we need the
+user to be able to tell us which one they wanted somehow
+(which for QEMU more or less means that they should tell
+us what tx attributes they wanted), or we need to make an
+arbitrary decision.
+
+PS: do we have any documentation of this new command ?
+ab4752ec8d9 has the implementation but no documentation...
+
+thanks
+-- PMM
 
