@@ -6,57 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C949C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDBAC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:55:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF9F820714
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:54:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF9F820714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 42E7620714
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 09:55:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E7620714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIr8E-0008G5-RQ
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:54:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42935)
+	id 1jIr8y-0001Sp-Ey
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 05:55:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jIr4L-00027Q-P7
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:50:58 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jIr86-0008Kw-It
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jIr4K-00062r-Ma
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:50:57 -0400
-Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:50479)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jIr83-00081n-VA
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:54:49 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48518)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jIr4K-00062B-Gp
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 05:50:56 -0400
-Received: from player729.ha.ovh.net (unknown [10.110.115.233])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id DF7EE1369B5
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 11:50:54 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player729.ha.ovh.net (Postfix) with ESMTPSA id 230D0110F53DC;
- Mon, 30 Mar 2020 09:50:45 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH 6/7] target/ppc: Extend ppc_radix64_check_prot() with a
- 'partition_scoped' bool
-Date: Mon, 30 Mar 2020 11:49:45 +0200
-Message-Id: <20200330094946.24678-7-clg@kaod.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200330094946.24678-1-clg@kaod.org>
-References: <20200330094946.24678-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 13906552701059697638
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeihedgvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpeegnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.251.49
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jIr82-00080Z-A9; Mon, 30 Mar 2020 05:54:47 -0400
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jIr7r-0000vx-T1; Mon, 30 Mar 2020 12:54:35 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v11 2/4] qcow2: rework the cluster compression routine
+Date: Mon, 30 Mar 2020 12:54:27 +0300
+Message-Id: <20200330095429.26974-3-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200330095429.26974-1-dplotnikov@virtuozzo.com>
+References: <20200330095429.26974-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,69 +57,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>, Nicholas Piggin <npiggin@gmail.com>,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This prepares ground for partition-scoped Radix translation.
+The patch enables processing the image compression type defined
+for the image and chooses an appropriate method for image clusters
+(de)compression.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- target/ppc/mmu-radix64.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/qcow2-threads.c | 71 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 60 insertions(+), 11 deletions(-)
 
-diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-index 136498111f60..3ae29ed90d49 100644
---- a/target/ppc/mmu-radix64.c
-+++ b/target/ppc/mmu-radix64.c
-@@ -105,7 +105,8 @@ static void ppc_radix64_raise_si(PowerPCCPU *cpu, int=
- rwx, vaddr eaddr,
-=20
-=20
- static bool ppc_radix64_check_prot(PowerPCCPU *cpu, int rwx, uint64_t pt=
-e,
--                                   int *fault_cause, int *prot)
-+                                   int *fault_cause, int *prot,
-+                                   bool partition_scoped)
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index a68126f291..7dbaf53489 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -74,7 +74,9 @@ typedef struct Qcow2CompressData {
+ } Qcow2CompressData;
+ 
+ /*
+- * qcow2_compress()
++ * qcow2_zlib_compress()
++ *
++ * Compress @src_size bytes of data using zlib compression method
+  *
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+@@ -83,8 +85,8 @@ typedef struct Qcow2CompressData {
+  *          -ENOMEM destination buffer is not enough to store compressed data
+  *          -EIO    on any other error
+  */
+-static ssize_t qcow2_compress(void *dest, size_t dest_size,
+-                              const void *src, size_t src_size)
++static ssize_t qcow2_zlib_compress(void *dest, size_t dest_size,
++                                   const void *src, size_t src_size)
  {
-     CPUPPCState *env =3D &cpu->env;
-     const int need_prot[] =3D { PAGE_READ, PAGE_WRITE, PAGE_EXEC };
-@@ -121,11 +122,11 @@ static bool ppc_radix64_check_prot(PowerPCCPU *cpu,=
- int rwx, uint64_t pte,
-     }
-=20
-     /* Determine permissions allowed by Encoded Access Authority */
--    if ((pte & R_PTE_EAA_PRIV) && msr_pr) { /* Insufficient Privilege */
-+    if (!partition_scoped && (pte & R_PTE_EAA_PRIV) && msr_pr) {
-         *prot =3D 0;
--    } else if (msr_pr || (pte & R_PTE_EAA_PRIV)) {
-+    } else if (msr_pr || (pte & R_PTE_EAA_PRIV) || partition_scoped) {
-         *prot =3D ppc_radix64_get_prot_eaa(pte);
--    } else { /* !msr_pr && !(pte & R_PTE_EAA_PRIV) */
-+    } else { /* !msr_pr && !(pte & R_PTE_EAA_PRIV) && !partition_scoped =
-*/
-         *prot =3D ppc_radix64_get_prot_eaa(pte);
-         *prot &=3D ppc_radix64_get_prot_amr(cpu); /* Least combined perm=
-issions */
-     }
-@@ -266,7 +267,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCP=
-U *cpu, int rwx,
-                                 g_raddr, g_page_size, &fault_cause, &pte=
-_addr);
-=20
-     if (!(pte & R_PTE_VALID) ||
--        ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, g_prot)) {
-+        ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, g_prot, 0)) =
-{
-         /* No valid pte or access denied due to protection */
-         if (cause_excp) {
-             ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
---=20
-2.21.1
+     ssize_t ret;
+     z_stream strm;
+@@ -119,10 +121,10 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+ }
+ 
+ /*
+- * qcow2_decompress()
++ * qcow2_zlib_decompress()
+  *
+  * Decompress some data (not more than @src_size bytes) to produce exactly
+- * @dest_size bytes.
++ * @dest_size bytes using zlib compression method
+  *
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+@@ -130,8 +132,8 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+  * Returns: 0 on success
+  *          -EIO on fail
+  */
+-static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+-                                const void *src, size_t src_size)
++static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size)
+ {
+     int ret;
+     z_stream strm;
+@@ -191,20 +193,67 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+     return arg.ret;
+ }
+ 
++/*
++ * qcow2_co_compress()
++ *
++ * Compress @src_size bytes of data using the compression
++ * method defined by the image compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: compressed size on success
++ *          a negative error code on failure
++ */
+ ssize_t coroutine_fn
+ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+                   const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_compress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_compress;
++        break;
++
++    default:
++        abort();
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
++/*
++ * qcow2_co_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes using the compression method defined by the image
++ * compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          a negative error code on failure
++ */
+ ssize_t coroutine_fn
+ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+                     const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_decompress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_decompress;
++        break;
++
++    default:
++        abort();
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
+ 
+-- 
+2.17.0
 
 
