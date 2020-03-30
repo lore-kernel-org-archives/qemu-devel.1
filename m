@@ -2,57 +2,56 @@ Return-Path: <SRS0=g3Vr=5P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URI_WP_DIRINDEX,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 869C3C2D0ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5138BC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:26:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FB7920786
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:26:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FB7920786
+	by mail.kernel.org (Postfix) with ESMTPS id 28904206F6
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Mar 2020 04:26:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28904206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jIlzs-0004iz-Fz
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 00:26:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37783)
+	id 1jIm0P-00064D-8W
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 00:26:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jIltS-0000qd-74
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:24 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jIlty-00021k-Pa
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jIltQ-0007p4-9d
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:22 -0400
-Received: from mga07.intel.com ([134.134.136.100]:12564)
+ (envelope-from <yi.l.liu@intel.com>) id 1jIltx-0008Jp-Cr
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:54 -0400
+Received: from mga07.intel.com ([134.134.136.100]:12574)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jIltQ-0007lr-22
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:20 -0400
-IronPort-SDR: nd/CUsEXyDCEcV5h8BBfoY0SeUWOML6BcsQorqAqFam3/xnqoksAPrZDmacQSQ7IwksLM5TA2P
- 5dQFJ1krnlYw==
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jIltw-0007ph-Up
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 00:19:53 -0400
+IronPort-SDR: tFqJTwRZ3Z8nGG+LOTYyafvpji8Cp0AKX9F+Oo1UBfeDj87wMtcYU5IuCG9sT+jZzAQ1R782WM
+ SPfurmI0LuyA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Mar 2020 21:19:15 -0700
-IronPort-SDR: Pb7T2CtcngefiMZVnGzOB08VFNucDQzpwAcqrWBRWoa50CwjCy0dcOUveAHTaimSL4+XjMyxrr
- X1ApROc7KCjw==
+ 29 Mar 2020 21:19:16 -0700
+IronPort-SDR: WKbxMxV4QFawnb6moNAw3onpaS6w65NuM+IE7/dlv7IdEQ8DoYLrrIw/9PFfwHlENgccAM65UK
+ jNnkLEArH4mw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,322,1580803200"; d="scan'208";a="327632020"
+X-IronPort-AV: E=Sophos;i="5.72,322,1580803200"; d="scan'208";a="327632062"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga001.jf.intel.com with ESMTP; 29 Mar 2020 21:19:15 -0700
+ by orsmga001.jf.intel.com with ESMTP; 29 Mar 2020 21:19:16 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
-Date: Sun, 29 Mar 2020 21:24:43 -0700
-Message-Id: <1585542301-84087-5-git-send-email-yi.l.liu@intel.com>
+Subject: [PATCH v2 17/22] intel_iommu: do not pass down pasid bind for PASID #0
+Date: Sun, 29 Mar 2020 21:24:56 -0700
+Message-Id: <1585542301-84087-18-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
 References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
@@ -70,276 +69,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, david@gibson.dropbear.id.au
+ hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, many platform vendors provide the capability of dual stage
-DMA address translation in hardware. For example, nested translation
-on Intel VT-d scalable mode, nested stage translation on ARM SMMUv3,
-and etc. In dual stage DMA address translation, there are two stages
-address translation, stage-1 (a.k.a first-level) and stage-2 (a.k.a
-second-level) translation structures. Stage-1 translation results are
-also subjected to stage-2 translation structures. Take vSVA (Virtual
-Shared Virtual Addressing) as an example, guest IOMMU driver owns
-stage-1 translation structures (covers GVA->GPA translation), and host
-IOMMU driver owns stage-2 translation structures (covers GPA->HPA
-translation). VMM is responsible to bind stage-1 translation structures
-to host, thus hardware could achieve GVA->GPA and then GPA->HPA
-translation. For more background on SVA, refer the below links.
- - https://www.youtube.com/watch?v=Kq_nfGK5MwQ
- - https://events19.lfasiallc.com/wp-content/uploads/2017/11/\
-Shared-Virtual-Memory-in-KVM_Yi-Liu.pdf
+RID_PASID field was introduced in VT-d 3.0 spec, it is used
+for DMA requests w/o PASID in scalable mode VT-d. It is also
+known as IOVA. And in VT-d 3.1 spec, there is definition on it:
 
-In QEMU, vIOMMU emulators expose IOMMUs to VM per their own spec (e.g.
-Intel VT-d spec). Devices are pass-through to guest via device pass-
-through components like VFIO. VFIO is a userspace driver framework
-which exposes host IOMMU programming capability to userspace in a
-secure manner. e.g. IOVA MAP/UNMAP requests. Thus the major connection
-between VFIO and vIOMMU are MAP/UNMAP. However, with the dual stage
-DMA translation support, there are more interactions between vIOMMU and
-VFIO as below:
- 1) PASID allocation (allow host to intercept in PASID allocation)
- 2) bind stage-1 translation structures to host
- 3) propagate stage-1 cache invalidation to host
- 4) DMA address translation fault (I/O page fault) servicing etc.
+"Implementations not supporting RID_PASID capability
+(ECAP_REG.RPS is 0b), use a PASID value of 0 to perform
+address translation for requests without PASID."
 
-With the above new interactions in QEMU, it requires an abstract layer
-to facilitate the above operations and expose to vIOMMU emulators as an
-explicit way for vIOMMU emulators call into VFIO. This patch introduces
-HostIOMMUContext to stand for hardware IOMMU w/ dual stage DMA address
-translation capability. And introduces HostIOMMUContextClass to provide
-methods for vIOMMU emulators to propagate dual-stage translation related
-requests to host. As a beginning, PASID allocation/free are defined to
-propagate PASID allocation/free requests to host which is helpful for the
-vendors who manage PASID in system-wide. In future, there will be more
-operations like bind_stage1_pgtbl, flush_stage1_cache and etc.
+This patch adds a check against the PASIDs which are going to be
+bound to device. For PASID #0, it is not necessary to pass down
+pasid bind request for it since PASID #0 is used as RID_PASID for
+DMA requests without pasid. Further reason is current Intel vIOMMU
+supports gIOVA by shadowing guest 2nd level page table. However,
+in future, if guest IOMMU driver uses 1st level page table to store
+IOVA mappings, then guest IOVA support will also be done via nested
+translation. When gIOVA is over FLPT, then vIOMMU should pass down
+the pasid bind request for PASID #0 to host, host needs to bind the
+guest IOVA page table to a proper PASID. e.g PASID value in RID_PASID
+field for PF/VF if ECAP_REG.RPS is clear or default PASID for ADI
+(Assignable Device Interface in Scalable IOV solution).
+
+IOVA over FLPT support on Intel VT-d:
+https://lkml.org/lkml/2019/9/23/297
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/Makefile.objs                      |  1 +
- hw/iommu/Makefile.objs                |  1 +
- hw/iommu/host_iommu_context.c         | 97 +++++++++++++++++++++++++++++++++++
- include/hw/iommu/host_iommu_context.h | 75 +++++++++++++++++++++++++++
- 4 files changed, 174 insertions(+)
- create mode 100644 hw/iommu/Makefile.objs
- create mode 100644 hw/iommu/host_iommu_context.c
- create mode 100644 include/hw/iommu/host_iommu_context.h
+ hw/i386/intel_iommu.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 660e2b4..cab83fe 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -40,6 +40,7 @@ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- devices-dirs-$(CONFIG_NUBUS) += nubus/
- devices-dirs-y += semihosting/
- devices-dirs-y += smbios/
-+devices-dirs-y += iommu/
- endif
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 883aeac..074d966 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -1895,6 +1895,16 @@ static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
+     struct iommu_gpasid_bind_data *g_bind_data;
+     int ret = -1;
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/iommu/Makefile.objs b/hw/iommu/Makefile.objs
-new file mode 100644
-index 0000000..e6eed4e
---- /dev/null
-+++ b/hw/iommu/Makefile.objs
-@@ -0,0 +1 @@
-+obj-y += host_iommu_context.o
-diff --git a/hw/iommu/host_iommu_context.c b/hw/iommu/host_iommu_context.c
-new file mode 100644
-index 0000000..5fb2223
---- /dev/null
-+++ b/hw/iommu/host_iommu_context.c
-@@ -0,0 +1,97 @@
-+/*
-+ * QEMU abstract of Host IOMMU
-+ *
-+ * Copyright (C) 2020 Intel Corporation.
-+ *
-+ * Authors: Liu Yi L <yi.l.liu@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qom/object.h"
-+#include "qapi/visitor.h"
-+#include "hw/iommu/host_iommu_context.h"
-+
-+int host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx, uint32_t min,
-+                               uint32_t max, uint32_t *pasid)
-+{
-+    HostIOMMUContextClass *hicxc;
-+
-+    if (!iommu_ctx) {
-+        return -EINVAL;
++    if (pasid < VTD_HPASID_MIN) {
++        /*
++         * If pasid < VTD_HPASID_MIN, this pasid is not allocated
++         * from host. No need to pass down the changes on it to host.
++         * TODO: when IOVA over FLPT is ready, this switch should be
++         * refined.
++         */
++        return 0;
 +    }
 +
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+
-+    if (!hicxc) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_PASID_REQUEST) ||
-+        !hicxc->pasid_alloc) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->pasid_alloc(iommu_ctx, min, max, pasid);
-+}
-+
-+int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid)
-+{
-+    HostIOMMUContextClass *hicxc;
-+
-+    if (!iommu_ctx) {
-+        return -EINVAL;
-+    }
-+
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+    if (!hicxc) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_PASID_REQUEST) ||
-+        !hicxc->pasid_free) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->pasid_free(iommu_ctx, pasid);
-+}
-+
-+void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-+                         const char *mrtypename,
-+                         uint64_t flags)
-+{
-+    HostIOMMUContext *iommu_ctx;
-+
-+    object_initialize(_iommu_ctx, instance_size, mrtypename);
-+    iommu_ctx = HOST_IOMMU_CONTEXT(_iommu_ctx);
-+    iommu_ctx->flags = flags;
-+    iommu_ctx->initialized = true;
-+}
-+
-+static const TypeInfo host_iommu_context_info = {
-+    .parent             = TYPE_OBJECT,
-+    .name               = TYPE_HOST_IOMMU_CONTEXT,
-+    .class_size         = sizeof(HostIOMMUContextClass),
-+    .instance_size      = sizeof(HostIOMMUContext),
-+    .abstract           = true,
-+};
-+
-+static void host_iommu_ctx_register_types(void)
-+{
-+    type_register_static(&host_iommu_context_info);
-+}
-+
-+type_init(host_iommu_ctx_register_types)
-diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
-new file mode 100644
-index 0000000..35c4861
---- /dev/null
-+++ b/include/hw/iommu/host_iommu_context.h
-@@ -0,0 +1,75 @@
-+/*
-+ * QEMU abstraction of Host IOMMU
-+ *
-+ * Copyright (C) 2020 Intel Corporation.
-+ *
-+ * Authors: Liu Yi L <yi.l.liu@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_IOMMU_CONTEXT_H
-+#define HW_IOMMU_CONTEXT_H
-+
-+#include "qemu/queue.h"
-+#include "qemu/thread.h"
-+#include "qom/object.h"
-+#include <linux/iommu.h>
-+#ifndef CONFIG_USER_ONLY
-+#include "exec/hwaddr.h"
-+#endif
-+
-+#define TYPE_HOST_IOMMU_CONTEXT "qemu:host-iommu-context"
-+#define HOST_IOMMU_CONTEXT(obj) \
-+        OBJECT_CHECK(HostIOMMUContext, (obj), TYPE_HOST_IOMMU_CONTEXT)
-+#define HOST_IOMMU_CONTEXT_GET_CLASS(obj) \
-+        OBJECT_GET_CLASS(HostIOMMUContextClass, (obj), \
-+                         TYPE_HOST_IOMMU_CONTEXT)
-+
-+typedef struct HostIOMMUContext HostIOMMUContext;
-+
-+typedef struct HostIOMMUContextClass {
-+    /* private */
-+    ObjectClass parent_class;
-+
-+    /* Allocate pasid from HostIOMMUContext (a.k.a. host software) */
-+    int (*pasid_alloc)(HostIOMMUContext *iommu_ctx,
-+                       uint32_t min,
-+                       uint32_t max,
-+                       uint32_t *pasid);
-+    /* Reclaim pasid from HostIOMMUContext (a.k.a. host software) */
-+    int (*pasid_free)(HostIOMMUContext *iommu_ctx,
-+                      uint32_t pasid);
-+} HostIOMMUContextClass;
-+
-+/*
-+ * This is an abstraction of host IOMMU with dual-stage capability
-+ */
-+struct HostIOMMUContext {
-+    Object parent_obj;
-+#define HOST_IOMMU_PASID_REQUEST (1ULL << 0)
-+    uint64_t flags;
-+    bool initialized;
-+};
-+
-+int host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx, uint32_t min,
-+                               uint32_t max, uint32_t *pasid);
-+int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid);
-+
-+void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-+                         const char *mrtypename,
-+                         uint64_t flags);
-+void host_iommu_ctx_destroy(HostIOMMUContext *iommu_ctx);
-+
-+#endif
+     vtd_dev_icx = vtd_bus->dev_icx[devfn];
+     if (!vtd_dev_icx) {
+         /* means no need to go further, e.g. for emulated devices */
 -- 
 2.7.4
 
