@@ -2,77 +2,83 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C89C9C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 01:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95889C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 01:31:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96A252072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 01:27:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A252072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5CD232072A
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 01:31:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CD232072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ5gL-000241-Py
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 21:27:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46294)
+	id 1jJ5kd-0003gP-Jg
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 21:31:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46730)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jJ5fI-0001PH-2U
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:26:09 -0400
+ (envelope-from <bounces@canonical.com>) id 1jJ5k0-0003Hk-S8
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1jJ5fF-0002DG-LS
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:26:03 -0400
-Received: from mga05.intel.com ([192.55.52.43]:18338)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1jJ5fF-0002Bo-Cv
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:26:01 -0400
-IronPort-SDR: nxkahq97CGQoQFUFb9lfM8PKxgTdpkzYNTqC4agoP82zLjOYlJAgYmGfXSA9fSKvC1uXXqahBz
- t/wmAuorRICg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 30 Mar 2020 18:25:59 -0700
-IronPort-SDR: gPDOd79ZNBiH76awpHCrYcoiVb6TfFgu+P9C527xOD3ZlvBvCKpRfTh2oQ9XvNhEzLXolFooLA
- phTk8jxXE5pw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,326,1580803200"; d="scan'208";a="252071314"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga006.jf.intel.com with ESMTP; 30 Mar 2020 18:25:54 -0700
-Date: Mon, 30 Mar 2020 21:16:21 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200331011621.GC6631@joy-OptiPlex-7040>
-References: <20200325021135.GB20109@joy-OptiPlex-7040>
- <33d38629-aeaf-1c30-26d4-958b998620b0@nvidia.com>
- <20200327003055.GB26419@joy-OptiPlex-7040>
- <deb8b18f-aa79-70d3-ce05-89b607f813c4@nvidia.com>
- <20200330032437.GD30683@joy-OptiPlex-7040>
- <e91dbf70-05bf-977f-208b-0fb5988af3a8@nvidia.com>
- <20200330235131.GB6478@joy-OptiPlex-7040>
- <20200330185347.58b1ab93@x1.home>
- <20200331005046.GB6631@joy-OptiPlex-7040>
- <20200330191259.42c560ee@x1.home>
+ (envelope-from <bounces@canonical.com>) id 1jJ5jz-0006NB-H6
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:30:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41562)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jJ5jx-0006LP-Qp
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:30:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jJ5jv-0002o9-M8
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 01:30:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A54F52E80C0
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 01:30:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200330191259.42c560ee@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.43
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 31 Mar 2020 01:16:53 -0000
+From: Bug Watch Updater <1868116@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Triaged; importance=High; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
+ status=Fix Released; importance=Critical;
+ assignee=ubuntu-desktop@lists.ubuntu.com; 
+X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
+ status=New; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
+ server-next
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail janitor leozinho29-eu
+ paelzer seb128
+X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Bug Watch Updater (bug-watch-updater)
+References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158561741443.24258.12940243739186218328.launchpad@loganberry.canonical.com>
+Subject: [Bug 1868116] Re: QEMU monitor no longer works
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 05fbbd4ca5c8d0c685203a5ea8492e59ffa60f5b
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,189 +87,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 31, 2020 at 09:12:59AM +0800, Alex Williamson wrote:
-> On Mon, 30 Mar 2020 20:50:47 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Tue, Mar 31, 2020 at 08:53:47AM +0800, Alex Williamson wrote:
-> > > On Mon, 30 Mar 2020 19:51:31 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > On Mon, Mar 30, 2020 at 09:49:21PM +0800, Kirti Wankhede wrote:  
-> > > > > 
-> > > > > 
-> > > > > On 3/30/2020 8:54 AM, Yan Zhao wrote:    
-> > > > > > On Fri, Mar 27, 2020 at 01:28:13PM +0800, Kirti Wankhede wrote:    
-> > > > > >> Hit send button little early.
-> > > > > >>    
-> > > > > >>   >
-> > > > > >>   > I checked v12, it's not like what I said.
-> > > > > >>   > In v12, bitmaps are generated per vfio_dma, and combination of the
-> > > > > >>   > bitmaps are required in order to generate a big bitmap suiting for dirty
-> > > > > >>   > query. It can cause problem when offset not aligning.
-> > > > > >>   > But what I propose here is to generate an rb tree orthogonal to the tree
-> > > > > >>   > of vfio_dma.
-> > > > > >>   >
-> > > > > >>   > as to CPU cycles saving, I don't think iterating/translating page by page
-> > > > > >>   > would achieve that purpose.
-> > > > > >>   >    
-> > > > > >>
-> > > > > >> Instead of creating one extra rb tree for dirty pages tracking in v10
-> > > > > >> tried to use dma->pfn_list itself, we tried changes in v10, v11 and v12,
-> > > > > >> latest version is evolved version with best possible approach after
-> > > > > >> discussion. Probably, go through v11 as well.
-> > > > > >> https://patchwork.kernel.org/patch/11298335/
-> > > > > >>    
-> > > > > > I'm not sure why all those previous implementations are bound to
-> > > > > > vfio_dma. for vIOMMU on, in most cases, a vfio_dma is only for a page,
-> > > > > > so generating a one-byte bitmap for a single page in each vfio_dma ?
-> > > > > > is it possible to creating one extra rb tree to keep dirty ranges, and
-> > > > > > one fixed length kernel bitmap whose content is generated on query,
-> > > > > > serving as a bouncing buffer for copy_to_user
-> > > > > >     
-> > > > > 
-> > > > > One fixed length? what should be fixed value? then isn't it better to 
-> > > > > fix the size to dma->size?
-> > > > > 
-> > > > > This is also to prevent DoS attack, user space application can query a 
-> > > > > very large range.
-> > > > >     
-> > > > > >>
-> > > > > >> On 3/27/2020 6:00 AM, Yan Zhao wrote:    
-> > > > > >>> On Fri, Mar 27, 2020 at 05:39:01AM +0800, Kirti Wankhede wrote:    
-> > > > > >>>>
-> > > > > >>>>
-> > > > > >>>> On 3/25/2020 7:41 AM, Yan Zhao wrote:    
-> > > > > >>>>> On Wed, Mar 25, 2020 at 05:18:52AM +0800, Kirti Wankhede wrote:    
-> > > > > >>>>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> > > > > >>>>>> - Start dirty pages tracking while migration is active
-> > > > > >>>>>> - Stop dirty pages tracking.
-> > > > > >>>>>> - Get dirty pages bitmap. Its user space application's responsibility to
-> > > > > >>>>>>      copy content of dirty pages from source to destination during migration.
-> > > > > >>>>>>
-> > > > > >>>>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> > > > > >>>>>> structure. Bitmap size is calculated considering smallest supported page
-> > > > > >>>>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> > > > > >>>>>>
-> > > > > >>>>>> Bitmap is populated for already pinned pages when bitmap is allocated for
-> > > > > >>>>>> a vfio_dma with the smallest supported page size. Update bitmap from
-> > > > > >>>>>> pinning functions when tracking is enabled. When user application queries
-> > > > > >>>>>> bitmap, check if requested page size is same as page size used to
-> > > > > >>>>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> > > > > >>>>>> error.
-> > > > > >>>>>>
-> > > > > >>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > > > >>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > > > >>>>>> ---
-> > > > > >>>>>>     drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
-> > > > > >>>>>>     1 file changed, 260 insertions(+), 6 deletions(-)
-> > > > > >>>>>>
-> > > > > >>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > > > >>>>>> index 70aeab921d0f..874a1a7ae925 100644
-> > > > > >>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
-> > > > > >>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > > > >>>>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
-> > > > > >>>>>>     	unsigned int		dma_avail;
-> > > > > >>>>>>     	bool			v2;
-> > > > > >>>>>>     	bool			nesting;
-> > > > > >>>>>> +	bool			dirty_page_tracking;
-> > > > > >>>>>>     };
-> > > > > >>>>>>     
-> > > > > >>>>>>     struct vfio_domain {
-> > > > > >>>>>> @@ -91,6 +92,7 @@ struct vfio_dma {
-> > > > > >>>>>>     	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
-> > > > > >>>>>>     	struct task_struct	*task;
-> > > > > >>>>>>     	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> > > > > >>>>>> +	unsigned long		*bitmap;
-> > > > > >>>>>>     };
-> > > > > >>>>>>     
-> > > > > >>>>>>     struct vfio_group {
-> > > > > >>>>>> @@ -125,7 +127,21 @@ struct vfio_regions {
-> > > > > >>>>>>     #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
-> > > > > >>>>>>     					(!list_empty(&iommu->domain_list))
-> > > > > >>>>>>     
-> > > > > >>>>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> > > > > >>>>>> +
-> > > > > >>>>>> +/*
-> > > > > >>>>>> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
-> > > > > >>>>>> + * further casts to signed integer for unaligned multi-bit operation,
-> > > > > >>>>>> + * __bitmap_set().
-> > > > > >>>>>> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
-> > > > > >>>>>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-> > > > > >>>>>> + * system.
-> > > > > >>>>>> + */
-> > > > > >>>>>> +#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
-> > > > > >>>>>> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> > > > > >>>>>> +
-> > > > > >>>>>>     static int put_pfn(unsigned long pfn, int prot);
-> > > > > >>>>>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
-> > > > > >>>>>>     
-> > > > > >>>>>>     /*
-> > > > > >>>>>>      * This code handles mapping and unmapping of user data buffers
-> > > > > >>>>>> @@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
-> > > > > >>>>>>     	rb_erase(&old->node, &iommu->dma_list);
-> > > > > >>>>>>     }
-> > > > > >>>>>>     
-> > > > > >>>>>> +
-> > > > > >>>>>> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, uint64_t pgsize)
-> > > > > >>>>>> +{
-> > > > > >>>>>> +	uint64_t npages = dma->size / pgsize;
-> > > > > >>>>>> +    
-> > > > > > If pgsize > dma->size, npages = 0.
-> > > > > > wouldn't it cause problem?
-> > > > > >     
-> > > > > 
-> > > > > This patch-set supports bitmap for smallest supported page size, i.e. 
-> > > > > PAGE_SIZE. vfio_dma_do_map() validates dma->size accordingly. So this 
-> > > > > case will not happen.
-> > > > >     
-> > > > as far as I know, qemu/kvm uses 4k as the unit for dirty page tracking.
-> > > > so why smallest iommu page size is used here?
-> > > > wouldn't it cause problem?  
-> > > 
-> > > If your concern is that the IOMMU supports sub-4K page sizes, see
-> > > vfio_pgsize_bitmap().  We actually only support PAGE_SIZE as our
-> > > minimum mapping unit, even if the IOMMU supports less, so PAGE_SIZE is
-> > > our lower bound.  Thanks,  
-> > 
-> > if we always uses PAGE_SIZE, why not use PAGE_SIZE directly?
-> > or returning dirty bitmap unit (e.g. 1 << __ffs(vfio_pgsize_bitmap(iommu)))
-> > to QEMU in VFIO_IOMMU_DIRTY_PAGES_FLAG_START, so that qemu can do possible
-> > conversion if it's not the same unit that QEMU uses.
-> 
-> The vfio interface is essentially just an extension of the IOMMU API
-> via domain->pgsize_bitmap.  intel-iommu mostly made the bitmask
-> meaningless by reporting essentially PAGE_MASK, and we just expose the
-> common version of that across potentially all the IOMMUs used by the
-> domain, modulo minimum of PAGE_SIZE.  Thanks,
+** Changed in: qemu (Debian)
+       Status: Unknown =3D> New
 
-ok. got it. do you think it's good to return this iommu page size
-when turning on dirty page tracking? so when GET_BITMAP ioctl
-comes, we don't need to quit if range.bitmap.pgsize != iommu_pgsize.
-instead, the GET_BITMAP can success with iommu page size and qemu does
-the bitmap conversion afterwards.
+-- =
 
-Thanks
-Yan
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1868116
 
+Title:
+  QEMU monitor no longer works
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
+Status in vte2.91 package in Ubuntu:
+  Fix Released
+Status in qemu package in Debian:
+  New
+
+Bug description:
+  Repro:
+  VTE
+  $ meson _build && ninja -C _build && ninja -C _build install
+
+  qemu:
+  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
+r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
+-enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
+sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
+-disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
+disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
+opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
+irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
+-pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
+vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
+sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
+le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
+e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
+utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
+-disable-cap-ng
+  $ make
+
+  Test:
+  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
+uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
+le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
+rent/images/netboot/mini.iso
+  - switch to monitor with CTRL+ALT+2
+  - try to enter something
+
+  Affects head of both usptream git repos.
+
+  =
+
+  --- original bug ---
+
+  It was observed that the QEMU console (normally accessible using
+  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
+  problematic because there are cases where it's required to send
+  commands to the guest, or key combinations that the host would grab
+  (as Ctrl-Alt-F1 or Alt-F4).
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 20.04
+  Package: qemu 1:4.2-3ubuntu2
+  Uname: Linux 5.6.0-rc6+ x86_64
+  ApportVersion: 2.20.11-0ubuntu20
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Thu Mar 19 12:16:31 2020
+  Dependencies:
+
+  InstallationDate: Installed on 2017-06-13 (1009 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine:
+  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
+  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
+86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
+,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
+home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
+  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
+-re]
+  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
+5]
+  MachineType: LENOVO 80UG
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
+4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
+rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
+ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
+enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
+7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
+scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
+_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
+  dmi.bios.date: 08/09/2018
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN45WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
