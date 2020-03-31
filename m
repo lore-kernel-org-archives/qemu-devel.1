@@ -2,83 +2,109 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95889C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 01:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E737C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:05:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CD232072A
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 01:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CD232072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C32302072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:05:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="rUMDA4fT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C32302072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ5kd-0003gP-Jg
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 21:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46730)
+	id 1jJ6HN-0001bo-Uv
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 22:05:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jJ5k0-0003Hk-S8
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:30:58 -0400
+ (envelope-from <dirty@apple.com>) id 1jJ6Gh-0001D3-HL
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:04:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jJ5jz-0006NB-H6
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:30:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41562)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jJ5jx-0006LP-Qp
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 21:30:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jJ5jv-0002o9-M8
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 01:30:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A54F52E80C0
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 01:30:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 31 Mar 2020 01:16:53 -0000
-From: Bug Watch Updater <1868116@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Triaged; importance=High; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
- status=Fix Released; importance=Critical;
- assignee=ubuntu-desktop@lists.ubuntu.com; 
-X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
- status=New; importance=Unknown; assignee=None; 
-X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
- server-next
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail janitor leozinho29-eu
- paelzer seb128
-X-Launchpad-Bug-Reporter: =?utf-8?q?Leonardo_M=C3=BCller_=28leozinho29-eu?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: Bug Watch Updater (bug-watch-updater)
-References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158561741443.24258.12940243739186218328.launchpad@loganberry.canonical.com>
-Subject: [Bug 1868116] Re: QEMU monitor no longer works
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a296f04231dee355be5db73cc878b9e21689a253";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 05fbbd4ca5c8d0c685203a5ea8492e59ffa60f5b
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ (envelope-from <dirty@apple.com>) id 1jJ6Gf-0004cC-Fi
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:04:43 -0400
+Received: from ma1-aaemail-dr-lapp01.apple.com ([17.171.2.60]:39040)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jJ6Ge-0004Yr-TX
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:04:41 -0400
+Received: from pps.filterd (ma1-aaemail-dr-lapp01.apple.com [127.0.0.1])
+ by ma1-aaemail-dr-lapp01.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ 02V22rkf019289; Mon, 30 Mar 2020 19:04:38 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : content-type
+ : mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=20180706;
+ bh=S/Gi2UtCbvR2vWkZuR4ZiGne+S6k5ItrPJxzu2uTv7I=;
+ b=rUMDA4fT7A1t5FBcQ1P4+Jk5DZ/a+CSnI9Mudszck+epY8b0YxfBWrqnCWKpMmiiTWie
+ TY/uVvEpPyGsTJYs8kJ3XOQogDA9JdcoHSsa0gxu5wUqISUZcnMr1mYg94PQgl0qtSnn
+ U+9+DxsMuhbefdkmj8u0y9EQ+S7M3PkfhQQ5fI2N9Y/FhInod2BvdqVOonY7G55kzdqg
+ qOCEc+XdGx35UDQBpPD2rod9EESz5WNO6qNbXDNEAn8275s97HjByNR0KhquA+SMrRLf
+ P2TwDj1KSxINtDPGHlp/rcbfZHnZ2x/B22kuVFYamV/kNHONC0Y446AuSqaRL+H6ySU7 tw== 
+Received: from rn-mailsvcp-mta-lapp02.rno.apple.com
+ (rn-mailsvcp-mta-lapp02.rno.apple.com [10.225.203.150])
+ by ma1-aaemail-dr-lapp01.apple.com with ESMTP id 302582k6qg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Mon, 30 Mar 2020 19:04:38 -0700
+Received: from rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (rn-mailsvcp-mmp-lapp02.rno.apple.com [17.179.253.15])
+ by rn-mailsvcp-mta-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) with ESMTPS id <0Q81003LZCFQM640@rn-mailsvcp-mta-lapp02.rno.apple.com>; 
+ Mon, 30 Mar 2020 19:04:38 -0700 (PDT)
+Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp02.rno.apple.com by
+ rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) id <0Q8100A00CCI0N00@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Mon,
+ 30 Mar 2020 19:04:38 -0700 (PDT)
+X-Va-A: 
+X-Va-T-CD: 20c0c410705af0c5efefeb0380f25862
+X-Va-E-CD: 2fde7b6a17f481efbdb3880150911029
+X-Va-R-CD: 852e2779f424d6adcac7bda87edb4646
+X-Va-CD: 0
+X-Va-ID: 22ece592-74e7-4c03-b080-21e5713e4019
+X-V-A: 
+X-V-T-CD: 20c0c410705af0c5efefeb0380f25862
+X-V-E-CD: 2fde7b6a17f481efbdb3880150911029
+X-V-R-CD: 852e2779f424d6adcac7bda87edb4646
+X-V-CD: 0
+X-V-ID: ece5a85f-e059-4ab5-85f1-a93eb794b161
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-03-30_07:2020-03-30,
+ 2020-03-30 signatures=0
+Received: from [17.234.84.168] (unknown [17.234.84.168])
+ by rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020))
+ with ESMTPSA id <0Q8100NW2CFPZR00@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Mon,
+ 30 Mar 2020 19:04:37 -0700 (PDT)
+Content-type: text/plain; charset=us-ascii
+MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH] i386: hvf: Reset IRQ inhibition after moving RIP
+In-reply-to: <20200328174411.51491-1-r.bolshakov@yadro.com>
+Date: Mon, 30 Mar 2020 19:04:37 -0700
+Cc: Cameron Esfahani via <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
+Content-transfer-encoding: quoted-printable
+Message-id: <E08111ED-C32B-4CAF-8302-BF82C9D05A63@apple.com>
+References: <20200328174411.51491-1-r.bolshakov@yadro.com>
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-03-31_01:2020-03-30,
+ 2020-03-31 signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 17.171.2.60
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,129 +113,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-** Changed in: qemu (Debian)
-       Status: Unknown =3D> New
+Reviewed-by: Cameron Esfahani <dirty@apple.com>
 
--- =
+LGTM.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1868116
+Cameron Esfahani
+dirty@apple.com
 
-Title:
-  QEMU monitor no longer works
+"There are times in the life of a nation when the only place a decent =
+man can find himself is in prison."
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-Status in vte2.91 package in Ubuntu:
-  Fix Released
-Status in qemu package in Debian:
-  New
 
-Bug description:
-  Repro:
-  VTE
-  $ meson _build && ninja -C _build && ninja -C _build install
 
-  qemu:
-  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
-r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
--enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
-sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
--disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
-disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
-opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
-irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
--pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
-vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
-sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
-le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
-e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
-utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
--disable-cap-ng
-  $ make
+> On Mar 28, 2020, at 10:44 AM, Roman Bolshakov <r.bolshakov@yadro.com> =
+wrote:
+>=20
+> The sequence of instructions exposes an issue:
+>  sti
+>  hlt
+>=20
+> Interrupts cannot be delivered to hvf after hlt instruction cpu =
+because
+> HF_INHIBIT_IRQ_MASK is set just before hlt is handled and never reset
+> after moving instruction pointer beyond hlt.
+>=20
+> So, after hvf_vcpu_exec() returns, CPU thread gets locked up forever =
+in
+> qemu_wait_io_event() (cpu_thread_is_idle() evaluates inhibition
+> flag and considers the CPU idle if the flag is set).
+>=20
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+> target/i386/hvf/vmx.h | 3 +++
+> 1 file changed, 3 insertions(+)
+>=20
+> diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
+> index 03d2c79b9c..ce2a1532d5 100644
+> --- a/target/i386/hvf/vmx.h
+> +++ b/target/i386/hvf/vmx.h
+> @@ -167,6 +167,8 @@ static inline void macvm_set_cr4(hv_vcpuid_t vcpu, =
+uint64_t cr4)
+>=20
+> static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+> {
+> +    X86CPU *x86_cpu =3D X86_CPU(cpu);
+> +    CPUX86State *env =3D &x86_cpu->env;
+>     uint64_t val;
+>=20
+>     /* BUG, should take considering overlap.. */
+> @@ -176,6 +178,7 @@ static inline void macvm_set_rip(CPUState *cpu, =
+uint64_t rip)
+>    val =3D rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+>    if (val & (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+>                VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING)) {
+> +        env->hflags &=3D ~HF_INHIBIT_IRQ_MASK;
+>         wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY,
+>                val & ~(VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+>                VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING));
+> --=20
+> 2.24.1
+>=20
+>=20
 
-  Test:
-  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
-uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
-le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
-rent/images/netboot/mini.iso
-  - switch to monitor with CTRL+ALT+2
-  - try to enter something
-
-  Affects head of both usptream git repos.
-
-  =
-
-  --- original bug ---
-
-  It was observed that the QEMU console (normally accessible using
-  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
-  problematic because there are cases where it's required to send
-  commands to the guest, or key combinations that the host would grab
-  (as Ctrl-Alt-F1 or Alt-F4).
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 20.04
-  Package: qemu 1:4.2-3ubuntu2
-  Uname: Linux 5.6.0-rc6+ x86_64
-  ApportVersion: 2.20.11-0ubuntu20
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Thu Mar 19 12:16:31 2020
-  Dependencies:
-
-  InstallationDate: Installed on 2017-06-13 (1009 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine:
-  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
-  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
-86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
-,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
-home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
-  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
--re]
-  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
-5]
-  MachineType: LENOVO 80UG
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
-4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
-rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
-ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
-enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
-7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
-scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
-_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
-  dmi.bios.date: 08/09/2018
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN45WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
