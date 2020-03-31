@@ -2,94 +2,129 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2E4C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 647D4C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EDFA2078B
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:10:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19B092078B
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:11:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5un7EZx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EDFA2078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q4fKmOtO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B092078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJHal-0007tW-BB
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47957)
+	id 1jJHbx-0001ww-85
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:11:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jJHXq-0002kP-Pa
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:07:12 -0400
+ (envelope-from <david@redhat.com>) id 1jJHar-00008n-10
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:10:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jJHXp-0007vg-D5
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:07:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41174
+ (envelope-from <david@redhat.com>) id 1jJHap-0001av-37
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:10:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29965
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jJHXp-0007vP-98
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:07:09 -0400
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJHao-0001ab-VE
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:10:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585663628;
+ s=mimecast20190719; t=1585663814;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vwF8hbu4xZl3dLIjwlZr2OJsZXfk81SSvzv3n2GE69A=;
- b=N5un7EZxfCnCmvkdPNBEeqQpDH8ELtd/SqcLkq9lgLGhNOKyxMr5fo0jaOwOpcVKXu9r7K
- LjTZbokGdXB540rKNYLTwMVakwA0WZZfYlLJtMD939hL/pqG+eRPFBfg2wTh3DgsR07vQt
- CmmHRNX+lI0xAokiI1PDh6JC9Rf2VzY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-wvkI5LplMMGxw4HoJo6vWQ-1; Tue, 31 Mar 2020 10:07:05 -0400
-X-MC-Unique: wvkI5LplMMGxw4HoJo6vWQ-1
-Received: by mail-wr1-f70.google.com with SMTP id u16so10054393wrp.14
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:07:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uUPU6s8/wt1p8Ho/mqxi5+dJOTfJbsMKE80XrqhvBkk=;
- b=EstnNdOyoJNTg8snJkFV/pfGK8UV6M+T8BQxDNjPXE0H41Krbbs3cN61BCpImjjFgu
- 1+Lgs2iTkc/7wE54t61Bwh4/uImCKRflaiFu/4Mxscvarp/BLmPuMKEEAQPK5z1glLsZ
- SaR1t0RUDJpWqXNd9Kup1f1dKrSylXPtOF4soY2fpXtibt1OyyKRvg42jJ8aQVRdbk6/
- IjY+iZeQe1z3YMJA3Wc7XRmow2zxfGZ8fESrDK6keRNx5EIU90gBc6KQBgwFxBKO9nNC
- XOU/94c3JZdTkXSuD2gBNv7aKUfQWnG0DREV9Vla3gVlUZKHX0AVU1bitokyWn9n3Ml7
- lfKQ==
-X-Gm-Message-State: ANhLgQ2ILdfpPZX6k0cxN1GbFWOeq1uwNJGuPsk5fs6NcinHYjzLgBmf
- E0IjO+/aDXGWcboJ3BGSGFbejpd0W+S4gpoLcQ97Dg4t9agVdC3eXuK+fsRAE6nUpp3IU+3ggMy
- 192Z5JPqktgKkrgQ=
-X-Received: by 2002:a1c:770a:: with SMTP id t10mr3713745wmi.150.1585663624108; 
- Tue, 31 Mar 2020 07:07:04 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtbpUO9Uac5SNE5Kfxg/r7yRyX6u8wlwnp7lMRIowj1RzZs7ifjSR9Pt457xYJa1SrxSNtcNA==
-X-Received: by 2002:a1c:770a:: with SMTP id t10mr3713725wmi.150.1585663623866; 
- Tue, 31 Mar 2020 07:07:03 -0700 (PDT)
-Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id m19sm3916474wml.48.2020.03.31.07.07.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 31 Mar 2020 07:07:03 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 v2 4/4] qga: Restrict guest-file-read count to 10 MB
- to avoid crashes
-Date: Tue, 31 Mar 2020 16:06:38 +0200
-Message-Id: <20200331140638.16464-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200331140638.16464-1-philmd@redhat.com>
-References: <20200331140638.16464-1-philmd@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=zaDvsYN8BRJn6uzt9vBaEcPBXIxrW6ki6PG9mgIOd/0=;
+ b=Q4fKmOtOA8aT4KVPKAsYTv/TfmmXs4ZavPD0d3vtUNvkgjXsNHmw+pUVdnee2uowKdDK3r
+ +xs3/0TB1ZxCkDU7vA2qDF5RqvDyB4fUrno46S/xFSE1tEvJbs05CuUNSCenR8/Hfaq2Lv
+ SgEq7FVaV0k0Jv7GI6h24nNxe1Zt914=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-rDuJkBoBOOCVSDWMqShx_A-1; Tue, 31 Mar 2020 10:10:12 -0400
+X-MC-Unique: rDuJkBoBOOCVSDWMqShx_A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5780A801E74;
+ Tue, 31 Mar 2020 14:10:11 +0000 (UTC)
+Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C2795C1C5;
+ Tue, 31 Mar 2020 14:10:00 +0000 (UTC)
+Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER to
+ handle THP spilt issue
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200326031817-mutt-send-email-mst@kernel.org>
+ <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
+ <20200326054554-mutt-send-email-mst@kernel.org>
+ <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
+ <20200331091718-mutt-send-email-mst@kernel.org>
+ <02a393ce-c4b4-ede9-7671-76fa4c19097a@redhat.com>
+ <20200331093300-mutt-send-email-mst@kernel.org>
+ <b69796e0-fa41-a219-c3e5-a11e9f5f18bf@redhat.com>
+ <20200331100359-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
+ 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
+ zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
+ Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
+ jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
+ II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
+ Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
+ RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
+ ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
+ Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
+ ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
+ 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
+ GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
+ GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
+ H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
+ 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
+ ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
+ GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
+ CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
+ njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
+ FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
+Organization: Red Hat GmbH
+Message-ID: <85f699d4-459a-a319-0a8f-96c87d345c49@redhat.com>
+Date: Tue, 31 Mar 2020 16:09:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+In-Reply-To: <20200331100359-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -104,105 +139,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Sameeh Jubran <sjubran@redhat.com>, Basil Salman <basil@daynix.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Dietmar Maurer <dietmar@proxmox.com>
+Cc: pagupta@redhat.com, Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ qemu-devel@nongnu.org, mojha@codeaurora.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, namit@vmware.com,
+ Hui Zhu <teawaterz@linux.alibaba.com>, akpm@linux-foundation.org,
+ jasowang@redhat.com, Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On https://www.mail-archive.com/qemu-devel@nongnu.org/msg693176.html
-Daniel Berrang=C3=A9 commented:
+On 31.03.20 16:07, Michael S. Tsirkin wrote:
+> On Tue, Mar 31, 2020 at 04:03:18PM +0200, David Hildenbrand wrote:
+>> On 31.03.20 15:37, Michael S. Tsirkin wrote:
+>>> On Tue, Mar 31, 2020 at 03:32:05PM +0200, David Hildenbrand wrote:
+>>>> On 31.03.20 15:24, Michael S. Tsirkin wrote:
+>>>>> On Tue, Mar 31, 2020 at 12:35:24PM +0200, David Hildenbrand wrote:
+>>>>>> On 26.03.20 10:49, Michael S. Tsirkin wrote:
+>>>>>>> On Thu, Mar 26, 2020 at 08:54:04AM +0100, David Hildenbrand wrote=
+:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>> Am 26.03.2020 um 08:21 schrieb Michael S. Tsirkin <mst@redhat.c=
+om>:
+>>>>>>>>>
+>>>>>>>>> =EF=BB=BFOn Thu, Mar 12, 2020 at 09:51:25AM +0100, David Hilden=
+brand wrote:
+>>>>>>>>>>> On 12.03.20 09:47, Michael S. Tsirkin wrote:
+>>>>>>>>>>> On Thu, Mar 12, 2020 at 09:37:32AM +0100, David Hildenbrand w=
+rote:
+>>>>>>>>>>>> 2. You are essentially stealing THPs in the guest. So the fa=
+stest
+>>>>>>>>>>>> mapping (THP in guest and host) is gone. The guest won't be =
+able to make
+>>>>>>>>>>>> use of THP where it previously was able to. I can imagine th=
+is implies a
+>>>>>>>>>>>> performance degradation for some workloads. This needs a pro=
+per
+>>>>>>>>>>>> performance evaluation.
+>>>>>>>>>>>
+>>>>>>>>>>> I think the problem is more with the alloc_pages API.
+>>>>>>>>>>> That gives you exactly the given order, and if there's
+>>>>>>>>>>> a larger chunk available, it will split it up.
+>>>>>>>>>>>
+>>>>>>>>>>> But for balloon - I suspect lots of other users,
+>>>>>>>>>>> we do not want to stress the system but if a large
+>>>>>>>>>>> chunk is available anyway, then we could handle
+>>>>>>>>>>> that more optimally by getting it all in one go.
+>>>>>>>>>>>
+>>>>>>>>>>>
+>>>>>>>>>>> So if we want to address this, IMHO this calls for a new API.
+>>>>>>>>>>> Along the lines of
+>>>>>>>>>>>
+>>>>>>>>>>>    struct page *alloc_page_range(gfp_t gfp, unsigned int min_=
+order,
+>>>>>>>>>>>                    unsigned int max_order, unsigned int *orde=
+r)
+>>>>>>>>>>>
+>>>>>>>>>>> the idea would then be to return at a number of pages in the =
+given
+>>>>>>>>>>> range.
+>>>>>>>>>>>
+>>>>>>>>>>> What do you think? Want to try implementing that?
+>>>>>>>>>>
+>>>>>>>>>> You can just start with the highest order and decrement the or=
+der until
+>>>>>>>>>> your allocation succeeds using alloc_pages(), which would be e=
+nough for
+>>>>>>>>>> a first version. At least I don't see the immediate need for a=
+ new
+>>>>>>>>>> kernel API.
+>>>>>>>>>
+>>>>>>>>> OK I remember now.  The problem is with reclaim. Unless reclaim=
+ is
+>>>>>>>>> completely disabled, any of these calls can sleep. After it wak=
+es up,
+>>>>>>>>> we would like to get the larger order that has become available
+>>>>>>>>> meanwhile.
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> Yes, but that=E2=80=98s a pure optimization IMHO.
+>>>>>>>> So I think we should do a trivial implementation first and then =
+see what we gain from a new allocator API. Then we might also be able to =
+justify it using real numbers.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Well how do you propose implement the necessary semantics?
+>>>>>>> I think we are both agreed that alloc_page_range is more or
+>>>>>>> less what's necessary anyway - so how would you approximate it
+>>>>>>> on top of existing APIs?
+>>>>>> diff --git a/include/linux/balloon_compaction.h b/include/linux/ba=
+lloon_compaction.h
+>>>
+>>> .....
+>>>
+>>>
+>>>>>> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+>>>>>> index 26de020aae7b..067810b32813 100644
+>>>>>> --- a/mm/balloon_compaction.c
+>>>>>> +++ b/mm/balloon_compaction.c
+>>>>>> @@ -112,23 +112,35 @@ size_t balloon_page_list_dequeue(struct ball=
+oon_dev_info *b_dev_info,
+>>>>>>  EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
+>>>>>> =20
+>>>>>>  /*
+>>>>>> - * balloon_page_alloc - allocates a new page for insertion into t=
+he balloon
+>>>>>> - *			page list.
+>>>>>> + * balloon_pages_alloc - allocates a new page (of at most the giv=
+en order)
+>>>>>> + * 			 for insertion into the balloon page list.
+>>>>>>   *
+>>>>>>   * Driver must call this function to properly allocate a new ball=
+oon page.
+>>>>>>   * Driver must call balloon_page_enqueue before definitively remo=
+ving the page
+>>>>>>   * from the guest system.
+>>>>>>   *
+>>>>>> + * Will fall back to smaller orders if allocation fails. The orde=
+r of the
+>>>>>> + * allocated page is stored in page->private.
+>>>>>> + *
+>>>>>>   * Return: struct page for the allocated page or NULL on allocati=
+on failure.
+>>>>>>   */
+>>>>>> -struct page *balloon_page_alloc(void)
+>>>>>> +struct page *balloon_pages_alloc(int order)
+>>>>>>  {
+>>>>>> -	struct page *page =3D alloc_page(balloon_mapping_gfp_mask() |
+>>>>>> -				       __GFP_NOMEMALLOC | __GFP_NORETRY |
+>>>>>> -				       __GFP_NOWARN);
+>>>>>> -	return page;
+>>>>>> +	struct page *page;
+>>>>>> +
+>>>>>> +	while (order >=3D 0) {
+>>>>>> +		page =3D alloc_pages(balloon_mapping_gfp_mask() |
+>>>>>> +				   __GFP_NOMEMALLOC | __GFP_NORETRY |
+>>>>>> +				   __GFP_NOWARN, order);
+>>>>>> +		if (page) {
+>>>>>> +			set_page_private(page, order);
+>>>>>> +			return page;
+>>>>>> +		}
+>>>>>> +		order--;
+>>>>>> +	}
+>>>>>> +	return NULL;
+>>>>>>  }
+>>>>>> -EXPORT_SYMBOL_GPL(balloon_page_alloc);
+>>>>>> +EXPORT_SYMBOL_GPL(balloon_pages_alloc);
+>>>>>> =20
+>>>>>>  /*
+>>>>>>   * balloon_page_enqueue - inserts a new page into the balloon pag=
+e list.
+>>>>>
+>>>>>
+>>>>> I think this will try to invoke direct reclaim from the first itera=
+tion
+>>>>> to free up the max order.
+>>>>
+>>>> %__GFP_NORETRY: The VM implementation will try only very lightweight
+>>>> memory direct reclaim to get some memory under memory pressure (thus=
+ it
+>>>> can sleep). It will avoid disruptive actions like OOM killer.
+>>>>
+>>>> Certainly good enough for a first version I would say, no?
+>>>
+>>> Frankly how well that behaves would depend a lot on the workload.
+>>> Can regress just as well.
+>>>
+>>> For the 1st version I'd prefer something that is the least disruptive=
+,
+>>> and that IMHO means we only trigger reclaim at all in the same config=
+uration
+>>> as now - when we can't satisfy the lowest order allocation.
+>>
+>> Agreed.
+>>
+>>>
+>>> Anything else would be a huge amount of testing with all kind of
+>>> workloads.
+>>>
+>>
+>> So doing a "& ~__GFP_RECLAIM" in case order > 0? (as done in
+>> GFP_TRANSHUGE_LIGHT)
+>=20
+> That will improve the situation when reclaim is not needed, but leave
+> the problem in place for when it's needed: if reclaim does trigger, we
+> can get a huge free page and immediately break it up.
+>=20
+> So it's ok as a first step but it will make the second step harder as
+> we'll need to test with reclaim :).
 
-  The QEMU guest agent protocol is not sensible way to access huge
-  files inside the guest. It requires the inefficient process of
-  reading the entire data into memory than duplicating it again in
-  base64 format, and then copying it again in the JSON serializer /
-  monitor code.
+I expect the whole "steal huge pages from your guest" to be problematic,
+as I already mentioned to Alex. This needs a performance evaluation.
 
-  For arbitrary general purpose file access, especially for large
-  files, use a real file transfer program or use a network block
-  device, not the QEMU guest agent.
+This all smells like a lot of workload dependent fine-tuning. :)
 
-To avoid bug reports as BZ#1594054, follow his suggestion to put a
-low, hard limit on "count" in the guest agent QAPI schema, and don't
-allow count to be larger than 10 MB.
-
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
-Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
-Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- qga/qapi-schema.json | 6 ++++--
- qga/commands.c       | 6 +++++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index f6fcb59f34..7758d9daf8 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -266,11 +266,13 @@
- ##
- # @guest-file-read:
- #
--# Read from an open file in the guest. Data will be base64-encoded
-+# Read from an open file in the guest. Data will be base64-encoded.
-+# As this command is just for limited, ad-hoc debugging, such as log
-+# file access, the number of bytes to read is limited to 10 MB.
- #
- # @handle: filehandle returned by guest-file-open
- #
--# @count: maximum number of bytes to read (default is 4KB)
-+# @count: maximum number of bytes to read (default is 4KB, maximum is 10MB=
-)
- #
- # Returns: @GuestFileRead on success.
- #
-diff --git a/qga/commands.c b/qga/commands.c
-index 8ee1244ebb..c130d1b0f5 100644
---- a/qga/commands.c
-+++ b/qga/commands.c
-@@ -11,6 +11,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "guest-agent-core.h"
- #include "qga-qapi-commands.h"
- #include "qapi/error.h"
-@@ -18,11 +19,14 @@
- #include "qemu/base64.h"
- #include "qemu/cutils.h"
- #include "qemu/atomic.h"
-+#include "commands-common.h"
-=20
- /* Maximum captured guest-exec out_data/err_data - 16MB */
- #define GUEST_EXEC_MAX_OUTPUT (16*1024*1024)
- /* Allocation and I/O buffer for reading guest-exec out_data/err_data - 4K=
-B */
- #define GUEST_EXEC_IO_SIZE (4*1024)
-+/* Maximum file size to read - 10MB */
-+#define GUEST_FILE_READ_COUNT_MAX (10 * MiB)
-=20
- /* Note: in some situations, like with the fsfreeze, logging may be
-  * temporarilly disabled. if it is necessary that a command be able
-@@ -559,7 +563,7 @@ GuestFileRead *qmp_guest_file_read(int64_t handle, bool=
- has_count,
-     }
-     if (!has_count) {
-         count =3D QGA_READ_COUNT_DEFAULT;
--    } else if (count < 0 || count >=3D UINT32_MAX) {
-+    } else if (count < 0 || count > GUEST_FILE_READ_COUNT_MAX) {
-         error_setg(errp, "value '%" PRId64 "' is invalid for argument coun=
-t",
-                    count);
-         return NULL;
 --=20
-2.21.1
+Thanks,
+
+David / dhildenb
 
 
