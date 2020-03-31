@@ -2,106 +2,109 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C06C6C2D0EE
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F20A3C2D0EE
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EAE7208FE
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE45320781
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:25:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QpKwA8qY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EAE7208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="atOjOAsS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE45320781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJE2N-0004WX-MA
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48761)
+	id 1jJE5f-0006Cx-T9
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:25:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jJE1h-00043Q-EI
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:21:46 -0400
+ (envelope-from <dirty@apple.com>) id 1jJE4c-00057y-9C
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jJE1g-0000M6-AB
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:21:45 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38090
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jJE1g-0000JN-6U
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:21:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585650103;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3RnK0Ahp2kQRYb8xaSSMQTyvrEDCLgRdT3v0w3TNkuU=;
- b=QpKwA8qYMVJO/2OC9BCC+BdhYWMrqhBNV4KUwj0RTdFOIQo3SUiow+ChGrIDfbALwVOphO
- kuOygEzNpvnBNFq5jIJ+9RJq8VgfPze9jpdSrbFQU64Igus/cmWxBGi3jJ8vAvMy0Wdakd
- KosIjox5jHlnyuaDUZWEo4q4w0xrV7c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-hdxRJlugOXeWcVYH3FihOA-1; Tue, 31 Mar 2020 06:21:39 -0400
-X-MC-Unique: hdxRJlugOXeWcVYH3FihOA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A03F0477;
- Tue, 31 Mar 2020 10:21:38 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-193.ams2.redhat.com
- [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D78A60BE1;
- Tue, 31 Mar 2020 10:21:36 +0000 (UTC)
-Subject: Re: [PATCH v10 10/14] iotests: add hmp helper with logging
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200331000014.11581-1-jsnow@redhat.com>
- <20200331000014.11581-11-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <88146808-4acc-247e-d34b-5dd16baad0b4@redhat.com>
-Date: Tue, 31 Mar 2020 12:21:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200331000014.11581-11-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="sMGMT2cOVTFeurUP10keRzwruq18GmAQL"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ (envelope-from <dirty@apple.com>) id 1jJE4b-00042v-54
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:24:46 -0400
+Received: from nwk-aaemail-lapp01.apple.com ([17.151.62.66]:52288)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jJE4a-00040K-Tf
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:24:45 -0400
+Received: from pps.filterd (nwk-aaemail-lapp01.apple.com [127.0.0.1])
+ by nwk-aaemail-lapp01.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ 02VAGvS2040068; Tue, 31 Mar 2020 03:24:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : content-type
+ : mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=20180706;
+ bh=yNVfKmnWYXnXUHJvdWhzj8VTxaVYVaiVI5UHAbdiez8=;
+ b=atOjOAsSkDsSUzihCJAE+5QxStH2lpn7O7J+gIH9vYORD9Id6d6TTzqkrv8H/Dq4/I6W
+ wTnFTIkgN5/umW1e2Dwm0aVVuqw/GDlXcFRn8Af2l2w6Jc8kyAvUS38qquFYr+Jt1pIy
+ h+5VcpRP4UprSEnMc9H34zSt00r4eYCXwNGSLz+RFd3ychapA0ndbii2bHPVrmQ/TIkU
+ vn5GUvjKxVw5wqKbefwVOeYmnRYDouCKS4Nb79wUry2k7fpk5TuhtaEY95AIZ/5+IwT+
+ Ex69IjxwHs/GV1gnV4225bhJ1S7PZA2O0fq+5l/l7DVhb/x/lBIjsVF/HsZBh1IjnepC AA== 
+Received: from rn-mailsvcp-mta-lapp01.rno.apple.com
+ (rn-mailsvcp-mta-lapp01.rno.apple.com [10.225.203.149])
+ by nwk-aaemail-lapp01.apple.com with ESMTP id 3025h0re27-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Tue, 31 Mar 2020 03:24:29 -0700
+Received: from rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (rn-mailsvcp-mmp-lapp02.rno.apple.com [17.179.253.15])
+ by rn-mailsvcp-mta-lapp01.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) with ESMTPS id <0Q8100AEGZKT7190@rn-mailsvcp-mta-lapp01.rno.apple.com>; 
+ Tue, 31 Mar 2020 03:24:29 -0700 (PDT)
+Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp02.rno.apple.com by
+ rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) id <0Q8100200ZCB2400@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Tue,
+ 31 Mar 2020 03:24:29 -0700 (PDT)
+X-Va-A: 
+X-Va-T-CD: d84713a760465a4a8b2ed3e217d59fe6
+X-Va-E-CD: d1b04e1bd6d154f87ae03aa5ecb8d694
+X-Va-R-CD: 4ce53bcb44072d4b699c104a90ef4dba
+X-Va-CD: 0
+X-Va-ID: 3070610b-ddac-4722-bc5f-501713d3a6bf
+X-V-A: 
+X-V-T-CD: d84713a760465a4a8b2ed3e217d59fe6
+X-V-E-CD: d1b04e1bd6d154f87ae03aa5ecb8d694
+X-V-R-CD: 4ce53bcb44072d4b699c104a90ef4dba
+X-V-CD: 0
+X-V-ID: 978f2d5a-693c-4678-a60a-54c781e6a860
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-03-31_03:2020-03-30,
+ 2020-03-31 signatures=0
+Received: from [17.234.84.168] (unknown [17.234.84.168])
+ by rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020))
+ with ESMTPSA id <0Q81009FRZKS3W60@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Tue,
+ 31 Mar 2020 03:24:29 -0700 (PDT)
+Content-type: text/plain; charset=us-ascii
+MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v1] usb: Add read support for HCIVERSION register to XHCI
+In-reply-to: <C89783E6-965B-4C0B-BB2F-6CB52D47F625@apple.com>
+Date: Tue, 31 Mar 2020 03:24:28 -0700
+Cc: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cameron Esfahani via <qemu-devel@nongnu.org>, kraxel@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Paul Menzel <pmenzel@molgen.mpg.de>,
+ Robert Mustacchi <rm@fingolfin.org>
+Content-transfer-encoding: quoted-printable
+Message-id: <58CE5200-AB75-4014-AA2B-EE6E2F265A43@apple.com>
+References: <20200330214444.43494-1-dirty@apple.com>
+ <71ec6105-b2f7-4805-c235-645c25a0b201@redhat.com>
+ <C89783E6-965B-4C0B-BB2F-6CB52D47F625@apple.com>
+To: Cameron Esfahani <dirty@apple.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-03-31_03:2020-03-30,
+ 2020-03-31 signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 17.151.62.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,116 +116,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
- philmd@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sMGMT2cOVTFeurUP10keRzwruq18GmAQL
-Content-Type: multipart/mixed; boundary="6dyIbhr2RF4gmYoPvEYXCTM5qYgPMbjf3"
+Actually, reading the specification a little more, the only fields which =
+are documented as being smaller than 4-bytes are CAPLENGTH (1-byte) and =
+HCIVERSION (2-bytes).
 
---6dyIbhr2RF4gmYoPvEYXCTM5qYgPMbjf3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+So maybe change impl.min_access_size to 1 and rely on the fact that =
+traditionally callers haven't read less than 4-bytes for any of the =
+4-byte fields...
 
-On 31.03.20 02:00, John Snow wrote:
-> Minor cleanup for HMP functions; helps with line length and consolidates
-> HMP helpers through one implementation function.
+Cameron Esfahani
+dirty@apple.com
+
+"In the elder days of Art, Builders wrought with greatest care each =
+minute and unseen part; For the gods see everywhere."
+
+"The Builders", H. W. Longfellow
+
+
+
+> On Mar 31, 2020, at 2:57 AM, Cameron Esfahani via =
+<qemu-devel@nongnu.org> wrote:
 >=20
-> Although we are adding a universal toggle to turn QMP logging on or off,
-> many existing callers to hmp functions don't expect that output to be
-> logged, which causes quite a few changes in the test output.
+> Philippe -
+> =46rom what I've seen, access size has nothing to do with alignment.
 >=20
-> For now, offer a use_log parameter.
+> What the code in access_with_adjusted_size() will do is make sure that =
+"size" is >=3D min_access_size and <=3D max_access_size.
 >=20
+> So reading 2-bytes from address 2 turns into reading 4-bytes from =
+address 2: xhci_cap_read() is called with reg 2, size 4.
 >=20
-> Typing notes:
+> But, due to the fact our change to support reg 2 only returns back =
+2-bytes, and how the loops work in access_with_adjusted_size(), we only =
+call xhci_cap_read() once.
 >=20
-> QMPResponse is just an alias for Dict[str, Any]. It holds no special
-> meanings and it is not a formal subtype of Dict[str, Any]. It is best
-> thought of as a lexical synonym.
+> It seems like we should also change impl.min_access_size for =
+xhci_cap_ops to be 2.
 >=20
-> We may well wish to add stricter subtypes in the future for certain
-> shapes of data that are not formalized as Python objects, at which point
-> we can simply retire the alias and allow mypy to more strictly check
-> usages of the name.
+> But, after that, to support people doing strange things like reading =
+traditionally 4-byte values as 2 2-byte values, we probably need to =
+change xhci_cap_read() to handle every memory range in steps of 2-bytes.
 >=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/iotests.py | 35 ++++++++++++++++++++++-------------
->  1 file changed, 22 insertions(+), 13 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-> index b08bcb87e1..dfc753c319 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -37,6 +37,10 @@
-> =20
->  assert sys.version_info >=3D (3, 6)
-> =20
-> +# Type Aliases
-> +QMPResponse =3D Dict[str, Any]
-> +
-> +
->  faulthandler.enable()
-> =20
->  # This will not work if arguments contain spaces but is necessary if we
-> @@ -540,25 +544,30 @@ def add_incoming(self, addr):
->          self._args.append(addr)
->          return self
-> =20
-> -    def pause_drive(self, drive, event=3DNone):
-> -        '''Pause drive r/w operations'''
-> +    def hmp(self, command_line: str, use_log: bool =3D False) -> QMPResp=
-onse:
-> +        cmd =3D 'human-monitor-command'
-> +        kwargs =3D {'command-line': command_line}
-> +        if use_log:
-> +            return self.qmp_log(cmd, **kwargs)
-> +        else:
-> +            return self.qmp(cmd, **kwargs)
-
-Hm.  I suppose I should take this chance to understand something about
-mypy.  QEMUMachine.qmp() isn=E2=80=99t typed, so mypy can=E2=80=99t check t=
-hat this
-really returns QMPResponse.  Is there some flag to make it?  Like
---actually-check-types?
-
-(--strict seems, well, overly strict?  Like not allowing generics, I
-don=E2=80=99t see why.  Or I suppose for the time being we want to allow un=
-typed
-definitions, as long as they don=E2=80=99t break type assertions such as it=
- kind
-of does here...?)
-
-Max
-
-
---6dyIbhr2RF4gmYoPvEYXCTM5qYgPMbjf3--
-
---sMGMT2cOVTFeurUP10keRzwruq18GmAQL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6DGa4ACgkQ9AfbAGHV
-z0D5+wf/bmrv4X8R/xIhf/spiYX3QJ7sJCcySxwYJnP+FQHRCFY04PnDjAsqN9Aa
-yI7z1BULpHvMsI60dLaYx1xUMuwAhqr5/3OtMVM20DLkXmoe6dMfRnHXMLN3Fk20
-ylmyBhbcqbgwilunVyMZD0uaH4s+GMf+jNeTttofCJf8EMl6j+6T+cnNLLGac6Vz
-IYxi/11ar+Qzh0ssfj4X+0VOYulJtP+NgLXGGIHbO45cmDbDB8yvn+zsiAMf+Vqd
-fx5TRoyth9kRnaxZOhDA+c7qv4Z52KOhHMhA57dc/uvuh96GVIfL3Gk6BA/5h+vN
-zSPMDGNCckAKlO3HpRE+XE24gW0fow==
-=Z7Qf
------END PGP SIGNATURE-----
-
---sMGMT2cOVTFeurUP10keRzwruq18GmAQL--
+> But I'll defer to Gerd on this...
+>=20
 
 
