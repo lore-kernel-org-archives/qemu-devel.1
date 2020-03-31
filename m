@@ -6,76 +6,77 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A376C10F26
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E22C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 592FF20838
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:42:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A373C20781
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:44:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgG1udvh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 592FF20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="agu230Z4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A373C20781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35733 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJEM6-0002zC-HD
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:42:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51293)
+	id 1jJEO3-0005T8-SA
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:44:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jJELB-00023I-5H
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:41:54 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jJEMy-0003vU-O2
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:43:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jJEL9-0007Hv-VQ
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:41:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48800
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1jJEMx-0008Qa-FG
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:43:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45100
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jJEL9-0007Hh-QV
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:41:51 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jJEMx-0008Pz-Bs
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:43:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585651311;
+ s=mimecast20190719; t=1585651422;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Z9HYddgyBw229ylVeLRdPHtQsfSAeGvqQsGQHL6SkYA=;
- b=UgG1udvhd8UcWXJ+DbkKsd52K+24DSh/ywcjaIdOMAyf3pTZcxoPYvp1KSTGOpwMK+zKvW
- gETIw4gGcwug8q0LJmJGjJEFAZDNuAgLlHa3fq1bS1uhK9VX8C6zzVhWbZyB3ZaTaSt05e
- s0khKzXFq910obEfkLshApulqkY9EIU=
+ bh=d0Baq7HfJJzRoGwBTi7Al5a1UpXKh7r6x4Tja9LMQUw=;
+ b=agu230Z4ia50c3/Kf9zgy1yy2e+TXDaLs5sfhOg/lm/J0fyq/+ZswjPQee+3st8KXenBHF
+ FInPVt9Y3r4ogJGa34zv+TpcjKywMp+nqhMljceXGkSW0tQ9Tr2vGfsp1e3S5I+3wA23N3
+ dmL1Del/sk349uV7BifdyEKt2Vzozks=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-CpAbOpmcNwqc0Y8t4yaFAA-1; Tue, 31 Mar 2020 06:41:50 -0400
-X-MC-Unique: CpAbOpmcNwqc0Y8t4yaFAA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-169-Gv3FHmd5N8mfLTIlcG9j7Q-1; Tue, 31 Mar 2020 06:43:38 -0400
+X-MC-Unique: Gv3FHmd5N8mfLTIlcG9j7Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E6161B18BC2;
- Tue, 31 Mar 2020 10:41:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83F14101FC72;
+ Tue, 31 Mar 2020 10:43:37 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F0B8460BE0;
- Tue, 31 Mar 2020 10:41:45 +0000 (UTC)
-Message-ID: <b46394ffa1e522bc7e0d3dcc5ab4762dfe16866c.camel@redhat.com>
-Subject: Re: [PATCH v6 07/42] nvme: refactor nvme_addr_read
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3847A5D9CA;
+ Tue, 31 Mar 2020 10:43:35 +0000 (UTC)
+Message-ID: <ae6cde248f173b5e82335f6aab409110ff93eb0a.camel@redhat.com>
+Subject: Re: [PATCH v6 04/42] nvme: bump spec data structures to v1.3
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Klaus Birkelund Jensen <its@irrelevant.dk>
-Date: Tue, 31 Mar 2020 13:41:44 +0300
-In-Reply-To: <20200331053948.ompv75njpyhlti7i@apples.localdomain>
+Date: Tue, 31 Mar 2020 13:43:34 +0300
+In-Reply-To: <20200331053829.wprsixru5machmwp@apples.localdomain>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-8-its@irrelevant.dk>
- <1fb18481dfcfa17c2395f3bcded0aef787badfc7.camel@redhat.com>
- <20200331053948.ompv75njpyhlti7i@apples.localdomain>
+ <20200316142928.153431-5-its@irrelevant.dk>
+ <edab0548c595bee319de4db4eefec87c1edfa1cd.camel@redhat.com>
+ <20200331053829.wprsixru5machmwp@apples.localdomain>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,96 +95,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-03-31 at 07:39 +0200, Klaus Birkelund Jensen wrote:
-> On Mar 25 12:38, Maxim Levitsky wrote:
+On Tue, 2020-03-31 at 07:38 +0200, Klaus Birkelund Jensen wrote:
+> On Mar 25 12:37, Maxim Levitsky wrote:
 > > On Mon, 2020-03-16 at 07:28 -0700, Klaus Jensen wrote:
 > > > From: Klaus Jensen <k.jensen@samsung.com>
 > > > 
-> > > Pull the controller memory buffer check to its own function. The check
-> > > will be used on its own in later patches.
+> > > Add missing fields in the Identify Controller and Identify Namespace
+> > > data structures to bring them in line with NVMe v1.3.
+> > > 
+> > > This also adds data structures and defines for SGL support which
+> > > requires a couple of trivial changes to the nvme block driver as well.
 > > > 
 > > > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > > Acked-by: Keith Busch <kbusch@kernel.org>
+> > > Acked-by: Fam Zheng <fam@euphon.net>
 > > > ---
-> > >  hw/block/nvme.c | 16 ++++++++++++----
-> > >  1 file changed, 12 insertions(+), 4 deletions(-)
+> > >  block/nvme.c         |  18 ++---
+> > >  hw/block/nvme.c      |  12 ++--
+> > >  include/block/nvme.h | 153 ++++++++++++++++++++++++++++++++++++++-----
+> > >  3 files changed, 151 insertions(+), 32 deletions(-)
 > > > 
-> > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > > index b38d7e548a60..08a83d449de3 100644
-> > > --- a/hw/block/nvme.c
-> > > +++ b/hw/block/nvme.c
-> > > @@ -52,14 +52,22 @@
+> > > diff --git a/block/nvme.c b/block/nvme.c
+> > > index d41c4bda6e39..99b9bb3dac96 100644
+> > > --- a/block/nvme.c
+> > > +++ b/block/nvme.c
+> > > @@ -589,6 +675,16 @@ enum NvmeIdCtrlOncs {
+> > >  #define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
+> > >  #define NVME_CTRL_CQES_MAX(cqes) (((cqes) >> 4) & 0xf)
 > > >  
-> > >  static void nvme_process_sq(void *opaque);
-> > >  
-> > > +static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
-> > > +{
-> > > +    hwaddr low = n->ctrl_mem.addr;
-> > > +    hwaddr hi  = n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size);
-> > > +
-> > > +    return addr >= low && addr < hi;
-> > > +}
-> > > +
-> > >  static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
-> > >  {
-> > > -    if (n->cmbsz && addr >= n->ctrl_mem.addr &&
-> > > -                addr < (n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size))) {
-> > > +    if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
-> > >          memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
-> > > -    } else {
-> > > -        pci_dma_read(&n->parent_obj, addr, buf, size);
-> > > +        return;
-> > >      }
-> > > +
-> > > +    pci_dma_read(&n->parent_obj, addr, buf, size);
-> > >  }
-> > >  
-> > >  static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+> > > +#define NVME_CTRL_SGLS_SUPPORTED_MASK            (0x3 <<  0)
+> > > +#define NVME_CTRL_SGLS_SUPPORTED_NO_ALIGNMENT    (0x1 <<  0)
+> > > +#define NVME_CTRL_SGLS_SUPPORTED_DWORD_ALIGNMENT (0x1 <<  1)
+> > > +#define NVME_CTRL_SGLS_KEYED                     (0x1 <<  2)
+> > > +#define NVME_CTRL_SGLS_BITBUCKET                 (0x1 << 16)
+> > > +#define NVME_CTRL_SGLS_MPTR_CONTIGUOUS           (0x1 << 17)
+> > > +#define NVME_CTRL_SGLS_EXCESS_LENGTH             (0x1 << 18)
+> > > +#define NVME_CTRL_SGLS_MPTR_SGL                  (0x1 << 19)
+> > > +#define NVME_CTRL_SGLS_ADDR_OFFSET               (0x1 << 20)
 > > 
-> > Note that this patch still contains a bug that it removes the check against the accessed
-> > size, which you fix in later patch.
-> > I prefer to not add a bug in first place
-> > However if you have a reason for this, I won't mind.
+> > OK
+> > > +
+> > >  typedef struct NvmeFeatureVal {
+> > >      uint32_t    arbitration;
+> > >      uint32_t    power_mgmt;
+> > > @@ -611,6 +707,10 @@ typedef struct NvmeFeatureVal {
+> > >  #define NVME_INTC_THR(intc)     (intc & 0xff)
+> > >  #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
+> > >  
+> > > +#define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
+> > 
+> > Nitpick: If we are adding this, I'll add a #define for the values as well
 > > 
 > 
-> So yeah. The resons is that there is actually no bug at this point
-> because the controller only supports PRPs. I actually thought there was
-> a bug as well and reported it to qemu-security some months ago as a
-> potential out of bounds access. I was then schooled by Keith on how PRPs
-> work ;) Below is a paraphrased version of Keiths analysis.
-> 
-> The PRPs does not cross page boundaries:
-True
+> Done. And used in the subsequent "nvme: add temperature threshold
+> feature" patch.
+Thank you!
 
 > 
->     trans_len = n->page_size - (prp1 % n->page_size);
+> > > +#define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
+> > > +#define NVME_TEMP_TMPTH(temp)  ((temp >>  0) & 0xffff)
+> > > +
+> > >  enum NvmeFeatureIds {
+> > >      NVME_ARBITRATION                = 0x1,
+> > >      NVME_POWER_MANAGEMENT           = 0x2,
+> > > @@ -653,18 +753,37 @@ typedef struct NvmeIdNs {
+> > >      uint8_t     mc;
+> > >      uint8_t     dpc;
+> > >      uint8_t     dps;
+> > > -
+> > >      uint8_t     nmic;
+> > >      uint8_t     rescap;
+> > >      uint8_t     fpi;
+> > >      uint8_t     dlfeat;
+> > > -
+> > > -    uint8_t     res34[94];
+> > > +    uint16_t    nawun;
+> > > +    uint16_t    nawupf;
+> > > +    uint16_t    nacwu;
+> > > +    uint16_t    nabsn;
+> > > +    uint16_t    nabo;
+> > > +    uint16_t    nabspf;
+> > > +    uint16_t    noiob;
+> > > +    uint8_t     nvmcap[16];
+> > > +    uint8_t     rsvd64[40];
+> > > +    uint8_t     nguid[16];
+> > > +    uint64_t    eui64;
+> > >      NvmeLBAF    lbaf[16];
+> > > -    uint8_t     res192[192];
+> > > +    uint8_t     rsvd192[192];
+> > >      uint8_t     vs[3712];
+> > >  } NvmeIdNs;
+> > 
+> > Also checked this against V5, looks OK now
+> > 
+> > >  
+> > > +typedef struct NvmeIdNsDescr {
+> > > +    uint8_t nidt;
+> > > +    uint8_t nidl;
+> > > +    uint8_t rsvd2[2];
+> > > +} NvmeIdNsDescr;
+> > 
+> > OK
+> > 
+> > 
+> > 
+> > > +
+> > > +#define NVME_NIDT_UUID_LEN 16
+> > > +
+> > > +enum {
+> > > +    NVME_NIDT_UUID = 0x3,
+> > 
+> > Very minor nitpick: I'll would add others as well just for the sake
+> > of better understanding what this is
+> > 
 > 
-> The PRPs are always verified to be page aligned:
-True
+> Done.
+Thanks!
 > 
->     if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
+> > > +};
+> > >  
+> > >  /*Deallocate Logical Block Features*/
+> > >  #define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
+> > 
+> > Looks very good.
+> > 
+> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
 > 
-> and the transfer length wont go above page size. So, since the beginning
-> of the address is within the CMB and considering that the CMB is of an
-> MB aligned and sized granularity, then we can never cross outside it
-> with PRPs.
-I understand now, however the reason I am arguing about this is
-that this patch actually _removes_ the size bound check
-
-It was before the patch:
-
-n->cmbsz && addr >= n->ctrl_mem.addr &&
-      addr < (n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)
-
 > 
-> I could add the check at this point (because it *is* needed for when
-> SGLs are introduced), but I think it would just be noise and I would
-> need to explain why the check is there, but not really needed at this
-> point. Instead I'm adding a new patch before the SGL patch that explains
-> this.
-
 
 Best regards,
 	Maxim Levitsky
+
 
 
