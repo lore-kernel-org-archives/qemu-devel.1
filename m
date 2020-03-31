@@ -2,82 +2,107 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0744C2D0E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 09:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07806C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 09:58:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 891DC207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 09:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8ED6215A4
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 09:58:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="CTwh0ZhS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891DC207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="pMed0yVU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8ED6215A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJDd0-0001hf-NM
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 05:56:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40072)
+	id 1jJDfa-0003ti-1o
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 05:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anup@brainfault.org>) id 1jJDYY-0006ng-Lg
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 05:51:40 -0400
+ (envelope-from <dirty@apple.com>) id 1jJDex-0003Ot-7K
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 05:58:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anup@brainfault.org>) id 1jJDYX-0000gD-5K
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 05:51:38 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41652)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <anup@brainfault.org>) id 1jJDYW-0000eG-OE
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 05:51:37 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h9so25052498wrc.8
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 02:51:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=brainfault-org.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=7SGY3oCZHaKz2pqqEdhYIfsjenh6sx659/ev3BpTn+U=;
- b=CTwh0ZhSZLu5SdtgmKH3ezPHsxek1s6tfXnCZEnDbmwOtH9NJuyJL/WtArUEvRO/EW
- D0hpDumnokRZxbEmuPD0Vv/GmpOBJVvYhopSxjJJufe6+ibTkX8o7en1cCmEknca2eoh
- rj+FhHQhsp7jSRqyxmB8kM+aZNV8Wst686Dr4UvOYRxBPvsBJDuT+fjUa27i7kQIXGbC
- btJt6ZwShIvwdpOn3dz5JdzeFmO7S/tV9f4riUuCtlua0BcKOXFEx91Q3CPtk8zwjM1h
- RJrC/fssFCd3YPx6ApGPFs55PH5Aiyk3rCjN0P/o/+w3wQ7N2StK66svo/75a9+OY61b
- tBHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=7SGY3oCZHaKz2pqqEdhYIfsjenh6sx659/ev3BpTn+U=;
- b=IvvgoIRaO5DiC/jInCOb5I1c5ygEFY+RR8fLn0zONiHbRA5QMOg2fhCfSUeUNzZ2iX
- YFV08Btta4arNO8t6KiySCG6W9iVdQR3nNhn4imWRMP2liNH9EB83T+h9GL/fprL5N+X
- 8GtyzAbyB8eSBGl8+PEpLdRgZsJIE3U0j55/wIcsxGLn7r/mqMnUJ8TgvLcBH0cKAv0w
- fIf3hUGsG27JcNtUbos8fBG4pxJw58NWYFQk5Zh/5LPayjnOlq9xk2oT2f4lw70cfZZP
- FwjK+uDyI1J1I5dUL4DFSPeHCRrGESm6noKHqNPL8frbp/I/nWXbaAvj9Vr41CimKdFF
- DOQA==
-X-Gm-Message-State: ANhLgQ0f4Tlj68p6J1RY9c2wTygv2ob6VPYhimKhTGuMwBvhajWCsz7x
- gIM0/q1ezICaXTaCYXk+oTqvCMg477YteKr2uF7VYA==
-X-Google-Smtp-Source: ADFU+vvL7EgwdIx8sc/ATwS4gco2A8ByuQ0l6FcC4CkxG+vNQuOdFDlLBvt8z3AALKvBFSbMiYL1MpcV7t154QuDZ04=
-X-Received: by 2002:a5d:4acd:: with SMTP id y13mr19547055wrs.61.1585648294934; 
- Tue, 31 Mar 2020 02:51:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200313034949.3028-1-jiangyifei@huawei.com>
- <20200313034949.3028-9-jiangyifei@huawei.com>
- <CAAhSdy3EE+2V+e0po7kmdEau_88CEJ-D9yu7=PQ4ZJQ=zWr9YA@mail.gmail.com>
- <3915816D913D8241BB43E932213F57D4ADC75680@dggemm525-mbs.china.huawei.com>
-In-Reply-To: <3915816D913D8241BB43E932213F57D4ADC75680@dggemm525-mbs.china.huawei.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 31 Mar 2020 15:21:23 +0530
-Message-ID: <CAAhSdy2ZNzm1t2=x-Nz-aJAMAWL58KD=H45XYvE8CtM0W4vcdA@mail.gmail.com>
-Subject: Re: [PATCH RFC 8/9] target/riscv: Handler KVM_EXIT_RISCV_SBI exit
-To: Jiangyifei <jiangyifei@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ (envelope-from <dirty@apple.com>) id 1jJDev-0003kj-QH
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 05:58:15 -0400
+Received: from ma1-aaemail-dr-lapp02.apple.com ([17.171.2.68]:44022)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jJDev-0003kI-Ko
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 05:58:13 -0400
+Received: from pps.filterd (ma1-aaemail-dr-lapp02.apple.com [127.0.0.1])
+ by ma1-aaemail-dr-lapp02.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ 02V9pmsf021029; Tue, 31 Mar 2020 02:57:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : content-type
+ : mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=20180706;
+ bh=VSONpEnQKDJCzB625OeXw62RRRVOj+Rgpr6BZNRZWt8=;
+ b=pMed0yVUEkUoEA+1ZsrU9GZvcZO0tQTd8S2MXfaHoLWxP+5T6efitqrbuqeiWfH9arDD
+ GDgpBYTuisZyisk5Y+uBrVV8u3ARSXxqUrzntdQEINsjWVbEyfeqZVG+uJDBSJotXD+M
+ lKx46uBhBdV4xgWlJ6ikp60zEZc6DZTLe2Y9huLNbyLO5wNnyTTbPAzgE0dGhRcifF8l
+ HjJBUDXiYUnEpNd1kF/VYvgFunTHdpsysIptYzhlOzWn378yEz7QQ6ITM4eSlrxvas5W
+ pi7bPVfxIsq0y1ku4Acdnh1LcmuhkPhDyRS0g7IRdbOWtvhyVEQYvioaP0paBRB+akoF AA== 
+Received: from rn-mailsvcp-mta-lapp03.rno.apple.com
+ (rn-mailsvcp-mta-lapp03.rno.apple.com [10.225.203.151])
+ by ma1-aaemail-dr-lapp02.apple.com with ESMTP id 30238sqyf6-3
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Tue, 31 Mar 2020 02:57:58 -0700
+Received: from rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (rn-mailsvcp-mmp-lapp02.rno.apple.com [17.179.253.15])
+ by rn-mailsvcp-mta-lapp03.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) with ESMTPS id <0Q8100JCSYCLXHB0@rn-mailsvcp-mta-lapp03.rno.apple.com>; 
+ Tue, 31 Mar 2020 02:57:57 -0700 (PDT)
+Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp02.rno.apple.com by
+ rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) id <0Q8100500Y2K8200@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Tue,
+ 31 Mar 2020 02:57:57 -0700 (PDT)
+X-Va-A: 
+X-Va-T-CD: b1aa2595368ad139bab7164dff388cf3
+X-Va-E-CD: d1b04e1bd6d154f87ae03aa5ecb8d694
+X-Va-R-CD: 4ce53bcb44072d4b699c104a90ef4dba
+X-Va-CD: 0
+X-Va-ID: bfa25967-f8ec-4eb1-b6a2-e7ac90e1e7c9
+X-V-A: 
+X-V-T-CD: b1aa2595368ad139bab7164dff388cf3
+X-V-E-CD: d1b04e1bd6d154f87ae03aa5ecb8d694
+X-V-R-CD: 4ce53bcb44072d4b699c104a90ef4dba
+X-V-CD: 0
+X-V-ID: bd5a0a96-5c04-4585-9ada-3198e4c9dd82
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-03-31_03:2020-03-30,
+ 2020-03-31 signatures=0
+Received: from [17.234.84.168] (unknown [17.234.84.168])
+ by rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020))
+ with ESMTPSA id <0Q8100EIGYCLLA50@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Tue,
+ 31 Mar 2020 02:57:57 -0700 (PDT)
+Content-type: text/plain; charset=utf-8
+MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v1] usb: Add read support for HCIVERSION register to XHCI
+In-reply-to: <71ec6105-b2f7-4805-c235-645c25a0b201@redhat.com>
+Date: Tue, 31 Mar 2020 02:57:56 -0700
+Cc: Cameron Esfahani via <qemu-devel@nongnu.org>, kraxel@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Paul Menzel <pmenzel@molgen.mpg.de>,
+ Robert Mustacchi <rm@fingolfin.org>
+Content-transfer-encoding: quoted-printable
+Message-id: <C89783E6-965B-4C0B-BB2F-6CB52D47F625@apple.com>
+References: <20200330214444.43494-1-dirty@apple.com>
+ <71ec6105-b2f7-4805-c235-645c25a0b201@redhat.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-03-31_03:2020-03-30,
+ 2020-03-31 signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 17.171.2.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,163 +114,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhangxiaofeng \(F\)" <victor.zhangxiaofeng@huawei.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Anup Patel <anup.patel@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, yinyipeng <yinyipeng1@huawei.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, "dengkai \(A\)" <dengkai1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-On Tue, Mar 31, 2020 at 2:56 PM Jiangyifei <jiangyifei@huawei.com> wrote:
->
->
-> > -----Original Message-----
-> > From: Anup Patel [mailto:anup@brainfault.org]
-> > Sent: Tuesday, March 31, 2020 1:17 PM
-> > To: Jiangyifei <jiangyifei@huawei.com>
-> > Cc: QEMU Developers <qemu-devel@nongnu.org>; open list:RISC-V <qemu-
-> > riscv@nongnu.org>; Anup Patel <anup.patel@wdc.com>; Zhanghailiang
-> > <zhang.zhanghailiang@huawei.com>; Sagar Karandikar
-> > <sagark@eecs.berkeley.edu>; Bastian Koppelmann <kbastian@mail.uni-
-> > paderborn.de>; Zhangxiaofeng (F) <victor.zhangxiaofeng@huawei.com>;
-> > Alistair Francis <Alistair.Francis@wdc.com>; yinyipeng
-> > <yinyipeng1@huawei.com>; Palmer Dabbelt <palmer@dabbelt.com>;
-> > dengkai (A) <dengkai1@huawei.com>
-> > Subject: Re: [PATCH RFC 8/9] target/riscv: Handler KVM_EXIT_RISCV_SBI exit
-> >
-> > On Fri, Mar 13, 2020 at 9:23 AM Yifei Jiang <jiangyifei@huawei.com> wrote:
-> > >
-> > > Use char-fe handler console sbi call, which implement early console io
-> > > while apply 'earlycon=sbi' into kernel parameters.
-> > >
-> > > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> > > Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
-> > > ---
-> > >  target/riscv/kvm.c | 54
-> > > +++++++++++++++++++++++++++++++++++++++++++++-
-> > >  1 file changed, 53 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c index
-> > > 0f429fd802..1df70fbb29 100644
-> > > --- a/target/riscv/kvm.c
-> > > +++ b/target/riscv/kvm.c
-> > > @@ -38,6 +38,7 @@
-> > >  #include "qemu/log.h"
-> > >  #include "hw/loader.h"
-> > >  #include "kvm_riscv.h"
-> > > +#include "chardev/char-fe.h"
-> > >
-> > >  static __u64 kvm_riscv_reg_id(__u64 type, __u64 idx)  { @@ -61,6
-> > > +62,19 @@ static __u64 kvm_riscv_reg_id(__u64 type, __u64 idx)
-> > >
-> > >  #define RISCV_FP_D_REG(idx)  kvm_riscv_reg_id(KVM_REG_RISCV_FP_D,
-> > > idx)
-> > >
-> > > +enum sbi_ext_id {
-> > > +    SBI_EXT_0_1_SET_TIMER = 0x0,
-> > > +    SBI_EXT_0_1_CONSOLE_PUTCHAR = 0x1,
-> > > +    SBI_EXT_0_1_CONSOLE_GETCHAR = 0x2,
-> > > +    SBI_EXT_0_1_CLEAR_IPI = 0x3,
-> > > +    SBI_EXT_0_1_SEND_IPI = 0x4,
-> > > +    SBI_EXT_0_1_REMOTE_FENCE_I = 0x5,
-> > > +    SBI_EXT_0_1_REMOTE_SFENCE_VMA = 0x6,
-> > > +    SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID = 0x7,
-> > > +    SBI_EXT_0_1_SHUTDOWN = 0x8,
-> > > +    SBI_EXT_BASE = 0x10,
-> > > +};
-> > > +
-> >
-> > Please add separate SBI ecall interface header (similar to OpenSBI).
-> > This header will only have SBI spec related defines.
-> >
-> > Refer,
-> > https://github.com/riscv/opensbi/blob/master/include/sbi/sbi_ecall_interfa
-> > ce.h
->
-> Yes, thanks for your review. I'll update it at next series after you review this series all.
->
-> >
-> > >  static int kvm_riscv_get_regs_core(CPUState *cs)  {
-> > >      int ret = 0;
-> > > @@ -423,9 +437,47 @@ bool
-> > kvm_arch_stop_on_emulation_error(CPUState *cs)
-> > >      return true;
-> > >  }
-> > >
-> > > +static int kvm_riscv_handle_sbi(struct kvm_run *run) {
-> > > +    int ret = 0;
-> > > +    unsigned char ch;
-> > > +    switch (run->riscv_sbi.extension_id) {
-> > > +    case SBI_EXT_0_1_CONSOLE_PUTCHAR:
-> > > +        ch = run->riscv_sbi.args[0];
-> > > +        qemu_chr_fe_write(serial_hd(0)->be, &ch, sizeof(ch));
-> > > +        break;
-> > > +    case SBI_EXT_0_1_CONSOLE_GETCHAR:
-> > > +        ret = qemu_chr_fe_read_all(serial_hd(0)->be, &ch, sizeof(ch));
-> > > +        if (ret == sizeof(ch)) {
-> > > +            run->riscv_sbi.args[0] = ch;
-> > > +        } else {
-> > > +            run->riscv_sbi.args[0] = -1;
-> > > +        }
-> > > +        break;
-> >
-> > Please emulate SBI v0.1 Shutdown call as well.
->
-> It seems that there is no need for emulating SHUTDOWN call at QEMU.
-> SBI_EXT_0_1_SHUTDOWN is redirect to KVM_SYSTEM_EVENT_SHUTDOWN in KVM,
-> which is handled by common kvm-exit handler in QEMU.
-> And, It is normal to perform `poweroff` in the virtual machine.
+Philippe -
+=46rom what I've seen, access size has nothing to do with alignment.
 
-Ahh, yes I forgot about KVM_SYSTEM_EVENT_SHUTDOWN
+What the code in access_with_adjusted_size() will do is make sure that =
+"size" is >=3D min_access_size and <=3D max_access_size.
 
-No need to handle SBI_EXT_0_1_SHUTDOWN here.
+So reading 2-bytes from address 2 turns into reading 4-bytes from =
+address 2: xhci_cap_read() is called with reg 2, size 4.
 
-Regards,
-Anup
+But, due to the fact our change to support reg 2 only returns back =
+2-bytes, and how the loops work in access_with_adjusted_size(), we only =
+call xhci_cap_read() once.
 
->
-> >
-> > > +    default:
-> > > +        qemu_log_mask(LOG_UNIMP,
-> > > +                      "%s: un-handled SBI EXIT, specific reasons is %lu\n",
-> > > +                      __func__, run->riscv_sbi.extension_id);
-> > > +        ret = -1;
-> > > +        break;
-> > > +    }
-> > > +    return ret;
-> > > +}
-> > > +
-> > >  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)  {
-> > > -    return 0;
-> > > +    int ret = 0;
-> > > +    switch (run->exit_reason) {
-> > > +    case KVM_EXIT_RISCV_SBI:
-> > > +        ret = kvm_riscv_handle_sbi(run);
-> > > +        break;
-> > > +    default:
-> > > +        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-> > > +                      __func__, run->exit_reason);
-> > > +        ret = -1;
-> > > +        break;
-> > > +    }
-> > > +    return ret;
-> > >  }
-> > >
-> > >  void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
-> > > --
-> > > 2.19.1
-> > >
-> > >
-> > >
-> >
-> > Regards,
-> > Anup
->
-> Best regards,
-> Yifei Jiang
+It seems like we should also change impl.min_access_size for =
+xhci_cap_ops to be 2.
+
+But, after that, to support people doing strange things like reading =
+traditionally 4-byte values as 2 2-byte values, we probably need to =
+change xhci_cap_read() to handle every memory range in steps of 2-bytes.
+
+But I'll defer to Gerd on this...
+
+Cameron Esfahani
+dirty@apple.com
+
+"Americans are very skilled at creating a custom meaning from something =
+that's mass-produced."
+
+Ann Powers
+
+
+> On Mar 31, 2020, at 12:52 AM, Philippe Mathieu-Daud=C3=A9 =
+<philmd@redhat.com> wrote:
+>=20
+> On 3/30/20 11:44 PM, Cameron Esfahani via wrote:
+>> macOS will read HCIVERSION separate from CAPLENGTH.  Add a distinct
+>> handler for that register.
+>=20
+> Apparently a fix for https://bugs.launchpad.net/qemu/+bug/1693050.
+>=20
+>> Signed-off-by: Cameron Esfahani <dirty@apple.com>
+>> ---
+>>  hw/usb/hcd-xhci.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+>> index b330e36fe6..061f8438de 100644
+>> --- a/hw/usb/hcd-xhci.c
+>> +++ b/hw/usb/hcd-xhci.c
+>> @@ -2739,6 +2739,9 @@ static uint64_t xhci_cap_read(void *ptr, hwaddr =
+reg, unsigned size)
+>>      case 0x00: /* HCIVERSION, CAPLENGTH */
+>>          ret =3D 0x01000000 | LEN_CAP;
+>>          break;
+>> +    case 0x02: /* HCIVERSION */
+>> +        ret =3D 0x0100;
+>> +        break;
+>=20
+> But we have:
+>=20
+> static const MemoryRegionOps xhci_cap_ops =3D {
+>    .read =3D xhci_cap_read,
+>    .write =3D xhci_cap_write,
+>    .valid.min_access_size =3D 1,
+>    .valid.max_access_size =3D 4,
+>    .impl.min_access_size =3D 4,
+>    .impl.max_access_size =3D 4,
+>    .endianness =3D DEVICE_LITTLE_ENDIAN,
+> };
+>=20
+> IIUC ".impl.min_access_size =3D 4" means the case 'reg =3D=3D 2' can =
+not happen. It seems we have a bug in memory.c elsewhere.
+>=20
+> How can we reproduce?
+>=20
+> If not easy, can you share the backtrace of:
+>=20
+> -- >8 --
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index b330e36fe6..d021129f3f 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -2735,6 +2735,7 @@ static uint64_t xhci_cap_read(void *ptr, hwaddr =
+reg, unsigned size)
+>     XHCIState *xhci =3D ptr;
+>     uint32_t ret;
+>=20
+> +    assert(reg !=3D 2);
+>     switch (reg) {
+>     case 0x00: /* HCIVERSION, CAPLENGTH */
+>         ret =3D 0x01000000 | LEN_CAP;
+> ---
+>=20
+>>      case 0x04: /* HCSPARAMS 1 */
+>>          ret =3D ((xhci->numports_2+xhci->numports_3)<<24)
+>>              | (xhci->numintrs<<8) | xhci->numslots;
+
 
