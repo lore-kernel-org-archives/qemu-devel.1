@@ -2,84 +2,96 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3891CC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70827C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BC5F207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:01:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BC5F207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46265207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:02:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46265207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJEdf-0004Tb-7S
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 07:00:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53981)
+	id 1jJEfT-0005SQ-Fa
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 07:02:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jJEcZ-0003OB-78
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:59:52 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jJEek-00050R-65
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:02:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jJEcW-0004a5-SH
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:59:50 -0400
-Received: from mga07.intel.com ([134.134.136.100]:43385)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jJEcW-0004XW-KO
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:59:48 -0400
-IronPort-SDR: im2JaepvDo4ypqfDL2xo+mO7KJtwuYTXqBcR0PkjaGkRQoOrWsxVx00HIFybLPEy1bIspSZqKo
- R5nuXIsDX+jQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 31 Mar 2020 03:59:44 -0700
-IronPort-SDR: ohgEQWK6TSy042e2SG4MrfKhUh7JE/FFXx35AyVj+KNmbrke2Yr30O15MRT8a+DXAtx5H6T/78
- KIzwiOKL8Tuw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,327,1580803200"; d="scan'208";a="272704772"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga004.fm.intel.com with ESMTP; 31 Mar 2020 03:59:44 -0700
-Received: from fmsmsx117.amr.corp.intel.com (10.18.116.17) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 03:59:44 -0700
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- fmsmsx117.amr.corp.intel.com (10.18.116.17) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 03:59:44 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.191]) with mapi id 14.03.0439.000;
- Tue, 31 Mar 2020 18:59:40 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "alex.williamson@redhat.com"
- <alex.williamson@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>
-Subject: RE: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
-Thread-Topic: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
-Thread-Index: AQHWBkpiGmk8cmt3gUmACGVeg+XtIahiAOgAgACGbQA=
-Date: Tue, 31 Mar 2020 10:59:39 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21AD6D@SHSMSX104.ccr.corp.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-9-git-send-email-yi.l.liu@intel.com>
- <e6d9a5bc-fd54-c220-067d-0597ad8e86fc@redhat.com>
-In-Reply-To: <e6d9a5bc-fd54-c220-067d-0597ad8e86fc@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <frankja@linux.ibm.com>) id 1jJEej-0007dL-3p
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:02:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50000
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1jJEei-0007cb-W1
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:02:05 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02VAis0V017310
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:02:02 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 3044cg8bvg-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:02:02 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Tue, 31 Mar 2020 12:01:23 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 31 Mar 2020 12:01:20 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 02VB0So645351220
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 31 Mar 2020 11:00:28 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DD0ECA407B;
+ Tue, 31 Mar 2020 11:01:31 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D2E2AA4055;
+ Tue, 31 Mar 2020 11:01:30 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.158.226])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 31 Mar 2020 11:01:30 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] s390x: kvm: Fix number of cpu reports for stsi 3.2.2
+Date: Tue, 31 Mar 2020 07:01:23 -0400
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <f6b26b2c-23c2-6622-2f58-1e74f335842e@redhat.com>
+References: <f6b26b2c-23c2-6622-2f58-1e74f335842e@redhat.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.100
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20033111-0016-0000-0000-000002FB9792
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20033111-0017-0000-0000-0000335F5643
+Message-Id: <20200331110123.3774-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-03-31_03:2020-03-30,
+ 2020-03-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=1 adultscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 mlxlogscore=999
+ malwarescore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003310091
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,179 +103,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, 
- Jun J" <jun.j.tian@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
+The cpu number reporting is handled by KVM and QEMU only fills in the
+VM name, uuid and other values.
 
-> From: Auger Eric
-> Sent: Tuesday, March 31, 2020 6:48 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
-> alex.williamson@redhat.com; peterx@redhat.com
-> Cc: pbonzini@redhat.com; mst@redhat.com; david@gibson.dropbear.id.au; Tia=
-n,
-> Kevin <kevin.tian@intel.com>; Tian, Jun J <jun.j.tian@intel.com>; Sun, Yi=
- Y
-> <yi.y.sun@intel.com>; kvm@vger.kernel.org; Wu, Hao <hao.wu@intel.com>; je=
-an-
-> philippe@linaro.org; Jacob Pan <jacob.jun.pan@linux.intel.com>; Yi Sun
-> <yi.y.sun@linux.intel.com>
-> Subject: Re: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
->=20
-> Yi,
->=20
-> On 3/30/20 6:24 AM, Liu Yi L wrote:
-> > This patch defines vfio_host_iommu_context_info, implements the PASID
-> > alloc/free hooks defined in HostIOMMUContextClass.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  hw/vfio/common.c                      | 69 +++++++++++++++++++++++++++=
-++++++++
-> >  include/hw/iommu/host_iommu_context.h |  3 ++
-> >  include/hw/vfio/vfio-common.h         |  4 ++
-> >  3 files changed, 76 insertions(+)
-> >
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c index
-> > c276732..5f3534d 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -1179,6 +1179,53 @@ static int vfio_get_iommu_type(VFIOContainer
-> *container,
-> >      return -EINVAL;
-> >  }
-> >
-> > +static int vfio_host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx=
-,
-> > +                                           uint32_t min, uint32_t max,
-> > +                                           uint32_t *pasid) {
-> > +    VFIOContainer *container =3D container_of(iommu_ctx,
-> > +                                            VFIOContainer, iommu_ctx);
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> you can easily avoid using argsz variable
+Unfortunately KVM doesn't report reserved cpus and doesn't even know
+they exist until the are created via the ioctl.
 
-oh, right. :-)
+So let's fix up the cpu values after KVM has written its values to the
+3.2.2 sysib. To be consistent We use the same code to retrieve the cpu
+numbers as the STSI TCG code in target/s390x/misc_helper.c:HELPER(stsi).
 
-> > +    int ret;
-> > +
-> > +    argsz =3D sizeof(req);
-> > +    req.argsz =3D argsz;
-> > +    req.flags =3D VFIO_IOMMU_PASID_ALLOC;
-> > +    req.alloc_pasid.min =3D min;
-> > +    req.alloc_pasid.max =3D max;
-> > +
-> > +    if (ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req)) {
-> > +        ret =3D -errno;
-> > +        error_report("%s: %d, alloc failed", __func__, ret);
-> better use %m directly or strerror(errno) also include vbasedev->name?
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+---
 
-or yes, vbasedev->name is also nice to have.
+* Fixed commit message and add rev-by
+* Calculating total_cpus from configured + reserved
 
-> > +        return ret;
-> > +    }
-> > +    *pasid =3D req.alloc_pasid.result;
-> > +    return 0;
-> > +}
-> > +
-> > +static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
-> > +                                          uint32_t pasid) {
-> > +    VFIOContainer *container =3D container_of(iommu_ctx,
-> > +                                            VFIOContainer, iommu_ctx);
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> same
+---
+ target/s390x/kvm.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-got it.
-
-> > +    int ret;
-> > +
-> > +    argsz =3D sizeof(req);
-> > +    req.argsz =3D argsz;
-> > +    req.flags =3D VFIO_IOMMU_PASID_FREE;
-> > +    req.free_pasid =3D pasid;
-> > +
-> > +    if (ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req)) {
-> > +        ret =3D -errno;
-> > +        error_report("%s: %d, free failed", __func__, ret);
-> same
-
-yep.
-> > +        return ret;
-> > +    }
-> > +    return 0;
-> > +}
-> > +
-> >  static int vfio_init_container(VFIOContainer *container, int group_fd,
-> >                                 Error **errp)  { @@ -1791,3 +1838,25
-> > @@ int vfio_eeh_as_op(AddressSpace *as, uint32_t op)
-> >      }
-> >      return vfio_eeh_container_op(container, op);  }
-> > +
-> > +static void vfio_host_iommu_context_class_init(ObjectClass *klass,
-> > +                                                       void *data) {
-> > +    HostIOMMUContextClass *hicxc =3D HOST_IOMMU_CONTEXT_CLASS(klass);
-> > +
-> > +    hicxc->pasid_alloc =3D vfio_host_iommu_ctx_pasid_alloc;
-> > +    hicxc->pasid_free =3D vfio_host_iommu_ctx_pasid_free; }
-> > +
-> > +static const TypeInfo vfio_host_iommu_context_info =3D {
-> > +    .parent =3D TYPE_HOST_IOMMU_CONTEXT,
-> > +    .name =3D TYPE_VFIO_HOST_IOMMU_CONTEXT,
-> > +    .class_init =3D vfio_host_iommu_context_class_init,
-> Ah OK
->=20
-> This is the object inheriting from the abstract TYPE_HOST_IOMMU_CONTEXT.
-
-yes. it is. :-)
-
-> I initially thought VTDHostIOMMUContext was, sorry for the misunderstandi=
-ng.
-
-Ah, my fault, should have got it earlier. so we may have just aligned
-in last Oct.
-
-> Do you expect other HostIOMMUContext backends? Given the name and ops, it
-> looks really related to VFIO?
-
-For other backends, I guess you mean other passthru modules? If yes, I
-think they should have their own type name. Just like vIOMMUs, the below
-vIOMMUs defines their own type name and inherits the same parent.
-
-static const TypeInfo vtd_iommu_memory_region_info =3D {
-    .parent =3D TYPE_IOMMU_MEMORY_REGION,
-    .name =3D TYPE_INTEL_IOMMU_MEMORY_REGION,
-    .class_init =3D vtd_iommu_memory_region_class_init,
-};
-
-static const TypeInfo smmuv3_iommu_memory_region_info =3D {
-    .parent =3D TYPE_IOMMU_MEMORY_REGION,
-    .name =3D TYPE_SMMUV3_IOMMU_MEMORY_REGION,
-    .class_init =3D smmuv3_iommu_memory_region_class_init,
-};
-
-static const TypeInfo amdvi_iommu_memory_region_info =3D {
-    .parent =3D TYPE_IOMMU_MEMORY_REGION,
-    .name =3D TYPE_AMD_IOMMU_MEMORY_REGION,
-    .class_init =3D amdvi_iommu_memory_region_class_init,
-};
-
-Regards,
-Yi Liu
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 3630c15f45a48864..69881a0da0b31f72 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1819,8 +1819,10 @@ static int handle_tsch(S390CPU *cpu)
+ 
+ static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
+ {
++    const MachineState *ms = MACHINE(qdev_get_machine());
++    uint16_t conf_cpus = 0, reserved_cpus = 0;
+     SysIB_322 sysib;
+-    int del;
++    int del, i;
+ 
+     if (s390_is_pv()) {
+         s390_cpu_pv_mem_read(cpu, 0, &sysib, sizeof(sysib));
+@@ -1842,6 +1844,19 @@ static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
+         memset(sysib.ext_names[del], 0,
+                sizeof(sysib.ext_names[0]) * (sysib.count - del));
+     }
++
++    /* count the cpus and split them into configured and reserved ones */
++    for (i = 0; i < ms->possible_cpus->len; i++) {
++        if (ms->possible_cpus->cpus[i].cpu) {
++            conf_cpus++;
++        } else {
++            reserved_cpus++;
++        }
++    }
++    sysib.vm[0].total_cpus = conf_cpus + reserved_cpus;
++    sysib.vm[0].conf_cpus = conf_cpus;
++    sysib.vm[0].reserved_cpus = reserved_cpus;
++
+     /* Insert short machine name in EBCDIC, padded with blanks */
+     if (qemu_name) {
+         memset(sysib.vm[0].name, 0x40, sizeof(sysib.vm[0].name));
+-- 
+2.25.1
 
 
