@@ -2,78 +2,92 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA473C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47298C2D0F3
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B286C20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:57:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15D9320675
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:58:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfZDEUDQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B286C20675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W+CsjTzF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D9320675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJIKl-0000Ig-TQ
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:57:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56278)
+	id 1jJILC-0001Ro-6F
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:58:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jJIJq-0007AQ-ND
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:56:48 -0400
+ (envelope-from <mst@redhat.com>) id 1jJIKF-00085S-47
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jJIJo-0004ZZ-PS
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:56:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48328
+ (envelope-from <mst@redhat.com>) id 1jJIKD-000535-Sh
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59689
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jJIJo-0004Yw-LG
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:56:44 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jJIKD-00052q-OJ
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585666603;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1585666629;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HMBaGt1boVUMe4+5sOFGgsGSg3D34oRCzsilXzJ4NBA=;
- b=dfZDEUDQxY2Tn+D2XqWMRkU7O2iOSoow1fO72bbKstIG2OixLuQQnfmpV7g/QGPzszqLNY
- caxAOfqKMw/cQ06Od2Q54TxwcjQ+0z2kN2E9u3dI6YKIvyFPmAoLK5ROVvulYU8v569Kq3
- 8+fk/KDLlKUCLL7mO990NbxiAuXYhzE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-Vgo-KHp6P4idczrnsVjgtg-1; Tue, 31 Mar 2020 10:56:25 -0400
-X-MC-Unique: Vgo-KHp6P4idczrnsVjgtg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D97D1083E92;
- Tue, 31 Mar 2020 14:56:19 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 688851001B2D;
- Tue, 31 Mar 2020 14:56:12 +0000 (UTC)
-Date: Tue, 31 Mar 2020 15:56:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] configure: warn if not using a separate build directory
-Message-ID: <20200331145609.GK353752@redhat.com>
-References: <20200331103758.370644-1-berrange@redhat.com>
- <042a22e2-5be5-ba57-1c35-8f210d9718fd@redhat.com>
+ bh=Y3JDDCxeHsu0uxBdU3hqYhD9IDIpl6gR6DiqYZM/Jw0=;
+ b=W+CsjTzFiTgh0ruyYntWxCsqeA51dRXEz6mQ1MojsU4K/n3QYncr+qipN2sq+RdVvLSksv
+ 97vLqj5WI0BbWzuuAJ07Juw3uE/oehnqSJnuC2d3kWRNgjoxATYT7Fz+i2jOR+Gr0lT1eb
+ GZmo1G7fKkGOiWibhuISywGJ3q4Vkk8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-IRJ2DvtTP0aK9WxFsFMU3w-1; Tue, 31 Mar 2020 10:57:07 -0400
+X-MC-Unique: IRJ2DvtTP0aK9WxFsFMU3w-1
+Received: by mail-wr1-f70.google.com with SMTP id d1so13066545wru.15
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:57:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=0MtgQcn82XAWmRqhItN4weyN5S4MhXPLIRVwnSTTFuQ=;
+ b=BD0KZCah4atoLcXwnWsTN/oeANjS9UATOfL12/Y5jbHR3WP/CGbzLQ4uSb+hO8xJO8
+ V44XwYDGkwlEOZo6ipIMmdhhmhD9H7QZt59jzaJn4obhxGd3UYhTY6HrxsE30ROCHoUK
+ UyoeF5OkaYLgbpAfLQ2djyLt9yw428jV76LG8LZcL2XSmWDe8Dvg1TmxR9eVSpBNHZ0x
+ y+6VCaprHtWc6Ku3ibuye8xyz1aILhDlYe9Rj8+lIcXuRqiTVo4skuu0hMzIg/CxDAYo
+ +x03UpvNkBVzZqs0nRwAsqykRN5rWaAoxrB+45QVUpL4Gw5W45HG2tvKkvMe1Dwe0Z1Z
+ Tn9g==
+X-Gm-Message-State: ANhLgQ1zmPQfBGLpvX12LL3r+y6m10tkFBfY/AOPNSn0uJB4q4HQYfUk
+ ufn27bY39WKLcXX9fGQrSN6651pWVRG0uKE21qIDXI5ed8iu9AcVeXURJc+BWoA2eRnLGyAt3fB
+ U36afm7NU4Exl6SU=
+X-Received: by 2002:a1c:4d7:: with SMTP id 206mr3754950wme.5.1585666625678;
+ Tue, 31 Mar 2020 07:57:05 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vt20bX8cLcjWZW8/qj5zisx4hb73rI+EShQcVb6YRqVRIUYWc/KtesLFJgkX1UcRObq10FVvw==
+X-Received: by 2002:a1c:4d7:: with SMTP id 206mr3754931wme.5.1585666625473;
+ Tue, 31 Mar 2020 07:57:05 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+ by smtp.gmail.com with ESMTPSA id f187sm4240956wme.9.2020.03.31.07.57.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 31 Mar 2020 07:57:04 -0700 (PDT)
+Date: Tue, 31 Mar 2020 10:57:03 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 02/10] MAINTAINERS: Add myself as virtio-balloon co-maintainer
+Message-ID: <20200331145631.135630-3-mst@redhat.com>
+References: <20200331145631.135630-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <042a22e2-5be5-ba57-1c35-8f210d9718fd@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200331145631.135630-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -89,120 +103,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Liviu Ionescu <ilg@livius.net>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Markus Armbruster <armbru@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 31, 2020 at 09:44:37AM -0500, Eric Blake wrote:
-> On 3/31/20 5:37 AM, Daniel P. Berrang=C3=A9 wrote:
-> > Running configure directly from the source directory is a build
-> > configuration that will go away in future. It is also not currently
-> > covered by any automated testing. Display a deprecation warning if
-> > the user attempts to use an in-srcdir build setup, so that they are
-> > aware that they're building QEMU in an undesirable manner.
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >   configure | 30 ++++++++++++++++++++++++++++++
-> >   1 file changed, 30 insertions(+)
-> >=20
->=20
-> It sounds like you already have a v2 coming up to address Phillipe's
-> comments, but I'd be happy to see this concept make it into v5.0.
->=20
-> > diff --git a/configure b/configure
-> > index e225a1e3ff..1ab7492ab5 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -3,6 +3,19 @@
-> >   # qemu configure script (c) 2003 Fabrice Bellard
-> >   #
-> > +BUILDDIR=3D$(pwd)
->=20
-> Why fork out to 'pwd', when we can rely on $PWD for the same answer? Note
-> that both $(pwd) and $PWD $BUILDDIR always give an absolute (but no
-> necessarily canonical) path, which means...
->=20
-> > +SRCDIR=3D$(dirname "$0")
-> > +
-> > +ABS_BUILDDIR=3D$(realpath $BUILDDIR)
->=20
-> ...calling this ABS_BUILDDIR is a misnomer (it was already absolute). Wha=
-t
-> it is really doing is chasing through symlinks to result in a canonical
-> name, particularly since unless you have absolute names, using only strin=
-g
-> comparison to see if two filenames are equivalent will have false negativ=
-es
-> (/tmp vs. /tmp/., for example).
->=20
-> > +ABS_SRCDIR=3D$(realpath $SRCDIR)
->=20
-> Not robust if there are spaces in the directory names.  Safer would be
-> ABS_BUILDDIR=3D$(realpath -- "$BUILDDIR")
-> and similarly for ABS_SRCDIR.
->=20
-> > +
-> > +in_srcdir=3Dno
-> > +if [ "$ABS_SRCDIR" =3D=3D "$ABS_BUILDDIR" ]
->=20
-> Bashism. You MUST spell this '=3D', not '=3D=3D', since configure is run =
-under
-> /bin/sh which might be dash which does not understand =3D=3D.
+From: David Hildenbrand <david@redhat.com>
 
-Ok, will address all of the above.
+As suggested by Michael, let's add me as co-maintainer of virtio-balloon.
+While at it, also add "balloon.c" and "include/sysemu/balloon.h" to the
+file list.
 
-> > @@ -6799,6 +6812,23 @@ if test "$supported_os" =3D "no"; then
-> >       echo "us upstream at qemu-devel@nongnu.org."
-> >   fi
-> > +if test "$in_srcdir" =3D "yes"; then
-> > +    echo
-> > +    echo "WARNING: SUPPORT FOR IN SOURCE DIR BUILDS IS DEPRECATED"
-> > +    echo
-> > +    echo "Support for running the 'configure' script directly from the=
-"
-> > +    echo "source directory is deprecated and will go away in a future"
-> > +    echo "release. In source dir builds are not covered by automated"
-> > +    echo "testing and are liable to break without warning. Users are"
-> > +    echo "strongly recommended to switch to a separate build directory=
-:"
-> > +    echo
-> > +    echo "  $ mkdir build"
-> > +    echo "  $ cd build"
-> > +    echo "  $ ../configure"
-> > +    echo "  $ make"
-> > +    echo
-> > +fi
->=20
-> You know, it WOULD be possible to further enhance this to actually create
-> 'build' as well as a shim GNUmakefile that would auto-forward on to build=
-ing
-> directly in build, so that you maintain the illusion of an in-place build
-> (other than all the build artifacts now living in a different location), =
-and
-> muscle memory for in-tree 'make' still works; I've posted elsewhere and w=
-ill
-> repeat here the contents of my GNUmakefile:
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200312133725.8192-1-david@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ MAINTAINERS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-I wanted to focus strictly on the part that we have agreement on, namely
-the deprecation. Any functional changes should be completely separate
-to avoid holding up the merge of the warning message patch.
-
-Regards,
-Daniel
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b5c86ec494..e580276603 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1634,6 +1634,15 @@ F: hw/virtio/trace-events
+ F: net/vhost-user.c
+ F: include/hw/virtio/
+=20
++virtio-balloon
++M: Michael S. Tsirkin <mst@redhat.com>
++M: David Hildenbrand <david@redhat.com>
++S: Maintained
++F: hw/virtio/virtio-balloon*.c
++F: include/hw/virtio/virtio-balloon.h
++F: balloon.c
++F: include/sysemu/balloon.h
++
+ virtio-9p
+ M: Greg Kurz <groug@kaod.org>
+ R: Christian Schoenebeck <qemu_oss@crudebyte.com>
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+MST
 
 
