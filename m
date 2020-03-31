@@ -2,165 +2,126 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D9EC2D0EE
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C2EC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9228206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:32:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5020420772
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="ai97pT9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9228206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evlzqF1/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5020420772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJEBd-0002kw-3D
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:32:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49894)
+	id 1jJEG4-00054t-HT
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:36:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1jJEAN-0001cK-4h
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:30:44 -0400
+ (envelope-from <david@redhat.com>) id 1jJEFD-0004Sb-HK
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1jJEAL-0000p1-OH
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:30:43 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:40778)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1jJEAL-0000oU-Hc
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:30:41 -0400
-Received: by mail-pg1-x543.google.com with SMTP id t24so10150278pgj.7
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 03:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nWdIUrdHdV6fvvbWuPcby4JVUascOVrKDzkNa73f8+o=;
- b=ai97pT9efcvOseoLR2R8XWcmEwEyZ2TUsSGpWapueSj6HRmnRa9C7ol78oi3HY0/KS
- ZJh/ti/f32poJ5eM6kdY9inNPYx4Um62BaeArUCXwPeI+Op28kamueH6ndM/N0zeOzDG
- dL/UakV0XfYqZohHmxpkoO5YO/AwDBC7q3ZWeM3bg5OF0r0LNz2/Bu3NnbiOwu+QaHOZ
- zB0PkbQtEkEggbYy4986PQOW2rO0R3MTds20jb4mg500w3FghLXNX89EluimIwjJ4jxA
- l8S2HUnJQwj+fmVRF0gKZq7lqeut/qD4AgzMSuVyFnei4TYEUeoXtxMSoLBeLVZLELzF
- vWhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=nWdIUrdHdV6fvvbWuPcby4JVUascOVrKDzkNa73f8+o=;
- b=H7xwU1koyxNEYdc1y2y3W2/GQ+J6rno/U3HYECKK3OB1ckIaT7RXNA4lh6o/n4sWPh
- WLpy5tYiyvjcENo9Wt1X4DrDs6gn8UgniGD7eg3Fd5i1YXRm3kh4Uawn4j0MPCnAwk6r
- 3CyVnoBfj4ObfVAYlLeQd567K9KfTyUwDJqpIvFDCVZdzuw5X3TdJXnO67ovRo2OZgC/
- M6p9HwPLIaJCKKb3GaBmkcbJOL003gfcrBkQRAGfkFB0nGcsU0NF2mufU1Km3Hh3cR9J
- oXtvDc6J0sYjxVFen/nk/gZZ6mDCVYxG1UAtsIgMcWeK4HMtyKOkTxyJo6AQJKXhMOWK
- Y9Ng==
-X-Gm-Message-State: AGi0PuYHDQpz9XZa/Jg7gS7NzpOpzW0Lo7mptpq9lsB1bRBw8fMy5ye/
- sLCNmvVBBUU4I3odXrRIqfEtFpm9PSs=
-X-Google-Smtp-Source: APiQypLda0JKSe7scVLjX8Puy863atDMOumEglZSSt/5nGAHdaO/KMiry//GyFCppi/s2hLld+Z1tQ==
-X-Received: by 2002:a63:5053:: with SMTP id q19mr3555150pgl.66.1585650640526; 
- Tue, 31 Mar 2020 03:30:40 -0700 (PDT)
-Received: from [192.168.10.94] (124-171-87-207.dyn.iinet.net.au.
- [124.171.87.207])
- by smtp.gmail.com with ESMTPSA id d84sm12302513pfd.197.2020.03.31.03.30.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 31 Mar 2020 03:30:40 -0700 (PDT)
-Subject: Re: [PATCH] spapr: Don't allow unplug of NVLink2 devices
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org
-References: <20200331032709.112476-1-david@gibson.dropbear.id.au>
- <abfad294-aef3-9750-7bc7-e15006659f79@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <d3ff3964-dbd7-91a3-f683-6f1089458844@ozlabs.ru>
-Date: Tue, 31 Mar 2020 21:30:36 +1100
+ (envelope-from <david@redhat.com>) id 1jJEFB-0003SB-4j
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:35:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42527
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJEFA-0003Rd-Qh
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:35:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585650940;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=7Is+kEnWeMwJR4W5Fu2nbZV1wb8zzwSNSK6qUiY612s=;
+ b=evlzqF1/zX7x+oatSqfngsmEMv450i78ejNLgao1zX++LldSrHKbdLvpFiuHvG43tccLMw
+ YCb31G+srsU2nk1uuK1xw/kJb9KxzABvHT0Drx5zFERaZhrJwVFlS2+r7S3omfhoEuvuIJ
+ I6KED0hww+QEAF2G4bA7DO8SAYyGskU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-aBgsaJtsMUqAA-onkrfTwA-1; Tue, 31 Mar 2020 06:35:38 -0400
+X-MC-Unique: aBgsaJtsMUqAA-onkrfTwA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9550E1937FC1;
+ Tue, 31 Mar 2020 10:35:35 +0000 (UTC)
+Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 419E660BE2;
+ Tue, 31 Mar 2020 10:35:25 +0000 (UTC)
+Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER to
+ handle THP spilt issue
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200326031817-mutt-send-email-mst@kernel.org>
+ <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
+ <20200326054554-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
+Date: Tue, 31 Mar 2020 12:35:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <abfad294-aef3-9750-7bc7-e15006659f79@redhat.com>
+In-Reply-To: <20200326054554-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -172,61 +133,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
+Cc: pagupta@redhat.com, Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ qemu-devel@nongnu.org, mojha@codeaurora.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, namit@vmware.com,
+ Hui Zhu <teawaterz@linux.alibaba.com>, akpm@linux-foundation.org,
+ jasowang@redhat.com, Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 31/03/2020 18:56, Philippe Mathieu-Daudé wrote:
-> On 3/31/20 5:27 AM, David Gibson wrote:
->> Currently, we can't properly handle unplug of NVLink2 devices, because we
->> don't have code to tear down their special memory resources.  There's not
->> a lot of impetus to implement that: since hardware NVLink2 devices can't
->> be hot unplugged, the guest side drivers don't usually support unplug
->> anyway.
+On 26.03.20 10:49, Michael S. Tsirkin wrote:
+> On Thu, Mar 26, 2020 at 08:54:04AM +0100, David Hildenbrand wrote:
 >>
->> Therefore, simply prevent unplug of NVLink2 devices.
-> 
-> Safe for 5.0, right?
-
-
-
-I'd say so, yes.
-
-
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
 >>
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->>   hw/ppc/spapr_pci.c | 4 ++++
->>   1 file changed, 4 insertions(+)
+>>> Am 26.03.2020 um 08:21 schrieb Michael S. Tsirkin <mst@redhat.com>:
+>>>
+>>> =EF=BB=BFOn Thu, Mar 12, 2020 at 09:51:25AM +0100, David Hildenbrand =
+wrote:
+>>>>> On 12.03.20 09:47, Michael S. Tsirkin wrote:
+>>>>> On Thu, Mar 12, 2020 at 09:37:32AM +0100, David Hildenbrand wrote:
+>>>>>> 2. You are essentially stealing THPs in the guest. So the fastest
+>>>>>> mapping (THP in guest and host) is gone. The guest won't be able t=
+o make
+>>>>>> use of THP where it previously was able to. I can imagine this imp=
+lies a
+>>>>>> performance degradation for some workloads. This needs a proper
+>>>>>> performance evaluation.
+>>>>>
+>>>>> I think the problem is more with the alloc_pages API.
+>>>>> That gives you exactly the given order, and if there's
+>>>>> a larger chunk available, it will split it up.
+>>>>>
+>>>>> But for balloon - I suspect lots of other users,
+>>>>> we do not want to stress the system but if a large
+>>>>> chunk is available anyway, then we could handle
+>>>>> that more optimally by getting it all in one go.
+>>>>>
+>>>>>
+>>>>> So if we want to address this, IMHO this calls for a new API.
+>>>>> Along the lines of
+>>>>>
+>>>>>    struct page *alloc_page_range(gfp_t gfp, unsigned int min_order,
+>>>>>                    unsigned int max_order, unsigned int *order)
+>>>>>
+>>>>> the idea would then be to return at a number of pages in the given
+>>>>> range.
+>>>>>
+>>>>> What do you think? Want to try implementing that?
+>>>>
+>>>> You can just start with the highest order and decrement the order un=
+til
+>>>> your allocation succeeds using alloc_pages(), which would be enough =
+for
+>>>> a first version. At least I don't see the immediate need for a new
+>>>> kernel API.
+>>>
+>>> OK I remember now.  The problem is with reclaim. Unless reclaim is
+>>> completely disabled, any of these calls can sleep. After it wakes up,
+>>> we would like to get the larger order that has become available
+>>> meanwhile.
+>>>
 >>
->> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
->> index 55ca9dee1e..61b84a392d 100644
->> --- a/hw/ppc/spapr_pci.c
->> +++ b/hw/ppc/spapr_pci.c
->> @@ -1665,6 +1665,10 @@ static void
->> spapr_pci_unplug_request(HotplugHandler *plug_handler,
->>               error_setg(errp, "PCI: Hot unplug of PCI bridges not
->> supported");
->>               return;
->>           }
->> +        if (object_property_get_uint(OBJECT(pdev), "nvlink2-tgt",
->> NULL)) {
->> +            error_setg(errp, "PCI: Cannot unplug NVLink2 devices");
->> +            return;
->> +        }
->>             /* ensure any other present functions are pending unplug */
->>           if (PCI_FUNC(pdev->devfn) == 0) {
+>> Yes, but that=E2=80=98s a pure optimization IMHO.
+>> So I think we should do a trivial implementation first and then see wh=
+at we gain from a new allocator API. Then we might also be able to justif=
+y it using real numbers.
+>>
+>=20
+> Well how do you propose implement the necessary semantics?
+> I think we are both agreed that alloc_page_range is more or
+> less what's necessary anyway - so how would you approximate it
+> on top of existing APIs?
+
+Looking at drivers/misc/vmw_balloon.c:vmballoon_inflate(), it first
+tries to allocate huge pages using
+
+	alloc_pages(__GFP_HIGHMEM|__GFP_NOWARN| __GFP_NOMEMALLOC,=20
+                    VMW_BALLOON_2M_ORDER)
+
+And then falls back to 4k allocations (balloon_page_alloc()) in case
+allocation fails.
+
+I'm roughly thinking of something like the following, but with an
+optimized reporting interface/bigger pfn array so we can report >
+1MB at a time. Also, it might make sense to remember the order that
+succeeded across some fill_balloon() calls.
+
+Don't even expect it to compile ...
 
 
 
+From 4305f989672ccca4be9293e6d4167e929f3e299b Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 31 Mar 2020 12:28:07 +0200
+Subject: [PATCH RFC] tmp
 
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ drivers/virtio/virtio_balloon.c    | 38 ++++++++++++++++++--------
+ include/linux/balloon_compaction.h |  7 ++++-
+ mm/balloon_compaction.c            | 43 +++++++++++++++++++++++-------
+ 3 files changed, 67 insertions(+), 21 deletions(-)
 
--- 
-Alexey
+diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_ball=
+oon.c
+index 8511d258dbb4..0660b1b988f0 100644
+--- a/drivers/virtio/virtio_balloon.c
++++ b/drivers/virtio/virtio_balloon.c
+@@ -187,7 +187,7 @@ int virtballoon_free_page_report(struct page_reportin=
+g_dev_info *pr_dev_info,
+ }
+=20
+ static void set_page_pfns(struct virtio_balloon *vb,
+-			  __virtio32 pfns[], struct page *page)
++			  __virtio32 pfns[], struct page *page, int order)
+ {
+ 	unsigned int i;
+=20
+@@ -197,7 +197,7 @@ static void set_page_pfns(struct virtio_balloon *vb,
+ 	 * Set balloon pfns pointing at this page.
+ 	 * Note that the first pfn points at start of the page.
+ 	 */
+-	for (i =3D 0; i < VIRTIO_BALLOON_PAGES_PER_PAGE; i++)
++	for (i =3D 0; i < VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order); i++)
+ 		pfns[i] =3D cpu_to_virtio32(vb->vdev,
+ 					  page_to_balloon_pfn(page) + i);
+ }
+@@ -205,6 +205,7 @@ static void set_page_pfns(struct virtio_balloon *vb,
+ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ {
+ 	unsigned num_allocated_pages;
++	int order =3D MAX_ORDER - 1;
+ 	unsigned num_pfns;
+ 	struct page *page;
+ 	LIST_HEAD(pages);
+@@ -212,9 +213,20 @@ static unsigned fill_balloon(struct virtio_balloon *=
+vb, size_t num)
+ 	/* We can only do one array worth at a time. */
+ 	num =3D min(num, ARRAY_SIZE(vb->pfns));
+=20
++	/*
++	 * Note: we will currently never allocate more than 1MB due to the
++	 * pfn array size, so we will not allocate MAX_ORDER - 1 ...
++	 */
++
+ 	for (num_pfns =3D 0; num_pfns < num;
+-	     num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE) {
+-		struct page *page =3D balloon_page_alloc();
++	     num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order)) {
++		const unsigned long remaining =3D num - num_pfns;
++
++		order =3D MIN(order,
++			    get_order(remaining << VIRTIO_BALLOON_PFN_SHIFT));
++		if ((1 << order) * VIRTIO_BALLOON_PAGES_PER_PAGE > remaining)
++			order--;
++		page =3D balloon_pages_alloc(order);
+=20
+ 		if (!page) {
+ 			dev_info_ratelimited(&vb->vdev->dev,
+@@ -225,6 +237,8 @@ static unsigned fill_balloon(struct virtio_balloon *v=
+b, size_t num)
+ 			break;
+ 		}
+=20
++		/* Continue with the actual order that succeeded. */
++		order =3D page_private(page);
+ 		balloon_page_push(&pages, page);
+ 	}
+=20
+@@ -233,14 +247,16 @@ static unsigned fill_balloon(struct virtio_balloon =
+*vb, size_t num)
+ 	vb->num_pfns =3D 0;
+=20
+ 	while ((page =3D balloon_page_pop(&pages))) {
++		order =3D page_order(page);
++		/* enqueuing will split the page and clear the order */
+ 		balloon_page_enqueue(&vb->vb_dev_info, page);
+=20
+-		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+-		vb->num_pages +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
++		set_page_pfns(vb, vb->pfns + vb->num_pfns, page, order);
++		vb->num_pages +=3D VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order);
+ 		if (!virtio_has_feature(vb->vdev,
+ 					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+-			adjust_managed_page_count(page, -1);
+-		vb->num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
++			adjust_managed_page_count(page, -1 * (1 << order));
++		vb->num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order);
+ 	}
+=20
+ 	num_allocated_pages =3D vb->num_pfns;
+@@ -284,7 +300,7 @@ static unsigned leak_balloon(struct virtio_balloon *v=
+b, size_t num)
+ 		page =3D balloon_page_dequeue(vb_dev_info);
+ 		if (!page)
+ 			break;
+-		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		set_page_pfns(vb, vb->pfns + vb->num_pfns, page, 0);
+ 		list_add(&page->lru, &pages);
+ 		vb->num_pages -=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+ 	}
+@@ -786,7 +802,7 @@ static int virtballoon_migratepage(struct balloon_dev=
+_info *vb_dev_info,
+ 	__count_vm_event(BALLOON_MIGRATE);
+ 	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
+ 	vb->num_pfns =3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+-	set_page_pfns(vb, vb->pfns, newpage);
++	set_page_pfns(vb, vb->pfns, newpage, 0);
+ 	tell_host(vb, vb->inflate_vq);
+=20
+ 	/* balloon's page migration 2nd step -- deflate "page" */
+@@ -794,7 +810,7 @@ static int virtballoon_migratepage(struct balloon_dev=
+_info *vb_dev_info,
+ 	balloon_page_delete(page);
+ 	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
+ 	vb->num_pfns =3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+-	set_page_pfns(vb, vb->pfns, page);
++	set_page_pfns(vb, vb->pfns, page, 0);
+ 	tell_host(vb, vb->deflate_vq);
+=20
+ 	mutex_unlock(&vb->balloon_lock);
+diff --git a/include/linux/balloon_compaction.h b/include/linux/balloon_c=
+ompaction.h
+index 338aa27e4773..ed93fe5704d1 100644
+--- a/include/linux/balloon_compaction.h
++++ b/include/linux/balloon_compaction.h
+@@ -60,7 +60,7 @@ struct balloon_dev_info {
+ 	struct inode *inode;
+ };
+=20
+-extern struct page *balloon_page_alloc(void);
++extern struct page *balloon_pages_alloc(int order);
+ extern void balloon_page_enqueue(struct balloon_dev_info *b_dev_info,
+ 				 struct page *page);
+ extern struct page *balloon_page_dequeue(struct balloon_dev_info *b_dev_=
+info);
+@@ -78,6 +78,11 @@ static inline void balloon_devinfo_init(struct balloon=
+_dev_info *balloon)
+ 	balloon->inode =3D NULL;
+ }
+=20
++static inline struct page *balloon_page_alloc(void)
++{
++	return balloon_pages_alloc(0);
++}
++
+ #ifdef CONFIG_BALLOON_COMPACTION
+ extern const struct address_space_operations balloon_aops;
+ extern bool balloon_page_isolate(struct page *page,
+diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+index 26de020aae7b..067810b32813 100644
+--- a/mm/balloon_compaction.c
++++ b/mm/balloon_compaction.c
+@@ -112,23 +112,35 @@ size_t balloon_page_list_dequeue(struct balloon_dev=
+_info *b_dev_info,
+ EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
+=20
+ /*
+- * balloon_page_alloc - allocates a new page for insertion into the ball=
+oon
+- *			page list.
++ * balloon_pages_alloc - allocates a new page (of at most the given orde=
+r)
++ * 			 for insertion into the balloon page list.
+  *
+  * Driver must call this function to properly allocate a new balloon pag=
+e.
+  * Driver must call balloon_page_enqueue before definitively removing th=
+e page
+  * from the guest system.
+  *
++ * Will fall back to smaller orders if allocation fails. The order of th=
+e
++ * allocated page is stored in page->private.
++ *
+  * Return: struct page for the allocated page or NULL on allocation fail=
+ure.
+  */
+-struct page *balloon_page_alloc(void)
++struct page *balloon_pages_alloc(int order)
+ {
+-	struct page *page =3D alloc_page(balloon_mapping_gfp_mask() |
+-				       __GFP_NOMEMALLOC | __GFP_NORETRY |
+-				       __GFP_NOWARN);
+-	return page;
++	struct page *page;
++
++	while (order >=3D 0) {
++		page =3D alloc_pages(balloon_mapping_gfp_mask() |
++				   __GFP_NOMEMALLOC | __GFP_NORETRY |
++				   __GFP_NOWARN, order);
++		if (page) {
++			set_page_private(page, order);
++			return page;
++		}
++		order--;
++	}
++	return NULL;
+ }
+-EXPORT_SYMBOL_GPL(balloon_page_alloc);
++EXPORT_SYMBOL_GPL(balloon_pages_alloc);
+=20
+ /*
+  * balloon_page_enqueue - inserts a new page into the balloon page list.
+@@ -146,10 +158,23 @@ EXPORT_SYMBOL_GPL(balloon_page_alloc);
+ void balloon_page_enqueue(struct balloon_dev_info *b_dev_info,
+ 			  struct page *page)
+ {
++	const int order =3D page_private(page);
+ 	unsigned long flags;
++	int i;
++
++	/*
++	 * We can only migrate single pages - and even if we could migrate
++	 * bigger ones, we would want to split them on demand instead of
++	 * trying to move around big chunks.
++	 */
++	if (order > 0)
++		split_page(page, order);
++	set_page_private(page, order);
+=20
+ 	spin_lock_irqsave(&b_dev_info->pages_lock, flags);
+-	balloon_page_enqueue_one(b_dev_info, page);
++	for (i =3D 0; i < (1 << order); i++)
++		balloon_page_enqueue_one(b_dev_info, page + i);
++
+ 	spin_unlock_irqrestore(&b_dev_info->pages_lock, flags);
+ }
+ EXPORT_SYMBOL_GPL(balloon_page_enqueue);
+--=20
+2.25.1
+
+--=20
+Thanks,
+
+David / dhildenb
+
 
