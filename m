@@ -2,57 +2,134 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F3BC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CA9C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:36:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDC7420784
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:34:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDC7420784
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 217F42071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:36:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LtHeYy1T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 217F42071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJHxu-0005yS-0g
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:34:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
+	id 1jJHzz-000875-8h
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:36:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52001)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jJHwb-0004xR-PO
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:32:47 -0400
+ (envelope-from <david@redhat.com>) id 1jJHyr-0006sW-CP
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jJHwa-00083d-21
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:32:45 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:49635)
+ (envelope-from <david@redhat.com>) id 1jJHyq-0000Kc-0c
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:35:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25415
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>)
- id 1jJHwV-0007yX-35; Tue, 31 Mar 2020 10:32:39 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id E4447457CC;
- Tue, 31 Mar 2020 16:32:34 +0200 (CEST)
-Date: Tue, 31 Mar 2020 16:32:32 +0200 (CEST)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <303038276.59.1585665152860@webmail.proxmox.com>
-In-Reply-To: <20200331125804.GE7030@linux.fritz.box>
-References: <658260883.24.1585644382441@webmail.proxmox.com>
- <20200331125804.GE7030@linux.fritz.box>
-Subject: Re: bdrv_drained_begin deadlock with io-threads
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJHyp-0000KB-SS
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:35:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585665302;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=xxKSX2erUXm8teiGRhQpTXCwL1APOTWOaLSEEHORbD8=;
+ b=LtHeYy1T8u7Nad945q35deM3CrM1QPE4XgbqY7dacvX1fOJIbebVEUjYT+Hi1i2siaCt6G
+ YH4m3ib0/LCfyKDyIUU9ZrU5uMZbXa2a6kmuPT0eKomrsNAc7MHj6Aw5N3aqCpyAkr2+x5
+ NT4sEU4GDkh0RjDsWVEwG0uLrHG3OPY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-n3JoleztP1i8sdheYhPpLA-1; Tue, 31 Mar 2020 10:34:58 -0400
+X-MC-Unique: n3JoleztP1i8sdheYhPpLA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B2268017CE;
+ Tue, 31 Mar 2020 14:34:57 +0000 (UTC)
+Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 363825D9C5;
+ Tue, 31 Mar 2020 14:34:49 +0000 (UTC)
+Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER to
+ handle THP spilt issue
+From: David Hildenbrand <david@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200326031817-mutt-send-email-mst@kernel.org>
+ <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
+ <20200326054554-mutt-send-email-mst@kernel.org>
+ <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
+ <20200331091718-mutt-send-email-mst@kernel.org>
+ <02a393ce-c4b4-ede9-7671-76fa4c19097a@redhat.com>
+ <20200331093300-mutt-send-email-mst@kernel.org>
+ <b69796e0-fa41-a219-c3e5-a11e9f5f18bf@redhat.com>
+ <20200331100359-mutt-send-email-mst@kernel.org>
+ <85f699d4-459a-a319-0a8f-96c87d345c49@redhat.com>
+ <20200331101117-mutt-send-email-mst@kernel.org>
+ <118bc13b-76b2-f5a1-6aca-65bd10a22f6c@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <00dc8bad-05e5-6085-525c-ce9fded672cc@redhat.com>
+Date: Tue, 31 Mar 2020 16:34:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <118bc13b-76b2-f5a1-6aca-65bd10a22f6c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev23
-X-Originating-Client: open-xchange-appsuite
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.186.127.180
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,120 +141,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
-Cc: "vsementsov@virtuozzo.com" <vsementsov@virtuozzo.com>,
- Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: pagupta@redhat.com, Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ qemu-devel@nongnu.org, mojha@codeaurora.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, namit@vmware.com,
+ Hui Zhu <teawaterz@linux.alibaba.com>, akpm@linux-foundation.org,
+ jasowang@redhat.com, Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > After a few iteration the VM freeze inside bdrv_drained_begin():
-> > 
-> > Thread 1 (Thread 0x7fffe9291080 (LWP 30949)):
-> > #0  0x00007ffff5cb3916 in __GI_ppoll (fds=0x7fff63d30c40, nfds=2, timeout=<optimized out>, timeout@entry=0x0, sigmask=sigmask@entry=0x0) at ../sysdeps/unix/sysv/linux/ppoll.c:39
-> > #1  0x0000555555c60419 in ppoll (__ss=0x0, __timeout=0x0, __nfds=<optimized out>, __fds=<optimized out>) at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
-> > #2  0x0000555555c60419 in qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, timeout=timeout@entry=-1) at util/qemu-timer.c:335
-> > #3  0x0000555555c62c01 in fdmon_poll_wait (ctx=0x7fffe8905e80, ready_list=0x7fffffffd3a8, timeout=-1) at util/fdmon-poll.c:79
-> > #4  0x0000555555c621e7 in aio_poll (ctx=0x7fffe8905e80, blocking=blocking@entry=true) at util/aio-posix.c:589
-> > #5  0x0000555555bc2565 in bdrv_do_drained_begin (poll=<optimized out>, ignore_bds_parents=false, parent=0x0, recursive=false, bs=0x7fff67240b80) at block/io.c:430
-> > #6  0x0000555555bc2565 in bdrv_do_drained_begin (bs=0x7fff67240b80, recursive=<optimized out>, parent=0x0, ignore_bds_parents=<optimized out>, poll=<optimized out>) at block/io.c:395
-> > #7  0x0000555555bde252 in bdrv_backup_top_drop (bs=0x7fff67240b80) at block/backup-top.c:273
-> > #8  0x0000555555bd995c in backup_clean (job=0x7fffe5609200) at block/backup.c:114
-> > #9  0x0000555555b6e08d in job_clean (job=0x7fffe5609200) at job.c:657
-> > #10 0x0000555555b6e08d in job_finalize_single (job=0x7fffe5609200) at job.c:673
-> > #11 0x0000555555b6e08d in job_finalize_single (job=0x7fffe5609200) at job.c:661
-> > #12 0x0000555555b6ea3a in job_completed_txn_abort (job=<optimized out>) at job.c:749
-> > #13 0x0000555555b6ec42 in job_completed (job=0x7fffe5609200) at job.c:843
-> > #14 0x0000555555b6ec42 in job_completed (job=0x7fffe5609200) at job.c:836
-> > #15 0x0000555555b6edf0 in job_exit (opaque=0x7fffe5609200) at job.c:864
-> > #16 0x0000555555c5e975 in aio_bh_call (bh=0x7fffe721a2d0) at util/async.c:164
-> > #17 0x0000555555c5e975 in aio_bh_poll (ctx=ctx@entry=0x7fffe8905e80) at util/async.c:164
-> > #18 0x0000555555c6202e in aio_dispatch (ctx=0x7fffe8905e80) at util/aio-posix.c:380
-> > #19 0x0000555555c5e85e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:298
-> > #20 0x00007ffff7c7ef2e in g_main_context_dispatch () at /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-> > #21 0x0000555555c61298 in glib_pollfds_poll () at util/main-loop.c:219
-> > #22 0x0000555555c61298 in os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:242
-> > #23 0x0000555555c61298 in main_loop_wait (nonblocking=nonblocking@entry=0) at util/main-loop.c:518
-> > #24 0x00005555558fc5a9 in qemu_main_loop () at /home/dietmar/pve5-devel/mirror_qemu/softmmu/vl.c:1665
-> > #25 0x0000555555800c3e in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /home/dietmar/pve5-devel/mirror_qemu/softmmu/main.c:49
+On 31.03.20 16:29, David Hildenbrand wrote:
+> On 31.03.20 16:18, Michael S. Tsirkin wrote:
+>> On Tue, Mar 31, 2020 at 04:09:59PM +0200, David Hildenbrand wrote:
+>>
+>> ...
+>>
+>>>>>>>>>>>>>> So if we want to address this, IMHO this calls for a new API.
+>>>>>>>>>>>>>> Along the lines of
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>    struct page *alloc_page_range(gfp_t gfp, unsigned int min_order,
+>>>>>>>>>>>>>>                    unsigned int max_order, unsigned int *order)
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> the idea would then be to return at a number of pages in the given
+>>>>>>>>>>>>>> range.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> What do you think? Want to try implementing that?
+>>
+>> ..
+>>
+>>> I expect the whole "steal huge pages from your guest" to be problematic,
+>>> as I already mentioned to Alex. This needs a performance evaluation.
+>>>
+>>> This all smells like a lot of workload dependent fine-tuning. :)
+>>
+>>
+>> So that's why I proposed the API above.
+>>
+>> The idea is that *if we are allocating a huge page anyway*,
+>> rather than break it up let's send it whole to the device.
+>> If we have smaller pages, return smaller pages.
+>>
 > 
-> The thing that we need to figure out is probably what operation we are
-> (or were) waiting for and why it doesn't complete.
+> Sorry, I still fail to see why you cannot do that with my version of
+> balloon_pages_alloc(). But maybe I haven't understood the magic you
+> expect to happen in alloc_page_range() :)
 > 
-> A typical cause of a hang like this is that the operation we're waiting
-> for actually did already complete in a different thread, but forgot to
-> call aio_wait_kick().
-
-no, that is not the case.
-
-> To confirm, if you have gdb attached to a hanging process, you could
-> manually call bdrv_drain_poll_top_level(bs, 0, 0) and check its result.
-> If it returns false, 
-
-it return true, because there are about 30 in_flight request (block_backend). But poll does not
-get any events ...
-
-> then a kick is missing somewhere. If it returns
-> true, some request is still waiting for completion somewhere and can be
-> inspected in gdb.
-
-How can I see/debug those waiting request? 
-
-> > Thread 1 locks the BQL, while thread7 wants to aquire it to complete the read in prepare_mmio_access():
-> > 
-> > (gdb) source ./scripts/qemu-gdb.py 
-> > (gdb) qemu tcg-lock-status 
-> > Thread, BQL (iothread_mutex), Replay, Blocked?
-> > 10/31149, false, false, not blocked
-> > 8/30998, false, false, __lll_lock_wait waiting on 0x555556142e60 <qemu_global_mutex> from 30949
-> > 7/30997, false, false, __lll_lock_wait waiting on 0x555556142e60 <qemu_global_mutex> from 30949
-> > 6/30996, false, false, not blocked
-> > 4/30955, false, false, not blocked
-> > 3/30954, false, false, __lll_lock_wait waiting on 0x7fffe89151e0 from 30949
-> > 2/30953, false, false, not blocked
-> > 1/30949, true, false, not blocked
-> > 
-> > 
-> > (gdb) thread apply 7 bt
-> > Thread 7 (Thread 0x7fff669ff700 (LWP 30997)):
-> > #0  0x00007ffff5d9729c in __lll_lock_wait () at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:103
-> > #1  0x00007ffff5d90714 in __GI___pthread_mutex_lock (mutex=mutex@entry=0x555556142e60 <qemu_global_mutex>) at ../nptl/pthread_mutex_lock.c:80
-> > #2  0x0000555555c65013 in qemu_mutex_lock_impl (mutex=0x555556142e60 <qemu_global_mutex>, file=0x555555c94008 "/home/dietmar/pve5-devel/mirror_qemu/exec.c", line=3089) at util/qemu-thread-posix.c:78
-> > #3  0x00005555558480ee in qemu_mutex_lock_iothread_impl (file=file@entry=0x555555c94008 "/home/dietmar/pve5-devel/mirror_qemu/exec.c", line=line@entry=3089)
-> >     at /home/dietmar/pve5-devel/mirror_qemu/cpus.c:1831
-> > #4  0x0000555555802425 in prepare_mmio_access (mr=<optimized out>, mr=<optimized out>) at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3089
-> > #5  0x000055555580759f in flatview_read_continue
-> >     (fv=fv@entry=0x7fff5f9baf00, addr=addr@entry=375, attrs=..., ptr=ptr@entry=0x7ffff7fbe000, len=len@entry=1, addr1=<optimized out>, l=<optimized out>, mr=0x7fffe8e66e80)
-> >     at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3188
-> > #6  0x0000555555807803 in flatview_read (fv=0x7fff5f9baf00, addr=375, attrs=..., buf=0x7ffff7fbe000, len=1) at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3229
-> > #7  0x000055555580791b in address_space_read_full (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3242
-> > #8  0x0000555555807a25 in address_space_rw (as=<optimized out>, addr=addr@entry=375, attrs=..., attrs@entry=..., buf=<optimized out>, len=len@entry=1, is_write=is_write@entry=false)
-> >     at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3270
-> > #9  0x0000555555865024 in kvm_handle_io (count=1, size=1, direction=<optimized out>, data=<optimized out>, attrs=..., port=375) at /home/dietmar/pve5-devel/mirror_qemu/accel/kvm/kvm-all.c:2140
-> > #10 0x0000555555865024 in kvm_cpu_exec (cpu=cpu@entry=0x7fffe89efb00) at /home/dietmar/pve5-devel/mirror_qemu/accel/kvm/kvm-all.c:2386
-> > #11 0x000055555584835e in qemu_kvm_cpu_thread_fn (arg=0x7fffe89efb00) at /home/dietmar/pve5-devel/mirror_qemu/cpus.c:1246
-> > #12 0x000055555584835e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x7fffe89efb00) at /home/dietmar/pve5-devel/mirror_qemu/cpus.c:1218
-> > #13 0x0000555555c64e1a in qemu_thread_start (args=<optimized out>) at util/qemu-thread-posix.c:519
-> > #14 0x00007ffff5d8dfa3 in start_thread (arg=<optimized out>) at pthread_create.c:486
-> > #15 0x00007ffff5cbe4cf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-> > [...]
+> It's just going via a different inflate queue once we have that page, as
+> I stated in front of my draft patch "but with an
+> optimized reporting interface".
 > 
-> > So the pattern is:
-> > 
-> > 1.) Main thread has the BQL
-> > 2.) Main thread calls bdrv_drained_begin(bs);
-> > 3.) CPU thread want to complete read prepare_mmio_access(), but needs BQL
-> > 4.) deadlock
-> > 
-> > Any ideas how to prevent that?
+>> That seems like it would always be an improvement, whatever the
+>> workload.
+>>
 > 
-> What's going on in the vcpu thread (thread 7) is probably not part of
-> the problem. It does have to wait for the main thread, but it would only
-> really be part of the deadlock if the main thread would also wait for
-> the vcpu thread, which I don't think it does.
+> Don't think so. Assume there are plenty of 4k pages lying around. It
+> might actually be *bad* for guest performance if you take a huge page
+> instead of all the leftover 4k pages that cannot be merged. Only at the
+> point where you would want to break a bigger page up and report it in
+> pieces, where it would definitely make no difference.
 
-Yes, I guess you are right. This read is triggered by the guest (not by bdrv_drained_begin).
+I just understood what you mean :) and now it makes sense - it avoids
+exactly that. Basically
+
+1. Try to allocate order-0. No split necessary? return the page
+2. Try to allocate order-1. No split necessary? return the page
+...
+
+up to MAX_ORDER - 1.
+
+Yeah, I guess this will need a new kernel API.
+
+
+-- 
+Thanks,
+
+David / dhildenb
 
 
