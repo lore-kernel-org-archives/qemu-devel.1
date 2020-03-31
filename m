@@ -2,92 +2,133 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DEEC2D0F0
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D18E5C2D0F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:30:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83A792071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:30:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D9162137B
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:30:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LV2mEmQP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83A792071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T2KUYWpC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9162137B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJHtx-00015G-Ex
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:30:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51026)
+	id 1jJHu6-0001GE-Ow
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:30:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51048)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jJHtE-0000Cq-F5
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:29:17 -0400
+ (envelope-from <david@redhat.com>) id 1jJHtJ-0000In-FL
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jJHtD-0006Jc-D9
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:29:16 -0400
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:34517)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jJHtD-0006Ix-6d
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:29:15 -0400
-Received: by mail-pl1-x62a.google.com with SMTP id a23so8190135plm.1
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:29:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=I6mGhiM8t6lCGgoRpN+0eQykgvIVJkPGS20hfbwKfxg=;
- b=LV2mEmQP6ADDBtKbzk3PzSa3bHCpcrKwBhVHzLLdVY9unb6dbCR/HEkIbaYlbaHutW
- HKdjqQ+uEJkQruJl0Bj1e7TJa/QXWHZh5ht3GTf+nmeQIKQ+D3FKDh4zFeLtjCLihoq9
- yiPqt8dYY75sjWsuLBWdWGLN3/jnO44tXG/2Fthad6HGj1DqC4FjzzePzlJuCJOlwbKI
- JGxhj7So66D61xhdXaVbxkq0awPFrovdX/xw9G+1XsLXojT4E7XQAUHl71hDe8w5vpl1
- ydw/nu0sYpc620RwZX5MVqPmiiOHTGQ0QLyd0duWDfAAuWRXAgyQvYtYJ5j5/wH7dDRF
- xZpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=I6mGhiM8t6lCGgoRpN+0eQykgvIVJkPGS20hfbwKfxg=;
- b=eFeVrw1ayolG+Xi0low9vD2mjFWxUzxMV2lvtI5NAZGsUQ0Lr8Oy8fL6lLtUgxO0cP
- VgH26SxPXK6TQ5BeMi4FVst9b2P9Rbqqb8WDFAdu9yqMv2arnzqepeIgXxSXSHqOx0Wn
- 3yN3wFsOlfu2pIoaEuiQ5J68l0DONUOAdWmUbNp2N5vJdjJVTPub5aTn4m/ONGLHLB0b
- oBf59ClOwXKy9HEGedjaBVltmz5h4OGE8ayAulIArViWexhpY4zH5SCfFlL1Jht9r75l
- dQb5Zlw8ttdCNpy/fl3jykc7bmPrkhjvIkrHHXuRO2uJBT9VeM7HVxQvIN4+rDrw4u0L
- H79Q==
-X-Gm-Message-State: AGi0PubdU4ZmpCk5k2E7Sc+bDomYbl8aYtJVPL+e/CPlILdKWNnNuRFc
- kUEReJSjpua1khX1Zz60Jw/NBQ==
-X-Google-Smtp-Source: APiQypLcFaFfGhVO78oVlKADJBWGwmor4lQx56JJauiqtQ99CRN9EDa67VOBU6PU1cF/FxHQJJeHPw==
-X-Received: by 2002:a17:90a:36c7:: with SMTP id
- t65mr4232026pjb.182.1585664953724; 
- Tue, 31 Mar 2020 07:29:13 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id m7sm2081166pjb.7.2020.03.31.07.29.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 31 Mar 2020 07:29:13 -0700 (PDT)
-Subject: Re: [PULL for-5.0 07/10] configure: Support -static-pie if requested
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20200331035456.6494-1-richard.henderson@linaro.org>
- <20200331035456.6494-9-richard.henderson@linaro.org>
- <a36effc1-cf0b-411d-2a2a-97dd2932e95f@redhat.com>
- <7818b819-10b5-b1ed-6f96-4f27e4369222@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c4f57f5e-d17d-f677-f64f-1467283324f4@linaro.org>
-Date: Tue, 31 Mar 2020 07:29:11 -0700
+ (envelope-from <david@redhat.com>) id 1jJHtH-0006LS-Bl
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:29:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45725
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJHtH-0006L8-7m
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:29:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585664958;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Mzgr//hDkLeHQLBr90XbRT7zGijeqwN8oOrj2vqTs4c=;
+ b=T2KUYWpCHt1le6Wos0SOw7egK7MeCJBzIHRV6piXi5nvglAnhBsz5uB+M9d3KvJXl/tZCw
+ qcx3Rp8Dq8ZD4wXnOXelmwzUrSK6T2fe+pP4EK+rJw0myGlYFUiYR8RlzhQBAzaAqTp2Qi
+ X346VOplXQ6sloRP375govRpMbMVMdw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-iI4Mk7qJOiW353q9KqAu3A-1; Tue, 31 Mar 2020 10:29:14 -0400
+X-MC-Unique: iI4Mk7qJOiW353q9KqAu3A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15CD3108443F;
+ Tue, 31 Mar 2020 14:29:12 +0000 (UTC)
+Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5733D5E009;
+ Tue, 31 Mar 2020 14:29:03 +0000 (UTC)
+Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER to
+ handle THP spilt issue
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200326031817-mutt-send-email-mst@kernel.org>
+ <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
+ <20200326054554-mutt-send-email-mst@kernel.org>
+ <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
+ <20200331091718-mutt-send-email-mst@kernel.org>
+ <02a393ce-c4b4-ede9-7671-76fa4c19097a@redhat.com>
+ <20200331093300-mutt-send-email-mst@kernel.org>
+ <b69796e0-fa41-a219-c3e5-a11e9f5f18bf@redhat.com>
+ <20200331100359-mutt-send-email-mst@kernel.org>
+ <85f699d4-459a-a319-0a8f-96c87d345c49@redhat.com>
+ <20200331101117-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
+ 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
+ zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
+ Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
+ jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
+ II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
+ Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
+ RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
+ ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
+ Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
+ ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
+ 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
+ GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
+ GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
+ H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
+ 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
+ ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
+ GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
+ CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
+ njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
+ FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
+Organization: Red Hat GmbH
+Message-ID: <118bc13b-76b2-f5a1-6aca-65bd10a22f6c@redhat.com>
+Date: Tue, 31 Mar 2020 16:29:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <7818b819-10b5-b1ed-6f96-4f27e4369222@redhat.com>
+In-Reply-To: <20200331101117-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::62a
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,28 +140,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: pagupta@redhat.com, Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ qemu-devel@nongnu.org, mojha@codeaurora.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, namit@vmware.com,
+ Hui Zhu <teawaterz@linux.alibaba.com>, akpm@linux-foundation.org,
+ jasowang@redhat.com, Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/31/20 6:44 AM, Laurent Vivier wrote:
->> QEMU_LDFLAGS       -Wl,--warn-common -Wl,-z,relro -Wl,-z,now -static-pie
->> -m64  -fstack-protector-strong
-...
->> $ file m68k-linux-user/qemu-m68k
->> m68k-linux-user/qemu-m68k: ELF 64-bit LSB pie executable, x86-64,
->> version 1 (GNU/Linux), dynamically linked,
->> BuildID[sha1]=363ee31697e874085ec53c2af454a070c62647e1, for GNU/Linux
->> 3.2.0, with debug_info, not stripped, too many notes (256)
-...
-> In fact, the binary works well in a chroot, so it should be  a bug in
-> "file" command.
+On 31.03.20 16:18, Michael S. Tsirkin wrote:
+> On Tue, Mar 31, 2020 at 04:09:59PM +0200, David Hildenbrand wrote:
+>=20
+> ...
+>=20
+>>>>>>>>>>>>> So if we want to address this, IMHO this calls for a new AP=
+I.
+>>>>>>>>>>>>> Along the lines of
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>    struct page *alloc_page_range(gfp_t gfp, unsigned int mi=
+n_order,
+>>>>>>>>>>>>>                    unsigned int max_order, unsigned int *or=
+der)
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> the idea would then be to return at a number of pages in th=
+e given
+>>>>>>>>>>>>> range.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> What do you think? Want to try implementing that?
+>=20
+> ..
+>=20
+>> I expect the whole "steal huge pages from your guest" to be problemati=
+c,
+>> as I already mentioned to Alex. This needs a performance evaluation.
+>>
+>> This all smells like a lot of workload dependent fine-tuning. :)
+>=20
+>=20
+> So that's why I proposed the API above.
+>=20
+> The idea is that *if we are allocating a huge page anyway*,
+> rather than break it up let's send it whole to the device.
+> If we have smaller pages, return smaller pages.
+>=20
 
-I hadn't noticed that before, but yes, it appears that file needs an update for
--static-pie.
+Sorry, I still fail to see why you cannot do that with my version of
+balloon_pages_alloc(). But maybe I haven't understood the magic you
+expect to happen in alloc_page_range() :)
 
+It's just going via a different inflate queue once we have that page, as
+I stated in front of my draft patch "but with an
+optimized reporting interface".
 
-r~
+> That seems like it would always be an improvement, whatever the
+> workload.
+>=20
+
+Don't think so. Assume there are plenty of 4k pages lying around. It
+might actually be *bad* for guest performance if you take a huge page
+instead of all the leftover 4k pages that cannot be merged. Only at the
+point where you would want to break a bigger page up and report it in
+pieces, where it would definitely make no difference.
+
+I guess Hui Zhu now has something to look into/work on :)
+
+--=20
+Thanks,
+
+David / dhildenb
+
 
