@@ -2,81 +2,68 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA19C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55582C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:23:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 533D620772
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:20:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="mVjXa9CS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 533D620772
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2764920838
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 11:23:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2764920838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJEwW-0006qm-Fq
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 07:20:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56086)
+	id 1jJEzI-0007zf-7z
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 07:23:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anup@brainfault.org>) id 1jJEvm-0005zh-8V
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:19:43 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jJEyj-0007ae-60
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:22:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anup@brainfault.org>) id 1jJEvl-0001tz-79
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:19:42 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50729)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <anup@brainfault.org>) id 1jJEvk-0001t3-SO
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:19:41 -0400
-Received: by mail-wm1-x344.google.com with SMTP id t128so2025841wma.0
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 04:19:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=brainfault-org.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=geJZCMvrUNcmYjo3qSm1Tn8ThMRGTj/0Gmcabw0Xnqs=;
- b=mVjXa9CS8W+RoZ5UPUCK/Loxk2ZfUaL3YIPeETI00lxRU1iSSiTYxQeWxRkceN6j9c
- gxySPCZNIdAKaHyAkZmY9OD1MI2GUDVsHQ6P0q1O4DnxdV68c/7LZrnajmycZGjgEYnT
- 0PSANlg1RyWsxI9dZH0/5jnGqQno58sITAmO+EI38HkLNHmFwCG3bH7CZAGA8ZeSg1y7
- 0gTTLV6LLKSM45FwJtehjAb3Yz4yaWJxQMvZKiRKOE/SPI9mbcdGmCnUakpGkismdU/X
- VIjoIFIKxKKpLnePAC0vQ0ReJol0/BEpKtxWFQS+Lq/s6XpVe4feg9oPdl4IPWtiBdV9
- 7lrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=geJZCMvrUNcmYjo3qSm1Tn8ThMRGTj/0Gmcabw0Xnqs=;
- b=mjikFQB2sNnjT4+tNVhDDFixoqtbNmw6QLMSP1y8BH5aHVz9xQ2aNIwTDbkPTZJPb6
- n7xGZjED1y2zR3ApNc7Bkq3Yu2UjqzQqRshddEQimWeQoZXKUF8Px62jkVHK3EYrxAbl
- +8Umc3SPO0Sv68tU3p7TS96tVsEYVbM3YI1pQ1W2/MZk7aa+Ait/SIQvw+PY8aGXrQ4D
- Av/bw0I+oaECL2bANgxjjG/o0RsWgrlbN+UssMoprS3aHbcA9zYU/ZeJrQJfRve5i9Xs
- hUsgHf1W0I+7J8wmY3UiyJzSCh6sUuJZ37tYlCxSSAII7ZDto+VGvN/1uqZzeeamMCqd
- Vkbg==
-X-Gm-Message-State: ANhLgQ0j5RZ3ovM2zKtbXAfowkZJ/6Zemt8cZcUs/iwIyKP+m1lvVR9p
- /2vRKxPk4eYuqKbvtfkPx/d9Uj9cyPjYYcFeIWITmQ==
-X-Google-Smtp-Source: ADFU+vvhzkkJ/9mMg6ecvYk/ZXrRPd048tDsdEcVFwA40WMS9SBPPsUlgchAg12fprxUbITGVRUQduGfcXq1dnx8ITU=
-X-Received: by 2002:a1c:6146:: with SMTP id v67mr3100199wmb.78.1585653579430; 
- Tue, 31 Mar 2020 04:19:39 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1jJEyh-0004CR-JN
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:22:44 -0400
+Resent-Date: Tue, 31 Mar 2020 07:22:44 -0400
+Resent-Message-Id: <E1jJEyh-0004CR-JN@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21105)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jJEyh-0004BZ-Bi
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 07:22:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1585653748; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=X64Nwy48d0fY3VO8mF6nluyFD783m0UdLoWY0JW2GizFRUadux93xyjkX6a/kLka+dmtmXFx9LZo7vwhjnXnnyO3shBV0B16c9KrcFqrfojvCXtybf69epgxaMXP4zXEbdRJ7XrIRkOhBb6WDXRNOY+jzGQ0z9khRIYKbyEbfoc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1585653748;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=xZpbnTnwYVjG18EQRiC9N8I7idU6E6uBqlXiq1q13OE=; 
+ b=E9Bu0xtls9Vg50PTTM/tyM/+HfsLQllw8CEQz92bT0JZoeJRWE8OGOghGwxE6G9KE+berrAtVml8Yf6ft1K2jz/Ts0eiMN2hCiPyAovzcEmQdcJSXmod13Vo8VMllWkGCpeU9r8Wwjf+9763oOMiBrgXsO85XPifX73GF+X4wS4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1585653746905288.07983564319363;
+ Tue, 31 Mar 2020 04:22:26 -0700 (PDT)
+In-Reply-To: <cover.1585641083.git.maozhongyi@cmss.chinamobile.com>
+Subject: Re: [PATCH v2 0/3] Improved reporting for migrate parameters
+Message-ID: <158565374556.16271.8088136402741585223@39012742ff91>
 MIME-Version: 1.0
-References: <20200313034949.3028-1-jiangyifei@huawei.com>
- <20200313034949.3028-3-jiangyifei@huawei.com>
- <CAAhSdy3_BO7pRwvLiS9qd3NLXUCj_MnsxT8JtD0833AnY1DOZQ@mail.gmail.com>
-In-Reply-To: <CAAhSdy3_BO7pRwvLiS9qd3NLXUCj_MnsxT8JtD0833AnY1DOZQ@mail.gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 31 Mar 2020 16:49:27 +0530
-Message-ID: <CAAhSdy24zBmuJ=BZFMXsHRJr-tLTEZs=C92QsE26KLGxPxd88Q@mail.gmail.com>
-Subject: Re: [PATCH RFC 2/9] target/riscv: Add target/riscv/kvm.c to place the
- public kvm interface
-To: Yifei Jiang <jiangyifei@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: maozhongyi@cmss.chinamobile.com
+Date: Tue, 31 Mar 2020 04:22:26 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,36 +75,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhangxiaofeng \(F\)" <victor.zhangxiaofeng@huawei.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Anup Patel <anup.patel@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, yinyipeng <yinyipeng1@huawei.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, "dengkai \(A\)" <dengkai1@huawei.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, maozhongyi@cmss.chinamobile.com,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 31, 2020 at 2:43 PM Anup Patel <anup@brainfault.org> wrote:
->
-> On Fri, Mar 13, 2020 at 9:23 AM Yifei Jiang <jiangyifei@huawei.com> wrote:
-> >
-> > Add target/riscv/kvm.c to place kvm_arch_* function needed by kvm/kvm-all.c.
-> > Meanwhile, add riscv64 kvm support to configure.
->
-> This should be for both riscv64 and riscv32. The KVMTOOL compiles perfectly
-> fine for riscv32 (although not tested much) so there is no harm is supporting
-> both riscv64 and riscv32 from start itself.
-
-For your reference, I have updated KVM RISC-V and KVMTOOL RISC-V repos
-at:
-https://github.com/kvm-riscv/linux.git (riscv_kvm_master branch)
-https://github.com/kvm-riscv/kvmtool.git (riscv_master branch)
-
-Above repos work for both RV32 and RV64 systems.
-
-Regards,
-Anup
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTg1NjQxMDgzLmdp
+dC5tYW96aG9uZ3lpQGNtc3MuY2hpbmFtb2JpbGUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
+aWxlZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
+cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
+b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2Ut
+ZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBU
+QVJHRVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy9jb3Zlci4xNTg1NjQxMDgzLmdpdC5tYW96aG9uZ3lpQGNtc3MuY2hpbmFtb2JpbGUu
+Y29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
