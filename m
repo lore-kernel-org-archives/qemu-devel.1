@@ -2,94 +2,126 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E439AC2D0E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B74CBC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:26:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF68720787
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 825BB20787
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:26:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AOi8tl6B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF68720787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSPpT11C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825BB20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33895 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJCDL-0008Tt-PK
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 04:25:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56641)
+	id 1jJCER-0001JG-JV
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 04:26:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56672)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhangfei.gao@linaro.org>) id 1jJCCM-0007Dv-9H
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:24:39 -0400
+ (envelope-from <david@redhat.com>) id 1jJCCb-0007kN-5d
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhangfei.gao@linaro.org>) id 1jJCCK-0002Qn-Hh
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:24:38 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33234)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <zhangfei.gao@linaro.org>)
- id 1jJCCK-0002Ov-AH
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:24:36 -0400
-Received: by mail-pf1-x444.google.com with SMTP id c138so354761pfc.0
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 01:24:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=RBjB4RwxEoa9gh4/QXpSAf7OmChI2hQjPdb5UTa+Xa0=;
- b=AOi8tl6BbSN3D1/izOtH6vxk1PdXCoWZcIUUg0RLWqMsDArt/y8llkXPrOqBQz7XbF
- n1DgtS8/sHp7EZckh46znX0VCZG87XREVusjJ2NvdDbosve9GowL75BEapHEzTE58Hp2
- QYJQI3ZeTtmuhauyeusr1OX5iqrrjE0gllWUqSnL6PxeL2uXdKFT1dWyQngTvNto5IiQ
- 5UaeTG37j7AE4rwts9PDtsEIu1v+uHQKbkoRF2lU4yZiYw3DEfNUL6yrOJ7g3TMkCo0y
- rYoAp7FzV4XAdDV8zI97Ut8R5dTWPTym4uGvleNgtwYbZ9Q70MPF7ToX8OPuC2XCUQpg
- 4PlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=RBjB4RwxEoa9gh4/QXpSAf7OmChI2hQjPdb5UTa+Xa0=;
- b=Gj2VcMiXXJAnqwUW2G1CAaFXV2CoSB3R+wsFcCYMkBbcbHxGkeSbx3GvEaV8YcyMwb
- DKbjZPWS02EC9Dw7oz/f2N+j+OEwVfuJKHBTtTHUrzr2fnj0P32wf+mukqd6b29HqZiq
- MeDnCLjvKRhvMTG8u4WNNxXeFZP2nWS/y2IqMpXfP8/5aTTqkRM+0+5tqfX8uxp0HBSD
- 4M7VFK2qFJlv+6gZxgBNIu03xTNMtGZpHlLSpuDju1rktYQrIUJFhuZ7cq3+kY/f/nVT
- OOPEX49KMYwrab5j5RXEWo2SIt4UBmJt1fpYE8+D/bQmBaBOZ4Y8rEwp1C0WG4YcVW7C
- 1Mlw==
-X-Gm-Message-State: AGi0PuYDbou8QiOqlcMH9QkPycFLMXBojdbRv2IoZvtSX3UB6cX2ZkRn
- uHy72Mv2n4QKnGhMALu7pL4iBw==
-X-Google-Smtp-Source: APiQypLpzmwAK55Q6bcByw9/mOsMeCSrwopSLlNZzZjOCUNZY2wSGRUxAzSD6HCcRjBTrnsgnfyeJw==
-X-Received: by 2002:a62:1648:: with SMTP id 69mr3628656pfw.14.1585643074785;
- Tue, 31 Mar 2020 01:24:34 -0700 (PDT)
-Received: from [10.27.1.2] ([45.135.186.113])
- by smtp.gmail.com with ESMTPSA id c128sm11792183pfa.11.2020.03.31.01.24.25
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 31 Mar 2020 01:24:34 -0700 (PDT)
-Subject: Re: [RFC v6 00/24] vSMMUv3/pSMMUv3 2 stage VFIO integration
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- mst@redhat.com, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
- yi.l.liu@intel.com
-References: <20200320165840.30057-1-eric.auger@redhat.com>
- <73b1c3e1-a418-f57c-d949-261250d6a79b@linaro.org>
- <c15f98fb-01d7-cb2f-5401-4b648997fcba@redhat.com>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <fbae2237-11ed-9527-0c01-340d5092ddcc@linaro.org>
-Date: Tue, 31 Mar 2020 16:24:20 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <david@redhat.com>) id 1jJCCZ-0002bh-Cb
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:24:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27370
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJCCZ-0002az-8K
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:24:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585643090;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=h5i9P7g455upE92PAjpu0i43ifKSEAJi4m4n4e3QR2Q=;
+ b=FSPpT11CiG6MA/lsXr0sQ9xyQ9eema046xRaQZ2S0Lp7htPjVvulr0k7m9wl1yNFP+TKEf
+ MLzha5mO2Z/gbtkWW3XjLrl8Ln5I5Grz5nw749J85HDl6jSFouVEotvxlu+AwTA+e/jT0+
+ 3nf3+f1DemcgXNnOhEf94iz0ppKqrvw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-314-MpLIjnwHOjqNkfwsRYqVuA-1; Tue, 31 Mar 2020 04:24:48 -0400
+X-MC-Unique: MpLIjnwHOjqNkfwsRYqVuA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D48401B2C992;
+ Tue, 31 Mar 2020 08:24:46 +0000 (UTC)
+Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4B39D98A37;
+ Tue, 31 Mar 2020 08:24:45 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3] s390x: Add stsi 3.2.2 tests
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <2ebc49ff-479a-351d-36f9-cb79fe4b9804@redhat.com>
+ <20200331071456.3302-1-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <37be8d87-d259-da6f-47c0-d5a314cfa2dc@redhat.com>
+Date: Tue, 31 Mar 2020 10:24:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <c15f98fb-01d7-cb2f-5401-4b648997fcba@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200331071456.3302-1-frankja@linux.ibm.com>
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,106 +133,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, tnowicki@marvell.com, maz@kernel.org,
- shameerali.kolothum.thodi@huawei.com, peterx@redhat.com, bbhushan2@marvell.com,
- will@kernel.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Eric
+On 31.03.20 09:14, Janosch Frank wrote:
+> Subcode 3.2.2 is handled by KVM/QEMU and should therefore be tested
+> a bit more thorough.
+> 
+> In this test we set a custom name and uuid through the QEMU command
+> line. Both parameters will be passed to the guest on a stsi subcode
+> 3.2.2 call and will then be checked.
+> 
+> We also compare the configured cpu numbers against the smp reported
+> numbers and if the reserved + configured add up to the total number
+> reported.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+> 
+> * Tabify on struct
+> * Moved prefix_push up a bit
+> * Replaced returns with goto out to pop prefix
+> 
+> ---
+>  s390x/stsi.c        | 73 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |  1 +
+>  2 files changed, 74 insertions(+)
+> 
+> diff --git a/s390x/stsi.c b/s390x/stsi.c
+> index e9206bca137d2edb..17ad33eefb9c948a 100644
+> --- a/s390x/stsi.c
+> +++ b/s390x/stsi.c
+> @@ -14,7 +14,28 @@
+>  #include <asm/page.h>
+>  #include <asm/asm-offsets.h>
+>  #include <asm/interrupt.h>
+> +#include <smp.h>
+>  
+> +struct stsi_322 {
+> +    uint8_t reserved[31];
+> +    uint8_t count;
+> +    struct {
+> +	uint8_t reserved2[4];
+> +	uint16_t total_cpus;
+> +	uint16_t conf_cpus;
+> +	uint16_t standby_cpus;
+> +	uint16_t reserved_cpus;
+> +	uint8_t name[8];
+> +	uint32_t caf;
+> +	uint8_t cpi[16];
+> +	uint8_t reserved5[3];
+> +	uint8_t ext_name_encoding;
+> +	uint32_t reserved3;
+> +	uint8_t uuid[16];
+> +    } vm[8];
+> +    uint8_t reserved4[1504];
+> +    uint8_t ext_names[8][256];
 
-On 2020/3/31 下午4:12, Auger Eric wrote:
-> Hi Zhangfei,
->
-> On 3/31/20 8:42 AM, Zhangfei Gao wrote:
->> Hi, Eric
->>
->> On 2020/3/21 上午12:58, Eric Auger wrote:
->>> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
->>> integration requires to program the physical IOMMU consistently
->>> with the guest mappings. However, as opposed to VTD, SMMUv3 has
->>> no "Caching Mode" which allows easy trapping of guest mappings.
->>> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
->>>
->>> However SMMUv3 has 2 translation stages. This was devised with
->>> virtualization use case in mind where stage 1 is "owned" by the
->>> guest whereas the host uses stage 2 for VM isolation.
->>>
->>> This series sets up this nested translation stage. It only works
->>> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
->>> other words, it does not work if there is a physical SMMUv2).
->>>
->>> - We force the host to use stage 2 instead of stage 1, when we
->>>     detect a vSMMUV3 is behind a VFIO device. For a VFIO device
->>>     without any virtual IOMMU, we still use stage 1 as many existing
->>>     SMMUs expect this behavior.
->>> - We use PCIPASIDOps to propage guest stage1 config changes on
->>>     STE (Stream Table Entry) changes.
->>> - We implement a specific UNMAP notifier that conveys guest
->>>     IOTLB invalidations to the host
->>> - We register MSI IOVA/GPA bindings to the host so that this latter
->>>     can build a nested stage translation
->>> - As the legacy MAP notifier is not called anymore, we must make
->>>     sure stage 2 mappings are set. This is achieved through another
->>>     prereg memory listener.
->>> - Physical SMMU stage 1 related faults are reported to the guest
->>>     via en eventfd mechanism and exposed trhough a dedicated VFIO-PCI
->>>     region. Then they are reinjected into the guest.
->>>
->>> Best Regards
->>>
->>> Eric
->>>
->>> This series can be found at:
->>> https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
->>>
->>> Kernel Dependencies:
->>> [1] [PATCH v10 00/11] SMMUv3 Nested Stage Setup (VFIO part)
->>> [2] [PATCH v10 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
->>> branch at:
->>> https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10
->> Really appreciated that you re-start this work.
->>
->> I tested your branch and some update.
->>
->> Guest: https://github.com/Linaro/linux-kernel-warpdrive/tree/sva-devel
->> <https://github.com/Linaro/linux-kernel-warpdrive/tree/sva-devel>
->> Host:
->> https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10
->> <https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10>
->> qemu: https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
->> <https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6>
->>
->> The guest I am using is contains Jean's sva patches.
->> Since currently they are many patch conflict, so use two different tree.
->>
->> Result
->> No-sva mode works.
->> This mode, guest directly get physical address via ioctl.
-> OK thanks for testing
->> While vSVA can not work, there are still much work to do.
->> I am trying to SVA mode, and it fails, so choose no-sva instead.
->> iommu_dev_enable_feature(parent, IOMMU_DEV_FEAT_SVA)
-> Indeed I assume there are plenty of things missing to make vSVM work on
-> ARM (iommu, vfio, QEMU). I am currently reviewing Jacob and Yi's kernel
-> and QEMU series on Intel side. After that, I will come back to you to
-> help. Also vSMMUv3 does not support multiple contexts at the moment. I
-> will add this soon.
->
->
-> Still the problem I have is testing. Any suggestion welcome.
->
->
-To make sure
-Do you mean you need a environment for testing?
+Sorry, still no proper use of tabs. (can fixup if you agree)
 
-How about Hisilicon kunpeng920, arm64 platform supporting SVA in host now.
-There is such a platform in linaro mlab that I think we can share.
-Currently I am testing with uacce,
-By testing a user driver (hisi zip accelerator) in guest, we can test 
-vSVA and PASID easily.
 
-Thanks
+-- 
+Thanks,
+
+David / dhildenb
 
 
