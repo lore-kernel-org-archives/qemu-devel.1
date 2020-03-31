@@ -2,101 +2,98 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F21C2D0EE
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B4CC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:52:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 348E920784
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D34C0206CC
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:52:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWbXHgFy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348E920784
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T++pqjpo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D34C0206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJJpi-0002fj-Cu
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 12:33:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43340)
+	id 1jJK81-00023j-0H
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 12:52:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jJJoz-00027R-AA
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:33:02 -0400
+ (envelope-from <peterx@redhat.com>) id 1jJK77-00016x-OH
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jJJor-0007gJ-4z
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:32:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49777
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1jJK75-0002DW-Rb
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:51:45 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48073
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jJJor-0007g6-0M
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:32:53 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jJK73-0002Ai-Nu
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:51:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585672372;
+ s=mimecast20190719; t=1585673500;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XieNtfkIuGf37R1Ct6MbojdTxe1Xg0SGMH8l0oHr/v4=;
- b=dWbXHgFy1g5o3OlnKzlTspSCIjkxp/ITB3WLcS56GhgQMfPIxzs1U7lbiVM0am54DDheb6
- aDZIE+DGhVy48HUJPNUHHlc7RgizlPjI0R5TKpBcKhubsMs+Cz051fl0EMiPQl5OpH1Hgp
- SD8fFvIo3xy3sJSt6Evqv733qUCldJM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-aMDsh0KhPYSeKamF17gOoQ-1; Tue, 31 Mar 2020 12:32:51 -0400
-X-MC-Unique: aMDsh0KhPYSeKamF17gOoQ-1
-Received: by mail-wm1-f69.google.com with SMTP id e16so678136wmh.5
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 09:32:50 -0700 (PDT)
+ bh=92xcFkbSOeKiZND8DVLt0LoMfNbGpH+qfhq4A4uQ9GA=;
+ b=T++pqjpotPU7GtFTwPyWJLwkXGdFIFz7brop+XWciNGvuL6Sl0aLkCbx2I8nqFMsffVZn4
+ SqiRtWnisnMLVCMl4pIRHiXlKrsXDmjZe0+hcSw30c1kr/bGGIwGKd1esc66oVH7/u87P9
+ drAA9kHo87cM4YZvFDGTZoBPtwijZwI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-QGhNqXwGPjO_pHSXbNN8Uw-1; Tue, 31 Mar 2020 12:51:38 -0400
+X-MC-Unique: QGhNqXwGPjO_pHSXbNN8Uw-1
+Received: by mail-wm1-f70.google.com with SMTP id e16so698664wmh.5
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 09:51:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XieNtfkIuGf37R1Ct6MbojdTxe1Xg0SGMH8l0oHr/v4=;
- b=Xmx8kFHc9/+YcJa5MJFtGA1KF93b4cdylBaVi5uufRpqMdDtbD3rVHMH9MLZAQISlg
- 1RaOJGVW2C17EJRA7USqNJoeZq502cvoiYd1QA9o3k3D+weu/It43RVwT8z39d7qKJrX
- UzOyjyVk50UrD1zM+2plr/UrfDaZmu+pzy40QzgVKyxkqVcQXhMEMzQbuAe3ixSmOsDN
- Ryzk12MdX6iOirQdfMCuIoi3Ug18eo3wpWTtkar5RYG0rXA0UADi86WL8a2Q/Dmqmpjw
- /3eCMDbjznlca/+LezdH0+ODHNO7VFE9711IoqHy6MGQLABLOQjstGHPfnEiVOdQRmjJ
- JyrA==
-X-Gm-Message-State: AGi0PuZFEulSFnhu3w6HgJBseIgIO7Psrcun80KQZahqgRNvRZZ187wb
- QQNa11kqQ+A77DWgM3XCWdwPUKBsR5nDVH65eiwFYZgGw8uAMMcBlv5qqvVUObUPzfotLRUKMnl
- YWZJd6sQuzpJlBfc=
-X-Received: by 2002:a05:600c:2284:: with SMTP id
- 4mr869057wmf.103.1585672369926; 
- Tue, 31 Mar 2020 09:32:49 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKCDfU2L4k8UU+LV7+PPCzuQvIFo2ldfb0XyeqmcTnZBpD7eQB+q057B7CeyVskURKQq5sr4g==
-X-Received: by 2002:a05:600c:2284:: with SMTP id
- 4mr869035wmf.103.1585672369643; 
- Tue, 31 Mar 2020 09:32:49 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea?
- ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
- by smtp.gmail.com with ESMTPSA id y189sm4623483wmb.26.2020.03.31.09.32.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 31 Mar 2020 09:32:49 -0700 (PDT)
-Subject: Re: [PATCH] target/i386: do not set unsupported VMX secondary
- execution controls
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
-References: <20200331162752.1209928-1-vkuznets@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f976c1b0-2f50-d9f6-0921-2fc8e25ddb80@redhat.com>
-Date: Tue, 31 Mar 2020 18:32:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=NP1m9XCO6KKa6bVIinTCba9cyrsRlgItIyK4mTXPstU=;
+ b=SH87jcy6ziMawoXNJQrgPeOTnSZge2xVeD1iaB0aKWRNfCPQhXAzhK/lJkjEhVkYpG
+ 6Ks1YKBTuXwIq70s97K/xQAdWuAeLKyAdU8MrGtQ5b9XvV9F6Ac4GrrxCBdeEKwoMCoj
+ Z4XaHPeZVRePbrvy/n6QruKtFJ4IjcLnYUlX3h2/HAjB0FU4j4S4klimx/6TL2wXRYn/
+ +03fhS4KDNPfG05Ubf154S0fvw0ryM79tyrKluPnvJCHcoxuZXr7VgVIhNVJPj6IYzQz
+ JKLMtahOMIKvts5snjSe/u5EqlnfsieovVX0QUcbEsquHO55o02mrOLbsTsJXxItSlUK
+ mOew==
+X-Gm-Message-State: ANhLgQ01weXHuw2AjXJLaAFgyG/zKTEcY8atDKF0GfAWOu3Cvjbj8nfa
+ RWlyIWZiGSDkKEm7qDyA+nfZ3+NE55x99x/JdvYskIAh+DMyDaokG0opfdeSrX6WfKDRQWnEXzu
+ ApCLv6b0tOehPshM=
+X-Received: by 2002:a1c:80d3:: with SMTP id b202mr4322160wmd.8.1585673497128; 
+ Tue, 31 Mar 2020 09:51:37 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuxz7jsUPWWcjG+qE2ew93Mnh+ps4J9z3W4c2uNuxLLd8STNP77dm1inZFAMF7pP4SEAJ4EYg==
+X-Received: by 2002:a1c:80d3:: with SMTP id b202mr4322143wmd.8.1585673496820; 
+ Tue, 31 Mar 2020 09:51:36 -0700 (PDT)
+Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
+ [72.137.123.47])
+ by smtp.gmail.com with ESMTPSA id v26sm28362127wra.7.2020.03.31.09.51.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 31 Mar 2020 09:51:36 -0700 (PDT)
+Date: Tue, 31 Mar 2020 12:51:33 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Question on dirty sync before kvm memslot removal
+Message-ID: <20200331165133.GI522868@xz-x1>
+References: <20200327150425.GJ422390@xz-x1>
+ <c90a6ffd-0cab-186d-b9c8-8e379921783f@redhat.com>
+ <20200331152314.GG522868@xz-x1>
+ <62aa8314-954f-7397-8bf4-d81d926c4f0b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200331162752.1209928-1-vkuznets@redhat.com>
-Content-Language: en-US
+In-Reply-To: <62aa8314-954f-7397-8bf4-d81d926c4f0b@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,111 +105,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/03/20 18:27, Vitaly Kuznetsov wrote:
-> Commit 048c95163b4 ("target/i386: work around KVM_GET_MSRS bug for
-> secondary execution controls") added a workaround for KVM pre-dating
-> commit 6defc591846d ("KVM: nVMX: include conditional controls in /dev/kvm
-> KVM_GET_MSRS") which wasn't setting certain available controls. The
-> workaround uses generic CPUID feature bits to set missing VMX controls.
-> 
-> It was found that in some cases it is possible to observe hosts which
-> have certain CPUID features but lack the corresponding VMX control.
-> 
-> In particular, it was reported that Azure VMs have RDSEED but lack
-> VMX_SECONDARY_EXEC_RDSEED_EXITING; attempts to enable this feature
-> bit result in QEMU abort.
-> 
-> Resolve the issue but not applying the workaround when we don't have
-> to. As there is no good way to find out if KVM has the fix itself, use
-> 95c5c7c77c ("KVM: nVMX: list VMX MSRs in KVM_GET_MSR_INDEX_LIST") instead
-> as these [are supposed to] come together.
-> 
-> Fixes: 048c95163b4 ("target/i386: work around KVM_GET_MSRS bug for secondary execution controls")
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Tue, Mar 31, 2020 at 05:34:43PM +0200, Paolo Bonzini wrote:
+> On 31/03/20 17:23, Peter Xu wrote:
+> >> Or KVM_MEM_READONLY.
+> > Yeah, I used a new flag because I thought READONLY was a bit tricky to
+> > be used directly here.  The thing is IIUC if guest writes to a
+> > READONLY slot then KVM should either ignore the write or trigger an
+> > error which I didn't check, however here what we want to do is to let
+> > the write to fallback to the userspace so it's neither dropped (we
+> > still want the written data to land gracefully on RAM), nor triggering
+> > an error (because the slot is actually writable).
+>=20
+> No, writes fall back to userspace with KVM_MEM_READONLY.
 
-Queued, thanks.
+I read that __kvm_write_guest_page() will return -EFAULT when writting
+to the read-only memslot, and e.g. kvm_write_guest_virt_helper() will
+return with X86EMUL_IO_NEEDED, which will be translated into a
+EMULATION_OK in x86_emulate_insn().  Then in x86_emulate_instruction()
+it seems to get a "1" returned (note that I think it does not set
+either vcpu->arch.pio.count or vcpu->mmio_needed).  Does that mean
+it'll retry the write forever instead of quit into the userspace?  I
+may possibly have misread somewhere, though..
 
-Paolo
+>=20
+> >> The problem here is also that the GFN is not an unique identifier of t=
+he
+> >> QEMU ram_addr_t.  However you don't really need to kick all vCPUs out,
+> >> do you?  You can protect the dirty ring with its own per-vCPU mutex an=
+d
+> >> harvest the pages from the main thread.
+> > I'm not sure I get the point, but just to mention that currently the
+> > dirty GFNs are collected in a standalone thread (in the QEMU series
+> > it's called the reaper thread) rather than in the per vcpu thread
+> > because the KVM_RESET_DIRTY_RINGS is per-vm after all.  One major
+> > reason to kick the vcpus is to make sure the hardware cached dirty
+> > GFNs (i.e. PML) are flushed synchronously.
+>=20
+> But you're referring to KVM kicking vCPUs not qemu_vcpu_kick.  Can you
+> just do an iteration of reaping after setting KVM_MEM_READONLY?
 
-> ---
->  target/i386/kvm.c | 41 ++++++++++++++++++++++++++---------------
->  1 file changed, 26 insertions(+), 15 deletions(-)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 69eb43d796e6..4901c6dd747d 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -106,6 +106,7 @@ static bool has_msr_arch_capabs;
->  static bool has_msr_core_capabs;
->  static bool has_msr_vmx_vmfunc;
->  static bool has_msr_ucode_rev;
-> +static bool has_msr_vmx_procbased_ctls2;
->  
->  static uint32_t has_architectural_pmu_version;
->  static uint32_t num_architectural_pmu_gp_counters;
-> @@ -490,21 +491,28 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
->      value = msr_data.entries[0].data;
->      switch (index) {
->      case MSR_IA32_VMX_PROCBASED_CTLS2:
-> -        /* KVM forgot to add these bits for some time, do this ourselves.  */
-> -        if (kvm_arch_get_supported_cpuid(s, 0xD, 1, R_ECX) & CPUID_XSAVE_XSAVES) {
-> -            value |= (uint64_t)VMX_SECONDARY_EXEC_XSAVES << 32;
-> -        }
-> -        if (kvm_arch_get_supported_cpuid(s, 1, 0, R_ECX) & CPUID_EXT_RDRAND) {
-> -            value |= (uint64_t)VMX_SECONDARY_EXEC_RDRAND_EXITING << 32;
-> -        }
-> -        if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) & CPUID_7_0_EBX_INVPCID) {
-> -            value |= (uint64_t)VMX_SECONDARY_EXEC_ENABLE_INVPCID << 32;
-> -        }
-> -        if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) & CPUID_7_0_EBX_RDSEED) {
-> -            value |= (uint64_t)VMX_SECONDARY_EXEC_RDSEED_EXITING << 32;
-> -        }
-> -        if (kvm_arch_get_supported_cpuid(s, 0x80000001, 0, R_EDX) & CPUID_EXT2_RDTSCP) {
-> -            value |= (uint64_t)VMX_SECONDARY_EXEC_RDTSCP << 32;
-> +        if (!has_msr_vmx_procbased_ctls2) {
-> +            /* KVM forgot to add these bits for some time, do this ourselves. */
-> +            if (kvm_arch_get_supported_cpuid(s, 0xD, 1, R_ECX) &
-> +                CPUID_XSAVE_XSAVES) {
-> +                value |= (uint64_t)VMX_SECONDARY_EXEC_XSAVES << 32;
-> +            }
-> +            if (kvm_arch_get_supported_cpuid(s, 1, 0, R_ECX) &
-> +                CPUID_EXT_RDRAND) {
-> +                value |= (uint64_t)VMX_SECONDARY_EXEC_RDRAND_EXITING << 32;
-> +            }
-> +            if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) &
-> +                CPUID_7_0_EBX_INVPCID) {
-> +                value |= (uint64_t)VMX_SECONDARY_EXEC_ENABLE_INVPCID << 32;
-> +            }
-> +            if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) &
-> +                CPUID_7_0_EBX_RDSEED) {
-> +                value |= (uint64_t)VMX_SECONDARY_EXEC_RDSEED_EXITING << 32;
-> +            }
-> +            if (kvm_arch_get_supported_cpuid(s, 0x80000001, 0, R_EDX) &
-> +                CPUID_EXT2_RDTSCP) {
-> +                value |= (uint64_t)VMX_SECONDARY_EXEC_RDTSCP << 32;
-> +            }
->          }
->          /* fall through */
->      case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
-> @@ -2060,6 +2068,9 @@ static int kvm_get_supported_msrs(KVMState *s)
->              case MSR_IA32_UCODE_REV:
->                  has_msr_ucode_rev = true;
->                  break;
-> +            case MSR_IA32_VMX_PROCBASED_CTLS2:
-> +                has_msr_vmx_procbased_ctls2 = true;
-> +                break;
->              }
->          }
->      }
-> 
+Oh I think you're right, deleting & readding memslot is special here
+that we can keep the data in PML untouched, as long as they can be
+flushed again to the new bitmap we're going to create.
+
+However... I think I might find another race with this:
+
+          main thread                       vcpu thread
+          -----------                       -----------
+                                            dirty GFN1, cached in PML
+                                            ...
+          remove memslot1 of GFN1
+            set slot READONLY (whatever, or INVALID)
+            sync log (NOTE: no GFN1 yet)
+                                            vmexit, flush PML with RCU
+                                            (will flush to old bitmap) <---=
+---- [1]
+            delete memslot1 (old bitmap freed)                         <---=
+---- [2]
+          add memslot2 of GFN1 (memslot2 could be smaller)
+            add memslot2
+
+I'm not 100% sure, but I think GFN1's dirty bit will be lost though
+it's correctly applied at [1] but quickly freed at [2].
+
+>=20
+> > I think the whole kick operation is indeed too heavy for this when
+> > with the run_on_cpu() trick, because the thing we want to know (pml
+> > flushing) is actually per-vcpu and no BQL interaction. Do we have/need
+> > a lightweight way to kick one vcpu in synchronous way?  I was
+> > wondering maybe something like responding a "sync kick" request in the
+> > vcpu thread right after KVM_RUN ends (when we don't have BQL yet).
+> > Would that make sense?
+>=20
+> Not synchronously, because anything synchronous is very susceptible to
+> deadlocks.
+
+Yeah it's easy to deadlock (I suffer from it...), but besides above
+case (which I really think it's special) I still think unluckily we
+need a synchronous way.  For example, the VGA code will need the
+latest dirty bit information to decide whether to update the screen
+(or it could stall), or the migration code where we need to calculate
+downtime with the current dirty bit information, etc.
+
+--=20
+Peter Xu
 
 
