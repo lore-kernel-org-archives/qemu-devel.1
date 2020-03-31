@@ -2,77 +2,99 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E6BC2D0E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F1EC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CABAD20B80
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29A5F20B80
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:03:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W3sRsyK0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CABAD20B80
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/pt1MJY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29A5F20B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJBpv-0005hy-19
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 04:01:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53652)
+	id 1jJBrW-0007B8-AF
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 04:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1jJBnv-0004Jb-1b
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:59:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1jJBp2-0005OO-Tg
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1jJBnu-0002Nn-4G
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:59:22 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59065
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jJBoz-0002we-Ev
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:00:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21354
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1jJBnu-0002N9-0i
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:59:22 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jJBoz-0002wG-Az
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:00:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585641560;
+ s=mimecast20190719; t=1585641628;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=s1tFEKlyjDQ9zhIy7PWTrqY99x9gUcOyNdcdTidqZf4=;
- b=W3sRsyK0dADAjUXJoY08xB3VQNHfkwSUsvIj9g48S1DD0lMyhaS1X1QIJT4wIcOqVeOSE7
- 9ONmXyqD4iiVw47tifp4pvj9AQSP/kjrlNLhBA/PsZKqA3zLZzYmUFsXsEvsobczsbprdf
- qSlJUZqGzp9NQW2tszIKq6RDAFcVUGk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77-n0fwKjrANGqWZ81KUI7CNA-1; Tue, 31 Mar 2020 03:59:18 -0400
-X-MC-Unique: n0fwKjrANGqWZ81KUI7CNA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4580149C0
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:59:17 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-112-123.ams2.redhat.com
- [10.36.112.123])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 416B6953D6;
- Tue, 31 Mar 2020 07:59:11 +0000 (UTC)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] vhost-vsock: fix double close() in the realize() error path
-Date: Tue, 31 Mar 2020 09:59:10 +0200
-Message-Id: <20200331075910.42529-1-sgarzare@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Rtx7dc7czJ6OdYOCXCWTlNmb3aCnPdlq+Q+M1B8y4eI=;
+ b=c/pt1MJY5Yd8uFu6iPtX2kAkGgBJR7cITICQ+k9BIGe8pPlX0KKos7GroDQsF7VhBMXcCw
+ kGGn4Wsptb8Z0S+0VDbPqTrGgpVBaeffF9DvNihW3EzoHKtwnYmsrVZ9DyVL8a+yDxp5Mv
+ Hm+yC2MONcbs1BmCby2uEhQF3+TDh/A=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-mim02LlVMhqkY3QPE9XmUA-1; Tue, 31 Mar 2020 04:00:27 -0400
+X-MC-Unique: mim02LlVMhqkY3QPE9XmUA-1
+Received: by mail-wm1-f72.google.com with SMTP id w9so390908wmi.2
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 01:00:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=A6GvF3x3fYn2E9FkuGW6iJo47NwPAS175Bye9CElTaM=;
+ b=mkG2CnG3qaxZGPXXh/sq7YMDpBlGJkgJihYRlrMzSvCTSy3ux/S/KBo6HilSr5x1Jm
+ Ht0H8llehWuWak5Gn3bHkeMjtTG+t3XAXSSk8zIMrdTrRGSz4GhkRf5++R+mIEOrni+p
+ tXFGT5Q9Mru1f47BUmKoKec97kg58yZoDEpmQILY2bHJmHi5abmzErKwJsJs724eS9BZ
+ GiEPLO3Lu0nqD57RaPajajIPfsTn8IdFur0EqfG2FMmQk3M+Cssu4+A2eqZm2D3nJHmM
+ 2DWwJCXsLzU7LpIoaCYXrQkpS1EYWTpwWHSsU8qOtZXy8wGdy/9nCJnZNvUA9lQwAz2s
+ 5YXg==
+X-Gm-Message-State: ANhLgQ2TP6S82Up0u+VUgMIwcGUryhP4/YBCS0zUXpnYdUggsh7i6X0G
+ EZL/yvCcDYz2M3NbEbCPwsz2lKM4SSgQdOfoZ3VDlDVndTk1gyIJmjBmfeC+JlYBJ2LL159DYo8
+ 6I6ziJJbW6AtLeiY=
+X-Received: by 2002:adf:a54a:: with SMTP id j10mr19826199wrb.188.1585641625679; 
+ Tue, 31 Mar 2020 01:00:25 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvDiW+peZLusClIOuajNz0uCaFM9qAC+JmxeMdwyz97MIF1ngH+TPiVwMxu65iEFWuBxZ4H7Q==
+X-Received: by 2002:adf:a54a:: with SMTP id j10mr19826181wrb.188.1585641625510; 
+ Tue, 31 Mar 2020 01:00:25 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id t16sm26533891wra.17.2020.03.31.01.00.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 31 Mar 2020 01:00:25 -0700 (PDT)
+Subject: Re: [PATCH v10 06/14] iotests: alphabetize standard imports
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200331000014.11581-1-jsnow@redhat.com>
+ <20200331000014.11581-7-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <902f392e-58bf-a44b-bdb2-516f1956cb87@redhat.com>
+Date: Tue, 31 Mar 2020 10:00:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200331000014.11581-7-jsnow@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,46 +106,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
+ armbru@redhat.com, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vhost_dev_cleanup() closes the vhostfd parameter passed to
-vhost_dev_init(), so this patch avoids closing it twice in
-the vhost_vsock_device_realize() error path.
+On 3/31/20 2:00 AM, John Snow wrote:
+> I had to fix a merge conflict, so do this tiny harmless thing while I'm
+> here.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   tests/qemu-iotests/iotests.py | 18 +++++++++---------
+>   1 file changed, 9 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+> index 51f84475d9..e6f9f62b2b 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -16,19 +16,19 @@
+>   # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>   #
+>  =20
+> +import atexit
+> +from collections import OrderedDict
+> +import faulthandler
+> +import io
+> +import json
+> +import logging
+>   import os
+>   import re
+> +import signal
+> +import struct
+>   import subprocess
+> -import unittest
+>   import sys
+> -import struct
+> -import json
+> -import signal
+> -import logging
+> -import atexit
+> -import io
+> -from collections import OrderedDict
+> -import faulthandler
+> +import unittest
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- hw/virtio/vhost-vsock.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-index 9f9093e196..09b6b07f94 100644
---- a/hw/virtio/vhost-vsock.c
-+++ b/hw/virtio/vhost-vsock.c
-@@ -364,12 +364,16 @@ static void vhost_vsock_device_realize(DeviceState *d=
-ev, Error **errp)
-=20
- err_vhost_dev:
-     vhost_dev_cleanup(&vsock->vhost_dev);
-+    /* vhost_dev_cleanup() closes the vhostfd passed to vhost_dev_init() *=
-/
-+    vhostfd =3D -1;
- err_virtio:
-     virtio_delete_queue(vsock->recv_vq);
-     virtio_delete_queue(vsock->trans_vq);
-     virtio_delete_queue(vsock->event_vq);
-     virtio_cleanup(vdev);
--    close(vhostfd);
-+    if (vhostfd >=3D 0) {
-+        close(vhostfd);
-+    }
-     return;
- }
-=20
---=20
-2.25.1
+>  =20
+>   # pylint: disable=3Dimport-error, wrong-import-position
+>   sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'py=
+thon'))
+>=20
 
 
