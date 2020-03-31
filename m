@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11ADFC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA286C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:42:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6286206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:41:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6286206EB
+	by mail.kernel.org (Postfix) with ESMTPS id 78711206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:42:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78711206EB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ9et-00064F-W7
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 01:41:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41235)
+	id 1jJ9fI-0006mX-Ih
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 01:42:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41052)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jJ9dq-0004Nx-8P
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:40:51 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jJ9cD-0001c7-Gd
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:39:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jJ9dp-0002cv-6H
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:40:50 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47988)
+ (envelope-from <its@irrelevant.dk>) id 1jJ9cC-0001tZ-Iv
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:39:09 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47950)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jJ9dm-0002bS-SN; Tue, 31 Mar 2020 01:40:47 -0400
+ id 1jJ9cA-0001sO-Cj; Tue, 31 Mar 2020 01:39:06 -0400
 Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id C813FBF48F;
- Tue, 31 Mar 2020 05:40:45 +0000 (UTC)
-Date: Tue, 31 Mar 2020 07:40:42 +0200
+ by charlie.dont.surf (Postfix) with ESMTPSA id 4E9F8BF48F;
+ Tue, 31 Mar 2020 05:39:05 +0000 (UTC)
+Date: Tue, 31 Mar 2020 07:39:01 +0200
 From: Klaus Birkelund Jensen <its@irrelevant.dk>
 To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v6 11/42] nvme: add temperature threshold feature
-Message-ID: <20200331054042.rf4nzrtocqzkw4if@apples.localdomain>
+Subject: Re: [PATCH v6 06/42] nvme: add identify cns values in header
+Message-ID: <20200331053901.mksyksmu54unox4x@apples.localdomain>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-12-its@irrelevant.dk>
- <47ef3ec5800b5f74017df60e599f16ba905daab6.camel@redhat.com>
+ <20200316142928.153431-7-its@irrelevant.dk>
+ <e42bd6d632853cb5e6350cdf43bbdd9123044d7f.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <47ef3ec5800b5f74017df60e599f16ba905daab6.camel@redhat.com>
+In-Reply-To: <e42bd6d632853cb5e6350cdf43bbdd9123044d7f.camel@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 128.199.63.193
@@ -69,43 +69,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mar 25 12:40, Maxim Levitsky wrote:
+On Mar 25 12:37, Maxim Levitsky wrote:
 > On Mon, 2020-03-16 at 07:28 -0700, Klaus Jensen wrote:
 > > From: Klaus Jensen <k.jensen@samsung.com>
 > > 
-> > It might seem wierd to implement this feature for an emulated device,
-> > but it is mandatory to support and the feature is useful for testing
-> > asynchronous event request support, which will be added in a later
-> > patch.
-> > 
 > > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > Acked-by: Keith Busch <kbusch@kernel.org>
 > > ---
-> >  hw/block/nvme.c      | 48 ++++++++++++++++++++++++++++++++++++++++++++
-> >  hw/block/nvme.h      |  2 ++
-> >  include/block/nvme.h |  8 +++++++-
-> >  3 files changed, 57 insertions(+), 1 deletion(-)
+> >  hw/block/nvme.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
 > > 
-> > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> > index b7c465560eea..8cda5f02c622 100644
-> > --- a/hw/block/nvme.h
-> > +++ b/hw/block/nvme.h
-> > @@ -108,6 +108,7 @@ typedef struct NvmeCtrl {
-> >      uint64_t    irq_status;
-> >      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
-> >      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
-> > +    uint16_t    temperature;
-> You forgot to move this too.
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index f716f690a594..b38d7e548a60 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -709,11 +709,11 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+> >      NvmeIdentify *c = (NvmeIdentify *)cmd;
+> >  
+> >      switch (le32_to_cpu(c->cns)) {
+> > -    case 0x00:
+> > +    case NVME_ID_CNS_NS:
+> >          return nvme_identify_ns(n, c);
+> > -    case 0x01:
+> > +    case NVME_ID_CNS_CTRL:
+> >          return nvme_identify_ctrl(n, c);
+> > -    case 0x02:
+> > +    case NVME_ID_CNS_NS_ACTIVE_LIST:
+> >          return nvme_identify_nslist(n, c);
+> >      default:
+> >          trace_nvme_dev_err_invalid_identify_cns(le32_to_cpu(c->cns));
+> 
+> This is a very good candidate to be squished with the patch 5 IMHO,
+> but you can leave this as is as well. I don't mind.
 > 
 
-Fixed!
-> 
-> With 'temperature' field removed from the header:
-> 
+Squashed!
+
 > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 > 
 > Best regards,
 > 	Maxim Levitsky
 > 
-
+> 
+> 
+> 
+> 
+> 
 
