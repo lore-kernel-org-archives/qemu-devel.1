@@ -2,84 +2,81 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DD9C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 19:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC31C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 19:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A9CD2072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 19:29:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A17B2080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 19:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPxUQ1nQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A9CD2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iPHriLZ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A17B2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJMZZ-0000CF-Vp
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 15:29:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39092)
+	id 1jJMyL-0002k9-LL
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 15:54:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49385)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1jJMYr-00085b-MI
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 15:28:34 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jJMx8-0001qw-6o
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 15:53:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1jJMYp-0002yV-Sv
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 15:28:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21860
+ (envelope-from <imammedo@redhat.com>) id 1jJMx5-0002MF-H1
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 15:53:37 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55331
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1jJMYp-0002y1-IM
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 15:28:31 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jJMx5-0002Kv-8M
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 15:53:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585682910;
+ s=mimecast20190719; t=1585684414;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=14AouyvoiVM6Rr1P9WqHOVjO0WYwEYfDMIoyNpa3BII=;
- b=XPxUQ1nQ6WadENoSxQHZ9wfSlxSPSQNiIQ6fJVihYXzkydP5Vnlr3V05XTZrlndotd5F07
- sMlQIG8f3+7iZUwEApybw67a0X5KEhkqVviC5N/DSUvYkfj8HFATjhj9D2RJxjT27SLMwM
- Ff1Yq2DV+ZrseAnHra0LJS/oRKq/zGk=
+ bh=A8RLnm05BD16LAcVFXf/3t6xDIQAvMVhL0LeemNs5ek=;
+ b=iPHriLZ4LeaLbnLkMfXm+0jkRgtVVQsl5Ud18R+yjN68feRBKskRfU6vsCjgX/0f4KqChj
+ +qFilL2RMJvwBpUbJgJOkc6Ylx1zU00bnWKeRJPH+a9/GKVQ3pvWcX+HP/ON1HePLvNqQm
+ ezeBnrE80evnf88d0fwjvoNZ8lavpxE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-6cEi1hVdM1qcO2Xneb3vDw-1; Tue, 31 Mar 2020 15:28:29 -0400
-X-MC-Unique: 6cEi1hVdM1qcO2Xneb3vDw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-159-doqS1DTcMiqTUmshwHszWg-1; Tue, 31 Mar 2020 15:53:32 -0400
+X-MC-Unique: doqS1DTcMiqTUmshwHszWg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 360C9101FC65;
- Tue, 31 Mar 2020 19:28:28 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B84FE96B93;
- Tue, 31 Mar 2020 19:28:27 +0000 (UTC)
-Date: Tue, 31 Mar 2020 13:28:27 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH] hw/vfio: let readonly flag take effect for mmaped regions
-Message-ID: <20200331132827.514b73b0@w520.home>
-In-Reply-To: <20200331015941.GD6631@joy-OptiPlex-7040>
-References: <20200327111934.71066-1-yan.y.zhao@intel.com>
- <20200327112537.2efd65ac@w520.home>
- <20200330013527.GA30683@joy-OptiPlex-7040>
- <20200330063402.GE30683@joy-OptiPlex-7040>
- <20200330085923.19d7345f@w520.home>
- <20200331015941.GD6631@joy-OptiPlex-7040>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4CEE800D5C;
+ Tue, 31 Mar 2020 19:53:30 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D8484D767E;
+ Tue, 31 Mar 2020 19:53:22 +0000 (UTC)
+Date: Tue, 31 Mar 2020 21:53:20 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH 5/6] acpi: serial: don't use _STA method
+Message-ID: <20200331215320.620c52bf@redhat.com>
+In-Reply-To: <20200331152342.vdfhosgpi6popy2x@sirius.home.kraxel.org>
+References: <20200327121111.1530-1-kraxel@redhat.com>
+ <20200327121111.1530-6-kraxel@redhat.com>
+ <20200327153340.519fac3f@redhat.com>
+ <20200331152342.vdfhosgpi6popy2x@sirius.home.kraxel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,85 +88,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Zeng,
- Xin" <xin.zeng@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 30 Mar 2020 21:59:41 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Tue, 31 Mar 2020 17:23:42 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-> On Mon, Mar 30, 2020 at 10:59:23PM +0800, Alex Williamson wrote:
-> > On Mon, 30 Mar 2020 02:34:02 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >   
-> > > On Mon, Mar 30, 2020 at 09:35:27AM +0800, Yan Zhao wrote:  
-> > > > On Sat, Mar 28, 2020 at 01:25:37AM +0800, Alex Williamson wrote:    
-> > > > > On Fri, 27 Mar 2020 11:19:34 +0000
-> > > > > yan.y.zhao@intel.com wrote:
-> > > > >     
-> > > > > > From: Yan Zhao <yan.y.zhao@intel.com>
-> > > > > > 
-> > > > > > currently, vfio regions without VFIO_REGION_INFO_FLAG_WRITE are only
-> > > > > > read-only when VFIO_REGION_INFO_FLAG_MMAP is not set.
-> > > > > > 
-> > > > > > regions with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP
-> > > > > > are only read-only in host page table for qemu.
-> > > > > > 
-> > > > > > This patch sets corresponding ept page entries read-only for regions
-> > > > > > with flag VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP.
-> > > > > > 
-> > > > > > accordingly, it ignores guest write when guest writes to the read-only
-> > > > > > regions are trapped.
-> > > > > > 
-> > > > > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > > > > > Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> > > > > > ---    
-> > > > > 
-> > > > > Currently we set the r/w protection on the mmap, do I understand
-> > > > > correctly that the change in the vfio code below results in KVM exiting
-> > > > > to QEMU to handle a write to a read-only region and therefore we need
-> > > > > the memory.c change to drop the write?  This prevents a SIGBUS or
-> > > > > similar?    
-> > > > yes, correct. the change in memory.c is to prevent a SIGSEGV in host as
-> > > > it's mmaped to read-only. we think it's better to just drop the writes
-> > > > from guest rather than corrupt the qemu.
-> > > >     
-> > > > > 
-> > > > > Meanwhile vfio_region_setup() uses the same vfio_region_ops for all
-> > > > > regions and vfio_region_write() would still allow writes, so if the
-> > > > > device were using x-no-mmap=on, I think we'd still get a write to this
-> > > > > region and expect the vfio device to drop it.  Should we prevent that
-> > > > > write in QEMU as well?    
-> > > > yes, it expects vfio device to drop it right now.
-> > > > As the driver sets the flag without VFIO_REGION_INFO_FLAG_WRITE, it should
-> > > > handle it properly.
-> > > > both dropping in qemu and dropping in vfio device are fine to us.
-> > > > we wonder which one is your preference :)  
+> > > -static Aml *build_com_device_aml(uint8_t uid)
+> > > +static void build_com_device_aml(Aml *scope, uint8_t uid)
+> > >  {
+> > >      Aml *dev;
+> > >      Aml *crs;
+> > > -    Aml *method;
+> > > -    Aml *if_ctx;
+> > > -    Aml *else_ctx;
+> > > -    Aml *zero = aml_int(0);
+> > > -    Aml *is_present = aml_local(0);
+> > > -    const char *enabled_field = "CAEN";
+> > >      uint8_t irq = 4;
+> > >      uint16_t io_port = 0x03F8;
+> > >  
+> > >      assert(uid == 1 || uid == 2);
+> > >      if (uid == 2) {
+> > > -        enabled_field = "CBEN";
+> > >          irq = 3;
+> > >          io_port = 0x02F8;
+> > >      }
+> > > +    if (!memory_region_present(get_system_io(), io_port)) {  
+> >                                   ^^^^^^
+> > even though acpi_setup() is a part of board code, usually it's not recommended to 
+> > use get_system_foo() outside of machine_init()
 > > 
-> > The kernel and device should always do the right thing, we cannot rely
-> > on the user to honor the mapping, but it's also a reasonable response
-> > from the kernel to kill the process with a SIGSEGV if the user ignores
-> > the protections.  So I don't think it's an either/or, the kernel needs
-> > to do the right thing for itself and in this case QEMU should do the
-> > right thing for itself, which is to drop writes for regions that don't
-> > support it.  So in general, I agree with your patch.
-> >  
-> hi Alex
-> so is there anything I need to do? do I need to add a write dropping in
-> vfio_region_write() too? if yes, do I need to keep the
-> trace_vfio_region_write() before dropping ?
+> > how about fishing out present serial ports from isa device in a helper
+> > like acpi_get_misc_info(), and then generalize AML like
+> >    build_com_device_aml(Aml *scope, uint8_t uid, io_port, irq)  
+> 
+> Hmm, I'm wondering whenever it would be useful to have ...
+> 
+>    ISADeviceClass->build_aml(Aml *scope, ISADevice *dev);
 
-Hi Yan,
+in relation to iqr, you said earlier that device doesn't know to which irq it's mapped.
+that might be a problem in this case, likewise for (MM)IO
 
-Yes to both feels the most consistent, right?  If we want the same
-behavior between mmap'd and non-mmap'd regions, QEMU should drop both
-writes.  Your change to memory_region_ram_device_write() drops the
-write after tracing.  For both cases though it might be worthwhile to
-have a separate trace recorded to indicate a dropped write, probably in
-place of the normal trace to avoid confusion.  Thanks,
+> ... then just walk all isa devices and call the handler
+> (if present).  Maybe the same for sysbus.
 
-Alex
+There was already such idea (Paolo or Michael), i.e. to move AML code
+generation related to specific devices inside of device model (not
+only ISA or sysbus), so one would just have to enumerate present
+devices in generic way and ask them to provide AML descriptors and be
+done with building DSDT.
+
+Not sure if it's doable in generic way though, especially when it comes to
+orchestrating _CRS between various devices.
+(while linux might still boot with resource conflicts, Windows 
+BSODs occasionally instead). Maybe there are other complications
+I don't recall.
+
+So it might take awhile to come up with approach which would work nice.
+
+Simplest way to get job done in case of microvm is to make board
+fill in assigned resources in some helper data structure and pass that
+to acpi code. (another approach - arm/virt uses static 'registry' to distribute
+address space/irq and then acpi code just fetches values from there if
+device is present + a bunch of shared PCI code to make up dynamic PCI
+description)
+
+> cheers,
+>   Gerd
+> 
 
 
