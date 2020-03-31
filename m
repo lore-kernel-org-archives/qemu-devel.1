@@ -2,85 +2,81 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C05D3C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 13:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DD5C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 13:45:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8723B2071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 13:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A9AB206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 13:45:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M2bf+eVp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8723B2071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fyRwVbfo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A9AB206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJH9I-00033V-NK
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 09:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44213)
+	id 1jJHD6-0006AK-CK
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 09:45:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <linus.walleij@linaro.org>) id 1jJH5T-000069-Cw
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 09:37:53 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jJHCK-0005TZ-6w
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 09:44:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <linus.walleij@linaro.org>) id 1jJH5R-0004pI-KS
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 09:37:51 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:45899)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
- id 1jJH5R-0004oR-2E
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 09:37:49 -0400
-Received: by mail-lf1-x141.google.com with SMTP id v4so17286650lfo.12
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 06:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aU5iLCuWaH4zxyOLw8e9l2ANSFZT9vUFLRpaEbsCIeI=;
- b=M2bf+eVpkauwEFyb4CxmjaPvpl1N7Yad7zfCQI7ftWmBLkeJPC0XXouWV2QI8hxZp0
- SWvodVcZIL6Bb/b/rJIkQwkInHpjgZ5o+LFL4a9Pq3M4CqV+zv5VdnUEa/Y9J4upA+Im
- 9Jw34jRSN6kWPZ+k5VsdGo8jY+lJaogNfFrBKMbUo/M+wp9QThZUUdUXu+DGnXp8u5k2
- KPhTqiN5HAQpCWvh1il9cj1mhxWhSyWq/d4wVo+nmE3Zy9I/KddzW5kBlWk/4bQIKCOR
- Av5ZU2ntiH08RXx7Vy7fMOQlQY1fz06o4VosndadGp4GHJG5h/oOYOtMMvQhx/Kp3hXh
- clpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aU5iLCuWaH4zxyOLw8e9l2ANSFZT9vUFLRpaEbsCIeI=;
- b=jIJFAM8AlLDjxIJeDkM9R7cHknAC8hnwf06rDKTi2JOqlq9jmHPDVpBxXVDSqhvMx6
- 2TlXcMEr6oiAsLOPtlwhaWWpA5vNS1hwPASSYH/IVu/HkDCoOs1haZ3NRFlI5dVRWTsC
- gWXncBLW/0vfF2ixyjCttx0tP1q3luX0hiwkOKbN2kmtJJMa5T76IlGK66ALC3C3lN+M
- /lUAGFbWWFPCP7bHnQGDH3BNi/e47O13aJj1YY4fc2V31NYVLNhkxiLJltOri7MnkClr
- bfg2DoYwogM86g6I7N/ygzwU0djmIckGe/MwKpAM+qsfg8iAtQd3TwzVQ7iLYsAejJpr
- NJLA==
-X-Gm-Message-State: AGi0Pub2yAVbCS45HS+kEF20Dd+QGOX7v/cAoIGMQWixpuJr3zqYI1qP
- ng20h9p7J3n2Lj4yIvMlMfLG/g==
-X-Google-Smtp-Source: APiQypKT2+uqdUkMNinUZ7US4h3EuWA+Qnq8u+r/x9eYKAF8W37lj90IU1/6iLzyAQ3J8dNMc7hMJw==
-X-Received: by 2002:a19:ad43:: with SMTP id s3mr11555874lfd.63.1585661866597; 
- Tue, 31 Mar 2020 06:37:46 -0700 (PDT)
-Received: from localhost.localdomain
- (c-f3d7225c.014-348-6c756e10.bbcust.telenor.se. [92.34.215.243])
- by smtp.gmail.com with ESMTPSA id x128sm9837994lff.67.2020.03.31.06.37.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 31 Mar 2020 06:37:45 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-To: Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>
-Subject: [PATCH] fcntl: Add 32bit filesystem mode
-Date: Tue, 31 Mar 2020 15:35:36 +0200
-Message-Id: <20200331133536.3328-1-linus.walleij@linaro.org>
-X-Mailer: git-send-email 2.25.1
+ (envelope-from <kwolf@redhat.com>) id 1jJHCI-0000TR-JV
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 09:44:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55667
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jJHCI-0000T9-Fl
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 09:44:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585662293;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Gw1vmhjUTM/L9ZxInXP/WEtklsRr+SfUxCX++LNxRLY=;
+ b=fyRwVbfo00nCekdJLNfwVH4vJcLyYGL2QEROr9lmTaMG6jul5lFX80r+ZQF3XKfq0b6Y1p
+ FVyh+kbt+D8oFtZq0KwB7KKckGpnNs6jtmWRV7VvXKZfS1w9USk5Q3zrw8skeQ0G5TmpHT
+ ScgaHjy2ignYuPNu+gh8SmqXAcyWjEs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-3ta517OzMBCHWqGAIfTvIQ-1; Tue, 31 Mar 2020 09:44:50 -0400
+X-MC-Unique: 3ta517OzMBCHWqGAIfTvIQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42825107ACC7;
+ Tue, 31 Mar 2020 13:44:49 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-236.ams2.redhat.com [10.36.114.236])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7519898A38;
+ Tue, 31 Mar 2020 13:44:47 +0000 (UTC)
+Date: Tue, 31 Mar 2020 15:44:46 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v10 14/14] iotests: use python logging for iotests.log()
+Message-ID: <20200331134446.GF7030@linux.fritz.box>
+References: <20200331000014.11581-1-jsnow@redhat.com>
+ <20200331000014.11581-15-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::141
+In-Reply-To: <20200331000014.11581-15-jsnow@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,135 +88,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, linux-api@vger.kernel.org,
- Linus Walleij <linus.walleij@linaro.org>, qemu-devel@nongnu.org,
- Florian Weimer <fw@deneb.enyo.de>, Andy Lutomirski <luto@kernel.org>,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org
+Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It was brought to my attention that this bug from 2018 was
-still unresolved: 32 bit emulators like QEMU were given
-64 bit hashes when running 32 bit emulation on 64 bit systems.
+Am 31.03.2020 um 02:00 hat John Snow geschrieben:
+> We can turn logging on/off globally instead of per-function.
+>=20
+> Remove use_log from run_job, and use python logging to turn on
+> diffable output when we run through a script entry point.
+>=20
+> iotest 245 changes output order due to buffering reasons.
+>=20
+>=20
+> An extended note on python logging:
+>=20
+> A NullHandler is added to `qemu.iotests` to stop output from being
+> generated if this code is used as a library without configuring logging.
+> A NullHandler is only needed at the root, so a duplicate handler is not
+> needed for `qemu.iotests.diff_io`.
+>=20
+> When logging is not configured, messages at the 'WARNING' levels or
+> above are printed with default settings. The NullHandler stops this from
+> occurring, which is considered good hygiene for code used as a library.
+>=20
+> See https://docs.python.org/3/howto/logging.html#library-config
+>=20
+> When logging is actually enabled (always at the behest of an explicit
+> call by a client script), a root logger is implicitly created at the
+> root, which allows messages to propagate upwards and be handled/emitted
+> from the root logger with default settings.
+>=20
+> When we want iotest logging, we attach a handler to the
+> qemu.iotests.diff_io logger and disable propagation to avoid possible
+> double-printing.
+>=20
+> For more information on python logging infrastructure, I highly
+> recommend downloading the pip package `logging_tree`, which provides
+> convenient visualizations of the hierarchical logging configuration
+> under different circumstances.
+>=20
+> See https://pypi.org/project/logging_tree/ for more information.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-This adds a fcntl() operation to set the underlying filesystem
-into 32bit mode even if the file hanle was opened using 64bit
-mode without the compat syscalls.
+Should we enable logger if -d is given?
 
-Programs that need the 32 bit file system behavior need to
-issue a fcntl() system call such as in this example:
+Previously we had:
 
-  #define F_SET_FILE_32BIT_FS (1024 + 15)
+$ ./check -d -T -raw 281
+[...]
+281 not run: not suitable for this image format: raw
+281      not run    [15:39:03] [15:39:04]                    not suitable f=
+or this image format: raw
+Not run: 281
 
-  int main(int argc, char** argv) {
-    DIR* dir;
-    int err;
-    int fd;
+After this series, the first line of output from notrun() is missing.
+Not that I think it's important to have the line, but as long as we
+bother to call logger.warning(), I thought that maybe we want to be able
+to actually see the effect of it somehwere?
 
-    dir = opendir("/boot");
-    fd = dirfd(dir);
-    err = fcntl(fd, F_SET_FILE_32BIT_FS);
-    if (err) {
-      printf("fcntl() failed! err=%d\n", err);
-      return 1;
-    }
-    printf("dir=%p\n", dir);
-    printf("readdir(dir)=%p\n", readdir(dir));
-    printf("errno=%d: %s\n", errno, strerror(errno));
-    return 0;
-  }
-
-This can be pretty hard to test since C libraries and linux
-userspace security extensions aggressively filter the parameters
-that are passed down and allowed to commit into actual system
-calls.
-
-Cc: Florian Weimer <fw@deneb.enyo.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andy Lutomirski <luto@kernel.org>
-Suggested-by: Theodore Ts'o <tytso@mit.edu>
-Link: https://bugs.launchpad.net/qemu/+bug/1805913
-Link: https://lore.kernel.org/lkml/87bm56vqg4.fsf@mid.deneb.enyo.de/
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=205957
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- fs/fcntl.c                       | 4 ++++
- include/uapi/linux/fcntl.h       | 9 +++++++++
- tools/include/uapi/linux/fcntl.h | 9 +++++++++
- tools/perf/trace/beauty/fcntl.c  | 3 ++-
- 4 files changed, 24 insertions(+), 1 deletion(-)
-
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index 2e4c0fa2074b..d194b1265bd4 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -426,6 +426,10 @@ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
- 	case F_SET_FILE_RW_HINT:
- 		err = fcntl_rw_hint(filp, cmd, arg);
- 		break;
-+	case F_SET_FILE_32BIT_FS:
-+		filp->f_mode |= FMODE_32BITHASH;
-+		err = 0;
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
-index ca88b7bce553..b9ad934147e8 100644
---- a/include/uapi/linux/fcntl.h
-+++ b/include/uapi/linux/fcntl.h
-@@ -73,6 +73,15 @@
-  */
- #define RWF_WRITE_LIFE_NOT_SET	RWH_WRITE_LIFE_NOT_SET
- 
-+/*
-+ * This instructs the kernel to provide 32bit semantics (such as hashes) from
-+ * the file system layer, when running a userland that depend on 32bit
-+ * semantics on a kernel that supports 64bit userland, but does not use the
-+ * compat ioctl() for e.g. open(), so that the kernel would otherwise assume
-+ * that the userland process is capable of dealing with 64bit semantics.
-+ */
-+#define F_SET_FILE_32BIT_FS	(F_LINUX_SPECIFIC_BASE + 15)
-+
- /*
-  * Types of directory notifications that may be requested.
-  */
-diff --git a/tools/include/uapi/linux/fcntl.h b/tools/include/uapi/linux/fcntl.h
-index ca88b7bce553..b9ad934147e8 100644
---- a/tools/include/uapi/linux/fcntl.h
-+++ b/tools/include/uapi/linux/fcntl.h
-@@ -73,6 +73,15 @@
-  */
- #define RWF_WRITE_LIFE_NOT_SET	RWH_WRITE_LIFE_NOT_SET
- 
-+/*
-+ * This instructs the kernel to provide 32bit semantics (such as hashes) from
-+ * the file system layer, when running a userland that depend on 32bit
-+ * semantics on a kernel that supports 64bit userland, but does not use the
-+ * compat ioctl() for e.g. open(), so that the kernel would otherwise assume
-+ * that the userland process is capable of dealing with 64bit semantics.
-+ */
-+#define F_SET_FILE_32BIT_FS	(F_LINUX_SPECIFIC_BASE + 15)
-+
- /*
-  * Types of directory notifications that may be requested.
-  */
-diff --git a/tools/perf/trace/beauty/fcntl.c b/tools/perf/trace/beauty/fcntl.c
-index 56ef83b3d130..da80264678cb 100644
---- a/tools/perf/trace/beauty/fcntl.c
-+++ b/tools/perf/trace/beauty/fcntl.c
-@@ -94,7 +94,8 @@ size_t syscall_arg__scnprintf_fcntl_arg(char *bf, size_t size, struct syscall_ar
- 	    cmd == F_OFD_SETLK || cmd == F_OFD_SETLKW || cmd == F_OFD_GETLK ||
- 	    cmd == F_GETOWN_EX || cmd == F_SETOWN_EX ||
- 	    cmd == F_GET_RW_HINT || cmd == F_SET_RW_HINT ||
--	    cmd == F_GET_FILE_RW_HINT || cmd == F_SET_FILE_RW_HINT)
-+	    cmd == F_GET_FILE_RW_HINT || cmd == F_SET_FILE_RW_HINT ||
-+	    cmd == F_SET_FILE_32BIT_FS)
- 		return syscall_arg__scnprintf_hex(bf, size, arg);
- 
- 	return syscall_arg__scnprintf_long(bf, size, arg);
--- 
-2.25.1
+Kevin
 
 
