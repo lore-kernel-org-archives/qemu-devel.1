@@ -2,53 +2,88 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC6DC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 874CBC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:25:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 224F220838
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:25:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 224F220838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4FF3420838
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:25:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwS+rkZo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FF3420838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJFx1-0004Hu-AE
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 08:25:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34425)
+	id 1jJFxO-0004uC-Ep
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 08:25:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35057)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <s.reiter@proxmox.com>) id 1jJFt6-0006jQ-Vu
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:21:02 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jJFwc-0003rs-LJ
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:24:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <s.reiter@proxmox.com>) id 1jJFt5-00086b-Mr
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:21:00 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:21794)
+ (envelope-from <kwolf@redhat.com>) id 1jJFwa-0002If-Gv
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:24:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36473
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <s.reiter@proxmox.com>)
- id 1jJFt2-00081U-Rz; Tue, 31 Mar 2020 08:20:57 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id D3CD943DBB;
- Tue, 31 Mar 2020 14:20:51 +0200 (CEST)
-From: Stefan Reiter <s.reiter@proxmox.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH v3 1/3] job: take each job's lock individually in job_txn_apply
-Date: Tue, 31 Mar 2020 14:20:43 +0200
-Message-Id: <20200331122045.164356-2-s.reiter@proxmox.com>
-X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200331122045.164356-1-s.reiter@proxmox.com>
-References: <20200331122045.164356-1-s.reiter@proxmox.com>
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jJFwZ-0002Fz-6T
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:24:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585657473;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qns4HGR/d6XW4WCB/3wHbPhCk7MBnRIK91j3WGKWE+I=;
+ b=MwS+rkZoTS5QUGbfRH3yERcirqdNhzGyUkZdNIDKURdmUwA8f50dI+UFFIObS/IgbeQkmt
+ 6K40daFxCa79uS8QKUTBMP+y+UmuxSRVr2I56wtPyrAD3nGvuVSykmqEYtlgtWHZEWlMBE
+ GqXsvvzeaFWRzniXafQeLNe8uI1R4/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-bH-I0RoWPGycuSBhyk-gUA-1; Tue, 31 Mar 2020 08:24:31 -0400
+X-MC-Unique: bH-I0RoWPGycuSBhyk-gUA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF7438010C8;
+ Tue, 31 Mar 2020 12:24:30 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-236.ams2.redhat.com [10.36.114.236])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C91C5D9CA;
+ Tue, 31 Mar 2020 12:24:29 +0000 (UTC)
+Date: Tue, 31 Mar 2020 14:24:28 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: deprecation of in-tree builds
+Message-ID: <20200331122428.GD7030@linux.fritz.box>
+References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+ <87v9mmug73.fsf@dusky.pond.sub.org>
+ <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
+ <20200330134212.GO236854@redhat.com>
+ <20200330143759.GD6139@linux.fritz.box>
+ <c0a1dc94-c3f2-696e-743f-aa15ef995094@redhat.com>
+ <20200331120220.GA7030@linux.fritz.box>
+ <CAFEAcA_p1T4--Re5=-x=q=cCX-8YDAk_keS72NURe3T23j89sA@mail.gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_p1T4--Re5=-x=q=cCX-8YDAk_keS72NURe3T23j89sA@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.186.127.180
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,161 +95,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, slp@redhat.com,
- mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com, dietmar@proxmox.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All callers of job_txn_apply hold a single job's lock, but different
-jobs within a transaction can have different contexts, thus we need to
-lock each one individually before applying the callback function.
+Am 31.03.2020 um 14:05 hat Peter Maydell geschrieben:
+> On Tue, 31 Mar 2020 at 13:02, Kevin Wolf <kwolf@redhat.com> wrote:
+> > Mainly because it allows me to start everything (most importantly: my
+> > editor, git and make) from the same directory.
+>=20
+> You can use 'make -C build/whatever' to avoid having to change directory.
 
-Similar to job_completed_txn_abort this also requires releasing the
-caller's context before and reacquiring it after to avoid recursive
-locks which might break AIO_WAIT_WHILE in the callback.
+Which is about five times as long as 'make'.
 
-This also brings to light a different issue: When a callback function in
-job_txn_apply moves it's job to a different AIO context, job_exit will
-try to release the wrong lock (now that we re-acquire the lock
-correctly, previously it would just continue with the old lock, leaving
-the job unlocked for the rest of the codepath back to job_exit). Fix
-this by not caching the job's context in job_exit and add a comment
-about why this is done.
+I'm not sure what the problem would be with a Makefile in the source
+tree that just calls make in the build directory? It's convenient and
+doesn't hurt anyone who prefers to work directly in the build directory.
 
-One test needed adapting, since it calls job_finalize directly, so it
-manually needs to acquire the correct context.
+> The odd one out here is configure, where you have to say
+>  (cd build/whatever && ../../configure ...)
+> I have occasionally wondered if we should add an equivalent to
+> make's -C option to configure, but AFAIX autoconf-configures don't
+> have it, so it would be an odd non-standardism.
 
-Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
----
- job.c                 | 48 ++++++++++++++++++++++++++++++++++---------
- tests/test-blockjob.c |  2 ++
- 2 files changed, 40 insertions(+), 10 deletions(-)
+Well, not allowing in-tree builds is an odd non-standardism, too, so I
+think some more non-standardisms to make it more bearable wouldn't be
+too bad.
 
-diff --git a/job.c b/job.c
-index 134a07b92e..5fbaaabf78 100644
---- a/job.c
-+++ b/job.c
-@@ -136,17 +136,36 @@ static void job_txn_del_job(Job *job)
-     }
- }
-=20
--static int job_txn_apply(JobTxn *txn, int fn(Job *))
-+static int job_txn_apply(Job *job, int fn(Job *))
- {
--    Job *job, *next;
-+    AioContext *inner_ctx;
-+    Job *other_job, *next;
-+    JobTxn *txn =3D job->txn;
-     int rc =3D 0;
-=20
--    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
--        rc =3D fn(job);
-+    /*
-+     * Similar to job_completed_txn_abort, we take each job's lock befor=
-e
-+     * applying fn, but since we assume that outer_ctx is held by the ca=
-ller,
-+     * we need to release it here to avoid holding the lock twice - whic=
-h would
-+     * break AIO_WAIT_WHILE from within fn.
-+     */
-+    aio_context_release(job->aio_context);
-+
-+    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
-+        inner_ctx =3D other_job->aio_context;
-+        aio_context_acquire(inner_ctx);
-+        rc =3D fn(other_job);
-+        aio_context_release(inner_ctx);
-         if (rc) {
-             break;
-         }
-     }
-+
-+    /*
-+     * Note that job->aio_context might have been changed by calling fn,=
- so we
-+     * can't use a local variable to cache it.
-+     */
-+    aio_context_acquire(job->aio_context);
-     return rc;
- }
-=20
-@@ -774,11 +793,11 @@ static void job_do_finalize(Job *job)
-     assert(job && job->txn);
-=20
-     /* prepare the transaction to complete */
--    rc =3D job_txn_apply(job->txn, job_prepare);
-+    rc =3D job_txn_apply(job, job_prepare);
-     if (rc) {
-         job_completed_txn_abort(job);
-     } else {
--        job_txn_apply(job->txn, job_finalize_single);
-+        job_txn_apply(job, job_finalize_single);
-     }
- }
-=20
-@@ -824,10 +843,10 @@ static void job_completed_txn_success(Job *job)
-         assert(other_job->ret =3D=3D 0);
-     }
-=20
--    job_txn_apply(txn, job_transition_to_pending);
-+    job_txn_apply(job, job_transition_to_pending);
-=20
-     /* If no jobs need manual finalization, automatically do so */
--    if (job_txn_apply(txn, job_needs_finalize) =3D=3D 0) {
-+    if (job_txn_apply(job, job_needs_finalize) =3D=3D 0) {
-         job_do_finalize(job);
-     }
- }
-@@ -849,9 +868,10 @@ static void job_completed(Job *job)
- static void job_exit(void *opaque)
- {
-     Job *job =3D (Job *)opaque;
--    AioContext *ctx =3D job->aio_context;
-+    AioContext *ctx;
-=20
--    aio_context_acquire(ctx);
-+    job_ref(job);
-+    aio_context_acquire(job->aio_context);
-=20
-     /* This is a lie, we're not quiescent, but still doing the completio=
-n
-      * callbacks. However, completion callbacks tend to involve operatio=
-ns that
-@@ -862,6 +882,14 @@ static void job_exit(void *opaque)
-=20
-     job_completed(job);
-=20
-+    /*
-+     * Note that calling job_completed can move the job to a different
-+     * aio_context, so we cannot cache from above. job_txn_apply takes c=
-are of
-+     * acquiring the new lock, and we ref/unref to avoid job_completed f=
-reeing
-+     * the job underneath us.
-+     */
-+    ctx =3D job->aio_context;
-+    job_unref(job);
-     aio_context_release(ctx);
- }
-=20
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 4eeb184caf..7519847912 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -367,7 +367,9 @@ static void test_cancel_concluded(void)
-     aio_poll(qemu_get_aio_context(), true);
-     assert(job->status =3D=3D JOB_STATUS_PENDING);
-=20
-+    aio_context_acquire(job->aio_context);
-     job_finalize(job, &error_abort);
-+    aio_context_release(job->aio_context);
-     assert(job->status =3D=3D JOB_STATUS_CONCLUDED);
-=20
-     cancel_common(s);
---=20
-2.26.0
-
+Kevin
 
 
