@@ -2,164 +2,81 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A25C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5654C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 03:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D98A62072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:59:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEC232072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 03:07:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="hbk7a93m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98A62072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXLHQRRr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC232072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ780-0006AN-Sr
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 22:59:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56136)
+	id 1jJ7FZ-0008Ii-PS
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 23:07:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57166)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1jJ77N-0005dj-N1
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:59:11 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jJ7Ez-0007uC-AW
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 23:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1jJ77M-0002nC-3W
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:59:09 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:34139)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1jJ77L-0002mS-O0
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:59:08 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id q16so533561pje.1
- for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 19:59:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=jBX/3jedvD8WvzMTCUSR+EKJL8Jz0/5XQL5K3+nOBDQ=;
- b=hbk7a93mETZFcw64kNknsbiMmp1IrAsItdEX0mT61kmS5yly//PQH9LI+PGzbzgZFt
- gF5MSFQt0w8AzuYB2aN6lZUcAKKWjLmUeWD/yudxE+NhCBRrandrfp7mr+er4QJ/S0Y4
- rQc3qrENxb1JiGqVyyZToLIxsiKobhQH6YOA42zz4PG2s1l1YpudAmVLX2/wPeSNOde1
- hAbeQWmT8mdcZMN362IPOl9hGMovHt7EP+MVkBgjj2q6O4PnpjgX+nNl/8a66cJjR92C
- ldQZ/2CPsWmBm4pBIZqihmOYgf1sb2P2RqD5weQfoaRYIg8+JG64uQFTrn2Jx6tBBmW1
- zhlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=jBX/3jedvD8WvzMTCUSR+EKJL8Jz0/5XQL5K3+nOBDQ=;
- b=CZzoTkeFz0Jj7LWYBYOllPZte2nXmYRl7DjMV3p6T0Gk3KkvI7Wh0hNCOw4wRYBBkE
- Q3fvMlG0gwvYbwnDhxbI2op0QN8lJAS45QrTiSLT9iZH5YZnkAsk9RCM/oqL9jBlZ1Y4
- Q4GJHJEYjQq2c6734hsJnyqvVMbPfAPIioIaWlSWcuMsjoaRnAlRvo2WkBd5j/NLvRoj
- 3dM/7qxVNNtgy/RiuyI3k50r56YEA4VROyJAT0vfEV2fcxgCdkJ8a+sNkNoqWIg2KeOC
- RNbZN+nuI0LKDSU435fiYpfGgGccJlI1GKfethwK1ZS5pb0zBZKQ1Nw8pknncCGecuXr
- qV+w==
-X-Gm-Message-State: ANhLgQ1VJ3wBH/Nn+JOUyn2Eeg0/r7zyH/X7EqDygFXIeQUWUfGg83L6
- X9Iq7VxKfZqGOZbkDe/D/0lFeg==
-X-Google-Smtp-Source: ADFU+vvLLCqHcTc3GXbV5DB3JlfVFRayW/zjiofAbz2DcfhzEFVErgaddY7f/CG6Lr1O32dYzNZFyg==
-X-Received: by 2002:a17:902:be14:: with SMTP id
- r20mr15675490pls.270.1585623545529; 
- Mon, 30 Mar 2020 19:59:05 -0700 (PDT)
-Received: from [192.168.10.94] (124-171-87-207.dyn.iinet.net.au.
- [124.171.87.207])
- by smtp.gmail.com with ESMTPSA id a24sm11260227pfl.115.2020.03.30.19.59.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 30 Mar 2020 19:59:04 -0700 (PDT)
-Subject: Re: [PATCH 0/4] spapr: Get rid of CAS reboot flag
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-References: <158514992409.478799.6718223069768660390.stgit@bahia.lan>
- <20200331004415.GC47772@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <d1a3e718-a0da-51a6-3511-b9dbb1fc6bfe@ozlabs.ru>
-Date: Tue, 31 Mar 2020 13:59:01 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <jasowang@redhat.com>) id 1jJ7Ex-00087x-A8
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 23:07:00 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:60010)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jJ7Ex-00087a-4n
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 23:06:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585624018;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BA/dIZWbBaKQirZdCjXZYuDyEDSYk0rlCZ4hfDM4zfI=;
+ b=PXLHQRRrk+T0C4mYKhb343g3FgzJs/VRRewmKukCHXyAZojPLelAXwe+52kfk8FQvvJFKE
+ 1+1KLYqHkS0uX+WzK9iG5jQX6+0H+JL+k2ESTBTAsPncU6PyrlOD2UVyfxaLvGP2fuojmd
+ hifRWVFEzAZD8AImY7aSYzaLdqzFERA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428--mS8Yl9HOSO97Zc5dFl30g-1; Mon, 30 Mar 2020 23:06:56 -0400
+X-MC-Unique: -mS8Yl9HOSO97Zc5dFl30g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 100FB13F7;
+ Tue, 31 Mar 2020 03:06:55 +0000 (UTC)
+Received: from [10.72.12.115] (ovpn-12-115.pek2.redhat.com [10.72.12.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6E5AB60BEC;
+ Tue, 31 Mar 2020 03:06:52 +0000 (UTC)
+Subject: Re: [PATCH v2] qtest: add tulip test case
+To: Li Qiang <liq3ea@163.com>, thuth@redhat.com, lvivier@redhat.com,
+ pbonzini@redhat.com
+References: <20200330145201.32534-1-liq3ea@163.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <44204bf9-0048-026c-192e-7ed5bf338b36@redhat.com>
+Date: Tue, 31 Mar 2020 11:06:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200331004415.GC47772@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200330145201.32534-1-liq3ea@163.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -171,45 +88,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+On 2020/3/30 =E4=B8=8B=E5=8D=8810:52, Li Qiang wrote:
+> The tulip networking card emulation has an OOB issue in
+> 'tulip_copy_tx_buffers' when the guest provide malformed descriptor.
+> This test will trigger a ASAN heap overflow crash. To trigger this
+> issue we can construct the data as following:
+>
+> 1. construct a 'tulip_descriptor'. Its control is set to
+> '0x7ff | 0x7ff << 11', this will make the 'tulip_copy_tx_buffers's
+> 'len1' and 'len2' to 0x7ff(2047). So 'len1+len2' will overflow
+> 'TULIPState's 'tx_frame' field. This descriptor's 'buf_addr1' and
+> 'buf_addr2' should set to a guest address.
+>
+> 2. write this descriptor to tulip device's CSR4 register. This will
+> set the 'TULIPState's 'current_tx_desc' field.
+>
+> 3. write 'CSR6_ST' to tulip device's CSR6 register. This will trigger
+> 'tulip_xmit_list_update' and finally calls 'tulip_copy_tx_buffers'.
+>
+> Following shows the backtrack of crash:
+>
+> =3D=3D31781=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address=
+ 0x628000007cd0 at pc 0x7fe03c5a077a bp 0x7fff05b46770 sp 0x7fff05b45f18
+> WRITE of size 2047 at 0x628000007cd0 thread T0
+>      #0 0x7fe03c5a0779  (/usr/lib/x86_64-linux-gnu/libasan.so.4+0x79779)
+>      #1 0x5575fb6daa6a in flatview_read_continue /home/test/qemu/exec.c:3=
+194
+>      #2 0x5575fb6daccb in flatview_read /home/test/qemu/exec.c:3227
+>      #3 0x5575fb6dae66 in address_space_read_full /home/test/qemu/exec.c:=
+3240
+>      #4 0x5575fb6db0cb in address_space_rw /home/test/qemu/exec.c:3268
+>      #5 0x5575fbdfd460 in dma_memory_rw_relaxed /home/test/qemu/include/s=
+ysemu/dma.h:87
+>      #6 0x5575fbdfd4b5 in dma_memory_rw /home/test/qemu/include/sysemu/dm=
+a.h:110
+>      #7 0x5575fbdfd866 in pci_dma_rw /home/test/qemu/include/hw/pci/pci.h=
+:787
+>      #8 0x5575fbdfd8a3 in pci_dma_read /home/test/qemu/include/hw/pci/pci=
+.h:794
+>      #9 0x5575fbe02761 in tulip_copy_tx_buffers hw/net/tulip.c:585
+>      #10 0x5575fbe0366b in tulip_xmit_list_update hw/net/tulip.c:678
+>      #11 0x5575fbe04073 in tulip_write hw/net/tulip.c:783
+>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+> Change since v1:
+>
+> Add detail descriptor construction to trigger the crash.
+> Use CSR6_ST to replace the magic value.
 
-On 31/03/2020 11:44, David Gibson wrote:
-> On Wed, Mar 25, 2020 at 04:25:24PM +0100, Greg Kurz wrote:
->> The CAS reboot flag was introduced in QEMU 2.10 to allow the guest
->> to be presented a new boot-time device tree after CAS negotiation.
->> CAS-generated resets rely on qemu_system_reset_request() which has
->> the particularity of dropping the main loop lock at some point. This
->> opens a window where migration can happen, hence promotting the CAS
->> reboot flag to actual state that we should also migrate. In practice,
->> this can't happen anymore since we have eliminated the scenario of
->> the XICS/XIVE switch and the much less frequent scenario of device
->> plug/unplug before CAS.
->>
->> We still have much of the CAS reboot bits around though. The full FDT
->> rendering we do at CAS is enough to get rid of them once and far all.
->>
->> Some preliminary cleanup is made before going for the full removal,
->> for easier reviewing. At some point I had the need to move some code
->> around in CAS, and Alexey's patch from the "spapr: kill SLOF" (v8)
->> series proved to be helpful so I've reused it in this patchset.
->>
->> This series applies cleanly on both ppc-for-5.0 and ppc-for-5.1.
->> Since it doesn't fix any actual bug, I think this can be delayed
->> to 5.1.
-> 
-> Applied to ppc-for-5.1.
+
+Applied.
+
+Thanks
 
 
+>
+>   tests/qtest/Makefile.include |  1 +
+>   tests/qtest/tulip-test.c     | 91 ++++++++++++++++++++++++++++++++++++
+>   2 files changed, 92 insertions(+)
+>   create mode 100644 tests/qtest/tulip-test.c
+>
+> diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+> index 10a28de8a3..9e5a51d033 100644
+> --- a/tests/qtest/Makefile.include
+> +++ b/tests/qtest/Makefile.include
+> @@ -217,6 +217,7 @@ qos-test-obj-y +=3D tests/qtest/es1370-test.o
+>   qos-test-obj-y +=3D tests/qtest/ipoctal232-test.o
+>   qos-test-obj-y +=3D tests/qtest/megasas-test.o
+>   qos-test-obj-y +=3D tests/qtest/ne2000-test.o
+> +qos-test-obj-y +=3D tests/qtest/tulip-test.o
+>   qos-test-obj-y +=3D tests/qtest/nvme-test.o
+>   qos-test-obj-y +=3D tests/qtest/pca9552-test.o
+>   qos-test-obj-y +=3D tests/qtest/pci-test.o
+> diff --git a/tests/qtest/tulip-test.c b/tests/qtest/tulip-test.c
+> new file mode 100644
+> index 0000000000..2fb6c4d5a7
+> --- /dev/null
+> +++ b/tests/qtest/tulip-test.c
+> @@ -0,0 +1,91 @@
+> +/*
+> + * QTest testcase for DEC/Intel Tulip 21143
+> + *
+> + * Copyright (c) 2020 Li Qiang <liq3ea@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "libqtest.h"
+> +#include "qemu/module.h"
+> +#include "libqos/qgraph.h"
+> +#include "libqos/pci.h"
+> +#include "qemu/bitops.h"
+> +#include "hw/net/tulip.h"
+> +
+> +typedef struct QTulip_pci QTulip_pci;
+> +
+> +struct QTulip_pci {
+> +    QOSGraphObject obj;
+> +    QPCIDevice dev;
+> +};
+> +
+> +static void *tulip_pci_get_driver(void *obj, const char *interface)
+> +{
+> +    QTulip_pci *tulip_pci =3D obj;
+> +
+> +    if (!g_strcmp0(interface, "pci-device")) {
+> +        return &tulip_pci->dev;
+> +    }
+> +
+> +    fprintf(stderr, "%s not present in tulip_pci\n", interface);
+> +    g_assert_not_reached();
+> +}
+> +
+> +static void *tulip_pci_create(void *pci_bus, QGuestAllocator *alloc, voi=
+d *addr)
+> +{
+> +    QTulip_pci *tulip_pci =3D g_new0(QTulip_pci, 1);
+> +    QPCIBus *bus =3D pci_bus;
+> +
+> +    qpci_device_init(&tulip_pci->dev, bus, addr);
+> +    tulip_pci->obj.get_driver =3D tulip_pci_get_driver;
+> +
+> +    return &tulip_pci->obj;
+> +}
+> +
+> +static void tulip_large_tx(void *obj, void *data, QGuestAllocator *alloc=
+)
+> +{
+> +    QTulip_pci *tulip_pci =3D obj;
+> +    QPCIDevice *dev =3D &tulip_pci->dev;
+> +    QPCIBar bar;
+> +    struct tulip_descriptor context;
+> +    char guest_data[4096];
+> +    uint64_t context_pa;
+> +    uint64_t guest_pa;
+> +
+> +    qpci_device_enable(dev);
+> +    bar =3D qpci_iomap(dev, 0, NULL);
+> +    context_pa =3D guest_alloc(alloc, sizeof(context));
+> +    guest_pa =3D guest_alloc(alloc, 4096);
+> +    memset(guest_data, 'A', sizeof(guest_data));
+> +    context.status =3D TDES0_OWN;
+> +    context.control =3D TDES1_BUF2_SIZE_MASK << TDES1_BUF2_SIZE_SHIFT |
+> +                      TDES1_BUF1_SIZE_MASK << TDES1_BUF1_SIZE_SHIFT;
+> +    context.buf_addr2 =3D guest_pa;
+> +    context.buf_addr1 =3D guest_pa;
+> +
+> +    qtest_memwrite(dev->bus->qts, context_pa, &context, sizeof(context))=
+;
+> +    qtest_memwrite(dev->bus->qts, guest_pa, guest_data, sizeof(guest_dat=
+a));
+> +    qpci_io_writel(dev, bar, 0x20, context_pa);
+> +    qpci_io_writel(dev, bar, 0x30, CSR6_ST);
+> +    guest_free(alloc, context_pa);
+> +    guest_free(alloc, guest_pa);
+> +}
+> +
+> +static void tulip_register_nodes(void)
+> +{
+> +    QOSGraphEdgeOptions opts =3D {
+> +        .extra_device_opts =3D "addr=3D04.0",
+> +    };
+> +    add_qpci_address(&opts, &(QPCIAddress) { .devfn =3D QPCI_DEVFN(4, 0)=
+ });
+> +
+> +    qos_node_create_driver("tulip", tulip_pci_create);
+> +    qos_node_consumes("tulip", "pci-bus", &opts);
+> +    qos_node_produces("tulip", "pci-device");
+> +
+> +    qos_add_test("tulip_large_tx", "tulip", tulip_large_tx, NULL);
+> +}
+> +
+> +libqos_init(tulip_register_nodes);
 
-Can you push it out please? The existing ppc-for-5.1 corrupts stack on
-my machine in qemu_init().
-
--- 
-Alexey
 
