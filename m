@@ -2,86 +2,60 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB02BC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB430C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8278E20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:33:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cpY4HskH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8278E20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9F9CA2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 12:35:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F9CA2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJG5A-0002bD-Ic
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 08:33:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36156)
+	id 1jJG71-0003WO-Q2
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 08:35:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jJG4S-00022P-RB
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:32:46 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jJG5Y-0002yD-BZ
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:33:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jJG4R-0008GE-2B
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:32:44 -0400
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:33581)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jJG4P-0008FB-U3
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:32:42 -0400
-Received: by mail-ot1-x32f.google.com with SMTP id 22so21813972otf.0
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 05:32:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=KX3bx5nyjmkbYRDFDbwXaLCvlYWCK2kdnAEMVPtWuSw=;
- b=cpY4HskHmBCCE2R2O4324GGsnFU3iAHs237N5cgLpY5vheJ2EUnT0ieJZv31n/XSd0
- lJq+s6Djc34X/QJ/49w9OC+qSdVqgZ6o4OZM/9CqwugHvBsenZx6EmMq2+Zqo4idl+ZE
- DQZBO5WdTNTtspm8dR+8HUQs/y9J6fp2cFP70s0sW/RgHIhbsjDwbDRsf9KTFUGlKgDl
- Fv3sj7oHHczqVzjwCdUHEiPsDP7faSaAMDKiCwWHS4G/RncJrIZt+X7ZVf1oz/93rvgI
- KqycLpyiLYFl7gcK0rxY0BAs4bS9PTOGZHaByOFpXoGy7UXfU0fqWpgwNZv1A71tWDXI
- Or7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=KX3bx5nyjmkbYRDFDbwXaLCvlYWCK2kdnAEMVPtWuSw=;
- b=i09wPm4MCGRr/juMoGetOmhWRHtG+zxYTGtiFQML3/gLDTnLp68N+g+Dws5G5u5ayW
- Xp+eorxzoQFb6XDZrjO+/G3pcL1phZiEWJQnUVF6IuAkOfs4gF1KdRpDdeFFPnfHiIZV
- rr31GMFqyx7G+Tku65HlcKyducXb/SpI+rtESx82xxjVpWrJEUEpCmQbIWHTIAjr8zvF
- u3IsOqwy5ly8ZeJVdirfXJwNCPSdd+SNRS9VXwrVLviGYRbj/zgSfpYqqAqGmAq/Eaq5
- kKoEc4OfkF/yiquLY243fzerSOCuONrP33kzfd7lDDQ+Tt+XXGpSo4KUV0pN2cxTgaqX
- iZnQ==
-X-Gm-Message-State: ANhLgQ1WD99VCp0IAJ1pGH73h4skAx/fQxNI3ds8zQPl2WRirhGjUx5w
- P5JMFbtTom2cHy/MNVxtJ6vn49mswuue5JAtylnwhQ==
-X-Google-Smtp-Source: ADFU+vth2bmk7s7pXCiRpYgtcmsTG3G4NaZH9x1nMOvm+C/rb+P/TANJnOPxOlqYIUvGP92eYbv94PQuGgSubH7beII=
-X-Received: by 2002:a05:6830:11d5:: with SMTP id
- v21mr1463432otq.91.1585657960993; 
- Tue, 31 Mar 2020 05:32:40 -0700 (PDT)
-MIME-Version: 1.0
+ (envelope-from <balaton@eik.bme.hu>) id 1jJG5W-0000ii-GD
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:33:51 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:55735)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1jJG5W-0000eZ-8c
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 08:33:50 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 8978B747EA7;
+ Tue, 31 Mar 2020 14:33:46 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 6201D747EA2; Tue, 31 Mar 2020 14:33:46 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 6094E747EA3;
+ Tue, 31 Mar 2020 14:33:46 +0200 (CEST)
+Date: Tue, 31 Mar 2020 14:33:46 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: deprecation of in-tree builds
+In-Reply-To: <875zel5722.fsf@dusky.pond.sub.org>
+Message-ID: <alpine.BSF.2.22.395.2003311417190.73689@zero.eik.bme.hu>
 References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
  <87v9mmug73.fsf@dusky.pond.sub.org>
  <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
- <20200330134212.GO236854@redhat.com> <20200330143759.GD6139@linux.fritz.box>
- <c0a1dc94-c3f2-696e-743f-aa15ef995094@redhat.com>
- <20200331120220.GA7030@linux.fritz.box>
- <CAFEAcA_p1T4--Re5=-x=q=cCX-8YDAk_keS72NURe3T23j89sA@mail.gmail.com>
- <20200331122428.GD7030@linux.fritz.box>
-In-Reply-To: <20200331122428.GD7030@linux.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Mar 2020 13:32:29 +0100
-Message-ID: <CAFEAcA9_3zSisDBv652q2G4uv_hgo4m5yo07w=qtULwKjqF2_g@mail.gmail.com>
-Subject: Re: deprecation of in-tree builds
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+ <875zel5722.fsf@dusky.pond.sub.org>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32f
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,41 +67,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 31 Mar 2020 at 13:24, Kevin Wolf <kwolf@redhat.com> wrote:
+On Tue, 31 Mar 2020, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>> On Mon, 30 Mar 2020 at 14:26, Markus Armbruster <armbru@redhat.com> wrote:
+>>>
+>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>
+>>>> AIUI from Paolo, the intention is to deprecate and eventually
+>>>> stop supporting "in-tree" builds, so that the only option is
+>>>> building in a separate build directory. I thought we should
+>>>> probably mention that in the 5.0 changelog, so I wrote up some
+>>>> text:
+>>>>
+>>>> https://wiki.qemu.org/ChangeLog/5.0#Build_Information
+>>>
+>>> Overdue.  Thanks for doing this!
+>>>
+>>>> Suggestions for changes/comments etc welcome.
+>>>
+>>> Looks fine to me.
+>>
+>> Consensus in the thread seemed to lean towards having
+>> the 'configure/make' runes auto-create a build directory;
+>> if we want to do that we should probably not say anything in
+>> the release notes, because we'll cause people to change
+>> unnecessarily. Or at least have them say "We recommend
+>> out-of-tree builds. In future we might make the commands
+>> that currently do an in-tree build automatically create
+>> and use a build directory for you." rather than a blanket
+>> "we're going to drop this and you should change what you
+>> do now".
+>>
+>> Thoughts?
 >
-> Am 31.03.2020 um 14:05 hat Peter Maydell geschrieben:
-> > On Tue, 31 Mar 2020 at 13:02, Kevin Wolf <kwolf@redhat.com> wrote:
-> > > Mainly because it allows me to start everything (most importantly: my
-> > > editor, git and make) from the same directory.
-> >
-> > You can use 'make -C build/whatever' to avoid having to change directory.
->
-> Which is about five times as long as 'make'.
+> I'm wary of complicating the build system to save developers a minor
+> change of habits.
 
-True; but once you've done it once then the second time is
-usually C-r <some letters from the last command> RET
-to pull it out of the shell history. (Usually I run something
-like 'make -C build/foo -j8 && make -C build/foo -j8 check &&
-make -C build/foo check-acceptance', which I'm definitely not
-typing out every time.)
+How much complication is it? Looks like a few lines in configure (like the 
+one submitted to print warning but instead of printing a long warning just 
+run the commands (which is even shorter then the text). Then a Makefile in 
+top level dir to do make -C build like someone has also posted in another 
+email. This does not seem too much burden to make life of some people 
+easier so I don't see why some of you insist to force everyone to change 
+their ways even if it could be solved with some effort.
 
-> I'm not sure what the problem would be with a Makefile in the source
-> tree that just calls make in the build directory? It's convenient and
-> doesn't hurt anyone who prefers to work directly in the build directory.
+> We will have to ask developers to change habits anyway when we switch to
+> Meson.  I agree with Daniel's recommendation to delay changes requiring
+> habit-changes until then.  However, telling people to stay clear of the
+> unloved and brittle in-tree build is simply good advice we should not
+> withhold.
 
-I don't object to it particularly; I'm just mentioning that you
-don't need to cd all over the place if you do decide to switch
-to using build dirs. (I think the main benefit of build dirs
-is that you get to have more than one at once, at which point
-you need to specify which one you meant somehow.)
+Can someone please explain why is it brittle and cannot be supported? It 
+has worked well so far apart from some breakage due to being untested 
+which is also not a techincal necessity just a decision by some 
+maintiners to not test it. Adding a CI job to keep it working would also 
+not be difficult or much complexity.
 
-thanks
--- PMM
+Regards,
+BALATON Zoltan
 
