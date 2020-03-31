@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78EC9C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16003C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:45:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E99B206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:45:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E99B206EB
+	by mail.kernel.org (Postfix) with ESMTPS id DEE6420781
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:45:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEE6420781
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ9iK-00034i-Cg
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 01:45:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41371)
+	id 1jJ9iZ-0003VW-1v
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 01:45:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jJ9eu-0006hL-Lz
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:41:57 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jJ9hW-0002Us-O1
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:44:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jJ9et-0003HX-Dr
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:41:56 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48012)
+ (envelope-from <its@irrelevant.dk>) id 1jJ9hV-0004hq-Mr
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:44:38 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48038)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jJ9en-0003ES-IQ; Tue, 31 Mar 2020 01:41:49 -0400
+ id 1jJ9hT-0004dG-E1; Tue, 31 Mar 2020 01:44:35 -0400
 Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 82726BF48F;
- Tue, 31 Mar 2020 05:41:48 +0000 (UTC)
-Date: Tue, 31 Mar 2020 07:41:45 +0200
+ by charlie.dont.surf (Postfix) with ESMTPSA id 10B74BF48F;
+ Tue, 31 Mar 2020 05:44:34 +0000 (UTC)
+Date: Tue, 31 Mar 2020 07:44:30 +0200
 From: Klaus Birkelund Jensen <its@irrelevant.dk>
 To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v6 14/42] nvme: add missing mandatory features
-Message-ID: <20200331054145.wh6olabpkzuw4iwb@apples.localdomain>
+Subject: Re: [PATCH v6 23/42] nvme: add mapping helpers
+Message-ID: <20200331054430.z4onw7uqnnuobmnk@apples.localdomain>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-15-its@irrelevant.dk>
- <e589c8897067d387cae4b03dece27c60fa33041c.camel@redhat.com>
+ <20200316142928.153431-24-its@irrelevant.dk>
+ <165e03c021e92f475dc1037b9421d3588d07799b.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e589c8897067d387cae4b03dece27c60fa33041c.camel@redhat.com>
+In-Reply-To: <165e03c021e92f475dc1037b9421d3588d07799b.camel@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 128.199.63.193
@@ -69,85 +69,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mar 25 12:41, Maxim Levitsky wrote:
+On Mar 25 12:45, Maxim Levitsky wrote:
 > On Mon, 2020-03-16 at 07:29 -0700, Klaus Jensen wrote:
 > > From: Klaus Jensen <k.jensen@samsung.com>
 > > 
-> > Add support for returning a resonable response to Get/Set Features of
-> > mandatory features.
+> > Add nvme_map_addr, nvme_map_addr_cmb and nvme_addr_to_cmb helpers and
+> > use them in nvme_map_prp.
 > > 
-> > Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
-> > Acked-by: Keith Busch <kbusch@kernel.org>
+> > This fixes a bug where in the case of a CMB transfer, the device would
+> > map to the buffer with a wrong length.
+> > 
+> > Fixes: b2b2b67a00574 ("nvme: Add support for Read Data and Write Data in CMBs.")
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > > ---
-> >  hw/block/nvme.c       | 60 ++++++++++++++++++++++++++++++++++++++++++-
-> >  hw/block/trace-events |  2 ++
-> >  include/block/nvme.h  |  6 ++++-
-> >  3 files changed, 66 insertions(+), 2 deletions(-)
+> >  hw/block/nvme.c       | 97 +++++++++++++++++++++++++++++++++++--------
+> >  hw/block/trace-events |  1 +
+> >  2 files changed, 81 insertions(+), 17 deletions(-)
 > > 
 > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > index ff8975cd6667..eb9c722df968 100644
+> > index 08267e847671..187c816eb6ad 100644
 > > --- a/hw/block/nvme.c
 > > +++ b/hw/block/nvme.c
-> > @@ -1058,6 +1069,19 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> >          break;
-> >      case NVME_TIMESTAMP:
-> >          return nvme_get_feature_timestamp(n, cmd);
-> > +    case NVME_INTERRUPT_COALESCING:
-> > +        result = cpu_to_le32(n->features.int_coalescing);
-> > +        break;
-> > +    case NVME_INTERRUPT_VECTOR_CONF:
-> > +        if ((dw11 & 0xffff) > n->params.max_ioqpairs + 1) {
-> > +            return NVME_INVALID_FIELD | NVME_DNR;
-> > +        }
-> I still think that this should be >= since the interrupt vector is not zero based.
-> So if we have for example 3 IO queues, then we have 4 queues in total
-> which translates to irq numbers 0..3.
-> 
-
-Yes you are right. The device will support max_ioqpairs + 1 IVs, so
-trying to access that would actually go 1 beyond the array.
-
-Fixed.
-
-> BTW the user of the device doesn't have to have 1:1 mapping between qid and msi interrupt index,
-> in fact when MSI is not used, all the queues will map to the same vector, which will be interrupt 0
-> from point of view of the device IMHO.
-> So it kind of makes sense IMHO to have num_irqs or something, even if it technically equals to number of queues.
-> 
-
-Yeah, but the device will still *support* the N IVs, so they can still
-be configured even though they will not be used. So I don't think we
-need to introduce an additional parameter?
-
-> > @@ -1120,6 +1146,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> > @@ -153,29 +158,79 @@ static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQueue *cq)
+> >      }
+> >  }
 > >  
-> >          break;
-> >      case NVME_VOLATILE_WRITE_CACHE:
-> > +        if (blk_enable_write_cache(n->conf.blk)) {
-> > +            blk_flush(n->conf.blk);
-> > +        }
+> > +static uint16_t nvme_map_addr_cmb(NvmeCtrl *n, QEMUIOVector *iov, hwaddr addr,
+> > +                                  size_t len)
+> > +{
+> > +    if (!nvme_addr_is_cmb(n, addr) || !nvme_addr_is_cmb(n, addr + len)) {
+> > +        return NVME_DATA_TRAS_ERROR;
+> > +    }
 > 
-> (not your fault) but the blk_enable_write_cache function name is highly misleading,
-> since it doesn't enable anything but just gets the flag if the write cache is enabled.
-> It really should be called blk_get_enable_write_cache.
+> I just noticed that
+> in theory (not that it really matters) but addr+len refers to the byte which is already 
+> not the part of the transfer.
 > 
 
-Agreed :)
+Oh. Good catch - and I think that it does matter? Can't we end up
+rejecting a valid access? Anyway, I fixed it with a '- 1'.
 
-> > @@ -1804,6 +1860,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-> >      id->cqes = (0x4 << 4) | 0x4;
-> >      id->nn = cpu_to_le32(n->num_namespaces);
-> >      id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP);
+> 
 > > +
-> Unrelated whitespace change
+> > +    qemu_iovec_add(iov, nvme_addr_to_cmb(n, addr), len);
+> Also intersting is we can add 0 sized iovec.
+> 
 
-Fixed.
+I added a check on len. This also makes sure the above '- 1' fix doesn't
+cause an 'addr + 0 - 1' to be done.
 
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
-> 
-> 
 
