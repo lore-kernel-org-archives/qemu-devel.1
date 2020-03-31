@@ -2,82 +2,82 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0771DC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2FFC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:13:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C60C3206CC
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A122206CC
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:13:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ecq2Uxo4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C60C3206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uv6oFycb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A122206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJJU7-0004ss-Un
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 12:11:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40902)
+	id 1jJJW4-00062T-LI
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 12:13:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jJJTR-0004Kb-Mh
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:10:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jJJVR-0005WV-GO
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:12:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jJJTQ-0002kw-9d
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:10:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56643
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jJJTQ-0002kf-68
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:10:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585671042;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xJMEObt099ILBREpWHE12Wp6qrNdzm1MauyLML7QBB4=;
- b=ecq2Uxo41eg/QzCO7nFZIyO/H66AKAoRQdqGcrFyJY4XTaau8s8CSuyPWjZopHfQW6ycw7
- cyCZ37HAyROurF31JvdE7DxrMlrMndOIujfF+BAYeEv1V3L4hrVRpoqrK5rvVUVvGuiDH8
- Gt39/22PmYSYiynhQSsfnSkVb67MpWw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-26YvaLqBOQm5BSwvdMt_KQ-1; Tue, 31 Mar 2020 12:10:40 -0400
-X-MC-Unique: 26YvaLqBOQm5BSwvdMt_KQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2F238010EB;
- Tue, 31 Mar 2020 16:10:37 +0000 (UTC)
-Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7CA1819C58;
- Tue, 31 Mar 2020 16:10:36 +0000 (UTC)
-Date: Tue, 31 Mar 2020 18:10:33 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] qemu-options.hx: 9p: clarify -virtfs vs. -fsdev
-Message-ID: <20200331181033.01d16aa2.cohuck@redhat.com>
-In-Reply-To: <87369otsqz.fsf@dusky.pond.sub.org>
-References: <208f1fceffce2feaf7c900b29e326b967dce7762.1585661532.git.qemu_oss@crudebyte.com>
- <20200331172727.6e844deb.cohuck@redhat.com>
- <6318846.9qTBnWfJNl@silver> <87369otsqz.fsf@dusky.pond.sub.org>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1jJJVQ-0004BH-BW
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:12:49 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35643)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jJJVQ-0004B8-3R
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:12:48 -0400
+Received: by mail-oi1-x241.google.com with SMTP id t25so19407019oij.2
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 09:12:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=xYxjFC05Y9IzMuow2NY7UJHZmguN7TRUgsgEOkh1MXA=;
+ b=uv6oFycbUMJjWYqPqV3cSHFSRjnHnRS4gMsx71exqC3/NZ/i6tJVJ1TgTcHU1SyKwz
+ ca7dHOlOZlcA9vOBL8Rr3ppO8UXuD86LghoRBYM2yAPgef2D6vAsw96Jg0zXcZ/N8grC
+ q7WL6jcZ7cyHDTC4mMqD1WkidyXNxSiDBUjEV4+CaOoLpGhjaekmix58OW8pb46RbCB8
+ wkZ4WgC7oLdkm2asJ5K3Jk0zDapdlLHvxy1oMaqszynt1uhVsKIsCC+iiKgAj2CksY53
+ 8lnmrJ+YGWdcsKbQCfoIZr8CcXgQaeBWEOCCQUzwza9DpqLQbXbkHJgwUw9X98tE1FCO
+ nb+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xYxjFC05Y9IzMuow2NY7UJHZmguN7TRUgsgEOkh1MXA=;
+ b=lNvrjbcfdS2tdokWe54OwtUF9zsgQnXTPCemaqSjTjAl2SQvMfzu3hcLJ47hWklqdH
+ LPwoTsDuLpuXSeTcn4J8WrHaRAO+Rnl/x36XJMzl/k9drLDjZKiXb2hz1lQM7kr+fYzn
+ tW7EDiwkSFihLfbFFmJ7To02uxwsA4fOWxQSUbkfQRVE3aRSaskx8C9bWpw/9OW3ZDH2
+ exKTmaLs/dQ8WKEhk9IhmAOe3riIlnf1o3TxxNSJw6gFZzGkmBXEr/LeL8gE0Jr9/nLE
+ orpdUxHtEnJUWR7Pr/IPEg5+KwIpOsSlqRS3d7wc4kkDsbakYNr7TwR6ZNXH9EnyGqUJ
+ jwpA==
+X-Gm-Message-State: ANhLgQ3UtdhYGu06HcsMMgEmhcnNRlVAabPqneVl+B1mLnJvK1BIi+xo
+ jWak8Zs9k55VKx0ik79Q5vgCzAGy3TwdrVC9KFu05A==
+X-Google-Smtp-Source: ADFU+vsi5Elde7e20W42PjyP8pP5y1iIhjWoj954WBn4XWlqx05pD6ntm8nRlRZ6Mr4d3d5IwKTYfp1izKlM9RL7AP4=
+X-Received: by 2002:a05:6808:64c:: with SMTP id
+ z12mr2537244oih.146.1585671167355; 
+ Tue, 31 Mar 2020 09:12:47 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+References: <20200331155158.381585-1-berrange@redhat.com>
+ <1450d802-4df8-117b-e58d-da8bf2334010@redhat.com>
+In-Reply-To: <1450d802-4df8-117b-e58d-da8bf2334010@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 31 Mar 2020 17:12:35 +0100
+Message-ID: <CAFEAcA-MNMK3O-iyP-wR4YGpTYua+vKHv=jAtmcC6U=_Gz4Fag@mail.gmail.com>
+Subject: Re: [PATCH v2] configure: warn if not using a separate build directory
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,63 +89,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Liviu Ionescu <ilg@livius.net>, QEMU Developers <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 31 Mar 2020 18:05:08 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+On Tue, 31 Mar 2020 at 17:05, Eric Blake <eblake@redhat.com> wrote:
+>
+> On 3/31/20 10:51 AM, Daniel P. Berrang=C3=A9 wrote:
+> > +if test "$in_srcdir" =3D "yes"; then
+> > +    echo
+> > +    echo "WARNING: SUPPORT FOR IN SOURCE DIR BUILDS IS DEPRECATED"
+> > +    echo
+> > +    echo "Support for running the 'configure' script directly from the=
+"
+> > +    echo "source directory is deprecated and will go away in a future"
+> > +    echo "release. In source dir builds are not covered by automated"
+> > +    echo "testing and are liable to break without warning. Users are"
+> > +    echo "strongly recommended to switch to a separate build directory=
+:"
+>
+> Per Kevin's response, we may want to tweak this wording slightly; maybe:
+>
+> Support for running the 'configure' script directly from the source
+> directory is deprecated.  In-tree builds are not covered by automated
+> testing and are liable to break without warning.  Future releases may
+> change the default location of built executables for an in-tree build,
+> or drop in-tree build support altogether.  Users are strongly
+> recommended to switch to a separate build directory:
 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> writes:
->=20
-> > On Dienstag, 31. M=C3=A4rz 2020 17:27:27 CEST Cornelia Huck wrote: =20
-> >> > diff --git a/qemu-options.hx b/qemu-options.hx
-> >> > index 962a5ebaa6..fd3830c6cd 100644
-> >> > --- a/qemu-options.hx
-> >> > +++ b/qemu-options.hx
-> >> > @@ -1542,9 +1542,17 @@ SRST
-> >> >=20
-> >> >  ``-virtfs proxy,sock_fd=3Dsock_fd,mount_tag=3Dmount_tag =20
-> >> >  [,writeout=3Dwriteout][,readonly]``>   =20
-> >> >    \
-> >> > =20
-> >> >  ``-virtfs synth,mount_tag=3Dmount_tag``
-> >> >=20
-> >> > -    Define a new filesystem device and expose it to the guest using=
- a
-> >> > -    virtio-9p-device. The general form of a Virtual File system
-> >> > -    pass-through options are:
-> >> > +    Define a new virtual filesystem device and expose it to the gue=
-st
-> >> > using +    a virtio-9p-device (a.k.a. 9pfs), which essentially means=
- that
-> >> > a certain +    directory on host is made directly accessible by gues=
-t as
-> >> > a pass-through +    file system by using the 9P network protocol for
-> >> > communication between +    host and guests, if desired even accessib=
-le,
-> >> > shared by several guests +    simultaniously.
-> >> > +
-> >> > +    Note that ``-virtfs`` is actually just a convenience shortcut f=
-or its
-> >> > +    generalized form ``-fsdev -device virtio-9p-pci``. =20
-> >>=20
-> >> Huh. This prompted me to try this on s390, and it actually creates a
-> >> virtio-9p-pci device there as well, not a virtio-9p-ccw device. A bit
-> >> surprising; but I don't see 9p used much (if at all) on s390 anyway. =
-=20
-> >
-> > Yeah, "virtio-9p-pci" is currently hard coded in softmmu/vl.c [line 335=
-2]:
-> > https://github.com/qemu/qemu/blob/17083d6d1e0635371418c26b613a6fa68d392=
-f49/softmmu/vl.c#L3352 =20
->=20
-> Should it be "virtio-9p" instead?  It's an alias for "virtio-9p-pci",
-> except for s390x, where it's an alias for "virtio-9p-ccw".
+I now feel that, given that we've had various people say they
+want to retain at least the basic in-tree build commands and are
+willing to put in a wrapper to make it keep working, that this
+deprecation wording is a bit strong. I don't think that it
+much serves our users to say "this will go away" and then
+implement the compatibility wrapper -- we've caused them
+to unnecessarily change what they're doing, and then reduced
+the value of the compat-wrapper work we do. A more gently
+phrased note that we recommend use of out-of-tree builds
+would be sufficient I think.
 
-Seems like a reasonable change (although I'm not sure it matters too
-much).
+(That is, the idea of notes in the release notes and configure
+is to signpost to our users the direction we think the
+project is going in, so they are not unpleasantly surprised
+in future. For this to work the signpost should be pointing
+reasonably in the direction we plan to head, rather than somewhat
+askew from it :-))
 
+thanks
+-- PMM
 
