@@ -2,104 +2,68 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F1AC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 00:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8C4C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 00:20:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0F7A206F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 00:19:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="u6NzHvyO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F7A206F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id C67EA206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 00:20:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C67EA206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ4cf-0000Iu-2H
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 20:19:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37162)
+	id 1jJ4eH-0001fZ-1A
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 20:20:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty@apple.com>) id 1jJ4Zh-0005So-B6
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 20:16:14 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jJ4dZ-0001AJ-BC
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 20:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty@apple.com>) id 1jJ4Zf-000096-Vc
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 20:16:13 -0400
-Received: from ma1-aaemail-dr-lapp03.apple.com ([17.171.2.72]:34550)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jJ4Zf-00007e-Pw
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 20:16:11 -0400
-Received: from pps.filterd (ma1-aaemail-dr-lapp03.apple.com [127.0.0.1])
- by ma1-aaemail-dr-lapp03.apple.com (8.16.0.27/8.16.0.27) with SMTP id
- 02V02F5L002286; Mon, 30 Mar 2020 17:16:11 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=sender : from : to :
- cc : subject : date : message-id : in-reply-to : references : mime-version
- : content-transfer-encoding; s=20180706;
- bh=6cQ9YsYiD0yDtEPmmyr32KvC+c0bsiUrac9Q+3B9QH8=;
- b=u6NzHvyOqIu8EsV/Ohm/lIr1ohaJiLccSYymb5s7giivZSjvnvUlZpXo8uhcI327BMBP
- cUSpFShCRWw78k8vDapKpHbldF/G1hNmmKYkqcMepYtANmQ6aXF3UCHGehcFnpP2/EcC
- 9bZYnBJpJXJVQpXc8UCdZ2mr25nHm1QqVRGQa9i+rfZK+3djIoIb+enf7wxAVGC5pCkx
- E3J9KLSumMFSKZSknjeMLag8XBJ9ICBmnZkpOTRh93bJSAEVQ5AHW3qrWFFK3/G82SN/
- 5L9I0l2ovmTmgTJYYU87ya3C7a4yVAf9XW47ZKKJyFZw/JM21MxVfq69BpClkfeYDJlz NA== 
-Received: from rn-mailsvcp-mta-lapp04.rno.apple.com
- (rn-mailsvcp-mta-lapp04.rno.apple.com [10.225.203.152])
- by ma1-aaemail-dr-lapp03.apple.com with ESMTP id 3025juy2bh-6
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Mon, 30 Mar 2020 17:16:11 -0700
-Received: from rn-mailsvcp-mmp-lapp01.rno.apple.com
- (rn-mailsvcp-mmp-lapp01.rno.apple.com [17.179.253.14])
- by rn-mailsvcp-mta-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) with ESMTPS id <0Q8100XEY7EWTJB0@rn-mailsvcp-mta-lapp04.rno.apple.com>; 
- Mon, 30 Mar 2020 17:16:08 -0700 (PDT)
-Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp01.rno.apple.com by
- rn-mailsvcp-mmp-lapp01.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) id <0Q8100C007EE3O00@rn-mailsvcp-mmp-lapp01.rno.apple.com>; Mon,
- 30 Mar 2020 17:16:08 -0700 (PDT)
-X-Va-A: 
-X-Va-T-CD: c56cc4374afe9162bf6a337f3d661529
-X-Va-E-CD: 4313961e8f3af7e2e35e28824e600d91
-X-Va-R-CD: d26d4bf9f9c9c00185d135aa104f412a
-X-Va-CD: 0
-X-Va-ID: c973c730-6505-428a-ad04-02bea54d6bba
-X-V-A: 
-X-V-T-CD: c56cc4374afe9162bf6a337f3d661529
-X-V-E-CD: 4313961e8f3af7e2e35e28824e600d91
-X-V-R-CD: d26d4bf9f9c9c00185d135aa104f412a
-X-V-CD: 0
-X-V-ID: 5ceefeee-3d54-4c9c-bf72-c90e169c14f9
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-03-30_07:2020-03-30,
- 2020-03-30 signatures=0
-Received: from pontoon.com (unknown [17.234.84.168])
- by rn-mailsvcp-mmp-lapp01.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020))
- with ESMTPSA id <0Q81010CS7EU8N70@rn-mailsvcp-mmp-lapp01.rno.apple.com>; Mon,
- 30 Mar 2020 17:16:07 -0700 (PDT)
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, r.bolshakov@yadro.com
-Subject: [PATCH v1 3/3] hvf: Support AVX512 guests on capable hardware
-Date: Mon, 30 Mar 2020 17:16:06 -0700
-Message-id: <1da0fc0a4f119e951ae11b29ff26ee587f4748aa.1585607927.git.dirty@apple.com>
-X-Mailer: git-send-email 2.24.0
-In-reply-to: <cover.1585607927.git.dirty@apple.com>
-References: <cover.1585607927.git.dirty@apple.com>
-MIME-version: 1.0
-Content-transfer-encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-03-30_07:2020-03-30,
- 2020-03-30 signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 17.171.2.72
+ (envelope-from <yan.y.zhao@intel.com>) id 1jJ4dW-0000bD-Jc
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 20:20:12 -0400
+Received: from mga04.intel.com ([192.55.52.120]:53369)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jJ4dW-0000Sw-79
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 20:20:10 -0400
+IronPort-SDR: hXXefFoJOrCumdQvpoOcPW/PJUbjtUCREo8VfW4WCtLyKppABs2GxyGTvsjJJnJueTjoKEFIDh
+ dhMQPo1kIT0g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 30 Mar 2020 17:20:06 -0700
+IronPort-SDR: VEGZMBuPruyzsdAz9DY2v9+OKGPBGiGChK2ilh37+/PsMdE43ekbKlkjXqJi+M56Nf1mM49+8x
+ h883/84sOGrw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,326,1580803200"; d="scan'208";a="272556725"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by fmsmga004.fm.intel.com with ESMTP; 30 Mar 2020 17:20:01 -0700
+Date: Mon, 30 Mar 2020 20:10:28 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v17 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+Message-ID: <20200331001027.GA6631@joy-OptiPlex-7040>
+References: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
+ <1585587044-2408-5-git-send-email-kwankhede@nvidia.com>
+ <20200330151909.71da1f91@w520.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200330151909.71da1f91@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,193 +75,434 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Cameron Esfahani <dirty@apple.com>
-From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-macOS lazily enables AVX512.  Explicitly enable it if the processor
-supports it.
-
-cpu_x86_cpuid() tries to handle OSXSAVE but refers to env->cr[4] for the
-guest copy of CR4.  HVF doesn't support caching CPUID values like KVM,
-so we need to track it ourselves.
-
-Signed-off-by: Cameron Esfahani <dirty@apple.com>
----
- target/i386/cpu.h        |  1 +
- target/i386/hvf/hvf.c    | 68 ++++++++++++++++++++++++++++++++++++++--
- target/i386/hvf/vmx.h    |  9 +++++-
- target/i386/hvf/x86hvf.c |  2 +-
- 4 files changed, 76 insertions(+), 4 deletions(-)
-
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 1286ec6e7a..f3864d0fac 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1591,6 +1591,7 @@ typedef struct CPUX86State {
-     struct kvm_nested_state *nested_state;
- #endif
- #if defined(CONFIG_HVF)
-+    bool osxsave_enabled;
-     HVFX86EmulatorState *hvf_emul;
- #endif
- 
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index fef1ee7d70..68a85c3b9b 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -65,6 +65,7 @@
- 
- #include <Hypervisor/hv.h>
- #include <Hypervisor/hv_vmx.h>
-+#include <mach/mach.h>
- 
- #include "exec/address-spaces.h"
- #include "hw/i386/apic_internal.h"
-@@ -458,7 +459,7 @@ void hvf_reset_vcpu(CPUState *cpu) {
-     macvm_set_cr0(cpu->hvf_fd, CR0_CD_MASK | CR0_NW_MASK | CR0_ET_MASK);
-     macvm_set_cr0(cpu->hvf_fd, 0x60000010);
- 
--    wvmcs(cpu->hvf_fd, VMCS_CR4_MASK, CR4_VMXE_MASK);
-+    wvmcs(cpu->hvf_fd, VMCS_CR4_MASK, CR4_VMXE_MASK | CR4_OSXSAVE_MASK);
-     wvmcs(cpu->hvf_fd, VMCS_CR4_SHADOW, 0x0);
-     wvmcs(cpu->hvf_fd, VMCS_GUEST_CR4, CR4_VMXE_MASK);
- 
-@@ -541,6 +542,55 @@ static void dummy_signal(int sig)
- {
- }
- 
-+static bool enable_avx512_thread_state(void)
-+{
-+    x86_avx512_state_t state;
-+    uint32_t ebx;
-+    kern_return_t ret;
-+    unsigned int count;
-+
-+    /*
-+     * macOS lazily enables AVX512 support.  Enable it explicitly if the
-+     * processor supports it.
-+     */
-+
-+    host_cpuid(7, 0, NULL, &ebx, NULL, NULL);
-+    if ((ebx & CPUID_7_0_EBX_AVX512F) == 0) {
-+        return false;
-+    }
-+
-+    memset(&state, 0, sizeof(x86_avx512_state_t));
-+
-+    /* Get AVX state */
-+    count = x86_AVX_STATE_COUNT;
-+    ret = thread_get_state(mach_thread_self(),
-+                           x86_AVX_STATE,
-+                           (thread_state_t) &state,
-+                           &count);
-+    if (ret != KERN_SUCCESS) {
-+        return false;
-+    }
-+    if (count != x86_AVX_STATE_COUNT) {
-+        return false;
-+    }
-+    if (state.ash.flavor != x86_AVX_STATE64) {
-+        return false;
-+    }
-+    state.ash.flavor = x86_AVX512_STATE64;
-+    state.ash.count = x86_AVX512_STATE64_COUNT;
-+
-+    /* Now set as AVX512 */
-+    ret = thread_set_state(mach_thread_self(),
-+                           state.ash.flavor,
-+                           (thread_state_t) &state.ufs.as64,
-+                           state.ash.count);
-+    if (ret != KERN_SUCCESS) {
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- int hvf_init_vcpu(CPUState *cpu)
- {
- 
-@@ -826,6 +876,18 @@ int hvf_vcpu_exec(CPUState *cpu)
- 
-             cpu_x86_cpuid(env, rax, rcx, &rax, &rbx, &rcx, &rdx);
- 
-+            if (rax == 1) {
-+                /*
-+                 * cpu_x86_cpuid tries to handle OSXSAVE but refers to
-+                 * env->cr[4] for the guest copy of CR4.  This isn't
-+                 * updated regularly so we track it ourselves in
-+                 * env->osxsave_enabled.
-+                 */
-+                if ((rcx & CPUID_EXT_XSAVE) && env->osxsave_enabled) {
-+                    rcx |= CPUID_EXT_OSXSAVE;
-+                }
-+            }
-+
-             wreg(cpu->hvf_fd, HV_X86_RAX, rax);
-             wreg(cpu->hvf_fd, HV_X86_RBX, rbx);
-             wreg(cpu->hvf_fd, HV_X86_RCX, rcx);
-@@ -889,7 +951,7 @@ int hvf_vcpu_exec(CPUState *cpu)
-                 break;
-             }
-             case 4: {
--                macvm_set_cr4(cpu->hvf_fd, RRX(env, reg));
-+                macvm_set_cr4(env, cpu->hvf_fd, RRX(env, reg));
-                 break;
-             }
-             case 8: {
-@@ -966,6 +1028,8 @@ static int hvf_accel_init(MachineState *ms)
-     hv_return_t ret;
-     HVFState *s;
- 
-+    enable_avx512_thread_state();
-+
-     ret = hv_vm_create(HV_VM_DEFAULT);
-     assert_hvf_ok(ret);
- 
-diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
-index 1a1b150c97..dccd5ceb0f 100644
---- a/target/i386/hvf/vmx.h
-+++ b/target/i386/hvf/vmx.h
-@@ -157,13 +157,20 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-     hv_vcpu_flush(vcpu);
- }
- 
--static inline void macvm_set_cr4(hv_vcpuid_t vcpu, uint64_t cr4)
-+static inline void macvm_set_cr4(CPUX86State *env, hv_vcpuid_t vcpu,
-+                                 uint64_t cr4)
- {
-     uint64_t guest_cr4 = cr4 | CR4_VMXE_MASK;
- 
-     wvmcs(vcpu, VMCS_GUEST_CR4, guest_cr4);
-     wvmcs(vcpu, VMCS_CR4_SHADOW, cr4);
- 
-+    /*
-+     * Track whether OSXSAVE is enabled so we can properly return it
-+     * for CPUID 1.
-+     */
-+    env->osxsave_enabled = ((cr4 & CR4_OSXSAVE_MASK) != 0);
-+
-     hv_vcpu_invalidate_tlb(vcpu);
-     hv_vcpu_flush(vcpu);
- }
-diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-index edefe5319a..bd25bf19c4 100644
---- a/target/i386/hvf/x86hvf.c
-+++ b/target/i386/hvf/x86hvf.c
-@@ -100,7 +100,7 @@ void hvf_put_segments(CPUState *cpu_state)
-     vmx_update_tpr(cpu_state);
-     wvmcs(cpu_state->hvf_fd, VMCS_GUEST_IA32_EFER, env->efer);
- 
--    macvm_set_cr4(cpu_state->hvf_fd, env->cr[4]);
-+    macvm_set_cr4(env, cpu_state->hvf_fd, env->cr[4]);
-     macvm_set_cr0(cpu_state->hvf_fd, env->cr[0]);
- 
-     hvf_set_segment(cpu_state, &seg, &env->segs[R_CS], false);
--- 
-2.24.0
-
+On Tue, Mar 31, 2020 at 05:19:09AM +0800, Alex Williamson wrote:
+> On Mon, 30 Mar 2020 22:20:41 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+> > VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+> > - Start dirty pages tracking while migration is active
+> > - Stop dirty pages tracking.
+> > - Get dirty pages bitmap. Its user space application's responsibility to
+> >   copy content of dirty pages from source to destination during migration.
+> > 
+> > To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+> > structure. Bitmap size is calculated considering smallest supported page
+> > size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
+> > 
+> > Bitmap is populated for already pinned pages when bitmap is allocated for
+> > a vfio_dma with the smallest supported page size. Update bitmap from
+> > pinning functions when tracking is enabled. When user application queries
+> > bitmap, check if requested page size is same as page size used to
+> > populated bitmap. If it is equal, copy bitmap, but if not equal, return
+> > error.
+> > 
+> > Fixed below error by changing pgsize type from uint64_t to size_t.
+> > Reported-by: kbuild test robot <lkp@intel.com>
+> > 
+> > All errors:
+> > drivers/vfio/vfio_iommu_type1.c:197: undefined reference to `__udivdi3'
+> > 
+> > drivers/vfio/vfio_iommu_type1.c:225: undefined reference to `__udivdi3'
+> > 
+> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 260 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index 70aeab921d0f..5efebc2b60e1 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -71,6 +71,7 @@ struct vfio_iommu {
+> >  	unsigned int		dma_avail;
+> >  	bool			v2;
+> >  	bool			nesting;
+> > +	bool			dirty_page_tracking;
+> >  };
+> >  
+> >  struct vfio_domain {
+> > @@ -91,6 +92,7 @@ struct vfio_dma {
+> >  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+> >  	struct task_struct	*task;
+> >  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+> > +	unsigned long		*bitmap;
+> >  };
+> >  
+> >  struct vfio_group {
+> > @@ -125,7 +127,21 @@ struct vfio_regions {
+> >  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+> >  					(!list_empty(&iommu->domain_list))
+> >  
+> > +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+> > +
+> > +/*
+> > + * Input argument of number of bits to bitmap_set() is unsigned integer, which
+> > + * further casts to signed integer for unaligned multi-bit operation,
+> > + * __bitmap_set().
+> > + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
+> > + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
+> > + * system.
+> > + */
+> > +#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
+> 
+> 
+> This was supposed to be (INT_MAX), not (INT_MAX - 1).  Thanks,
+> 
+> Alex
+> 
+> 
+> > +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+> > +
+> >  static int put_pfn(unsigned long pfn, int prot);
+> > +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+> >  
+> >  /*
+> >   * This code handles mapping and unmapping of user data buffers
+> > @@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+> >  	rb_erase(&old->node, &iommu->dma_list);
+> >  }
+> >  
+> > +
+> > +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
+> > +{
+> > +	uint64_t npages = dma->size / pgsize;
+> > +
+> > +	if (npages > DIRTY_BITMAP_PAGES_MAX)
+> > +		return -EINVAL;
+> > +
+> > +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+> > +	if (!dma->bitmap)
+> > +		return -ENOMEM;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
+> > +{
+> > +	kfree(dma->bitmap);
+> > +	dma->bitmap = NULL;
+> > +}
+> > +
+> > +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+> > +{
+> > +	struct rb_node *p;
+> > +
+> > +	if (RB_EMPTY_ROOT(&dma->pfn_list))
+> > +		return;
+> > +
+> > +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
+> > +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
+> > +
+> > +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
+> > +	}
+> > +}
+> > +
+> > +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
+> > +{
+> > +	struct rb_node *n = rb_first(&iommu->dma_list);
+> > +
+> > +	for (; n; n = rb_next(n)) {
+> > +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> > +		int ret;
+> > +
+> > +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
+> > +		if (ret) {
+> > +			struct rb_node *p = rb_prev(n);
+> > +
+> > +			for (; p; p = rb_prev(p)) {
+> > +				struct vfio_dma *dma = rb_entry(n,
+> > +							struct vfio_dma, node);
+> > +
+> > +				vfio_dma_bitmap_free(dma);
+> > +			}
+> > +			return ret;
+> > +		}
+> > +		vfio_dma_populate_bitmap(dma, pgsize);
+> > +	}
+> > +	return 0;
+> > +}
+> > +
+> > +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
+> > +{
+> > +	struct rb_node *n = rb_first(&iommu->dma_list);
+> > +
+> > +	for (; n; n = rb_next(n)) {
+> > +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> > +
+> > +		vfio_dma_bitmap_free(dma);
+> > +	}
+> > +}
+> > +
+> >  /*
+> >   * Helper Functions for host iova-pfn list
+> >   */
+> > @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >  			vfio_unpin_page_external(dma, iova, do_accounting);
+> >  			goto pin_unwind;
+> >  		}
+> > +
+> > +		if (iommu->dirty_page_tracking) {
+> > +			unsigned long pgshift =
+> > +					 __ffs(vfio_pgsize_bitmap(iommu));
+> > +
+> > +			/*
+> > +			 * Bitmap populated with the smallest supported page
+> > +			 * size
+> > +			 */
+> > +			bitmap_set(dma->bitmap,
+> > +				   (vpfn->iova - dma->iova) >> pgshift, 1);
+> > +		}
+> >  	}
+> >  
+> >  	ret = i;
+> > @@ -801,6 +900,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+> >  	vfio_unmap_unpin(iommu, dma, true);
+> >  	vfio_unlink_dma(iommu, dma);
+> >  	put_task_struct(dma->task);
+> > +	vfio_dma_bitmap_free(dma);
+> >  	kfree(dma);
+> >  	iommu->dma_avail++;
+> >  }
+> > @@ -831,6 +931,57 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+> >  	return bitmap;
+> >  }
+> >  
+> > +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> > +				  size_t size, size_t pgsize,
+> > +				  u64 __user *bitmap)
+> > +{
+> > +	struct vfio_dma *dma;
+> > +	unsigned long pgshift = __ffs(pgsize);
+> > +	unsigned int npages, bitmap_size;
+> > +
+> > +	dma = vfio_find_dma(iommu, iova, 1);
+> > +
+> > +	if (!dma)
+> > +		return -EINVAL;
+> > +
+> > +	if (dma->iova != iova || dma->size != size)
+> > +		return -EINVAL;
+> > +
+> > +	npages = dma->size >> pgshift;
+> > +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+> > +
+> > +	/* mark all pages dirty if all pages are pinned and mapped. */
+> > +	if (dma->iommu_mapped)
+> > +		bitmap_set(dma->bitmap, 0, npages);
+> > +
+> > +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+> > +		return -EFAULT;
+> > +
+> > +	/*
+> > +	 * Re-populate bitmap to include all pinned pages which are considered
+> > +	 * as dirty but exclude pages which are unpinned and pages which are
+> > +	 * marked dirty by vfio_dma_rw()
+> > +	 */
+> > +	bitmap_clear(dma->bitmap, 0, npages);
+> > +	vfio_dma_populate_bitmap(dma, pgsize);
+> > +	return 0;
+> > +}
+> > +
+> > +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> > +{
+> > +	uint64_t bsize;
+> > +
+> > +	if (!npages || !bitmap_size || (bitmap_size > DIRTY_BITMAP_SIZE_MAX))
+> > +		return -EINVAL;
+> > +
+> > +	bsize = DIRTY_BITMAP_BYTES(npages);
+> > +
+> > +	if (bitmap_size < bsize)
+> > +		return -EINVAL;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >  			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >  {
+> > @@ -1038,16 +1189,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+> >  	unsigned long vaddr = map->vaddr;
+> >  	size_t size = map->size;
+> >  	int ret = 0, prot = 0;
+> > -	uint64_t mask;
+> > +	size_t pgsize;
+> >  	struct vfio_dma *dma;
+> >  
+> >  	/* Verify that none of our __u64 fields overflow */
+> >  	if (map->size != size || map->vaddr != vaddr || map->iova != iova)
+> >  		return -EINVAL;
+> >  
+> > -	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> > +	pgsize = (size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
+> >  
+> > -	WARN_ON(mask & PAGE_MASK);
+> > +	WARN_ON((pgsize - 1) & PAGE_MASK);
+> >  
+> >  	/* READ/WRITE from device perspective */
+> >  	if (map->flags & VFIO_DMA_MAP_FLAG_WRITE)
+> > @@ -1055,7 +1206,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+> >  	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+> >  		prot |= IOMMU_READ;
+> >  
+> > -	if (!prot || !size || (size | iova | vaddr) & mask)
+> > +	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1))
+> >  		return -EINVAL;
+> >  
+> >  	/* Don't allow IOVA or virtual address wrap */
+> > @@ -1130,6 +1281,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+> >  	else
+> >  		ret = vfio_pin_map_dma(iommu, dma, size);
+> >  
+> > +	if (!ret && iommu->dirty_page_tracking) {
+> > +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
+> > +		if (ret)
+> > +			vfio_remove_dma(iommu, dma);
+> > +	}
+> > +
+> >  out_unlock:
+> >  	mutex_unlock(&iommu->lock);
+> >  	return ret;
+> > @@ -2278,6 +2435,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >  
+> >  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> >  			-EFAULT : 0;
+> > +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> > +		struct vfio_iommu_type1_dirty_bitmap dirty;
+> > +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> > +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> > +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> > +		int ret = 0;
+> > +
+> > +		if (!iommu->v2)
+> > +			return -EACCES;
+> > +
+> > +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> > +				    flags);
+> > +
+> > +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
+> > +			return -EFAULT;
+> > +
+> > +		if (dirty.argsz < minsz || dirty.flags & ~mask)
+> > +			return -EINVAL;
+> > +
+> > +		/* only one flag should be set at a time */
+> > +		if (__ffs(dirty.flags) != __fls(dirty.flags))
+> > +			return -EINVAL;
+> > +
+> > +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> > +			size_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
+> > +
+should not use smallest iommu page size as pgsize here as well as for
+bitmap_set.
+qemu uses 4k for dirty page track.
+> > +			mutex_lock(&iommu->lock);
+> > +			if (!iommu->dirty_page_tracking) {
+> > +				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
+> > +				if (!ret)
+> > +					iommu->dirty_page_tracking = true;
+> > +			}
+> > +			mutex_unlock(&iommu->lock);
+> > +			return ret;
+> > +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> > +			mutex_lock(&iommu->lock);
+> > +			if (iommu->dirty_page_tracking) {
+> > +				iommu->dirty_page_tracking = false;
+> > +				vfio_dma_bitmap_free_all(iommu);
+> > +			}
+> > +			mutex_unlock(&iommu->lock);
+> > +			return 0;
+> > +		} else if (dirty.flags &
+> > +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> > +			struct vfio_iommu_type1_dirty_bitmap_get range;
+> > +			unsigned long pgshift;
+> > +			size_t data_size = dirty.argsz - minsz;
+> > +			size_t iommu_pgsize =
+> > +				 (size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
+> > +
+> > +			if (!data_size || data_size < sizeof(range))
+> > +				return -EINVAL;
+> > +
+> > +			if (copy_from_user(&range, (void __user *)(arg + minsz),
+> > +					   sizeof(range)))
+> > +				return -EFAULT;
+> > +
+> > +			/* allow only smallest supported pgsize */
+> > +			if (range.bitmap.pgsize != iommu_pgsize)
+> > +				return -EINVAL;
+> > +			if (range.iova & (iommu_pgsize - 1))
+> > +				return -EINVAL;
+> > +			if (!range.size || range.size & (iommu_pgsize - 1))
+> > +				return -EINVAL;
+> > +			if (range.iova + range.size < range.iova)
+> > +				return -EINVAL;
+> > +			if (!access_ok((void __user *)range.bitmap.data,
+> > +				       range.bitmap.size))
+> > +				return -EINVAL;
+> > +
+> > +			pgshift = __ffs(range.bitmap.pgsize);
+> > +			ret = verify_bitmap_size(range.size >> pgshift,
+> > +						 range.bitmap.size);
+> > +			if (ret)
+> > +				return ret;
+> > +
+> > +			mutex_lock(&iommu->lock);
+> > +			if (iommu->dirty_page_tracking)
+> > +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
+> > +						range.size, range.bitmap.pgsize,
+> > +						range.bitmap.data);
+> > +			else
+> > +				ret = -EINVAL;
+> > +			mutex_unlock(&iommu->lock);
+> > +
+> > +			return ret;
+> > +		}
+> >  	}
+> >  
+> >  	return -ENOTTY;
+> > @@ -2345,10 +2589,20 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+> >  
+> >  	vaddr = dma->vaddr + offset;
+> >  
+> > -	if (write)
+> > +	if (write) {
+> >  		*copied = __copy_to_user((void __user *)vaddr, data,
+> >  					 count) ? 0 : count;
+> > -	else
+> > +		if (*copied && iommu->dirty_page_tracking) {
+> > +			unsigned long pgshift =
+> > +				__ffs(vfio_pgsize_bitmap(iommu));
+> > +			/*
+> > +			 * Bitmap populated with the smallest supported page
+> > +			 * size
+> > +			 */
+> > +			bitmap_set(dma->bitmap, offset >> pgshift,
+> > +				   *copied >> pgshift);
+> > +		}
+> > +	} else
+> >  		*copied = __copy_from_user(data, (void __user *)vaddr,
+> >  					   count) ? 0 : count;
+> >  	if (kthread)
+> 
 
