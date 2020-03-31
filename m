@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC2DC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEECFC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4305206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:39:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4305206EB
+	by mail.kernel.org (Postfix) with ESMTPS id A4DD1206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 05:39:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4DD1206EB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ9cj-0001zx-OU
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 01:39:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40963)
+	id 1jJ9cq-0002HL-LY
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 01:39:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jJ9bi-0000lA-UP
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:38:40 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jJ9bw-000124-TH
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:38:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jJ9bh-0001he-M9
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:38:38 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47926)
+ (envelope-from <its@irrelevant.dk>) id 1jJ9bv-0001nS-S9
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 01:38:52 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47942)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jJ9be-0001fE-Vl; Tue, 31 Mar 2020 01:38:35 -0400
+ id 1jJ9bt-0001m3-It; Tue, 31 Mar 2020 01:38:49 -0400
 Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id E2FC0BF48F;
- Tue, 31 Mar 2020 05:38:32 +0000 (UTC)
-Date: Tue, 31 Mar 2020 07:38:29 +0200
+ by charlie.dont.surf (Postfix) with ESMTPSA id 590F8BF48F;
+ Tue, 31 Mar 2020 05:38:48 +0000 (UTC)
+Date: Tue, 31 Mar 2020 07:38:45 +0200
 From: Klaus Birkelund Jensen <its@irrelevant.dk>
 To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v6 04/42] nvme: bump spec data structures to v1.3
-Message-ID: <20200331053829.wprsixru5machmwp@apples.localdomain>
+Subject: Re: [PATCH v6 05/42] nvme: use constant for identify data size
+Message-ID: <20200331053845.qghkki5orx34ajxy@apples.localdomain>
 References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-5-its@irrelevant.dk>
- <edab0548c595bee319de4db4eefec87c1edfa1cd.camel@redhat.com>
+ <20200316142928.153431-6-its@irrelevant.dk>
+ <72b049dcec0391aa128879a3a301f04ba0afd3f3.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <edab0548c595bee319de4db4eefec87c1edfa1cd.camel@redhat.com>
+In-Reply-To: <72b049dcec0391aa128879a3a301f04ba0afd3f3.camel@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 128.199.63.193
@@ -73,119 +73,38 @@ On Mar 25 12:37, Maxim Levitsky wrote:
 > On Mon, 2020-03-16 at 07:28 -0700, Klaus Jensen wrote:
 > > From: Klaus Jensen <k.jensen@samsung.com>
 > > 
-> > Add missing fields in the Identify Controller and Identify Namespace
-> > data structures to bring them in line with NVMe v1.3.
-> > 
-> > This also adds data structures and defines for SGL support which
-> > requires a couple of trivial changes to the nvme block driver as well.
-> > 
 > > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > Acked-by: Fam Zheng <fam@euphon.net>
 > > ---
-> >  block/nvme.c         |  18 ++---
-> >  hw/block/nvme.c      |  12 ++--
-> >  include/block/nvme.h | 153 ++++++++++++++++++++++++++++++++++++++-----
-> >  3 files changed, 151 insertions(+), 32 deletions(-)
+> >  hw/block/nvme.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > > 
-> > diff --git a/block/nvme.c b/block/nvme.c
-> > index d41c4bda6e39..99b9bb3dac96 100644
-> > --- a/block/nvme.c
-> > +++ b/block/nvme.c
-> > @@ -589,6 +675,16 @@ enum NvmeIdCtrlOncs {
-> >  #define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
-> >  #define NVME_CTRL_CQES_MAX(cqes) (((cqes) >> 4) & 0xf)
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index 40cb176dea3c..f716f690a594 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -679,7 +679,7 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
 > >  
-> > +#define NVME_CTRL_SGLS_SUPPORTED_MASK            (0x3 <<  0)
-> > +#define NVME_CTRL_SGLS_SUPPORTED_NO_ALIGNMENT    (0x1 <<  0)
-> > +#define NVME_CTRL_SGLS_SUPPORTED_DWORD_ALIGNMENT (0x1 <<  1)
-> > +#define NVME_CTRL_SGLS_KEYED                     (0x1 <<  2)
-> > +#define NVME_CTRL_SGLS_BITBUCKET                 (0x1 << 16)
-> > +#define NVME_CTRL_SGLS_MPTR_CONTIGUOUS           (0x1 << 17)
-> > +#define NVME_CTRL_SGLS_EXCESS_LENGTH             (0x1 << 18)
-> > +#define NVME_CTRL_SGLS_MPTR_SGL                  (0x1 << 19)
-> > +#define NVME_CTRL_SGLS_ADDR_OFFSET               (0x1 << 20)
-> OK
-> > +
-> >  typedef struct NvmeFeatureVal {
-> >      uint32_t    arbitration;
-> >      uint32_t    power_mgmt;
-> > @@ -611,6 +707,10 @@ typedef struct NvmeFeatureVal {
-> >  #define NVME_INTC_THR(intc)     (intc & 0xff)
-> >  #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
-> >  
-> > +#define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
-> Nitpick: If we are adding this, I'll add a #define for the values as well
+> >  static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+> >  {
+> > -    static const int data_len = 4 * KiB;
+> > +    static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+> >      uint32_t min_nsid = le32_to_cpu(c->nsid);
+> >      uint64_t prp1 = le64_to_cpu(c->prp1);
+> >      uint64_t prp2 = le64_to_cpu(c->prp2);
+> 
+> I'll probably squash this with some other refactoring patch,
+> but I absolutely don't mind leaving this as is.
+> Fine grained patches never cause any harm.
 > 
 
-Done. And used in the subsequent "nvme: add temperature threshold
-feature" patch.
+Squashed into 06/42.
 
-> > +#define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
-> > +#define NVME_TEMP_TMPTH(temp)  ((temp >>  0) & 0xffff)
-> > +
-> >  enum NvmeFeatureIds {
-> >      NVME_ARBITRATION                = 0x1,
-> >      NVME_POWER_MANAGEMENT           = 0x2,
-> > @@ -653,18 +753,37 @@ typedef struct NvmeIdNs {
-> >      uint8_t     mc;
-> >      uint8_t     dpc;
-> >      uint8_t     dps;
-> > -
-> >      uint8_t     nmic;
-> >      uint8_t     rescap;
-> >      uint8_t     fpi;
-> >      uint8_t     dlfeat;
-> > -
-> > -    uint8_t     res34[94];
-> > +    uint16_t    nawun;
-> > +    uint16_t    nawupf;
-> > +    uint16_t    nacwu;
-> > +    uint16_t    nabsn;
-> > +    uint16_t    nabo;
-> > +    uint16_t    nabspf;
-> > +    uint16_t    noiob;
-> > +    uint8_t     nvmcap[16];
-> > +    uint8_t     rsvd64[40];
-> > +    uint8_t     nguid[16];
-> > +    uint64_t    eui64;
-> >      NvmeLBAF    lbaf[16];
-> > -    uint8_t     res192[192];
-> > +    uint8_t     rsvd192[192];
-> >      uint8_t     vs[3712];
-> >  } NvmeIdNs;
-> Also checked this against V5, looks OK now
-> 
-> >  
-> > +typedef struct NvmeIdNsDescr {
-> > +    uint8_t nidt;
-> > +    uint8_t nidl;
-> > +    uint8_t rsvd2[2];
-> > +} NvmeIdNsDescr;
-> OK
-> 
-> 
-> 
-> > +
-> > +#define NVME_NIDT_UUID_LEN 16
-> > +
-> > +enum {
-> > +    NVME_NIDT_UUID = 0x3,
-> Very minor nitpick: I'll would add others as well just for the sake
-> of better understanding what this is
-> 
-
-Done.
-
-> > +};
-> >  
-> >  /*Deallocate Logical Block Features*/
-> >  #define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
-> 
-> Looks very good.
-> 
 > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 > 
 > Best regards,
 > 	Maxim Levitsky
+> 
+> 
+> 
 > 
 
