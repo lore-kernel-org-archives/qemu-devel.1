@@ -2,80 +2,108 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 166A2C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA278C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:58:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2CF8207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:52:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3417207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 08:58:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJctVTwX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2CF8207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7sgrTCr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3417207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJCd3-0006ZQ-0e
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 04:52:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60454)
+	id 1jJCj0-0000jv-MV
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 04:58:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32935)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jJCcK-00063n-TH
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:51:30 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jJCiH-0008Hm-U4
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:57:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jJCcJ-0005fG-AR
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:51:28 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31647
+ (envelope-from <mreitz@redhat.com>) id 1jJCiG-0001t8-FW
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:57:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38489
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jJCcJ-0005ey-6M
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:51:27 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jJCiG-0001rj-Ba
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 04:57:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585644686;
+ s=mimecast20190719; t=1585645056;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RbLNCVW5cyHI6on2lu/dPAxljdE+voS4BL9wMWmRZgI=;
- b=ZJctVTwXmPehyvt971XZO1Y2+/K5U6/Nkf2KOnfscqiDHmeW5HJvPiZPBnugnob11YCbCo
- q/x69udtQKz1KYE8LD1wZi+TOKrBkwZaNrGAYYBbMNfQ0ILXYQF6+j3lp3CT8WjhdwMiEs
- TexB7OWnf56VHRAqotmMuS46k8hVgoI=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=elAI/Qpn1HFlr3O9Rw4Nje2IfEm2X+dC900RpLUTQCo=;
+ b=Z7sgrTCrlY7OqjXQTw5/a/gc9Nt4eniA7DshRaZ/MP/vW5QqXbILPmtTfUHormfsGAGrL/
+ jLhVsxNAfaOmqm18HienapFA7BiQsoYnFiDgLy/xPo+5gNyyabppo/wCZEtfcYemlonE9g
+ 4zhK5c/lpGpomTF9FofDhVEUjyp0KZ8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-9wcRbWwsM9KoJQbCVYtKiw-1; Tue, 31 Mar 2020 04:51:23 -0400
-X-MC-Unique: 9wcRbWwsM9KoJQbCVYtKiw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-389-0jOhm5JgMQuww-rDczrBgg-1; Tue, 31 Mar 2020 04:57:26 -0400
+X-MC-Unique: 0jOhm5JgMQuww-rDczrBgg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9666A8010F3;
- Tue, 31 Mar 2020 08:51:21 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4795FD768A;
- Tue, 31 Mar 2020 08:51:19 +0000 (UTC)
-Message-ID: <586ae8bcadfc5ae382d8fff7c28fd8bcfdc41862.camel@redhat.com>
-Subject: Re: [PATCH v6 36/42] nvme: add support for scatter gather lists
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Klaus Birkelund Jensen <its@irrelevant.dk>
-Date: Tue, 31 Mar 2020 11:51:18 +0300
-In-Reply-To: <20200331054753.dqxttb7rgxcwok5d@apples.localdomain>
-References: <20200316142928.153431-1-its@irrelevant.dk>
- <20200316142928.153431-37-its@irrelevant.dk>
- <ab590abcfe5ea854aa9760086ad3bb000c4564be.camel@redhat.com>
- <20200331054753.dqxttb7rgxcwok5d@apples.localdomain>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A4501050942;
+ Tue, 31 Mar 2020 08:57:24 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-193.ams2.redhat.com
+ [10.36.113.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0458E1001925;
+ Tue, 31 Mar 2020 08:57:20 +0000 (UTC)
+Subject: Re: [PATCH v4] qcow2: Forbid discard in qcow2 v2 images with backing
+ files
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <20200327185930.19493-1-berto@igalia.com>
+ <81e31d93-8bd6-476b-ff92-080da8a2cd67@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <44971b75-3a06-3111-716e-8e615f775f0f@redhat.com>
+Date: Tue, 31 Mar 2020 10:57:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <81e31d93-8bd6-476b-ff92-080da8a2cd67@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="zJBux2AWLeIXfG8mD3xb9OConnIvCG6PH"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,249 +115,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-03-31 at 07:48 +0200, Klaus Birkelund Jensen wrote:
-> On Mar 25 12:58, Maxim Levitsky wrote:
-> > On Mon, 2020-03-16 at 07:29 -0700, Klaus Jensen wrote:
-> > > From: Klaus Jensen <k.jensen@samsung.com>
-> > > 
-> > > For now, support the Data Block, Segment and Last Segment descriptor
-> > > types.
-> > > 
-> > > See NVM Express 1.3d, Section 4.4 ("Scatter Gather List (SGL)").
-> > > 
-> > > Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
-> > > Acked-by: Keith Busch <kbusch@kernel.org>
-> > > ---
-> > >  hw/block/nvme.c       | 310 +++++++++++++++++++++++++++++++++++-------
-> > >  hw/block/trace-events |   4 +
-> > >  2 files changed, 262 insertions(+), 52 deletions(-)
-> > > 
-> > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > > index 49d323566393..b89b96990f52 100644
-> > > --- a/hw/block/nvme.c
-> > > +++ b/hw/block/nvme.c
-> > > @@ -76,7 +76,12 @@ static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
-> > >  
-> > >  static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
-> > >  {
-> > > -    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
-> > > +    hwaddr hi = addr + size;
-> > > +    if (hi < addr) {
-> > > +        return 1;
-> > > +    }
-> > > +
-> > > +    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr) && nvme_addr_is_cmb(n, hi)) {
-> > 
-> > I would suggest to split this into a separate patch as well, since this contains not just one but 2 bugfixes
-> > for this function and they are not related to sg lists.
-> > Or at least move this to 'nvme: refactor nvme_addr_read' and rename this patch
-> > to something like 'nvme: fix and refactor nvme_addr_read'
-> > 
-> 
-> I've split it into a patch.
-> 
-> > 
-> > >          memcpy(buf, nvme_addr_to_cmb(n, addr), size);
-> > >          return 0;
-> > >      }
-> > > @@ -328,13 +333,242 @@ unmap:
-> > >      return status;
-> > >  }
-> > >  
-> > > -static uint16_t nvme_dma_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
-> > > -                             uint64_t prp1, uint64_t prp2, DMADirection dir,
-> > > +static uint16_t nvme_map_sgl_data(NvmeCtrl *n, QEMUSGList *qsg,
-> > > +                                  QEMUIOVector *iov,
-> > > +                                  NvmeSglDescriptor *segment, uint64_t nsgld,
-> > > +                                  size_t *len, NvmeRequest *req)
-> > > +{
-> > > +    dma_addr_t addr, trans_len;
-> > > +    uint32_t blk_len;
-> > > +    uint16_t status;
-> > > +
-> > > +    for (int i = 0; i < nsgld; i++) {
-> > > +        uint8_t type = NVME_SGL_TYPE(segment[i].type);
-> > > +
-> > > +        if (type != NVME_SGL_DESCR_TYPE_DATA_BLOCK) {
-> > > +            switch (type) {
-> > > +            case NVME_SGL_DESCR_TYPE_BIT_BUCKET:
-> > > +            case NVME_SGL_DESCR_TYPE_KEYED_DATA_BLOCK:
-> > > +                return NVME_SGL_DESCR_TYPE_INVALID | NVME_DNR;
-> > > +            default:
-> > 
-> > To be honest I don't like that 'default'
-> > I would explicitly state which segment types remain 
-> > (I think segment list and last segment list, and various reserved types)
-> > In fact for the reserved types you probably also want to return NVME_SGL_DESCR_TYPE_INVALID)
-> > 
-> 
-> I "negated" the logic which I think is more readable. I still really
-> want to keep the default, for instance, nvme v1.4 adds a new type that
-> we do not support (the Transport SGL Data Block descriptor).
-OK, I'll take a look a that in the next version of the patches.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zJBux2AWLeIXfG8mD3xb9OConnIvCG6PH
+Content-Type: multipart/mixed; boundary="siczMJM4nuEFYpNCuf13Is7iCtZtizVUI"
 
-> 
-> > Also this function as well really begs to have a description prior to it,
-> > something like 'map a sg list section, assuming that it only contains SGL data descriptions,
-> > caller has to ensure this'.
-> > 
-> 
-> Done.
-Thanks a lot!
-> 
-> > 
-> > > +                return NVME_INVALID_NUM_SGL_DESCRS | NVME_DNR;
-> > > +            }
-> > > +        }
-> > > +
-> > > +        if (*len == 0) {
-> > > +            uint16_t sgls = le16_to_cpu(n->id_ctrl.sgls);
-> > 
-> > Nitpick: I would add a small comment here as well describiing
-> > what this does (We reach this point if sg list covers more that that
-> > was specified in the commmand, and the NVME_CTRL_SGLS_EXCESS_LENGTH controller
-> > capability indicates that we support just throwing the extra data away)
-> > 
-> 
-> Adding a comment. It's the other way around. The size as indicated by
-> NLB (or whatever depending on the command) is the "authoritative" souce
-> of information for the size of the payload. We will never accept an SGL
-> that is too short such that we lose or throw away data, but we might
-> accept ignoring parts of the SGL.
-Yes, that is what I meant. Thanks!
+--siczMJM4nuEFYpNCuf13Is7iCtZtizVUI
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> > > +            if (sgls & NVME_CTRL_SGLS_EXCESS_LENGTH) {
-> > > +                break;
-> > > +            }
-> > > +
-> > > +            trace_nvme_dev_err_invalid_sgl_excess_length(nvme_cid(req));
-> > > +            return NVME_DATA_SGL_LEN_INVALID | NVME_DNR;
-> > > +        }
-> > > +
-> > > +        addr = le64_to_cpu(segment[i].addr);
-> > > +        blk_len = le32_to_cpu(segment[i].len);
-> > > +
-> > > +        if (!blk_len) {
-> > > +            continue;
-> > > +        }
-> > > +
-> > > +        if (UINT64_MAX - addr < blk_len) {
-> > > +            return NVME_DATA_SGL_LEN_INVALID | NVME_DNR;
-> > > +        }
-> > 
-> > Good!
-> > > +
-> > > +        trans_len = MIN(*len, blk_len);
-> > > +
-> > > +        status = nvme_map_addr(n, qsg, iov, addr, trans_len);
-> > > +        if (status) {
-> > > +            return status;
-> > > +        }
-> > > +
-> > > +        *len -= trans_len;
-> > > +    }
-> > > +
-> > > +    return NVME_SUCCESS;
-> > > +}
-> > > +
-> > > +static uint16_t nvme_map_sgl(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
-> > > +                             NvmeSglDescriptor sgl, size_t len,
-> > >                               NvmeRequest *req)
-> > > +{
-> > > +    /*
-> > > +     * Read the segment in chunks of 256 descriptors (one 4k page) to avoid
-> > > +     * dynamically allocating a potentially large SGL. The spec allows the SGL
-> > > +     * to be larger than the command transfer size, so it is not bounded by
-> > > +     * MDTS.
-> > > +     */
-> > 
-> > Now this is a very good comment!
-> > 
-> > However I don't fully understand the note about the SGL. I assume that you mean
-> > that the data that SGL covers still should be less that MDTS, but the actual SGL chain,
-> > if assembled really in inefficient way (like 1 byte per each data descriptor) might be larger.
-> > 
-> 
-> Exactly. I'll rephrase.
-Thanks!
-> 
-> > 
-> > > +    const int SEG_CHUNK_SIZE = 256;
-> > > +
-> > > +    NvmeSglDescriptor segment[SEG_CHUNK_SIZE], *sgld, *last_sgld;
-> > > +    uint64_t nsgld;
-> > > +    uint32_t seg_len;
-> > > +    uint16_t status;
-> > > +    bool sgl_in_cmb = false;
-> > > +    hwaddr addr;
-> > > +    int ret;
-> > > +
-> > > +    sgld = &sgl;
-> > > +    addr = le64_to_cpu(sgl.addr);
-> > > +
-> > > +    trace_nvme_dev_map_sgl(nvme_cid(req), NVME_SGL_TYPE(sgl.type), req->nlb,
-> > > +                           len);
-> > > +
-> > > +    /*
-> > > +     * If the entire transfer can be described with a single data block it can
-> > > +     * be mapped directly.
-> > > +     */
-> > > +    if (NVME_SGL_TYPE(sgl.type) == NVME_SGL_DESCR_TYPE_DATA_BLOCK) {
-> > > +        status = nvme_map_sgl_data(n, qsg, iov, sgld, 1, &len, req);
-> > > +        if (status) {
-> > > +            goto unmap;
-> > > +        }
-> > > +
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    /*
-> > > +     * If the segment is located in the CMB, the submission queue of the
-> > > +     * request must also reside there.
-> > > +     */
-> > > +    if (nvme_addr_is_cmb(n, addr)) {
-> > > +        if (!nvme_addr_is_cmb(n, req->sq->dma_addr)) {
-> > > +            return NVME_INVALID_USE_OF_CMB | NVME_DNR;
-> > > +        }
-> > > +
-> > > +        sgl_in_cmb = true;
-> > > +    }
-> > > +
-> > > +    for (;;) {
-> > > +        seg_len = le32_to_cpu(sgld->len);
-> > > +
-> > > +        if (!seg_len || seg_len & 0xf) {
-> > > +            return NVME_INVALID_SGL_SEG_DESCR | NVME_DNR;
-> > > +        }
-> > 
-> > It might be worth noting here that we are dealing with sgl (last) segment descriptor
-> > and its length indeed must be non zero and multiple of 16.
-> > Otherwise I confused this for a moment with the alignment requirements on the data itsel.
-> > 
-> 
-> Done.
-Thanks as well!
-> 
-> > 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > 
-> > 
-> > 
-> > 
-> 
+On 30.03.20 12:05, Max Reitz wrote:
+> On 27.03.20 19:59, Alberto Garcia wrote:
+>> A discard request deallocates the selected clusters so they read back
+>> as zeroes. This is done by clearing the cluster offset field and
+>> setting QCOW_OFLAG_ZERO in the L2 entry.
+>>
+>> This flag is however only supported when qcow_version >=3D 3. In older
+>> images the cluster is simply deallocated, exposing any possible stale
+>> data from the backing file.
+>>
+>> Since discard is an advisory operation it's safer to simply forbid it
+>> in this scenario.
+>>
+>> Note that we are adding this check to qcow2_co_pdiscard() and not to
+>> qcow2_cluster_discard() or discard_in_l2_slice() because the last
+>> two are also used by qcow2_snapshot_create() to discard the clusters
+>> used by the VM state. In this case there's no risk of exposing stale
+>> data to the guest and we really want that the clusters are always
+>> discarded.
+>>
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>> v4:
+>> - Show output of qemu-img map when there's no backing file [Eric]
+>>
+>> v3:
+>> - Rebase and change iotest number
+>> - Show output of qemu-img map in iotest 290 [Kevin]
+>> - Use the l2_offset and rb_offset variables in iotest 060
+>>
+>> v2:
+>>
+>> - Don't create the image with compat=3D0.10 in iotest 060 [Max]
+>> - Use $TEST_IMG.base for the backing image name in iotest 289 [Max]
+>> - Add list of unsupported options to iotest 289 [Max]
+>>
+>>  block/qcow2.c              |  6 +++
+>>  tests/qemu-iotests/060     | 12 ++---
+>>  tests/qemu-iotests/060.out |  2 -
+>>  tests/qemu-iotests/290     | 97 ++++++++++++++++++++++++++++++++++++++
+>>  tests/qemu-iotests/290.out | 61 ++++++++++++++++++++++++
+>>  tests/qemu-iotests/group   |  1 +
+>>  6 files changed, 170 insertions(+), 9 deletions(-)
+>>  create mode 100755 tests/qemu-iotests/290
+>>  create mode 100644 tests/qemu-iotests/290.out
+>=20
+> Thanks, applied to my block branch:
+>=20
+> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-Best regards,
-	Maxim Levitsky
+I=E2=80=99ll have to dequeue it again, because it breaks iotests 046 and 17=
+7
+(both of which already have special handling for v2-specific discard;
+but it needs to be adjusted now that the discard operation no longer
+reveals the backing file contents).
 
+Max
+
+
+--siczMJM4nuEFYpNCuf13Is7iCtZtizVUI--
+
+--zJBux2AWLeIXfG8mD3xb9OConnIvCG6PH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6DBe4ACgkQ9AfbAGHV
+z0Bh/wf/XysICpadYIepSOpeCQKiD0hFMz2sK5KkuixyJo9ckf4fN4//6MTkle90
+B981wtApA1HKT3Qx3ucB07bPhQkh9rQY+7VF8LopvDavmUR8Qjvq4vcqV1XLt0cJ
+aDmzmmEnlWIxAbr8GOyjuNuJvfbOpuS/if+7RKtwcQ/sMT9i0w651/tUZwrGtONO
+HXbHg2yRPLQpZf7diwT/6oKaKT4YwuDMjqlzC58wZl0XO+pVDLeru6NNbuQs6V9g
+6VETxjuaPYmu6SD2EHSypStbTjAdhGL8BW6V8BHpQ9S9t1u3UunRKRhCF1M/W+dk
+Sq6asYTDLZVeNL+4PlQM1M/g35w8aw==
+=ngQf
+-----END PGP SIGNATURE-----
+
+--zJBux2AWLeIXfG8mD3xb9OConnIvCG6PH--
 
 
