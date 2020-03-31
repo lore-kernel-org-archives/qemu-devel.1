@@ -2,104 +2,83 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B24C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 20:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1699AC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 21:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51F7F20658
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 20:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D585F20787
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 21:06:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWxNXJHl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51F7F20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bUCDV+6M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D585F20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJNBm-0001eF-6b
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 16:08:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41170)
+	id 1jJO5B-0007gx-2j
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 17:06:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jJNAn-0001E3-0e
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 16:07:47 -0400
+ (envelope-from <flukshun@gmail.com>) id 1jJO3s-00070y-8X
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 17:04:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jJNAk-0003oE-5J
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 16:07:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59297)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jJNAj-0003lf-S2
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 16:07:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585685260;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T6wna8JGCrQl5yddINWYdosTxQ/MqNTUcqko/Is1kIk=;
- b=BWxNXJHlBvG890kN4tRQwNx+Q749YvIlxoqoDbpPmnY16jGVS1Exq14U2y9CNn3Qx+YROx
- Hxe0GA+V9wVvSNcIpTShvtS5FD5Q0RP8r/Z+R6fm6Z324+5RaPfhi6g8qRs6iqj2DnFvhl
- 32BLL+3u5EGnIjd8maNhtFOYRwvQHLE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-orjXwjDxOh6Dwpc2L2ljUA-1; Tue, 31 Mar 2020 16:07:35 -0400
-X-MC-Unique: orjXwjDxOh6Dwpc2L2ljUA-1
-Received: by mail-ed1-f72.google.com with SMTP id c2so19359781edx.16
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 13:07:35 -0700 (PDT)
+ (envelope-from <flukshun@gmail.com>) id 1jJO3q-0003Qu-DC
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 17:04:40 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:34524)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1jJO3k-0003KU-LI
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 17:04:33 -0400
+Received: by mail-ot1-x330.google.com with SMTP id m2so8898891otr.1
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 14:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:mime-version:content-transfer-encoding:from:cc:user-agent:to
+ :message-id:subject:date;
+ bh=pWCXlz1PrUHqii6SGI1YtDTZX3zTur0XvZxPpco7o0k=;
+ b=bUCDV+6MSJOUoF+zjEYy17JHGJyuZYRqyP/MEeI4sifLSF7lH6SgzOO+Xj5CitR4u2
+ /KtGLgEjDychWJS/B/G+mMrgpuKSNEDz2uiltFtcok3OK6a0zm2QqQbdDNuyfZthMBaW
+ ZoWAKtdjsT3q51A1OR+S7HWUhBZv70ZrZ0y3W09f/9ZxAgqhlWBJbg95L5B3XkLHHTYn
+ sy3c00dnevXogIzFAN6iakkIWZM5pG2k6W8gI31m1rl1py94nAZvsMKtB7zUL+eWwLAz
+ eD0RAZUTd6D9fhshK/iDoOggj6QeX/309sfC0/AyxDOJAe6orOXepJJ1UAsmMgVnVp1C
+ PeBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9FCIhMCa4sllKyY+Z5ntxcWfOWuY/+p0ZXtEmjVXl9k=;
- b=fiGeVe8NpFzGxkVh+ZyvyT0LqSgpnxT47UFIB3EiaI0s2hIVPELFSaUd4DWQSuZ3wv
- EiAAWIymJLZUXLI8yLnbl9on5e9wAwySCrtX9lai4VAAXfxaiOEjXuwDLgAV6eERSXwO
- bDg6g3t9/JaNOSoMCW1e9uY0bYd+8jKdWq4MOQCTIRMq7DNVSTwu/NKXxw95wuVHfHon
- pgk773N+rxHesKojc/WuBc5fLa+9jBIdw2E2Ph8hc1MfCaIZHrhJ+8NJISO5MeQ63YvL
- 4nck6yU7nmHfOyUmZMBHKAsH9Gl/eDOdWjsEiqIPAvFLWDXg2trNYLjYIwUBNp9wd268
- QlAA==
-X-Gm-Message-State: ANhLgQ1PNR9rrWIfK9Iu97dvuexEdsawpgauKyby37+wkwr5BBTdEezJ
- FgqQ7FMBbbNn4REpQuj+aSKokSxM6ixif3jAk+ippPjK6vMjRuU5ilCvVvH2EUrtfZaCkBPY+Zw
- +aHh9kvxxDbvZ4A4=
-X-Received: by 2002:a17:906:319a:: with SMTP id
- 26mr16420756ejy.199.1585685254491; 
- Tue, 31 Mar 2020 13:07:34 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtqKdhDDNqxlr+rHRhNMjBEUSRPTcOIqNIUpig3HNIHMAepQPgfPY4EFTuP9G8gLUsYrqcX4w==
-X-Received: by 2002:a17:906:319a:: with SMTP id
- 26mr16420738ejy.199.1585685254200; 
- Tue, 31 Mar 2020 13:07:34 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id aq2sm2225189ejc.9.2020.03.31.13.07.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 31 Mar 2020 13:07:33 -0700 (PDT)
-Subject: Re: [PATCH-for-5.0 1/7] tests/acceptance/machine_sparc_leon3: Disable
- HelenOS test
-To: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200331105048.27989-1-f4bug@amsat.org>
- <20200331105048.27989-2-f4bug@amsat.org>
- <3dd36ad8-53c1-7dd0-3934-88a2c14afd28@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e5384733-7812-1e05-fdf1-92c08c457c4f@redhat.com>
-Date: Tue, 31 Mar 2020 22:07:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding
+ :from:cc:user-agent:to:message-id:subject:date;
+ bh=pWCXlz1PrUHqii6SGI1YtDTZX3zTur0XvZxPpco7o0k=;
+ b=V/rJr3w/adQsiVfU+3ZpP+WddbVobdCPFtPQV0pW60OJop+xrQ6JTTm0LCOLnWUO5c
+ U6MC/Cy8LR9bWaisE5DPGOXSHR3H8mVkvecPoY34Kom+X82R2n5ZCaltrm8mlbg1s6rx
+ P6Is58hVEOwIm0MvFdZ4mo5olEdKWrPDVueezj+7kQ0mdPIV64Y8AgpHvvQV0/PLXECa
+ ylEC1kN5yfXD/qEl7NMf1p+I9QibglQjtyQmyjXGQSe/I5qGCuArzKDXmEzjQsNdm1gD
+ bhnRZ4G+JBoJ9Gh2uD303GMoJ2QNk3fiPpi1hr9nwKQ92+CNCOFBppgnCQIVR4shAfk2
+ OPVg==
+X-Gm-Message-State: ANhLgQ21u2C/OqxdoAML+d/qrFjPYijLOK35dQOvxtQORop3wMyR5ALC
+ KR+xfMicG0h4F3JJzPHQb1I=
+X-Google-Smtp-Source: ADFU+vvSVhAbn80a6ntVo35HnUdUSffYxendNQPTf4rttmi+gWvzj6q7p0OFvdzylqKWSRfe9hO37Q==
+X-Received: by 2002:a4a:e9fc:: with SMTP id w28mr14483113ooc.98.1585688670478; 
+ Tue, 31 Mar 2020 14:04:30 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id l188sm28696oib.44.2020.03.31.14.04.29
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 31 Mar 2020 14:04:29 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <3dd36ad8-53c1-7dd0-3934-88a2c14afd28@linaro.org>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+User-Agent: alot/0.7
+To: qemu-devel@nongnu.org
+Message-ID: <158568866265.20966.3583703667420924155@sif>
+Subject: [ANNOUNCE] QEMU 5.0.0-rc1 is now available
+Date: Tue, 31 Mar 2020 16:04:22 -0500
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::330
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,153 +90,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Willian Rampazzo <wrampazz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Jiri Gaisler <jiri@gaisler.se>, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Avocado team
+Hello,
 
-On 3/31/20 6:18 PM, Richard Henderson wrote:
-> On 3/31/20 3:50 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> This test was written/tested around beginning of 2019, but was
->> extracted from a bigger series and posted end of June 2019 [*].
->> Unfortunately I did not notice commit 162abf1a8 was merged by
->> then, which implements the AHB and APB plug and play devices.
->>
->> HelenOS 0.6 is expecting the PnP registers to be not implemented
->> by QEMU, then forces the discovered AMBA devices (see [2]).
->>
->> Before 162abf1a8, the console was displaying:
->>
->>    HelenOS bootloader, release 0.6.0 (Elastic Horse)
->>    Built on 2014-12-21 20:17:42 for sparc32
->>    Copyright (c) 2001-2014 HelenOS project
->>     0x4000bf20|0x4000bf20: kernel image (496640/128466 bytes)
->>     0x4002b4f2|0x4002b4f2: ns image (154195/66444 bytes)
->>     0x4003b87e|0x4003b87e: loader image (153182/66437 bytes)
->>     0x4004bc03|0x4004bc03: init image (155339/66834 bytes)
->>     0x4005c115|0x4005c115: locsrv image (162063/70267 bytes)
->>     0x4006d390|0x4006d390: rd image (152678/65889 bytes)
->>     0x4007d4f1|0x4007d4f1: vfs image (168480/73394 bytes)
->>     0x4008f3a3|0x4008f3a3: logger image (158034/68368 bytes)
->>     0x4009feb3|0x4009feb3: ext4fs image (234510/100301 bytes)
->>     0x400b8680|0x400b8680: initrd image (8388608/1668901 bytes)
->>    ABMA devices:
->>    <1:00c> at 0x80000100 irq 3
->>    <1:00d> at 0x80000200
->>    <1:011> at 0x80000300 irq 8
->>    Memory size: 64 MB
->>
->> As of this commit, it is now confused:
->>
->>    ABMA devices:
->>    <1:3000> at 0x00000000 irq 0
->>    <1:3000> at 0x00000000 irq 0
->>    <1:3000> at 0x00000000 irq 0
->>    <1:3000> at 0x00000000 irq 0
->>    <1:3000> at 0x00000000 irq 0
->>    <1:3000> at 0x00000000 irq 0
->>    <1:3000> at 0x00000000 irq 0
->>    ...
->>
->> As this test is not working as expected, simply disable it (by
->> skipping it) for now.
->>
->> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg627094.html
->> [2] https://github.com/HelenOS/helenos/blob/0.6.0/boot/arch/sparc32/src/=
-ambapp.c#L75
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>   tests/acceptance/machine_sparc_leon3.py | 4 ++++
->>   1 file changed, 4 insertions(+)
->=20
-> Thanks!
->=20
-> Reviewed-by: Richard Henderson <richard.hendersion@linaro.org>
-> Tested-by: Richard Henderson <richard.hendersion@linaro.org>
+On behalf of the QEMU Team, I'd like to announce the availability of the
+second release candidate for the QEMU 5.0 release.  This release is meant
+for testing purposes and should not be used in a production environment.
 
-Thanks!
+  http://download.qemu-project.org/qemu-5.0.0-rc1.tar.xz
+  http://download.qemu-project.org/qemu-5.0.0-rc1.tar.xz.sig
 
-First job failed by timeout, 2nd succeeded:
-https://travis-ci.org/github/philmd/qemu/jobs/669265466
+You can help improve the quality of the QEMU 5.0 release by testing this
+release and reporting bugs on Launchpad:
 
-However "Ran for 46 min 48 sec"
+  https://bugs.launchpad.net/qemu/
 
- From the log:
+The release plan, as well a documented known issues for release
+candidates, are available at:
 
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips64el_malta=
-_5KEc_cpio
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips64el_malta=
-_5KEc_cpio
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_i=
-nitrd
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_i=
-nitrd
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_s=
-d
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_s=
-d
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_b=
-ionic
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_u=
-boot_netbsd9
-Fetching asset from=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_u=
-boot_netbsd9
-Fetching asset from=20
-tests/acceptance/ppc_prep_40p.py:IbmPrep40pMachine.test_openbios_and_netbsd
-...
-  (13/82)=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips64el_malta=
-_5KEc_cpio:=20
-  SKIP: untrusted code
-  (24/82)=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_b=
-ionic:=20
-  SKIP: storage limited
-...
-  (25/82)=20
-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_u=
-boot_netbsd9:=20
-  SKIP: storage limited
-...
-  (63/82)=20
-tests/acceptance/ppc_prep_40p.py:IbmPrep40pMachine.test_openbios_and_netbsd=
-:=20
-  SKIP: Running on Travis-CI
+  http://wiki.qemu.org/Planning/5.0
 
-Is it possible that we are now fetching assets for tests we are not=20
-running? In particular the one marked @skip because the downloading time=20
-was too long on Travis?
+Please add entries to the ChangeLog for the 5.0 release below:
 
-RESULTS    : PASS 65 | ERROR 0 | FAIL 0 | SKIP 14 | WARN 0 | INTERRUPT 0=20
-| CANCEL 3
-JOB TIME   : 1480.72 s
+  http://wiki.qemu.org/ChangeLog/5.0
 
-Does this "JOB TIME" sums the 'Fetching asset' part?
+Thank you to everyone involved!
 
-Thanks,
+Changes since rc0:
 
-Phil.
-
+2833ad487c: Update version for v5.0.0-rc1 release (Peter Maydell)
+e82cdba394: vhost-vsock: fix double close() in the realize() error path (St=
+efano Garzarella)
+1153cf9f5b: qtest: add tulip test case (Li Qiang)
+b88fb1247b: hw/net/allwinner-sun8i-emac.c: Fix REG_ADDR_HIGH/LOW reads (Pet=
+er Maydell)
+8ffb7265af: net: tulip: check frame size and r/w data length (Prasad J Pand=
+it)
+cca35ac4d1: net/colo-compare.c: Expose "expired_scan_cycle" to users (Zhang=
+ Chen)
+9cc43c94b3: net/colo-compare.c: Expose "compare_timeout" to users (Zhang Ch=
+en)
+767cc9a9c1: hw/net/can: Make CanBusClientInfo::can_receive() return a boole=
+an (Philippe Mathieu-Daud=C3=A9)
+b8c4b67e3e: hw/net: Make NetCanReceive() return a boolean (Philippe Mathieu=
+-Daud=C3=A9)
+3317db7439: hw/net/rtl8139: Update coding style to make checkpatch.pl happy=
+ (Philippe Mathieu-Daud=C3=A9)
+2fa3d2d401: hw/net/rtl8139: Simplify if/else statement (Philippe Mathieu-Da=
+ud=C3=A9)
+0002c3a696: hw/net/smc91c111: Let smc91c111_can_receive() return a boolean =
+(Philippe Mathieu-Daud=C3=A9)
+205ce5670f: hw/net/e1000e_core: Let e1000e_can_receive() return a boolean (=
+Philippe Mathieu-Daud=C3=A9)
+f22a57ac09: Fixed integer overflow in e1000e (Andrew Melnychenko)
+a43790f2f6: hw/net/i82596.c: Avoid reading off end of buffer in i82596_rece=
+ive() (Peter Maydell)
+baba731bc6: hw/net/i82596: Correct command bitmask (CID 1419392) (Philippe =
+Mathieu-Daud=C3=A9)
+b412378785: decodetree: Use Python3 floor division operator (Philippe Mathi=
+eu-Daud=C3=A9)
+e20cb81d9c: tcg/i386: Fix INDEX_op_dup2_vec (Richard Henderson)
+88828bf133: target/arm: fix incorrect current EL bug in aarch32 exception e=
+mulation (Changbin Du)
+660b4e7042: hw/arm/xlnx-zynqmp.c: Add missing error-propagation code (Peter=
+ Maydell)
+63fef6287e: hw/arm/xlnx-zynqmp.c: Avoid memory leak in error-return path (P=
+eter Maydell)
+e22684e34d: docs/conf.py: Raise ConfigError for bad Sphinx Python version (=
+Peter Maydell)
+34d8df2a1d: hw/misc/allwinner-h3-dramc: enforce 64-bit multiply when calcul=
+ating row mirror address (Niek Linnenbank)
+c251191eae: hw/arm/orangepi: check for potential NULL pointer when calling =
+blk_is_available (Niek Linnenbank)
+146902964d: linux-user: Support futex_time64 (Alistair Francis)
+17e89077b7: acpi: add acpi=3DOnOffAuto machine property to x86 and arm virt=
+ (Gerd Hoffmann)
+9d283f85d7: fix vhost_user_blk_watch crash (Li Feng)
+32a2d6b1f6: hw/i386/amd_iommu.c: Fix corruption of log events passed to gue=
+st (Peter Maydell)
+de38ed3007: virtio-iommu: avoid memleak in the unrealize (Pan Nengyuan)
+cfaf757edd: virtio-blk: delete vqs on the error path in realize() (Pan Neng=
+yuan)
+a3ec4bb7e5: acpi: pcihp: fix left shift undefined behavior in acpi_pcihp_ej=
+ect_slot() (Igor Mammedov)
+0d930b870a: virtio-serial-bus: Plug memory leak on realize() error paths (P=
+an Nengyuan)
+6d7b25ad6e: MAINTAINERS: Add myself as virtio-balloon co-maintainer (David =
+Hildenbrand)
+1c3c9a8c5a: checkpatch: enforce process for expected files (Michael S. Tsir=
+kin)
+84878f4c00: target/mips: Fix loongson multimedia condition instructions (Ji=
+axun Yang)
+127814629b: configure: Support -static-pie if requested (Richard Henderson)
+2c674109c2: configure: Override the os default with --disable-pie (Richard =
+Henderson)
+e6cbd75158: configure: Unnest detection of -z,relro and -z,now (Richard Hen=
+derson)
+b26341241b: configure: Always detect -no-pie toolchain support (Richard Hen=
+derson)
+d2cd29e307: configure: Do not force pie=3Dno for non-x86 (Richard Henderson)
+64547a3bb6: tcg: Remove softmmu code_gen_buffer fixed address (Richard Hend=
+erson)
+ee5195ee0f: configure: Drop adjustment of textseg (Richard Henderson)
+cbf4c9ac9c: cmd646-ide: use qdev gpio rather than qemu_allocate_irqs() (Mar=
+k Cave-Ayland)
+627a445ae0: via-ide: use qdev gpio rather than qemu_allocate_irqs() (Mark C=
+ave-Ayland)
+b938587569: via-ide: don't use PCI level for legacy IRQs (Mark Cave-Ayland)
+d6ef883d9d: hw/ide/sii3112: Use qdev gpio rather than qemu_allocate_irqs() =
+(Peter Maydell)
+9e58f17270: fdc/i8257: implement verify transfer mode (Sven Schnelle)
+df74b1d3df: qcow2: Remove unused fields from BDRVQcow2State (Kevin Wolf)
+ce8cabbd17: mirror: Wait only for in-flight operations (Kevin Wolf)
+9178f4fe5f: Revert "mirror: Don't let an operation wait for itself" (Kevin =
+Wolf)
+6fcc859fc2: nvme: Print 'cqid' for nvme_del_cq (Minwoo Im)
+7a26df203c: block: fix bdrv_root_attach_child forget to unref child_bs (Vla=
+dimir Sementsov-Ogievskiy)
+34afc5c298: block/iscsi:use the flags in iscsi_open() prevent Clang warning=
+ (Chen Qun)
+41e1f0e225: .travis.yml: Add a KVM-only s390x job (Philippe Mathieu-Daud=C3=
+=A9)
+3e3207337b: tests/docker: Add libepoxy and libudev packages to the Fedora i=
+mage (Philippe Mathieu-Daud=C3=A9)
+6d8e7738b0: tests/docker: Use Python3 PyYAML in the Fedora image (Philippe =
+Mathieu-Daud=C3=A9)
+9274ae32c3: tests/docker: Install gcrypt devel package in Debian image (Phi=
+lippe Mathieu-Daud=C3=A9)
+cdb1a84cfe: tests/docker: Keep package list sorted (Philippe Mathieu-Daud=
+=C3=A9)
+a092a95547: configure: disable MTTCG for MIPS guests (Alex Benn=C3=A9e)
+f01454ad17: tests/vm: fix basevm config (Alex Benn=C3=A9e)
+2cc3e591b3: tests/vm: update NetBSD to 9.0 (Gerd Hoffmann)
+610bd2cf2f: tests/vm: update FreeBSD to 12.1 (Gerd Hoffmann)
+50a06452c7: tests/vm: move vga setup (Gerd Hoffmann)
+698a64f948: tests/vm: write raw console log (Gerd Hoffmann)
+f4ce3adf6b: qemu/atomic.h: add #ifdef guards for stdatomic.h (Alex Benn=C3=
+=A9e)
+a507c51790: iotests/138: Test leaks/corruptions fixed report (Max Reitz)
+2f8bb28ff0: iotests: Add poke_file_[bl]e functions (Max Reitz)
+1656324ec0: qemu-img: Fix check's leak/corruption fix report (Max Reitz)
+ed04991063: sheepdog: Consistently set bdrv_has_zero_init_truncate (Eric Bl=
+ake)
+e7be13ad3f: qcow2: Avoid feature name extension on small cluster size (Eric=
+ Blake)
+bb40ebce2c: qcow2: List autoclear bit names in header (Eric Blake)
+a951a631b9: qcow2: Comment typo fixes (Eric Blake)
+5a5e7f8cd8: block: trickle down the fallback image creation function use to=
+ the block drivers (Maxim Levitsky)
+b92902dfea: block: pass BlockDriver reference to the .bdrv_co_create (Maxim=
+ Levitsky)
+66c8672d24: block/mirror: fix use after free of local_err (Vladimir Sements=
+ov-Ogievskiy)
+a52f5f87be: linux-user: Flush out implementation of gettimeofday (Richard H=
+enderson)
+bf02adcd88: linux-user: Add x86_64 vsyscall page to /proc/self/maps (Richar=
+d Henderson)
+b26491b4d4: linux-user/i386: Emulate x86_64 vsyscalls (Richard Henderson)
+acf768a904: linux-user/i386: Split out gen_signal (Richard Henderson)
+628460891d: target/i386: Renumber EXCP_SYSCALL (Richard Henderson)
+91e5998f18: linux-user, configure: fix (again) syscall_nr.h dependencies cl=
+eanup (Laurent Vivier)
+7cd75cbdb8: migration: use "" instead of (null) for tls-authz (Mao Zhongyi)
+b4a1733c5e: migration/ram: fix use after free of local_err (Vladimir Sement=
+sov-Ogievskiy)
+27d07fcfa7: migration/colo: fix use after free of local_err (Vladimir Semen=
+tsov-Ogievskiy)
+d96c4d5f19: vl.c: fix migration failure for 3.1 and older machine types (Ig=
+or Mammedov)
+e1cd92d95c: tools/virtiofsd/passthrough_ll: Fix double close() (Philippe Ma=
+thieu-Daud=C3=A9)
+d4ff109373: hmp/vnc: Fix info vnc list leak (Dr. David Alan Gilbert)
+6d1da867e6: tests/migration: Reduce autoconverge initial bandwidth (Philipp=
+e Mathieu-Daud=C3=A9)
+06b1c6f8b7: xbzrle: update xbzrle doc (Mao Zhongyi)
+33ee3d96c7: hmp-cmd: fix a missing_break warning (Pan Nengyuan)
+95fad99cb2: hw/audio/fmopl: fix segmentation fault (Volker R=C3=BCmelin)
+112c37a6a6: ui/input-linux: Do not ignore ioctl() return value (Philippe Ma=
+thieu-Daud=C3=A9)
 
