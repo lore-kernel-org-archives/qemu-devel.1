@@ -2,84 +2,95 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D698C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 07:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5657AC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 07:21:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1352A2072A
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 07:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 205D42072A
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 07:21:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+WUqknF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1352A2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bEBlUUj/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 205D42072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJB8i-0006mw-5s
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 03:16:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49846)
+	id 1jJBCy-0007xl-8k
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 03:21:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jJB7R-0005Fl-2V
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:15:30 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jJBCL-0007Wf-Js
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:20:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jJB7P-0003KE-9Z
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:15:28 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39689
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jJB7P-0003Jr-5Y
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:15:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585638926;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gNpP9DXLxJv8ckOM9cL3t4TDUQkcBA9Jmrv0WI0E3DY=;
- b=R+WUqknFd6pdEsm5t9ONS2X4ikTOziSaKbIfpCzn7vZNJMQ+HzBtE3qaECQ+2UTJhesM48
- vE7L571+ffU9iLCaQE4waTAgM7QDSI4qpLFQDB/IFbMUdzzUbwKB26mvxrUFnqRyxHDm4C
- evu6e4NMEm2SDdwGi443CyQuIfUbaZk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-2OtuOL_9OHmrN69lymw6ng-1; Tue, 31 Mar 2020 03:15:20 -0400
-X-MC-Unique: 2OtuOL_9OHmrN69lymw6ng-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 957331005509;
- Tue, 31 Mar 2020 07:15:19 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 488DC5C1C5;
- Tue, 31 Mar 2020 07:15:19 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CE6AB11385E2; Tue, 31 Mar 2020 09:15:17 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: deprecation of in-tree builds
-References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
- <87v9mmug73.fsf@dusky.pond.sub.org>
- <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
-Date: Tue, 31 Mar 2020 09:15:17 +0200
-In-Reply-To: <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
- (Peter Maydell's message of "Mon, 30 Mar 2020 14:31:52 +0100")
-Message-ID: <875zel5722.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1jJBCJ-0006sf-7I
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:20:33 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39547)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jJBCJ-0006s7-0c
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 03:20:31 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p10so24544785wrt.6
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 00:20:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=imrAE/ffXQzCoxNXZvjsT7WpTFugKJmejFu11KvGyeQ=;
+ b=bEBlUUj/73na93RLQU1i100MECp3oMtWnjIp7jdYXWeEneI67+g9aXXBATE9zjNPb1
+ dOwOCFac4r9U/CvOjd6jSYTV1OUug7DXs5l32r5u0eOYRCX8Wjeo1pmzxqNahE99pWaY
+ pRO0C0hBs+2WAC38kRrpDLy6s939vkqUihyOkuK9fUX0OnnKzv9/W7SOB3REkD7hCluM
+ ST8vqCX7QP5m4pSh+XoKilgFJNHpV1VtnQvrWQ+taT8yzeOJkG6Oo3qtXpDcB5hooM1i
+ t9obIZA/gLLjNRZwKNbupowvKb/TxSVqXW+MjEREeofAQ2zPgF5z0WsM8tiHtb0zT6Vb
+ t8Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=imrAE/ffXQzCoxNXZvjsT7WpTFugKJmejFu11KvGyeQ=;
+ b=Y2IRksmLFCMSL2boL2PG6jwSSppEo0upFVXls9kcK5g4mA1WpPl2q2hr0v2EDaC1dF
+ 66T0EFN7ke01aRIq4KKakht6Yyb3iSQqbBsUTDI12+HFO5rCsqLKupJsOCGQyIlz/qB1
+ b19B3i3Djkd+41+fgEh1NbAkupDY35JOiIDtuI61zAOFR668z9gWFkftHpyaIVjAP55S
+ wCE48+C2rBH7+kAucbJeya4L21jNW2Ziu9koCvCeLiGw5m4i/TqKSGnVDSwLM3NDUiqV
+ F1sQzSkORZm6OWk7VlgHq2ymOkHymBggnfqO9/IU4vHjHvAibj6g1SHUVaRJtolp579n
+ 92lQ==
+X-Gm-Message-State: ANhLgQ1FAUMEZfPNCX/js/qT1EcTRvsB4/842zJvS/Hbybe+xdcsOu34
+ tFGDOqfVlZGAFzFP/EnRomPxaw==
+X-Google-Smtp-Source: ADFU+vsQgJa6IFf5vXUs+QUwNrUG/ok1lOxwF9H8KEFJdemBBg+z2Kmg+PnaufTZU+hrQwFjH9nCRg==
+X-Received: by 2002:adf:a319:: with SMTP id c25mr18954194wrb.197.1585639229477; 
+ Tue, 31 Mar 2020 00:20:29 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a64sm2645658wmh.39.2020.03.31.00.20.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 31 Mar 2020 00:20:27 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 628521FF7E;
+ Tue, 31 Mar 2020 08:20:26 +0100 (BST)
+References: <20200307010051.97022-1-yuanzi@google.com>
+ <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
+ <87imizidwc.fsf@linaro.org>
+ <CADjx4CJJdQep+K3ibfhjin7Eo6uCEFGQ6R6yVC0OcNo8MsfvJw@mail.gmail.com>
+ <87d095u804.fsf@linaro.org>
+ <CADjx4CKhoikcZanqYCs11ubGY+6tOeNjToiCgjnp8V_rzZcDHw@mail.gmail.com>
+ <87tv25fwvz.fsf@linaro.org>
+ <CADjx4CK-NtPP9iRmao_J9A+25y-MUjco=sM+sKwHfpWXzSV_yA@mail.gmail.com>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Lirong Yuan <yuanzi@google.com>
+Subject: Re: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
+In-reply-to: <CADjx4CK-NtPP9iRmao_J9A+25y-MUjco=sM+sKwHfpWXzSV_yA@mail.gmail.com>
+Date: Tue, 31 Mar 2020 08:20:26 +0100
+Message-ID: <87o8sdf0sl.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,61 +102,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Josh Kunz <jkz@google.com>,
+ Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Shu-Chun Weng <scw@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On Mon, 30 Mar 2020 at 14:26, Markus Armbruster <armbru@redhat.com> wrote=
-:
+Lirong Yuan <yuanzi@google.com> writes:
+
+> On Mon, Mar 30, 2020 at 12:47 PM Alex Benn=C3=A9e <alex.bennee@linaro.org=
+> wrote:
+>
 >>
->> Peter Maydell <peter.maydell@linaro.org> writes:
+>> Lirong Yuan <yuanzi@google.com> writes:
 >>
->> > AIUI from Paolo, the intention is to deprecate and eventually
->> > stop supporting "in-tree" builds, so that the only option is
->> > building in a separate build directory. I thought we should
->> > probably mention that in the 5.0 changelog, so I wrote up some
->> > text:
+>> > On Sat, Mar 21, 2020 at 6:56 AM Alex Benn=C3=A9e <alex.bennee@linaro.o=
+rg>
+>> wrote:
 >> >
->> > https://wiki.qemu.org/ChangeLog/5.0#Build_Information
+>> >>
+>> >> Lirong Yuan <yuanzi@google.com> writes:
+>> >>
+>> >> > On Fri, Mar 20, 2020 at 2:17 AM Alex Benn=C3=A9e <alex.bennee@linar=
+o.org>
+>> >> wrote:
+>> >> <snip>
+>> >> >>
+>> >> >> Sorry I missed this on my radar. There was a minor re-factor of
+>> gdbstub
+>> >> >> that was just merged which will mean this patch needs a re-base to
+>> use
+>> >> >> g_string_* functions to expand stings.
+>> >> >>
+>> >> >> Also we have some simple gdbstub tests now - could we come up with=
+ a
+>> >> >> multiarch gdbstub test to verify this is working properly?
+>> >> >>
+>> >> <snip>
+>> >> > For sure, I will re-base this patch to use g_string_* functions.
+>> >> >
+>> >> > Currently we are using qemu aarch64. I am not sure how to do this y=
+et,
+>> >> but
+>> >> > I could try to add something to
+>> >> > https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbstub
+>> >>
+>> >> If the auxv support is appropriate to all linux-user targets you can
+>> >> plumb it into the multiarch tests - you can even use the existing
+>> >> binaries.
+>> >>
+>> >> So you need:
+>> >>
+>> >>   - a stanza in the makefiles to launch the test (see
+>> >>     tests/tcg/aarch64/Makefile.target)
+>> >>
+>> >>   - a .py test script that manipulates gdbstub to check things are
+>> working
+>> >>
+>> >> So something like:
+>> >>
+>> >> .PHONY: gdbstub-foo-binary
+>> >> run-gdbstub-foo-binary: foo-binary
+>> >>         $(call run-test, $@, $(GDB_SCRIPT) \
+>> >>                 --gdb $(HAVE_GDB_BIN) \
+>> >>                 --qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
+>> >>                 --bin $< --test $(MULTIARCH_SRC)/gdbstub/test-foo.py,=
+ \
+>> >>         "basic gdbstub FOO support")
+>> >>
+>> >>
+>> >> >
+>> >> > Does this sound good?
+>> >>
+>> >> Hope that helps.
+>> >>
+>> >> >
+>> >> > Thanks!
+>> >> > Lirong
+>> >>
+>> >>
+>> >> --
+>> >> Alex Benn=C3=A9e
+>> >>
+>> >
+>> > Hi Alex,
+>> >
+>> > Thanks for the instructions, very helpful!
+>> >
+>> > I rebased this patch to use g_string_* functions, and the link to
+>> patchwork
+>> > is:
+>> > http://patchwork.ozlabs.org/patch/1264125/
+>> > Could you help take another look?
+>> >
+>> > Regarding testing, I looked at some instructions for running tests, e.=
+g.
+>> > https://github.com/qemu/qemu/blob/master/docs/devel/testing.rst
+>> > https://wiki.qemu.org/Testing
+>> > However I still could not get the tests for aarch64 to run. Do you know
+>> how
+>> > to run the aarch64 or multi-arch tests?
 >>
->> Overdue.  Thanks for doing this!
+>> The aarch64 ones run with "make run-tcg-tests-aarch64-linux-user" add
+>> V=3D1 to see the details.
 >>
->> > Suggestions for changes/comments etc welcome.
+>> > Also there aren't any existing gdb stub tests that try to read
+>> > uninterpreted bytes from the target=E2=80=99s special data area identi=
+fied by a
+>> > keyword:
+>> >
+>> https://sourceware.org/gdb/current/onlinedocs/gdb/General-Query-Packets.=
+html#qXfer-auxiliary-vector-read
+>> > I looked at some other gdb stub tests, but they did not seem to send a=
+ny
+>> > queries:
+>> > https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbstub
+>> > So I am not sure how to set up one for "Xfer:auxv:read:" packets...
+>> > Are there plans to add more tests for other packets like
+>> > "Xfer:features:read:"?
+>> > I'd be happy to add a test if there is an example of how to do it. :)
 >>
->> Looks fine to me.
+>> What would you do from a normal gdb command line. At the very least you
+>> run the same command with gdb.execute(), e.g.:
+>>
+>>   gdb.execute("set confirm off")
+>>
+>> is the same as typing
+>>
+>>   set confirm off
+>>
+>> at the gdb command prompt.
+>>
+>> >
+>> > Thanks,
+>> > Lirong
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
 >
-> Consensus in the thread seemed to lean towards having
-> the 'configure/make' runes auto-create a build directory;
-> if we want to do that we should probably not say anything in
-> the release notes, because we'll cause people to change
-> unnecessarily. Or at least have them say "We recommend
-> out-of-tree builds. In future we might make the commands
-> that currently do an in-tree build automatically create
-> and use a build directory for you." rather than a blanket
-> "we're going to drop this and you should change what you
-> do now".
+> Hey Alex,
 >
-> Thoughts?
+> I tried to run the test but they were skipped. Do you know if there's any
+> other flag that needs to be set?
+>
+> $ make run-tcg-tests-aarch64-linux-user
+> make[1]: Entering directory '/usr/local/google/home/yuanzi/qemu/slirp'
+> make[1]: Nothing to be done for 'all'.
+> make[1]: Leaving directory '/usr/local/google/home/yuanzi/qemu/slirp'
+>   BUILD   TCG tests for aarch64-linux-user
+>   BUILD   aarch64-linux-user guest-tests SKIPPED
+>   RUN     TCG tests for aarch64-linux-user
+>   RUN     tests for aarch64-linux-user SKIPPED
 
-I'm wary of complicating the build system to save developers a minor
-change of habits.
+Ahh you either need to have docker enabled or the aarch64 compilers in
+your path when you run configure so the test programs can be built. The
+details are in docs/devel/testing.rst
 
-We will have to ask developers to change habits anyway when we switch to
-Meson.  I agree with Daniel's recommendation to delay changes requiring
-habit-changes until then.  However, telling people to stay clear of the
-unloved and brittle in-tree build is simply good advice we should not
-withhold.  When you can't make the obvious way to do things the way that
-has the best chance of actually working, at least have the courtesy to
-point people to the way that has the best chance of actually working.
+> I don't think any command needs to be run. It should just send the query
+> automatically.
+> Could we assume that it will work the same in the test?
 
-If some developers want to avoid a change of habits badly enough, surely
-one or more of them will volunteer to contribute / maintain the
-complications needed for that with Meson.
+If that is enough to exercise the code. Can we not validate the data someho=
+w?
 
-Whatever it takes to get rid of in-tree-only build breakages :)
 
+--=20
+Alex Benn=C3=A9e
 
