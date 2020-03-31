@@ -2,83 +2,87 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 683D1C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:49:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFBDC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:52:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E0720772
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:49:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FDE3208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 10:52:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RoLYs+yc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E0720772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpP+ysRL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FDE3208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJESO-0001fy-Cl
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:49:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52542)
+	id 1jJEVa-0003pA-BB
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 06:52:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52930)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jJER7-0000eo-Jg
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:48:04 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jJETx-0002Ll-Jc
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jJER5-0003I0-8s
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:48:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58645
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jJER5-0003Gp-4q
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:47:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585651678;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=38QBf+KUJW2bcghEae4V9VBYJdyliTaWn0kE2CZJrjA=;
- b=RoLYs+yceUOQIPpdPIkegsV7StaRHzD8LpIMfOfHK4qEsVBToqZ4P8VoS3et2wslXugPeV
- hEixh8WAe3LdlVmk+ockYox4phUaaiMrkkWUeVypglvEo11dmfO2g0A5FzCs6eg5ZYJgVK
- wELOyH1dg1I96AJQu9VaBbqwM/M3PoE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-CrfPxV5DPL6H_ElCT05g3g-1; Tue, 31 Mar 2020 06:47:57 -0400
-X-MC-Unique: CrfPxV5DPL6H_ElCT05g3g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34E8418AB2C4;
- Tue, 31 Mar 2020 10:47:55 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD921100EBB7;
- Tue, 31 Mar 2020 10:47:42 +0000 (UTC)
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
-To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
- alex.williamson@redhat.com, peterx@redhat.com
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-9-git-send-email-yi.l.liu@intel.com>
-Message-ID: <e6d9a5bc-fd54-c220-067d-0597ad8e86fc@redhat.com>
-Date: Tue, 31 Mar 2020 12:47:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jJETw-0006EQ-Cf
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:50:57 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44225)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jJETw-0006DK-4l
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 06:50:56 -0400
+Received: by mail-wr1-x443.google.com with SMTP id m17so25252076wrw.11
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 03:50:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lJqcVg1nkmfnugvWLqOmYqnLVrllS1d2tf91/cbFWCE=;
+ b=GpP+ysRLnV0s20kXUN2ZO6HKsIUTEw5CxqtRUfeR/8y6i5onRLgRDtQRWkBrRiCBa6
+ XTeyTUyZCeiaVTezQSQi1Nqe1a6PeD2Ya+9tQxypKfOudWBVOaQ+94WZ6q0Rm9vHWga5
+ KbnC3QtCAn8mEiJKvjknuC+WfXB6gNtScySRF+R7yH0pPWDX5xTeBr5RqN2Vgfy4u/P2
+ V4e+Q3t+9IQwtmWdfDrSMzGGISc4tSEKxVGAZ2M9JekVDP9JnH4fueX85UOOi1Y6eeXh
+ rmC4bxpm6+Px0u4SyFmDqn7yyZtZMxdvxCfqc7rb44KN41RxHJ4/TTRA8Wunol9B8LpK
+ h6kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=lJqcVg1nkmfnugvWLqOmYqnLVrllS1d2tf91/cbFWCE=;
+ b=iK8h7aqKtJOvfXgvVxtCsjFW4A+o3wAnyQ/fHkyPI1e41BJAVOEhN+lZrXoX3L8UuL
+ I8/CMXH27MInUC9QHltrV53S5oO69Y9rms0MU4du5iyPzIvIqzUwuD6LvAzEVibxAi9u
+ YdaGByIxbjHiY0+a38QK3+Idk5lwWzzy9unv1F8gHAw17EDTJTZrZ93NoYkJiRm18P/L
+ RA2je/xmJtVpEorNDdogZSV9bnp50oZ34dpLtP/U+yuiFr9eMQTuxak+o9aihobbW1A6
+ 6wkFn1irdkx2QTWSlX1gSPmy5QiUxdIn7B2NUKsf4JtNzJxvRWu2cTDgvZ4lrTn/5Du6
+ VJeg==
+X-Gm-Message-State: ANhLgQ3PKPPKTbRSdzDXbKgHXtJB48/bmWtwAnlybZxiB77jzqapt+tG
+ fvV7GyBUG89rw7hih/6TXQRVeuSBpDs=
+X-Google-Smtp-Source: ADFU+vtY6FRQLuswX7yS1SdXSGoJVm9WM66ygBROrJo8kbkNtDb3EpT+xvRisA4pPKbkN/VVZunzqQ==
+X-Received: by 2002:a05:6000:1205:: with SMTP id
+ e5mr21104439wrx.73.1585651854684; 
+ Tue, 31 Mar 2020 03:50:54 -0700 (PDT)
+Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id w3sm26042830wrn.31.2020.03.31.03.50.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 31 Mar 2020 03:50:53 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/7] hw/sparc/leon3: Few fixes and disable HelenOS test
+Date: Tue, 31 Mar 2020 12:50:41 +0200
+Message-Id: <20200331105048.27989-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-9-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,178 +94,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
- pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, Jiri Gaisler <jiri@gaisler.se>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yi,
+The Leon3Machine.test_leon3_helenos_uimage has been running
+erratically since some time now. Time to disable it (at least
+until we make it reliable).
+Few other patches added while tracking the issue.
 
-On 3/30/20 6:24 AM, Liu Yi L wrote:
-> This patch defines vfio_host_iommu_context_info, implements the PASID
-> alloc/free hooks defined in HostIOMMUContextClass.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/vfio/common.c                      | 69 +++++++++++++++++++++++++++++++++++
->  include/hw/iommu/host_iommu_context.h |  3 ++
->  include/hw/vfio/vfio-common.h         |  4 ++
->  3 files changed, 76 insertions(+)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index c276732..5f3534d 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1179,6 +1179,53 @@ static int vfio_get_iommu_type(VFIOContainer *container,
->      return -EINVAL;
->  }
->  
-> +static int vfio_host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx,
-> +                                           uint32_t min, uint32_t max,
-> +                                           uint32_t *pasid)
-> +{
-> +    VFIOContainer *container = container_of(iommu_ctx,
-> +                                            VFIOContainer, iommu_ctx);
-> +    struct vfio_iommu_type1_pasid_request req;
-> +    unsigned long argsz;
-you can easily avoid using argsz variable
-> +    int ret;
-> +
-> +    argsz = sizeof(req);
-> +    req.argsz = argsz;
-> +    req.flags = VFIO_IOMMU_PASID_ALLOC;
-> +    req.alloc_pasid.min = min;
-> +    req.alloc_pasid.max = max;
-> +
-> +    if (ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req)) {
-> +        ret = -errno;
-> +        error_report("%s: %d, alloc failed", __func__, ret);
-better use %m directly or strerror(errno)
-also include vbasedev->name?
-> +        return ret;
-> +    }
-> +    *pasid = req.alloc_pasid.result;
-> +    return 0;
-> +}
-> +
-> +static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
-> +                                          uint32_t pasid)
-> +{
-> +    VFIOContainer *container = container_of(iommu_ctx,
-> +                                            VFIOContainer, iommu_ctx);
-> +    struct vfio_iommu_type1_pasid_request req;
-> +    unsigned long argsz;
-same
-> +    int ret;
-> +
-> +    argsz = sizeof(req);
-> +    req.argsz = argsz;
-> +    req.flags = VFIO_IOMMU_PASID_FREE;
-> +    req.free_pasid = pasid;
-> +
-> +    if (ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req)) {
-> +        ret = -errno;
-> +        error_report("%s: %d, free failed", __func__, ret);
-same
-> +        return ret;
-> +    }
-> +    return 0;
-> +}
-> +
->  static int vfio_init_container(VFIOContainer *container, int group_fd,
->                                 Error **errp)
->  {
-> @@ -1791,3 +1838,25 @@ int vfio_eeh_as_op(AddressSpace *as, uint32_t op)
->      }
->      return vfio_eeh_container_op(container, op);
->  }
-> +
-> +static void vfio_host_iommu_context_class_init(ObjectClass *klass,
-> +                                                       void *data)
-> +{
-> +    HostIOMMUContextClass *hicxc = HOST_IOMMU_CONTEXT_CLASS(klass);
-> +
-> +    hicxc->pasid_alloc = vfio_host_iommu_ctx_pasid_alloc;
-> +    hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
-> +}
-> +
-> +static const TypeInfo vfio_host_iommu_context_info = {
-> +    .parent = TYPE_HOST_IOMMU_CONTEXT,
-> +    .name = TYPE_VFIO_HOST_IOMMU_CONTEXT,
-> +    .class_init = vfio_host_iommu_context_class_init,
-Ah OK
+Philippe Mathieu-Daudé (7):
+  tests/acceptance/machine_sparc_leon3: Disable HelenOS test
+  hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to AHB PnP
+    registers
+  hw/misc/grlib_ahb_apb_pnp: Fix AHB PnP 8-bit accesses
+  hw/misc/grlib_ahb_apb_pnp: Add trace events on read accesses
+  hw/timer/grlib_gptimer: Display frequency in decimal
+  target/sparc/int32_helper: Remove DEBUG_PCALL definition
+  target/sparc/int32_helper: Extract and use excp_name_str()
 
-This is the object inheriting from the abstract TYPE_HOST_IOMMU_CONTEXT.
-I initially thought VTDHostIOMMUContext was, sorry for the misunderstanding.
+ hw/misc/grlib_ahb_apb_pnp.c             | 24 ++++++++++++++++++++++--
+ target/sparc/int32_helper.c             | 23 ++++++++++++-----------
+ hw/misc/trace-events                    |  4 ++++
+ hw/timer/trace-events                   |  2 +-
+ tests/acceptance/machine_sparc_leon3.py |  4 ++++
+ 5 files changed, 43 insertions(+), 14 deletions(-)
 
-Do you expect other HostIOMMUContext backends? Given the name and ops,
-it looks really related to VFIO?
-
-Thanks
-
-Eric
-
-
-> +};
-> +
-> +static void vfio_register_types(void)
-> +{
-> +    type_register_static(&vfio_host_iommu_context_info);
-> +}
-> +
-> +type_init(vfio_register_types)
-> diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
-> index 35c4861..227c433 100644
-> --- a/include/hw/iommu/host_iommu_context.h
-> +++ b/include/hw/iommu/host_iommu_context.h
-> @@ -33,6 +33,9 @@
->  #define TYPE_HOST_IOMMU_CONTEXT "qemu:host-iommu-context"
->  #define HOST_IOMMU_CONTEXT(obj) \
->          OBJECT_CHECK(HostIOMMUContext, (obj), TYPE_HOST_IOMMU_CONTEXT)
-> +#define HOST_IOMMU_CONTEXT_CLASS(klass) \
-> +        OBJECT_CLASS_CHECK(HostIOMMUContextClass, (klass), \
-> +                         TYPE_HOST_IOMMU_CONTEXT)
->  #define HOST_IOMMU_CONTEXT_GET_CLASS(obj) \
->          OBJECT_GET_CLASS(HostIOMMUContextClass, (obj), \
->                           TYPE_HOST_IOMMU_CONTEXT)
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index fd56420..0b07303 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -26,12 +26,15 @@
->  #include "qemu/notify.h"
->  #include "ui/console.h"
->  #include "hw/display/ramfb.h"
-> +#include "hw/iommu/host_iommu_context.h"
->  #ifdef CONFIG_LINUX
->  #include <linux/vfio.h>
->  #endif
->  
->  #define VFIO_MSG_PREFIX "vfio %s: "
->  
-> +#define TYPE_VFIO_HOST_IOMMU_CONTEXT "qemu:vfio-host-iommu-context"
-> +
->  enum {
->      VFIO_DEVICE_TYPE_PCI = 0,
->      VFIO_DEVICE_TYPE_PLATFORM = 1,
-> @@ -71,6 +74,7 @@ typedef struct VFIOContainer {
->      MemoryListener listener;
->      MemoryListener prereg_listener;
->      unsigned iommu_type;
-> +    HostIOMMUContext iommu_ctx;
->      Error *error;
->      bool initialized;
->      unsigned long pgsizes;
-> 
+-- 
+2.21.1
 
 
