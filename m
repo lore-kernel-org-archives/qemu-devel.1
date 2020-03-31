@@ -2,60 +2,80 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F260C2D0F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:11:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88902C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:12:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55C5E20781
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:11:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C5E20781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 4E73520781
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:12:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5q/1Opz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E73520781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJIY7-0004lX-Ea
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 11:11:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58610)
+	id 1jJIZ2-0006oK-F5
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 11:12:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jJIX2-0003D4-Qv
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:10:26 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jJIUk-0008OC-HT
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:08:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jJIX1-0001CU-14
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:10:24 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:61729)
+ (envelope-from <kwolf@redhat.com>) id 1jJIUj-0008Oi-7Z
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:08:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39621
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1jJIWz-0001Bk-U5
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:10:22 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id E5D75747E0F;
- Tue, 31 Mar 2020 17:10:19 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id A51F97475F6; Tue, 31 Mar 2020 17:10:19 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id A371574638A;
- Tue, 31 Mar 2020 17:10:19 +0200 (CEST)
-Date: Tue, 31 Mar 2020 17:10:19 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] configure: warn if not using a separate build
- directory
-In-Reply-To: <042a22e2-5be5-ba57-1c35-8f210d9718fd@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003311707100.73689@zero.eik.bme.hu>
-References: <20200331103758.370644-1-berrange@redhat.com>
- <042a22e2-5be5-ba57-1c35-8f210d9718fd@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jJIUj-0008OI-42
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:08:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585667280;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kZI6ZWDlyXnpjwUIr7sBRa5x+lgCmRA0UTkCASxf4tA=;
+ b=S5q/1Opz7SWp93s9jwhqrwMZfLhUTtKVXY+0cVCnybaeKAq5esX4aXou0BOn68zHekMbaS
+ MqKnwPWkdIn1rhZ7M4QY+Rgc7Zl+BGlTnh2U0GfD4pGKBWASCHo9ADFqvN7D4wQ2QKB1uJ
+ P0UV9H4hz/Bd2vuIVnPQDyxZ1I8/yEA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-vh_pEtfEOym-P9hOoa5dSg-1; Tue, 31 Mar 2020 11:07:58 -0400
+X-MC-Unique: vh_pEtfEOym-P9hOoa5dSg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D9AC18C43C0;
+ Tue, 31 Mar 2020 15:07:57 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-236.ams2.redhat.com [10.36.114.236])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 733FC60BFE;
+ Tue, 31 Mar 2020 15:07:55 +0000 (UTC)
+Date: Tue, 31 Mar 2020 17:07:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v10 00/14] iotests: use python logging
+Message-ID: <20200331150753.GH7030@linux.fritz.box>
+References: <20200331000014.11581-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- BOUNDARY="3866299591-1014521963-1585667234=:73689"
-Content-ID: <alpine.BSF.2.22.395.2003311707180.73689@zero.eik.bme.hu>
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <20200331000014.11581-1-jsnow@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,152 +87,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
- Liviu Ionescu <ilg@livius.net>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?ISO-8859-15?Q?Michal_Such=E1nek?= <msuchanek@suse.de>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Am 31.03.2020 um 02:00 hat John Snow geschrieben:
+> This series uses python logging to enable output conditionally on
+> iotests.log(). We unify an initialization call (which also enables
+> debugging output for those tests with -d) and then make the switch
+> inside of iotests.
+>=20
+> It will help alleviate the need to create logged/unlogged versions
+> of all the various helpers we have made.
+>=20
+> Also, I got lost and accidentally delinted iotests while I was here.
+> Sorry about that. By version 9, it's now the overwhelming focus of
+> this series. No good deed, etc.
 
---3866299591-1014521963-1585667234=:73689
-Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
-Content-ID: <alpine.BSF.2.22.395.2003311707181.73689@zero.eik.bme.hu>
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
-On Tue, 31 Mar 2020, Eric Blake wrote:
-> On 3/31/20 5:37 AM, Daniel P. Berrang=E9 wrote:
->> Running configure directly from the source directory is a build
->> configuration that will go away in future. It is also not currently
->> covered by any automated testing. Display a deprecation warning if
->> the user attempts to use an in-srcdir build setup, so that they are
->> aware that they're building QEMU in an undesirable manner.
->>=20
->> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
->> ---
->>   configure | 30 ++++++++++++++++++++++++++++++
->>   1 file changed, 30 insertions(+)
->>=20
->
-> It sounds like you already have a v2 coming up to address Phillipe's=20
-> comments, but I'd be happy to see this concept make it into v5.0.
->
->> diff --git a/configure b/configure
->> index e225a1e3ff..1ab7492ab5 100755
->> --- a/configure
->> +++ b/configure
->> @@ -3,6 +3,19 @@
->>   # qemu configure script (c) 2003 Fabrice Bellard
->>   #
->>   +BUILDDIR=3D$(pwd)
->
-> Why fork out to 'pwd', when we can rely on $PWD for the same answer? No=
-te=20
-> that both $(pwd) and $PWD $BUILDDIR always give an absolute (but no=20
-> necessarily canonical) path, which means...
->
->> +SRCDIR=3D$(dirname "$0")
->> +
->> +ABS_BUILDDIR=3D$(realpath $BUILDDIR)
->
-> ...calling this ABS_BUILDDIR is a misnomer (it was already absolute). W=
-hat it=20
-> is really doing is chasing through symlinks to result in a canonical na=
-me,=20
-> particularly since unless you have absolute names, using only string=20
-> comparison to see if two filenames are equivalent will have false negat=
-ives=20
-> (/tmp vs. /tmp/., for example).
->
->> +ABS_SRCDIR=3D$(realpath $SRCDIR)
->
-> Not robust if there are spaces in the directory names.  Safer would be
-> ABS_BUILDDIR=3D$(realpath -- "$BUILDDIR")
-> and similarly for ABS_SRCDIR.
->
->> +
->> +in_srcdir=3Dno
->> +if [ "$ABS_SRCDIR" =3D=3D "$ABS_BUILDDIR" ]
->
-> Bashism. You MUST spell this '=3D', not '=3D=3D', since configure is ru=
-n under=20
-> /bin/sh which might be dash which does not understand =3D=3D.
->
->> +then
->> +    in_srcdir=3Dyes
->> +fi
->> +
->> +
->>   # Unset some variables known to interfere with behavior of common to=
-ols,
->>   # just as autoconf does.
->>   CLICOLOR_FORCE=3D GREP_OPTIONS=3D
->> @@ -6799,6 +6812,23 @@ if test "$supported_os" =3D "no"; then
->>       echo "us upstream at qemu-devel@nongnu.org."
->>   fi
->>   +if test "$in_srcdir" =3D "yes"; then
->> +    echo
->> +    echo "WARNING: SUPPORT FOR IN SOURCE DIR BUILDS IS DEPRECATED"
->> +    echo
->> +    echo "Support for running the 'configure' script directly from th=
-e"
->> +    echo "source directory is deprecated and will go away in a future=
-"
->> +    echo "release. In source dir builds are not covered by automated"
->> +    echo "testing and are liable to break without warning. Users are"
->> +    echo "strongly recommended to switch to a separate build director=
-y:"
->> +    echo
->> +    echo "  $ mkdir build"
->> +    echo "  $ cd build"
->> +    echo "  $ ../configure"
->> +    echo "  $ make"
->> +    echo
->> +fi
->
-> You know, it WOULD be possible to further enhance this to actually crea=
-te=20
-> 'build' as well as a shim GNUmakefile that would auto-forward on to bui=
-lding=20
-> directly in build, so that you maintain the illusion of an in-place bui=
-ld=20
-> (other than all the build artifacts now living in a different location)=
-, and=20
-> muscle memory for in-tree 'make' still works; I've posted elsewhere and=
- will=20
-> repeat here the contents of my GNUmakefile:
->
-> # Hack for redirecting while reminding myself to use distinct builddir
-> ifeq ($(MAKECMDGOALS),)
-> recurse: all
-> endif
-> %: force
-> 	@echo 'changing directory to build...'
-> 	@sleep 2
-
-Right, just drop all the 14 line warning above, this one line here should=
-=20
-be enough to remind people (maybe reworded to say that build results are=20
-found there and move it after the $(MAKE) so it's printed last and drop=20
-the sleep 2 and this should work.
-
-Regards,
-BALATON Zoltan
-
-> 	@$(MAKE) -C build -f Makefile $(MAKECMDGOALS)
-> force: ;
-> .PHONY: force
-> GNUmakefile: ;
->
->
-> But we could do that as a patch on top of yours.
->
->
---3866299591-1014521963-1585667234=:73689--
 
