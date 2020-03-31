@@ -2,65 +2,84 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91167C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88420C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:06:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6159220781
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:56:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6159220781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 53766206CC
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 16:06:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h2a+7beY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53766206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJJFD-0000Dr-IG
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 11:56:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38843)
+	id 1jJJPO-0001Mq-AH
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 12:06:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jJJEP-0007n7-Bn
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:55:14 -0400
+ (envelope-from <eblake@redhat.com>) id 1jJJO8-00005B-EX
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:05:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jJJEN-0003sT-EE
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:55:12 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:61250)
+ (envelope-from <eblake@redhat.com>) id 1jJJO6-0000VV-ED
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:05:15 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48712
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1jJJEL-0003pD-L3
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:55:10 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 32489747DFB;
- Tue, 31 Mar 2020 17:55:05 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 07FD77475F6; Tue, 31 Mar 2020 17:55:05 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 068B174638A;
- Tue, 31 Mar 2020 17:55:05 +0200 (CEST)
-Date: Tue, 31 Mar 2020 17:55:05 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: deprecation of in-tree builds
-In-Reply-To: <20200331152317.GL353752@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003311734540.73689@zero.eik.bme.hu>
-References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
- <87v9mmug73.fsf@dusky.pond.sub.org>
- <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
- <875zel5722.fsf@dusky.pond.sub.org>
- <alpine.BSF.2.22.395.2003311417190.73689@zero.eik.bme.hu>
- <20200331125030.GG353752@redhat.com>
- <alpine.BSF.2.22.395.2003311632270.73689@zero.eik.bme.hu>
- <20200331152317.GL353752@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jJJO6-0000Up-97
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 12:05:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585670713;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8nc+642Iu38kodAsZ3P/GI+L7ljQSFwAnTs0+CWhM/s=;
+ b=h2a+7beYojbMIwI5C5N3C6JuCssb148NFh1yuBkkJbETF1EyhXAR6DadDeh5+6DTpu1x5z
+ UeZ7JWPHHu4HNh75jV3gX/fOI5OGmGHUL6RabrYYfJAOew0Lzw4481ZocByPfFIB8z5TGj
+ jNR4SI7ORacWk5Yuj83qUbldqm8vcZc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-gvWk_0XwNxO5ggUVMdAM5w-1; Tue, 31 Mar 2020 12:05:09 -0400
+X-MC-Unique: gvWk_0XwNxO5ggUVMdAM5w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 363328017CE;
+ Tue, 31 Mar 2020 16:05:08 +0000 (UTC)
+Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FA8460BE2;
+ Tue, 31 Mar 2020 16:05:06 +0000 (UTC)
+Subject: Re: [PATCH v2] configure: warn if not using a separate build directory
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200331155158.381585-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <1450d802-4df8-117b-e58d-da8bf2334010@redhat.com>
+Date: Tue, 31 Mar 2020 11:05:06 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1604181391-1585670105=:73689"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:738:2001:2001::2001
+In-Reply-To: <20200331155158.381585-1-berrange@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,86 +91,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ Liviu Ionescu <ilg@livius.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 3/31/20 10:51 AM, Daniel P. Berrang=C3=A9 wrote:
+> Running configure directly from the source directory is a build
+> configuration that will go away in future. It is also not currently
+> covered by any automated testing. Display a deprecation warning if
+> the user attempts to use an in-srcdir build setup, so that they are
+> aware that they're building QEMU in an undesirable manner.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>=20
+> Changed in v2:
+>=20
+>   - Use existing $source_path variable (Eric)
 
---3866299591-1604181391-1585670105=:73689
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Phillipe, actually - but this line isn't permanent.
 
-On Tue, 31 Mar 2020, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Mar 31, 2020 at 05:04:16PM +0200, BALATON Zoltan wrote:
->> OK, so then only supporting out-of-tree builds but adding convenience
->> function and Makefile to still allow people to run configure; make fro=
-m
->> source dir would solve this without also needing people to change what=
- they
->> always did so why is that solution not acceptable?
->
-> There's several scenarios discussed. Currently we don't do anything to
-> prevent src-dir builds, so there's no need to extra make magic describe=
-d
-> I proposed a patch to add a warning, but it still allows src-dir builds=
-,
-> so nothing functional has changed.
->
-> We could forbid src-dir builds now and add the magic to redirct to a
-> build-dir. That would work, but I don't think we should block src-dir
-> builds in make, assuming we have a switch to meson arriving in the
-> near-ish future.
+>   - Remove bash-ism in comparison (Eric)
+>   - Safe quoting of directory paths (Eric)
+>   - Rename variables to reflect that we're applying canonicalization (Eri=
+c)
+>=20
+>   configure | 27 +++++++++++++++++++++++++++
+>   1 file changed, 27 insertions(+)
+>=20
+> diff --git a/configure b/configure
+> index e225a1e3ff..5991e0e6e5 100755
+> --- a/configure
+> +++ b/configure
+> @@ -285,6 +285,16 @@ then
+>     error_exit "main directory cannot contain spaces nor colons"
+>   fi
+>  =20
+> +canon_build_path=3D$(realpath -- "$PWD")
+> +canon_source_path=3D$(realpath -- "$source_path")
+> +
+> +in_srcdir=3Dno
+> +if [ "$canon_build_path" =3D "$canon_source_path" ]
+> +then
+> +    in_srcdir=3Dyes
+> +fi
 
-So then why print a warning when it will change again when the build=20
-system is replaced? Isn't it enough to worry about it at that point? If i=
-t=20
-works now as before then no need to constantly bug people at every=20
-cofigure invocation. Simply put a warning in changelog that current build=
-=20
-system is deprecated and will be replaced with something else like Meson=20
-in some future release and that should be enough to notify people about=20
-the coming change. You don't print warnings for every other deprecated=20
-features either.
+This part is good.
 
-> Once we switch to Meson there will inevitably be some disruption in
-> build system ussage as it is a completely new tool. That makes it a
-> good flag day for forbidding src-dir builds. Given that it is a flag
-> day, I don't think there's any need to create makefile magic at that
-> time.
+> +
+> +
+>   # default parameters
+>   cpu=3D""
+>   iasl=3D"iasl"
+> @@ -6799,6 +6809,23 @@ if test "$supported_os" =3D "no"; then
+>       echo "us upstream at qemu-devel@nongnu.org."
+>   fi
+>  =20
+> +if test "$in_srcdir" =3D "yes"; then
+> +    echo
+> +    echo "WARNING: SUPPORT FOR IN SOURCE DIR BUILDS IS DEPRECATED"
+> +    echo
+> +    echo "Support for running the 'configure' script directly from the"
+> +    echo "source directory is deprecated and will go away in a future"
+> +    echo "release. In source dir builds are not covered by automated"
+> +    echo "testing and are liable to break without warning. Users are"
+> +    echo "strongly recommended to switch to a separate build directory:"
 
-Ideally a change in build system should make it more convenient to work=20
-with not more inconvenient otherwise it's questionable if we want to=20
-introduce it at all but we'll see then. But then why bug people with a 14=
-=20
-line warning now if they'll have to change their ways again shortly? I=20
-thought you wanted to get rid of in-tree builds now to ease the=20
-maintenance of current make system and the convenience makefile would=20
-help that.
+Per Kevin's response, we may want to tweak this wording slightly; maybe:
 
-> IMHO we shouldn't be so afraid of change that we need to try to preserv=
-e
-> every precise way of working we've had in the past. In the long term th=
-is
-> frame of mind holds back the project and promotes a negative impression
-> of QEMU as an old, outdated project resistant to any kind of change.
+Support for running the 'configure' script directly from the source=20
+directory is deprecated.  In-tree builds are not covered by automated=20
+testing and are liable to break without warning.  Future releases may=20
+change the default location of built executables for an in-tree build,=20
+or drop in-tree build support altogether.  Users are strongly=20
+recommended to switch to a separate build directory:
 
-I did not say that. What I said was that you can change or replace the=20
-build system with whatever you want as long as I can still run make (or=20
-equivalently simple command) in source dir and it will build the project.=
-=20
-I can live with build results moved to a subdir to ease your task of=20
-managing build system so you don't have to support two ways of building=20
-now. But if you say this will still work for now and don't mind continue=20
-to support it as before at least until a new build system is introduced=20
-I'm happy with that too. I'll raise same complaints against new build=20
-system then when it's about to be merged.
+> +    echo
+> +    echo "  $ mkdir build"
+> +    echo "  $ cd build"
+> +    echo "  $ ../configure"
+> +    echo "  $ make"
+> +    echo
+> +fi
+> +
+>   config_host_mak=3D"config-host.mak"
+>  =20
+>   echo "# Automatically generated by configure - do not modify" >config-a=
+ll-disas.mak
+>=20
 
-Regards,
-BALATON Zoltan
---3866299591-1604181391-1585670105=:73689--
+Whether we keep your wording or switch to somthing based on mine,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
