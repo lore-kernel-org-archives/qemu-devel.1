@@ -2,86 +2,74 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C38CFC2D0F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B4CC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92EAE20BED
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:14:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YUFyrQio"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92EAE20BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15B5E20786
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:16:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15B5E20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJIbG-0002Kn-OD
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 11:14:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59119)
+	id 1jJIdM-0005AS-3c
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 11:16:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jJIZe-0008S8-3k
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:13:07 -0400
+ (envelope-from <bounces@canonical.com>) id 1jJIcW-0004N5-Ud
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jJIZc-0002Qq-P4
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:13:05 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47688
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jJIZc-0002QS-Km
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:13:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585667583;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5GKiJBzl4x58r7tlFgM7ELEcO62DVc1ZKolrrOgJdgg=;
- b=YUFyrQio874qpMG2syzcV63TSEq9CxeEjnU8OVk16GFNNQR+3pvsY9wYhHMBYo1rmiip6n
- 84k9AAm0rlAn+fBpBTWcQHaCq2fdSvZKS8EpnkEFHDJ8850acbE6C5RjHaQauekZee8mxK
- fpANzq0md6k8k5TSXw8whK47ezy2Rtw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-fB_05eJBNe2mxV3X5uAuJA-1; Tue, 31 Mar 2020 11:13:01 -0400
-X-MC-Unique: fB_05eJBNe2mxV3X5uAuJA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C761C1902EAD;
- Tue, 31 Mar 2020 15:12:59 +0000 (UTC)
-Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B3678F34F;
- Tue, 31 Mar 2020 15:12:58 +0000 (UTC)
-Subject: Re: [PATCH v5] qcow2: Forbid discard in qcow2 v2 images with backing
- files
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20200331114345.29993-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <3fb921af-06f8-2157-bc1e-cc25fee96319@redhat.com>
-Date: Tue, 31 Mar 2020 10:12:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <bounces@canonical.com>) id 1jJIcV-0004SD-IJ
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:16:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36776)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jJIcV-0004R5-Cl
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:16:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jJIcR-0008Rm-Rx
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 15:15:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 338192E80D2
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 15:15:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200331114345.29993-1-berto@igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 31 Mar 2020 15:10:34 -0000
+From: carlosedp <carlosedp@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: carlosedp laurent-vivier
+X-Launchpad-Bug-Reporter: carlosedp (carlosedp)
+X-Launchpad-Bug-Modifier: carlosedp (carlosedp)
+References: <158445595923.20060.16174990100496488911.malonedeb@wampee.canonical.com>
+Message-Id: <158566743431.24030.9186298318794643830.malone@soybean.canonical.com>
+Subject: [Bug 1867786] Re: Qemu PPC64 freezes with multi-core CPU
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 76f26eb0621368e6ac9af7afde0b3f44e883440c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,42 +78,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1867786 <1867786@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/31/20 6:43 AM, Alberto Garcia wrote:
-> A discard request deallocates the selected clusters so they read back
-> as zeroes. This is done by clearing the cluster offset field and
-> setting QCOW_OFLAG_ZERO in the L2 entry.
-> 
-> This flag is however only supported when qcow_version >= 3. In older
-> images the cluster is simply deallocated, exposing any possible stale
-> data from the backing file.
-> 
-> Since discard is an advisory operation it's safer to simply forbid it
-> in this scenario.
-> 
-> Note that we are adding this check to qcow2_co_pdiscard() and not to
-> qcow2_cluster_discard() or discard_in_l2_slice() because the last
-> two are also used by qcow2_snapshot_create() to discard the clusters
-> used by the VM state. In this case there's no risk of exposing stale
-> data to the guest and we really want that the clusters are always
-> discarded.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
-> v5:
-> - Fix iotests 046 and 177 with compat=0.10 [Max]
+Hi Laurent, confirm that after changing the network adapter to the
+e1000e it worked flawlessly for hours with 4 cores on Macbook Pro.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks!
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1867786
+
+Title:
+  Qemu PPC64 freezes with multi-core CPU
+
+Status in QEMU:
+  New
+
+Bug description:
+  I installed Debian 10 on a Qemu PPC64 VM running with the following
+  flags:
+
+  qemu-system-ppc64 \
+       -nographic -nodefaults -monitor pty -serial stdio \
+       -M pseries -cpu POWER9 -smp cores=3D4,threads=3D1 -m 4G \
+       -drive file=3Ddebian-ppc64el-qemu.qcow2,format=3Dqcow2,if=3Dvirtio \
+       -netdev user,id=3Dnetwork01,$ports -device rtl8139,netdev=3Dnetwork0=
+1 \
+
+  =
+
+  Within a couple minutes on any operation (could be a Go application or si=
+mply changing the hostname with hostnamectl, the VM freezes and prints this=
+ on the console:
+
+  ```
+  root@debian:~# [  950.428255] rcu: INFO: rcu_sched self-detected stall on=
+ CPU
+  [  950.428453] rcu:     3-....: (5318 ticks this GP) idle=3D8e2/1/0x40000=
+00000000004 softirq=3D5957/5960 fqs=3D2544
+  [  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! [zsh:462]
+
+  Message from syslogd@debian at Mar 17 11:35:24 ...
+   kernel:[  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! =
+[zsh:462]
+  [  980.110018] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tas=
+ks: { 3-... } 5276 jiffies s: 93 root: 0x8/.
+  [  980.111177] rcu: blocking rcu_node structures:
+  [ 1013.442268] rcu: INFO: rcu_sched self-detected stall on CPU
+  [ 1013.442365] rcu:     3-....: (21071 ticks this GP) idle=3D8e2/1/0x4000=
+000000000004 softirq=3D5957/5960 fqs=3D9342
+  ```
+
+  If I change to 1 core on the command line, I haven't seen these
+  freezes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1867786/+subscriptions
 
