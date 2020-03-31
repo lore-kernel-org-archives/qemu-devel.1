@@ -2,84 +2,61 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBB4C2D0F2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AEA5C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:11:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBE6920781
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:10:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T8ArUCnU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE6920781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF36420781
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 15:11:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF36420781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJIXS-0003P2-PO
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 11:10:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57495)
+	id 1jJIY7-0004l8-0e
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 11:11:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jJIQK-0001iv-IC
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:03:29 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jJIRJ-0003Nv-4n
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jJIQF-0001E6-Gc
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:03:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54149
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1jJIRH-0003ve-80
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:04:28 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:61602)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jJIQF-0001Dq-B0
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:03:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585667003;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=acgp/8hO5UArPmrgeVJ48WS3S8E4cqI7wgzYYPeFL68=;
- b=T8ArUCnUt+Y5zvP59KN1SLy0hVQ0Uyl5gRpFKdgmoud5HpivVb96dMV+9Dg/GctxN3As36
- TY1z/zRX/PNH/ksGphxPxzgUDQzYItj5saD5vW9xTC0VtH9okJtR42doonNCp+7z+BxuEQ
- Glv7XfWv0dQRJVGhAxJPR31Ei9P9dHg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-tIWDjKiRPAqTwiNExeh3gA-1; Tue, 31 Mar 2020 11:03:21 -0400
-X-MC-Unique: tIWDjKiRPAqTwiNExeh3gA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 399F8189F785;
- Tue, 31 Mar 2020 15:03:20 +0000 (UTC)
-Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 366741001B2B;
- Tue, 31 Mar 2020 15:03:19 +0000 (UTC)
-Subject: Re: [PATCH v2] migration/throttle: Add cpu-throttle-tailslow
- migration parameter
-To: Keqian Zhu <zhukeqian1@huawei.com>, qemu-devel@nongnu.org
-References: <20200316042935.28306-1-zhukeqian1@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <144483ff-e10d-e1b5-0c60-609b4da9c217@redhat.com>
-Date: Tue, 31 Mar 2020 10:03:18 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1jJIRF-0003Xt-Ve
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 11:04:27 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 56E64745953;
+ Tue, 31 Mar 2020 17:04:17 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id CD293747EA2; Tue, 31 Mar 2020 17:04:16 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id CC08B747EA7;
+ Tue, 31 Mar 2020 17:04:16 +0200 (CEST)
+Date: Tue, 31 Mar 2020 17:04:16 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: deprecation of in-tree builds
+In-Reply-To: <20200331125030.GG353752@redhat.com>
+Message-ID: <alpine.BSF.2.22.395.2003311632270.73689@zero.eik.bme.hu>
+References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+ <87v9mmug73.fsf@dusky.pond.sub.org>
+ <CAFEAcA-9U=EAXAtPDh_AnO3eUbM_jcRBuf4x=0Rec0EC-v2mNA@mail.gmail.com>
+ <875zel5722.fsf@dusky.pond.sub.org>
+ <alpine.BSF.2.22.395.2003311417190.73689@zero.eik.bme.hu>
+ <20200331125030.GG353752@redhat.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <20200316042935.28306-1-zhukeqian1@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: multipart/mixed; boundary="3866299591-84508624-1585667056=:73689"
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,67 +68,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com, qemu-arm@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/15/20 11:29 PM, Keqian Zhu wrote:
-> At the tail stage of throttling, the Guest is very sensitive to
-> CPU percentage while the @cpu-throttle-increment is excessive
-> usually at tail stage.
-> 
-> If this parameter is true, we will compute the ideal CPU percentage
-> used by the Guest, which may exactly makes dirty rate to be dirty
-> rate threshold. Then we will choose a smaller throttle increment
-> between the one specified by @cpu-throttle-increment and the one
-> generated by ideal CPU percentage.
-> 
-> Therefore, it is compatible to traditional throttling, meanwhile
-> the throttle increment won't be excessive at tail stage. This may
-> make migration time longer, and is disabled by default.
-> 
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> ---
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> +++ b/qapi/migration.json
-> @@ -552,6 +552,21 @@
->   #                          auto-converge detects that migration is not making
->   #                          progress. The default value is 10. (Since 2.7)
->   #
-> +# @cpu-throttle-tailslow: Make CPU throttling slower at tail stage
-> +#                         At the tail stage of throttling, the Guest is very
-> +#                         sensitive to CPU percentage while the @cpu-throttle
-> +#                         -increment is excessive usually at tail stage.
-> +#                         If this parameter is true, we will compute the ideal
-> +#                         CPU percentage used by the Guest, which may exactly
-> +#                         makes dirty rate to be dirty rate threshold. Then we
+--3866299591-84508624-1585667056=:73689
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Grammar is off here, but I don't know if you meant "which may exactly 
-make the dirty rate match the dirty rate threshold" or something else.
+On Tue, 31 Mar 2020, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Mar 31, 2020 at 02:33:46PM +0200, BALATON Zoltan wrote:
+>>> We will have to ask developers to change habits anyway when we switch=
+ to
+>>> Meson.  I agree with Daniel's recommendation to delay changes requiri=
+ng
+>>> habit-changes until then.  However, telling people to stay clear of t=
+he
+>>> unloved and brittle in-tree build is simply good advice we should not
+>>> withhold.
+>>
+>> Can someone please explain why is it brittle and cannot be supported? =
+It has
+>> worked well so far apart from some breakage due to being untested whic=
+h is
+>> also not a techincal necessity just a decision by some maintiners to n=
+ot
+>> test it. Adding a CI job to keep it working would also not be difficul=
+t or
+>> much complexity.
+>
+> Writing make rules to correctly handle both src-dir and build-dir scena=
+rios
+> is a non-negligible maint burden. If you look back through QEMU's histo=
+ry
+> we have a steady stream of patches which have broken one or the other
+> build scenarios.
 
-> +#                         will choose a smaller throttle increment between the
-> +#                         one specified by @cpu-throttle-increment and the one
-> +#                         generated by ideal CPU percentage.
-> +#                         Therefore, it is compatible to traditional throttling,
-> +#                         meanwhile the throttle increment won't be excessive
-> +#                         at tail stage.
-> +#                         The default value is false. (Since 5.0)
+That's probably becuase there are no clear rules (such as always prefix=20
+files in source dir with $(SRC_PATH), generated files with some BUILDDIR,=
+=20
+etc.) and these are not documented so every time someone touches it has t=
+o=20
+explore and debug it again. This could be avoided if these were written=20
+down once but instead of trying to document and clean up the build system=
+=20
+the chosen direction is to just throw it out and replace it with somethin=
+g=20
+more complex and with more dependencies (Meson) and then to save=20
+"additional complexity" it also breaks people's workflow and demand them=20
+to adapt themselves. I'm not saying there should be no changes but if=20
+there's a way to make them less painful it could be considered if it's no=
+t=20
+much extra work and in this case it does not seem to be.
 
-Is this a bug-fix that must make it into 5.0?  It seems more like a 
-feature addition, at which point listing it for 5.1 is probably a better 
-idea.
+> Developers will often not test both scenarios, just the one they prefer
+> to use. This results in a maint burden on the subsystem maintainers who
+> merge patches and then find they break & have to back them out. Sometim=
+es
+> even the subsystem maintainer gets it wrong and burden falls on Peter t=
+o
+> find & reject it.
+>
+> Even if we have CI to test both, it is still a burden on developers to
+> debug failures reported by the CI and figure out what needs fixing. Wit=
+h
+> the number of builds we do & the time for a single CI cycle it gets ver=
+y
+> time consuming. I've personally wasted many many hours debugging src-di=
+r
+> vs build-dir problems in QEMU's makefiles - probably more than an entir=
+e
+> day was lost when I did the patches to split the trace.h header file.
+>
+> This all serves to divert time away from useful work on QEMU. If there
+> was some critically important functional thing that src-dir builds offe=
+r
+> that can't be achieved by build-dir builds, then the extra maint work
+> could be justified. I don't think that's the case though.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+OK, so then only supporting out-of-tree builds but adding convenience=20
+function and Makefile to still allow people to run configure; make from=20
+source dir would solve this without also needing people to change what=20
+they always did so why is that solution not acceptable?
 
+Regards,
+BALATON Zoltan
+--3866299591-84508624-1585667056=:73689--
 
