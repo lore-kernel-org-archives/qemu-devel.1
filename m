@@ -2,87 +2,84 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47298C2D0F3
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1F1C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:58:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15D9320675
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7304620675
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 14:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W+CsjTzF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D9320675
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iCUl0cja"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7304620675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJILC-0001Ro-6F
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56380)
+	id 1jJILF-0001bO-Iu
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 10:58:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jJIKF-00085S-47
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:12 -0400
+ (envelope-from <mst@redhat.com>) id 1jJIK9-0007tT-MB
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jJIKD-000535-Sh
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59689
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1jJIK8-0004yr-Jh
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45934
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jJIKD-00052q-OJ
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:09 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jJIK8-0004xW-FR
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 10:57:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585666629;
+ s=mimecast20190719; t=1585666623;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Y3JDDCxeHsu0uxBdU3hqYhD9IDIpl6gR6DiqYZM/Jw0=;
- b=W+CsjTzFiTgh0ruyYntWxCsqeA51dRXEz6mQ1MojsU4K/n3QYncr+qipN2sq+RdVvLSksv
- 97vLqj5WI0BbWzuuAJ07Juw3uE/oehnqSJnuC2d3kWRNgjoxATYT7Fz+i2jOR+Gr0lT1eb
- GZmo1G7fKkGOiWibhuISywGJ3q4Vkk8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-IRJ2DvtTP0aK9WxFsFMU3w-1; Tue, 31 Mar 2020 10:57:07 -0400
-X-MC-Unique: IRJ2DvtTP0aK9WxFsFMU3w-1
-Received: by mail-wr1-f70.google.com with SMTP id d1so13066545wru.15
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:57:06 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=eI7h3HrqQofMJ3tqdEd4AybxOVit8Q3Jo4m5bdyl3uA=;
+ b=iCUl0cjad+bgPbKsCcAHmiy9ri+kKJv7mxgHiphia89+vzyAfTjZsEc2N+rocNWF/2o+nB
+ 4prtXgZxOqwhjxgxDQpeXwDzUz8rvP4vCGBydkDpIxMj5mt6bNz6ABVJGJRxLtSPCT/UsB
+ yu1NQPR6pq6oOVquKtJPCp/kcnhBrWc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-LnMkYaxVMJ2DVWRIuoqufg-1; Tue, 31 Mar 2020 10:57:02 -0400
+X-MC-Unique: LnMkYaxVMJ2DVWRIuoqufg-1
+Received: by mail-wm1-f71.google.com with SMTP id s15so802296wmc.0
+ for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 07:57:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=0MtgQcn82XAWmRqhItN4weyN5S4MhXPLIRVwnSTTFuQ=;
- b=BD0KZCah4atoLcXwnWsTN/oeANjS9UATOfL12/Y5jbHR3WP/CGbzLQ4uSb+hO8xJO8
- V44XwYDGkwlEOZo6ipIMmdhhmhD9H7QZt59jzaJn4obhxGd3UYhTY6HrxsE30ROCHoUK
- UyoeF5OkaYLgbpAfLQ2djyLt9yw428jV76LG8LZcL2XSmWDe8Dvg1TmxR9eVSpBNHZ0x
- y+6VCaprHtWc6Ku3ibuye8xyz1aILhDlYe9Rj8+lIcXuRqiTVo4skuu0hMzIg/CxDAYo
- +x03UpvNkBVzZqs0nRwAsqykRN5rWaAoxrB+45QVUpL4Gw5W45HG2tvKkvMe1Dwe0Z1Z
- Tn9g==
-X-Gm-Message-State: ANhLgQ1zmPQfBGLpvX12LL3r+y6m10tkFBfY/AOPNSn0uJB4q4HQYfUk
- ufn27bY39WKLcXX9fGQrSN6651pWVRG0uKE21qIDXI5ed8iu9AcVeXURJc+BWoA2eRnLGyAt3fB
- U36afm7NU4Exl6SU=
-X-Received: by 2002:a1c:4d7:: with SMTP id 206mr3754950wme.5.1585666625678;
- Tue, 31 Mar 2020 07:57:05 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vt20bX8cLcjWZW8/qj5zisx4hb73rI+EShQcVb6YRqVRIUYWc/KtesLFJgkX1UcRObq10FVvw==
-X-Received: by 2002:a1c:4d7:: with SMTP id 206mr3754931wme.5.1585666625473;
- Tue, 31 Mar 2020 07:57:05 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=MTHke4CHukD3SSbL6gWMTXramsTo39KLg0o5XWSaYns=;
+ b=HWYOl9BTKlCPwyZJPXozH7sf6tkjj3YI7RGl8yy5okLU9D9rIlT+hlWzgf2pFg8ZOb
+ 3B8ImGw5bxTVIKVKfLkE1i6nYl/abY56WbjqFJG32qcHqNejIeHX7vHyAMZZLp+iYX8c
+ 1kQgezDKLddMvQowrK5IcmtUBv6naJ24ZqsexYE7Q7iJBbxhxKMohR9KDZUmcdv1hJA0
+ 176i3qThzHv7SkzFpJAXcFJ1z5sG1OFZjFen67XW7N7g6ch7Zz1oU1Ny8SRYbSZTWKBg
+ 8q4F7bRRJ8KfKP+78gWI40pNCDFX5FIu7cFZlC8Sx1eEOBIg42nVeV3iqexUGjy31wKB
+ zdMA==
+X-Gm-Message-State: ANhLgQ1DA5TNfmCL6xPagy86zhkuW9hfa8RMLgfli8B8C1FlO3FFQxdB
+ lLJTdwusXXMQ9oJ6umVSw83U5RoW4oYC5bYD3G+IiCf/ZMw4Rx+CiNMERmmPKdkpmSXqKiWxbQF
+ sUPz1KvvnHjhomOg=
+X-Received: by 2002:a1c:418b:: with SMTP id o133mr3975038wma.165.1585666620579; 
+ Tue, 31 Mar 2020 07:57:00 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuGjT7lh6JE6GdxB1pwDo0nWwFSXdJ7cQtxoB8zB/+Hb1ge/9jLVXoac0PC9LxawMRb/2zbkA==
+X-Received: by 2002:a1c:418b:: with SMTP id o133mr3975023wma.165.1585666620317; 
+ Tue, 31 Mar 2020 07:57:00 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
- by smtp.gmail.com with ESMTPSA id f187sm4240956wme.9.2020.03.31.07.57.03
+ by smtp.gmail.com with ESMTPSA id x206sm4260701wmg.17.2020.03.31.07.56.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 31 Mar 2020 07:57:04 -0700 (PDT)
-Date: Tue, 31 Mar 2020 10:57:03 -0400
+ Tue, 31 Mar 2020 07:56:59 -0700 (PDT)
+Date: Tue, 31 Mar 2020 10:56:58 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/10] MAINTAINERS: Add myself as virtio-balloon co-maintainer
-Message-ID: <20200331145631.135630-3-mst@redhat.com>
-References: <20200331145631.135630-1-mst@redhat.com>
+Subject: [PULL 00/10] virtio, pci, pc: bugfixes, checkpatch, maintainers
+Message-ID: <20200331145631.135630-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200331145631.135630-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
@@ -91,7 +88,7 @@ Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,52 +100,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Markus Armbruster <armbru@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+The following changes since commit 5acad5bf480321f178866dc28e38eeda5a3f19bb=
+:
 
-As suggested by Michael, let's add me as co-maintainer of virtio-balloon.
-While at it, also add "balloon.c" and "include/sysemu/balloon.h" to the
-file list.
+  Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into =
+staging (2020-03-28 00:27:04 +0000)
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200312133725.8192-1-david@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+
+for you to fetch changes up to e82cdba3945340f524ba153170d52800dbd55ca4:
+
+  vhost-vsock: fix double close() in the realize() error path (2020-03-31 1=
+0:54:28 -0400)
+
+----------------------------------------------------------------
+virtio, pci, pc: bugfixes, checkpatch, maintainers
+
+Bugfixes all over the place.
+Add a new balloon maintainer.
+A checkpatch enhancement to enforce ACPI change rules.
+
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b5c86ec494..e580276603 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1634,6 +1634,15 @@ F: hw/virtio/trace-events
- F: net/vhost-user.c
- F: include/hw/virtio/
-=20
-+virtio-balloon
-+M: Michael S. Tsirkin <mst@redhat.com>
-+M: David Hildenbrand <david@redhat.com>
-+S: Maintained
-+F: hw/virtio/virtio-balloon*.c
-+F: include/hw/virtio/virtio-balloon.h
-+F: balloon.c
-+F: include/sysemu/balloon.h
-+
- virtio-9p
- M: Greg Kurz <groug@kaod.org>
- R: Christian Schoenebeck <qemu_oss@crudebyte.com>
---=20
-MST
+----------------------------------------------------------------
+David Hildenbrand (1):
+      MAINTAINERS: Add myself as virtio-balloon co-maintainer
+
+Gerd Hoffmann (1):
+      acpi: add acpi=3DOnOffAuto machine property to x86 and arm virt
+
+Igor Mammedov (1):
+      acpi: pcihp: fix left shift undefined behavior in acpi_pcihp_eject_sl=
+ot()
+
+Li Feng (1):
+      fix vhost_user_blk_watch crash
+
+Michael S. Tsirkin (1):
+      checkpatch: enforce process for expected files
+
+Pan Nengyuan (3):
+      virtio-serial-bus: Plug memory leak on realize() error paths
+      virtio-blk: delete vqs on the error path in realize()
+      virtio-iommu: avoid memleak in the unrealize
+
+Peter Maydell (1):
+      hw/i386/amd_iommu.c: Fix corruption of log events passed to guest
+
+Stefano Garzarella (1):
+      vhost-vsock: fix double close() in the realize() error path
+
+ include/hw/acpi/acpi.h             |  1 -
+ include/hw/arm/virt.h              |  2 ++
+ include/hw/i386/x86.h              |  3 +++
+ include/hw/virtio/vhost-user-blk.h |  1 -
+ hw/acpi/pcihp.c                    |  2 +-
+ hw/arm/virt-acpi-build.c           |  2 +-
+ hw/arm/virt.c                      | 36 ++++++++++++++++++++++++++++++++++=
+--
+ hw/block/vhost-user-blk.c          | 19 -------------------
+ hw/block/virtio-blk.c              |  3 +++
+ hw/char/virtio-serial-bus.c        |  2 +-
+ hw/i386/acpi-build.c               |  2 +-
+ hw/i386/amd_iommu.c                |  2 +-
+ hw/i386/pc.c                       |  4 ++--
+ hw/i386/pc_piix.c                  |  2 +-
+ hw/i386/x86.c                      | 32 ++++++++++++++++++++++++++++++++
+ hw/virtio/vhost-vsock.c            |  6 +++++-
+ hw/virtio/virtio-iommu.c           |  3 +++
+ softmmu/vl.c                       |  4 ++--
+ MAINTAINERS                        |  9 +++++++++
+ scripts/checkpatch.pl              | 25 +++++++++++++++++++++++++
+ 20 files changed, 126 insertions(+), 34 deletions(-)
 
 
