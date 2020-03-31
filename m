@@ -2,85 +2,84 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B04C2D0F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 17:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA96C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 17:13:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D8FE20848
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 17:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4943520848
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 17:13:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SLv0dQ7u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D8FE20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g2WAUxku"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4943520848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJKJx-0003ds-I4
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 13:05:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47036)
+	id 1jJKRn-0007sF-EI
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 13:13:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jJKIm-0002Og-L9
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 13:03:49 -0400
+ (envelope-from <eblake@redhat.com>) id 1jJKQw-0007G5-6T
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 13:12:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jJKIk-0008WQ-EO
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 13:03:48 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:36107)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jJKIj-0008VL-Cz
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 13:03:45 -0400
-Received: by mail-oi1-x236.google.com with SMTP id k18so19574505oib.3
- for <qemu-devel@nongnu.org>; Tue, 31 Mar 2020 10:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=9blV1H9Js4on1Ru4pm7hErJIva7kNEymOz2IOkz5vus=;
- b=SLv0dQ7u1fEVRXqkzrOdwk8U3oIebC2JYOFyn5H3Ap9UMGXug+Ki2LmB7tMf5dalMM
- ZVCDWaE8AMUENE4AAGM9ra/L6etUNOIO0ErUUIZBw2fED6xgcVUj4n0J8njSKMLiHhDq
- 3RSDUZLhG7dELbTj5yEBthasUqochW4FQpYHaE7A4DDZISu4NzoO7YCDvjyVHh/+0kez
- Q/9AxIKsRcAG6T9teNyd22CpINizKC3dGf0SNqEE+HV2c5jGdtnYolw6HhbMAQXhnNos
- dhUmpaWaiEkUvMXdA6UTMErbxRxVVW94eEBCxXzuU2panAyvzOg+/s0oQLr4YBUmYge/
- OXLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=9blV1H9Js4on1Ru4pm7hErJIva7kNEymOz2IOkz5vus=;
- b=Gqg0wHBpWW7FjYXZ4ikeSoprkggg1hzlmpftiqpJsbZAlITL+8aOn5vIl87NQEjUQN
- a6/FHMm4gjDw4tpG0vCgYiQVaoT8t24OahrK14FbbxjGKhtstdk/cxwMLqWCCJjWcbe1
- 8LL9RwW6u7yjiIIFRdi3AProD9hE/50JtMPjq21TA0x9xvVQNa/6XduDB8Etoihsaaqd
- u1jzoPu7hamrUpx7trnazMr05sGVP+Yt58v45CH8uCYkl3CVztdImXCud4Br71yhgT+Z
- b1rn25dlecTqmq3XdfejSUofMhs1tNmG40Fsk6J0Na0qkAF9zO7onZzlpKRpwm1sVWVD
- wQig==
-X-Gm-Message-State: ANhLgQ1WPHQMEsk3hVIvnfAP93pcAhe2exn9vMFFSoBQ+tv53tqIFLF9
- fNn86cEY3WeiAqFuWEtzxO5kWyk+FF1fGlsdDVl5Qg==
-X-Google-Smtp-Source: ADFU+vukaA/yWKn49R6q5KefPeW7YOl72sG3FHyafQT6fGH4fTrRy/6qZjVmQqrm5Iuva8UOjqwXVAuPJ2XknyT1hPQ=
-X-Received: by 2002:a05:6808:8cb:: with SMTP id
- k11mr2652699oij.48.1585674223782; 
- Tue, 31 Mar 2020 10:03:43 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1jJKQu-0003oY-4s
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 13:12:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26474
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jJKQu-0003oJ-1S
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 13:12:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585674731;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZeGUV/fmekBrqXPnJzgep8AjZx86mvELev1vQ+RcAxo=;
+ b=g2WAUxkuGCATbO2u41uTqFNZi6QUzs2wYOcGVnfpftcbANaZzuDAG8Cn2xBUVB7DXPlX8T
+ diXvwz59L8XiGUz+Jsx+QPvOUOiIpQYXWwePIH4OpWF/3Ff6fS67fVpY89ecTslA8RzFE3
+ KBSQsIX3nK1OVVxFqx1izIsa5aitMW0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-9tIzQzB-M8iUiey8BcNxnQ-1; Tue, 31 Mar 2020 13:12:06 -0400
+X-MC-Unique: 9tIzQzB-M8iUiey8BcNxnQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F52B13FA;
+ Tue, 31 Mar 2020 17:12:04 +0000 (UTC)
+Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 76A02196AE;
+ Tue, 31 Mar 2020 17:12:03 +0000 (UTC)
+Subject: Re: [PATCH v2] configure: warn if not using a separate build directory
+To: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200331155158.381585-1-berrange@redhat.com>
+ <87wo70sdnr.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <f9330c17-79da-a120-f13f-0a6b51c31235@redhat.com>
+Date: Tue, 31 Mar 2020 12:12:02 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200325191830.16553-1-f4bug@amsat.org>
- <20200325191830.16553-13-f4bug@amsat.org>
- <CAFEAcA-26fHbOp5saM+XBCz72fzfz+=+xtiXGRtWnc6CMoiakA@mail.gmail.com>
- <e293f19c-7005-16f0-57df-55ce953fe0a4@redhat.com>
-In-Reply-To: <e293f19c-7005-16f0-57df-55ce953fe0a4@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Mar 2020 18:03:32 +0100
-Message-ID: <CAFEAcA-W9V_GvA0yKXY+tsZNSe_DnSbYsd33wNnAP4WWivi-og@mail.gmail.com>
-Subject: Re: [PATCH-for-5.0 12/12] hw/riscv/sifive_u: Add missing
- error-propagation code
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87wo70sdnr.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::236
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,36 +91,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Liviu Ionescu <ilg@livius.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 31 Mar 2020 at 18:02, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote
-> What about this memory_region_init_rom() call (and later
-> memory_region_init_ram) using error_fatal, same reasoning right?
+On 3/31/20 11:16 AM, Markus Armbruster wrote:
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>=20
+>> Running configure directly from the source directory is a build
+>> configuration that will go away in future. It is also not currently
+>> covered by any automated testing. Display a deprecation warning if
+>> the user attempts to use an in-srcdir build setup, so that they are
+>> aware that they're building QEMU in an undesirable manner.
+>>
+>> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> ---
+>>
 
-Yes.
+>> +if test "$in_srcdir" =3D "yes"; then
+>> +    echo
+>> +    echo "WARNING: SUPPORT FOR IN SOURCE DIR BUILDS IS DEPRECATED"
+>=20
+> I don't like shouted warnings, but it's consistent with what we have.
 
--- PMM
+The grammar is also a bit awkward to parse; maybe:
+
+support for building in the source directory is deprecated
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
