@@ -2,94 +2,164 @@ Return-Path: <SRS0=xFA2=5Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLACK,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4796DC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A25C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:59:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 090D420748
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:41:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 090D420748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D98A62072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Mar 2020 02:59:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="hbk7a93m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98A62072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJ6qA-0002M0-6S
-	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 22:41:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54877)
+	id 1jJ780-0006AN-Sr
+	for qemu-devel@archiver.kernel.org; Mon, 30 Mar 2020 22:59:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jJ6pU-0001s3-5c
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:40:43 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1jJ77N-0005dj-N1
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1jJ6pR-0001wF-6l
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:40:39 -0400
-Received: from mga11.intel.com ([192.55.52.93]:34101)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1jJ6pQ-0001sI-R1
- for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:40:37 -0400
-IronPort-SDR: Ihv8vdEdDzpvJxuTYOWNU/0hG8HWf/Yc8YJ3T3Og1BUbHM6LoEhkoVYqNRFhLyX+LsUkjii9rI
- iwo289d4j7qg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 30 Mar 2020 19:40:29 -0700
-IronPort-SDR: 8774qk7ovZyIeQOHD+dAk7yCVvJ6wSblEcSBfNficJl6yvmLxG77BrvObnkBtSLc9uQa4VeztR
- ZtxysoFm33yQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,326,1580803200"; d="scan'208";a="272588777"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by fmsmga004.fm.intel.com with ESMTP; 30 Mar 2020 19:40:29 -0700
-Received: from fmsmsx118.amr.corp.intel.com (10.18.116.18) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 19:40:29 -0700
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- fmsmsx118.amr.corp.intel.com (10.18.116.18) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 19:40:28 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.138]) by
- SHSMSX151.ccr.corp.intel.com ([169.254.3.22]) with mapi id 14.03.0439.000;
- Tue, 31 Mar 2020 10:40:25 +0800
-From: "Zhao, Yan Y" <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: RE: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Thread-Topic: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Thread-Index: AQHWAiaCBWEyOsc9okK1y3RUgVyKz6hYkR2AgAJSZoCAALYkgP//zPSAgAUakoCAAChxgIABLlqA//+LSYCAAIVFAP//gBmAABDhq4D//5DGAP//eW8A
-Date: Tue, 31 Mar 2020 02:40:24 +0000
-Message-ID: <F22B14EC3CFBB843AD3E03B6B78F2C6A4C4B1627@shsmsx102.ccr.corp.intel.com>
-References: <20200325021135.GB20109@joy-OptiPlex-7040>
- <33d38629-aeaf-1c30-26d4-958b998620b0@nvidia.com>
- <20200327003055.GB26419@joy-OptiPlex-7040>
- <deb8b18f-aa79-70d3-ce05-89b607f813c4@nvidia.com>
- <20200330032437.GD30683@joy-OptiPlex-7040>
- <e91dbf70-05bf-977f-208b-0fb5988af3a8@nvidia.com>
- <20200330235131.GB6478@joy-OptiPlex-7040>
- <20200330185347.58b1ab93@x1.home>
- <20200331005046.GB6631@joy-OptiPlex-7040>
- <20200330191259.42c560ee@x1.home>
- <20200331011621.GC6631@joy-OptiPlex-7040>
- <20200330203816.4c26ae53@x1.home>
-In-Reply-To: <20200330203816.4c26ae53@x1.home>
-Accept-Language: en-US, zh-CN
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <aik@ozlabs.ru>) id 1jJ77M-0002nC-3W
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:59:09 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:34139)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1jJ77L-0002mS-O0
+ for qemu-devel@nongnu.org; Mon, 30 Mar 2020 22:59:08 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id q16so533561pje.1
+ for <qemu-devel@nongnu.org>; Mon, 30 Mar 2020 19:59:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=jBX/3jedvD8WvzMTCUSR+EKJL8Jz0/5XQL5K3+nOBDQ=;
+ b=hbk7a93mETZFcw64kNknsbiMmp1IrAsItdEX0mT61kmS5yly//PQH9LI+PGzbzgZFt
+ gF5MSFQt0w8AzuYB2aN6lZUcAKKWjLmUeWD/yudxE+NhCBRrandrfp7mr+er4QJ/S0Y4
+ rQc3qrENxb1JiGqVyyZToLIxsiKobhQH6YOA42zz4PG2s1l1YpudAmVLX2/wPeSNOde1
+ hAbeQWmT8mdcZMN362IPOl9hGMovHt7EP+MVkBgjj2q6O4PnpjgX+nNl/8a66cJjR92C
+ ldQZ/2CPsWmBm4pBIZqihmOYgf1sb2P2RqD5weQfoaRYIg8+JG64uQFTrn2Jx6tBBmW1
+ zhlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=jBX/3jedvD8WvzMTCUSR+EKJL8Jz0/5XQL5K3+nOBDQ=;
+ b=CZzoTkeFz0Jj7LWYBYOllPZte2nXmYRl7DjMV3p6T0Gk3KkvI7Wh0hNCOw4wRYBBkE
+ Q3fvMlG0gwvYbwnDhxbI2op0QN8lJAS45QrTiSLT9iZH5YZnkAsk9RCM/oqL9jBlZ1Y4
+ Q4GJHJEYjQq2c6734hsJnyqvVMbPfAPIioIaWlSWcuMsjoaRnAlRvo2WkBd5j/NLvRoj
+ 3dM/7qxVNNtgy/RiuyI3k50r56YEA4VROyJAT0vfEV2fcxgCdkJ8a+sNkNoqWIg2KeOC
+ RNbZN+nuI0LKDSU435fiYpfGgGccJlI1GKfethwK1ZS5pb0zBZKQ1Nw8pknncCGecuXr
+ qV+w==
+X-Gm-Message-State: ANhLgQ1VJ3wBH/Nn+JOUyn2Eeg0/r7zyH/X7EqDygFXIeQUWUfGg83L6
+ X9Iq7VxKfZqGOZbkDe/D/0lFeg==
+X-Google-Smtp-Source: ADFU+vvLLCqHcTc3GXbV5DB3JlfVFRayW/zjiofAbz2DcfhzEFVErgaddY7f/CG6Lr1O32dYzNZFyg==
+X-Received: by 2002:a17:902:be14:: with SMTP id
+ r20mr15675490pls.270.1585623545529; 
+ Mon, 30 Mar 2020 19:59:05 -0700 (PDT)
+Received: from [192.168.10.94] (124-171-87-207.dyn.iinet.net.au.
+ [124.171.87.207])
+ by smtp.gmail.com with ESMTPSA id a24sm11260227pfl.115.2020.03.30.19.59.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 30 Mar 2020 19:59:04 -0700 (PDT)
+Subject: Re: [PATCH 0/4] spapr: Get rid of CAS reboot flag
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+References: <158514992409.478799.6718223069768660390.stgit@bahia.lan>
+ <20200331004415.GC47772@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <d1a3e718-a0da-51a6-3511-b9dbb1fc6bfe@ozlabs.ru>
+Date: Tue, 31 Mar 2020 13:59:01 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.93
+In-Reply-To: <20200331004415.GC47772@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,266 +171,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi
- L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On Behalf
-> Of Alex Williamson
-> Sent: Tuesday, March 31, 2020 10:38 AM
-> To: Zhao, Yan Y <yan.y.zhao@intel.com>
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>; cjia@nvidia.com; Tian, Kevin
-> <kevin.tian@intel.com>; Yang, Ziye <ziye.yang@intel.com>; Liu, Changpeng
-> <changpeng.liu@intel.com>; Liu, Yi L <yi.l.liu@intel.com>;
-> mlevitsk@redhat.com; eskultet@redhat.com; cohuck@redhat.com;
-> dgilbert@redhat.com; jonathan.davies@nutanix.com; eauger@redhat.com;
-> aik@ozlabs.ru; pasic@linux.ibm.com; felipe@nutanix.com;
-> Zhengxiao.zx@Alibaba-inc.com; shuangtai.tst@alibaba-inc.com;
-> Ken.Xue@amd.com; Wang, Zhi A <zhi.a.wang@intel.com>; qemu-
-> devel@nongnu.org; kvm@vger.kernel.org
-> Subject: Re: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl f=
-or
-> dirty pages tracking.
->=20
-> On Mon, 30 Mar 2020 21:16:21 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
->=20
-> > On Tue, Mar 31, 2020 at 09:12:59AM +0800, Alex Williamson wrote:
-> > > On Mon, 30 Mar 2020 20:50:47 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >
-> > > > On Tue, Mar 31, 2020 at 08:53:47AM +0800, Alex Williamson wrote:
-> > > > > On Mon, 30 Mar 2020 19:51:31 -0400 Yan Zhao
-> > > > > <yan.y.zhao@intel.com> wrote:
-> > > > >
-> > > > > > On Mon, Mar 30, 2020 at 09:49:21PM +0800, Kirti Wankhede wrote:
-> > > > > > >
-> > > > > > >
-> > > > > > > On 3/30/2020 8:54 AM, Yan Zhao wrote:
-> > > > > > > > On Fri, Mar 27, 2020 at 01:28:13PM +0800, Kirti Wankhede wr=
-ote:
-> > > > > > > >> Hit send button little early.
-> > > > > > > >>
-> > > > > > > >>   >
-> > > > > > > >>   > I checked v12, it's not like what I said.
-> > > > > > > >>   > In v12, bitmaps are generated per vfio_dma, and
-> combination of the
-> > > > > > > >>   > bitmaps are required in order to generate a big bitmap
-> suiting for dirty
-> > > > > > > >>   > query. It can cause problem when offset not aligning.
-> > > > > > > >>   > But what I propose here is to generate an rb tree orth=
-ogonal
-> to the tree
-> > > > > > > >>   > of vfio_dma.
-> > > > > > > >>   >
-> > > > > > > >>   > as to CPU cycles saving, I don't think iterating/trans=
-lating
-> page by page
-> > > > > > > >>   > would achieve that purpose.
-> > > > > > > >>   >
-> > > > > > > >>
-> > > > > > > >> Instead of creating one extra rb tree for dirty pages
-> > > > > > > >> tracking in v10 tried to use dma->pfn_list itself, we
-> > > > > > > >> tried changes in v10, v11 and v12, latest version is
-> > > > > > > >> evolved version with best possible approach after discussi=
-on.
-> Probably, go through v11 as well.
-> > > > > > > >> https://patchwork.kernel.org/patch/11298335/
-> > > > > > > >>
-> > > > > > > > I'm not sure why all those previous implementations are
-> > > > > > > > bound to vfio_dma. for vIOMMU on, in most cases, a
-> > > > > > > > vfio_dma is only for a page, so generating a one-byte bitma=
-p for
-> a single page in each vfio_dma ?
-> > > > > > > > is it possible to creating one extra rb tree to keep dirty
-> > > > > > > > ranges, and one fixed length kernel bitmap whose content
-> > > > > > > > is generated on query, serving as a bouncing buffer for
-> > > > > > > > copy_to_user
-> > > > > > > >
-> > > > > > >
-> > > > > > > One fixed length? what should be fixed value? then isn't it
-> > > > > > > better to fix the size to dma->size?
-> > > > > > >
-> > > > > > > This is also to prevent DoS attack, user space application
-> > > > > > > can query a very large range.
-> > > > > > >
-> > > > > > > >>
-> > > > > > > >> On 3/27/2020 6:00 AM, Yan Zhao wrote:
-> > > > > > > >>> On Fri, Mar 27, 2020 at 05:39:01AM +0800, Kirti Wankhede
-> wrote:
-> > > > > > > >>>>
-> > > > > > > >>>>
-> > > > > > > >>>> On 3/25/2020 7:41 AM, Yan Zhao wrote:
-> > > > > > > >>>>> On Wed, Mar 25, 2020 at 05:18:52AM +0800, Kirti
-> Wankhede wrote:
-> > > > > > > >>>>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three
-> operations:
-> > > > > > > >>>>>> - Start dirty pages tracking while migration is
-> > > > > > > >>>>>> active
-> > > > > > > >>>>>> - Stop dirty pages tracking.
-> > > > > > > >>>>>> - Get dirty pages bitmap. Its user space application's
-> responsibility to
-> > > > > > > >>>>>>      copy content of dirty pages from source to destin=
-ation
-> during migration.
-> > > > > > > >>>>>>
-> > > > > > > >>>>>> To prevent DoS attack, memory for bitmap is allocated
-> > > > > > > >>>>>> per vfio_dma structure. Bitmap size is calculated
-> > > > > > > >>>>>> considering smallest supported page size. Bitmap is
-> > > > > > > >>>>>> allocated for all vfio_dmas when dirty logging is
-> > > > > > > >>>>>> enabled
-> > > > > > > >>>>>>
-> > > > > > > >>>>>> Bitmap is populated for already pinned pages when
-> > > > > > > >>>>>> bitmap is allocated for a vfio_dma with the smallest
-> > > > > > > >>>>>> supported page size. Update bitmap from pinning
-> > > > > > > >>>>>> functions when tracking is enabled. When user
-> > > > > > > >>>>>> application queries bitmap, check if requested page
-> > > > > > > >>>>>> size is same as page size used to populated bitmap. If=
- it is
-> equal, copy bitmap, but if not equal, return error.
-> > > > > > > >>>>>>
-> > > > > > > >>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > > > > > >>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > > > > > >>>>>> ---
-> > > > > > > >>>>>>     drivers/vfio/vfio_iommu_type1.c | 266
-> +++++++++++++++++++++++++++++++++++++++-
-> > > > > > > >>>>>>     1 file changed, 260 insertions(+), 6 deletions(-)
-> > > > > > > >>>>>>
-> > > > > > > >>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c
-> > > > > > > >>>>>> b/drivers/vfio/vfio_iommu_type1.c index
-> > > > > > > >>>>>> 70aeab921d0f..874a1a7ae925 100644
-> > > > > > > >>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
-> > > > > > > >>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > > > > > >>>>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
-> > > > > > > >>>>>>     	unsigned int		dma_avail;
-> > > > > > > >>>>>>     	bool			v2;
-> > > > > > > >>>>>>     	bool			nesting;
-> > > > > > > >>>>>> +	bool			dirty_page_tracking;
-> > > > > > > >>>>>>     };
-> > > > > > > >>>>>>
-> > > > > > > >>>>>>     struct vfio_domain { @@ -91,6 +92,7 @@ struct
-> > > > > > > >>>>>> vfio_dma {
-> > > > > > > >>>>>>     	bool			lock_cap;	/*
-> capable(CAP_IPC_LOCK) */
-> > > > > > > >>>>>>     	struct task_struct	*task;
-> > > > > > > >>>>>>     	struct rb_root		pfn_list;	/* Ex-user
-> pinned pfn list */
-> > > > > > > >>>>>> +	unsigned long		*bitmap;
-> > > > > > > >>>>>>     };
-> > > > > > > >>>>>>
-> > > > > > > >>>>>>     struct vfio_group { @@ -125,7 +127,21 @@ struct
-> > > > > > > >>>>>> vfio_regions {
-> > > > > > > >>>>>>     #define
-> IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
-> > > > > > > >>>>>>
-> 	(!list_empty(&iommu->domain_list))
-> > > > > > > >>>>>>
-> > > > > > > >>>>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n,
-> BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> > > > > > > >>>>>> +
-> > > > > > > >>>>>> +/*
-> > > > > > > >>>>>> + * Input argument of number of bits to bitmap_set()
-> > > > > > > >>>>>> +is unsigned integer, which
-> > > > > > > >>>>>> + * further casts to signed integer for unaligned
-> > > > > > > >>>>>> +multi-bit operation,
-> > > > > > > >>>>>> + * __bitmap_set().
-> > > > > > > >>>>>> + * Then maximum bitmap size supported is 2^31 bits
-> > > > > > > >>>>>> +divided by 2^3 bits/byte,
-> > > > > > > >>>>>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 =
-=3D
-> > > > > > > >>>>>> +2^43 (8TB) on 4K page
-> > > > > > > >>>>>> + * system.
-> > > > > > > >>>>>> + */
-> > > > > > > >>>>>> +#define DIRTY_BITMAP_PAGES_MAX
-> 	(uint64_t)(INT_MAX - 1)
-> > > > > > > >>>>>> +#define DIRTY_BITMAP_SIZE_MAX
-> DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> > > > > > > >>>>>> +
-> > > > > > > >>>>>>     static int put_pfn(unsigned long pfn, int prot);
-> > > > > > > >>>>>> +static unsigned long vfio_pgsize_bitmap(struct
-> > > > > > > >>>>>> +vfio_iommu *iommu);
-> > > > > > > >>>>>>
-> > > > > > > >>>>>>     /*
-> > > > > > > >>>>>>      * This code handles mapping and unmapping of
-> > > > > > > >>>>>> user data buffers @@ -175,6 +191,77 @@ static void
-> vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
-> > > > > > > >>>>>>     	rb_erase(&old->node, &iommu->dma_list);
-> > > > > > > >>>>>>     }
-> > > > > > > >>>>>>
-> > > > > > > >>>>>> +
-> > > > > > > >>>>>> +static int vfio_dma_bitmap_alloc(struct vfio_dma
-> > > > > > > >>>>>> +*dma, uint64_t pgsize) {
-> > > > > > > >>>>>> +	uint64_t npages =3D dma->size / pgsize;
-> > > > > > > >>>>>> +
-> > > > > > > > If pgsize > dma->size, npages =3D 0.
-> > > > > > > > wouldn't it cause problem?
-> > > > > > > >
-> > > > > > >
-> > > > > > > This patch-set supports bitmap for smallest supported page si=
-ze,
-> i.e.
-> > > > > > > PAGE_SIZE. vfio_dma_do_map() validates dma->size
-> > > > > > > accordingly. So this case will not happen.
-> > > > > > >
-> > > > > > as far as I know, qemu/kvm uses 4k as the unit for dirty page
-> tracking.
-> > > > > > so why smallest iommu page size is used here?
-> > > > > > wouldn't it cause problem?
-> > > > >
-> > > > > If your concern is that the IOMMU supports sub-4K page sizes,
-> > > > > see vfio_pgsize_bitmap().  We actually only support PAGE_SIZE as
-> > > > > our minimum mapping unit, even if the IOMMU supports less, so
-> PAGE_SIZE is
-> > > > > our lower bound.  Thanks,
-> > > >
-> > > > if we always uses PAGE_SIZE, why not use PAGE_SIZE directly?
-> > > > or returning dirty bitmap unit (e.g. 1 <<
-> > > > __ffs(vfio_pgsize_bitmap(iommu))) to QEMU in
-> > > > VFIO_IOMMU_DIRTY_PAGES_FLAG_START, so that qemu can do
-> possible conversion if it's not the same unit that QEMU uses.
-> > >
-> > > The vfio interface is essentially just an extension of the IOMMU API
-> > > via domain->pgsize_bitmap.  intel-iommu mostly made the bitmask
-> > > meaningless by reporting essentially PAGE_MASK, and we just expose
-> > > the common version of that across potentially all the IOMMUs used by
-> > > the domain, modulo minimum of PAGE_SIZE.  Thanks,
-> >
-> > ok. got it. do you think it's good to return this iommu page size when
-> > turning on dirty page tracking? so when GET_BITMAP ioctl comes, we
-> > don't need to quit if range.bitmap.pgsize !=3D iommu_pgsize.
-> > instead, the GET_BITMAP can success with iommu page size and qemu
-> does
-> > the bitmap conversion afterwards.
->=20
-> The bitmap is already expose to the user via
-> vfio_iommu_type1_info.iova_pgsizes in the VFIO_IOMMU_GET_INFO ioctl.
-> Our original intention was to allow the user to specify the dirty bitmap =
-page
-> size, which is still enabled in the ioctl via bitmap.pgsize, but for simp=
-lification
-> we currently only support the smallest page size.  This could be somethin=
-g
-> else we expose via the extension interface when more page sizes are
-> supported.  Thanks,
->=20
-Ok. Got it .  Thanks
+On 31/03/2020 11:44, David Gibson wrote:
+> On Wed, Mar 25, 2020 at 04:25:24PM +0100, Greg Kurz wrote:
+>> The CAS reboot flag was introduced in QEMU 2.10 to allow the guest
+>> to be presented a new boot-time device tree after CAS negotiation.
+>> CAS-generated resets rely on qemu_system_reset_request() which has
+>> the particularity of dropping the main loop lock at some point. This
+>> opens a window where migration can happen, hence promotting the CAS
+>> reboot flag to actual state that we should also migrate. In practice,
+>> this can't happen anymore since we have eliminated the scenario of
+>> the XICS/XIVE switch and the much less frequent scenario of device
+>> plug/unplug before CAS.
+>>
+>> We still have much of the CAS reboot bits around though. The full FDT
+>> rendering we do at CAS is enough to get rid of them once and far all.
+>>
+>> Some preliminary cleanup is made before going for the full removal,
+>> for easier reviewing. At some point I had the need to move some code
+>> around in CAS, and Alexey's patch from the "spapr: kill SLOF" (v8)
+>> series proved to be helpful so I've reused it in this patchset.
+>>
+>> This series applies cleanly on both ppc-for-5.0 and ppc-for-5.1.
+>> Since it doesn't fix any actual bug, I think this can be delayed
+>> to 5.1.
+> 
+> Applied to ppc-for-5.1.
 
+
+
+Can you push it out please? The existing ppc-for-5.1 corrupts stack on
+my machine in qemu_init().
+
+-- 
+Alexey
 
