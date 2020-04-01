@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E517EC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4373C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:06:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3B1720776
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:06:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99F322078C
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:06:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="SZk+bAff"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B1720776
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nrxs55oc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F322078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJewx-0004Li-UW
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 11:06:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38970)
+	id 1jJex6-0004WJ-Pe
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 11:06:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJes4-0006RD-VJ
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:01:37 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJes9-0006ca-VN
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJes0-0004Bp-2x
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:01:36 -0400
-Received: from mail-eopbgr10093.outbound.protection.outlook.com
- ([40.107.1.93]:29790 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJes4-0004Em-Pu
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:01:41 -0400
+Received: from mail-eopbgr70115.outbound.protection.outlook.com
+ ([40.107.7.115]:27679 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jJerx-000494-IE; Wed, 01 Apr 2020 11:01:29 -0400
+ id 1jJes1-0004BA-Kz; Wed, 01 Apr 2020 11:01:33 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kCKsS3xQ6vtQ9XH7xDo7C8Gznr9a1l076spbKUiIr1eyU0P3U2ObduRTRvhbGT/NnuncoJPOkIuQk63k2YnmsYEkeAOVc7/3jja4omGpaHWGFdEvBwS02s70+YMasl2YSitEtUfyK9Sjyqe4l/+fxtvCFEMgTuvaAvg13hOXYlGmB+O5lLEN3TwGzlq1o+vDKwRs1BIloZQ/HQvXa3o11lS6PwJR80R9Njya9iYw76SRJzFgRqDqVfl8/eKD/fzlXKUp3KkV5RwHfxkMBY+sKRA8F2yGtKubtVExRF1pfn8BmFvKkRymlEweWvkZVcpJLMCfz3b046BnLe8QM5CX6g==
+ b=nyiyzipJ6xQdl2Fha6DZ2lPVoLYeP1mO5uU7rUbN+U2Ef6/zKBnH1Wo9cu40yRNl6cvT38w4AukikX7PtiyWkybCBy5jEDjqj91wb/LlAhHAaeP+3A0RxJmHb5pDi03u3vKcwI97auNJyGE8usCE22Ywi6vtEbfJgJfQujvF37Lmnid1W3yrH/NrMFoCg6tpaHdw28c5Po7jOkO8ntmJ02geovz1U1EeUa9GGaJhxcwtReitVh1jvgqPg3cwpOebhQQQc+3Ekm73klT7opB5w6/F2pVDZyUTpzrsf+i/bbAKnh4IzXyWlzFz2MMMXdVlbB0pJnm/ySEqjpOXEJJwUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Sprp88RYjDByino1ILE6cOMplx/yinMuFwvuYp/nAu8=;
- b=hjAvAVAndbHwNWTLLRrWG2SnEcMnVUuYNHy9k58gOAjSznSr9Pff1FepzPsxGyC7jxMCCMJ2rPBHFrfkBKNOhYrVFgQWypim6to7wrnTfFjGG2WN9nP0ya0X8vRjfKiyE4Hl9Ro8Y1WzT+naqYAPfZBe5p78j0Tr3bDcwijygvfTfAQTSzCbC/JE9FgBGbQHDmlSDYKM4fCnqny/AYLvZOt3KL1p0IIZlYy2g/lkAH9LBfmx38Us9Zq7b5Z7/G4IJrwLyjAbqmVIU4OPZ6SROoR/LzPPqXy4YuakAKVeJgGTuN5KW5m7wxE21jWuT5tgZBDaKO/E/p8+jNmfX+vLmQ==
+ bh=E4vPecfMUyhEoG30258jqBVf60UprGH5VzrhO5ZBM64=;
+ b=bEdLYBBLcazrJePsCQ+0a37xVtMvOERE35niwALnEfDunOWkIEtmONDaONzG+QKSeJpDgPjqFZRIVpePNcnWzz2TyUD7BrtTwmvq+8B08a6Yx5X/p0ZBh4iGHodQ5VIWahKUPx7t6XsMKzO/SCPnORQNL/1/C0gQS6wJeL3YaWqVdkZKFllvtaxcsbGMLo44SLIF+UV+xUYnDFxNZtZ+u2UNeciK+skRol88HeDgnT7LpQAHCDxM7jhf2Qr+2k3LECp8IFoAbplps5kRQSVDe5jq0ePTdnloI3cugv4knT9WA4Ezs8/wVv7QHseBR8Q6McxqZpXOVh7mljicG5flMg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Sprp88RYjDByino1ILE6cOMplx/yinMuFwvuYp/nAu8=;
- b=SZk+bAffZxkVlkAyoxYPTw2tzntX8DXOOkxJ8NcKwuGqD7iBDxnR9vWWvrO2yNRdGezL5Q8HFOsxVUYumYpDMWAG0QGe7gLmhrMur5OoRDicgYSN2wQxIsc65brC8NPK9HZ7dyGr4EpW/NXBE44efU1leDOos/PezThcqRLMN10=
+ bh=E4vPecfMUyhEoG30258jqBVf60UprGH5VzrhO5ZBM64=;
+ b=nrxs55ocefnhIZccTrfue1sH80aGwuUcPJlIr0VCYBXtmimqD764BA+AJqNqiw9aQPKOeWP5wV+d9Hsfcx1n9xNqgAaT6r50Y9jPtp/wBpSLFlYXaXlyDEbfMVUyqOqr+1+qq0CBbMCAl/SZozZ/43qLCih1G99QcKGYhdN3W70=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) with Microsoft SMTP
+ AM7PR08MB5397.eurprd08.prod.outlook.com (10.141.175.81) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.15; Wed, 1 Apr 2020 15:01:27 +0000
+ 15.20.2856.18; Wed, 1 Apr 2020 15:01:30 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
- 15:01:27 +0000
+ 15:01:30 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 2/6] block/nbd-client: drop max_block restriction from
- discard
-Date: Wed,  1 Apr 2020 18:01:08 +0300
-Message-ID: <20200401150112.9557-3-vsementsov@virtuozzo.com>
+Subject: [PATCH v2 6/6] block/io: auto-no-fallback for write-zeroes
+Date: Wed,  1 Apr 2020 18:01:12 +0300
+Message-ID: <20200401150112.9557-7-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200401150112.9557-1-vsementsov@virtuozzo.com>
 References: <20200401150112.9557-1-vsementsov@virtuozzo.com>
@@ -80,38 +79,37 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.23) by
  AM4P190CA0012.EURP190.PROD.OUTLOOK.COM (2603:10a6:200:56::22) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.20 via Frontend Transport; Wed, 1 Apr 2020 15:01:26 +0000
+ 15.20.2856.20 via Frontend Transport; Wed, 1 Apr 2020 15:01:30 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.23]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8a91d175-7147-45d9-2c26-08d7d64d8db0
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5494:
+X-MS-Office365-Filtering-Correlation-Id: 8ffa17d9-234d-44d4-a261-08d7d64d8f94
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5397:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54949C4FC443E366FD971048C1C90@AM7PR08MB5494.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:309;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5397C144D1B63300C966F92DC1C90@AM7PR08MB5397.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:381;
 X-Forefront-PRVS: 03607C04F0
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(10019020)(4636009)(376002)(136003)(346002)(396003)(39840400004)(366004)(66946007)(66556008)(52116002)(6486002)(86362001)(186003)(107886003)(478600001)(6506007)(4326008)(2906002)(6916009)(16526019)(26005)(5660300002)(6666004)(316002)(66476007)(1076003)(81166006)(36756003)(4744005)(2616005)(81156014)(8676002)(8936002)(956004)(6512007);
+ SFS:(10019020)(4636009)(396003)(366004)(136003)(39840400004)(346002)(376002)(956004)(2616005)(81156014)(6916009)(6666004)(478600001)(5660300002)(86362001)(66946007)(186003)(4326008)(6512007)(16526019)(6486002)(66556008)(6506007)(81166006)(26005)(36756003)(52116002)(66476007)(2906002)(8676002)(8936002)(1076003)(107886003)(316002);
  DIR:OUT; SFP:1102; 
 Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WaddosziBLbV4scSHxjenu4UhAuTKln4rZkOsIBhvYCfKBIc4YB7iZl9OAkfPjDD0slbrsqBJthuvlPk3XDkGgeI8/cc4J8TRKTW1MYMVgShHfVA1GrlGYcy7lmIOWIXRVH2ni1mSargiLXGLt1NGJG7NMc63S21RRIHwat0Qz/L0rwPAzbQDWdIg1Ks69oJKUXiy8ya/sM03sIY7qK/2XV7Xx8QaevPFJPF9wsOVk0SSTL57QXTJt1qnN1uquEDpyGLS4m4jbQq1owkrJmhtm5ZS2BQUrgpoi5HLn16hNzYYiI7Qd5cslQvInYlIpBZu0rCbB8cbfDa5EfTQxHl2lNM8nCk8dkNnhoVbF6LnRHNU1TF4828sN0RjCxeqx7xDFJNjH0V7BC/ixy11962WcHJKDZzzeQmeWHA7Rc2MPNHYi/nCbiar9/pZ8t78SmZ
-X-MS-Exchange-AntiSpam-MessageData: 0L26QLe5L76Ow/xQe409Ap2rguK0T8aKtDKHSt0thnCLhzgegn7XI56aU6MSmyIlfWu7SOCt4W6tpK/i3LM8pBb7pjHdjXB7DuVZ0ZYjg33LjkBtcQLUq8do5yAMFRGWDYZAhBKJr7Z9ZEvMhdaL7w==
+X-Microsoft-Antispam-Message-Info: gmUaylRB7TfZOJA+aMStz5/0fFrB7vkLLpPC5uB6ED8t9JJr/qAKpoSfVFKIwY/bve9mTv8fbtufvzCD2fTI1Jfbzo1bCGQjQ4/FB/1hrPaBJy51FHQFUgM9GsxCuy9vDXC7jlnkJ1MWttZWMAoYof5J9EyX7Dmy1cvNB1msD8PC9Yb4YulldGFsNWN3nC6LNbdPTSCY6YpITpOzun3/umWoGJr+o8sefdtuf8qEFZKvihqyfoQ5wuBltVRhoogavPu6YZTusG4XTcVL8Zceu0V98pN7pxr2TAxi/+BleEYdjFWRRIfgFtHCuyb0bovHo4TP7nCA8GhmCn2tnPt52yikrZN4Iwexd6NeRLbyD6gDlv4Q5v4uUj+KynnN+KeRNA1ZASpjVuXVWWSGkaep2Ig2CKT02Ihdp5YteQ1wKCPwlVdC59Bw+uGc5H+4NbeZ
+X-MS-Exchange-AntiSpam-MessageData: LZ21QJlFsIP9P1g6lrnn4TqZBpIpAOjVp2dD5ZxtStAqpBR6ZNnxUFUNBm0sqCH4GkunwADhJg2/ysKeEOJ51wBT/0DStaCDuSARo50q4QIlcS/O58955H94Rn1+hTsRK2J1Xl4+alOFSvsDSa/vMA==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a91d175-7147-45d9-2c26-08d7d64d8db0
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 15:01:27.5955 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ffa17d9-234d-44d4-a261-08d7d64d8f94
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 15:01:30.7545 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vn0bCVG78kd2iu/bREvC0d7/mrS6nSrySK6XW56FTihHqAYUOvswa/EsOyPkLx6hsPZAYIGG7yAUKGVb22A4XxPNBQID+OuKjybFTuEaosI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5494
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.1.93
+X-MS-Exchange-CrossTenant-UserPrincipalName: 78T60hqTfjadlbM5dxY6uGPxNBmFgrMkKA+6xA5UPbakAoxeo3lmqauHUCNstch1B1SxuDhOZiMMmJ4yp4uC/8xvF7zD0xR5mXS0GxBvvMo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5397
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,28 +127,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-NBD spec is updated, so that max_block doesn't relate to
-NBD_CMD_TRIM. So, drop the restriction.
+When BDRV_REQ_NO_FALLBACK is supported, the NBD driver supports a
+larger request size.  Add code to try large zero requests with a
+NO_FALLBACK request prior to having to split a request into chunks
+according to max_pwrite_zeroes.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/io.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index d4d518a780..4ac23c8f62 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1955,7 +1955,7 @@ static void nbd_refresh_limits(BlockDriverState *bs, =
-Error **errp)
+diff --git a/block/io.c b/block/io.c
+index f8335e7212..425314a221 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1755,6 +1755,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bloc=
+kDriverState *bs,
+     int alignment =3D MAX(bs->bl.pwrite_zeroes_alignment,
+                         bs->bl.request_alignment);
+     int max_transfer =3D MIN_NON_ZERO(bs->bl.max_transfer, MAX_BOUNCE_BUFF=
+ER);
++    bool auto_no_fallback;
+=20
+     assert(alignment % bs->bl.request_alignment =3D=3D 0);
+=20
+@@ -1762,6 +1763,16 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Blo=
+ckDriverState *bs,
+         return -ENOMEDIUM;
      }
 =20
-     bs->bl.request_alignment =3D min;
--    bs->bl.max_pdiscard =3D max;
-+    bs->bl.max_pdiscard =3D QEMU_ALIGN_DOWN(INT_MAX, min);
-     bs->bl.max_pwrite_zeroes =3D max;
-     bs->bl.max_transfer =3D max;
-=20
++    if (!(flags & BDRV_REQ_NO_FALLBACK) &&
++        (bs->supported_zero_flags & BDRV_REQ_NO_FALLBACK) &&
++        bs->bl.max_pwrite_zeroes && bs->bl.max_pwrite_zeroes < bytes &&
++        bs->bl.max_pwrite_zeroes < bs->bl.max_pwrite_zeroes_fast)
++    {
++        assert(drv->bdrv_co_pwrite_zeroes);
++        flags |=3D BDRV_REQ_NO_FALLBACK;
++        auto_no_fallback =3D true;
++    }
++
+     if ((flags & ~bs->supported_zero_flags) & BDRV_REQ_NO_FALLBACK) {
+         return -ENOTSUP;
+     }
+@@ -1806,6 +1817,13 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Blo=
+ckDriverState *bs,
+         if (drv->bdrv_co_pwrite_zeroes) {
+             ret =3D drv->bdrv_co_pwrite_zeroes(bs, offset, num,
+                                              flags & bs->supported_zero_fl=
+ags);
++            if (ret =3D=3D -ENOTSUP && auto_no_fallback) {
++                flags &=3D ~BDRV_REQ_NO_FALLBACK;
++                max_write_zeroes =3D
++                    QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pwrite_zeroes,
++                                                 INT_MAX), alignment);
++                continue;
++            }
+             if (ret !=3D -ENOTSUP && (flags & BDRV_REQ_FUA) &&
+                 !(bs->supported_zero_flags & BDRV_REQ_FUA)) {
+                 need_flush =3D true;
 --=20
 2.21.0
 
