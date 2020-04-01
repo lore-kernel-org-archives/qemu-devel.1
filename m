@@ -2,46 +2,48 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB380C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 08:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C46BAC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 08:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A41852078B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 08:16:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41852078B
+	by mail.kernel.org (Postfix) with ESMTPS id 98F162078B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 08:18:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F162078B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJYXv-0003aR-Qo
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 04:16:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35282)
+	id 1jJYZX-0005m9-P9
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 04:18:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <s.reiter@proxmox.com>) id 1jJYWs-0001rk-GV
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 04:15:19 -0400
+ (envelope-from <s.reiter@proxmox.com>) id 1jJYWt-0001sc-5F
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 04:15:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <s.reiter@proxmox.com>) id 1jJYWr-00072G-CY
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 04:15:18 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:56477)
+ (envelope-from <s.reiter@proxmox.com>) id 1jJYWr-00073C-Kn
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 04:15:19 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:14740)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <s.reiter@proxmox.com>)
- id 1jJYWo-0006f1-PK; Wed, 01 Apr 2020 04:15:14 -0400
+ id 1jJYWo-0006fM-MW; Wed, 01 Apr 2020 04:15:14 -0400
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id DB86A458E5;
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 9E47F4592C;
  Wed,  1 Apr 2020 10:15:10 +0200 (CEST)
 From: Stefan Reiter <s.reiter@proxmox.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH v4 0/3] Fix some AIO context locking in jobs
-Date: Wed,  1 Apr 2020 10:15:01 +0200
-Message-Id: <20200401081504.200017-1-s.reiter@proxmox.com>
+Subject: [PATCH v4 1/3] job: take each job's lock individually in job_txn_apply
+Date: Wed,  1 Apr 2020 10:15:02 +0200
+Message-Id: <20200401081504.200017-2-s.reiter@proxmox.com>
 X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200401081504.200017-1-s.reiter@proxmox.com>
+References: <20200401081504.200017-1-s.reiter@proxmox.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -64,43 +66,155 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Contains three seperate but related patches cleaning up and fixing some
-issues regarding aio_context_acquire/aio_context_release for jobs. Mostly
-affects blockjobs running for devices that have IO threads enabled AFAICT=
-.
+All callers of job_txn_apply hold a single job's lock, but different
+jobs within a transaction can have different contexts, thus we need to
+lock each one individually before applying the callback function.
 
-This is based on the discussions here:
-https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07929.html
+Similar to job_completed_txn_abort this also requires releasing the
+caller's context before and reacquiring it after to avoid recursive
+locks which might break AIO_WAIT_WHILE in the callback.
 
-Changes from v3:
-* commit_job appears to be unset in certain cases when replication_close =
-is
-  called, only access when necessary to avoid SIGSEGV
+This also brings to light a different issue: When a callback function in
+job_txn_apply moves it's job to a different AIO context, job_exit will
+try to release the wrong lock (now that we re-acquire the lock
+correctly, previously it would just continue with the old lock, leaving
+the job unlocked for the rest of the codepath back to job_exit). Fix
+this by not caching the job's context in job_exit and add a comment
+about why this is done.
 
-Missed this when shuffling around patches, sorry for noise with still-bro=
-ken v3.
+One test needed adapting, since it calls job_finalize directly, so it
+manually needs to acquire the correct context.
 
-Changes from v2:
-* reordered patch 1 to the end to not introduce temporary breakages
-* added more fixes to job txn patch (should now pass the tests)
-
-Changes from v1:
-* fixed commit message for patch 1
-* added patches 2 and 3
-
-
-qemu: Stefan Reiter (3):
-  job: take each job's lock individually in job_txn_apply
-  replication: acquire aio context before calling job_cancel_sync
-  backup: don't acquire aio_context in backup_clean
-
- block/backup.c        |  4 ----
- block/replication.c   |  8 +++++++-
+Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+---
  job.c                 | 48 ++++++++++++++++++++++++++++++++++---------
  tests/test-blockjob.c |  2 ++
- 4 files changed, 47 insertions(+), 15 deletions(-)
+ 2 files changed, 40 insertions(+), 10 deletions(-)
 
+diff --git a/job.c b/job.c
+index 134a07b92e..5fbaaabf78 100644
+--- a/job.c
++++ b/job.c
+@@ -136,17 +136,36 @@ static void job_txn_del_job(Job *job)
+     }
+ }
+=20
+-static int job_txn_apply(JobTxn *txn, int fn(Job *))
++static int job_txn_apply(Job *job, int fn(Job *))
+ {
+-    Job *job, *next;
++    AioContext *inner_ctx;
++    Job *other_job, *next;
++    JobTxn *txn =3D job->txn;
+     int rc =3D 0;
+=20
+-    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
+-        rc =3D fn(job);
++    /*
++     * Similar to job_completed_txn_abort, we take each job's lock befor=
+e
++     * applying fn, but since we assume that outer_ctx is held by the ca=
+ller,
++     * we need to release it here to avoid holding the lock twice - whic=
+h would
++     * break AIO_WAIT_WHILE from within fn.
++     */
++    aio_context_release(job->aio_context);
++
++    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
++        inner_ctx =3D other_job->aio_context;
++        aio_context_acquire(inner_ctx);
++        rc =3D fn(other_job);
++        aio_context_release(inner_ctx);
+         if (rc) {
+             break;
+         }
+     }
++
++    /*
++     * Note that job->aio_context might have been changed by calling fn,=
+ so we
++     * can't use a local variable to cache it.
++     */
++    aio_context_acquire(job->aio_context);
+     return rc;
+ }
+=20
+@@ -774,11 +793,11 @@ static void job_do_finalize(Job *job)
+     assert(job && job->txn);
+=20
+     /* prepare the transaction to complete */
+-    rc =3D job_txn_apply(job->txn, job_prepare);
++    rc =3D job_txn_apply(job, job_prepare);
+     if (rc) {
+         job_completed_txn_abort(job);
+     } else {
+-        job_txn_apply(job->txn, job_finalize_single);
++        job_txn_apply(job, job_finalize_single);
+     }
+ }
+=20
+@@ -824,10 +843,10 @@ static void job_completed_txn_success(Job *job)
+         assert(other_job->ret =3D=3D 0);
+     }
+=20
+-    job_txn_apply(txn, job_transition_to_pending);
++    job_txn_apply(job, job_transition_to_pending);
+=20
+     /* If no jobs need manual finalization, automatically do so */
+-    if (job_txn_apply(txn, job_needs_finalize) =3D=3D 0) {
++    if (job_txn_apply(job, job_needs_finalize) =3D=3D 0) {
+         job_do_finalize(job);
+     }
+ }
+@@ -849,9 +868,10 @@ static void job_completed(Job *job)
+ static void job_exit(void *opaque)
+ {
+     Job *job =3D (Job *)opaque;
+-    AioContext *ctx =3D job->aio_context;
++    AioContext *ctx;
+=20
+-    aio_context_acquire(ctx);
++    job_ref(job);
++    aio_context_acquire(job->aio_context);
+=20
+     /* This is a lie, we're not quiescent, but still doing the completio=
+n
+      * callbacks. However, completion callbacks tend to involve operatio=
+ns that
+@@ -862,6 +882,14 @@ static void job_exit(void *opaque)
+=20
+     job_completed(job);
+=20
++    /*
++     * Note that calling job_completed can move the job to a different
++     * aio_context, so we cannot cache from above. job_txn_apply takes c=
+are of
++     * acquiring the new lock, and we ref/unref to avoid job_completed f=
+reeing
++     * the job underneath us.
++     */
++    ctx =3D job->aio_context;
++    job_unref(job);
+     aio_context_release(ctx);
+ }
+=20
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 4eeb184caf..7519847912 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -367,7 +367,9 @@ static void test_cancel_concluded(void)
+     aio_poll(qemu_get_aio_context(), true);
+     assert(job->status =3D=3D JOB_STATUS_PENDING);
+=20
++    aio_context_acquire(job->aio_context);
+     job_finalize(job, &error_abort);
++    aio_context_release(job->aio_context);
+     assert(job->status =3D=3D JOB_STATUS_CONCLUDED);
+=20
+     cancel_common(s);
 --=20
 2.26.0
+
 
 
