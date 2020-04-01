@@ -2,84 +2,73 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2DD3C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B92C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:42:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE5FD2080C
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:28:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bEu8Egas"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE5FD2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9EC3220776
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:42:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC3220776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJbXg-0005r1-U1
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:28:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34686)
+	id 1jJblB-00014r-Vm
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:42:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jJbX2-0005CH-4F
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:27:41 -0400
+ (envelope-from <bounces@canonical.com>) id 1jJbkL-0000FX-KV
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jJbX0-0003wm-BD
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:27:39 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23661
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jJbX0-0003u2-7C
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:27:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585740457;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pq6h1+4+GpkaDA7KikqWvCTREKEM3v8XKTYxepESK0k=;
- b=bEu8Egas+pljkR0lumdXgQASf8E4dfHbuwlCZ8432a44SwiDDuaOoyRe1PzryGcIyBfmS5
- s50eb6eq6KLgtHBwZBeQBZj33+M+4RZcTtHf3rwWBkuYuMTSC6bFzbTEBQ5y2qMMEGy8t8
- jfRZSCCyhbMaFjhyrft/rCjmV6LDoRQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-1Lc62O8iPBiJIZ8r3P2ilg-1; Wed, 01 Apr 2020 07:27:33 -0400
-X-MC-Unique: 1Lc62O8iPBiJIZ8r3P2ilg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7846B800D4E;
- Wed,  1 Apr 2020 11:27:30 +0000 (UTC)
-Received: from work-vm (ovpn-115-22.ams2.redhat.com [10.36.115.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F63519C6A;
- Wed,  1 Apr 2020 11:27:23 +0000 (UTC)
-Date: Wed, 1 Apr 2020 12:27:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v16 QEMU 07/16] vfio: Add migration state change notifier
-Message-ID: <20200401112720.GB3258@work-vm>
-References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
- <1585084154-29461-8-git-send-email-kwankhede@nvidia.com>
+ (envelope-from <bounces@canonical.com>) id 1jJbkK-0004CG-6b
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:41:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49346)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jJbkK-0004BR-0Q
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:41:24 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jJbkH-0005oG-P5
+ for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 11:41:21 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BCE152E810A
+ for <qemu-devel@nongnu.org>; Wed,  1 Apr 2020 11:41:21 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1585084154-29461-8-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Wed, 01 Apr 2020 11:28:33 -0000
+From: Dongwhan Kim <1868055@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: eastson83 laurent-vivier pmaydell
+X-Launchpad-Bug-Reporter: Dongwhan Kim (eastson83)
+X-Launchpad-Bug-Modifier: Dongwhan Kim (eastson83)
+References: <158460432256.11238.315491712700748145.malonedeb@soybean.canonical.com>
+Message-Id: <158574051386.22866.7081354214530706316.malone@wampee.canonical.com>
+Subject: [Bug 1868055] Re: cannot run golang app with docker,
+ version 17.09.1-ce, disabling core 0 and qemu-arm, version 2.7.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4f4f3c87147cf6df92c6f634e779ed31628b37db
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,142 +77,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- alex.williamson@redhat.com, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Reply-To: Bug 1868055 <1868055@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> Added migration state change notifier to get notification on migration st=
-ate
-> change. These states are translated to VFIO device state and conveyed to =
-vendor
-> driver.
->=20
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/migration.c           | 29 +++++++++++++++++++++++++++++
->  hw/vfio/trace-events          |  1 +
->  include/hw/vfio/vfio-common.h |  1 +
->  3 files changed, 31 insertions(+)
->=20
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index af9443c275fb..22ded9d28cf3 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -154,6 +154,27 @@ static void vfio_vmstate_change(void *opaque, int ru=
-nning, RunState state)
->      }
->  }
-> =20
-> +static void vfio_migration_state_notifier(Notifier *notifier, void *data=
-)
-> +{
-> +    MigrationState *s =3D data;
-> +    VFIODevice *vbasedev =3D container_of(notifier, VFIODevice, migratio=
-n_state);
-> +    int ret;
-> +
-> +    trace_vfio_migration_state_notifier(vbasedev->name, s->state);
+Hello! Peter and Laurent,
+Thanks for your kind & rapid reply.
 
-You might want to use MigrationStatus_str(s->status) to make that
-readable.
+It took long to merge the patch Peter mentioned.
+After applying the patch the problem is gone but I found new issue.
 
-> +    switch (s->state) {
-> +    case MIGRATION_STATUS_CANCELLING:
-> +    case MIGRATION_STATUS_CANCELLED:
-> +    case MIGRATION_STATUS_FAILED:
-> +        ret =3D vfio_migration_set_state(vbasedev,
-> +                      ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RES=
-UMING),
-> +                      VFIO_DEVICE_STATE_RUNNING);
-> +        if (ret) {
-> +            error_report("%s: Failed to set state RUNNING", vbasedev->na=
-me);
-> +        }
+When I had tried to test for the first time after making new docker
+container it took much longer time.
 
-In the migration code we check to see if the VM was running prior to the
-start of the migration before we start the CPUs going again (see
-migration_iteration_finish):
-    case MIGRATION_STATUS_FAILED:
-    case MIGRATION_STATUS_CANCELLED:
-    case MIGRATION_STATUS_CANCELLING:
-        if (s->vm_was_running) {
-            vm_start();
-        } else {
-            if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-                runstate_set(RUN_STATE_POSTMIGRATE);
-            }
 
-so if the guest was paused before a migration we don't falsely restart
-it.  Maybe you need something similar?
+bash-3.2# time go run test.go
+Hello world
 
-Dave
+real	5m3.516s
+user	5m48.696s
+sys	13m32.600s
+bash-3.2# time go run test.go
+Hello world
 
-> +    }
-> +}
-> +
->  static int vfio_migration_init(VFIODevice *vbasedev,
->                                 struct vfio_region_info *info)
->  {
-> @@ -173,6 +194,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->      vbasedev->vm_state =3D qemu_add_vm_change_state_handler(vfio_vmstate=
-_change,
->                                                            vbasedev);
-> =20
-> +    vbasedev->migration_state.notify =3D vfio_migration_state_notifier;
-> +    add_migration_state_change_notifier(&vbasedev->migration_state);
-> +
->      return 0;
->  }
-> =20
-> @@ -211,6 +235,11 @@ add_blocker:
-> =20
->  void vfio_migration_finalize(VFIODevice *vbasedev)
->  {
-> +
-> +    if (vbasedev->migration_state.notify) {
-> +        remove_migration_state_change_notifier(&vbasedev->migration_stat=
-e);
-> +    }
-> +
->      if (vbasedev->vm_state) {
->          qemu_del_vm_change_state_handler(vbasedev->vm_state);
->      }
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 3d15bacd031a..69503228f20e 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -148,3 +148,4 @@ vfio_display_edid_write_error(void) ""
->  vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
->  vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
->  vfio_vmstate_change(char *name, int running, const char *reason, uint32_=
-t dev_state) " (%s) running %d reason %s device state %d"
-> +vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
-h
-> index 3d18eb146b33..28f55f66d019 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -123,6 +123,7 @@ typedef struct VFIODevice {
->      VMChangeStateEntry *vm_state;
->      uint32_t device_state;
->      int vm_running;
-> +    Notifier migration_state;
->  } VFIODevice;
-> =20
->  struct VFIODeviceOps {
-> --=20
-> 2.7.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+real	0m1.784s
+user	0m2.339s
+sys	0m1.742s
+bash-3.2# time go run test.go
+Hello world
 
+real	0m1.881s
+user	0m2.302s
+sys	0m1.926s
+bash-3.2# pwd
+
+I believe that 5 min for just printing "Hello world" is not your
+expectation.
+
+Is it also known issue?
+Please check it.
+
+Thanks.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1868055
+
+Title:
+  cannot run golang app with docker, version 17.09.1-ce, disabling core
+  0 and qemu-arm, version 2.7.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello!
+  I figure out that sometimes simple go application is not working.
+  I am using docker + qemu-arm + go( for armv7l).
+
+  These are version info below.
+
+  root@VDBS1535:~# docker -v
+  Docker version 17.09.1-ce, build 19e2cf6
+
+  bash-3.2# qemu-arm --version
+  qemu-arm version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and the Q=
+EMU Project developers
+
+  $ go version
+  go version go1.12.6 linux/arm
+  $ go env
+  GOARCH=3D"arm"
+  GOBIN=3D""
+  GOCACHE=3D"/home/quickbuild/.cache/go-build"
+  GOEXE=3D""
+  GOFLAGS=3D""
+  GOHOSTARCH=3D"arm"
+  GOHOSTOS=3D"linux"
+  GOOS=3D"linux"
+  GOPATH=3D"/home/quickbuild/go"
+  GOPROXY=3D""
+  GORACE=3D""
+  GOROOT=3D"/usr/lib/golang"
+  GOTMPDIR=3D""
+  GOTOOLDIR=3D"/usr/lib/golang/pkg/tool/linux_arm"
+  GCCGO=3D"gccgo"
+  GOARM=3D"7"
+  CC=3D"gcc"
+  CXX=3D"g++"
+  CGO_ENABLED=3D"1"
+  GOMOD=3D""
+  CGO_CFLAGS=3D"-g -O2"
+  CGO_CPPFLAGS=3D""
+  CGO_CXXFLAGS=3D"-g -O2"
+  CGO_FFLAGS=3D"-g -O2"
+  CGO_LDFLAGS=3D"-g -O2"
+  PKG_CONFIG=3D"pkg-config"
+  GOGCCFLAGS=3D"-fPIC -marm -pthread -fmessage-length=3D0 -fdebug-prefix-ma=
+p=3D/tmp/go-build242285369=3D/tmp/go-build -gno-record-gcc-switches"
+
+  This issue is come only when I disable core 0 using a command below.
+  please check "--cpuset-cpus=3D1-55" option.
+
+  sudo docker run --privileged -d -i -t --cpuset-cpus=3D1-55 --mount
+  type=3Dbind,source=3D"/home/dw83kim/mnt",destination=3D"/mnt" --network h=
+ost
+  --name=3D"ubuntu_core1" ubuntu:xenial-20200212
+
+  =
+
+  This is what I have tested in the environment above.
+
+  package main
+  func main(){
+      for i:=3D0; i<1000; i++ {
+          println("Hello world")
+      }
+  }
+
+  This is one of the error logs have faced sometimes not always.
+
+  bash-3.2# go run test.go
+  fatal error: schedule: holding locks
+  panic during panic
+  SIGILL: illegal instruction
+  PC=3D0xc9ec4c m=3D3 sigcode=3D2
+
+  goroutine 122 [runnable]:
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault (core dumped)
+  bash-3.2#
+
+  Please check it.
+  Thanks in advance.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1868055/+subscriptions
 
