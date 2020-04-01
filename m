@@ -2,80 +2,69 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B73D9C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68741C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:14:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EE31206E9
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:14:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PoHibI/M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE31206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C0FB206E9
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:14:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C0FB206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJbKI-0006BL-Lv
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60178)
+	id 1jJbKY-0006U4-BO
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:14:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jJbJF-0005Gf-7G
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:13:26 -0400
+ (envelope-from <frederic.konrad@adacore.com>) id 1jJbJM-0005NA-QJ
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:13:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jJbJD-00007x-M3
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:13:24 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60943
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <frederic.konrad@adacore.com>) id 1jJbJL-0000H4-Kf
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:13:32 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:47073
+ helo=smtp.eu.adacore.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jJbJD-00007G-CJ
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:13:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585739602;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ez95WzjdwCLqrjXyuHkHO3HL1ZExDT6b4tUuMMLb/3I=;
- b=PoHibI/Mj62qOyQDA3Ft0TnBbBK2nnB7yfwDp7OL0Xs/CXtywi+GlivAkA3Xp3W49QrFm6
- aS25AhqBxRtXPRlzs2VUibJkwoNFXig2w5/djVhTA4W9YIuf2v8dhqXH+IU7I05/FZEIJ+
- wRgtvqMOtJzBdXTsaGxoQd0Ut+wrgSM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-_As59BF8O1i9Ne79cyNDBw-1; Wed, 01 Apr 2020 07:13:20 -0400
-X-MC-Unique: _As59BF8O1i9Ne79cyNDBw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+ id 1jJbJL-0000GR-F4
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:13:31 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id DBC738137C;
+ Wed,  1 Apr 2020 13:13:29 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
+Received: from smtp.eu.adacore.com ([127.0.0.1])
+ by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0VBHhkcR7KNf; Wed,  1 Apr 2020 13:13:29 +0200 (CEST)
+Received: from localhost.localdomain (lfbn-tou-1-1471-22.w90-89.abo.wanadoo.fr
+ [90.89.4.22])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3F99800D4E;
- Wed,  1 Apr 2020 11:13:19 +0000 (UTC)
-Received: from gondolin (ovpn-112-252.ams2.redhat.com [10.36.112.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C8BC60BE2;
- Wed,  1 Apr 2020 11:13:14 +0000 (UTC)
-Date: Wed, 1 Apr 2020 13:12:43 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v2] vl/s390: fixup ram sizes for compat machines
-Message-ID: <20200401131243.14125f37.cohuck@redhat.com>
-In-Reply-To: <9f64cfb4-df6d-f43e-034c-f4e18a372e06@de.ibm.com>
-References: <20200401085014.100125-1-borntraeger@de.ibm.com>
- <20200401121324.379cfd0d.cohuck@redhat.com>
- <9f64cfb4-df6d-f43e-034c-f4e18a372e06@de.ibm.com>
-Organization: Red Hat GmbH
+ by smtp.eu.adacore.com (Postfix) with ESMTPSA id 916EF81368;
+ Wed,  1 Apr 2020 13:13:29 +0200 (CEST)
+Subject: Re: [PATCH-for-5.1 7/7] target/sparc/int32_helper: Extract and use
+ excp_name_str()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200331105048.27989-1-f4bug@amsat.org>
+ <20200331105048.27989-8-f4bug@amsat.org>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <ae52a968-b47a-2e4d-0cda-7061efd946ed@adacore.com>
+Date: Wed, 1 Apr 2020 13:13:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20200331105048.27989-8-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 194.98.77.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,72 +76,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVr?= =?UTF-8?B?w6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Jiri Gaisler <jiri@gaisler.se>, Fabien Chouteau <chouteau@adacore.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 1 Apr 2020 13:01:43 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On 01.04.20 12:13, Cornelia Huck wrote:
-> > On Wed,  1 Apr 2020 04:50:14 -0400
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> Older QEMU versions did fixup the ram size to match what can be reported
-> >> via sclp. We need to mimic this behaviour for machine types 4.2 and
-> >> older to not fail on inbound migration for memory sizes that do not fit.
-> >> Old machines with proper aligned memory sizes are not affected.
-> >>
-> >> Alignment table:
-> >>  VM size (<=) | Alignment
-> >> --------------------------
-> >>       1020M   |     1M
-> >>       2040M   |     2M
-> >>       4080M   |     4M
-> >>       8160M   |     8M
-> >>      16320M   |    16M
-> >>      32640M   |    32M
-> >>      65280M   |    64M
-> >>     130560M   |   128M
-> >>     261120M   |   256M
-> >>     522240M   |   512M
-> >>    1044480M   |     1G
-> >>    2088960M   |     2G
-> >>    4177920M   |     4G
-> >>    8355840M   |     8G
-> >>
-> >> Suggested action is to replace unaligned -m value with a suitable  
-> > 
-> > "to replace any unaligned -m value" ?
-> >   
-> >> aligned one or to use a machine version >= 5.0 as future versions might
-> >> remove the compatibility handling.  
-> > 
-> > I'm confused by the second part of the sentence. Warning about possible
-> > future removal of the compat stuff is fine, but I don't understand the
-> > suggestion to use a machine type >= 5.0. If I create a new machine that
-> > does not need be migrated to an old QEMU, using the latest machine type
-> > always seems like the best idea, right? And for a migration target it's
-> > not like we can choose the version freely anyway.  
-> 
-> 
-> My point was that - when you redefine your guest, which is disruptive anyway
-> you could also change the machine version to 5.0 and keep the strange memory
-> size.
 
-Ah, ok. That depends however on whether you still need compatibility,
-so it might not be advisable. What about:
+Le 3/31/20 =C3=A0 12:50 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0=
+:
+> Improve exception error report:
+>=20
+> Before:
+>=20
+>    qemu: fatal: Trap 0x06 while interrupts disabled, Error state
+>=20
+> After:
+>=20
+>    qemu: fatal: Trap 0x06 (Window Underflow) while interrupts disabled,=
+ Error state
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>   target/sparc/int32_helper.c | 18 ++++++++++++------
+>   1 file changed, 12 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/target/sparc/int32_helper.c b/target/sparc/int32_helper.c
+> index c56dd3df18..9a71e1abd8 100644
+> --- a/target/sparc/int32_helper.c
+> +++ b/target/sparc/int32_helper.c
+> @@ -57,6 +57,14 @@ static const char * const excp_names[0x80] =3D {
+>       [TT_NCP_INSN] =3D "Coprocessor Disabled",
+>   };
+>  =20
+> +static const char *excp_name_str(int32_t exception_index)
+> +{
+> +    if (exception_index < 0 || exception_index >=3D ARRAY_SIZE(excp_na=
+mes)) {
+> +        return "Unknown";
+> +    }
+> +    return excp_names[exception_index];
+> +}
+> +
+>   void sparc_cpu_do_interrupt(CPUState *cs)
+>   {
+>       SPARCCPU *cpu =3D SPARC_CPU(cs);
+> @@ -77,10 +85,7 @@ void sparc_cpu_do_interrupt(CPUState *cs)
+>           } else if (intno >=3D 0x80) {
+>               name =3D "Trap Instruction";
+>           } else {
+> -            name =3D excp_names[intno];
+> -            if (!name) {
+> -                name =3D "Unknown";
+> -            }
+> +            name =3D excp_name_str(intno);
+>           }
+>  =20
+>           qemu_log("%6d: %s (v=3D%02x)\n", count, name, intno);
+> @@ -106,8 +111,9 @@ void sparc_cpu_do_interrupt(CPUState *cs)
+>               env->def.features & CPU_FEATURE_TA0_SHUTDOWN) {
+>               qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOW=
+N);
+>           } else {
+> -            cpu_abort(cs, "Trap 0x%02x while interrupts disabled, Erro=
+r state",
+> -                      cs->exception_index);
+> +            cpu_abort(cs, "Trap 0x%02x (%s) while interrupts disabled,=
+ "
+> +                          "Error state",
+> +                      cs->exception_index, excp_name_str(cs->exception=
+_index));
+>           }
+>           return;
+>       }
+>=20
 
-"...or to switch to a machine version >= 5.0 if migration to older
-machine types is not needed; future versions might remove the
-compatibility handling."
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
 
-?
-
+Thanks,
+Fred
 
