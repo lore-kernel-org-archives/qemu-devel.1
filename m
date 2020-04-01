@@ -2,69 +2,143 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E87EFC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 854C8C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8CB32078B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:03:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8CB32078B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15FCE2078B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:03:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15FCE2078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJb9H-0000Bu-U6
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:03:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58252)
+	id 1jJb9u-0000ug-Ug
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:03:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58689)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frederic.konrad@adacore.com>) id 1jJb5y-0006df-Lu
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:59:44 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jJb8c-0008Ot-Nz
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:02:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frederic.konrad@adacore.com>) id 1jJb5x-00024M-Iz
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:59:42 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:46127
- helo=smtp.eu.adacore.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
- id 1jJb5x-00022i-Ch
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:59:41 -0400
-Received: from localhost (localhost [127.0.0.1])
- by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 9D12681387;
- Wed,  1 Apr 2020 12:59:40 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
-Received: from smtp.eu.adacore.com ([127.0.0.1])
- by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KALbQw33jB9L; Wed,  1 Apr 2020 12:59:40 +0200 (CEST)
-Received: from localhost.localdomain (lfbn-tou-1-1471-22.w90-89.abo.wanadoo.fr
- [90.89.4.22])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by smtp.eu.adacore.com (Postfix) with ESMTPSA id 5E5E181385;
- Wed,  1 Apr 2020 12:59:40 +0200 (CEST)
-Subject: Re: [PATCH-for-5.1 5/7] hw/timer/grlib_gptimer: Display frequency in
- decimal
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200331105048.27989-1-f4bug@amsat.org>
- <20200331105048.27989-6-f4bug@amsat.org>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <965a3560-e4b7-0b77-88d0-01acbcaf94c2@adacore.com>
-Date: Wed, 1 Apr 2020 12:59:40 +0200
+ (envelope-from <borntraeger@de.ibm.com>) id 1jJb8b-0007mE-Jv
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:02:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41502
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jJb8b-0007ks-Am
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:02:25 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 031B2Jfb184130
+ for <qemu-devel@nongnu.org>; Wed, 1 Apr 2020 07:02:24 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 304pm6wrnh-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 07:02:23 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Wed, 1 Apr 2020 12:01:35 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 1 Apr 2020 12:01:31 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 031B1iQ150200686
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 1 Apr 2020 11:01:44 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4B98EAE045;
+ Wed,  1 Apr 2020 11:01:44 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A733AAE04D;
+ Wed,  1 Apr 2020 11:01:43 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.71.143])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed,  1 Apr 2020 11:01:43 +0000 (GMT)
+Subject: Re: [PATCH v2] vl/s390: fixup ram sizes for compat machines
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200401085014.100125-1-borntraeger@de.ibm.com>
+ <20200401121324.379cfd0d.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Wed, 1 Apr 2020 13:01:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200331105048.27989-6-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 194.98.77.210
+In-Reply-To: <20200401121324.379cfd0d.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20040111-0016-0000-0000-000002FC477F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040111-0017-0000-0000-000033600B9C
+Message-Id: <9f64cfb4-df6d-f43e-034c-f4e18a372e06@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-01_01:2020-03-31,
+ 2020-03-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 adultscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 priorityscore=1501
+ bulkscore=0 suspectscore=0 spamscore=0 mlxscore=0 malwarescore=0
+ mlxlogscore=913 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004010097
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,45 +150,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Jiri Gaisler <jiri@gaisler.se>, Fabien Chouteau <chouteau@adacore.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-Le 3/31/20 =C3=A0 12:50 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0=
-:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->   hw/timer/trace-events | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-> index 29fda7870e..96a6c9138c 100644
-> --- a/hw/timer/trace-events
-> +++ b/hw/timer/trace-events
-> @@ -19,7 +19,7 @@ slavio_timer_mem_writel_invalid(uint64_t addr) "inval=
-id write address 0x%"PRIx64
->   grlib_gptimer_enable(int id, uint32_t count) "timer:%d set count 0x%x=
- and run"
->   grlib_gptimer_disabled(int id, uint32_t config) "timer:%d Timer disab=
-le config 0x%x"
->   grlib_gptimer_restart(int id, uint32_t reload) "timer:%d reload val: =
-0x%x"
-> -grlib_gptimer_set_scaler(uint32_t scaler, uint32_t freq) "scaler:0x%x =
-freq: 0x%x"
-> +grlib_gptimer_set_scaler(uint32_t scaler, uint32_t freq) "scaler:0x%x =
-freq:%uHz"
->   grlib_gptimer_hit(int id) "timer:%d HIT"
->   grlib_gptimer_readl(int id, uint64_t addr, uint32_t val) "timer:%d ad=
-dr 0x%"PRIx64" 0x%x"
->   grlib_gptimer_writel(int id, uint64_t addr, uint32_t val) "timer:%d a=
-ddr 0x%"PRIx64" 0x%x"
->=20
+On 01.04.20 12:13, Cornelia Huck wrote:
+> On Wed,  1 Apr 2020 04:50:14 -0400
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> Older QEMU versions did fixup the ram size to match what can be reported
+>> via sclp. We need to mimic this behaviour for machine types 4.2 and
+>> older to not fail on inbound migration for memory sizes that do not fit.
+>> Old machines with proper aligned memory sizes are not affected.
+>>
+>> Alignment table:
+>>  VM size (<=) | Alignment
+>> --------------------------
+>>       1020M   |     1M
+>>       2040M   |     2M
+>>       4080M   |     4M
+>>       8160M   |     8M
+>>      16320M   |    16M
+>>      32640M   |    32M
+>>      65280M   |    64M
+>>     130560M   |   128M
+>>     261120M   |   256M
+>>     522240M   |   512M
+>>    1044480M   |     1G
+>>    2088960M   |     2G
+>>    4177920M   |     4G
+>>    8355840M   |     8G
+>>
+>> Suggested action is to replace unaligned -m value with a suitable
+> 
+> "to replace any unaligned -m value" ?
+> 
+>> aligned one or to use a machine version >= 5.0 as future versions might
+>> remove the compatibility handling.
+> 
+> I'm confused by the second part of the sentence. Warning about possible
+> future removal of the compat stuff is fine, but I don't understand the
+> suggestion to use a machine type >= 5.0. If I create a new machine that
+> does not need be migrated to an old QEMU, using the latest machine type
+> always seems like the best idea, right? And for a migration target it's
+> not like we can choose the version freely anyway.
 
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+
+My point was that - when you redefine your guest, which is disruptive anyway
+you could also change the machine version to 5.0 and keep the strange memory
+size.
+
 
