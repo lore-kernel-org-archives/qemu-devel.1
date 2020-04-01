@@ -2,72 +2,83 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE5C2C2D0E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 07:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F05DBC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 07:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8196620714
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 07:49:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8196620714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE0D720714
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 07:52:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HW3gUo3X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE0D720714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJY7v-0003Gn-Ne
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 03:49:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54567)
+	id 1jJYAO-0004iD-TF
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 03:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55311)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jJY6t-0002YB-N9
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 03:48:29 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jJY9S-0003yC-QF
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 03:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jJY6r-0007xN-U7
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 03:48:27 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2094 helo=huawei.com)
+ (envelope-from <eric.auger@redhat.com>) id 1jJY9Q-0003cp-JU
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 03:51:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39462
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jJY6o-0007sE-1D; Wed, 01 Apr 2020 03:48:22 -0400
-Received: from lhreml703-chm.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id 2E7216FC37C1A3F8CB87;
- Wed,  1 Apr 2020 08:48:21 +0100 (IST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml703-chm.china.huawei.com (10.201.108.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 1 Apr 2020 08:48:20 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Wed, 1 Apr 2020 08:48:20 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH for-5.0 2/3] fw_cfg: Migrate ACPI table mr sizes separately
-Thread-Topic: [PATCH for-5.0 2/3] fw_cfg: Migrate ACPI table mr sizes
- separately
-Thread-Index: AQHWBrNmc/8JhbZhOkGXkACpglv9b6hivMgAgAEo84A=
-Date: Wed, 1 Apr 2020 07:48:20 +0000
-Message-ID: <26ca9fa6d82d4388b6707a5c856aeca0@huawei.com>
-References: <20200330164909.28324-1-shameerali.kolothum.thodi@huawei.com>
- <20200330164909.28324-3-shameerali.kolothum.thodi@huawei.com>
- <20200331110223-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200331110223-mutt-send-email-mst@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.88.147]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jJY9Q-0003ah-Cv
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 03:51:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585727463;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zKmkcFAeYkQC5+2s/XUIkEeLKqrQCJQCL5NCupQG9sM=;
+ b=HW3gUo3XIgy3dxb+Q6ReePu2IzBp3KLXsg7RXGhcH2ohWjusszKBXSdyTQ9BfO9Rtk2tSd
+ YaxxnGMHLUiNgWALLr6JR+Wm/CX6DIHIP+RqUgK/XRf8XGU43dF2eJ0NsQg+zTsVw8IjeC
+ WaNCUG5VZg3vVzARk5frVEcSAHBJIO8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-E1aw_hGBMYm1ayf1pDI5-Q-1; Wed, 01 Apr 2020 03:50:59 -0400
+X-MC-Unique: E1aw_hGBMYm1ayf1pDI5-Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 136F48017CC;
+ Wed,  1 Apr 2020 07:50:58 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA5E05D9CD;
+ Wed,  1 Apr 2020 07:50:46 +0000 (UTC)
+Subject: Re: [PATCH v2 09/22] vfio/common: init HostIOMMUContext per-container
+To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, peterx@redhat.com
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-10-git-send-email-yi.l.liu@intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <55a767fb-ed98-bc30-5de1-0791f1ce8642@redhat.com>
+Date: Wed, 1 Apr 2020 09:50:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <1585542301-84087-10-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,277 +90,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "david@redhat.com" <david@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei
- \(O\)" <xuwei5@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+ pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Yi,
 
+On 3/30/20 6:24 AM, Liu Yi L wrote:
+> In this patch, QEMU firstly gets iommu info from kernel to check the
+> supported capabilities by a VFIO_IOMMU_TYPE1_NESTING iommu. And inits
+> HostIOMMUContet instance.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  hw/vfio/common.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 99 insertions(+)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 5f3534d..44b142c 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1226,10 +1226,89 @@ static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
+>      return 0;
+>  }
+>  
+> +/**
+> + * Get iommu info from host. Caller of this funcion should free
+> + * the memory pointed by the returned pointer stored in @info
+> + * after a successful calling when finished its usage.
+> + */
+> +static int vfio_get_iommu_info(VFIOContainer *container,
+> +                         struct vfio_iommu_type1_info **info)
+> +{
+> +
+> +    size_t argsz = sizeof(struct vfio_iommu_type1_info);
+> +
+> +    *info = g_malloc0(argsz);
+> +
+> +retry:
+> +    (*info)->argsz = argsz;
+> +
+> +    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
+> +        g_free(*info);
+> +        *info = NULL;
+> +        return -errno;
+> +    }
+> +
+> +    if (((*info)->argsz > argsz)) {
+> +        argsz = (*info)->argsz;
+> +        *info = g_realloc(*info, argsz);
+> +        goto retry;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static struct vfio_info_cap_header *
+> +vfio_get_iommu_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
+> +{
+> +    struct vfio_info_cap_header *hdr;
+> +    void *ptr = info;
+> +
+> +    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
+> +        return NULL;
+> +    }
+> +
+> +    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
+> +        if (hdr->id == id) {
+> +            return hdr;
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static int vfio_get_nesting_iommu_cap(VFIOContainer *container,
+> +                   struct vfio_iommu_type1_info_cap_nesting *cap_nesting)
+> +{
+> +    struct vfio_iommu_type1_info *info;
+> +    struct vfio_info_cap_header *hdr;
+> +    struct vfio_iommu_type1_info_cap_nesting *cap;
+> +    int ret;
+> +
+> +    ret = vfio_get_iommu_info(container, &info);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    hdr = vfio_get_iommu_info_cap(info,
+> +                        VFIO_IOMMU_TYPE1_INFO_CAP_NESTING);
+> +    if (!hdr) {
+> +        g_free(info);
+> +        return -errno;
+> +    }
+> +
+> +    cap = container_of(hdr,
+> +                struct vfio_iommu_type1_info_cap_nesting, header);
+> +    *cap_nesting = *cap;
+> +
+> +    g_free(info);
+> +    return 0;
+> +}
+> +
+>  static int vfio_init_container(VFIOContainer *container, int group_fd,
+>                                 Error **errp)
+>  {
+>      int iommu_type, ret;
+> +    uint64_t flags = 0;
+>  
+>      iommu_type = vfio_get_iommu_type(container, errp);
+>      if (iommu_type < 0) {
+> @@ -1257,6 +1336,26 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
+>          return -errno;
+>      }
+>  
+> +    if (iommu_type == VFIO_TYPE1_NESTING_IOMMU) {
+> +        struct vfio_iommu_type1_info_cap_nesting nesting = {
+> +                                         .nesting_capabilities = 0x0,
+> +                                         .stage1_formats = 0, };
+> +
+> +        ret = vfio_get_nesting_iommu_cap(container, &nesting);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret,
+> +                             "Failed to get nesting iommu cap");
+> +            return ret;
+> +        }
+> +
+> +        flags |= (nesting.nesting_capabilities & VFIO_IOMMU_PASID_REQS) ?
+> +                 HOST_IOMMU_PASID_REQUEST : 0;
+I still don't get why you can't transform your iommu_ctx into a  pointer
+and do
+container->iommu_ctx = g_new0(HostIOMMUContext, 1);
+then
+host_iommu_ctx_init(container->iommu_ctx, flags);
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: 31 March 2020 16:03
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
-> eric.auger@redhat.com; imammedo@redhat.com; peter.maydell@linaro.org;
-> shannon.zhaosl@gmail.com; xiaoguangrong.eric@gmail.com;
-> david@redhat.com; xuwei (O) <xuwei5@huawei.com>; lersek@redhat.com;
-> Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [PATCH for-5.0 2/3] fw_cfg: Migrate ACPI table mr sizes sepa=
-rately
->=20
-> On Mon, Mar 30, 2020 at 05:49:08PM +0100, Shameer Kolothum wrote:
-> > Any sub-page size update to ACPI MRs will be lost during
-> > migration, as we use aligned size in ram_load_precopy() ->
-> > qemu_ram_resize() path. This will result in inconsistency in
-> > FWCfgEntry sizes between source and destination. In order to avoid
-> > this, save and restore them separately during migration.
-> >
-> > Up until now, this problem may not be that relevant for x86 as both
-> > ACPI table and Linker MRs gets padded and aligned. Also at present,
-> > qemu_ram_resize() doesn't invoke callback to update FWCfgEntry for
-> > unaligned size changes. But since we are going to fix the
-> > qemu_ram_resize() in the subsequent patch, the issue may become
-> > more serious especially for RSDP MR case.
-> >
-> > Moreover, the issue will soon become prominent in arm/virt as well
-> > where the MRs are not padded or aligned at all and eventually have
-> > acpi table changes as part of future additions like NVDIMM hot-add
-> > feature.
-> >
-> > Suggested-by: David Hildenbrand <david@redhat.com>
-> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > Acked-by: David Hildenbrand <david@redhat.com>
-> > ---
-> > Please find previous discussions here,
-> > https://patchwork.kernel.org/patch/11339591/#23140343
-> > ---
-> >
-> >  hw/core/machine.c         |  1 +
-> >  hw/nvram/fw_cfg.c         | 86
-> ++++++++++++++++++++++++++++++++++++++-
-> >  include/hw/nvram/fw_cfg.h |  6 +++
-> >  3 files changed, 92 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index de0c425605..c1a444cb75 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -39,6 +39,7 @@ GlobalProperty hw_compat_4_2[] =3D {
-> >      { "usb-redir", "suppress-remote-wake", "off" },
-> >      { "qxl", "revision", "4" },
-> >      { "qxl-vga", "revision", "4" },
-> > +    { "fw_cfg", "acpi-mr-restore", "false" },
-> >  };
-> >  const size_t hw_compat_4_2_len =3D G_N_ELEMENTS(hw_compat_4_2);
-> >
-> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> > index 179b302f01..36d1e32f83 100644
-> > --- a/hw/nvram/fw_cfg.c
-> > +++ b/hw/nvram/fw_cfg.c
-> > @@ -39,6 +39,7 @@
-> >  #include "qemu/config-file.h"
-> >  #include "qemu/cutils.h"
-> >  #include "qapi/error.h"
-> > +#include "hw/acpi/aml-build.h"
-> >
-> >  #define FW_CFG_FILE_SLOTS_DFLT 0x20
-> >
-> > @@ -610,6 +611,50 @@ bool fw_cfg_dma_enabled(void *opaque)
-> >      return s->dma_enabled;
-> >  }
-> >
-> > +static bool fw_cfg_acpi_mr_restore(void *opaque)
-> > +{
-> > +    FWCfgState *s =3D opaque;
-> > +    return s->acpi_mr_restore;
->=20
-> How about we limit this to the case where the address is
-> unaligned?
+looks something similar to (hw/vfio/common.c). You may not even need to
+use a derived VFIOHostIOMMUContext object (As only VFIO does use that
+object)? Only the ops do change, no new field?
+        region->mem = g_new0(MemoryRegion, 1);
+        memory_region_init_io(region->mem, obj, &vfio_region_ops,
+                              region, name, region->size);
 
-Ok. I will add that check as well.
+Thanks
 
-Thanks,
-Shameer
+Eric
 
-> > +}
-> > +
-> > +static void fw_cfg_update_mr(FWCfgState *s, uint16_t key, size_t size)
-> > +{
-> > +    MemoryRegion *mr;
-> > +    ram_addr_t offset;
-> > +    int arch =3D !!(key & FW_CFG_ARCH_LOCAL);
-> > +    void *ptr;
-> > +
-> > +    key &=3D FW_CFG_ENTRY_MASK;
-> > +    assert(key < fw_cfg_max_entry(s));
-> > +
-> > +    ptr =3D s->entries[arch][key].data;
-> > +    mr =3D memory_region_from_host(ptr, &offset);
-> > +
-> > +    memory_region_ram_resize(mr, size, &error_abort);
-> > +}
-> > +
-> > +static int fw_cfg_acpi_mr_restore_post_load(void *opaque, int version_=
-id)
-> > +{
-> > +    FWCfgState *s =3D opaque;
-> > +    int i, index;
-> > +
-> > +    assert(s->files);
-> > +
-> > +    index =3D be32_to_cpu(s->files->count);
-> > +
-> > +    for (i =3D 0; i < index; i++) {
-> > +        if (!strcmp(s->files->f[i].name, ACPI_BUILD_TABLE_FILE)) {
-> > +            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i,
-> s->table_mr_size);
-> > +        } else if (!strcmp(s->files->f[i].name, ACPI_BUILD_LOADER_FILE=
-)) {
-> > +            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i,
-> s->linker_mr_size);
-> > +        } else if (!strcmp(s->files->f[i].name, ACPI_BUILD_RSDP_FILE))=
- {
-> > +            fw_cfg_update_mr(s, FW_CFG_FILE_FIRST + i,
-> s->rsdp_mr_size);
-> > +        }
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> >  static const VMStateDescription vmstate_fw_cfg_dma =3D {
-> >      .name =3D "fw_cfg/dma",
-> >      .needed =3D fw_cfg_dma_enabled,
-> > @@ -619,6 +664,20 @@ static const VMStateDescription
-> vmstate_fw_cfg_dma =3D {
-> >      },
-> >  };
-> >
-> > +static const VMStateDescription vmstate_fw_cfg_acpi_mr =3D {
-> > +    .name =3D "fw_cfg/acpi_mr",
-> > +    .version_id =3D 1,
-> > +    .minimum_version_id =3D 1,
-> > +    .needed =3D fw_cfg_acpi_mr_restore,
-> > +    .post_load =3D fw_cfg_acpi_mr_restore_post_load,
-> > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_UINT64(table_mr_size, FWCfgState),
-> > +        VMSTATE_UINT64(linker_mr_size, FWCfgState),
-> > +        VMSTATE_UINT64(rsdp_mr_size, FWCfgState),
-> > +        VMSTATE_END_OF_LIST()
-> > +    },
-> > +};
-> > +
-> >  static const VMStateDescription vmstate_fw_cfg =3D {
-> >      .name =3D "fw_cfg",
-> >      .version_id =3D 2,
-> > @@ -631,6 +690,7 @@ static const VMStateDescription vmstate_fw_cfg =3D =
-{
-> >      },
-> >      .subsections =3D (const VMStateDescription*[]) {
-> >          &vmstate_fw_cfg_dma,
-> > +        &vmstate_fw_cfg_acpi_mr,
-> >          NULL,
-> >      }
-> >  };
-> > @@ -815,6 +875,23 @@ static struct {
-> >  #define FW_CFG_ORDER_OVERRIDE_LAST 200
-> >  };
-> >
-> > +/*
-> > + * Any sub-page size update to these table MRs will be lost during mig=
-ration,
-> > + * as we use aligned size in ram_load_precopy() -> qemu_ram_resize() p=
-ath.
-> > + * In order to avoid the inconsistency in sizes save them seperately a=
-nd
-> > + * migrate over in vmstate post_load().
-> > + */
-> > +static void fw_cfg_acpi_mr_save(FWCfgState *s, const char *filename,
-> size_t len)
-> > +{
-> > +    if (!strcmp(filename, ACPI_BUILD_TABLE_FILE)) {
-> > +        s->table_mr_size =3D len;
-> > +    } else if (!strcmp(filename, ACPI_BUILD_LOADER_FILE)) {
-> > +        s->linker_mr_size =3D len;
-> > +    } else if (!strcmp(filename, ACPI_BUILD_RSDP_FILE)) {
-> > +        s->rsdp_mr_size =3D len;
-> > +    }
-> > +}
-> > +
-> >  static int get_fw_cfg_order(FWCfgState *s, const char *name)
-> >  {
-> >      int i;
-> > @@ -914,6 +991,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,
-> const char *filename,
-> >      trace_fw_cfg_add_file(s, index, s->files->f[index].name, len);
-> >
-> >      s->files->count =3D cpu_to_be32(count+1);
-> > +    fw_cfg_acpi_mr_save(s, filename, len);
-> >  }
-> >
-> >  void fw_cfg_add_file(FWCfgState *s,  const char *filename,
-> > @@ -937,6 +1015,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char
-> *filename,
-> >              ptr =3D fw_cfg_modify_bytes_read(s, FW_CFG_FILE_FIRST + i,
-> >                                             data, len);
-> >              s->files->f[i].size   =3D cpu_to_be32(len);
-> > +            fw_cfg_acpi_mr_save(s, filename, len);
-> >              return ptr;
-> >          }
-> >      }
-> > @@ -973,7 +1052,10 @@ static void fw_cfg_machine_ready(struct Notifier
-> *n, void *data)
-> >      qemu_register_reset(fw_cfg_machine_reset, s);
-> >  }
-> >
-> > -
-> > +static Property fw_cfg_properties[] =3D {
-> > +    DEFINE_PROP_BOOL("acpi-mr-restore", FWCfgState, acpi_mr_restore,
-> true),
-> > +    DEFINE_PROP_END_OF_LIST(),
-> > +};
-> >
-> >  static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
-> >  {
-> > @@ -1097,6 +1179,8 @@ static void fw_cfg_class_init(ObjectClass *klass,
-> void *data)
-> >
-> >      dc->reset =3D fw_cfg_reset;
-> >      dc->vmsd =3D &vmstate_fw_cfg;
-> > +
-> > +    device_class_set_props(dc, fw_cfg_properties);
-> >  }
-> >
-> >  static const TypeInfo fw_cfg_info =3D {
-> > diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> > index b5291eefad..457fee7425 100644
-> > --- a/include/hw/nvram/fw_cfg.h
-> > +++ b/include/hw/nvram/fw_cfg.h
-> > @@ -53,6 +53,12 @@ struct FWCfgState {
-> >      dma_addr_t dma_addr;
-> >      AddressSpace *dma_as;
-> >      MemoryRegion dma_iomem;
-> > +
-> > +    /* restore during migration */
-> > +    bool acpi_mr_restore;
-> > +    size_t table_mr_size;
-> > +    size_t linker_mr_size;
-> > +    size_t rsdp_mr_size;
-> >  };
-> >
-> >  struct FWCfgIoState {
-> > --
-> > 2.17.1
-> >
+> +        host_iommu_ctx_init(&container->iommu_ctx,
+> +                            sizeof(container->iommu_ctx),
+> +                            TYPE_VFIO_HOST_IOMMU_CONTEXT,
+> +                            flags);
+> +    }
+> +
+>      container->iommu_type = iommu_type;
+>      return 0;
+>  }
+> 
 
 
