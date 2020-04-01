@@ -2,132 +2,126 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EBEC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A743C2D0F3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:15:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED89A206E9
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:59:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08B682073B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:15:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="nLmG90Wz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED89A206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=partner.samsung.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJK1TbMk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08B682073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJcxl-0007ib-4y
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:59:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60773)
+	id 1jJdDC-0003uX-4v
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 09:15:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1jJcx1-0007B7-Vw
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:58:38 -0400
+ (envelope-from <david@redhat.com>) id 1jJdCH-0003Tu-MR
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:14:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1jJcx0-0008Ci-6e
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:58:35 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:39434)
+ (envelope-from <david@redhat.com>) id 1jJdCF-0004le-Ny
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:14:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25044
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1jJcwz-0008Bc-V9
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:58:34 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
- by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id
- 20200401125829euoutp01dffe992a83a599f4a8363f33df11003b~Bs4DWa2cx2395723957euoutp01C
- for <qemu-devel@nongnu.org>; Wed,  1 Apr 2020 12:58:29 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com
- 20200401125829euoutp01dffe992a83a599f4a8363f33df11003b~Bs4DWa2cx2395723957euoutp01C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1585745909;
- bh=g+vcj42Ss4L+HAIwzR8+kr/+iL6TCJPk1LOmOrCg4+k=;
- h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
- b=nLmG90WznG9HPG/tI+HsVZZtCErNIU5vAhPU4oi9oI9Ib6oN8mIFoJUbmTTpxGRXO
- N7hQHBUx+ZuoUxiXpoloIhyyOHWxVdEZrZOx82WHodHAf/9aZ1dSp8mKHLcOkYAiAY
- pDCwITJwBEB3davk5OICzorgpJGfww1gfeZICzQo=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTP id
- 20200401125829eucas1p1bdb7c67d104e4093f7e8e1400d6008e7~Bs4DMthr20112601126eucas1p1v;
- Wed,  1 Apr 2020 12:58:29 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
- eusmges2new.samsung.com (EUCPMTA) with SMTP id A8.99.60679.5FF848E5; Wed,  1
- Apr 2020 13:58:29 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
- 20200401125829eucas1p19e8c3859fef1ea2bc1cd10ab2f153479~Bs4C6E99v0110001100eucas1p1E;
- Wed,  1 Apr 2020 12:58:29 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
- eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
- 20200401125829eusmtrp1311bb0b907fccaa1d70bf7b31fd35e8b~Bs4C5e7dX0933109331eusmtrp1L;
- Wed,  1 Apr 2020 12:58:29 +0000 (GMT)
-X-AuditID: cbfec7f4-0e5ff7000001ed07-f3-5e848ff5965f
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
- eusmgms1.samsung.com (EUCPMTA) with SMTP id 85.9A.08375.5FF848E5; Wed,  1
- Apr 2020 13:58:29 +0100 (BST)
-Received: from [106.210.122.12] (unknown [106.210.122.12]) by
- eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
- 20200401125828eusmtip1614845696767fe1e8c8facfb5716c00f~Bs4Ci_wkp2866728667eusmtip1L;
- Wed,  1 Apr 2020 12:58:28 +0000 (GMT)
-Subject: Re: [RFC 0/9] Add an interVM memory sharing device
-From: =?UTF-8?Q?Igor_Kotrasi=c5=84ski?= <i.kotrasinsk@partner.samsung.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Igor Mammedov <imammedo@redhat.com>
-Message-ID: <0bd92bb6-9ff6-be44-37a0-8d0b3f79693e@partner.samsung.com>
-Date: Wed, 1 Apr 2020 14:58:28 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJdCF-0004l0-Es
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:14:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585746858;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Kzni+a+pjMuuVixoz0QjYPTvNR/en/IwUGQP0qomcFw=;
+ b=GJK1TbMk+WzqUTPg1agvkwJttz4SJSazOQvo6TcP95bNisJqPodJMp3HfuRMqh9CqKgS9n
+ /Yjhkb4O+glIl3soU+UfbQA8qa0kg+bDqnd0ELfQ9MM8+jfs72uqwizkY1GGeda4510sz1
+ N22aRyolDbPeURThXrqKC5JIfgNT1F8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-GF_1ge3oNEWBVaEutNJqkw-1; Wed, 01 Apr 2020 09:14:17 -0400
+X-MC-Unique: GF_1ge3oNEWBVaEutNJqkw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A86D58017F4;
+ Wed,  1 Apr 2020 13:14:15 +0000 (UTC)
+Received: from [10.36.114.59] (ovpn-114-59.ams2.redhat.com [10.36.114.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 406A660C05;
+ Wed,  1 Apr 2020 13:14:13 +0000 (UTC)
+Subject: Re: [PATCH v3 1/1] vl/s390x: fixup ram sizes for compat machines
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
+References: <20200401123754.109602-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <285819e0-e23e-32ac-b061-a0b683baeb5a@redhat.com>
+Date: Wed, 1 Apr 2020 15:14:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <91525902-952f-7f84-c1b0-a4e5c35e0363@partner.samsung.com>
+In-Reply-To: <20200401123754.109602-1-borntraeger@de.ibm.com>
 Content-Language: en-US
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGKsWRmVeSWpSXmKPExsWy7djP87pf+1viDDZNVLQ4fbSD2eLezZvM
- Fvu3/WO1mHPmAYvF8d4dLBY3p09lcmDz2DnrLrvHnWt72DyeXNvM5PF+31U2j+0nJzEFsEZx
- 2aSk5mSWpRbp2yVwZczruMNcsEqj4vyeC0wNjNcVuhg5OSQETCSuPDvG2MXIxSEksIJRYsO7
- C+wQzhdGienznrBBOJ8ZJeY83MUG0/K59QMLRGI5o8TBhZ+hqt4zSqydfpkRpEpYwFqi53kf
- WAebgJfE/YkrweIiAv4Ss890soDYzAL5EsdOfmbtYuTg4BVwk9i8zwQkzCKgIvFm53ywElGB
- WIlzj26wgti8AoISJ2c+AYtzCrhLtHT+ghojLnHryXwmCFteonnrbGaQeyQEVrFL/JmzmxHi
- aheJd4cnMkHYwhKvjm9hh7BlJE5P7mGBsOslWu7sYIJo7mCU6Fs5Hepla4kvG5aygBzKLKAp
- sX6XPkTYUeLKnSZmkLCEAJ/EjbeCEDfwSUzaNh0qzCvR0SYEUa0n0f3kJhPM1mWNj1gmMCrN
- QvLZLCTfzELyzSyEvQsYWVYxiqeWFuempxYb5aWW6xUn5haX5qXrJefnbmIEpp7T/45/2cG4
- 60/SIUYBDkYlHt6KjJY4IdbEsuLK3EOMEhzMSiK8s12AQrwpiZVVqUX58UWlOanFhxilOViU
- xHmNF72MFRJITyxJzU5NLUgtgskycXBKNTDyeS0vOtSwdbq8P+cZ6XN2BxR2lcx9yPWG0duH
- uev7BI3b1xQOuMgvWzuDMe5xv+TxAlOrPydkt1tVJ1TOcdtv0Zh+4rXj/5rjsXWTL6z88msa
- c+HxdAc9i4igmZlT06pnLtRe3DF1gnv7lo87Yi7bWogGrPfZfa3iWIdE5MlXUkYP3Cezz92l
- xFKckWioxVxUnAgAMPHJAjkDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrJIsWRmVeSWpSXmKPExsVy+t/xu7pf+1viDC494LM4fbSD2eLezZvM
- Fvu3/WO1mHPmAYvF8d4dLBY3p09lcmDz2DnrLrvHnWt72DyeXNvM5PF+31U2j+0nJzEFsEbp
- 2RTll5akKmTkF5fYKkUbWhjpGVpa6BmZWOoZGpvHWhmZKunb2aSk5mSWpRbp2yXoZczruMNc
- sEqj4vyeC0wNjNcVuhg5OSQETCQ+t35g6WLk4hASWMooce/yU0aIhIzEj9Nr2CBsYYk/17rY
- IIreMkrsvNwHlhAWsJboeQ5hswl4SdyfuBKsWUTAV+LN4wtMIDazQL7EtK41UM0PmSUWrNrF
- 2sXIwcEr4CaxeZ8JSA2LgIrEm53zWUBsUYFYif7m3WBzeAUEJU7OfAIW5xRwl2jp/MUCMdNM
- Yt7mh8wQtrjErSfzoXbJSzRvnc08gVFoFpL2WUhaZiFpmYWkZQEjyypGkdTS4tz03GJDveLE
- 3OLSvHS95PzcTYzAaNt27OfmHYyXNgYfYhTgYFTi4a3IaIkTYk0sK67MPcQowcGsJMI72wUo
- xJuSWFmVWpQfX1Sak1p8iNEU6LmJzFKiyfnARJBXEm9oamhuYWlobmxubGahJM7bIXAwRkgg
- PbEkNTs1tSC1CKaPiYNTqoGxXlBoT1qy0YSH8t+tXiy7vLZnT9BjxQlaS7IDth1e/fHnvcc7
- fbas7l+lcnnausuF7xU8axbZPrvAuurq3Qn9mXeLlvKffxJ3/bzzRYXv3td4H64tlzY6npjF
- PPlNm4JVwC7D1mfvWqOKJNW/ssrNUrocGMjP7qympmg7dbWp2e/PM4w313myKrEUZyQaajEX
- FScCAPwygJbMAgAA
-X-CMS-MailID: 20200401125829eucas1p19e8c3859fef1ea2bc1cd10ab2f153479
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200204113102eucas1p172cfb883c70cfc8d7c2832682df3df2a
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200204113102eucas1p172cfb883c70cfc8d7c2832682df3df2a
-References: <CGME20200204113102eucas1p172cfb883c70cfc8d7c2832682df3df2a@eucas1p1.samsung.com>
- <1580815851-28887-1-git-send-email-i.kotrasinsk@partner.samsung.com>
- <20200205143911.GG58062@stefanha-x1.localdomain>
- <1e872eb3-a21b-0f9b-e6a4-54843a028bed@siemens.com>
- <91d3f574-3a4f-8291-040e-520c5c58e77e@partner.samsung.com>
- <20200207110403.08a8a7cc@redhat.com>
- <20200207163349.GI168381@stefanha-x1.localdomain>
- <91525902-952f-7f84-c1b0-a4e5c35e0363@partner.samsung.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 210.118.77.11
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -139,146 +133,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, pbonzini@redhat.com,
- qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10.02.2020 14:01, Igor Kotrasi=C5=84ski wrote:
-> On 2/7/20 5:33 PM, Stefan Hajnoczi wrote:
->> On Fri, Feb 07, 2020 at 11:04:03AM +0100, Igor Mammedov wrote:
->>> On Fri, 7 Feb 2020 10:00:50 +0100
->>> Igor Kotrasi=C5=84ski <i.kotrasinsk@partner.samsung.com> wrote:
->>>
->>>> On 2/5/20 3:49 PM, Jan Kiszka wrote:
->>>>> On 05.02.20 15:39, Stefan Hajnoczi wrote:
->>>>>> On Tue, Feb 04, 2020 at 12:30:42PM +0100,
->>>>>> i.kotrasinsk@partner.samsung.com wrote:
->>>>>>> From: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
->>>>>>>
->>>>>>> This patchset adds a "memory exposing" device that allows two QEM=
-U
->>>>>>> instances to share arbitrary memory regions. Unlike ivshmem, it=20
->>>>>>> does not
->>>>>>> create a new region of memory that's shared between VMs, but inst=
-ead
->>>>>>> allows one VM to access any memory region of the other VM we=20
->>>>>>> choose to
->>>>>>> share.
->>>>>>>
->>>>>>> The motivation for this device is a sort of ARM Trustzone=20
->>>>>>> "emulation",
->>>>>>> where a rich system running on one machine (e.g. x86_64 linux) is=
-=20
->>>>>>> able
->>>>>>> to perform SMCs to a trusted system running on another (e.g.=20
->>>>>>> OpTEE on
->>>>>>> ARM). With a device that allows sharing arbitrary memory between=20
->>>>>>> VMs,
->>>>>>> this can be achieved with minimal changes to the trusted system=20
->>>>>>> and its
->>>>>>> linux driver while allowing the rich system to run on a speedier =
-x86
->>>>>>> emulator. I prepared additional patches for linux, OpTEE OS and=20
->>>>>>> OpTEE
->>>>>>> build system as a PoC that such emulation works and passes OpTEE=20
->>>>>>> tests;
->>>>>>> I'm not sure what would be the best way to share them.
->>>>>>>
->>>>>>> This patchset is my first foray into QEMU source code and I'm=20
->>>>>>> certain
->>>>>>> it's not yet ready to be merged in. I'm not sure whether memory=20
->>>>>>> sharing
->>>>>>> code has any race conditions or breaks rules of working with memo=
-ry
->>>>>>> regions, or if having VMs communicate synchronously via chardevs=20
->>>>>>> is the
->>>>>>> right way to do it. I do believe the basic idea for sharing memor=
-y
->>>>>>> regions is sound and that it could be useful for inter-VM=20
->>>>>>> communication.
->>>>>>
->>>>>> Hi,
->>>>>> Without having looked into the patches yet, I'm already wondering=20
->>>>>> if you
->>>>>> can use the existing -object
->>>>>> memory-backend-file,size=3D512M,mem-path=3D/my/shared/mem feature =
-for=20
->>>>>> your
->>>>>> use case?
->>>>>>
->>>>>> That's the existing mechanism for fully sharing guest RAM and if y=
-ou
->>>>>> want to share all of memory then maybe a device is not necessary -=
-=20
->>>>>> just
->>>>>> share the memory.
->>>>
->>>> That option adds memory in addition to the memory allocated with the
->>>> '-m' flag, doesn't it? I looked into that option, and it seemed to m=
-e
->>>> you can't back all memory this way.
->>> with current QEMU you play with memory sharing using numa workaround
->>>
->>> -m 512 \
->>> -object memory-backend-file,id=3Dmem,size=3D512M,mem-path=3D/my/share=
-d/mem=20
->>> feature,share=3Don \
->>> -numa node,memdev=3Dmem
->>>
->>> also on the list there is series that allows to share main ram
->>> without numa workaround, see
->>> =C2=A0=C2=A0 "[PATCH v4 00/80] refactor main RAM allocation to use ho=
-stmem=20
->>> backend"
->>>
->>> with it applied you can share main RAM with following CLI:
->>>
->>> -object memory-backend-file,id=3Dmem,size=3D512M,mem-path=3D/my/share=
-d/mem=20
->>> feature,share=3Don \
->>> -m 512 \
->>> -M virt,memory-backend=3Dmem
->>
->> Nice!=C2=A0 That takes care of memory.
+On 01.04.20 14:37, Christian Borntraeger wrote:
+> Older QEMU versions did fixup the ram size to match what can be reported
+> via sclp. We need to mimic this behaviour for machine types 4.2 and
+> older to not fail on inbound migration for memory sizes that do not fit.
+> Old machines with proper aligned memory sizes are not affected.
 >=20
-> After a bit of hacking to map the shared RAM instead of communicating=20
-> via socket I can confirm - I can run OpTEE this way, and it passes=20
-> tests. My solution is *technically* more accurate since it is aware of=20
-> memory subregions and completely independent from memory backend setup,=
-=20
-> but with my use case satisfied already, I don't think it's of use to=20
-> anyone.
+> Alignment table:
+>  VM size (<=3D) | Alignment
+> --------------------------
+>       1020M   |     1M
+>       2040M   |     2M
+>       4080M   |     4M
+>       8160M   |     8M
+>      16320M   |    16M
+>      32640M   |    32M
+>      65280M   |    64M
+>     130560M   |   128M
+>     261120M   |   256M
+>     522240M   |   512M
+>    1044480M   |     1G
+>    2088960M   |     2G
+>    4177920M   |     4G
+>    8355840M   |     8G
 >=20
-
-After a long while hacking QEMU to achieve 1-to-1 memory mapping between=20
-machines, I realized that I wasn't completely right here. I can share=20
-main memory from both machines, but for the arm machine that's only=20
-non-secure memory. Secure memory (VIRT_SECURE_MEM) is always allocated=20
-with memory_region_init_ram(), I don't know if other secure memory=20
-regions (e.g. VIRT_FLASH) might need to be shared as well.
-
-This can probably be solved by allowing these regions to use file-backed=20
-memory when configured to do so, then mapping these files in the other=20
-machine at correct offsets.
-
-Another solution would be memory sharing in this patchset. If we strip=20
-away interrupts, PCI stuff and io memory region support, it amounts to=20
-basically the same thing - a mechanism for accessing shareable memory in=20
-the other machine in a discoverable way.
-
->>
->> If signalling (e.g. a notification interrupt) is necessary then a
->> mechanism is still needed for that.=C2=A0 I don't know enough about Tr=
-ustZone
->> to suggest an appropriate way of doing it with existing QEMU features.
->> Maybe Peter understands?
->>
+> Suggested action is to replace unaligned -m value with a suitable
+> aligned one or if a change to a newer machine type is possible, use a
+> machine version >=3D 5.0.
 >=20
-> Any signalling mechanism that can pass data along with it (e.g. ivshmem=
-=20
-> with its shared memory) will suffice.
+> A future versions might remove the compatibility handling.
+>=20
+> For machine types >=3D 5.0 we can simply use an increment size of 1M and
+> use the full range of increment number which allows for all possible
+> memory sizes. The old limitation of having a maximum of 1020 increments
+> was added for standby memory, which we no longer support. With that we
+> can now support even weird memory sizes like 10001234 MB.
+>=20
+> As we no longer fixup maxram_size as well, make other users use ram_size
+> instead. Keep using maxram_size when setting the maximum ram size in KVM,
+> as that will come in handy in the future when supporting memory hotplug
+> (in contrast, storage keys and storage attributes for hotplugged memory
+> will have to be migrated per RAM block in the future).
+>=20
+> Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
+> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/s390x/s390-skeys.c        |  2 +-
+>  hw/s390x/s390-stattrib-kvm.c |  4 ++--
+>  hw/s390x/s390-virtio-ccw.c   | 21 +++++++++++++++++++++
+>  hw/s390x/sclp.c              | 17 +++++------------
+>  include/hw/boards.h          |  7 +++++++
+>  softmmu/vl.c                 |  3 +++
+>  6 files changed, 39 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+> index 5da6e5292f..a9a4ae7b39 100644
+> --- a/hw/s390x/s390-skeys.c
+> +++ b/hw/s390x/s390-skeys.c
+> @@ -176,7 +176,7 @@ static void qemu_s390_skeys_init(Object *obj)
+>      QEMUS390SKeysState *skeys =3D QEMU_S390_SKEYS(obj);
+>      MachineState *machine =3D MACHINE(qdev_get_machine());
+> =20
+> -    skeys->key_count =3D machine->maxram_size / TARGET_PAGE_SIZE;
+> +    skeys->key_count =3D machine->ram_size / TARGET_PAGE_SIZE;
+>      skeys->keydata =3D g_malloc0(skeys->key_count);
+>  }
+> =20
+> diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
+> index c7e1f35524..f89d8d9d16 100644
+> --- a/hw/s390x/s390-stattrib-kvm.c
+> +++ b/hw/s390x/s390-stattrib-kvm.c
+> @@ -85,7 +85,7 @@ static int kvm_s390_stattrib_set_stattr(S390StAttribSta=
+te *sa,
+>  {
+>      KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
+>      MachineState *machine =3D MACHINE(qdev_get_machine());
+> -    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
+> +    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
+> =20
+>      if (start_gfn + count > max) {
+>          error_report("Out of memory bounds when setting storage attribut=
+es");
+> @@ -104,7 +104,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttri=
+bState *sa)
+>  {
+>      KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
+>      MachineState *machine =3D MACHINE(qdev_get_machine());
+> -    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
+> +    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
+>      /* We do not need to reach the maximum buffer size allowed */
+>      unsigned long cx, len =3D KVM_S390_SKEYS_MAX / 2;
+>      int r;
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 3cf19c99f3..61a8a0e693 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -27,6 +27,7 @@
+>  #include "qemu/ctype.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/option.h"
+> +#include "qemu/qemu-print.h"
+>  #include "s390-pci-bus.h"
+>  #include "sysemu/reset.h"
+>  #include "hw/s390x/storage-keys.h"
+> @@ -579,6 +580,25 @@ static void s390_nmi(NMIState *n, int cpu_index, Err=
+or **errp)
+>      s390_cpu_restart(S390_CPU(cs));
+>  }
+> =20
+> +static ram_addr_t s390_fixup_ram_size(ram_addr_t sz)
+> +{
+> +    /* same logic as in sclp.c */
+> +    int increment_size =3D 20;
+> +    ram_addr_t newsz;
+> +
+> +    while ((sz >> increment_size) > MAX_STORAGE_INCREMENTS) {
+> +        increment_size++;
+> +    }
+> +    newsz =3D sz >> increment_size << increment_size;
+> +
+> +    if (sz !=3D newsz) {
+> +        qemu_printf("Ram size %" PRIu64 "MB was fixed up to %" PRIu64
+> +                    "MB to match machine restrictions. Consider updating=
+ "
+> +                    "the guest definition.i\n", sz / MiB, newsz / MiB);
 
-Igor
+Not sure if news/zs will be printed correctly in case ram_addr_t !=3D
+uint64_t.
+
+Thanks!
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+--=20
+Thanks,
+
+David / dhildenb
+
 
