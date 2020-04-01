@@ -2,64 +2,67 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64807C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8D3C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BDD02071A
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:05:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BDD02071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DC032071A
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:07:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DC032071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJfrr-0006pa-4o
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55429)
+	id 1jJftm-0000VZ-Hf
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jJfmq-00037r-U6
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:00:18 -0400
+ (envelope-from <jonathan.cameron@huawei.com>) id 1jJfoM-00049P-Uq
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:01:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jJfmp-00067M-Cf
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:00:16 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:25575)
+ (envelope-from <jonathan.cameron@huawei.com>) id 1jJfoK-000812-G8
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:01:50 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2096 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>)
- id 1jJfml-0005cx-UG; Wed, 01 Apr 2020 12:00:12 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 54A3A4277B;
- Wed,  1 Apr 2020 17:59:59 +0200 (CEST)
-Date: Wed, 1 Apr 2020 17:50:30 +0200 (CEST)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1854680630.1.1585756230142@webmail.proxmox.com>
-In-Reply-To: <997901084.0.1585755465486@webmail.proxmox.com>
-References: <658260883.24.1585644382441@webmail.proxmox.com>
- <20200331125804.GE7030@linux.fritz.box>
- <303038276.59.1585665152860@webmail.proxmox.com>
- <787d7517-bf56-72c7-d197-2313a864e05f@virtuozzo.com>
- <713436887.61.1585668262838@webmail.proxmox.com>
- <20200331153719.GI7030@linux.fritz.box>
- <518198448.62.1585671498399@webmail.proxmox.com>
- <20200401103748.GA4680@linux.fritz.box>
- <997901084.0.1585755465486@webmail.proxmox.com>
-Subject: Re: bdrv_drained_begin deadlock with io-threads
+ (Exim 4.71) (envelope-from <jonathan.cameron@huawei.com>)
+ id 1jJfoI-0007lf-Mx
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:01:47 -0400
+Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.106])
+ by Forcepoint Email with ESMTP id DB95265654A3D22F32C3;
+ Wed,  1 Apr 2020 17:01:32 +0100 (IST)
+Received: from localhost (10.227.96.57) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 1 Apr 2020
+ 17:01:32 +0100
+Date: Wed, 1 Apr 2020 17:01:31 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v7 00/41] target/arm: Implement ARMv8.1-VHE
+Message-ID: <20200401170131.00005f57@huawei.com>
+In-Reply-To: <20200401114522.00007335@huawei.com>
+References: <20200206105448.4726-1-richard.henderson@linaro.org>
+ <CAFEAcA83vHKOYdxnAG9ouF9OJTGh+3z_RuB1yEc6dCpErZ4pZw@mail.gmail.com>
+ <20200331163324.000020fb@Huawei.com>
+ <2c29aaa9-0c92-ba48-e218-ab816044eec3@linaro.org>
+ <20200401114522.00007335@huawei.com>
+Organization: Huawei tech. R&D (UK)  Ltd.
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev23
-X-Originating-Client: open-xchange-appsuite
+X-Originating-IP: [10.227.96.57]
+X-ClientProxiedBy: lhreml717-chm.china.huawei.com (10.201.108.68) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.186.127.180
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,72 +74,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, salil.mehta@huawei.com,
+ QEMU Developers <qemu-devel@nongnu.org>, shameerali.kolothum.thodi@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 1 Apr 2020 11:45:22 +0100
+Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
 
-> On April 1, 2020 5:37 PM Dietmar Maurer <dietmar@proxmox.com> wrote:
+> On Tue, 31 Mar 2020 11:59:13 -0700
+> Richard Henderson <richard.henderson@linaro.org> wrote:
 > 
->  
-> > > I really nobody else able to reproduce this (somebody already tried to reproduce)?
+> > On 3/31/20 8:33 AM, Jonathan Cameron wrote:  
+> > > Just wondering if there are any known issues with this?    
 > > 
-> > I can get hangs, but that's for job_completed(), not for starting the
-> > job. Also, my hangs have a non-empty bs->tracked_requests, so it looks
-> > like a different case to me.
+> > Nope.  It works for me.
+> > Can you give us any more details.
+> >   
 > 
-> Please can you post the command line args of your VM? I use something like
+> Unfortunately not a lot more to add.
 > 
-> ./x86_64-softmmu/qemu-system-x86_64 -chardev 'socket,id=qmp,path=/var/run/qemu-server/101.qmp,server,nowait' -mon 'chardev=qmp,mode=control' -pidfile /var/run/qemu-server/101.pid  -m 1024 -object 'iothread,id=iothread-virtioscsi0' -device 'virtio-scsi-pci,id=virtioscsi0,iothread=iothread-virtioscsi0' -drive 'file=/backup/disk3/debian-buster.raw,if=none,id=drive-scsi0,format=raw,cache=none,aio=native,detect-zeroes=on' -device 'scsi-hd,bus=virtioscsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0' -machine "type=pc,accel=kvm"
+> I ran some sanity checks that it wasn't something else looking like
+> an issue in these patches.
+> 
+> All with 5.6 kernel and 5.0.0 rc0 qemu
+> 
+> 1) sve=off but VHE still on. failed.
+> 2) sve=off + VH bit not set. fine but obviously no VHE.
+> (dance with SVE required because of kernel checks for SVE before
+> allowing no VHE kvm).
+> 3) above tests run on mainline qemu just after VHE patches applied
+> (just in case we have a regression from some other change).  No
+> change. 4) EDK2 for the guest.  Synchronous exception. (works fine
+> with no VHE) 0x00..05F9B2208
 
-BTW, I get a segfault if I start above VM without "accel=kvm", 
+This one may be something since fixed in edk2.  I did a fresh build
+of the current tree and it goes away.
 
-gdb --args ./x86_64-softmmu/qemu-system-x86_64 -chardev 'socket,id=qmp,path=/var/run/qemu-server/101.qmp,server,nowait' -mon 'chardev=qmp,mode=control' -pidfile /var/run/qemu-server/101.pid  -m 1024 -object 'iothread,id=iothread-virtioscsi0' -device 'virtio-scsi-pci,id=virtioscsi0,iothread=iothread-virtioscsi0' -drive 'file=/backup/disk3/debian-buster.raw,if=none,id=drive-scsi0,format=raw,cache=none,aio=native,detect-zeroes=on' -device 'scsi-hd,bus=virtioscsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0' -machine "type=pc"
+> 
+> I do get an additional error sometimes such as the ld.so one here.
+> 
+> [   16.539375] Run /sbin/init as init process
+> Inconsistency detected by ld.so: rtld.c: 721: init_tls: Assertion `i
+> == GL(dl_tls_max_dtv_idx)' failed! [   17.780596] Kernel panic - not
+> syncing: Attempted to kill init! exitcode=0x00007f00 [   17.847709]
+> CPU: 0 PID: 1 Comm: init Not tainted 5.6.0 #356 [   17.897260]
+> Hardware name: linux,dummy-virt (DT) [   17.940007] Call trace:
+> [   17.962297]  dump_backtrace+0x0/0x190
+> [   17.993897]  show_stack+0x1c/0x28
+> [   18.022382]  dump_stack+0xb4/0xfc
+> [   18.050781]  panic+0x160/0x35c
+> [   18.077469]  do_exit+0x9a4/0xa08
+> [   18.105510]  do_group_exit+0x48/0xa8
+> [   18.136073]  __arm64_sys_exit_group+0x1c/0x20
+> [   18.173677]  el0_svc_common.constprop.0+0x70/0x168
+> [   18.218659]  do_el0_svc+0x28/0x88
+> [   18.247154]  el0_sync_handler+0x10c/0x180
+> [   18.281379]  el0_sync+0x140/0x180
+> [   18.310684] Kernel Offset: 0x2a67dcc00000 from 0xffff800010000000
+> [   18.362474] PHYS_OFFSET: 0xfffff79400000000
+> [   18.398314] CPU features: 0x40012,20c0a238
+> [   18.433416] Memory Limit: none
+> [   18.463648] ---[ end Kernel panic - not syncing: Attempted to kill
+> init! exitcode=0x00007f00 ]---
 
-after a few seconds:
+Seems I can get away with an initrd, but not a qcow2 based disk image.
 
-Thread 3 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0x7fffe857e700 (LWP 22257)]
-0x000055555587c130 in do_tb_phys_invalidate (tb=tb@entry=0x7fffa7b40500 <code_gen_buffer+3409107>, 
-    rm_from_page_list=rm_from_page_list@entry=true)
-    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1483
-1483	    atomic_set(&tcg_ctx->tb_phys_invalidate_count,
-(gdb) bt
-#0  0x000055555587c130 in do_tb_phys_invalidate
-    (tb=tb@entry=0x7fffa7b40500 <code_gen_buffer+3409107>, rm_from_page_list=rm_from_page_list@entry=true)
-    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1483
-#1  0x000055555587c53b in tb_phys_invalidate__locked (tb=0x7fffa7b40500 <code_gen_buffer+3409107>)
-    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1960
-#2  0x000055555587c53b in tb_invalidate_phys_page_range__locked
-    (pages=pages@entry=0x7fffe780d400, p=0x7fff651066a0, start=start@entry=1072709632, end=end@entry=1072713728, retaddr=retaddr@entry=0) at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1960
-#3  0x000055555587dad1 in tb_invalidate_phys_range (start=1072709632, end=1072771072)
-    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:2036
-#4  0x0000555555801c12 in invalidate_and_set_dirty
-    (mr=<optimized out>, addr=<optimized out>, length=<optimized out>)
-    at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3036
-#5  0x00005555558072df in address_space_unmap
-    (as=<optimized out>, buffer=<optimized out>, len=<optimized out>, is_write=<optimized out>, access_len=65536)
-    at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3571
-#6  0x0000555555967ff6 in dma_memory_unmap
-    (access_len=<optimized out>, dir=<optimized out>, len=<optimized out>, buffer=<optimized out>, as=<optimized out>) at /home/dietmar/pve5-devel/mirror_qemu/include/sysemu/dma.h:145
-#7  0x0000555555967ff6 in dma_blk_unmap (dbs=dbs@entry=0x7fffe7839220) at dma-helpers.c:104
-#8  0x0000555555968394 in dma_complete (ret=0, dbs=0x7fffe7839220) at dma-helpers.c:116
-#9  0x0000555555968394 in dma_blk_cb (opaque=0x7fffe7839220, ret=0) at dma-helpers.c:136
-#10 0x0000555555bac78e in blk_aio_complete (acb=0x7fffe783da00) at block/block-backend.c:1339
-#11 0x0000555555c7280b in coroutine_trampoline (i0=<optimized out>, i1=<optimized out>)
-    at util/coroutine-ucontext.c:115
-#12 0x00007ffff6176b50 in __correctly_grouped_prefixwc
-    (begin=0x7fffa7b40240 <code_gen_buffer+3408403> L"\x3ff0497b", end=0x12 <error: Cannot access memory at address 0x12>, thousands=0 L'\000', grouping=0x7fffa7b40590 <code_gen_buffer+3409251> "\001") at grouping.c:171
-#13 0x0000000000000000 in  ()
+Not that this necessarily helps much with working out what is going
+wrong!
 
+Jonathan
 
-It runs fine without iothreads.
+> 
+> 
+> Jonathan
+> 
+> 
+> > 
+> > r~  
+> 
 
-But I guess this is a totally different problem?
 
 
