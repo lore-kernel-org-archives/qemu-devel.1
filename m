@@ -2,86 +2,66 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 567AAC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5280C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:46:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 208B72078B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:38:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="La4UZQlF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 208B72078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7239D2078B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:46:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7239D2078B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJalf-0008L5-6K
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 06:38:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52923)
+	id 1jJat1-0002AJ-LR
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 06:46:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54825)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jJal0-0007oj-A0
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:38:03 -0400
+ (envelope-from <jonathan.cameron@huawei.com>) id 1jJasD-0001iv-P6
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jJaky-0004cs-Gm
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:38:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44601
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jonathan.cameron@huawei.com>) id 1jJasC-0006w4-Bo
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:45:29 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2095 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jJaky-0004YG-Cz
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:38:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585737479;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=raS5hmhZnXVqq4ElSc8SDvkKufIDVApCf58MPSTo8jE=;
- b=La4UZQlFF5TJg0KE8XTB85ckUMT2J1DScj0Hlqk+4thUQ3hHH4EfGcjX5dJ4gkCR9tLp/M
- 8qMddVX0LiJVf3ymDLjhz8IL7LnQAII50wIrhpDMILJtoawim8eYgu4J9BTHG8Q5GE9Z+W
- g/HzBO1cXGgmyZXiTuzDfnZZNvt8Zcs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-rAy6HmTGOfGVEH04MzCIvQ-1; Wed, 01 Apr 2020 06:37:58 -0400
-X-MC-Unique: rAy6HmTGOfGVEH04MzCIvQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B997F10CE789;
- Wed,  1 Apr 2020 10:37:56 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-172.ams2.redhat.com [10.36.114.172])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A702999DE9;
- Wed,  1 Apr 2020 10:37:49 +0000 (UTC)
-Date: Wed, 1 Apr 2020 12:37:48 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Dietmar Maurer <dietmar@proxmox.com>
-Subject: Re: bdrv_drained_begin deadlock with io-threads
-Message-ID: <20200401103748.GA4680@linux.fritz.box>
-References: <658260883.24.1585644382441@webmail.proxmox.com>
- <20200331125804.GE7030@linux.fritz.box>
- <303038276.59.1585665152860@webmail.proxmox.com>
- <787d7517-bf56-72c7-d197-2313a864e05f@virtuozzo.com>
- <713436887.61.1585668262838@webmail.proxmox.com>
- <20200331153719.GI7030@linux.fritz.box>
- <518198448.62.1585671498399@webmail.proxmox.com>
+ (Exim 4.71) (envelope-from <jonathan.cameron@huawei.com>)
+ id 1jJasC-0006uU-4v
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:45:28 -0400
+Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.106])
+ by Forcepoint Email with ESMTP id 24B4EC3766AF1A7F37CA;
+ Wed,  1 Apr 2020 11:45:24 +0100 (IST)
+Received: from localhost (10.227.96.57) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 1 Apr 2020
+ 11:45:23 +0100
+Date: Wed, 1 Apr 2020 11:45:22 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v7 00/41] target/arm: Implement ARMv8.1-VHE
+Message-ID: <20200401114522.00007335@huawei.com>
+In-Reply-To: <2c29aaa9-0c92-ba48-e218-ab816044eec3@linaro.org>
+References: <20200206105448.4726-1-richard.henderson@linaro.org>
+ <CAFEAcA83vHKOYdxnAG9ouF9OJTGh+3z_RuB1yEc6dCpErZ4pZw@mail.gmail.com>
+ <20200331163324.000020fb@Huawei.com>
+ <2c29aaa9-0c92-ba48-e218-ab816044eec3@linaro.org>
+Organization: Huawei tech. R&D (UK)  Ltd.
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-In-Reply-To: <518198448.62.1585671498399@webmail.proxmox.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.227.96.57]
+X-ClientProxiedBy: lhreml717-chm.china.huawei.com (10.201.108.68) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,97 +73,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, salil.mehta@huawei.com,
+ QEMU Developers <qemu-devel@nongnu.org>, shameerali.kolothum.thodi@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 31.03.2020 um 18:18 hat Dietmar Maurer geschrieben:
-> > > Looks bdrv_parent_drained_poll_single() calls
-> > > blk_root_drained_poll(), which return true in my case (in_flight > 5)=
-.
-> >=20
-> > Can you identify which BlockBackend is this? Specifically if it's the
-> > one attached to a guest device or whether it belongs to the block job.
->=20
-> This can trigger from various different places, but the simplest case is =
-when
-> its called from drive_backup_prepare=20
->=20
-> >   bdrv_drained_begin(bs);
->=20
-> which is the backup source drive.
+On Tue, 31 Mar 2020 11:59:13 -0700
+Richard Henderson <richard.henderson@linaro.org> wrote:
 
-I mean the BlockBackend for which blk_root_drained_poll() is called.
+> On 3/31/20 8:33 AM, Jonathan Cameron wrote:
+> > Just wondering if there are any known issues with this?  
+> 
+> Nope.  It works for me.
+> Can you give us any more details.
+> 
 
-> > Maybe have a look at the job coroutine, too. You can probably easiest
-> > find it in the 'jobs' list, and then print the coroutine backtrace for
-> > job->co.
->=20
-> There is in drive_backup_prepare(), before the job gets created.
+Unfortunately not a lot more to add.
 
-Oh, I see. Then it can't be job BlockBackend, of course.
+I ran some sanity checks that it wasn't something else looking like an issue
+in these patches.
 
-> > > Looks like I am loosing poll events somewhere?
-> >=20
-> > I don't think we've lost any event if in_flight > 0. It means that
-> > something is still supposedly active. Maybe the job deadlocked.
->=20
-> This is a simple call to bdrv_drained_begin(bs) (before we setup the job)=
-.
->=20
-> I really nobody else able to reproduce this (somebody already tried to re=
-produce)?
+All with 5.6 kernel and 5.0.0 rc0 qemu
 
-I can get hangs, but that's for job_completed(), not for starting the
-job. Also, my hangs have a non-empty bs->tracked_requests, so it looks
-like a different case to me.
+1) sve=off but VHE still on. failed.
+2) sve=off + VH bit not set. fine but obviously no VHE.
+(dance with SVE required because of kernel checks for SVE before allowing
+ no VHE kvm).
+3) above tests run on mainline qemu just after VHE patches applied (just in case
+   we have a regression from some other change).  No change.
+4) EDK2 for the guest.  Synchronous exception. (works fine with no VHE)
+0x00..05F9B2208
 
-In my case, the hanging requests looks like this:
+I do get an additional error sometimes such as the ld.so one here.
 
-(gdb) qemu coroutine 0x556e055750e0
-#0  0x0000556e03999150 in qemu_coroutine_switch (from_=3Dfrom_@entry=3D0x55=
-6e055750e0, to_=3Dto_@entry=3D0x7fd34bbeb5b8, action=3Daction@entry=3DCOROU=
-TINE_YIELD) at util/coroutine-ucontext.c:218
-#1  0x0000556e03997e31 in qemu_coroutine_yield () at util/qemu-coroutine.c:=
-193
-#2  0x0000556e0397fc88 in thread_pool_submit_co (pool=3D0x7fd33c003120, fun=
-c=3Dfunc@entry=3D0x556e038d59a0 <handle_aiocb_rw>, arg=3Darg@entry=3D0x7fd2=
-d2b96440) at util/thread-pool.c:289
-#3  0x0000556e038d511d in raw_thread_pool_submit (bs=3Dbs@entry=3D0x556e04e=
-459b0, func=3Dfunc@entry=3D0x556e038d59a0 <handle_aiocb_rw>, arg=3Darg@entr=
-y=3D0x7fd2d2b96440) at block/file-posix.c:1894
-#4  0x0000556e038d58c3 in raw_co_prw (bs=3D0x556e04e459b0, offset=3D2309570=
-56, bytes=3D4096, qiov=3D0x7fd33c006fe0, type=3D1) at block/file-posix.c:19=
-41
+[   16.539375] Run /sbin/init as init process
+Inconsistency detected by ld.so: rtld.c: 721: init_tls: Assertion `i == GL(dl_tls_max_dtv_idx)' failed!
+[   17.780596] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00
+[   17.847709] CPU: 0 PID: 1 Comm: init Not tainted 5.6.0 #356
+[   17.897260] Hardware name: linux,dummy-virt (DT)
+[   17.940007] Call trace:
+[   17.962297]  dump_backtrace+0x0/0x190
+[   17.993897]  show_stack+0x1c/0x28
+[   18.022382]  dump_stack+0xb4/0xfc
+[   18.050781]  panic+0x160/0x35c
+[   18.077469]  do_exit+0x9a4/0xa08
+[   18.105510]  do_group_exit+0x48/0xa8
+[   18.136073]  __arm64_sys_exit_group+0x1c/0x20
+[   18.173677]  el0_svc_common.constprop.0+0x70/0x168
+[   18.218659]  do_el0_svc+0x28/0x88
+[   18.247154]  el0_sync_handler+0x10c/0x180
+[   18.281379]  el0_sync+0x140/0x180
+[   18.310684] Kernel Offset: 0x2a67dcc00000 from 0xffff800010000000
+[   18.362474] PHYS_OFFSET: 0xfffff79400000000
+[   18.398314] CPU features: 0x40012,20c0a238
+[   18.433416] Memory Limit: none
+[   18.463648] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00 ]---
 
-Checking the thread pool request:
 
-(gdb) p *((ThreadPool*)0x7fd33c003120).head .lh_first
-$9 =3D {common =3D {aiocb_info =3D 0x556e03f43f80 <thread_pool_aiocb_info>,=
- bs =3D 0x0, cb =3D 0x556e0397f670 <thread_pool_co_cb>, opaque =3D 0x7fd2d2=
-b96400, refcnt =3D 1}, pool =3D 0x7fd33c003120,
-  func =3D 0x556e038d59a0 <handle_aiocb_rw>, arg =3D 0x7fd2d2b96440, state =
-=3D THREAD_DONE, ret =3D 0, reqs =3D {tqe_next =3D 0x0, tqe_circ =3D {tql_n=
-ext =3D 0x0, tql_prev =3D 0x0}}, all =3D {le_next =3D 0x0,
-    le_prev =3D 0x7fd33c0031d0}}
+Jonathan
 
-So apparently the request is THREAD_DONE, but the coroutine was never
-reentered. I saw one case where ctx.bh_list was empty, but I also have a
-case where a BH sits there scheduled and apparently just doesn't get
-run:
 
-(gdb) p *((ThreadPool*)0x7fd33c003120).ctx.bh_list .slh_first
-$13 =3D {ctx =3D 0x556e04e41a10, cb =3D 0x556e0397f8e0 <thread_pool_complet=
-ion_bh>, opaque =3D 0x7fd33c003120, next =3D {sle_next =3D 0x0}, flags =3D =
-3}
+> 
+> r~
 
-Stefan, I wonder if this is related to the recent changes to the BH
-implementation.
-
-Kevin
 
 
