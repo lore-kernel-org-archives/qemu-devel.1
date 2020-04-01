@@ -2,119 +2,84 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFEEC10F26
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D04C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:12:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 278A4206F8
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:11:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9392D206F8
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:12:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="r42zthdr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278A4206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYhsGRKf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9392D206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJcD3-00018L-BR
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45247)
+	id 1jJcEF-0002Eo-OU
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:12:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45363)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJcCD-0008Gu-FC
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:10:15 -0400
+ (envelope-from <singhalsimran0@gmail.com>) id 1jJcDE-0001Qj-Fe
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJcCB-00085b-38
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:10:12 -0400
-Received: from mail-vi1eur05on2093.outbound.protection.outlook.com
- ([40.107.21.93]:35937 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jJcCA-00083U-9x
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:10:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YxbyD1XgGoLIrH3na4nP3hkdPPhu9H3IU5yVLkl49Ye/ScPqG55Qncdua8DoFRKPdju2edeZkNqEFchNwZBruqLmsKJLS2cbPQO7bzBCEzHoxOF17sOKffdD98eh+i6tQYChRDSLV8xS6c3kp6KuHWf2jdmXZBsfvRztPzocReBVnm6fCSfqF74yb1EJ83O36TEtiI18O9ynDNFJWzkk4jbeZ3WnxW8LpvB7mFsWrD3Pbe2hB28KvoqLxeLx/7pGRz5MGTNd6maIqVk/8v5Cm3SovoDVjdzht/oxBCS7fxObsb/ifUYUAxOhyYkKFyHPEQstmSvT3hplPV2Crc/MoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xq63JKGAiXBfQtkwUhL7EsVPyReT6+D2gDPPB9pb/ew=;
- b=BJaMdxfOvT/QjVjGL0eDneZx1oMiGfiGIdLO4OsplHgPCRHebJmkfZ/OKBNhnMkb7imsbEICaDUZuxawjppGzJO6GmJVhgqlSaJ9Ka6Wbji1UabFQjY2KUgtCskf3MXHS6NwTyX0jb1cTN9sNHOBKvomdrt//n2VJAtJV09OAEwEHrw9Cja8EYWKFw8VFEs6kYvxHQERxhBbYS+dDO0YV3kz7m2TDX1NlilBO1/V3RqP/hJ6JhRm1Ae7wUlP5HzsBVeNKGXlXvT5UFOT+97AMvU2CjwyJqzJA4YxyPUI3DAacF+pHUvnf1qF02saV/jvPcOei4ug19/SNp28ivodKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xq63JKGAiXBfQtkwUhL7EsVPyReT6+D2gDPPB9pb/ew=;
- b=r42zthdrm085XoZv/KUxv0AECy10HzfYhhqLMtnh3q1MUqkZFznZuxwT8X8g6OHAYSoI4jjk00XuN4a/A2iNdPzvNhvGlsqJtcqkNeIKZ0O8AmqNSUuPa1rAOtNd0wHlm4X72Tp2xYR5Uv4Pw+pIOfbFVKi2JKeLzBotYyEaNlQ=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5478.eurprd08.prod.outlook.com (10.141.172.206) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.19; Wed, 1 Apr 2020 12:10:07 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
- 12:10:07 +0000
-Subject: Re: Questionable aspects of QEMU Error's design
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <87o8sblgto.fsf@dusky.pond.sub.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200401151005436
-Message-ID: <e980477d-3951-2a2b-fa38-dee8e1895019@virtuozzo.com>
-Date: Wed, 1 Apr 2020 15:10:05 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <87o8sblgto.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR01CA0034.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:69::47) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <singhalsimran0@gmail.com>) id 1jJcDC-0000YB-0z
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:11:16 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:53744)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <singhalsimran0@gmail.com>)
+ id 1jJcDB-0000Wu-Gm; Wed, 01 Apr 2020 08:11:13 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id l36so2622865pjb.3;
+ Wed, 01 Apr 2020 05:11:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+ :user-agent; bh=FuDRYvHnYYf+dkIWyJIZR4ZnrXq3DkjWg4dJWTRrxfk=;
+ b=cYhsGRKfQVPzEnZ3IuNwocMjEAwpFHSyWzsI9if/3g9LecyGOpEesPoZRYBV+pMOq8
+ SJGgmnoX4T24oSMP34Qp8hSApLhzqnTRdEcqoT2puOhloTsWHSBSDSffVg/FOuQSC2hx
+ rtjR/uA+NLKpcQOYQMynmnLrGFNLPsZTWdEj5QxSikK5q5v4oUCvLgFnNaU9Sad/JXHW
+ hqkQlxrd9as18QkNewmI8zvAOiKMnZcq9K3sMNiwHEq8VCTkNNLfkjtaqtSXV0CM9HMK
+ iIapnhgifJDeAxjvVGJ/xEdOdUNFVFDS4RbKU/78i33+gYX4mU9hITC0CYCL+Qgod8Nh
+ cNXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition:user-agent;
+ bh=FuDRYvHnYYf+dkIWyJIZR4ZnrXq3DkjWg4dJWTRrxfk=;
+ b=VcK8ZJYfnig3JBMUf/PMxopse6DX+yKkgNt/dbjXsW18tYHpzznlm/zkrgidbA5OAX
+ xeRMNOdc536hfTG/AxVhBl5q9tpV/ki4Hy/5RgIakZh7Tydmyr+Fek49R/OopLSYt7p1
+ NUFUCkLmKrSrtHAkErgc5hUWVPv17VAN2gqXgSvC5Lg4xoNA4jitDLsrHuNSl6z2iLLV
+ 6mkNTykay2AeCXYsdEs2GIGqXLqmmcluEXZEb4Nf7Sugu4yw5Vz+6FNa8RgivcgMDnNr
+ k0qV9jrxoqjrc0dBAIJufHQw7jkkIizMpSuAJ3V6KRWsmOZacnkJNhjG7+HqhkeN32ef
+ 8FWg==
+X-Gm-Message-State: ANhLgQ1v2A/EEr3sT5cYWRwPBk7CayHvFhRsN9P1hhR9Q/47nYoKuj6l
+ mExnXkl27Nh2l51sggqYTck=
+X-Google-Smtp-Source: ADFU+vte9SY08DvNk+IWoFROuHwWWinWoDejNLP6G2XVm5TMilIQIuI18EqkuqgXcVBguEa6qpRkDg==
+X-Received: by 2002:a17:902:a411:: with SMTP id
+ p17mr22440205plq.157.1585743071808; 
+ Wed, 01 Apr 2020 05:11:11 -0700 (PDT)
+Received: from simran-Inspiron-5558 ([2409:4052:200f:7af7:f5db:ec54:4b36:5338])
+ by smtp.gmail.com with ESMTPSA id x75sm1494167pfc.161.2020.04.01.05.11.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Apr 2020 05:11:10 -0700 (PDT)
+Date: Wed, 1 Apr 2020 17:41:01 +0530
+From: Simran Singhal <singhalsimran0@gmail.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Subject: [PATCH] Compress lines for immediate return
+Message-ID: <20200401121101.GA26994@simran-Inspiron-5558>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.23) by
- AM0PR01CA0034.eurprd01.prod.exchangelabs.com (2603:10a6:208:69::47) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20 via Frontend
- Transport; Wed, 1 Apr 2020 12:10:06 +0000
-X-Tagtoolbar-Keys: D20200401151005436
-X-Originating-IP: [185.215.60.23]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 99685caa-3ff9-4656-2dcd-08d7d6359df0
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5478:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB547892D509990B38E40A3ACFC1C90@AM7PR08MB5478.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
-X-Forefront-PRVS: 03607C04F0
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(39840400004)(396003)(366004)(136003)(376002)(346002)(316002)(478600001)(66946007)(2906002)(186003)(66556008)(36756003)(6486002)(31686004)(16526019)(52116002)(81166006)(81156014)(5660300002)(26005)(66476007)(16576012)(8676002)(86362001)(8936002)(31696002)(4326008)(2616005)(956004);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: csM8hpa0N8srAp094K8KuZS/pvB4iHP/PC/YIGClo1GRaGIvS1D/wg3WQEqhveQQo6dsysSrx9JXJ9Im6fDPSFfORjhvekVWIrSeX2pwlYU7q/4XzHlqE2is1GB6RYSKXiaqZC1HooEQlQpaPQN/Zdwk1O4lL3bOS+pkTAJPHGDWi0xJzSMhlgAUbl57Dh8NSzGxj0nXNSuM4sJL/mDebno2iRrR9jC70XUbVfbm4FvbMtFZMKfzkiyfX1BcDk5TN+YD3QXAPLVAsb7S5jF83oEWx5Gy9WUGC3r6wCQiAtYnGe6q2dejSQjD9+VDzcO5AFfVJLFpZkStmzCOxxAixGmNsVC2WieBoy99KXlUqD4WxvubelgCS/Qwv7Dfgct1i5d0VFmWJ0kRxC0u289yAxAQtxnojbGg27l1XchJQYPQIybktdl8ifvGzskemAbN
-X-MS-Exchange-AntiSpam-MessageData: t/UX0J5lhNSFkRKuhRPN41ZX6/QsjEyYR0M3SMGTZz/51EucmOqMwNPq8CSOsFyaN+KjOSQgWhQF/GfMCD+ehKuWk9zD6A3wwoD/My2UKKOD8ocgH9Gtd+HB7L7vCZ8MzPgxWiJ1GE4f/oJLmz4Zqg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99685caa-3ff9-4656-2dcd-08d7d6359df0
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 12:10:06.9390 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nnzFNGx/NtBUP+z97zaMr7RoO99Ksu+RUQVUYiOR474PTBETihrbkUd9PrwSPgpOxanv13sHmxvUqvbh9nvezBNcAOGNISwrR65vXXXtPew=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5478
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.21.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,121 +91,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Peter Lieven <pl@kamp.de>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-01.04.2020 12:02, Markus Armbruster wrote:
-> QEMU's Error was patterned after GLib's GError.  Differences include:
-> 
-> * &error_fatal, &error_abort for convenience
-> 
-> * Error can optionally store hints
-> 
-> * Pointlessly different names: error_prepend() vs. g_error_prefix() and
->    so forth *shrug*
-> 
-> * Propagating errors
-> 
->    Thanks to Vladimir, we'll soon have "auto propagation", which is less
->    verbose and less error-prone.
-> 
-> * Accumulating errors
-> 
->    error_propagate() permits it, g_propagate_error() does not[*].
-> 
->    I believe this feature is used rarely.  Perhaps we'd be better off
->    without it.  The problem is identifying its uses.  If I remember
->    correctly, Vladimir struggled with that for his "auto propagation"
->    work.
-> 
->    Perhaps "auto propagation" will reduce the number of manual
->    error_propagate() to the point where we can identify accumulations.
->    Removing the feature would become feasible then.
-> 
-> * Distinguishing different errors
-> 
->    Where Error has ErrorClass, GError has Gquark domain, gint code.  Use
->    of ErrorClass other than ERROR_CLASS_GENERIC_ERROR is strongly
->    discouraged.  When we need callers to distinguish errors, we return
->    suitable error codes separately.
-> 
-> * Return value conventions
-> 
->    Common: non-void functions return a distinct error value on failure
->    when such a value can be defined.  Patterns:
-> 
->    - Functions returning non-null pointers on success return null pointer
->      on failure.
-> 
->    - Functions returning non-negative integers on success return a
->      negative error code on failure.
-> 
->    Different: GLib discourages void functions, because these lead to
->    awkward error checking code.  We have tons of them, and tons of
->    awkward error checking code:
-> 
->      Error *err = NULL;
->      frobnicate(arg, &err);
->      if (err) {
->          ... recover ...
->          error_propagate(errp, err);
->      }
-> 
->    instead of
-> 
->      if (!frobnicate(arg, errp))
->          ... recover ...
->      }
-> 
->    Can also lead to pointless creation of Error objects.
-> 
->    I consider this a design mistake.  Can we still fix it?  We have more
->    than 2000 void functions taking an Error ** parameter...
-> 
->    Transforming code that receives and checks for errors with Coccinelle
->    shouldn't be hard.  Transforming code that returns errors seems more
->    difficult.  We need to transform explicit and implicit return to
->    either return true or return false, depending on what we did to the
->    @errp parameter on the way to the return.  Hmm.
-> 
-> 
-> [*] According to documentation; the code merely calls g_warning() then,
-> in typical GLib fashion.
-> 
+Compress two lines into a single line if immediate return statement is found.
 
+It also remove variables progress, val, data, ret and sock
+as they are no longer needed.
 
-Side question:
+Remove space between function "mixer_load" and '(' to fix the
+checkpatch.pl error:-
+ERROR: space prohibited between function name and open parenthesis '('
 
-Can we somehow implement a possibility to reliably identify file and line number
-where error is set by error message?
+Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
+---
+ block/file-posix.c      | 3 +--
+ block/nfs.c             | 3 +--
+ block/nvme.c            | 4 +---
+ block/vhdx.c            | 3 +--
+ hw/audio/ac97.c         | 4 +---
+ hw/audio/adlib.c        | 5 +----
+ hw/display/cirrus_vga.c | 4 +---
+ migration/ram.c         | 4 +---
+ ui/gtk.c                | 3 +--
+ util/qemu-sockets.c     | 5 +----
+ 10 files changed, 10 insertions(+), 28 deletions(-)
 
-It's where debug of error-bugs always starts: try to imagine which parts of the error
-message are "%s", and how to grep for it in the code, keeping in mind also,
-that error massage may be split into several lines..
-
-Put file:line into each error? Seems too noisy for users.. A lot of errors are not
-bugs: use do something wrong and see the error, and understands what he is doing
-wrong.. It's not usual practice to print file:line into each message for user.
-
-
-But what if we do some kind of mapping file:line <-> error code, so user will see
-something like:
-
-
-    Error 12345: Device drive-scsi0-0-0-0 is not found
-
-....
-
-Hmm, maybe, just add one more argument to error_setg:
-
-error_setg(errp, 12345, "Device %s is not found", device_name);
-
-- it's enough grep-able.
-
-
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 7e19bbff5f..dc01f0d4d3 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1627,8 +1627,7 @@ static int handle_aiocb_write_zeroes_unmap(void *opaque)
+ 
+     /* If we couldn't manage to unmap while guaranteed that the area reads as
+      * all-zero afterwards, just write zeroes without unmapping */
+-    ret = handle_aiocb_write_zeroes(aiocb);
+-    return ret;
++    return handle_aiocb_write_zeroes(aiocb);
+ }
+ 
+ #ifndef HAVE_COPY_FILE_RANGE
+diff --git a/block/nfs.c b/block/nfs.c
+index cc2413d5ab..100f15bd1f 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -623,8 +623,7 @@ static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     bs->total_sectors = ret;
+-    ret = 0;
+-    return ret;
++    return 0;
+ }
+ 
+ static QemuOptsList nfs_create_opts = {
+diff --git a/block/nvme.c b/block/nvme.c
+index 7b7c0cc5d6..eb2f54dd9d 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -575,11 +575,9 @@ static bool nvme_poll_cb(void *opaque)
+ {
+     EventNotifier *e = opaque;
+     BDRVNVMeState *s = container_of(e, BDRVNVMeState, irq_notifier);
+-    bool progress = false;
+ 
+     trace_nvme_poll_cb(s);
+-    progress = nvme_poll_queues(s);
+-    return progress;
++    return nvme_poll_queues(s);
+ }
+ 
+ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 33e57cd656..2c0e7ee44d 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -411,8 +411,7 @@ int vhdx_update_headers(BlockDriverState *bs, BDRVVHDXState *s,
+     if (ret < 0) {
+         return ret;
+     }
+-    ret = vhdx_update_header(bs, s, generate_data_write_guid, log_guid);
+-    return ret;
++    return vhdx_update_header(bs, s, generate_data_write_guid, log_guid);
+ }
+ 
+ /* opens the specified header block from the VHDX file header section */
+diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+index 1ec87feec0..8a9b9924c4 100644
+--- a/hw/audio/ac97.c
++++ b/hw/audio/ac97.c
+@@ -573,11 +573,9 @@ static uint32_t nam_readb (void *opaque, uint32_t addr)
+ static uint32_t nam_readw (void *opaque, uint32_t addr)
+ {
+     AC97LinkState *s = opaque;
+-    uint32_t val = ~0U;
+     uint32_t index = addr;
+     s->cas = 0;
+-    val = mixer_load (s, index);
+-    return val;
++    return mixer_load(s, index);
+ }
+ 
+ static uint32_t nam_readl (void *opaque, uint32_t addr)
+diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
+index d6c1fb0586..7c3b67dcfb 100644
+--- a/hw/audio/adlib.c
++++ b/hw/audio/adlib.c
+@@ -120,13 +120,10 @@ static void adlib_write(void *opaque, uint32_t nport, uint32_t val)
+ static uint32_t adlib_read(void *opaque, uint32_t nport)
+ {
+     AdlibState *s = opaque;
+-    uint8_t data;
+     int a = nport & 3;
+ 
+     adlib_kill_timers (s);
+-    data = OPLRead (s->opl, a);
+-
+-    return data;
++    return OPLRead (s->opl, a);
+ }
+ 
+ static void timer_handler (void *opaque, int c, double interval_Sec)
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index 0d391e1300..1f29731ffe 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -2411,12 +2411,10 @@ static uint64_t cirrus_linear_bitblt_read(void *opaque,
+                                           unsigned size)
+ {
+     CirrusVGAState *s = opaque;
+-    uint32_t ret;
+ 
+     /* XXX handle bitblt */
+     (void)s;
+-    ret = 0xff;
+-    return ret;
++    return 0xff;
+ }
+ 
+ static void cirrus_linear_bitblt_write(void *opaque,
+diff --git a/migration/ram.c b/migration/ram.c
+index 04f13feb2e..06cba88632 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2135,9 +2135,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
+     }
+     trace_ram_postcopy_send_discard_bitmap();
+ 
+-    ret = postcopy_each_ram_send_discard(ms);
+-
+-    return ret;
++    return postcopy_each_ram_send_discard(ms);
+ }
+ 
+ /**
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 030b251c61..83f2f5d49b 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1650,8 +1650,7 @@ static GSList *gd_vc_menu_init(GtkDisplayState *s, VirtualConsole *vc,
+                      G_CALLBACK(gd_menu_switch_vc), s);
+     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), vc->menu_item);
+ 
+-    group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(vc->menu_item));
+-    return group;
++    return gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(vc->menu_item));
+ }
+ 
+ #if defined(CONFIG_VTE)
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index bcc06d0e01..86c48b9fa5 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -765,15 +765,12 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, Error **errp)
+ static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
+ {
+     struct sockaddr_vm svm;
+-    int sock = -1;
+ 
+     if (!vsock_parse_vaddr_to_sockaddr(vaddr, &svm, errp)) {
+         return -1;
+     }
+ 
+-    sock = vsock_connect_addr(&svm, errp);
+-
+-    return sock;
++    return vsock_connect_addr(&svm, errp);
+ }
+ 
+ static int vsock_listen_saddr(VsockSocketAddress *vaddr,
 -- 
-Best regards,
-Vladimir
+2.17.1
+
 
