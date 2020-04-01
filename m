@@ -2,121 +2,80 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9D7C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB56C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7170B2073B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:18:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A14CF2073B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:28:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="r42fvqrd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7170B2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iaAD5aFx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A14CF2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJdGW-0005aq-IS
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 09:18:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36225)
+	id 1jJdQD-0004Ww-O0
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 09:28:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38541)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJdFe-000568-5g
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:17:52 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jJdPM-0003Pm-1W
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:27:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJdFc-0008CP-6p
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:17:50 -0400
-Received: from mail-vi1eur05on20706.outbound.protection.outlook.com
- ([2a01:111:f400:7d00::706]:64800
- helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jJdFU-0007yb-Mr; Wed, 01 Apr 2020 09:17:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b83vK8e+FJULEzdg6dr2YNfo8lQviM/9sYIw5Gs7zmMIK4hVQlyyqchvCR2KDPtLP3lbX//Ux8u/ISws0pfPE7BeHPp9srZ9IOSEnq6oL7TBbxT7AS4YtKr9xV1w7fDaY+kKWrwW3MyvEkJdBHKSHIF23wra1C2pky8YFGR2sF/PqKJRRUHC0YvWLEWK9GGZoOfCV/u76ViLhi1ZEMdBrb+2cRbK8KLCOl+gpPti1ZuJiPgSL+3b5dV/+EgI5w1LLXP9rVlwBK/r8jxLRF7JmoQKgAbjl5QmHVIAWlGpK4K27HMyWWaBVYUncoc+sd8zyAus6E7R5cZmonLEWJhSVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pRQXkfQkKnKs6Lh8rAmoRpt37l125tnUxD7aO+FLXqE=;
- b=huQ6gB5pVEMu2KmlXMgLvuSSkBH5LP6TJugSJ24z7gdAGW1ZS9d+TbEUsF6pgHruQwaoV7TS/flixUXlAVMIaH9k9uBAenLYkuOjWHwhML+Myp5NS5qKAj4zVyDwlnyYg9msAa7ruw8ZqsaOmkP90G3USX5dlZtS82lkWuE4VQE58LNQyO6VAlMeTMmOZAedE75WiyWH5m0Ue3FN0hRotqRswdaRv8rm2n23Z/ae7xECEWyZ71lfdid0aYZldadkR7uNKWPPeJDup4KyhhikRLDU+niXQ6+owPZTt4ttqTYpmpqeNip6TnDaZ8mU6NEkBc/QUKlPvjYaSqafD/rPMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pRQXkfQkKnKs6Lh8rAmoRpt37l125tnUxD7aO+FLXqE=;
- b=r42fvqrdIJOhXZmQGT8HcgENNAth/OlEBxiuNpwndCDelfb71c2Kq6uBDJ0Dh2HrdV8rFjMWLkfKRnVYJmyCWzGqahlTmJn6+tZRbKE61YfYuGoeRvuUSbdUdmN9KfPjtbJvEaZ6sXguP2747ZAuk2t+3xzNW/WEVozf75P9xsU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5527.eurprd08.prod.outlook.com (10.141.175.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.20; Wed, 1 Apr 2020 13:17:37 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
- 13:17:37 +0000
-Subject: Re: [PATCH v15 4/4] iotests: 287: add qcow2 compression type test
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200401101213.24505-1-dplotnikov@virtuozzo.com>
- <20200401101213.24505-5-dplotnikov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200401161735299
-Message-ID: <e77968ec-cba7-1078-d4f6-b91298403906@virtuozzo.com>
-Date: Wed, 1 Apr 2020 16:17:35 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200401101213.24505-5-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR02CA0077.eurprd02.prod.outlook.com
- (2603:10a6:208:154::18) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <dgilbert@redhat.com>) id 1jJdPK-0003po-6n
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:27:51 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27504
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jJdPK-0003pN-33
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:27:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585747669;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ni71YiFDJuPenSfHSGoeA9VeWWMym47rH7T1ZZ2OrWM=;
+ b=iaAD5aFxaIvVI602ROaK9n2J6M/vtBXH+dntGfvD9v8kDrlei9ySgYs62ezdzzVzhU4ye5
+ 2FkYa8AtCkPu0N8pNqR0kFRUYgehKGuzuOfEWh6MQ1fP1PgaRkAoQM2KKzYDvJybyWL9H6
+ ePxazVUrkbuWaV/gCmfftKe9iCalOws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-6NnEcXrrPROj0cLjB2gthg-1; Wed, 01 Apr 2020 09:27:45 -0400
+X-MC-Unique: 6NnEcXrrPROj0cLjB2gthg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F28F813F6;
+ Wed,  1 Apr 2020 13:27:43 +0000 (UTC)
+Received: from work-vm (ovpn-115-201.ams2.redhat.com [10.36.115.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 03EF1DA101;
+ Wed,  1 Apr 2020 13:27:37 +0000 (UTC)
+Date: Wed, 1 Apr 2020 14:27:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Simran Singhal <singhalsimran0@gmail.com>
+Subject: Re: [PATCH] Compress lines for immediate return
+Message-ID: <20200401132735.GC52559@work-vm>
+References: <20200401121101.GA26994@simran-Inspiron-5558>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.23) by
- AM0PR02CA0077.eurprd02.prod.outlook.com (2603:10a6:208:154::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.15 via Frontend
- Transport; Wed, 1 Apr 2020 13:17:36 +0000
-X-Tagtoolbar-Keys: D20200401161735299
-X-Originating-IP: [185.215.60.23]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 441b5e7b-c543-4e52-b547-08d7d63f0c06
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5527:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5527CA748FDEB8D7DD8E1376C1C90@AM7PR08MB5527.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
-X-Forefront-PRVS: 03607C04F0
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(376002)(39840400004)(346002)(396003)(136003)(366004)(16576012)(36756003)(8676002)(6486002)(2906002)(52116002)(4326008)(8936002)(81166006)(81156014)(186003)(86362001)(66946007)(5660300002)(316002)(478600001)(26005)(16526019)(2616005)(31686004)(66556008)(66476007)(956004)(31696002)(2004002)(21314003);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mUpmU7xDOmeFCB5Bc13J/2OCUHEK+nMGCLuS+fo0qPmJ0B+oRHXYk0hi2l0pc7EuKVT7zS+PwRU1URK4scare3ZIU4sThYjr58mWvtSzkV9lmkfpyC5062aNHsd1qD8vR3yH+mLUop3E0FqVWoK6BUA7h/Lixf5eoVRtYF+QtLZsRrRGCcMglL3eTRlpelJG633Vt2YzOKap57PapRVAXUiB3sCvYbmUoxkbc7froZH2U2R39ApIkt5gdCKqKU+oEB6RiQmiLq/wDL+L5yEwDqmN4kE8WQAJovSWN22HYmPnGHoVBE+ygPgB2okNDAzeXr+inUVeVymMMqE2SfpQBpY4PSnPte3Kdcfm+ZJywnZxbNHYMwtD3AdUuRhXNgA6GR64fC43QjzC53ZTMxcqBCrVHZYOZOZEpyAcQ2zSL1EXeY70N051vG2fg5N+4PIa1MCrdrJzG57WNUDh0TbOn59NbZ5a2XwA9aToCG4CRrZjMkWTvzBk3QoUbxhl+zAqnRYMVkNkr9OsPnhdwYjX5j5HxXzt4IP3dYfx2EVL6lXVOn74sWvY/L7k33gvuEjSpMxllG/c3Kk8AZv2b1ShOw==
-X-MS-Exchange-AntiSpam-MessageData: cbsUxCqERyM3sN4tvma5pZmUG2gQZd5uX3Gc/CJXZ3AG14tn+PA+BGjyLnPONS47bxM8orih2D2iNjheF2B8KBfT9GKIUcWXZLGDF+/A7qmSjofjrQ/ybjHK3tuzlxbmU9PG8G2EiscQKvjWS7+GRA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 441b5e7b-c543-4e52-b547-08d7d63f0c06
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 13:17:37.0817 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oOyiWdQiMeNutv0QiOPAfbQ+dopnendVWuHFWVKYR6KVtU0nasgtqzs107/+qMRSphYOZyMrodKqHFEFjbM2gEgi5/8NxbZHpRVmFSjjPeE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5527
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:111:f400:7d00::706
+In-Reply-To: <20200401121101.GA26994@simran-Inspiron-5558>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,301 +87,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ Jeff Cody <codyprime@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-01.04.2020 13:12, Denis Plotnikov wrote:
-> The test checks fulfilling qcow2 requiriements for the compression
-> type feature and zstd compression type operability.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+* Simran Singhal (singhalsimran0@gmail.com) wrote:
+> Compress two lines into a single line if immediate return statement is fo=
+und.
+>=20
+> It also remove variables progress, val, data, ret and sock
+> as they are no longer needed.
+>=20
+> Remove space between function "mixer_load" and '(' to fix the
+> checkpatch.pl error:-
+> ERROR: space prohibited between function name and open parenthesis '('
+>=20
+> Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
 > ---
->   tests/qemu-iotests/287     | 159 +++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/287.out |  70 ++++++++++++++++
->   tests/qemu-iotests/group   |   1 +
->   3 files changed, 230 insertions(+)
->   create mode 100755 tests/qemu-iotests/287
->   create mode 100644 tests/qemu-iotests/287.out
-> 
-> diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
-> new file mode 100755
-> index 0000000000..9925a2a14f
-> --- /dev/null
-> +++ b/tests/qemu-iotests/287
-> @@ -0,0 +1,159 @@
-> +#!/usr/bin/env bash
-> +#
-> +# Test case for an image using zstd compression
-> +#
-> +# Copyright (c) 2020 Virtuozzo International GmbH
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +# creator
-> +owner=dplotnikov@virtuozzo.com
-> +
-> +seq="$(basename $0)"
-> +echo "QA output created by $seq"
-> +
-> +status=1	# failure is the default!
-> +
-> +_cleanup()
-> +{
-> +	_cleanup_test_img
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +# standard environment
-> +. ./common.rc
-> +. ./common.filter
-> +
-> +# This tests qocw2-specific low-level functionality
-> +_supported_fmt qcow2
-> +_supported_proto file
-> +_supported_os Linux
-> +
-> +# for all the cases
-> +CLUSTER_SIZE=65536
-> +
-> +# Check if we can run this test.
-> +if IMGOPTS='compression_type=zstd' _make_test_img 64M |
-> +    grep "Invalid parameter 'zstd'"; then
-> +    _notrun "ZSTD is disabled"
-> +fi
-> +
-> +# Test: when compression is zlib the incompatible bit is unset
-> +echo
-> +echo "=== Testing compression type incompatible bit setting for zlib ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zlib' _make_test_img 64M
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +
-> +# Test: when compression differs from zlib the incompatible bit is set
-> +echo
-> +echo "=== Testing compression type incompatible bit setting for zstd ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +
-> +# Test: an image can't be opened if compression type is zlib and
-> +#       incompatible feature compression type is set
-> +echo
-> +echo "=== Testing zlib with incompatible bit set ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zlib' _make_test_img 64M
-> +$PYTHON qcow2.py "$TEST_IMG" set-feature-bit incompatible 3
-> +# to make sure the bit was actually set
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
-> +if (($?==0)); then
-> +    echo "Error: The image opened successfully. The image must not be opened"
-> +fi
-> +
-> +# Test: an image can't be opened if compression type is NOT zlib and
-> +#       incompatible feature compression type is UNSET
-> +echo
-> +echo "=== Testing zstd with incompatible bit unset ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +$PYTHON qcow2.py "$TEST_IMG" set-header incompatible_features 0
-> +# to make sure the bit was actually unset
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
-> +if (($?==0)); then
-> +    echo "Error: The image opened successfully. The image must not be opened"
-> +fi
-> +# Test: check compression type values
-> +echo
-> +echo "=== Testing compression type values ==="
-> +echo
-> +# zlib=0
-> +IMGOPTS='compression_type=zlib' _make_test_img 64M
-> +od -j104 -N1 -An -vtu1 "$TEST_IMG"
-> +
-> +# zstd=1
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +od -j104 -N1 -An -vtu1 "$TEST_IMG"
-> +
-> +# Test: using zstd compression, write to and read from an image
-> +echo
-> +echo "=== Testing simple reading and writing with zstd ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "read -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-> +# read on the cluster boundaries
-> +$QEMU_IO -c "read -v 131070 8 " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "read -v 65534 8" "$TEST_IMG" | _filter_qemu_io
-> +
-> +# Test: using zstd compression, write and verify three adjacent
-> +#       compressed clusters
-> +echo
-> +echo "=== Testing adjacent clusters reading and writing with zstd ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +$QEMU_IO -c "write -c -P 0xAB 0 64k " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
+>  block/file-posix.c      | 3 +--
+>  block/nfs.c             | 3 +--
+>  block/nvme.c            | 4 +---
+>  block/vhdx.c            | 3 +--
+>  hw/audio/ac97.c         | 4 +---
+>  hw/audio/adlib.c        | 5 +----
+>  hw/display/cirrus_vga.c | 4 +---
+>  migration/ram.c         | 4 +---
+>  ui/gtk.c                | 3 +--
+>  util/qemu-sockets.c     | 5 +----
+>  10 files changed, 10 insertions(+), 28 deletions(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 7e19bbff5f..dc01f0d4d3 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1627,8 +1627,7 @@ static int handle_aiocb_write_zeroes_unmap(void *op=
+aque)
+> =20
+>      /* If we couldn't manage to unmap while guaranteed that the area rea=
+ds as
+>       * all-zero afterwards, just write zeroes without unmapping */
+> -    ret =3D handle_aiocb_write_zeroes(aiocb);
+> -    return ret;
+> +    return handle_aiocb_write_zeroes(aiocb);
+>  }
+> =20
+>  #ifndef HAVE_COPY_FILE_RANGE
+> diff --git a/block/nfs.c b/block/nfs.c
+> index cc2413d5ab..100f15bd1f 100644
+> --- a/block/nfs.c
+> +++ b/block/nfs.c
+> @@ -623,8 +623,7 @@ static int nfs_file_open(BlockDriverState *bs, QDict =
+*options, int flags,
+>      }
+> =20
+>      bs->total_sectors =3D ret;
+> -    ret =3D 0;
+> -    return ret;
+> +    return 0;
+>  }
+> =20
+>  static QemuOptsList nfs_create_opts =3D {
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 7b7c0cc5d6..eb2f54dd9d 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -575,11 +575,9 @@ static bool nvme_poll_cb(void *opaque)
+>  {
+>      EventNotifier *e =3D opaque;
+>      BDRVNVMeState *s =3D container_of(e, BDRVNVMeState, irq_notifier);
+> -    bool progress =3D false;
+> =20
+>      trace_nvme_poll_cb(s);
+> -    progress =3D nvme_poll_queues(s);
+> -    return progress;
+> +    return nvme_poll_queues(s);
+>  }
+> =20
+>  static int nvme_init(BlockDriverState *bs, const char *device, int names=
+pace,
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 33e57cd656..2c0e7ee44d 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -411,8 +411,7 @@ int vhdx_update_headers(BlockDriverState *bs, BDRVVHD=
+XState *s,
+>      if (ret < 0) {
+>          return ret;
+>      }
+> -    ret =3D vhdx_update_header(bs, s, generate_data_write_guid, log_guid=
+);
+> -    return ret;
+> +    return vhdx_update_header(bs, s, generate_data_write_guid, log_guid)=
+;
+>  }
+> =20
+>  /* opens the specified header block from the VHDX file header section */
+> diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+> index 1ec87feec0..8a9b9924c4 100644
+> --- a/hw/audio/ac97.c
+> +++ b/hw/audio/ac97.c
+> @@ -573,11 +573,9 @@ static uint32_t nam_readb (void *opaque, uint32_t ad=
+dr)
+>  static uint32_t nam_readw (void *opaque, uint32_t addr)
+>  {
+>      AC97LinkState *s =3D opaque;
+> -    uint32_t val =3D ~0U;
+>      uint32_t index =3D addr;
+>      s->cas =3D 0;
+> -    val =3D mixer_load (s, index);
+> -    return val;
+> +    return mixer_load(s, index);
+>  }
+> =20
+>  static uint32_t nam_readl (void *opaque, uint32_t addr)
+> diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
+> index d6c1fb0586..7c3b67dcfb 100644
+> --- a/hw/audio/adlib.c
+> +++ b/hw/audio/adlib.c
+> @@ -120,13 +120,10 @@ static void adlib_write(void *opaque, uint32_t npor=
+t, uint32_t val)
+>  static uint32_t adlib_read(void *opaque, uint32_t nport)
+>  {
+>      AdlibState *s =3D opaque;
+> -    uint8_t data;
+>      int a =3D nport & 3;
+> =20
+>      adlib_kill_timers (s);
+> -    data =3D OPLRead (s->opl, a);
+> -
+> -    return data;
+> +    return OPLRead (s->opl, a);
+>  }
+> =20
+>  static void timer_handler (void *opaque, int c, double interval_Sec)
+> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> index 0d391e1300..1f29731ffe 100644
+> --- a/hw/display/cirrus_vga.c
+> +++ b/hw/display/cirrus_vga.c
+> @@ -2411,12 +2411,10 @@ static uint64_t cirrus_linear_bitblt_read(void *o=
+paque,
+>                                            unsigned size)
+>  {
+>      CirrusVGAState *s =3D opaque;
+> -    uint32_t ret;
+> =20
+>      /* XXX handle bitblt */
+>      (void)s;
+> -    ret =3D 0xff;
+> -    return ret;
+> +    return 0xff;
+>  }
+> =20
+>  static void cirrus_linear_bitblt_write(void *opaque,
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 04f13feb2e..06cba88632 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2135,9 +2135,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
+ *ms)
+>      }
+>      trace_ram_postcopy_send_discard_bitmap();
+> =20
+> -    ret =3D postcopy_each_ram_send_discard(ms);
+> -
+> -    return ret;
+> +    return postcopy_each_ram_send_discard(ms);
+>  }
+> =20
 
-you may use "64k" notation both for offset and length
+For migration
 
-> +$QEMU_IO -c "write -c -P 0xAD 131072 64k " "$TEST_IMG" | _filter_qemu_io
-> +
-> +$QEMU_IO -c "read -P 0xAB 0 64k " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "read -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "read -P 0xAD 131072 64k " "$TEST_IMG" | _filter_qemu_io
-> +
-> +# Test: create an image, write 1M likely uncompressible data from urandom,
-> +#       write 1M of compressible data, convert the image with zstd
-> +#       and compare these two images - their data should be identical
-> +echo
-> +echo "=== Testing incompressible cluster processing with zstd ==="
-> +echo
-> +
-> +RAND_FILE="./287_rand_data"
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-you should use something like "$TEST_DIR/rand_data"
+(If you rework this patch for another reason you could move the 'int ret' d=
+own into the
+loop as int ret =3D ....   but it's not important)
 
 
-> +dd if=/dev/urandom of=$RAND_FILE bs=1M count=1
 
-of="$RAND_FILE"
+>  /**
+> diff --git a/ui/gtk.c b/ui/gtk.c
+> index 030b251c61..83f2f5d49b 100644
+> --- a/ui/gtk.c
+> +++ b/ui/gtk.c
+> @@ -1650,8 +1650,7 @@ static GSList *gd_vc_menu_init(GtkDisplayState *s, =
+VirtualConsole *vc,
+>                       G_CALLBACK(gd_menu_switch_vc), s);
+>      gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), vc->menu_item);
+> =20
+> -    group =3D gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(vc->menu=
+_item));
+> -    return group;
+> +    return gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(vc->menu_it=
+em));
+>  }
+> =20
+>  #if defined(CONFIG_VTE)
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index bcc06d0e01..86c48b9fa5 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -765,15 +765,12 @@ static int vsock_connect_addr(const struct sockaddr=
+_vm *svm, Error **errp)
+>  static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
+>  {
+>      struct sockaddr_vm svm;
+> -    int sock =3D -1;
+> =20
+>      if (!vsock_parse_vaddr_to_sockaddr(vaddr, &svm, errp)) {
+>          return -1;
+>      }
+> =20
+> -    sock =3D vsock_connect_addr(&svm, errp);
+> -
+> -    return sock;
+> +    return vsock_connect_addr(&svm, errp);
+>  }
+> =20
+>  static int vsock_listen_saddr(VsockSocketAddress *vaddr,
+> --=20
+> 2.17.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-> +
-> +IMGOPTS='' _make_test_img 64M
-
-You don't need to clean IMGOPTS, it was not changed globally when you pass
-it to previous commands.
-
-> +# fill the image with likely incompressible and compressible clusters
-> +$QEMU_IO -c "write -c -s $RAND_FILE 0 1M " "$TEST_IMG" | _filter_qemu_io
-
-Hmm, I'm afraid -s is broken if RAND_FILE contains spaces. Should be fixed separately somehow.
-
-> +$QEMU_IO -c "write -c -P 0xFA 1M 1M " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IMG convert -O $IMGFMT -c -o compression_type=zstd \
-> +                  "$TEST_IMG" "$TEST_IMG".orig
-
-Strange that target is called "$TEST_IMG".orig... Could we call it "$TEST_IMG".compressed ?
-
-> +$QEMU_IMG compare "$TEST_IMG" "$TEST_IMG".orig
-> +
-> +rm -f $RAND_FILE
-> +# success, all done
-> +echo "*** done"
-> +rm -f $seq.full
-> +status=0
-> diff --git a/tests/qemu-iotests/287.out b/tests/qemu-iotests/287.out
-> new file mode 100644
-> index 0000000000..3f47528b20
-> --- /dev/null
-> +++ b/tests/qemu-iotests/287.out
-> @@ -0,0 +1,70 @@
-> +QA output created by 287
-> +
-> +=== Testing compression type incompatible bit setting for zlib ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +incompatible_features     []
-> +
-> +=== Testing compression type incompatible bit setting for zstd ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +incompatible_features     [3]
-> +
-> +=== Testing zlib with incompatible bit set  ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +incompatible_features     [3]
-> +
-> +=== Testing zstd with incompatible bit unset  ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +incompatible_features     []
-> +
-> +=== Testing compression type values  ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +   0
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +   1
-> +
-> +=== Testing simple reading and writing with zstd ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +wrote 65536/65536 bytes at offset 65536
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 65536
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +0001fffe:  ac ac 00 00 00 00 00 00  ........
-> +read 8/8 bytes at offset 131070
-> +8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +0000fffe:  00 00 ac ac ac ac ac ac  ........
-> +read 8/8 bytes at offset 65534
-> +8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +=== Testing adjacent clusters reading and writing with zstd ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +wrote 65536/65536 bytes at offset 0
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 65536/65536 bytes at offset 65536
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 65536/65536 bytes at offset 131072
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 0
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 65536
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 131072
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +=== Testing incompressible cluster processing with zstd ===
-> +
-> +1+0 records in
-> +1+0 records out
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +wrote 1048576/1048576 bytes at offset 0
-> +1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 1048576/1048576 bytes at offset 1048576
-> +1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Images are identical.
-> +*** done
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 79c6dfc85d..dacbcfc12d 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -294,5 +294,6 @@
->   283 auto quick
->   284 rw
->   286 rw quick
-> +287 auto quick
->   288 quick
->   289 rw quick
-> 
-
-
--- 
-Best regards,
-Vladimir
 
