@@ -2,86 +2,64 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B256C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64807C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:05:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E6420658
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:53:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E889oOdw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E6420658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3BDD02071A
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:05:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BDD02071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJffn-0000By-Ch
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 11:52:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53204)
+	id 1jJfrr-0006pa-4o
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:05:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55429)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jJfce-0004Ys-KW
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:49:45 -0400
+ (envelope-from <dietmar@proxmox.com>) id 1jJfmq-00037r-U6
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:00:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jJfcd-0000u2-Cq
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:49:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48231
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dietmar@proxmox.com>) id 1jJfmp-00067M-Cf
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:00:16 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:25575)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jJfcd-0000tI-9n
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:49:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585756182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qcn08/UCasPsw7c1jdL5vTQfG4C4ssttNKKNQl0T8Bc=;
- b=E889oOdwDw0Aao9S70OYwnmuLCrnuajvQ+090zrthbbQA0+vmIo+VwH1iSWbth5RIgX2To
- IT5bMIT9keWbqfNeLqXaSejbiOS7hmSKOhHpvSbAGGdPxk5rvaCSQl3Xfx7xcgOw+FKSOb
- 9xlvghGxX39aoJK5cT6OZj+iKQKKr2w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-PQ3qX5VRMgePJ4EMkxM_0A-1; Wed, 01 Apr 2020 11:49:40 -0400
-X-MC-Unique: PQ3qX5VRMgePJ4EMkxM_0A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90EAC18C8C03;
- Wed,  1 Apr 2020 15:49:39 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F0BE96F83;
- Wed,  1 Apr 2020 15:49:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D401411385E2; Wed,  1 Apr 2020 17:49:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: Questionable aspects of QEMU Error's design
-References: <87o8sblgto.fsf@dusky.pond.sub.org>
- <e980477d-3951-2a2b-fa38-dee8e1895019@virtuozzo.com>
- <87v9mje24d.fsf@linaro.org>
-Date: Wed, 01 Apr 2020 17:49:37 +0200
-In-Reply-To: <87v9mje24d.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
- message of "Wed, 01 Apr 2020 15:01:38 +0100")
-Message-ID: <87wo6zcijy.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <dietmar@proxmox.com>)
+ id 1jJfml-0005cx-UG; Wed, 01 Apr 2020 12:00:12 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 54A3A4277B;
+ Wed,  1 Apr 2020 17:59:59 +0200 (CEST)
+Date: Wed, 1 Apr 2020 17:50:30 +0200 (CEST)
+From: Dietmar Maurer <dietmar@proxmox.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <1854680630.1.1585756230142@webmail.proxmox.com>
+In-Reply-To: <997901084.0.1585755465486@webmail.proxmox.com>
+References: <658260883.24.1585644382441@webmail.proxmox.com>
+ <20200331125804.GE7030@linux.fritz.box>
+ <303038276.59.1585665152860@webmail.proxmox.com>
+ <787d7517-bf56-72c7-d197-2313a864e05f@virtuozzo.com>
+ <713436887.61.1585668262838@webmail.proxmox.com>
+ <20200331153719.GI7030@linux.fritz.box>
+ <518198448.62.1585671498399@webmail.proxmox.com>
+ <20200401103748.GA4680@linux.fritz.box>
+ <997901084.0.1585755465486@webmail.proxmox.com>
+Subject: Re: bdrv_drained_begin deadlock with io-threads
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Mailer: Open-Xchange Mailer v7.10.2-Rev23
+X-Originating-Client: open-xchange-appsuite
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.186.127.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,39 +71,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Dietmar Maurer <dietmar@proxmox.com>
 Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+ qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->
->> Side question:
->>
->> Can we somehow implement a possibility to reliably identify file and lin=
-e number
->> where error is set by error message?
->>
->> It's where debug of error-bugs always starts: try to imagine which parts=
- of the error
->> message are "%s", and how to grep for it in the code, keeping in mind al=
-so,
->> that error massage may be split into several lines..
->>
->> Put file:line into each error? Seems too noisy for users.. A lot of erro=
-rs are not
->> bugs: use do something wrong and see the error, and understands what he =
-is doing
->> wrong.. It's not usual practice to print file:line into each message
->> for user.
->
-> I tend to use __func__ for these things as the result is usually easily
-> grep-able.
+> On April 1, 2020 5:37 PM Dietmar Maurer <dietmar@proxmox.com> wrote:
+> 
+>  
+> > > I really nobody else able to reproduce this (somebody already tried to reproduce)?
+> > 
+> > I can get hangs, but that's for job_completed(), not for starting the
+> > job. Also, my hangs have a non-empty bs->tracked_requests, so it looks
+> > like a different case to me.
+> 
+> Please can you post the command line args of your VM? I use something like
+> 
+> ./x86_64-softmmu/qemu-system-x86_64 -chardev 'socket,id=qmp,path=/var/run/qemu-server/101.qmp,server,nowait' -mon 'chardev=qmp,mode=control' -pidfile /var/run/qemu-server/101.pid  -m 1024 -object 'iothread,id=iothread-virtioscsi0' -device 'virtio-scsi-pci,id=virtioscsi0,iothread=iothread-virtioscsi0' -drive 'file=/backup/disk3/debian-buster.raw,if=none,id=drive-scsi0,format=raw,cache=none,aio=native,detect-zeroes=on' -device 'scsi-hd,bus=virtioscsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0' -machine "type=pc,accel=kvm"
 
-Putting __func__ in error messages makes them both greppable and ugly.
+BTW, I get a segfault if I start above VM without "accel=kvm", 
+
+gdb --args ./x86_64-softmmu/qemu-system-x86_64 -chardev 'socket,id=qmp,path=/var/run/qemu-server/101.qmp,server,nowait' -mon 'chardev=qmp,mode=control' -pidfile /var/run/qemu-server/101.pid  -m 1024 -object 'iothread,id=iothread-virtioscsi0' -device 'virtio-scsi-pci,id=virtioscsi0,iothread=iothread-virtioscsi0' -drive 'file=/backup/disk3/debian-buster.raw,if=none,id=drive-scsi0,format=raw,cache=none,aio=native,detect-zeroes=on' -device 'scsi-hd,bus=virtioscsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0' -machine "type=pc"
+
+after a few seconds:
+
+Thread 3 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fffe857e700 (LWP 22257)]
+0x000055555587c130 in do_tb_phys_invalidate (tb=tb@entry=0x7fffa7b40500 <code_gen_buffer+3409107>, 
+    rm_from_page_list=rm_from_page_list@entry=true)
+    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1483
+1483	    atomic_set(&tcg_ctx->tb_phys_invalidate_count,
+(gdb) bt
+#0  0x000055555587c130 in do_tb_phys_invalidate
+    (tb=tb@entry=0x7fffa7b40500 <code_gen_buffer+3409107>, rm_from_page_list=rm_from_page_list@entry=true)
+    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1483
+#1  0x000055555587c53b in tb_phys_invalidate__locked (tb=0x7fffa7b40500 <code_gen_buffer+3409107>)
+    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1960
+#2  0x000055555587c53b in tb_invalidate_phys_page_range__locked
+    (pages=pages@entry=0x7fffe780d400, p=0x7fff651066a0, start=start@entry=1072709632, end=end@entry=1072713728, retaddr=retaddr@entry=0) at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:1960
+#3  0x000055555587dad1 in tb_invalidate_phys_range (start=1072709632, end=1072771072)
+    at /home/dietmar/pve5-devel/mirror_qemu/accel/tcg/translate-all.c:2036
+#4  0x0000555555801c12 in invalidate_and_set_dirty
+    (mr=<optimized out>, addr=<optimized out>, length=<optimized out>)
+    at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3036
+#5  0x00005555558072df in address_space_unmap
+    (as=<optimized out>, buffer=<optimized out>, len=<optimized out>, is_write=<optimized out>, access_len=65536)
+    at /home/dietmar/pve5-devel/mirror_qemu/exec.c:3571
+#6  0x0000555555967ff6 in dma_memory_unmap
+    (access_len=<optimized out>, dir=<optimized out>, len=<optimized out>, buffer=<optimized out>, as=<optimized out>) at /home/dietmar/pve5-devel/mirror_qemu/include/sysemu/dma.h:145
+#7  0x0000555555967ff6 in dma_blk_unmap (dbs=dbs@entry=0x7fffe7839220) at dma-helpers.c:104
+#8  0x0000555555968394 in dma_complete (ret=0, dbs=0x7fffe7839220) at dma-helpers.c:116
+#9  0x0000555555968394 in dma_blk_cb (opaque=0x7fffe7839220, ret=0) at dma-helpers.c:136
+#10 0x0000555555bac78e in blk_aio_complete (acb=0x7fffe783da00) at block/block-backend.c:1339
+#11 0x0000555555c7280b in coroutine_trampoline (i0=<optimized out>, i1=<optimized out>)
+    at util/coroutine-ucontext.c:115
+#12 0x00007ffff6176b50 in __correctly_grouped_prefixwc
+    (begin=0x7fffa7b40240 <code_gen_buffer+3408403> L"\x3ff0497b", end=0x12 <error: Cannot access memory at address 0x12>, thousands=0 L'\000', grouping=0x7fffa7b40590 <code_gen_buffer+3409251> "\001") at grouping.c:171
+#13 0x0000000000000000 in  ()
+
+
+It runs fine without iothreads.
+
+But I guess this is a totally different problem?
 
 
