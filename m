@@ -2,88 +2,74 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4798DC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E76C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:14:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C29E20776
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:10:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gb7M43yq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C29E20776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4D3AA20719
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:14:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D3AA20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJf0g-0000DU-4O
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 11:10:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40236)
+	id 1jJf3D-0002i8-5w
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 11:13:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40626)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jJf03-000890-EI
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:09:52 -0400
+ (envelope-from <bounces@canonical.com>) id 1jJf1e-0001BP-S6
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:11:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1jJf01-0000nU-Py
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:09:51 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:44375)
+ (envelope-from <bounces@canonical.com>) id 1jJf1c-000208-RT
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:11:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33526)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jJf01-0000lt-JK
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:09:49 -0400
-Received: by mail-wr1-x431.google.com with SMTP id m17so420411wrw.11
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 08:09:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=cLluM/9K0G98s84ODKjhGtGlfBsm5BDtxcKk/LW00l4=;
- b=gb7M43yqdId3PMG1kzP3ikMw03Z0fwjyhRRDEr244pD05wry7LPcSnRH9XTSyY+lcO
- R8Re1mVaNifeknXQFYDg7IFYMj5QuCCQBda1UQXsiRAhmVpwC0CnBvJn2FuZx16fivF/
- jTOtJ5CTtcW3nRMHuRhWOVYyJSgBEKwmXRl8eDcZKQRkNbQy9Z8qcdEL1pm8Qvd0p93q
- K3tCpOIpExzwDKmxqpyq9bsVRVo4DXfjryF6ls0vXkJV1421qnq2eIUj8DHYdonqGdHw
- fgMXNNQrWjymg8gogQhogwbAjxgO6lBkirqQjDFoZu1UH7EQkPNL0xpnTEQL4u0qC4eW
- iZiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=cLluM/9K0G98s84ODKjhGtGlfBsm5BDtxcKk/LW00l4=;
- b=bxInOelywgu4whIyVDp2gzl8+8cRqtesnX2jmiMAQSSFvHWDxCdq/omoynvliyV3ZE
- bEsa2zxIgqKcZTIPUU/cxKQh4M4AeMSjnrk2LaxlCgYh/WUi1lLQFeqzHtqPyIh+a+RM
- ymdKYzyV/iDiObCXG5N6IXKhjRCRT4ZsGSfXD8ZUWRMJjFMK/qeMyWEMhz86CkhryDYf
- PtiNpf0OnNs4aAbhJhuECNlsN4h/a7q85QpNVSL6ZYOJodtKhQxBPawlWFfF1dtsXRHh
- PPT+LCi0NvpXEaX5ckI4Ewp5VETekJP2/CDTvC2PFn0LkLzadm2L/0YziBFFXvLrrW8e
- 0RvA==
-X-Gm-Message-State: AGi0PuYsmk9y2O3oRaoDkFe22J8KjK0V4bxdI3NklehS4gyWsyGgomvI
- jfbdmkSH9w0w8DjU3jTk9rw=
-X-Google-Smtp-Source: APiQypIfQyYv2stS+tB+RUdvacqdhzDV3x/nOisNm1hdPIfm3c+XwvJmzlN3MPgnB61jHJ3Oz3mPUQ==
-X-Received: by 2002:a5d:4cc7:: with SMTP id c7mr5344596wrt.375.1585753787836; 
- Wed, 01 Apr 2020 08:09:47 -0700 (PDT)
-Received: from localhost (114.9.90.146.dyn.plus.net. [146.90.9.114])
- by smtp.gmail.com with ESMTPSA id v186sm2994121wme.24.2020.04.01.08.09.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Apr 2020 08:09:46 -0700 (PDT)
-Date: Wed, 1 Apr 2020 16:09:44 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: Question about scsi device hotplug (e.g scsi-hd)
-Message-ID: <20200401150944.GA4500@stefanha-x1.localdomain>
-References: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jJf1c-0001yf-I9
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:11:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jJf1a-0005Hi-OO
+ for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 15:11:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B4AD12E8104
+ for <qemu-devel@nongnu.org>; Wed,  1 Apr 2020 15:11:26 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
-Content-Disposition: inline
-In-Reply-To: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::431
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Apr 2020 14:56:31 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: kvm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andrew-randrianasulu
+X-Launchpad-Bug-Reporter: Andrew Randrianasulu (andrew-randrianasulu)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <157065019192.22617.14242881910317034171.malonedeb@gac.canonical.com>
+Message-Id: <158575299191.22570.9229707993178597782.launchpad@wampee.canonical.com>
+Subject: [Bug 1847525] Re: qemu-system-i386 eats a lot of cpu after just few
+ hours, with sdl, gl=on
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1fc4c43629794be8342477c498bf714839d9ae07
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,74 +78,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1847525 <1847525@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+** Tags added: tcg
 
---0F1p//8PRICkK4MW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Tags removed: tcg
+** Tags added: kvm
 
-On Tue, Mar 31, 2020 at 07:16:23PM +0300, Maxim Levitsky wrote:
-> Hi!
->=20
-> I recently investigated an interesting issue related to repeated scsi-hd =
-hotplug/hotunplug.
-> The bugzilla for it is here:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1812399
->=20
-> In nutshell the issue that I think that I found and I would like to ask y=
-our opinion on it,
-> since I don't have enough experience to be 100% sure that I didn't miss s=
-omething  is this:
->=20
-> When a new device is hotplugged via monitor, the qdev_device_add first pu=
-ts the device on
-> the bus where the user requested it to be, and then calls the device's .r=
-ealize.
->=20
-> However for scsi bus, each time a new request is sent from the guest, the=
- scsi adapter drivers
-> (e.g virtio-scsi) call scsi_device_find to find the LUN's driver to dispa=
-tch the request to,
-> and scsi_device_find will return the added device as soon as it is placed=
- on the bus.
->=20
-> Thus between the point when the new device is placed on the bus and until=
- the end of the .realize,
-> the device can be accessed by the guest when it is not yet realized or pa=
-rtially realized as
-> happens in the bugreport.
->=20
-> What do you think about it?
+-- =
 
-Maybe aio_disable_external() is needed to postpone device emulation
-until after realize has finished?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1847525
 
-Virtqueue kick ioeventfds are marked "external" and won't be processed
-while external events are disabled.  See also
-virtio_queue_aio_set_host_notifier_handler() ->
-aio_set_event_notifier().
+Title:
+  qemu-system-i386 eats a lot of cpu after just few hours,  with
+  sdl,gl=3Don
 
-Stefan
+Status in QEMU:
+  New
 
---0F1p//8PRICkK4MW
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  I already send this email to qemu-discuss@nongnu.org , but I can't see
+  it arriving in archives, so here  is copy.
 
------BEGIN PGP SIGNATURE-----
+  Hello, all!
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6ErrgACgkQnKSrs4Gr
-c8jb2Af9FXO6LpiY7KoNp7ln5dscYzHwtT/6UQXgDmr547hXu4SdpzGALtFsL5dN
-KoNIH+v6w7l9j8F1xoB5GfBWwZgDb0r/jEr/2QTWJEarnBVzQl+v52Y27Rc8hsZy
-DP6h1T+ltia6fMwyqkQqAKm1sNg8gsEwD3KKeapcSrxdldn9zDZx2YM/HdPSOY9r
-lpjIWCb04YXlZEGy1wqV3EoFZEUoQFPq/jy0YkbCL/TEcB3MH/Pr2mbypAJudyyD
-MX5UDLtMN1t9LFUoaQNuta6IlQK9YnpzhXAT4deg1h3QY7iMXGDJpQUJ+QQ28pHI
-UwjNZmWxl1jgfT00CDveaczZZ48fVA==
-=UJsu
------END PGP SIGNATURE-----
+  I use qemu-system-i386/qemu-system_x86_64 for rebuilding Slax-like live c=
+d/dvd.
+  Usually guests (with various self-compiled kernels and X stack with kde3 =
+on top of them)
+  boot up normally, but if I left them to run in GUI mode for few hours - q=
+emu process on host
+  started to eat more and more cpu for itself - more notiecable if I set ho=
+st cpu to lowest possible
+  frequency via trayfreq applet (1400Mhz in my case).
 
---0F1p//8PRICkK4MW--
+  Boot line a bit complicated, but I really prefer to have sound and usb in=
+side VM.
+  qemu-system-i386 -cdrom /dev/shm/CDROM-4.4.194_5.iso -m 1.9G -enable-kvm =
+-soundhw es1370 -smp 2 -display sdl,gl=3Don -usb -cpu host -rtc clock=3Dvm
+
+  rtc clock=3Dvm was taken from https://bugs.launchpad.net/qemu/+bug/117465=
+4 but apparently not helping.
+  After just 3 hours of uptime (copied line from 'top' on host)
+
+  31943 guest     20   0 2412m 791m  38m R   51  6.7  66:36.51 qemu-
+  system-i38
+
+  I use Xorg 1.19.7 on host, with mesa git/nouveau as GL driver. But my car=
+d has not very big amount of VRAM - only 384Mb.
+  May be this limitation is playing some role .. but 'end-user' result was =
+after 1-2 day of guest uptime I run into completely frozen guest =
+
+  (may be when qemu was hitting 100 one core usage on host some internal ti=
+mer just made guest kernel too upset/froze?
+   I was sleeping or doing other things on host  for all this time, with VM=
+ just supposedly running at another virtual desktop - =
+
+  in KDE3 + built-in compositor ....)
+
+  I wonder if more mainstream desktop users (on GNOME, Xfce, etc) and/or us=
+ers of other distros (I use self-re-compiled Slackware)
+  actually can see same problem?
+
+  qemu-system-i386 --version
+  QEMU emulator version 4.1.50 (v4.1.0-1188-gc6f5012ba5-dirty)
+  but I saw same behavior for quite some time .. just never reported it in =
+hope it will go away.
+
+  cat /proc/cpuinfo
+  processor       : 0
+  vendor_id       : AuthenticAMD
+  cpu family      : 21
+  model           : 2
+  model name      : AMD FX(tm)-4300 Quad-Core Processor
+  stepping        : 0
+  microcode       : 0x6000852
+  cpu MHz         : 1399.977
+  cache size      : 2048 KB
+  physical id     : 0
+  siblings        : 4
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 16
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 13
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pd=
+pe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid ap=
+erfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsav=
+e avx f16c lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse =
+3dnowprefetch osvw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext p=
+erfctr_core perfctr_nb cpb hw_pstate ssbd vmmcall bmi1 arat npt lbrv svm_lo=
+ck nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pft=
+hreshold
+  bugs            : fxsave_leak sysret_ss_attrs null_seg spectre_v1 spectre=
+_v2 spec_store_bypass
+  bogomips        : 7600.06
+  TLB size        : 1536 4K pages
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 48 bits physical, 48 bits virtual
+  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
+
+  [and 3x more of the same, for 3 remaining cores]
+
+  Gcc is Slackware 14.2's gcc 5.5.0, but I saw this with 4.9.2 too.
+  This might be 32-bit host problem. But may be just no-one tried to run qe=
+mu with GUI guest for literaly days?
+
+  Host kernel is
+   uname -a
+  Linux slax 5.1.12-x64 #1 SMP PREEMPT Wed Jun 19 12:31:05 MSK 2019 x86_64 =
+AMD FX(tm)-4300 Quad-Core Processor AuthenticAMD GNU/Linux
+
+  I was trying newish 5.3.2 but my compilation was not as stable as this on=
+e =
+
+  (I tend to change few things, like max cpu count, preemption mode, numa s=
+upport .... =
+
+  for more distribution-like, yet most stable  and performant for me kernel)
+
+  Kernel world is moving fast, so I'll try to recompile new 5.3.x too
+  ....
+
+  =
+
+  I guess I  should provide perf/profiler output, but for  this I need to r=
+ecompile qemu. =
+
+  I'll try to come back with more details soon.
+
+  Thanks for your attention and possible feedback!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1847525/+subscriptions
 
