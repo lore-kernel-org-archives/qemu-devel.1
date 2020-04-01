@@ -2,126 +2,121 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A743C2D0F3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9D7C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08B682073B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:15:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7170B2073B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 13:18:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJK1TbMk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08B682073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="r42fvqrd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7170B2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJdDC-0003uX-4v
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 09:15:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35704)
+	id 1jJdGW-0005aq-IS
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 09:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36225)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jJdCH-0003Tu-MR
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:14:23 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJdFe-000568-5g
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jJdCF-0004le-Ny
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:14:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25044
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJdCF-0004l0-Es
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:14:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585746858;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Kzni+a+pjMuuVixoz0QjYPTvNR/en/IwUGQP0qomcFw=;
- b=GJK1TbMk+WzqUTPg1agvkwJttz4SJSazOQvo6TcP95bNisJqPodJMp3HfuRMqh9CqKgS9n
- /Yjhkb4O+glIl3soU+UfbQA8qa0kg+bDqnd0ELfQ9MM8+jfs72uqwizkY1GGeda4510sz1
- N22aRyolDbPeURThXrqKC5JIfgNT1F8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-GF_1ge3oNEWBVaEutNJqkw-1; Wed, 01 Apr 2020 09:14:17 -0400
-X-MC-Unique: GF_1ge3oNEWBVaEutNJqkw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A86D58017F4;
- Wed,  1 Apr 2020 13:14:15 +0000 (UTC)
-Received: from [10.36.114.59] (ovpn-114-59.ams2.redhat.com [10.36.114.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 406A660C05;
- Wed,  1 Apr 2020 13:14:13 +0000 (UTC)
-Subject: Re: [PATCH v3 1/1] vl/s390x: fixup ram sizes for compat machines
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-References: <20200401123754.109602-1-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <285819e0-e23e-32ac-b061-a0b683baeb5a@redhat.com>
-Date: Wed, 1 Apr 2020 15:14:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200401123754.109602-1-borntraeger@de.ibm.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJdFc-0008CP-6p
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 09:17:50 -0400
+Received: from mail-vi1eur05on20706.outbound.protection.outlook.com
+ ([2a01:111:f400:7d00::706]:64800
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jJdFU-0007yb-Mr; Wed, 01 Apr 2020 09:17:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b83vK8e+FJULEzdg6dr2YNfo8lQviM/9sYIw5Gs7zmMIK4hVQlyyqchvCR2KDPtLP3lbX//Ux8u/ISws0pfPE7BeHPp9srZ9IOSEnq6oL7TBbxT7AS4YtKr9xV1w7fDaY+kKWrwW3MyvEkJdBHKSHIF23wra1C2pky8YFGR2sF/PqKJRRUHC0YvWLEWK9GGZoOfCV/u76ViLhi1ZEMdBrb+2cRbK8KLCOl+gpPti1ZuJiPgSL+3b5dV/+EgI5w1LLXP9rVlwBK/r8jxLRF7JmoQKgAbjl5QmHVIAWlGpK4K27HMyWWaBVYUncoc+sd8zyAus6E7R5cZmonLEWJhSVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pRQXkfQkKnKs6Lh8rAmoRpt37l125tnUxD7aO+FLXqE=;
+ b=huQ6gB5pVEMu2KmlXMgLvuSSkBH5LP6TJugSJ24z7gdAGW1ZS9d+TbEUsF6pgHruQwaoV7TS/flixUXlAVMIaH9k9uBAenLYkuOjWHwhML+Myp5NS5qKAj4zVyDwlnyYg9msAa7ruw8ZqsaOmkP90G3USX5dlZtS82lkWuE4VQE58LNQyO6VAlMeTMmOZAedE75WiyWH5m0Ue3FN0hRotqRswdaRv8rm2n23Z/ae7xECEWyZ71lfdid0aYZldadkR7uNKWPPeJDup4KyhhikRLDU+niXQ6+owPZTt4ttqTYpmpqeNip6TnDaZ8mU6NEkBc/QUKlPvjYaSqafD/rPMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pRQXkfQkKnKs6Lh8rAmoRpt37l125tnUxD7aO+FLXqE=;
+ b=r42fvqrdIJOhXZmQGT8HcgENNAth/OlEBxiuNpwndCDelfb71c2Kq6uBDJ0Dh2HrdV8rFjMWLkfKRnVYJmyCWzGqahlTmJn6+tZRbKE61YfYuGoeRvuUSbdUdmN9KfPjtbJvEaZ6sXguP2747ZAuk2t+3xzNW/WEVozf75P9xsU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5527.eurprd08.prod.outlook.com (10.141.175.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.20; Wed, 1 Apr 2020 13:17:37 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
+ 13:17:37 +0000
+Subject: Re: [PATCH v15 4/4] iotests: 287: add qcow2 compression type test
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200401101213.24505-1-dplotnikov@virtuozzo.com>
+ <20200401101213.24505-5-dplotnikov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200401161735299
+Message-ID: <e77968ec-cba7-1078-d4f6-b91298403906@virtuozzo.com>
+Date: Wed, 1 Apr 2020 16:17:35 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200401101213.24505-5-dplotnikov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR02CA0077.eurprd02.prod.outlook.com
+ (2603:10a6:208:154::18) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.23) by
+ AM0PR02CA0077.eurprd02.prod.outlook.com (2603:10a6:208:154::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.15 via Frontend
+ Transport; Wed, 1 Apr 2020 13:17:36 +0000
+X-Tagtoolbar-Keys: D20200401161735299
+X-Originating-IP: [185.215.60.23]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 441b5e7b-c543-4e52-b547-08d7d63f0c06
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5527:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5527CA748FDEB8D7DD8E1376C1C90@AM7PR08MB5527.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
+X-Forefront-PRVS: 03607C04F0
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(376002)(39840400004)(346002)(396003)(136003)(366004)(16576012)(36756003)(8676002)(6486002)(2906002)(52116002)(4326008)(8936002)(81166006)(81156014)(186003)(86362001)(66946007)(5660300002)(316002)(478600001)(26005)(16526019)(2616005)(31686004)(66556008)(66476007)(956004)(31696002)(2004002)(21314003);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mUpmU7xDOmeFCB5Bc13J/2OCUHEK+nMGCLuS+fo0qPmJ0B+oRHXYk0hi2l0pc7EuKVT7zS+PwRU1URK4scare3ZIU4sThYjr58mWvtSzkV9lmkfpyC5062aNHsd1qD8vR3yH+mLUop3E0FqVWoK6BUA7h/Lixf5eoVRtYF+QtLZsRrRGCcMglL3eTRlpelJG633Vt2YzOKap57PapRVAXUiB3sCvYbmUoxkbc7froZH2U2R39ApIkt5gdCKqKU+oEB6RiQmiLq/wDL+L5yEwDqmN4kE8WQAJovSWN22HYmPnGHoVBE+ygPgB2okNDAzeXr+inUVeVymMMqE2SfpQBpY4PSnPte3Kdcfm+ZJywnZxbNHYMwtD3AdUuRhXNgA6GR64fC43QjzC53ZTMxcqBCrVHZYOZOZEpyAcQ2zSL1EXeY70N051vG2fg5N+4PIa1MCrdrJzG57WNUDh0TbOn59NbZ5a2XwA9aToCG4CRrZjMkWTvzBk3QoUbxhl+zAqnRYMVkNkr9OsPnhdwYjX5j5HxXzt4IP3dYfx2EVL6lXVOn74sWvY/L7k33gvuEjSpMxllG/c3Kk8AZv2b1ShOw==
+X-MS-Exchange-AntiSpam-MessageData: cbsUxCqERyM3sN4tvma5pZmUG2gQZd5uX3Gc/CJXZ3AG14tn+PA+BGjyLnPONS47bxM8orih2D2iNjheF2B8KBfT9GKIUcWXZLGDF+/A7qmSjofjrQ/ybjHK3tuzlxbmU9PG8G2EiscQKvjWS7+GRA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 441b5e7b-c543-4e52-b547-08d7d63f0c06
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 13:17:37.0817 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oOyiWdQiMeNutv0QiOPAfbQ+dopnendVWuHFWVKYR6KVtU0nasgtqzs107/+qMRSphYOZyMrodKqHFEFjbM2gEgi5/8NxbZHpRVmFSjjPeE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5527
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:111:f400:7d00::706
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,154 +128,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
+ armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01.04.20 14:37, Christian Borntraeger wrote:
-> Older QEMU versions did fixup the ram size to match what can be reported
-> via sclp. We need to mimic this behaviour for machine types 4.2 and
-> older to not fail on inbound migration for memory sizes that do not fit.
-> Old machines with proper aligned memory sizes are not affected.
->=20
-> Alignment table:
->  VM size (<=3D) | Alignment
-> --------------------------
->       1020M   |     1M
->       2040M   |     2M
->       4080M   |     4M
->       8160M   |     8M
->      16320M   |    16M
->      32640M   |    32M
->      65280M   |    64M
->     130560M   |   128M
->     261120M   |   256M
->     522240M   |   512M
->    1044480M   |     1G
->    2088960M   |     2G
->    4177920M   |     4G
->    8355840M   |     8G
->=20
-> Suggested action is to replace unaligned -m value with a suitable
-> aligned one or if a change to a newer machine type is possible, use a
-> machine version >=3D 5.0.
->=20
-> A future versions might remove the compatibility handling.
->=20
-> For machine types >=3D 5.0 we can simply use an increment size of 1M and
-> use the full range of increment number which allows for all possible
-> memory sizes. The old limitation of having a maximum of 1020 increments
-> was added for standby memory, which we no longer support. With that we
-> can now support even weird memory sizes like 10001234 MB.
->=20
-> As we no longer fixup maxram_size as well, make other users use ram_size
-> instead. Keep using maxram_size when setting the maximum ram size in KVM,
-> as that will come in handy in the future when supporting memory hotplug
-> (in contrast, storage keys and storage attributes for hotplugged memory
-> will have to be migrated per RAM block in the future).
->=20
-> Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
-> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+01.04.2020 13:12, Denis Plotnikov wrote:
+> The test checks fulfilling qcow2 requiriements for the compression
+> type feature and zstd compression type operability.
+> 
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 > ---
->  hw/s390x/s390-skeys.c        |  2 +-
->  hw/s390x/s390-stattrib-kvm.c |  4 ++--
->  hw/s390x/s390-virtio-ccw.c   | 21 +++++++++++++++++++++
->  hw/s390x/sclp.c              | 17 +++++------------
->  include/hw/boards.h          |  7 +++++++
->  softmmu/vl.c                 |  3 +++
->  6 files changed, 39 insertions(+), 15 deletions(-)
->=20
-> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-> index 5da6e5292f..a9a4ae7b39 100644
-> --- a/hw/s390x/s390-skeys.c
-> +++ b/hw/s390x/s390-skeys.c
-> @@ -176,7 +176,7 @@ static void qemu_s390_skeys_init(Object *obj)
->      QEMUS390SKeysState *skeys =3D QEMU_S390_SKEYS(obj);
->      MachineState *machine =3D MACHINE(qdev_get_machine());
-> =20
-> -    skeys->key_count =3D machine->maxram_size / TARGET_PAGE_SIZE;
-> +    skeys->key_count =3D machine->ram_size / TARGET_PAGE_SIZE;
->      skeys->keydata =3D g_malloc0(skeys->key_count);
->  }
-> =20
-> diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-> index c7e1f35524..f89d8d9d16 100644
-> --- a/hw/s390x/s390-stattrib-kvm.c
-> +++ b/hw/s390x/s390-stattrib-kvm.c
-> @@ -85,7 +85,7 @@ static int kvm_s390_stattrib_set_stattr(S390StAttribSta=
-te *sa,
->  {
->      KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
->      MachineState *machine =3D MACHINE(qdev_get_machine());
-> -    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
-> +    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
-> =20
->      if (start_gfn + count > max) {
->          error_report("Out of memory bounds when setting storage attribut=
-es");
-> @@ -104,7 +104,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttri=
-bState *sa)
->  {
->      KVMS390StAttribState *sas =3D KVM_S390_STATTRIB(sa);
->      MachineState *machine =3D MACHINE(qdev_get_machine());
-> -    unsigned long max =3D machine->maxram_size / TARGET_PAGE_SIZE;
-> +    unsigned long max =3D machine->ram_size / TARGET_PAGE_SIZE;
->      /* We do not need to reach the maximum buffer size allowed */
->      unsigned long cx, len =3D KVM_S390_SKEYS_MAX / 2;
->      int r;
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 3cf19c99f3..61a8a0e693 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -27,6 +27,7 @@
->  #include "qemu/ctype.h"
->  #include "qemu/error-report.h"
->  #include "qemu/option.h"
-> +#include "qemu/qemu-print.h"
->  #include "s390-pci-bus.h"
->  #include "sysemu/reset.h"
->  #include "hw/s390x/storage-keys.h"
-> @@ -579,6 +580,25 @@ static void s390_nmi(NMIState *n, int cpu_index, Err=
-or **errp)
->      s390_cpu_restart(S390_CPU(cs));
->  }
-> =20
-> +static ram_addr_t s390_fixup_ram_size(ram_addr_t sz)
+>   tests/qemu-iotests/287     | 159 +++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/287.out |  70 ++++++++++++++++
+>   tests/qemu-iotests/group   |   1 +
+>   3 files changed, 230 insertions(+)
+>   create mode 100755 tests/qemu-iotests/287
+>   create mode 100644 tests/qemu-iotests/287.out
+> 
+> diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
+> new file mode 100755
+> index 0000000000..9925a2a14f
+> --- /dev/null
+> +++ b/tests/qemu-iotests/287
+> @@ -0,0 +1,159 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test case for an image using zstd compression
+> +#
+> +# Copyright (c) 2020 Virtuozzo International GmbH
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +# creator
+> +owner=dplotnikov@virtuozzo.com
+> +
+> +seq="$(basename $0)"
+> +echo "QA output created by $seq"
+> +
+> +status=1	# failure is the default!
+> +
+> +_cleanup()
 > +{
-> +    /* same logic as in sclp.c */
-> +    int increment_size =3D 20;
-> +    ram_addr_t newsz;
+> +	_cleanup_test_img
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
 > +
-> +    while ((sz >> increment_size) > MAX_STORAGE_INCREMENTS) {
-> +        increment_size++;
-> +    }
-> +    newsz =3D sz >> increment_size << increment_size;
+> +# standard environment
+> +. ./common.rc
+> +. ./common.filter
 > +
-> +    if (sz !=3D newsz) {
-> +        qemu_printf("Ram size %" PRIu64 "MB was fixed up to %" PRIu64
-> +                    "MB to match machine restrictions. Consider updating=
- "
-> +                    "the guest definition.i\n", sz / MiB, newsz / MiB);
+> +# This tests qocw2-specific low-level functionality
+> +_supported_fmt qcow2
+> +_supported_proto file
+> +_supported_os Linux
+> +
+> +# for all the cases
+> +CLUSTER_SIZE=65536
+> +
+> +# Check if we can run this test.
+> +if IMGOPTS='compression_type=zstd' _make_test_img 64M |
+> +    grep "Invalid parameter 'zstd'"; then
+> +    _notrun "ZSTD is disabled"
+> +fi
+> +
+> +# Test: when compression is zlib the incompatible bit is unset
+> +echo
+> +echo "=== Testing compression type incompatible bit setting for zlib ==="
+> +echo
+> +
+> +IMGOPTS='compression_type=zlib' _make_test_img 64M
+> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
+> +
+> +# Test: when compression differs from zlib the incompatible bit is set
+> +echo
+> +echo "=== Testing compression type incompatible bit setting for zstd ==="
+> +echo
+> +
+> +IMGOPTS='compression_type=zstd' _make_test_img 64M
+> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
+> +
+> +# Test: an image can't be opened if compression type is zlib and
+> +#       incompatible feature compression type is set
+> +echo
+> +echo "=== Testing zlib with incompatible bit set ==="
+> +echo
+> +
+> +IMGOPTS='compression_type=zlib' _make_test_img 64M
+> +$PYTHON qcow2.py "$TEST_IMG" set-feature-bit incompatible 3
+> +# to make sure the bit was actually set
+> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
+> +$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
+> +if (($?==0)); then
+> +    echo "Error: The image opened successfully. The image must not be opened"
+> +fi
+> +
+> +# Test: an image can't be opened if compression type is NOT zlib and
+> +#       incompatible feature compression type is UNSET
+> +echo
+> +echo "=== Testing zstd with incompatible bit unset ==="
+> +echo
+> +
+> +IMGOPTS='compression_type=zstd' _make_test_img 64M
+> +$PYTHON qcow2.py "$TEST_IMG" set-header incompatible_features 0
+> +# to make sure the bit was actually unset
+> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
+> +$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
+> +if (($?==0)); then
+> +    echo "Error: The image opened successfully. The image must not be opened"
+> +fi
+> +# Test: check compression type values
+> +echo
+> +echo "=== Testing compression type values ==="
+> +echo
+> +# zlib=0
+> +IMGOPTS='compression_type=zlib' _make_test_img 64M
+> +od -j104 -N1 -An -vtu1 "$TEST_IMG"
+> +
+> +# zstd=1
+> +IMGOPTS='compression_type=zstd' _make_test_img 64M
+> +od -j104 -N1 -An -vtu1 "$TEST_IMG"
+> +
+> +# Test: using zstd compression, write to and read from an image
+> +echo
+> +echo "=== Testing simple reading and writing with zstd ==="
+> +echo
+> +
+> +IMGOPTS='compression_type=zstd' _make_test_img 64M
+> +$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IO -c "read -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
+> +# read on the cluster boundaries
+> +$QEMU_IO -c "read -v 131070 8 " "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IO -c "read -v 65534 8" "$TEST_IMG" | _filter_qemu_io
+> +
+> +# Test: using zstd compression, write and verify three adjacent
+> +#       compressed clusters
+> +echo
+> +echo "=== Testing adjacent clusters reading and writing with zstd ==="
+> +echo
+> +
+> +IMGOPTS='compression_type=zstd' _make_test_img 64M
+> +$QEMU_IO -c "write -c -P 0xAB 0 64k " "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
 
-Not sure if news/zs will be printed correctly in case ram_addr_t !=3D
-uint64_t.
+you may use "64k" notation both for offset and length
 
-Thanks!
+> +$QEMU_IO -c "write -c -P 0xAD 131072 64k " "$TEST_IMG" | _filter_qemu_io
+> +
+> +$QEMU_IO -c "read -P 0xAB 0 64k " "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IO -c "read -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IO -c "read -P 0xAD 131072 64k " "$TEST_IMG" | _filter_qemu_io
+> +
+> +# Test: create an image, write 1M likely uncompressible data from urandom,
+> +#       write 1M of compressible data, convert the image with zstd
+> +#       and compare these two images - their data should be identical
+> +echo
+> +echo "=== Testing incompressible cluster processing with zstd ==="
+> +echo
+> +
+> +RAND_FILE="./287_rand_data"
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+you should use something like "$TEST_DIR/rand_data"
 
---=20
-Thanks,
 
-David / dhildenb
+> +dd if=/dev/urandom of=$RAND_FILE bs=1M count=1
 
+of="$RAND_FILE"
+
+> +
+> +IMGOPTS='' _make_test_img 64M
+
+You don't need to clean IMGOPTS, it was not changed globally when you pass
+it to previous commands.
+
+> +# fill the image with likely incompressible and compressible clusters
+> +$QEMU_IO -c "write -c -s $RAND_FILE 0 1M " "$TEST_IMG" | _filter_qemu_io
+
+Hmm, I'm afraid -s is broken if RAND_FILE contains spaces. Should be fixed separately somehow.
+
+> +$QEMU_IO -c "write -c -P 0xFA 1M 1M " "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IMG convert -O $IMGFMT -c -o compression_type=zstd \
+> +                  "$TEST_IMG" "$TEST_IMG".orig
+
+Strange that target is called "$TEST_IMG".orig... Could we call it "$TEST_IMG".compressed ?
+
+> +$QEMU_IMG compare "$TEST_IMG" "$TEST_IMG".orig
+> +
+> +rm -f $RAND_FILE
+> +# success, all done
+> +echo "*** done"
+> +rm -f $seq.full
+> +status=0
+> diff --git a/tests/qemu-iotests/287.out b/tests/qemu-iotests/287.out
+> new file mode 100644
+> index 0000000000..3f47528b20
+> --- /dev/null
+> +++ b/tests/qemu-iotests/287.out
+> @@ -0,0 +1,70 @@
+> +QA output created by 287
+> +
+> +=== Testing compression type incompatible bit setting for zlib ===
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +incompatible_features     []
+> +
+> +=== Testing compression type incompatible bit setting for zstd ===
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +incompatible_features     [3]
+> +
+> +=== Testing zlib with incompatible bit set  ===
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +incompatible_features     [3]
+> +
+> +=== Testing zstd with incompatible bit unset  ===
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +incompatible_features     []
+> +
+> +=== Testing compression type values  ===
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +   0
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +   1
+> +
+> +=== Testing simple reading and writing with zstd ===
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +wrote 65536/65536 bytes at offset 65536
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +read 65536/65536 bytes at offset 65536
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +0001fffe:  ac ac 00 00 00 00 00 00  ........
+> +read 8/8 bytes at offset 131070
+> +8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +0000fffe:  00 00 ac ac ac ac ac ac  ........
+> +read 8/8 bytes at offset 65534
+> +8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +
+> +=== Testing adjacent clusters reading and writing with zstd ===
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +wrote 65536/65536 bytes at offset 0
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +wrote 65536/65536 bytes at offset 65536
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +wrote 65536/65536 bytes at offset 131072
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +read 65536/65536 bytes at offset 0
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +read 65536/65536 bytes at offset 65536
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +read 65536/65536 bytes at offset 131072
+> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +
+> +=== Testing incompressible cluster processing with zstd ===
+> +
+> +1+0 records in
+> +1+0 records out
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +wrote 1048576/1048576 bytes at offset 0
+> +1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +wrote 1048576/1048576 bytes at offset 1048576
+> +1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +Images are identical.
+> +*** done
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 79c6dfc85d..dacbcfc12d 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -294,5 +294,6 @@
+>   283 auto quick
+>   284 rw
+>   286 rw quick
+> +287 auto quick
+>   288 quick
+>   289 rw quick
+> 
+
+
+-- 
+Best regards,
+Vladimir
 
