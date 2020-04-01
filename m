@@ -2,98 +2,48 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28520C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7777CC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:38:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3F1820719
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:37:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JAxtoTpM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3F1820719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 453ED2078C
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:38:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453ED2078C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJeUg-0003gS-0y
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 10:37:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58587)
+	id 1jJeVn-0005YA-DU
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 10:38:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59568)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vkuznets@redhat.com>) id 1jJeTd-0002gM-19
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:36:22 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jJeUp-0004B8-UK
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:37:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vkuznets@redhat.com>) id 1jJeTb-0003DM-HM
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:36:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25232
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jJeUo-0005h8-Ih
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:37:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44960)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1jJeTb-0003Br-D4
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:36:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585751778;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=E0HhxWxLh02fJVJp4LVVG+4+DEa30nEIdCgKV6IPzrU=;
- b=JAxtoTpMhlFYwnnVHFouTVNAEcVGM1asoxCq+Au2vTxxFXa593jIdqdG2vualt/t0uwQ8B
- aPU1YNvx71kkpSP5Wr5kR/jJtlZ8pBMdv/YsXmtAZTC5J6RknsprT+3qf8juRKaPmNUvX7
- NOxwfuIveKDv+SurP0G1BqH9Y+XnWhk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-KPVYIdxfNumU-biex7XZkg-1; Wed, 01 Apr 2020 10:36:11 -0400
-X-MC-Unique: KPVYIdxfNumU-biex7XZkg-1
-Received: by mail-wr1-f71.google.com with SMTP id j12so14589618wrr.18
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 07:36:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=wMTuqB3xp3q/wCkNzofppZx/HxXObvR69NvhYurCQfY=;
- b=DuRaNwXsE/9Be1YgUudJLVncilJDJgO5Zgq+fE15JdZMfIOzwqpanIl+SsNqmGMLgd
- puB7NVE2FHjrelvhud87TUsFvDM7SjnNzEQJW460Fl9gv5s1LmzFUUm7KcVzZwNfr9zB
- 7j8cMaUoiQsvEYfnijVXNMO+GCog+9mQygsEa/gyXpvFieE9MQ8+GC0YR1pEbEyifqNA
- VS8HQYr6LmuXpRs+fEqwj2rchtbUWYF7xG4q+44pk9mcqmEHXRy5Qpb96icrkaEi6S0Z
- ZLjnfYqLxrreKjCnJdyMnkxzLX9MsqcK79Rbm3l1KUyDwal0PzemCv05XG+CCAPQNE1x
- HqiA==
-X-Gm-Message-State: AGi0PubKb/eZwabD6e3hL4v3WT7CQzPBbpsN6wRu70jCQ7FKuTwECJl9
- pPU3dNyLtnPqs7XVAR9yzLMW3x4Zr62tjIqL6d8obdh9Yu5Anp6MsLAq9KdR5Z2M0db6jAdNssF
- QaOFFPbMC6U6QDvs=
-X-Received: by 2002:a7b:cde8:: with SMTP id p8mr4613837wmj.87.1585751770371;
- Wed, 01 Apr 2020 07:36:10 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJS/T45sQ2Q53UVsuueuE9FJSqTpQeaeapqHanxS44jbYGeaJBEhHnMVlbDe79sq9trPyh/8w==
-X-Received: by 2002:a7b:cde8:: with SMTP id p8mr4613813wmj.87.1585751770099;
- Wed, 01 Apr 2020 07:36:10 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id f13sm3047379wrx.56.2020.04.01.07.36.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Apr 2020 07:36:09 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: "Montes\, Julio" <julio.montes@intel.com>
-Subject: Re: [PATCH] target/i386: do not set unsupported VMX secondary
- execution controls
-In-Reply-To: <BY5PR11MB39607C77082407729CFEBA399AC90@BY5PR11MB3960.namprd11.prod.outlook.com>
-References: <20200331162752.1209928-1-vkuznets@redhat.com>
- <f976c1b0-2f50-d9f6-0921-2fc8e25ddb80@redhat.com>
- <BY5PR11MB396059E9E1FFE4B93EDE38E89AC80@BY5PR11MB3960.namprd11.prod.outlook.com>
- <877dyz1y9g.fsf@vitty.brq.redhat.com>
- <BY5PR11MB39607C77082407729CFEBA399AC90@BY5PR11MB3960.namprd11.prod.outlook.com>
-Date: Wed, 01 Apr 2020 16:36:07 +0200
-Message-ID: <87wo6zz31k.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jJeUo-0005di-92; Wed, 01 Apr 2020 10:37:34 -0400
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jJeUg-0005CS-1a; Wed, 01 Apr 2020 17:37:26 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v16 0/4] qcow2: Implement zstd cluster compression method
+Date: Wed,  1 Apr 2020 17:37:15 +0300
+Message-Id: <20200401143719.21639-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,30 +55,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Montes, Julio" <julio.montes@intel.com> writes:
+v16:
+   * 03: ssize_t for ret, size_t for zstd_ret [Vladimir]
+   * 04: small fixes according to the comments [Vladimir] 
 
->> Does you kernel have 95c5c7c77c ("KVM: nVMX: list VMX MSRs in
->> KVM_GET_MSR_INDEX_LIST")?
->
-> I was using linux 5.0.0, now I have 5.3.0 and it's working, thanks for fi=
-xing this
->
+v15:
+   * 01: aiming qemu 5.1 [Eric]
+   * 03: change zstd_res definition place [Vladimir]
+   * 04: add two new test cases [Eric]
+         1. test adjacent cluster compression with zstd
+         2. test incompressible cluster processing
+   * 03, 04: many rewording and gramma fixing [Eric]
 
-Thanks for the confirmation!
+v14:
+   * fix bug on compression - looping until compress == 0 [Me]
+   * apply reworked Vladimir's suggestions:
+      1. not mixing ssize_t with size_t
+      2. safe check for ENOMEM in compression part - avoid overflow
+      3. tolerate sanity check allow zstd to make progress only
+         on one of the buffers
+v13:
+   * 03: add progress sanity check to decompression loop [Vladimir]
+     03: add successful decompression check [Me]
 
-I don't see any good solution for kernels without 95c5c7c77c, we'll have
-either one issue or another.
+v12:
+   * 03: again, rework compression and decompression loops
+         to make them more correct [Vladimir]
+     03: move assert in compression to more appropriate place
+             [Vladimir]
+v11:
+   * 03: the loops don't need "do{}while" form anymore and
+         the they were buggy (missed "do" in the beginning)
+         replace them with usual "while(){}" loops [Vladimir]
+v10:
+   * 03: fix zstd (de)compressed loops for multi-frame
+         cases [Vladimir]
+v9:
+   * 01: fix error checking and reporting in qcow2_amend compression type part [Vladimir]
+   * 03: replace asserts with -EIO in qcow2_zstd_decompression [Vladimir, Alberto]
+   * 03: reword/amend/add comments, fix typos [Vladimir]
 
---=20
-Vitaly
+v8:
+   * 03: switch zstd API from simple to stream [Eric]
+         No need to state a special cluster layout for zstd
+         compressed clusters.
+v7:
+   * use qapi_enum_parse instead of the open-coding [Eric]
+   * fix wording, typos and spelling [Eric]
+
+v6:
+   * "block/qcow2-threads: fix qcow2_decompress" is removed from the series
+      since it has been accepted by Max already
+   * add compile time checking for Qcow2Header to be a multiple of 8 [Max, Alberto]
+   * report error on qcow2 amending when the compression type is actually chnged [Max]
+   * remove the extra space and the extra new line [Max]
+   * re-arrange acks and signed-off-s [Vladimir]
+
+v5:
+   * replace -ENOTSUP with abort in qcow2_co_decompress [Vladimir]
+   * set cluster size for all test cases in the beginning of the 287 test
+
+v4:
+   * the series is rebased on top of 01 "block/qcow2-threads: fix qcow2_decompress"
+   * 01 is just a no-change resend to avoid extra dependencies. Still, it may be merged in separate
+
+v3:
+   * remove redundant max compression type value check [Vladimir, Eric]
+     (the switch below checks everything)
+   * prevent compression type changing on "qemu-img amend" [Vladimir]
+   * remove zstd config setting, since it has been added already by
+     "migration" patches [Vladimir]
+   * change the compression type error message [Vladimir] 
+   * fix alignment and 80-chars exceeding [Vladimir]
+
+v2:
+   * rework compression type setting [Vladimir]
+   * squash iotest changes to the compression type introduction patch [Vladimir, Eric]
+   * fix zstd availability checking in zstd iotest [Vladimir]
+   * remove unnecessry casting [Eric]
+   * remove rudundant checks [Eric]
+   * fix compressed cluster layout in qcow2 spec [Vladimir]
+   * fix wording [Eric, Vladimir]
+   * fix compression type filtering in iotests [Eric]
+
+v1:
+   the initial series
+
+
+Denis Plotnikov (4):
+  qcow2: introduce compression type feature
+  qcow2: rework the cluster compression routine
+  qcow2: add zstd cluster compression
+  iotests: 287: add qcow2 compression type test
+
+ docs/interop/qcow2.txt           |   1 +
+ configure                        |   2 +-
+ qapi/block-core.json             |  23 ++-
+ block/qcow2.h                    |  20 ++-
+ include/block/block_int.h        |   1 +
+ block/qcow2-threads.c            | 234 +++++++++++++++++++++++++++++--
+ block/qcow2.c                    | 120 ++++++++++++++++
+ tests/qemu-iotests/031.out       |  14 +-
+ tests/qemu-iotests/036.out       |   4 +-
+ tests/qemu-iotests/049.out       | 102 +++++++-------
+ tests/qemu-iotests/060.out       |   1 +
+ tests/qemu-iotests/061.out       |  34 +++--
+ tests/qemu-iotests/065           |  28 ++--
+ tests/qemu-iotests/080           |   2 +-
+ tests/qemu-iotests/144.out       |   4 +-
+ tests/qemu-iotests/182.out       |   2 +-
+ tests/qemu-iotests/242.out       |   5 +
+ tests/qemu-iotests/255.out       |   8 +-
+ tests/qemu-iotests/287           | 162 +++++++++++++++++++++
+ tests/qemu-iotests/287.out       |  70 +++++++++
+ tests/qemu-iotests/common.filter |   3 +-
+ tests/qemu-iotests/group         |   1 +
+ 22 files changed, 733 insertions(+), 108 deletions(-)
+ create mode 100755 tests/qemu-iotests/287
+ create mode 100644 tests/qemu-iotests/287.out
+
+-- 
+2.17.0
 
 
