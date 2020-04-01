@@ -2,81 +2,51 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6D8CC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9113BC2D0F3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:40:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC01020719
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:38:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k38CtPCe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC01020719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 692FE2071A
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:40:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 692FE2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJeWA-0006W8-RT
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 10:38:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58901)
+	id 1jJeXA-00088C-Hl
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 10:40:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jJeU3-0003HY-OF
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:36:49 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jJeUq-0004Bk-KV
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jJeU2-0003zV-33
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:36:47 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50338)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jJeU1-0003xf-Rw
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:36:46 -0400
-Received: by mail-wm1-x342.google.com with SMTP id t128so6903443wma.0
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 07:36:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TQUMZ9HlhcpvqeC1U2gNdJ/+gyNagNngjlFwThL+fZc=;
- b=k38CtPCeIkvL4xxQc7jelV4Bj4xxLNCd8C37KcZNKyl1ivwhd9yNHSsIQvkt2rAC7P
- amE+zlUgJLmpwLlryRJSL1G9aeapeltKiTFIv4ag8Ypnihuqq3I6v82j3JgrENzEYkxY
- /MVAfFE8iv/sR0wJayeh7tVmju64ZVXVOT7LSkhWjIjN51iBSCtqqhxo3Q2YnAt1XKxS
- Z3Vv/wZmAYTeRIGhfpCyS2/9yu8rPi4O9xIM1tXHG82G0WCHPiB02pvtFxhp2e+mM1cC
- HMUoUo3y/e4Aqd6YAKfNakrLF7R3DFlQcrGLjLlYUFOi2FTo7e8bejb/QRJlCXqV85J8
- 1EYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TQUMZ9HlhcpvqeC1U2gNdJ/+gyNagNngjlFwThL+fZc=;
- b=eYtXlcF5T1NBc3Z2njdlDFeU7Gf8FYI32DhjCG5vcTU4ZHxeJUb3NvY1y+xDDTLoKl
- y4HGUpVvwshThhpErU4aJT+YbQO9IkB1tL+klDHbdWmMaM69OhqFZqK7qfxZioxApUoU
- BK4GGwMuC1I//Y52ygYsTWarqP9wpOxcV2ueft8URILNrjC55dV4V/4qgp+uj+72xob+
- iaBlcHF5sXnoLCO3OTYQ16OH3DUShcOGIolZlsk+y8SGlAgfitEd1cyhypBQbm7uR6dX
- diYHQ4A/rx7oJHVWzRKntk+y+Lh2SL65C0gZymaQjbVs9hTiU329HbLSgmoGqK4l5xkr
- LudQ==
-X-Gm-Message-State: AGi0PubOdKddFvFJWIGt3FJ4VBx1PoJExiamr942ean/tmwha+prKX/e
- 5szK9bFeexsBtyJRKgn6xpA5jW9JWMcE+s5dXmc=
-X-Google-Smtp-Source: APiQypJITDgW4A6J/LNjdyVzsfLvZ4sxVBsmo0sU3u2rHLmVPU7EaVsTCt6cOZZYhvkqYF2/eZtL4j4AhdNsFOVFRRg=
-X-Received: by 2002:a7b:c051:: with SMTP id u17mr4364606wmc.129.1585751802366; 
- Wed, 01 Apr 2020 07:36:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
-In-Reply-To: <20200324122212.11156-1-jiaxun.yang@flygoat.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 1 Apr 2020 16:36:22 +0200
-Message-ID: <CAHiYmc6xouy6_ZbrFEQksb1iGq1CFZkYOvG0ZGiFaFhPOf5mGg@mail.gmail.com>
-Subject: Re: [PATCH for-5.0,
- v1] target/mips: Fix loongson multimedia condition instructions
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: multipart/alternative; boundary="000000000000e1d03205a23b9cf2"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jJeUo-0005h3-IA
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:37:36 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44974)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jJeUo-0005dh-8x; Wed, 01 Apr 2020 10:37:34 -0400
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jJeUg-0005CS-E6; Wed, 01 Apr 2020 17:37:26 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v16 3/4] qcow2: add zstd cluster compression
+Date: Wed,  1 Apr 2020 17:37:18 +0300
+Message-Id: <20200401143719.21639-4-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200401143719.21639-1-dplotnikov@virtuozzo.com>
+References: <20200401143719.21639-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,253 +58,319 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e1d03205a23b9cf2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+zstd significantly reduces cluster compression time.
+It provides better compression performance maintaining
+the same level of the compression ratio in comparison with
+zlib, which, at the moment, is the only compression
+method available.
 
-13:23 Uto, 24.03.2020. Jiaxun Yang <jiaxun.yang@flygoat.com> =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Loongson multimedia condition instructions were previously implemented as
-> write 0 to rd due to lack of documentation. So I just confirmed with
-Loongson
-> about their encoding and implemented them correctly.
->
+The performance test results:
+Test compresses and decompresses qemu qcow2 image with just
+installed rhel-7.6 guest.
+Image cluster size: 64K. Image on disk size: 2.2G
 
-Hi, Jiaxun,
+The test was conducted with brd disk to reduce the influence
+of disk subsystem to the test results.
+The results is given in seconds.
 
-Richard Henderson selected your patch to be in his pull request, and the
-main maintainer, Peter Maydell, accepted it and integrated it into main
-tree:
+compress cmd:
+  time ./qemu-img convert -O qcow2 -c -o compression_type=[zlib|zstd]
+                  src.img [zlib|zstd]_compressed.img
+decompress cmd
+  time ./qemu-img convert -O qcow2
+                  [zlib|zstd]_compressed.img uncompressed.img
 
-https://github.com/qemu/qemu/commit/84878f4c00a7beca1d1460e2f77a6c833b8d039=
-3#diff-b06d6b84c7a82caf0f5e4645f4b80540
+           compression               decompression
+         zlib       zstd           zlib         zstd
+------------------------------------------------------------
+real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
+user     65.0       15.8            5.3          2.5
+sys       3.3        0.2            2.0          2.0
 
-I gather this is your first patch merged in QEMU upstream.
+Both ZLIB and ZSTD gave the same compression ratio: 1.57
+compressed image size in both cases: 1.4G
 
-Congratulations!!
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+QAPI part:
+Acked-by: Markus Armbruster <armbru@redhat.com>
+---
+ docs/interop/qcow2.txt |   1 +
+ configure              |   2 +-
+ qapi/block-core.json   |   3 +-
+ block/qcow2-threads.c  | 163 +++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          |   7 ++
+ 5 files changed, 174 insertions(+), 2 deletions(-)
 
-There is a place for you in QEMU community.
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 640e0eca40..18a77f737e 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -209,6 +209,7 @@ version 2.
+ 
+                     Available compression type values:
+                         0: zlib <https://www.zlib.net/>
++                        1: zstd <http://github.com/facebook/zstd>
+ 
+ 
+ === Header padding ===
+diff --git a/configure b/configure
+index e225a1e3ff..fdc991b010 100755
+--- a/configure
++++ b/configure
+@@ -1861,7 +1861,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   lzfse           support of lzfse compression library
+                   (for reading lzfse-compressed dmg images)
+   zstd            support for zstd compression library
+-                  (for migration compression)
++                  (for migration compression and qcow2 cluster compression)
+   seccomp         seccomp support
+   coroutine-pool  coroutine freelist (better performance)
+   glusterfs       GlusterFS backend
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1522e2983f..6fbacddab2 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4293,11 +4293,12 @@
+ # Compression type used in qcow2 image file
+ #
+ # @zlib: zlib compression, see <http://zlib.net/>
++# @zstd: zstd compression, see <http://github.com/facebook/zstd>
+ #
+ # Since: 5.1
+ ##
+ { 'enum': 'Qcow2CompressionType',
+-  'data': [ 'zlib' ] }
++  'data': [ 'zlib', { 'name': 'zstd', 'if': 'defined(CONFIG_ZSTD)' } ] }
+ 
+ ##
+ # @BlockdevCreateOptionsQcow2:
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index 7dbaf53489..aa133204f0 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -28,6 +28,11 @@
+ #define ZLIB_CONST
+ #include <zlib.h>
+ 
++#ifdef CONFIG_ZSTD
++#include <zstd.h>
++#include <zstd_errors.h>
++#endif
++
+ #include "qcow2.h"
+ #include "block/thread-pool.h"
+ #include "crypto.h"
+@@ -166,6 +171,154 @@ static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
+     return ret;
+ }
+ 
++#ifdef CONFIG_ZSTD
++
++/*
++ * qcow2_zstd_compress()
++ *
++ * Compress @src_size bytes of data using zstd compression method
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: compressed size on success
++ *          -ENOMEM destination buffer is not enough to store compressed data
++ *          -EIO    on any other error
++ */
++static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
++                                   const void *src, size_t src_size)
++{
++    ssize_t ret;
++    ZSTD_outBuffer output = { dest, dest_size, 0 };
++    ZSTD_inBuffer input = { src, src_size, 0 };
++    ZSTD_CCtx *cctx = ZSTD_createCCtx();
++
++    if (!cctx) {
++        return -EIO;
++    }
++    /*
++     * Use the zstd streamed interface for symmetry with decompression,
++     * where streaming is essential since we don't record the exact
++     * compressed size.
++     *
++     * In the loop, we try to compress all the data into one zstd frame.
++     * ZSTD_compressStream2 potentially can finish a frame earlier
++     * than the full input data is consumed. That's why we are looping
++     * until all the input data is consumed.
++     */
++    while (input.pos < input.size) {
++        size_t zstd_ret = 0;
++        /*
++         * ZSTD spec: "You must continue calling ZSTD_compressStream2()
++         * with ZSTD_e_end until it returns 0, at which point you are
++         * free to start a new frame". We assume that "start a new frame"
++         * means call ZSTD_compressStream2 in the very beginning or when
++         * ZSTD_compressStream2 has returned with 0.
++         */
++        do {
++            zstd_ret = ZSTD_compressStream2(cctx, &output, &input, ZSTD_e_end);
++
++            if (ZSTD_isError(zstd_ret)) {
++                ret = -EIO;
++                goto out;
++            }
++            /* Dest buffer isn't big enough to store compressed content */
++            if (zstd_ret > output.size - output.pos) {
++                ret = -ENOMEM;
++                goto out;
++            }
++        } while (zstd_ret);
++    }
++    /* make sure we can safely return compressed buffer size with ssize_t */
++    assert(output.pos <= SSIZE_MAX);
++    ret = output.pos;
++out:
++    ZSTD_freeCCtx(cctx);
++    return ret;
++}
++
++/*
++ * qcow2_zstd_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes using zstd compression method
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          -EIO on any error
++ */
++static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size)
++{
++    size_t zstd_ret = 0;
++    ssize_t ret = 0;
++    ZSTD_outBuffer output = { dest, dest_size, 0 };
++    ZSTD_inBuffer input = { src, src_size, 0 };
++    ZSTD_DCtx *dctx = ZSTD_createDCtx();
++
++    if (!dctx) {
++        return -EIO;
++    }
++
++    /*
++     * The compressed stream from the input buffer may consist of more
++     * than one zstd frame. So we iterate until we get a fully
++     * uncompressed cluster.
++     * From zstd docs related to ZSTD_decompressStream:
++     * "return : 0 when a frame is completely decoded and fully flushed"
++     * We suppose that this means: each time ZSTD_decompressStream reads
++     * only ONE full frame and returns 0 if and only if that frame
++     * is completely decoded and flushed. Only after returning 0,
++     * ZSTD_decompressStream reads another ONE full frame.
++     */
++    while (output.pos < output.size) {
++        size_t last_in_pos = input.pos;
++        size_t last_out_pos = output.pos;
++        zstd_ret = ZSTD_decompressStream(dctx, &output, &input);
++        /*
++         * ZSTD manual doesn't explicitly state what happens,
++         * if ZSTD_decompressStream reads the frame partially.
++         * But, based on our tests, if we don't fully populate
++         * the output and have read all the frames from the input,
++         * we end up with error here.
++         */
++        if (ZSTD_isError(zstd_ret)) {
++            ret = -EIO;
++            break;
++        }
++
++        /*
++         * The ZSTD manual is vague about what to do if it reads
++         * the buffer partially, and we don't want to get stuck
++         * in an infinite loop where ZSTD_decompressStream
++         * returns > 0 waiting for another input chunk. So, we add
++         * a paranoid check that on each step the loop makes some
++         * progress.
++         */
++        if (last_in_pos >= input.pos &&
++            last_out_pos >= output.pos) {
++            ret = -EIO;
++            break;
++        }
++    }
++    /*
++     * Make sure that we have the frame fully flushed here
++     * if not, we somehow managed to get uncompressed cluster
++     * greater then the cluster size, possibly because of its
++     * damage.
++     */
++    if (zstd_ret > 0) {
++        ret = -EIO;
++    }
++
++    ZSTD_freeDCtx(dctx);
++    assert(ret == 0 || ret == -EIO);
++    return ret;
++}
++#endif
++
+ static int qcow2_compress_pool_func(void *opaque)
+ {
+     Qcow2CompressData *data = opaque;
+@@ -217,6 +370,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+         fn = qcow2_zlib_compress;
+         break;
+ 
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++        fn = qcow2_zstd_compress;
++        break;
++#endif
+     default:
+         abort();
+     }
+@@ -249,6 +407,11 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+         fn = qcow2_zlib_decompress;
+         break;
+ 
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++        fn = qcow2_zstd_decompress;
++        break;
++#endif
+     default:
+         abort();
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6cb000be19..3ae9624ba3 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1246,6 +1246,9 @@ static int validate_compression_type(BDRVQcow2State *s, Error **errp)
+ {
+     switch (s->compression_type) {
+     case QCOW2_COMPRESSION_TYPE_ZLIB:
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++#endif
+         break;
+ 
+     default:
+@@ -3478,6 +3481,10 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+         }
+ 
+         switch (qcow2_opts->compression_type) {
++#ifdef CONFIG_ZSTD
++        case QCOW2_COMPRESSION_TYPE_ZSTD:
++            break;
++#endif
+         default:
+             error_setg(errp, "Unknown compression type");
+             goto out;
+-- 
+2.17.0
 
-Hope we hear from you soon, with more fixes, improvements, and new features=
-.
-
-Yours,
-Aleksandar
-
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> Acked-by: Huacai Chen <chenhc@lemote.com>
-> ---
-> v1: Use deposit opreations according to Richard's suggestion.
-> ---
->  target/mips/translate.c | 35 +++++++++++++++++++++++++++++++----
->  1 file changed, 31 insertions(+), 4 deletions(-)
->
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index d745bd2803..25b595a17d 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -5529,6 +5529,7 @@ static void gen_loongson_multimedia(DisasContext
-*ctx, int rd, int rs, int rt)
->  {
->      uint32_t opc, shift_max;
->      TCGv_i64 t0, t1;
-> +    TCGCond cond;
->
->      opc =3D MASK_LMI(ctx->opcode);
->      switch (opc) {
-> @@ -5862,14 +5863,39 @@ static void gen_loongson_multimedia(DisasContext
-*ctx, int rd, int rs, int rt)
->
->      case OPC_SEQU_CP2:
->      case OPC_SEQ_CP2:
-> +        cond =3D TCG_COND_EQ;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLTU_CP2:
-> +        cond =3D TCG_COND_LTU;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLT_CP2:
-> +        cond =3D TCG_COND_LT;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLEU_CP2:
-> +        cond =3D TCG_COND_LEU;
-> +        goto do_cc_cond;
-> +        break;
->      case OPC_SLE_CP2:
-> -        /*
-> -         * ??? Document is unclear: Set FCC[CC].  Does that mean the
-> -         * FD field is the CC field?
-> -         */
-> +        cond =3D TCG_COND_LE;
-> +    do_cc_cond:
-> +        {
-> +            int cc =3D (ctx->opcode >> 8) & 0x7;
-> +            TCGv_i64 t64 =3D tcg_temp_new_i64();
-> +            TCGv_i32 t32 =3D tcg_temp_new_i32();
-> +
-> +            tcg_gen_setcond_i64(cond, t64, t0, t1);
-> +            tcg_gen_extrl_i64_i32(t32, t64);
-> +            tcg_gen_deposit_i32(fpu_fcr31, fpu_fcr31, t32,
-> +                                get_fp_bit(cc), 1);
-> +
-> +            tcg_temp_free_i32(t32);
-> +            tcg_temp_free_i64(t64);
-> +        }
-> +        goto no_rd;
-> +        break;
->      default:
->          MIPS_INVAL("loongson_cp2");
->          generate_exception_end(ctx, EXCP_RI);
-> @@ -5878,6 +5904,7 @@ static void gen_loongson_multimedia(DisasContext
-*ctx, int rd, int rs, int rt)
->
->      gen_store_fpr64(ctx, t0, rd);
->
-> +no_rd:
->      tcg_temp_free_i64(t0);
->      tcg_temp_free_i64(t1);
->  }
-> --
-> 2.26.0.rc2
->
->
-
---000000000000e1d03205a23b9cf2
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">13:23 Uto, 24.03.2020. Jiaxun Yang &lt;<a href=3D"mailto:jia=
-xun.yang@flygoat.com">jiaxun.yang@flygoat.com</a>&gt; =D1=98=D0=B5 =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; Loongson multimedia condition instructions were previously implemented=
- as<br>
-&gt; write 0 to rd due to lack of documentation. So I just confirmed with L=
-oongson<br>
-&gt; about their encoding and implemented them correctly.<br>
-&gt;</p>
-<p dir=3D"ltr">Hi, Jiaxun,</p>
-<p dir=3D"ltr">Richard Henderson selected your patch to be in his pull requ=
-est, and the main maintainer, Peter Maydell, accepted it and integrated it =
-into main tree:</p>
-<p dir=3D"ltr"><a href=3D"https://github.com/qemu/qemu/commit/84878f4c00a7b=
-eca1d1460e2f77a6c833b8d0393#diff-b06d6b84c7a82caf0f5e4645f4b80540">https://=
-github.com/qemu/qemu/commit/84878f4c00a7beca1d1460e2f77a6c833b8d0393#diff-b=
-06d6b84c7a82caf0f5e4645f4b80540</a></p>
-<p dir=3D"ltr">I gather this is your first patch merged in QEMU upstream.</=
-p>
-<p dir=3D"ltr">Congratulations!!</p>
-<p dir=3D"ltr">There is a place for you in QEMU community.</p>
-<p dir=3D"ltr">Hope we hear from you soon, with more fixes, improvements, a=
-nd new features.</p>
-<p dir=3D"ltr">Yours,<br>
-Aleksandar<br></p>
-<p dir=3D"ltr">&gt; Signed-off-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun=
-.yang@flygoat.com">jiaxun.yang@flygoat.com</a>&gt;<br>
-&gt; Acked-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com">chenhc@=
-lemote.com</a>&gt;<br>
-&gt; ---<br>
-&gt; v1: Use deposit opreations according to Richard&#39;s suggestion.<br>
-&gt; ---<br>
-&gt; =C2=A0target/mips/translate.c | 35 +++++++++++++++++++++++++++++++----=
-<br>
-&gt; =C2=A01 file changed, 31 insertions(+), 4 deletions(-)<br>
-&gt;<br>
-&gt; diff --git a/target/mips/translate.c b/target/mips/translate.c<br>
-&gt; index d745bd2803..25b595a17d 100644<br>
-&gt; --- a/target/mips/translate.c<br>
-&gt; +++ b/target/mips/translate.c<br>
-&gt; @@ -5529,6 +5529,7 @@ static void gen_loongson_multimedia(DisasContext=
- *ctx, int rd, int rs, int rt)<br>
-&gt; =C2=A0{<br>
-&gt; =C2=A0 =C2=A0 =C2=A0uint32_t opc, shift_max;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0TCGv_i64 t0, t1;<br>
-&gt; +=C2=A0 =C2=A0 TCGCond cond;<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0opc =3D MASK_LMI(ctx-&gt;opcode);<br>
-&gt; =C2=A0 =C2=A0 =C2=A0switch (opc) {<br>
-&gt; @@ -5862,14 +5863,39 @@ static void gen_loongson_multimedia(DisasConte=
-xt *ctx, int rd, int rs, int rt)<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SEQU_CP2:<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SEQ_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_EQ;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLTU_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LTU;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLT_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LT;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLEU_CP2:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LEU;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto do_cc_cond;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0case OPC_SLE_CP2:<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ??? Document is unclear: Set FCC[=
-CC].=C2=A0 Does that mean the<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* FD field is the CC field?<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 cond =3D TCG_COND_LE;<br>
-&gt; +=C2=A0 =C2=A0 do_cc_cond:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int cc =3D (ctx-&gt;opcode =
-&gt;&gt; 8) &amp; 0x7;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t64 =3D tcg_temp_n=
-ew_i64();<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i32 t32 =3D tcg_temp_n=
-ew_i32();<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_setcond_i64(cond, t=
-64, t0, t1);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_extrl_i64_i32(t32, =
-t64);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i32(fpu_fcr=
-31, fpu_fcr31, t32,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_fp_bit(cc), 1);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i32(t32);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t64);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto no_rd;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0default:<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_INVAL(&quot;loongson_cp2&quot;)=
-;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0generate_exception_end(ctx, EXCP_RI)=
-;<br>
-&gt; @@ -5878,6 +5904,7 @@ static void gen_loongson_multimedia(DisasContext=
- *ctx, int rd, int rs, int rt)<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 =C2=A0gen_store_fpr64(ctx, t0, rd);<br>
-&gt;<br>
-&gt; +no_rd:<br>
-&gt; =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t0);<br>
-&gt; =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t1);<br>
-&gt; =C2=A0}<br>
-&gt; -- <br>
-&gt; 2.26.0.rc2<br>
-&gt;<br>
-&gt;<br>
-</p>
-
---000000000000e1d03205a23b9cf2--
 
