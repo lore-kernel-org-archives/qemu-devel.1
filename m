@@ -2,141 +2,121 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,PDS_TONAME_EQ_TOLOCAL_SHORT,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFEFC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6072C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 924DB20675
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:48:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 924DB20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6DB472078B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:49:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="MF12B1aX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB472078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJcnH-0002PR-Gv
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:48:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57859)
+	id 1jJcoW-00049t-LI
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:49:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jJcll-0001bv-50
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:46:58 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJcmR-00020Z-DT
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:47:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jJclk-0004ub-0R
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:46:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62422
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJcmP-0005gV-8o
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:47:38 -0400
+Received: from mail-am6eur05on2096.outbound.protection.outlook.com
+ ([40.107.22.96]:26080 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jJclj-0004sH-Qf
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:46:55 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 031CeNiY137767
- for <qemu-devel@nongnu.org>; Wed, 1 Apr 2020 08:46:55 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 304h3w9c0r-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 08:46:54 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Wed, 1 Apr 2020 13:46:38 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 1 Apr 2020 13:46:34 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 031CklEE61407442
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 1 Apr 2020 12:46:47 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C77864203F;
- Wed,  1 Apr 2020 12:46:47 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 408524204B;
- Wed,  1 Apr 2020 12:46:47 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.71.143])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  1 Apr 2020 12:46:47 +0000 (GMT)
-Subject: Re: [PATCH v3 1/1] vl/s390x: fixup ram sizes for compat machines
-To: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-References: <20200401123754.109602-1-borntraeger@de.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Wed, 1 Apr 2020 14:46:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200401123754.109602-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jJcmO-0005cy-GD
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:47:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b1tCyVeNsfUScsSyaMOcKPrcZizCGxFviV10kTe18haFVzLq6C/iRTVbK8/Prmzz6bv2jELm+25y9DR5EMNsIfLQjIbGvhNnNOBlPRvvt4FquoHMvaGjZ8tSfQtDUiDA8x97foG364LqT/wcBTF+RhvAR/mmnflIPYMq2sUzG9GtZXZxugaGuio1y8mkzPKj+zMSCcRFdAPgvHTaWx0lc9SfWOziLrxM2We+Wf93hkQlITe+HE5t0tGbowCibkubg74A/ld8sV+mJZrHumsKSvOLZ5SdDkfePnaasU1s9DO138TiKmSDiMYHorMWxqgLZVteFfyZraSFFhAJfLgUZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uGMPnb2DmVmzGRtopoyn2Tj+DDTS5cbZczLuqQtisUY=;
+ b=gVs4B3XLLiKJpWiiVWxLYdv0VFHRIcGm1j7BYMKRFrbk9AECI3ZeDqu29uo2hAVyLqGnvL6fqu/JFeD9k3/cItVMBfhU9Abn041GgFqf2MfspxOvX3pZDtWx2vYHYiW0Urnfa/eBldjMIBoR86eTZA6ui8vi3ItypTGr/H/20gDu4acsbhkX3+NuKIaGxy9aRul4X6nxznuvv7y1+QlMleQEBJ/SOV8XZjchj0yn0+Vltri+slZDsHoLeuZ0hit9wUWT3v6Q+T3WUadqaPA+89sfnjKwAFzotGjGXVT5bdYs0t0TFQLUq3cq/IcTY1Ph7bXKQ8OMf9kFbvtQdXgUKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uGMPnb2DmVmzGRtopoyn2Tj+DDTS5cbZczLuqQtisUY=;
+ b=MF12B1aXGiAWRd39E4PQWPapQGuj5QzwoL1HV+/dOZL0aadn+rZE/rPk4tIGaSM1aAkyqOpHz/sq3OI6MJ8hvk5G200bDQACRDQkMLwGFmr8blFZK8boYtzjY7Gs0NfxdObS1j+/EgYnoLxJ5fMG5FPyZjSY+y379zzq8rBJ+UI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5302.eurprd08.prod.outlook.com (10.141.171.74) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.20; Wed, 1 Apr 2020 12:47:34 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
+ 12:47:34 +0000
+Subject: Re: Questionable aspects of QEMU Error's design
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <20200401124422.GC393810@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200401154732635
+Message-ID: <78f18b8e-720e-8826-e35f-3fbba8c97124@virtuozzo.com>
+Date: Wed, 1 Apr 2020 15:47:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200401124422.GC393810@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20040112-0016-0000-0000-000002FC5498
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040112-0017-0000-0000-00003360191F
-Message-Id: <98e7d475-62d6-8259-3541-791be978abff@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-01_01:2020-03-31,
- 2020-03-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=0
- phishscore=0 adultscore=0 priorityscore=1501 lowpriorityscore=0
- mlxlogscore=822 suspectscore=0 spamscore=0 clxscore=1015 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004010113
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: AM0PR05CA0082.eurprd05.prod.outlook.com
+ (2603:10a6:208:136::22) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.23) by
+ AM0PR05CA0082.eurprd05.prod.outlook.com (2603:10a6:208:136::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20 via Frontend
+ Transport; Wed, 1 Apr 2020 12:47:34 +0000
+X-Tagtoolbar-Keys: D20200401154732635
+X-Originating-IP: [185.215.60.23]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b56194fa-f56f-40c2-265b-08d7d63ad998
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5302:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5302B69698FCA077C3B185DFC1C90@AM7PR08MB5302.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 03607C04F0
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(396003)(39840400004)(366004)(136003)(346002)(376002)(316002)(86362001)(478600001)(66946007)(36756003)(31686004)(6486002)(31696002)(186003)(5660300002)(52116002)(26005)(16576012)(8676002)(66556008)(110136005)(4326008)(956004)(81166006)(2906002)(2616005)(16526019)(81156014)(8936002)(66476007);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Kf2Pywhbva7dcR85xUnAf+ppwvt5XHO7aUzZWl9X/nGOLFLa9pnEUeuqXHICpoIF+wj55QGUum4hzkUkdJJ6gMHatXQxUXDm7v/PSprq6DZhkBBbrkXpgn3adlgkdtENWmSvyH7B8rD91dOVnYGL0F6PHweS11wKEW4JugYy/Nd/WRsPevKIK3TfmC/JRyNz3Je07tKXmHGXlNWF3sTX8+mfuZNd4s2Ew8KAsuoTu0bm+/W74+Tqqi8OEsNJzNb5isSCMUevEatJS/Yq1wO8pfdKPs6tsLE0ABSrHiVlJJk4SufiPtto7PM2ejOIukbzPFBE5oF/2JJHG8kOdu8NYC7sQfK6NLcfj+Un2pmJ3rJcHV4H32sCCgBoumJmnyRk7eY29CaedFNl3K2ZHHsR74psS1ic2dtMUI5vI1Hsqthp7yjeBvD8Ec/GhcBOCdIm
+X-MS-Exchange-AntiSpam-MessageData: 4rljAmN+JWxgplNAeIyFOu4g87iyhjwomrV/k3mwsrtseETmQCYtxZkWHXEyLnZpwxfRToFuUqTTJpVCoac8ObDX7rm3BQRn3Z/py4kiSwj/qkZgMv/n35R+3Iac/hhHPicHe0gXdn+9/lWRXdY67w==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b56194fa-f56f-40c2-265b-08d7d63ad998
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 12:47:34.4682 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: i/pqFA0Q0v47UB/vudwCdniReUkJRWl3aGkHDyZFmCrYFb8b5uLhfLDcwA2ziTMfsGFUABwe9oa24jEskWhPL+/pxCVOlp5v/+6WjNRv7v4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5302
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.22.96
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,24 +128,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+01.04.2020 15:44, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Apr 01, 2020 at 11:02:11AM +0200, Markus Armbruster wrote:
+>> QEMU's Error was patterned after GLib's GError.  Differences include:
+>>
+>> * &error_fatal, &error_abort for convenience
+>=20
+> I think this doesn't really need to exist, and is an artifact
+> of the later point "return values" where we commonly make methds
+> return void.  If we adopted a non-void return value, then these
+> are no longer so compelling.
+>=20
+> Consider if we didn't have &error_fatal right now, then we would
+> need to
+>=20
+>     Error *local_err =3D NULL;
+>     qemu_boot_set(boot_once, &local_err)
+>     if (*local_err)
+>        abort();
+>=20
+> This is tedious, so we invented &error_abort to make our lives
+> better
+>=20
+>     qemu_boot_set(boot_once, &error_abort)
+>=20
+>=20
+> If we had a "bool" return value though, we would probably have just
+> ended up doing:
+>=20
+>     assert(qemu_boot_set(boot_once, NULL));
+
+But error_abort is better: it crashes where error fired and backtrace
+in core file is backtrace of and error.
+
+>=20
+> or
+>=20
+>     if (!qemu_boot_set(boot_once, NULL))
+>         abort()
+>=20
+> and would never have invented &error_fatal.
+>=20
+>> * Distinguishing different errors
+>>
+>>    Where Error has ErrorClass, GError has Gquark domain, gint code.  Use
+>>    of ErrorClass other than ERROR_CLASS_GENERIC_ERROR is strongly
+>>    discouraged.  When we need callers to distinguish errors, we return
+>>    suitable error codes separately.
+>=20
+> The GQuark is just a static string, and in most cases this ends up being
+> defined per-file, or sometimes per functional group. So essentially you
+> can consider it to approximately a source file in most cases. The code
+> is a constant of some arbitrary type that is generally considered to be
+> scoped within the context of the GQuark domain.
+>=20
+>> * Return value conventions
+>>
+>>    Common: non-void functions return a distinct error value on failure
+>>    when such a value can be defined.  Patterns:
+>>
+>>    - Functions returning non-null pointers on success return null pointe=
+r
+>>      on failure.
+>>
+>>    - Functions returning non-negative integers on success return a
+>>      negative error code on failure.
+>>
+>>    Different: GLib discourages void functions, because these lead to
+>>    awkward error checking code.  We have tons of them, and tons of
+>>    awkward error checking code:
+>>
+>>      Error *err =3D NULL;
+>>      frobnicate(arg, &err);
+>>      if (err) {
+>>          ... recover ...
+>>          error_propagate(errp, err);
+>>      }
+>=20
+> Yeah, I really dislike this verbose style...
+>=20
+>>
+>>    instead of
+>>
+>>      if (!frobnicate(arg, errp))
+>>          ... recover ...
+>>      }
+>=20
+> ...so I've followed this style for any code I've written in QEMU
+> where possible.
+>=20
+>>
+>>    Can also lead to pointless creation of Error objects.
+>>
+>>    I consider this a design mistake.  Can we still fix it?  We have more
+>>    than 2000 void functions taking an Error ** parameter...
+>=20
+> Even if we don't do full conversion, we can at least encourage the
+> simpler style - previously reviewers have told me to rewrite code
+> to use the more verbose style, which I resisted. So at the very
+> least setting the expectations for preferred style is useful.
+>=20
+>>    Transforming code that receives and checks for errors with Coccinelle
+>>    shouldn't be hard.  Transforming code that returns errors seems more
+>>    difficult.  We need to transform explicit and implicit return to
+>>    either return true or return false, depending on what we did to the
+>>    @errp parameter on the way to the return.  Hmm.
+>=20
+> Even if we only converted methods which are currently void, that
+> would be a notable benefit I think.
+>=20
+> It is a shame we didn't just use GError from the start, but I guess
+> its probably too late to consider changing that now.
+>=20
+> Regards,
+> Daniel
+>=20
 
 
-On 01.04.20 14:37, Christian Borntraeger wrote:
-> +    if (sz != newsz) {
-> +        qemu_printf("Ram size %" PRIu64 "MB was fixed up to %" PRIu64
-> +                    "MB to match machine restrictions. Consider updating "
-> +                    "the guest definition.i\n", sz / MiB, newsz / MiB);
-
-                                             ^ spurious i.
-
+--=20
+Best regards,
+Vladimir
 
