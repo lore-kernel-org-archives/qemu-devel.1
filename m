@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B4C9C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 09:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCA6C2D0F2
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 09:52:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2128420772
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 09:52:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E7E520772
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 09:52:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bho9PpvI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2128420772
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o4vYVVwe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E7E520772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJa2q-0003oH-Ao
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 05:52:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38494)
+	id 1jJa2r-0003qA-E2
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 05:52:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jJZyp-0004TV-Dg
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 05:48:16 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jJZym-0004L1-4T
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 05:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jJZyo-0002Fw-9f
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 05:48:15 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45978)
+ (envelope-from <alex.bennee@linaro.org>) id 1jJZyl-0002CR-2W
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 05:48:12 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:39524)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jJZyo-0002FX-3D
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 05:48:14 -0400
-Received: by mail-wr1-x442.google.com with SMTP id t7so29717079wrw.12
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 02:48:14 -0700 (PDT)
+ id 1jJZyk-0002C7-Sj
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 05:48:11 -0400
+Received: by mail-wm1-x333.google.com with SMTP id e9so6423010wme.4
+ for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 02:48:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WLTsGPoiyiZpQWSAjDx1Jd/3OsKOnqyDSFWAME1qJxU=;
- b=Bho9PpvIJqh1yBVCpgktnF2q4gBLJiWRK1Bdesx3wnL+bemJhpFF1PtSZ+V0z2Whcl
- qnChS1AabKalg2BP7QCt6e9x5+0GxJXZhVSve+cbD1XWZkvsnFYExxwP4WasdAmzJj0J
- hYEhtdQc1gRLIleu5WkOCk/gRUSVRzSOvABl/rfkX5KLwSh2fgqh9RYG4gD2EEf+omeo
- P5UTatdU0nrIn57LzZRfvI8FXFZYveF8tlWC1zdqhDnhA4eO/hNs6IucRB1l6c7Wa9N+
- x/6atOLjsBst1LJAEw4RkvK+ntRfZykRlGvD/plb2bySagklsTfkDhdAApKYjyKlDUez
- UAPQ==
+ bh=IiHiPfqSf5RxTYVWG0ZPN64iJbsFrXxtKKLhTgnCXm4=;
+ b=o4vYVVwe2EC92JvUXX3NUKM4/28QtjdplV4no0lfxCgy5M98elsMbsK8YZ5zMP/yfg
+ joliNWhm17CbcgQB4JIY1CnM4Hj1r2DN0KOsKsDu3aS8NPQOItWNXuNSYXjvo1wJGvC8
+ Or+nm2PfUhzOgJZTbX/UVTtEBdBAGmWLgdwrIW9Yz42054i+5snn/YVHmcGMvYfXJhay
+ peXWQF4v4cnMaPK2BPoZZc2ElSvndfyGiBguuQ+Y7KJQOxst+ZqAvbyU+tGX7dgjwTq+
+ Um2ZdyxuJHYOSef5AFF9yHm92WKrg7ubRZqQD2Lbct1jsYKouhOg8ItPN8cMiE0rxr7J
+ qTgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WLTsGPoiyiZpQWSAjDx1Jd/3OsKOnqyDSFWAME1qJxU=;
- b=nWQaj1jUyEJDpLujiLffm+QJOGTp14laUIiEi8lJMyIC8+dCquMPIUz1qt7Lj8Slcr
- fT8qAhr2EU4AlPEJTcyO7JiPvfO8NUBmjeInfADxLjA2XWZfxkhNeZRpnF6RHXTwmmXO
- 3cGMwTfE2hQw25U2EPVBr5nugSeF/Fd2+bkcFUO47bl/i389uAi8/UEBpDj4XVCWcmAf
- P2abDXvdsmXIlBBTy415yDoCE/nMlm4zOSOaqMdeMwLCDuIYFeU34jeBrBXoZHfG0rSC
- vyO+K3fr2XulfRlAC8hUQfJ696CO1zDdlquqPAWMBNmUjvuDXHDsa0YzdKnAePCB7qgU
- pkaA==
-X-Gm-Message-State: ANhLgQ3VHu9JhzhEJ/IwP9CytePMVazEWI1d2sEmcdTEZ8kjxvKcUmu+
- t9sd14xn8bLtI4Jy4wHHUCRaCg==
-X-Google-Smtp-Source: ADFU+vvmkcPnEaQoSqVRpRTP7Ezl4fwK7WCuek23SCd9jAE6+pWf+MZLzxDBU85j05YW39uphhtwoQ==
-X-Received: by 2002:adf:bb06:: with SMTP id r6mr25539282wrg.324.1585734493143; 
- Wed, 01 Apr 2020 02:48:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r15sm2350519wra.19.2020.04.01.02.48.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=IiHiPfqSf5RxTYVWG0ZPN64iJbsFrXxtKKLhTgnCXm4=;
+ b=Dev5vlF7YWbb9xryKrwab7PCK9eZ6QdWvgf2wjcvoMAUN+m0wAL2O4xbACVadlJKfe
+ 0DEmb7xfPtc57WhtNqqopCX2yHvO723vnF8dT+tv6bN5rOK0Xd69uPxjNqmEWZyRJyGm
+ NrD/PWP+idx18ARUUcfH7WVOLHT4z2QrSUxqjcv8nF7slYIPfxp4hyNN5t1UZeLhBhXe
+ 0uxtoFwswIQaI0QoerCusRz1otQ1l/NeikWwFIVyefeUCT1Kpbc9hLxGYFZPJoKu7p9k
+ /Xfp78HpyK/u3wHAfU9BoGRYkkEnBeqXkPYuXUPBb2QFvrcj3JcQeM4+nD2lDadeObFp
+ MknQ==
+X-Gm-Message-State: AGi0PuYRtMGt09l8kmXN9EjyIfxKQCY3NC/C4Ic2sZiIvN9U8o5C4zdn
+ /bH0Ktgp6i+OvFi9GIL8mkxWYg==
+X-Google-Smtp-Source: APiQypL3qT/ng4H8zsPoTm92t2srUtNHi9cg41Gzg+vNwft4IeWldnuE01wCzh7dbRLCePxvRh16yw==
+X-Received: by 2002:a1c:8193:: with SMTP id c141mr3330040wmd.14.1585734489788; 
  Wed, 01 Apr 2020 02:48:09 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o9sm2184644wrx.48.2020.04.01.02.48.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Apr 2020 02:48:03 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C998A1FF98;
+ by zen.linaroharston (Postfix) with ESMTP id 09BC91FF92;
  Wed,  1 Apr 2020 10:48:01 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 09/10] linux-user: clean-up padding on /proc/self/maps
-Date: Wed,  1 Apr 2020 10:47:58 +0100
-Message-Id: <20200401094759.5835-10-alex.bennee@linaro.org>
+Subject: [PATCH  v2 06/10] gdbstub: fix compiler complaining
+Date: Wed,  1 Apr 2020 10:47:55 +0100
+Message-Id: <20200401094759.5835-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200401094759.5835-1-alex.bennee@linaro.org>
 References: <20200401094759.5835-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,82 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Don't use magic spaces, calculate the justification for the file
-field like the kernel does with seq_pad.
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 
+    ./gdbstub.c: In function ‘handle_query_thread_extra’:
+        /usr/include/glib-2.0/glib/glib-autocleanups.h:28:10:
+    error: ‘cpu_name’ may be used uninitialized in this function
+    [-Werror=maybe-uninitialized]
+        g_free (*pp);
+               ^
+    ./gdbstub.c:2063:26: note: ‘cpu_name’ was declared here
+        g_autofree char *cpu_name;
+                         ^
+    cc1: all warnings being treated as errors
+
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-Id: <20200326151407.25046-1-dplotnikov@virtuozzo.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Reported-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- linux-user/syscall.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+ gdbstub.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 0246df01573..b921432f4ff 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7235,6 +7235,7 @@ static int open_self_maps(void *cpu_env, int fd)
-     TaskState *ts = cpu->opaque;
-     GSList *map_info = read_self_maps();
-     GSList *s;
-+    int count;
- 
-     for (s = map_info; s; s = g_slist_next(s)) {
-         MapInfo *e = (MapInfo *) s->data;
-@@ -7253,20 +7254,24 @@ static int open_self_maps(void *cpu_env, int fd)
-             }
- 
-             if (h2g(min) == ts->info->stack_limit) {
--                path = "      [stack]";
-+                path = "[stack]";
-             } else {
-                 path = e->path;
-             }
- 
--            dprintf(fd, TARGET_ABI_FMT_ptr "-" TARGET_ABI_FMT_ptr
--                    " %c%c%c%c %08" PRIx64 " %s %d %s%s\n",
--                    h2g(min), h2g(max - 1) + 1,
--                    e->is_read ? 'r' : '-',
--                    e->is_write ? 'w' : '-',
--                    e->is_exec ? 'x' : '-',
--                    e->is_priv ? 'p' : '-',
--                    e->offset, e->dev, e->inode,
--                    path ? "         " : "", path ? path : "");
-+            count = dprintf(fd, TARGET_ABI_FMT_ptr "-" TARGET_ABI_FMT_ptr
-+                            " %c%c%c%c %08" PRIx64 " %s %d",
-+                            h2g(min), h2g(max - 1) + 1,
-+                            e->is_read ? 'r' : '-',
-+                            e->is_write ? 'w' : '-',
-+                            e->is_exec ? 'x' : '-',
-+                            e->is_priv ? 'p' : '-',
-+                            e->offset, e->dev, e->inode);
-+            if (path) {
-+                dprintf(fd, "%*s%s\n", 73 - count, "", path);
-+            } else {
-+                dprintf(fd, "\n");
-+            }
-         }
-     }
- 
-@@ -7277,9 +7282,10 @@ static int open_self_maps(void *cpu_env, int fd)
-      * We only support execution from the vsyscall page.
-      * This is as if CONFIG_LEGACY_VSYSCALL_XONLY=y from v5.3.
-      */
--    dprintf(fd, TARGET_FMT_lx "-" TARGET_FMT_lx
--            " --xp 00000000 00:00 0 [vsyscall]\n",
--            TARGET_VSYSCALL_PAGE, TARGET_VSYSCALL_PAGE + TARGET_PAGE_SIZE);
-+    count = dprintf(fd, TARGET_FMT_lx "-" TARGET_FMT_lx
-+                    " --xp 00000000 00:00 0",
-+                    TARGET_VSYSCALL_PAGE, TARGET_VSYSCALL_PAGE + TARGET_PAGE_SIZE);
-+    dprintf(fd, "%*s%s\n", 73 - count, "",  "[vsyscall]");
- #endif
- 
-     return 0;
+diff --git a/gdbstub.c b/gdbstub.c
+index 013fb1ac0f1..171e1509509 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -2060,8 +2060,8 @@ static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
+         /* Print the CPU model and name in multiprocess mode */
+         ObjectClass *oc = object_get_class(OBJECT(cpu));
+         const char *cpu_model = object_class_get_name(oc);
+-        g_autofree char *cpu_name;
+-        cpu_name  = object_get_canonical_path_component(OBJECT(cpu));
++        g_autofree char *cpu_name =
++            object_get_canonical_path_component(OBJECT(cpu));
+         g_string_printf(rs, "%s %s [%s]", cpu_model, cpu_name,
+                         cpu->halted ? "halted " : "running");
+     } else {
 -- 
 2.20.1
 
