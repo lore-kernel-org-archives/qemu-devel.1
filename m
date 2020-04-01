@@ -2,115 +2,85 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CFDC2D0F3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4798DC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:10:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72C2E20776
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:08:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C29E20776
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 15:10:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OibTwkSh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72C2E20776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gb7M43yq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C29E20776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJeyP-0006pS-K4
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 11:08:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38996)
+	id 1jJf0g-0000DU-4O
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 11:10:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40236)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJesA-0006cq-2u
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:01:43 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jJf03-000890-EI
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJes5-0004F3-0r
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:01:41 -0400
-Received: from mail-eopbgr10093.outbound.protection.outlook.com
- ([40.107.1.93]:29790 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jJery-000494-4g; Wed, 01 Apr 2020 11:01:30 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mGAE9zky8WW1Qo2P63tw39Cukji+NqdNiJpLoJApfS43ON7gvgmtUmdYHc2m8nBVRrlDb3h6TZh9CBMyJuWXxqfoipXlugfBtSSepNa1UCO1trcti57e5u/4lUFMPAOeRn48A7FHPEQhAFEwPmTlahZ1oBjyDDhgeo4iozCOjj8a44l2FjI6tmgttOf7X4pcxT1lJE1VE4qVreAhORo04Ih45Fdx+gFx/LkRN2Cvg/bNdMBaGfMKk5lwXNjm/ztzJsj/YbRJecxaF39yHzKbb61pxdhc+odhFhzu69Tis45KBOUncGS436slwItXVu2LaPrnMa9j1gUgh1822tQ3DQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z3WoCCv4H2YnJxqmhYPQHq97h5gTbEbEb+hVB6Wu7bo=;
- b=ISx7r//xWwSkJKMmL0BdOJW43Zi2LP/ZqeeBjymf1bz0FEeJV672KoAvIgPQQyc2PKT/toHUB29XD0JgJDhf1594IYBFQbmN20aPRaJ7ft6v9ehLnUqKrj6wmhCaWVlAPYSg2lYoTFhNL8PGqN8vzenfyzkoDChBvflCPdZzuJwwzwpYUE6xA0OosydcWTe01pV3VpQeHo2IEeitBhm464S4yHySQH6ZEdwSyxwFEEBLdY8GQZLKhOoFv9lWK0pwK9RwfHtDlyuYTyxB0QX+oTfNJLGQlipqqqvsSzkbBHLKFF2m5xep1/u+eTzM8P8B3EFrqSiThen9069yt3JvCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z3WoCCv4H2YnJxqmhYPQHq97h5gTbEbEb+hVB6Wu7bo=;
- b=OibTwkShr/7hQrmZlkTzxyFUzBHYqg0Wxc1kCd+9LJc2vVbDU+klOFi1JLd3+yvWA+Lcd+oenjR6/o3/RTu9VDAWnRZUBlRUmR4GWs9ii9e5UXJ4Pqj//MWD5/wuQ213XObmkR3ZnYGN+c6fdGR1sDQvqi7dC36OC7nNP7Ejayc=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.15; Wed, 1 Apr 2020 15:01:28 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
- 15:01:28 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 3/6] block: add max_pwrite_zeroes_fast to BlockLimits
-Date: Wed,  1 Apr 2020 18:01:09 +0300
-Message-ID: <20200401150112.9557-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200401150112.9557-1-vsementsov@virtuozzo.com>
-References: <20200401150112.9557-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: AM4P190CA0012.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:200:56::22) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <stefanha@gmail.com>) id 1jJf01-0000nU-Py
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:09:51 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:44375)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jJf01-0000lt-JK
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 11:09:49 -0400
+Received: by mail-wr1-x431.google.com with SMTP id m17so420411wrw.11
+ for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 08:09:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=cLluM/9K0G98s84ODKjhGtGlfBsm5BDtxcKk/LW00l4=;
+ b=gb7M43yqdId3PMG1kzP3ikMw03Z0fwjyhRRDEr244pD05wry7LPcSnRH9XTSyY+lcO
+ R8Re1mVaNifeknXQFYDg7IFYMj5QuCCQBda1UQXsiRAhmVpwC0CnBvJn2FuZx16fivF/
+ jTOtJ5CTtcW3nRMHuRhWOVYyJSgBEKwmXRl8eDcZKQRkNbQy9Z8qcdEL1pm8Qvd0p93q
+ K3tCpOIpExzwDKmxqpyq9bsVRVo4DXfjryF6ls0vXkJV1421qnq2eIUj8DHYdonqGdHw
+ fgMXNNQrWjymg8gogQhogwbAjxgO6lBkirqQjDFoZu1UH7EQkPNL0xpnTEQL4u0qC4eW
+ iZiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=cLluM/9K0G98s84ODKjhGtGlfBsm5BDtxcKk/LW00l4=;
+ b=bxInOelywgu4whIyVDp2gzl8+8cRqtesnX2jmiMAQSSFvHWDxCdq/omoynvliyV3ZE
+ bEsa2zxIgqKcZTIPUU/cxKQh4M4AeMSjnrk2LaxlCgYh/WUi1lLQFeqzHtqPyIh+a+RM
+ ymdKYzyV/iDiObCXG5N6IXKhjRCRT4ZsGSfXD8ZUWRMJjFMK/qeMyWEMhz86CkhryDYf
+ PtiNpf0OnNs4aAbhJhuECNlsN4h/a7q85QpNVSL6ZYOJodtKhQxBPawlWFfF1dtsXRHh
+ PPT+LCi0NvpXEaX5ckI4Ewp5VETekJP2/CDTvC2PFn0LkLzadm2L/0YziBFFXvLrrW8e
+ 0RvA==
+X-Gm-Message-State: AGi0PuYsmk9y2O3oRaoDkFe22J8KjK0V4bxdI3NklehS4gyWsyGgomvI
+ jfbdmkSH9w0w8DjU3jTk9rw=
+X-Google-Smtp-Source: APiQypIfQyYv2stS+tB+RUdvacqdhzDV3x/nOisNm1hdPIfm3c+XwvJmzlN3MPgnB61jHJ3Oz3mPUQ==
+X-Received: by 2002:a5d:4cc7:: with SMTP id c7mr5344596wrt.375.1585753787836; 
+ Wed, 01 Apr 2020 08:09:47 -0700 (PDT)
+Received: from localhost (114.9.90.146.dyn.plus.net. [146.90.9.114])
+ by smtp.gmail.com with ESMTPSA id v186sm2994121wme.24.2020.04.01.08.09.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Apr 2020 08:09:46 -0700 (PDT)
+Date: Wed, 1 Apr 2020 16:09:44 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: Question about scsi device hotplug (e.g scsi-hd)
+Message-ID: <20200401150944.GA4500@stefanha-x1.localdomain>
+References: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.23) by
- AM4P190CA0012.EURP190.PROD.OUTLOOK.COM (2603:10a6:200:56::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.20 via Frontend Transport; Wed, 1 Apr 2020 15:01:27 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.23]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d61ded40-b62f-4875-6076-08d7d64d8e2b
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5494:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5494B714EEA9B9D2FEA971A8C1C90@AM7PR08MB5494.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:538;
-X-Forefront-PRVS: 03607C04F0
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(376002)(136003)(346002)(396003)(39840400004)(366004)(66946007)(66556008)(52116002)(6486002)(86362001)(186003)(107886003)(478600001)(6506007)(4326008)(2906002)(6916009)(16526019)(26005)(5660300002)(6666004)(316002)(66476007)(1076003)(81166006)(36756003)(2616005)(81156014)(8676002)(8936002)(956004)(6512007);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ntJp2fcjjRNfE4Qjs2yEDiCPQEPAJTxB7OfWcKfCogKAExZwriBuGvAMGIcJTGyZ4Xi50BcOc3FwRbJ2XdJRbj6ZqEwm1evZhzY0xjaw0P7N4eGRR6sHKddfiscd05FqRwyR1AwwC4S5mxX7up4Y/83PXALq83oVQdFVkpKq4VJKCc+RBO8KBiIjNxYKZwEulZ18ahSB2uLw1Pv9AdD415hzvkP3HGPoSx4H/01Cqw0DHoI33OdAfmEZRZbdMl1P/rjug6fhrKHERLe9Vc1qJsyCw71MSkSZu8gnfYw54StwtjYKckdzxqMx08r8Or1bDUPkMwjYy7vrPtGUJdLUVNI6k2DiRlzwB+dZ1rq+ceYZM6x13SVy7JqzaWtGUD1sA0vNjbVwHYerhuKo1bC1KphJ2AVFGnXo0/noCPiEP13qyGkUmmN+BbxUwEQBIkv0
-X-MS-Exchange-AntiSpam-MessageData: RYRVOPXLnx6uvc7MNHSazu5dc1j+i7VzMYQ1CrBoHzSL9sbIp+5DLN+ORRrDdchUpSNBLvDFJPKzmHEIYylFSDHsSQvbElhPEGqssLlIJ8XrPXSRlbG7bRy42/lYcQkpzL9c1esgJbfN9nEV2SxCJw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d61ded40-b62f-4875-6076-08d7d64d8e2b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 15:01:28.3960 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BYLjYK0RpSF2tY5tKDSdE5sFfMTHgWCx6Npd/C8HVWZ258ML4YVQUQ9/2Ohs0kXA9oLCJvMQfwamGLSUHYQs9klGOVgCnMiQCvgCfET+uxA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5494
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.1.93
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
+Content-Disposition: inline
+In-Reply-To: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,92 +92,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The NBD spec was recently updated to clarify that max_block doesn't
-relate to NBD_CMD_WRITE_ZEROES with NBD_CMD_FLAG_FAST_ZERO (which
-mirrors Qemu flag BDRV_REQ_NO_FALLBACK). To drop the restriction we
-need new max_pwrite_zeroes_fast.
 
-Default value of new max_pwrite_zeroes_fast is zero and it means
-use max_pwrite_zeroes. So this commit semantically changes nothing.
+--0F1p//8PRICkK4MW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/block_int.h |  8 ++++++++
- block/io.c                | 17 ++++++++++++-----
- 2 files changed, 20 insertions(+), 5 deletions(-)
+On Tue, Mar 31, 2020 at 07:16:23PM +0300, Maxim Levitsky wrote:
+> Hi!
+>=20
+> I recently investigated an interesting issue related to repeated scsi-hd =
+hotplug/hotunplug.
+> The bugzilla for it is here:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1812399
+>=20
+> In nutshell the issue that I think that I found and I would like to ask y=
+our opinion on it,
+> since I don't have enough experience to be 100% sure that I didn't miss s=
+omething  is this:
+>=20
+> When a new device is hotplugged via monitor, the qdev_device_add first pu=
+ts the device on
+> the bus where the user requested it to be, and then calls the device's .r=
+ealize.
+>=20
+> However for scsi bus, each time a new request is sent from the guest, the=
+ scsi adapter drivers
+> (e.g virtio-scsi) call scsi_device_find to find the LUN's driver to dispa=
+tch the request to,
+> and scsi_device_find will return the added device as soon as it is placed=
+ on the bus.
+>=20
+> Thus between the point when the new device is placed on the bus and until=
+ the end of the .realize,
+> the device can be accessed by the guest when it is not yet realized or pa=
+rtially realized as
+> happens in the bugreport.
+>=20
+> What do you think about it?
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 4c3587ea19..ea1018d598 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -624,6 +624,14 @@ typedef struct BlockLimits {
-      * pwrite_zeroes_alignment. May be 0 if no inherent 32-bit limit */
-     int32_t max_pwrite_zeroes;
-=20
-+    /*
-+     * Maximum number of bytes that can zeroed at once if flag
-+     * BDRV_REQ_NO_FALLBACK specified. Must be multiple of
-+     * pwrite_zeroes_alignment.
-+     * If 0, max_pwrite_zeroes is used for no-fallback case.
-+     */
-+    int64_t max_pwrite_zeroes_fast;
-+
-     /* Optimal alignment for write zeroes requests in bytes. A power
-      * of 2 is best but not mandatory.  Must be a multiple of
-      * bl.request_alignment, and must be less than max_pwrite_zeroes
-diff --git a/block/io.c b/block/io.c
-index aba67f66b9..07270524a9 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1751,12 +1751,13 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bl=
-ockDriverState *bs,
-     bool need_flush =3D false;
-     int head =3D 0;
-     int tail =3D 0;
--
--    int max_write_zeroes =3D MIN_NON_ZERO(bs->bl.max_pwrite_zeroes, INT_MA=
-X);
-+    int max_write_zeroes;
-     int alignment =3D MAX(bs->bl.pwrite_zeroes_alignment,
-                         bs->bl.request_alignment);
-     int max_transfer =3D MIN_NON_ZERO(bs->bl.max_transfer, MAX_BOUNCE_BUFF=
-ER);
-=20
-+    assert(alignment % bs->bl.request_alignment =3D=3D 0);
-+
-     if (!drv) {
-         return -ENOMEDIUM;
-     }
-@@ -1765,12 +1766,18 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bl=
-ockDriverState *bs,
-         return -ENOTSUP;
-     }
-=20
--    assert(alignment % bs->bl.request_alignment =3D=3D 0);
--    head =3D offset % alignment;
--    tail =3D (offset + bytes) % alignment;
-+    if ((flags & BDRV_REQ_NO_FALLBACK) && bs->bl.max_pwrite_zeroes_fast) {
-+        max_write_zeroes =3D bs->bl.max_pwrite_zeroes_fast;
-+    } else {
-+        max_write_zeroes =3D bs->bl.max_pwrite_zeroes;
-+    }
-+    max_write_zeroes =3D MIN_NON_ZERO(max_write_zeroes, INT_MAX);
-     max_write_zeroes =3D QEMU_ALIGN_DOWN(max_write_zeroes, alignment);
-     assert(max_write_zeroes >=3D bs->bl.request_alignment);
-=20
-+    head =3D offset % alignment;
-+    tail =3D (offset + bytes) % alignment;
-+
-     while (bytes > 0 && !ret) {
-         int num =3D bytes;
-=20
---=20
-2.21.0
+Maybe aio_disable_external() is needed to postpone device emulation
+until after realize has finished?
 
+Virtqueue kick ioeventfds are marked "external" and won't be processed
+while external events are disabled.  See also
+virtio_queue_aio_set_host_notifier_handler() ->
+aio_set_event_notifier().
+
+Stefan
+
+--0F1p//8PRICkK4MW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6ErrgACgkQnKSrs4Gr
+c8jb2Af9FXO6LpiY7KoNp7ln5dscYzHwtT/6UQXgDmr547hXu4SdpzGALtFsL5dN
+KoNIH+v6w7l9j8F1xoB5GfBWwZgDb0r/jEr/2QTWJEarnBVzQl+v52Y27Rc8hsZy
+DP6h1T+ltia6fMwyqkQqAKm1sNg8gsEwD3KKeapcSrxdldn9zDZx2YM/HdPSOY9r
+lpjIWCb04YXlZEGy1wqV3EoFZEUoQFPq/jy0YkbCL/TEcB3MH/Pr2mbypAJudyyD
+MX5UDLtMN1t9LFUoaQNuta6IlQK9YnpzhXAT4deg1h3QY7iMXGDJpQUJ+QQ28pHI
+UwjNZmWxl1jgfT00CDveaczZZ48fVA==
+=UJsu
+-----END PGP SIGNATURE-----
+
+--0F1p//8PRICkK4MW--
 
