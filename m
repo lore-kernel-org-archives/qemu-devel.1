@@ -1,82 +1,99 @@
 Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E26FC2D0F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8418CC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:38:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AAC4212CC
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28504206F8
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:38:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fi73KHEW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AAC4212CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqPpuiK8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28504206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJgN5-0000Be-65
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:37:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35096)
+	id 1jJgNW-0000hM-AC
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:38:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35175)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <singhalsimran0@gmail.com>) id 1jJgLu-0007X6-DI
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:36:31 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jJgMJ-0007wf-0i
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:36:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <singhalsimran0@gmail.com>) id 1jJgLt-0007hz-7U
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:36:30 -0400
-Received: from mail-lj1-x22e.google.com ([2a00:1450:4864:20::22e]:42224)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <singhalsimran0@gmail.com>)
- id 1jJgLq-0007bh-BC; Wed, 01 Apr 2020 12:36:26 -0400
-Received: by mail-lj1-x22e.google.com with SMTP id q19so108900ljp.9;
- Wed, 01 Apr 2020 09:36:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mSCxKEIswY3twR25bYTVpqCEOpJgrL69cF/U0oJAV5Q=;
- b=Fi73KHEW03qGk8kB6r/mUc72Zbj6fzHTieDkZEzZAdGe1BHooDe4hOzo1kuAKOI4yw
- ZHs0nP4o/Gyi5DqWAsbPRohOfNEdZ8xEIOHLknFltdAnGLThUYG8MNCj0kRTPR3gxXrp
- Z498/BABFaTFKkbOuBrc5J/eCjNKWDK6TrgTICFkHX12k5zGUCDx3l6mQaduttqwIVhy
- p5n2M4n+3EgVyDbU9rjYJFJVOT2Q6Txxggd0Yb9IvSqCGOj35CyyEwyL5iw77AIy72n0
- 9NdRTcYZEEGB+LvKiq9odZjrRwskH53ODVOs7oKRJmb+3WPby/cYo/wGpo44lWTebWeB
- rRSA==
+ (envelope-from <pbonzini@redhat.com>) id 1jJgMI-0008MR-2h
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:36:54 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35355
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jJgMH-0008LA-Uz
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:36:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585759013;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Im73kI7kPbUsUdGTNn7/Q62xkcO7MaqecscvF5H6F3Y=;
+ b=fqPpuiK89ia5Clafdin8S9pVCMULbQP/Sfh2r60YhwUoEJaDSukhr0yH9XfEd+n2vi6L9v
+ Y96WER+l35ujVDhWwlioel2brw9p0jhAU6F8BOqr2F602+TxGs99fSLXwQwl73TsLIf0JR
+ EHbUL+qNTXD/Yl3ikZxmrEcGts6iYOY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-Y5N5r5tOP46QIBRYO9pJhQ-1; Wed, 01 Apr 2020 12:36:49 -0400
+X-MC-Unique: Y5N5r5tOP46QIBRYO9pJhQ-1
+Received: by mail-wr1-f70.google.com with SMTP id w12so80950wrl.23
+ for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 09:36:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mSCxKEIswY3twR25bYTVpqCEOpJgrL69cF/U0oJAV5Q=;
- b=jBW7Z8xYK3cd2AAHFN47zjHTEp0aSzAR95oXiuUnriPOO7NpvmhUGeqKOeJ0s3oHIX
- b1Ip88OvEfhc3Zlvfnddwm3LOFeJlbFSw66UteUbAICJ/QMgA5xFdA3WPQK9Wu9G4GUl
- GKSTieXgtUnmgmsrCVXa7ZnMRlbRP6bCoANrQ3WLwkhBpO4lG0yR+WxUrEcTpIqcBd1M
- k9f89nvSePhXuOQ/7YD1uH7eyoa7q/PXaGs8r/Q+FEJJXW12/mCQf3w+BNldc9TPUpYe
- qYQ9m1iFywxsR2EB3imipqhtmUOpI+CBbTe/RudqzTsXyaT5ZmwLzIlGrG7gs4Bzs58l
- OVuA==
-X-Gm-Message-State: AGi0PuaHc5E5P+oojsq9uraRRQJdyHhwDe+KZzogKXhlEtASdwtIoYSY
- TSFYFHXdDHHiCYoIfwmL8Fil3PGxSSK71cxvz70=
-X-Google-Smtp-Source: APiQypJGVFIs8zaPERwl8Kr0ATBpGen/DHkyPB9vPODNYJr6LxhuqKQhL77P96046bL0FsmHxbjFQOiJIp4gtcE4Y8Q=
-X-Received: by 2002:a2e:8954:: with SMTP id b20mr12841678ljk.176.1585758983992; 
- Wed, 01 Apr 2020 09:36:23 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=Im73kI7kPbUsUdGTNn7/Q62xkcO7MaqecscvF5H6F3Y=;
+ b=mTjt+iKfwKGxsxjjGZpu4pRkDrxxOqpmyVoVfipiFg6DZxs6eATh5xOshswGPxT4UN
+ IM/22JM/eZ8M2Sf8JauIq3krvbDZlIX2aqeUu5525RYt/wBVqdyKa0Q/4M+qW+DCymI0
+ 2hQmArRaFUeXCpfgNY4R0xOK24juZUI44dwUO55IK1oYEwNGjR4J6OowCHQoS2QIhVkE
+ 0pgAAN0fNMXb/obhsgGAz5vzGmS0dg5INwE0sjaC5BrZwPMW87QRnJd+as6yxYju+cTa
+ BBVU9S3s8FMTDXMY9/JQyOqKK51FE5RiRNkbUAHSsD0+Bq74kwr6/aKiocx6LCx41h2v
+ qaFw==
+X-Gm-Message-State: AGi0PuYXyOR8BJ7wD/l5mT4kN0FDw7jIqA4QuUKJ+X3ha8HUz9TVQng4
+ 5VArPoK5t8quioa9/5GD90mT9BI9/3Y62bwOD5Q/xZUE8ogc6AKrbQBA68bZB/zzFSLywYsUGe3
+ dh+2a3cIEPglNkKM=
+X-Received: by 2002:a7b:c144:: with SMTP id z4mr2716088wmi.128.1585759008150; 
+ Wed, 01 Apr 2020 09:36:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKGMynmKcsozJ5m4y78UJpiUnXKYFHaZ+UigiS9h7RXJEEGo5i9cGOzPz/tdbjeNjsR42Z8QQ==
+X-Received: by 2002:a7b:c144:: with SMTP id z4mr2716071wmi.128.1585759007909; 
+ Wed, 01 Apr 2020 09:36:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1868:42dd:216c:2c09?
+ ([2001:b07:6468:f312:1868:42dd:216c:2c09])
+ by smtp.gmail.com with ESMTPSA id t12sm3717887wrm.0.2020.04.01.09.36.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Apr 2020 09:36:47 -0700 (PDT)
+Subject: Re: Question about scsi device hotplug (e.g scsi-hd)
+To: Stefan Hajnoczi <stefanha@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>
+References: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
+ <20200401150944.GA4500@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4bc42bf2-939f-f6c4-ea45-0d08eb42fc2b@redhat.com>
+Date: Wed, 1 Apr 2020 18:36:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200401121101.GA26994@simran-Inspiron-5558>
- <d93af7ef-59d3-ceda-6847-1f5c92eaea2b@redhat.com>
- <CALrZqyNpvKeH6E2KCLQoCt1H1qphktWuX8i-cwoMOH6_g0Qu4g@mail.gmail.com>
- <33d40ebc-00d1-28d2-f278-2419ab636b45@redhat.com>
-In-Reply-To: <33d40ebc-00d1-28d2-f278-2419ab636b45@redhat.com>
-From: Simran Singhal <singhalsimran0@gmail.com>
-Date: Wed, 1 Apr 2020 22:06:11 +0530
-Message-ID: <CALrZqyOiSCv4=rdT_S8W-N12yOBk2tX=Wsxxxb_9S_4uCGeO=w@mail.gmail.com>
-Subject: Re: [PATCH] Compress lines for immediate return
-To: Eric Blake <eblake@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000f0b72905a23d4883"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::22e
+In-Reply-To: <20200401150944.GA4500@stefanha-x1.localdomain>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="UcfgEs0VPjkQkY8BBKbA1OjyVC8mwByVM"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,116 +105,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- Julia Suvorova <jusual@mail.ru>, Peter Lieven <pl@kamp.de>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f0b72905a23d4883
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UcfgEs0VPjkQkY8BBKbA1OjyVC8mwByVM
+Content-Type: multipart/mixed; boundary="YwSUJQaqmEjFH8dUoH8jlhMDWoqxctMd7"
+
+--YwSUJQaqmEjFH8dUoH8jlhMDWoqxctMd7
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 1, 2020 at 9:15 PM Eric Blake <eblake@redhat.com> wrote:
-
-> On 4/1/20 9:49 AM, Simran Singhal wrote:
-> > Hello Philippe
-> >
-> > On Wed, Apr 1, 2020 at 7:26 PM Philippe Mathieu-Daud=C3=A9 <philmd@redh=
-at.com
-> >
-> > wrote:
-> >
-> >> Hi Simran,
-> >>
-> >> On 4/1/20 2:11 PM, Simran Singhal wrote:
-> >>> Compress two lines into a single line if immediate return statement i=
-s
-> >> found.
-> >>
-> >> How did you find these changes? Manual audit, some tool?
-> >>
-> >
-> > I wrote coccinelle script to do these changes.
-> >
+On 01/04/20 17:09, Stefan Hajnoczi wrote:
+>> What do you think about it?
 >
-> Then is it worth checking in your script to scripts/coccinelle/ to let
-> it be something we can repeatedly rerun in the future to catch more
-> instances?  Even if you don't go that far, mentioning the exact rune you
-> used makes it easier to reproduce the patch, or even backport its
-> effects to a different branch.
->
+> Maybe aio_disable_external() is needed to postpone device emulation
+> until after realize has finished?
+>=20
+> Virtqueue kick ioeventfds are marked "external" and won't be processed
+> while external events are disabled.  See also
+> virtio_queue_aio_set_host_notifier_handler() ->
+> aio_set_event_notifier().
 
-Ok, I'll resend the patch with changing the commit message to include the
-script used to make the change.
+Yes, I think Stefan is right.
 
-Thanks
-Simran
+Paolo
 
 
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
->
+--YwSUJQaqmEjFH8dUoH8jlhMDWoqxctMd7--
 
---000000000000f0b72905a23d4883
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+--UcfgEs0VPjkQkY8BBKbA1OjyVC8mwByVM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Apr 1, 2020 at 9:15 PM Eric B=
-lake &lt;<a href=3D"mailto:eblake@redhat.com">eblake@redhat.com</a>&gt; wro=
-te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
-0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 4/1/20 9:=
-49 AM, Simran Singhal wrote:<br>
-&gt; Hello Philippe<br>
-&gt; <br>
-&gt; On Wed, Apr 1, 2020 at 7:26 PM Philippe Mathieu-Daud=C3=A9 &lt;<a href=
-=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<b=
-r>
-&gt; wrote:<br>
-&gt; <br>
-&gt;&gt; Hi Simran,<br>
-&gt;&gt;<br>
-&gt;&gt; On 4/1/20 2:11 PM, Simran Singhal wrote:<br>
-&gt;&gt;&gt; Compress two lines into a single line if immediate return stat=
-ement is<br>
-&gt;&gt; found.<br>
-&gt;&gt;<br>
-&gt;&gt; How did you find these changes? Manual audit, some tool?<br>
-&gt;&gt;<br>
-&gt; <br>
-&gt; I wrote coccinelle script to do these changes.<br>
-&gt; <br>
-<br>
-Then is it worth checking in your script to scripts/coccinelle/ to let <br>
-it be something we can repeatedly rerun in the future to catch more <br>
-instances?=C2=A0 Even if you don&#39;t go that far, mentioning the exact ru=
-ne you <br>
-used makes it easier to reproduce the patch, or even backport its <br>
-effects to a different branch.<br></blockquote><div><br></div><div>Ok, I&#3=
-9;ll resend the patch with changing the commit message to include the scrip=
-t used to make the change.</div><div><br></div><div>Thanks</div><div>Simran=
-<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-">
-<br>
--- <br>
-Eric Blake, Principal Software Engineer<br>
-Red Hat, Inc.=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0+1-919-301-3226<br>
-Virtualization:=C2=A0 <a href=3D"http://qemu.org" rel=3D"noreferrer" target=
-=3D"_blank">qemu.org</a> | <a href=3D"http://libvirt.org" rel=3D"noreferrer=
-" target=3D"_blank">libvirt.org</a><br>
-<br>
-</blockquote></div></div>
+-----BEGIN PGP SIGNATURE-----
 
---000000000000f0b72905a23d4883--
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl6Ewx4ACgkQv/vSX3jH
+roM8pAgAm1tShPusIagqcjgw8/a2r7G6QgCNvhkXoLskJyI1Q8R78axIvmZEMPcZ
+xwI1lP7RwC8MiPtIwWGy1E1IvSrEDphMmYzkIH6khKss/cSByZmG1JufbW2D3RfI
++V6NOB6sJLnzKXXspg/ZMYKDhQnhYEDz4PDAVzT+CVmcBBGityprX7mInmPrRHxd
+kl73z+VB8coz7Gbu4KzdC22pXyLvSNDcCuu2uGrLL5pJrnYnBRWXgsVmRfIXBT+u
+WDyb3fFlznEFNDclW86vG69wEsYxLW4PVH2+VJaM+15ovWoIUHZbZf8s5yCL43lR
+IGZE7+vbrVcDTYEwthsqgtyICKO+nA==
+=8REo
+-----END PGP SIGNATURE-----
+
+--UcfgEs0VPjkQkY8BBKbA1OjyVC8mwByVM--
+
 
