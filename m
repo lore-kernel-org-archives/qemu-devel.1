@@ -6,56 +6,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 897F6C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A69AC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 562A020678
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:18:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 562A020678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FD172054F
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:19:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FD172054F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJTts-0004jI-H6
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 23:18:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36471)
+	id 1jJTuY-0005iR-DO
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 23:19:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jJTsz-00040K-Q8
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:17:50 -0400
+ (envelope-from <wangxinxin.wang@huawei.com>) id 1jJRsb-0001xP-Q0
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 21:09:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jingqi.liu@intel.com>) id 1jJTsy-0000Jf-2s
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:17:49 -0400
-Received: from mga06.intel.com ([134.134.136.31]:50506)
+ (envelope-from <wangxinxin.wang@huawei.com>) id 1jJRsa-0007Rl-CF
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 21:09:17 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:59218 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
- id 1jJTsx-0008Ne-Qe
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:17:48 -0400
-IronPort-SDR: i8VvI+NbUy4CaUMq6wZU5Glanqnk1IMbKFOpGK4fC7/HAGfdDrsCLY8oivid7lf+PwoZB7m/Ce
- i4fFXXfikyKg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 31 Mar 2020 20:17:42 -0700
-IronPort-SDR: +oaTlhXYm2c1Ekhk104vd7EENYZ9C5YNd3ixfDIjjDl07qKb88kMr8ti4bosBrGJf39WwCUZYp
- AnfS/+gYXh6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,330,1580803200"; d="scan'208";a="395798143"
-Received: from dazhang1-mobile.sh.intel.com ([10.239.48.70])
- by orsmga004.jf.intel.com with ESMTP; 31 Mar 2020 20:17:39 -0700
-From: Jingqi Liu <jingqi.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
-Subject: [PATCH] exec: fetch the alignment of Linux devdax pmem character
- device nodes
-Date: Wed,  1 Apr 2020 11:13:14 +0800
-Message-Id: <20200401031314.11592-1-jingqi.liu@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.31
+ (Exim 4.71) (envelope-from <wangxinxin.wang@huawei.com>)
+ id 1jJRsa-0006qZ-0c
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 21:09:16 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 6636A36059DBB26BE6A4;
+ Wed,  1 Apr 2020 09:09:08 +0800 (CST)
+Received: from localhost (10.173.228.84) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Wed, 1 Apr 2020
+ 09:09:00 +0800
+From: Wang Xin <wangxinxin.wang@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH] migration/throttle: use the xfer pages as threshold
+Date: Wed, 1 Apr 2020 09:08:58 +0800
+Message-ID: <20200401010858.799-1-wangxinxin.wang@huawei.com>
+X-Mailer: git-send-email 2.26.0.windows.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.173.228.84]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
+X-Mailman-Approved-At: Tue, 31 Mar 2020 23:18:42 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,101 +65,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jingqi Liu <jingqi.liu@intel.com>, Dan Williams <dan.j.williams@intel.com>,
- qemu-devel@nongnu.org
+Cc: Wang Xin <wangxinxin.wang@huawei.com>, dgilbert@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the backend file is devdax pmem character device, the alignment
-specified by the option 'align=NUM' in the '-object memory-backend-file'
-needs to match the alignment requirement of the devdax pmem character device.
+If VM migration with lots of zero page or enable data compress, the peroi=
+d
+tansfer bytes may be much less than the available bandwidth, which trigge=
+r
+unnecessary guest throttle down. Use the raw transfer pages as the
+threshold instead.
 
-This patch fetches the devdax pmem file 'align', so that we can compare
-it with the NUM of 'align=NUM'.
-The NUM needs to be larger than or equal to the devdax pmem file 'align'.
+Signed-off-by: Wang Xin <wangxinxin.wang@huawei.com>
 
-It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
-when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
-
-Cc: Dan Williams <dan.j.williams@intel.com>
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
----
- exec.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
-
-diff --git a/exec.c b/exec.c
-index de9d949902..8221abffec 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1736,6 +1736,42 @@ static int64_t get_file_size(int fd)
-     return size;
- }
- 
-+static int64_t get_file_align(int fd)
-+{
-+    int64_t align = -1;
-+#if defined(__linux__)
-+    struct stat st;
-+
-+    if (fstat(fd, &st) < 0) {
-+        return -errno;
-+    }
-+
-+    /* Special handling for devdax character devices */
-+    if (S_ISCHR(st.st_mode)) {
-+        g_autofree char *subsystem_path = NULL;
-+        g_autofree char *subsystem = NULL;
-+
-+        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
-+                                         major(st.st_rdev), minor(st.st_rdev));
-+        subsystem = g_file_read_link(subsystem_path, NULL);
-+
-+        if (subsystem && g_str_has_suffix(subsystem, "/dax")) {
-+            g_autofree char *align_path = NULL;
-+            g_autofree char *align_str = NULL;
-+
-+            align_path = g_strdup_printf("/sys/dev/char/%d:%d/device/align",
-+                                    major(st.st_rdev), minor(st.st_rdev));
-+
-+            if (g_file_get_contents(align_path, &align_str, NULL, NULL)) {
-+                return g_ascii_strtoll(align_str, NULL, 0);
-+            }
-+        }
-+    }
-+#endif /* defined(__linux__) */
-+
-+    return align;
-+}
-+
- static int file_ram_open(const char *path,
-                          const char *region_name,
-                          bool *created,
-@@ -2275,7 +2311,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
- {
-     RAMBlock *new_block;
-     Error *local_err = NULL;
--    int64_t file_size;
-+    int64_t file_size, file_align;
- 
-     /* Just support these ram flags by now. */
-     assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
-@@ -2311,6 +2347,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-         return NULL;
+diff --git a/migration/ram.c b/migration/ram.c
+index 04f13feb2e..e53333bc6a 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -323,6 +323,8 @@ struct RAMState {
+     int64_t time_last_bitmap_sync;
+     /* bytes transferred at start_time */
+     uint64_t bytes_xfer_prev;
++    /* pages transferred at start_time */
++    uint64_t pages_xfer_prev;
+     /* number of dirty pages since start_time */
+     uint64_t num_dirty_pages_period;
+     /* xbzrle misses since the beginning of the period */
+@@ -901,9 +903,9 @@ static void migration_trigger_throttle(RAMState *rs)
+     MigrationState *s =3D migrate_get_current();
+     uint64_t threshold =3D s->parameters.throttle_trigger_threshold;
+=20
+-    uint64_t bytes_xfer_period =3D ram_counters.transferred - rs->bytes_=
+xfer_prev;
+-    uint64_t bytes_dirty_period =3D rs->num_dirty_pages_period * TARGET_=
+PAGE_SIZE;
+-    uint64_t bytes_dirty_threshold =3D bytes_xfer_period * threshold / 1=
+00;
++    uint64_t pages_xfer_period =3D ram_get_total_transferred_pages() -
++                                 rs->pages_xfer_prev;
++    uint64_t pages_dirty_threshold =3D pages_xfer_period * threshold / 1=
+00;
+=20
+     /* During block migration the auto-converge logic incorrectly detect=
+s
+      * that ram migration makes no progress. Avoid this by disabling the
+@@ -915,7 +917,7 @@ static void migration_trigger_throttle(RAMState *rs)
+            we were in this routine reaches the threshold. If that happen=
+s
+            twice, start or increase throttling. */
+=20
+-        if ((bytes_dirty_period > bytes_dirty_threshold) &&
++        if ((rs->num_dirty_pages_period > pages_dirty_threshold) &&
+             (++rs->dirty_rate_high_cnt >=3D 2)) {
+             trace_migration_throttle();
+             rs->dirty_rate_high_cnt =3D 0;
+@@ -964,6 +966,7 @@ static void migration_bitmap_sync(RAMState *rs)
+         rs->time_last_bitmap_sync =3D end_time;
+         rs->num_dirty_pages_period =3D 0;
+         rs->bytes_xfer_prev =3D ram_counters.transferred;
++        rs->pages_xfer_prev =3D ram_get_total_transferred_pages();
      }
- 
-+    file_align = get_file_align(fd);
-+    if (file_align > 0 && mr && file_align > mr->align) {
-+        error_setg(errp, "backing store align 0x%" PRIx64
-+                   " is larger than 'align' option 0x" RAM_ADDR_FMT,
-+                   file_align, mr->align);
-+        return NULL;
-+    }
-+
-     new_block = g_malloc0(sizeof(*new_block));
-     new_block->mr = mr;
-     new_block->used_length = size;
--- 
-2.17.1
+     if (migrate_use_events()) {
+         qapi_event_send_migration_pass(ram_counters.dirty_sync_count);
+--=20
+2.26.0.windows.1
+
 
 
