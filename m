@@ -2,58 +2,89 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A69AC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C49FC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:21:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FD172054F
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:19:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FD172054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 00AAF20678
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:21:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00AAF20678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJTuY-0005iR-DO
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 23:19:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39769)
+	id 1jJTwT-00073v-77
+	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 23:21:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42115)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wangxinxin.wang@huawei.com>) id 1jJRsb-0001xP-Q0
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 21:09:18 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jJTvr-0006Yi-KV
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wangxinxin.wang@huawei.com>) id 1jJRsa-0007Rl-CF
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 21:09:17 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59218 helo=huawei.com)
+ (envelope-from <yi.l.liu@intel.com>) id 1jJTvq-0002Vj-FF
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:20:47 -0400
+Received: from mga07.intel.com ([134.134.136.100]:38810)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wangxinxin.wang@huawei.com>)
- id 1jJRsa-0006qZ-0c
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 21:09:16 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 6636A36059DBB26BE6A4;
- Wed,  1 Apr 2020 09:09:08 +0800 (CST)
-Received: from localhost (10.173.228.84) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Wed, 1 Apr 2020
- 09:09:00 +0800
-From: Wang Xin <wangxinxin.wang@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH] migration/throttle: use the xfer pages as threshold
-Date: Wed, 1 Apr 2020 09:08:58 +0800
-Message-ID: <20200401010858.799-1-wangxinxin.wang@huawei.com>
-X-Mailer: git-send-email 2.26.0.windows.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.228.84]
-X-CFilter-Loop: Reflected
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jJTvq-0002SY-6Y
+ for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:20:46 -0400
+IronPort-SDR: d6MS9V6fDv7m4/4QegVX0niWf7tImiN1pxjTlRt360FoE8x2vdYIhbFNgKzRb+6BQ/5XyMCtyB
+ vBezko+RAzOg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 31 Mar 2020 20:20:45 -0700
+IronPort-SDR: DPK9gyQBnEe3V8YRFGyinPVh5PBvRNVxBeQIZ+D4NvjJv4fxznqQzxh6YPavIs5efZ9H7Ygq3b
+ 9kqc4lwjuDXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,330,1580803200"; d="scan'208";a="450387728"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by fmsmga006.fm.intel.com with ESMTP; 31 Mar 2020 20:20:44 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 31 Mar 2020 20:20:44 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 31 Mar 2020 20:20:44 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 31 Mar 2020 20:20:44 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
+ Wed, 1 Apr 2020 11:20:40 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "alex.williamson@redhat.com"
+ <alex.williamson@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>
+Subject: RE: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
+Thread-Topic: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
+Thread-Index: AQHWBkpjlWASVTcKHUCJ2vYuB9rbdahiPwyAgAFDflA=
+Date: Wed, 1 Apr 2020 03:20:40 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21C0FB@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-11-git-send-email-yi.l.liu@intel.com>
+ <564d1a55-04df-a3bd-5241-e30f958a4e89@redhat.com>
+In-Reply-To: <564d1a55-04df-a3bd-5241-e30f958a4e89@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="iso-2022-jp"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
-X-Mailman-Approved-At: Tue, 31 Mar 2020 23:18:42 -0400
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,72 +96,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wang Xin <wangxinxin.wang@huawei.com>, dgilbert@redhat.com,
- quintela@redhat.com
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, 
+ Jun J" <jun.j.tian@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If VM migration with lots of zero page or enable data compress, the peroi=
-d
-tansfer bytes may be much less than the available bandwidth, which trigge=
-r
-unnecessary guest throttle down. Use the raw transfer pages as the
-threshold instead.
+Hi Eric=1B$B!$=1B(B
 
-Signed-off-by: Wang Xin <wangxinxin.wang@huawei.com>
+> From: Auger Eric <eric.auger@redhat.com>
+> Sent: Tuesday, March 31, 2020 10:30 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
+> Subject: Re: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
+>=20
+> Yi,
+>=20
+> On 3/30/20 6:24 AM, Liu Yi L wrote:
+> > For vfio-pci devices, it could use pci_device_set/unset_iommu() to
+> > expose host iommu context to vIOMMU emulators. vIOMMU emulators could
+> > make use the methods provided by host iommu context. e.g.
+> > propagate requests to host iommu.
+> I think I would squash this patch into the previous one.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 04f13feb2e..e53333bc6a 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -323,6 +323,8 @@ struct RAMState {
-     int64_t time_last_bitmap_sync;
-     /* bytes transferred at start_time */
-     uint64_t bytes_xfer_prev;
-+    /* pages transferred at start_time */
-+    uint64_t pages_xfer_prev;
-     /* number of dirty pages since start_time */
-     uint64_t num_dirty_pages_period;
-     /* xbzrle misses since the beginning of the period */
-@@ -901,9 +903,9 @@ static void migration_trigger_throttle(RAMState *rs)
-     MigrationState *s =3D migrate_get_current();
-     uint64_t threshold =3D s->parameters.throttle_trigger_threshold;
-=20
--    uint64_t bytes_xfer_period =3D ram_counters.transferred - rs->bytes_=
-xfer_prev;
--    uint64_t bytes_dirty_period =3D rs->num_dirty_pages_period * TARGET_=
-PAGE_SIZE;
--    uint64_t bytes_dirty_threshold =3D bytes_xfer_period * threshold / 1=
-00;
-+    uint64_t pages_xfer_period =3D ram_get_total_transferred_pages() -
-+                                 rs->pages_xfer_prev;
-+    uint64_t pages_dirty_threshold =3D pages_xfer_period * threshold / 1=
-00;
-=20
-     /* During block migration the auto-converge logic incorrectly detect=
-s
-      * that ram migration makes no progress. Avoid this by disabling the
-@@ -915,7 +917,7 @@ static void migration_trigger_throttle(RAMState *rs)
-            we were in this routine reaches the threshold. If that happen=
-s
-            twice, start or increase throttling. */
-=20
--        if ((bytes_dirty_period > bytes_dirty_threshold) &&
-+        if ((rs->num_dirty_pages_period > pages_dirty_threshold) &&
-             (++rs->dirty_rate_high_cnt >=3D 2)) {
-             trace_migration_throttle();
-             rs->dirty_rate_high_cnt =3D 0;
-@@ -964,6 +966,7 @@ static void migration_bitmap_sync(RAMState *rs)
-         rs->time_last_bitmap_sync =3D end_time;
-         rs->num_dirty_pages_period =3D 0;
-         rs->bytes_xfer_prev =3D ram_counters.transferred;
-+        rs->pages_xfer_prev =3D ram_get_total_transferred_pages();
-     }
-     if (migrate_use_events()) {
-         qapi_event_send_migration_pass(ram_counters.dirty_sync_count);
---=20
-2.26.0.windows.1
+sure, I can make it. :-)
 
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  hw/vfio/pci.c | 13 +++++++++++++
+> >  1 file changed, 13 insertions(+)
+> >
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c index 5e75a95..c140c88
+> > 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2717,6 +2717,7 @@ static void vfio_realize(PCIDevice *pdev, Error *=
+*errp)
+> >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+> >      VFIODevice *vbasedev_iter;
+> >      VFIOGroup *group;
+> > +    VFIOContainer *container;
+> >      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
+> >      Error *err =3D NULL;
+> >      ssize_t len;
+> > @@ -3028,6 +3029,11 @@ static void vfio_realize(PCIDevice *pdev, Error =
+**errp)
+> >      vfio_register_req_notifier(vdev);
+> >      vfio_setup_resetfn_quirk(vdev);
+> >
+> > +    container =3D vdev->vbasedev.group->container;
+> > +    if (container->iommu_ctx.initialized) {
+> Sin't it possible to dynamically allocate the iommu_ctx so that you can s=
+imply check
+> container->iommu_ctx and discard the initialized field?
 
+iommu_ctx is allocated along with container as it is not a pointer in VFIOC=
+ontainer.
+The only way to check it is to have flag. :-)
+
+Regards,
+Yi Liu
 
