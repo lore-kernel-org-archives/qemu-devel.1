@@ -1,142 +1,121 @@
 Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA3FC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCD26C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9A6420714
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:24:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89B4820719
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 14:36:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="sLmq76o1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9A6420714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="oMomtsTB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89B4820719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJeIK-0007Z6-RM
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 10:24:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53546)
+	id 1jJeUA-00039o-Gs
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 10:36:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <julio.montes@intel.com>) id 1jJeHg-00078c-29
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:24:01 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJeTD-00028q-RY
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <julio.montes@intel.com>) id 1jJeHd-0003em-O2
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:23:58 -0400
-Received: from mga02.intel.com ([134.134.136.20]:20609)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <julio.montes@intel.com>)
- id 1jJeHd-0003XW-Bs
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:23:57 -0400
-IronPort-SDR: gT/WuHrS4uPnXgEdP/kPobojNEHLh8lU8EG1MuGBuuMf0flTwS2X3GKUcn3axdIyWGSHYQ5hF8
- zIh9xsF2qDnA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 01 Apr 2020 07:23:53 -0700
-IronPort-SDR: yXm7RAyKwy3BK16CUPmOGRSbLjOs8dUzX8G36NEdjy4tkJYti5GYVAy0NuWt1tSIvp+rRgKmYt
- jZIuMGxJCgfw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,332,1580803200"; 
- d="scan'208,217";a="242244954"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
- by fmsmga008.fm.intel.com with ESMTP; 01 Apr 2020 07:23:52 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 1 Apr 2020 07:23:52 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 1 Apr 2020 07:23:51 -0700
-Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 1 Apr 2020 07:23:51 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
- by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 1 Apr 2020 07:23:46 -0700
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJeTB-0002bX-GI
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 10:35:54 -0400
+Received: from mail-eopbgr30096.outbound.protection.outlook.com
+ ([40.107.3.96]:6560 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jJeTA-0002Ys-UV; Wed, 01 Apr 2020 10:35:53 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mzoMaGNciTlhXMqMtjLEwXF0Mxr7Aknwh/GgiWQbhZPjz0RB1mTRX1h9iSH0b8Ug8BM4d+tePTK/xyEV4Rysb35OGo7nsaEWhHUwM7mXJs3vMngUXlHGFDMUHuZxa8Ec+RoEBfzslIlfaEN0YyPI47wHOFggsGIIYQGomRaHTNPgY37M8ELTmrABSsTjNua6V1XpsWhcUYi8yaSb+YuCYUhdzIToN9X+6qulWwtgZFezaOzjWC/FjpUliOhmnb/jQm+7Mf5W55Jd6PNJBsz7QEEZlHXYjKbgmU4TWKZgvteY5plVxOa0c5PVzsVDL4XOB6TK8cSH03w60tX9ppMbXg==
+ b=d8o0bFRt+ejfub1a4mePrszUBIi1NuvEWP7ziV+MMkGNo7eSllRgBPB4MgbJ3uS2jgk9hJNWXtstnVH616xYPXiqdRzwdAGA20MQwrkT/q0chQcEeHgHbZlph7OWnGIJdPnIyDKDGTMPiwjVZI6aF3Ql9LjuVeh5eDuseToOSElhN1QtcXVX10mbwhT4/txtLVF2pPqGUy8QJkqVHTLDtNzVus4hpuE+YY8gEC98lFQmW/vDPSBBT/CfxdKmBDekNwUZmDot+d5P0Dkv5upqZCClc+hh8apYMoOFOLA11CTPZ3ibJPSziIHW+iUNm3Li85ti2xPiXeYPhhGm+Yu8lg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OQPD4oGhmQvUF4aBXTTWS5puB2CCaG4T2+bV4uUm6cI=;
- b=IRrsTNOgo1rwBdSWm/As+jjaRvmEXA8rOSTzvu4PVg422xTWvNH+fIeThBC9Y0T+ZN0/dzY9i8GLt93sTCe8NWpDZnbkDRH6I8XyEXiV+h0yrz5920DSm6mZzIQIFr9XwdHkTcXWZfymWdOfuoA+sZB7xOTDbxZjj4aFwooUz2qSYx7H3cl6pExYt4aiES3jDcAoxFNxCDgmpSfErDYCNYGb+HyHk+Yx6mO9b/D0OdHkawVd4oscEfnfIIllXgw5u+iGXqvhbhHZD5H+L7O5xeeF7bg/gzXaCV6ahS5yg1xZTrXsTp07fiPERMA05jypyAxw6D2Ivk/ww2+0BO97GA==
+ bh=UC3u9ut13l3dOKDG9qSLk84DES2gN7e3FOTb7s501xs=;
+ b=Ulm5FjVlTs64jzVD9OW2/gLMYCkBzmGAiGLm0JvpadgXVAQXNpbEPcpvoU5STuLzJHFsdOlOibwALg6Akzl+FIGKW6Q64Z3v+/d81tnRViDtKy+t5u22xYy/yt0Hj6T2i2iIQH6q/jzJL8Q2pPa7wtk6a/+luCnhABDpS00bH9gYt3HaCD9TFcF/MSjSF6ZNWo8K6N5dZEMqzW8GI4rLtEZaifnsBS4BlzQE23qnXFnJ0vkBnSsOpzq3MjJpcK5cqDbdJaALCpKRu7XGtMRj4eD6WPWEvH51g27hSm62ivwCfsdWdLjQjilmj7dIs/ik2kF4QOdREBYLq/DjjaAqVQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com; 
- s=selector2-intel-onmicrosoft-com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OQPD4oGhmQvUF4aBXTTWS5puB2CCaG4T2+bV4uUm6cI=;
- b=sLmq76o1o9fPK2nYDjg7Od2gghLglLPdlOQZ+0SR8XvyfTYb9JHHaJAYbncDDzUeUwYvqoOqQLcDHO9VUHJjEPxHe7OqXExwWY4Ecoi2gEvq0HWoMXiqUrzqL9qD1aiS4CvBo4NKQ6Kdu11hrAlysKpFCidUH1rHOnVnkfO0Loc=
-Received: from BY5PR11MB3960.namprd11.prod.outlook.com (2603:10b6:a03:185::30)
- by BY5PR11MB4165.namprd11.prod.outlook.com (2603:10b6:a03:18c::26)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.19; Wed, 1 Apr
- 2020 14:23:45 +0000
-Received: from BY5PR11MB3960.namprd11.prod.outlook.com
- ([fe80::f80d:8a9b:8bf3:47a7]) by BY5PR11MB3960.namprd11.prod.outlook.com
- ([fe80::f80d:8a9b:8bf3:47a7%5]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
- 14:23:44 +0000
-From: "Montes, Julio" <julio.montes@intel.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH] target/i386: do not set unsupported VMX secondary
- execution controls
-Thread-Topic: [PATCH] target/i386: do not set unsupported VMX secondary
- execution controls
-Thread-Index: AQHWB3m8r1FB2qyA5Umhq8e1klXMS6hi5RMAgAAGPUWAAO2sgIAAdZ2T
-Date: Wed, 1 Apr 2020 14:23:44 +0000
-Message-ID: <BY5PR11MB39607C77082407729CFEBA399AC90@BY5PR11MB3960.namprd11.prod.outlook.com>
-References: <20200331162752.1209928-1-vkuznets@redhat.com>
- <f976c1b0-2f50-d9f6-0921-2fc8e25ddb80@redhat.com>
- <BY5PR11MB396059E9E1FFE4B93EDE38E89AC80@BY5PR11MB3960.namprd11.prod.outlook.com>,
- <877dyz1y9g.fsf@vitty.brq.redhat.com>
-In-Reply-To: <877dyz1y9g.fsf@vitty.brq.redhat.com>
-Accept-Language: en-US
+ bh=UC3u9ut13l3dOKDG9qSLk84DES2gN7e3FOTb7s501xs=;
+ b=oMomtsTB2fa5RwoTYfKINB8JCA7mdy/otubuykkpMi+8KMX2ZZFGR1aa29Vly0GSYWPBfZvjGsmTi0SVHymT2Q1PsO9PO4GT64uLCLK/kSsvs8EmStM6gq4BFuHRg/m/U+uagppa3uBvMR3P+L1RggOZ7GOoim5hsxo1DmY4+t8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5464.eurprd08.prod.outlook.com (10.141.173.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.20; Wed, 1 Apr 2020 14:35:50 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
+ 14:35:50 +0000
+Subject: Re: [PATCH 5/5] block/io: auto-no-fallback for write-zeroes
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200302100537.29058-1-vsementsov@virtuozzo.com>
+ <20200302100537.29058-6-vsementsov@virtuozzo.com>
+ <5e7f5649-c349-7d8e-f2a0-203cc53aa8cb@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200401173548229
+Message-ID: <da83d8dd-cfbb-2add-8c1b-06bd6c895565@virtuozzo.com>
+Date: Wed, 1 Apr 2020 17:35:48 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <5e7f5649-c349-7d8e-f2a0-203cc53aa8cb@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=julio.montes@intel.com; 
-x-originating-ip: [134.134.139.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 94f63476-3a84-400e-24df-08d7d6484928
-x-ms-traffictypediagnostic: BY5PR11MB4165:
-x-microsoft-antispam-prvs: <BY5PR11MB4165504B763B14B1B16FA2FD9AC90@BY5PR11MB4165.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:569;
-x-forefront-prvs: 03607C04F0
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BY5PR11MB3960.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(346002)(39860400002)(366004)(396003)(376002)(136003)(6506007)(478600001)(26005)(4744005)(186003)(2906002)(76116006)(316002)(4326008)(64756008)(81166006)(66556008)(66476007)(53546011)(52536014)(8936002)(9686003)(66446008)(8676002)(81156014)(55016002)(6916009)(33656002)(86362001)(54906003)(71200400001)(7696005)(66946007)(5660300002)(19627405001);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Y85ps6BmqrVo2hXMXUq/4bI8kkfjMffrbkeN+NrkPMBt7IHSG8rR/ZL2Q8VdZmWr0k+OF313iqSR+Q/riWUJWitm6RJhe9qVIfekJBNUFCxdm18hBFs5vzCIj8BeHrCK9yxMuVzTVEGUvMW8t+dHWi06kYcyok7hP3AnHZxStsREM/mNaPUZJJMX5F//4NzgfPbCvXtXefgxQUCB8TD8WDLrYwcJlob8y3RsuXiYp/BX+RahW0NuwPWENx5insJTYiefF1LDcNo2vFwoxVEsxgucWSqiahbibbxyrvofdo/mIyfM3v8zTr9TE4yyjpTqxl9aUjrNOz43OdtJoDWPzmV5M7zSIGzPHeVYuzUdR/+A+Gvzmk1zna3Pw9CC7vvt7RIZMHNP4W/Lr+KpfHrl5/QEXKR2SiYzfu+QGr4ODfuUWgXPQaenlUvNGh0SnpJb
-x-ms-exchange-antispam-messagedata: J2U5I2vriSw0+/jnR838d4v1PSqAN+U14ZDAOm8xkou0ESEF5/+RrYa50UDPhvu0aURf5HdOVPW0hGgQ/NdRX9weaN1SixB8euRhd6Sy/cZd7d7vuTwmhrGVYhdsGtMrgyrOvncMoDHDMivYDaWV/w==
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/alternative;
- boundary="_000_BY5PR11MB39607C77082407729CFEBA399AC90BY5PR11MB3960namp_"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: AM0PR0102CA0035.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:14::48) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94f63476-3a84-400e-24df-08d7d6484928
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Apr 2020 14:23:44.7882 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2wrWUw25QoEnBvgLlw3Y4z7jWG351If2S2r/uf7lBSTZvtvRycUIBqTcFdG82dFTf0RPMYduc4SVO4kIYN0u8w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR11MB4165
-X-OriginatorOrg: intel.com
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.20
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.23) by
+ AM0PR0102CA0035.eurprd01.prod.exchangelabs.com (2603:10a6:208:14::48) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.15 via Frontend
+ Transport; Wed, 1 Apr 2020 14:35:49 +0000
+X-Tagtoolbar-Keys: D20200401173548229
+X-Originating-IP: [185.215.60.23]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2502440e-cdbb-451d-74c8-08d7d649f996
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5464:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5464D4DBFE7F1A6DA3879061C1C90@AM7PR08MB5464.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:883;
+X-Forefront-PRVS: 03607C04F0
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(376002)(346002)(366004)(39840400004)(136003)(396003)(31696002)(81166006)(81156014)(107886003)(8676002)(53546011)(36756003)(52116002)(478600001)(86362001)(4326008)(66946007)(66476007)(6486002)(66556008)(16526019)(16576012)(2616005)(31686004)(2906002)(316002)(956004)(26005)(8936002)(5660300002)(186003);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: T9H+7XiL9oTBcQ4CdV9IGyF9iozdMJ67f0Jl/5/Jl0ncmLE2RMJ2Kf1eicUf5tDmADe8ENBF80qx2R+OPXlJppxJOLrHxDkE/uMNqMkMDd8r6TuN+422oTYG5tFOfZdxn0SE0AomehjKTJ2PLQ6gE8+Gp1JkhvBQSjcWCH+FRCBXoxf0a7wVtdgGPGT5dpYjNkeg5kW7gDJrCnmyUhyKCNEfUfoMaSCJNneoZDvB0bkXrbV6CZZ6DHZJuZeme9dsrI1wpBIMDycm8c2FHH2PQaWtM5VXd+r1SRFpMlAQYudcY1CW0fWZSc9766myE6d81tyH95yAoT/LtvPxJPaWN0w1slcSruzXbpXsSmFyAOKmVpPgKdv3vTO7PAjUJ42omBEMrwN/mEsQaue2NCDEt5CuEmpVOfUW7zLuRdNFQ+kiy5OhcgyLrezZ4LbFuCCc
+X-MS-Exchange-AntiSpam-MessageData: BKi88nnU45glAL00PPagSw6gTTZPl0Q/0XGmiuRJiaBpYNM+cNAHP8NE9OpqyZGuB9YxPMZBAeJdd3Vzd+8CWjrbWcV34qmrQrav1TJw0xlEsmVNooMMJoj5BklUPPcZGWgFUmx7Ne9xDdqCIQv47Q==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2502440e-cdbb-451d-74c8-08d7d649f996
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 14:35:50.6051 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K9+Z9Lr+iskHIC6K5XBAlKB5RJmeZvOU+Zk/C1pvKV9WuSpuunH62MRaPtzX3FUaZuJ5sXhP5H/napXui7Km/FEqXz9kBUYdSLFNyDCkuHc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5464
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.96
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,116 +127,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_BY5PR11MB39607C77082407729CFEBA399AC90BY5PR11MB3960namp_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+14.03.2020 0:56, Eric Blake wrote:
+> On 3/2/20 4:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> NBD driver may has max_pwrite_zeroes but doesn't has
+>> max_pwrite_zeroes_no_fallback limit. This means, that (when
+>> BDRV_REQ_NO_FALLBACK is supported) it is beneficial to try send request
+>> with BDRV_REQ_NO_FALLBACK instead of splitting the request accordingly
+>> to max_pwrite_zeroes.
+>>
+>> If failed, fallback to old behavior.
+>=20
+> Grammar:
+>=20
+> When BDRV_REQ_NO_FALLBACK is supported, the NBD driver supports a larger =
+request size.=A0 Add code to try large zero requests with a NO_FALLBACK req=
+uest prior to having to split a request into chunks according to max_pwrite=
+_zeroes.
+>=20
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>> =A0 block/io.c | 30 ++++++++++++++++++++++++++----
+>> =A0 1 file changed, 26 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index c64566b4cf..48d71b0883 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -1752,17 +1752,28 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes=
+(BlockDriverState *bs,
+>> =A0=A0=A0=A0=A0 int head =3D 0;
+>> =A0=A0=A0=A0=A0 int tail =3D 0;
+>> -=A0=A0=A0 int max_write_zeroes =3D MIN_NON_ZERO((flags & BDRV_REQ_NO_FA=
+LLBACK) ?
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bs->bl.max_pwrite_zeroes_n=
+o_fallback :
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bs->bl.max_pwrite_zeroes, =
+INT_MAX);
+>> +=A0=A0=A0 int max_write_zeroes;
+>> =A0=A0=A0=A0=A0 int alignment =3D MAX(bs->bl.pwrite_zeroes_alignment,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 bs->bl.request_alignment);
+>> =A0=A0=A0=A0=A0 int max_transfer =3D MIN_NON_ZERO(bs->bl.max_transfer, M=
+AX_BOUNCE_BUFFER);
+>> +=A0=A0=A0 bool auto_no_fallback;
+>> =A0=A0=A0=A0=A0 if (!drv) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return -ENOMEDIUM;
+>> =A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0 if (!(flags & BDRV_REQ_NO_FALLBACK) &&
+>> +=A0=A0=A0=A0=A0=A0=A0 (bs->supported_zero_flags & BDRV_REQ_NO_FALLBACK)=
+ &&
+>> +=A0=A0=A0=A0=A0=A0=A0 bs->bl.max_pwrite_zeroes &&
+>> +=A0=A0=A0=A0=A0=A0=A0 bs->bl.max_pwrite_zeroes < bytes &&
+>> +=A0=A0=A0=A0=A0=A0=A0 (bs->bl.max_pwrite_zeroes < bs->bl.max_pwrite_zer=
+oes_no_fallback ||
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 bs->bl.max_pwrite_zeroes_no_fallback =3D=3D 0)=
+)
+>=20
+> Why are we letting max_pwrite_zeroes_no_fallback ever be 0?=A0 It might b=
+e more convenient if it is always guaranteed to be >=3D max_pwrite_zeroes b=
+y the block layer.
 
-> Does you kernel have 95c5c7c77c ("KVM: nVMX: list VMX MSRs in
-> KVM_GET_MSR_INDEX_LIST")?
 
-I was using linux 5.0.0, now I have 5.3.0 and it's working, thanks for fixi=
-ng this
+All other limits may be 0 too, which means some default.. So, if we want to=
+ set the default for max_pwrite_zeroes_no_fallback explicitly, I think we s=
+hould do it for all other limits too. And it should be separate thing..
 
-________________________________
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Sent: Wednesday, April 1, 2020 1:05 AM
-To: Montes, Julio <julio.montes@intel.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>; Eduardo Habkost <ehabkost@redhat=
-.com>; Dr . David Alan Gilbert <dgilbert@redhat.com>; Richard Henderson <rt=
-h@twiddle.net>; Paolo Bonzini <pbonzini@redhat.com>; qemu-devel@nongnu.org =
-<qemu-devel@nongnu.org>
-Subject: Re: [PATCH] target/i386: do not set unsupported VMX secondary exec=
-ution controls
+>=20
+>> +=A0=A0=A0 {
+>> +=A0=A0=A0=A0=A0=A0=A0 assert(drv->bdrv_co_pwrite_zeroes);
+>> +=A0=A0=A0=A0=A0=A0=A0 flags |=3D BDRV_REQ_NO_FALLBACK;
+>> +=A0=A0=A0=A0=A0=A0=A0 auto_no_fallback =3D true;
+>> +=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0=A0 if ((flags & ~bs->supported_zero_flags) & BDRV_REQ_NO_FA=
+LLBACK) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return -ENOTSUP;
+>> =A0=A0=A0=A0=A0 }
+>> @@ -1770,7 +1781,11 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(=
+BlockDriverState *bs,
+>> =A0=A0=A0=A0=A0 assert(alignment % bs->bl.request_alignment =3D=3D 0);
+>> =A0=A0=A0=A0=A0 head =3D offset % alignment;
+>> =A0=A0=A0=A0=A0 tail =3D (offset + bytes) % alignment;
+>> -=A0=A0=A0 max_write_zeroes =3D QEMU_ALIGN_DOWN(max_write_zeroes, alignm=
+ent);
+>> +=A0=A0=A0 max_write_zeroes =3D
+>> +=A0=A0=A0=A0=A0=A0=A0 QEMU_ALIGN_DOWN(MIN_NON_ZERO((flags & BDRV_REQ_NO=
+_FALLBACK) ?
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bs->bl.max_pwrite_zeroes_no_fallbac=
+k :
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bs->bl.max_pwrite_zeroes, INT_MAX),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 a=
+lignment);
+>> =A0=A0=A0=A0=A0 assert(max_write_zeroes >=3D bs->bl.request_alignment);
+>> =A0=A0=A0=A0=A0 while (bytes > 0 && !ret) {
+>> @@ -1801,6 +1816,13 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(=
+BlockDriverState *bs,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 if (drv->bdrv_co_pwrite_zeroes) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D drv->bdrv_co_pwrite_zero=
+es(bs, offset, num,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 flags & =
+bs->supported_zero_flags);
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (ret =3D=3D -ENOTSUP && auto_no_fa=
+llback) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 flags &=3D ~BDRV_REQ_NO_F=
+ALLBACK;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 max_write_zeroes =3D
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 QEMU_ALIGN_DO=
+WN(MIN_NON_ZERO(bs->bl.max_pwrite_zeroes,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ INT_MAX), alignment);
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 continue;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (ret !=3D -ENOTSUP && (flags =
+& BDRV_REQ_FUA) &&
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 !(bs->supported_zero=
+_flags & BDRV_REQ_FUA)) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 need_flush =3D true;
+>>
+>=20
+> Otherwise makes sense.
+>=20
 
-"Montes, Julio" <julio.montes@intel.com> writes:
 
-> Hi Vitaly
->
-> thanks for raising this, unfortunately this patch didn't work for me, I s=
-till get the same error:
->
->
-
-Does you kernel have 95c5c7c77c ("KVM: nVMX: list VMX MSRs in
-KVM_GET_MSR_INDEX_LIST")?
-
---
-Vitaly
-
---_000_BY5PR11MB39607C77082407729CFEBA399AC90BY5PR11MB3960namp_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-&gt; Does you kernel have 95c5c7c77c (&quot;KVM: nVMX: list VMX MSRs in<br>
-&gt; KVM_GET_MSR_INDEX_LIST&quot;)?<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-I was using linux 5.0.0, now I have 5.3.0 and it's working, thanks for fixi=
-ng this<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-<br>
-</div>
-<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font style=3D"font-size: 11pt;" data=
--ogsc=3D"" face=3D"Calibri, sans-serif" color=3D"#000000"><b>From:</b> Vita=
-ly Kuznetsov &lt;vkuznets@redhat.com&gt;<br>
-<b>Sent:</b> Wednesday, April 1, 2020 1:05 AM<br>
-<b>To:</b> Montes, Julio &lt;julio.montes@intel.com&gt;<br>
-<b>Cc:</b> Marcelo Tosatti &lt;mtosatti@redhat.com&gt;; Eduardo Habkost &lt=
-;ehabkost@redhat.com&gt;; Dr . David Alan Gilbert &lt;dgilbert@redhat.com&g=
-t;; Richard Henderson &lt;rth@twiddle.net&gt;; Paolo Bonzini &lt;pbonzini@r=
-edhat.com&gt;; qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;<br>
-<b>Subject:</b> Re: [PATCH] target/i386: do not set unsupported VMX seconda=
-ry execution controls</font>
-<div>&nbsp;</div>
-</div>
-<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt"=
->
-<div class=3D"PlainText">&quot;Montes, Julio&quot; &lt;julio.montes@intel.c=
-om&gt; writes:<br>
-<br>
-&gt; Hi Vitaly<br>
-&gt;<br>
-&gt; thanks for raising this, unfortunately this patch didn't work for me, =
-I still get the same error:<br>
-&gt;<br>
-&gt;<br>
-<br>
-Does you kernel have 95c5c7c77c (&quot;KVM: nVMX: list VMX MSRs in<br>
-KVM_GET_MSR_INDEX_LIST&quot;)?<br>
-<br>
--- <br>
-Vitaly<br>
-</div>
-</span></font></div>
-</body>
-</html>
-
---_000_BY5PR11MB39607C77082407729CFEBA399AC90BY5PR11MB3960namp_--
+--=20
+Best regards,
+Vladimir
 
