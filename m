@@ -2,66 +2,69 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5280C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5C4C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:58:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7239D2078B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:46:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7239D2078B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id E5CB92078B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:58:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5CB92078B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJat1-0002AJ-LR
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 06:46:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54825)
+	id 1jJb55-0005IP-1v
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 06:58:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jonathan.cameron@huawei.com>) id 1jJasD-0001iv-P6
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:45:30 -0400
+ (envelope-from <frederic.konrad@adacore.com>) id 1jJb4T-0004qp-S3
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jonathan.cameron@huawei.com>) id 1jJasC-0006w4-Bo
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:45:29 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2095 helo=huawei.com)
+ (envelope-from <frederic.konrad@adacore.com>) id 1jJb4S-0006GK-Jy
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:58:09 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:54508
+ helo=smtp.eu.adacore.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jonathan.cameron@huawei.com>)
- id 1jJasC-0006uU-4v
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:45:28 -0400
-Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.106])
- by Forcepoint Email with ESMTP id 24B4EC3766AF1A7F37CA;
- Wed,  1 Apr 2020 11:45:24 +0100 (IST)
-Received: from localhost (10.227.96.57) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 1 Apr 2020
- 11:45:23 +0100
-Date: Wed, 1 Apr 2020 11:45:22 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v7 00/41] target/arm: Implement ARMv8.1-VHE
-Message-ID: <20200401114522.00007335@huawei.com>
-In-Reply-To: <2c29aaa9-0c92-ba48-e218-ab816044eec3@linaro.org>
-References: <20200206105448.4726-1-richard.henderson@linaro.org>
- <CAFEAcA83vHKOYdxnAG9ouF9OJTGh+3z_RuB1yEc6dCpErZ4pZw@mail.gmail.com>
- <20200331163324.000020fb@Huawei.com>
- <2c29aaa9-0c92-ba48-e218-ab816044eec3@linaro.org>
-Organization: Huawei tech. R&D (UK)  Ltd.
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
+ (Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+ id 1jJb4S-00068G-Aq
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:58:08 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id E9A428137C;
+ Wed,  1 Apr 2020 12:58:05 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
+Received: from smtp.eu.adacore.com ([127.0.0.1])
+ by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 88gO_xLdbcwI; Wed,  1 Apr 2020 12:58:05 +0200 (CEST)
+Received: from localhost.localdomain (lfbn-tou-1-1471-22.w90-89.abo.wanadoo.fr
+ [90.89.4.22])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by smtp.eu.adacore.com (Postfix) with ESMTPSA id 00E3C8137F;
+ Wed,  1 Apr 2020 12:58:04 +0200 (CEST)
+Subject: Re: [PATCH-for-5.0 2/7] hw/misc/grlib_ahb_apb_pnp: Avoid crash when
+ writing to AHB PnP registers
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200331105048.27989-1-f4bug@amsat.org>
+ <20200331105048.27989-3-f4bug@amsat.org>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <b5d5f8b3-6950-9463-b901-b31ba640525c@adacore.com>
+Date: Wed, 1 Apr 2020 12:58:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.227.96.57]
-X-ClientProxiedBy: lhreml717-chm.china.huawei.com (10.201.108.68) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.176.76.210
+In-Reply-To: <20200331105048.27989-3-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:2ab8:224:1::a0a:d2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,69 +76,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, salil.mehta@huawei.com,
- QEMU Developers <qemu-devel@nongnu.org>, shameerali.kolothum.thodi@huawei.com
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Jiri Gaisler <jiri@gaisler.se>, Fabien Chouteau <chouteau@adacore.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 31 Mar 2020 11:59:13 -0700
-Richard Henderson <richard.henderson@linaro.org> wrote:
-
-> On 3/31/20 8:33 AM, Jonathan Cameron wrote:
-> > Just wondering if there are any known issues with this?  
-> 
-> Nope.  It works for me.
-> Can you give us any more details.
-> 
-
-Unfortunately not a lot more to add.
-
-I ran some sanity checks that it wasn't something else looking like an issue
-in these patches.
-
-All with 5.6 kernel and 5.0.0 rc0 qemu
-
-1) sve=off but VHE still on. failed.
-2) sve=off + VH bit not set. fine but obviously no VHE.
-(dance with SVE required because of kernel checks for SVE before allowing
- no VHE kvm).
-3) above tests run on mainline qemu just after VHE patches applied (just in case
-   we have a regression from some other change).  No change.
-4) EDK2 for the guest.  Synchronous exception. (works fine with no VHE)
-0x00..05F9B2208
-
-I do get an additional error sometimes such as the ld.so one here.
-
-[   16.539375] Run /sbin/init as init process
-Inconsistency detected by ld.so: rtld.c: 721: init_tls: Assertion `i == GL(dl_tls_max_dtv_idx)' failed!
-[   17.780596] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00
-[   17.847709] CPU: 0 PID: 1 Comm: init Not tainted 5.6.0 #356
-[   17.897260] Hardware name: linux,dummy-virt (DT)
-[   17.940007] Call trace:
-[   17.962297]  dump_backtrace+0x0/0x190
-[   17.993897]  show_stack+0x1c/0x28
-[   18.022382]  dump_stack+0xb4/0xfc
-[   18.050781]  panic+0x160/0x35c
-[   18.077469]  do_exit+0x9a4/0xa08
-[   18.105510]  do_group_exit+0x48/0xa8
-[   18.136073]  __arm64_sys_exit_group+0x1c/0x20
-[   18.173677]  el0_svc_common.constprop.0+0x70/0x168
-[   18.218659]  do_el0_svc+0x28/0x88
-[   18.247154]  el0_sync_handler+0x10c/0x180
-[   18.281379]  el0_sync+0x140/0x180
-[   18.310684] Kernel Offset: 0x2a67dcc00000 from 0xffff800010000000
-[   18.362474] PHYS_OFFSET: 0xfffff79400000000
-[   18.398314] CPU features: 0x40012,20c0a238
-[   18.433416] Memory Limit: none
-[   18.463648] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00 ]---
 
 
-Jonathan
+Le 3/31/20 =C3=A0 12:50 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0=
+:
+> Similarly to commit 158b659451 with the APB PnP registers, guests
+> can crash QEMU when writting to the AHB PnP registers:
+>=20
+>    $ echo 'writeb 0xfffff042 69' | qemu-system-sparc -M leon3_generic -=
+S -bios /etc/magic -qtest stdio
+>    [I 1571938309.932255] OPENED
+>    [R +0.063474] writeb 0xfffff042 69
+>    Segmentation fault (core dumped)
+>=20
+>    (gdb) bt
+>    #0  0x0000000000000000 in  ()
+>    #1  0x0000562999110df4 in memory_region_write_with_attrs_accessor
+>        (mr=3Dmr@entry=3D0x56299aa28ea0, addr=3D66, value=3Dvalue@entry=3D=
+0x7fff6abe13b8, size=3Dsize@entry=3D1, shift=3D<optimized out>, mask=3Dma=
+sk@entry=3D255, attrs=3D...) at memory.c:503
+>    #2  0x000056299911095e in access_with_adjusted_size
+>        (addr=3Daddr@entry=3D66, value=3Dvalue@entry=3D0x7fff6abe13b8, s=
+ize=3Dsize@entry=3D1, access_size_min=3D<optimized out>, access_size_max=3D=
+<optimized out>, access_fn=3Daccess_fn@entry=3D
+>        0x562999110d70 <memory_region_write_with_attrs_accessor>, mr=3D0=
+x56299aa28ea0, attrs=3D...) at memory.c:539
+>    #3  0x0000562999114fba in memory_region_dispatch_write (mr=3Dmr@entr=
+y=3D0x56299aa28ea0, addr=3D66, data=3D<optimized out>, op=3D<optimized ou=
+t>, attrs=3Dattrs@entry=3D...) at memory.c:1482
+>    #4  0x00005629990c0860 in flatview_write_continue
+>        (fv=3Dfv@entry=3D0x56299aa7d8a0, addr=3Daddr@entry=3D4294963266,=
+ attrs=3D..., ptr=3Dptr@entry=3D0x7fff6abe1540, len=3Dlen@entry=3D1, addr=
+1=3D<optimized out>, l=3D<optimized out>, mr=3D0x56299aa28ea0)
+>        at include/qemu/host-utils.h:164
+>    #5  0x00005629990c0a76 in flatview_write (fv=3D0x56299aa7d8a0, addr=3D=
+4294963266, attrs=3D..., buf=3D0x7fff6abe1540, len=3D1) at exec.c:3165
+>    #6  0x00005629990c4c1b in address_space_write (as=3D<optimized out>,=
+ addr=3D<optimized out>, attrs=3D..., attrs@entry=3D..., buf=3Dbuf@entry=3D=
+0x7fff6abe1540, len=3Dlen@entry=3D1) at exec.c:3256
+>    #7  0x000056299910f807 in qtest_process_command (chr=3Dchr@entry=3D0=
+x5629995ee920 <qtest_chr>, words=3Dwords@entry=3D0x56299acfcfa0) at qtest=
+.c:437
+>=20
+> Instead of crashing, log the access as unimplemented.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>   hw/misc/grlib_ahb_apb_pnp.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
+>=20
+> diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
+> index e230e25363..72a8764776 100644
+> --- a/hw/misc/grlib_ahb_apb_pnp.c
+> +++ b/hw/misc/grlib_ahb_apb_pnp.c
+> @@ -136,8 +136,15 @@ static uint64_t grlib_ahb_pnp_read(void *opaque, h=
+waddr offset, unsigned size)
+>       return ahb_pnp->regs[offset >> 2];
+>   }
+>  =20
+> +static void grlib_ahb_pnp_write(void *opaque, hwaddr addr,
+> +                                uint64_t val, unsigned size)
+> +{
+> +    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
+> +}
+> +
+>   static const MemoryRegionOps grlib_ahb_pnp_ops =3D {
+>       .read       =3D grlib_ahb_pnp_read,
+> +    .write      =3D grlib_ahb_pnp_write,
+>       .endianness =3D DEVICE_BIG_ENDIAN,
+>   };
+>  =20
+>=20
 
-
-> 
-> r~
-
-
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
 
