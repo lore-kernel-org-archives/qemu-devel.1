@@ -2,119 +2,85 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D4AC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F268BC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:13:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1FF62071A
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:12:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 896C62071A
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:13:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ltEWjMvG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1FF62071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hb8jER1u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 896C62071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJfyj-0006FJ-1A
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:12:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58592)
+	id 1jJfzu-0007Qj-Ow
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:13:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJfxo-0005hU-Jx
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:11:37 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jJfz9-0006tS-EP
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJfxn-0003Zg-6D
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:11:36 -0400
-Received: from mail-eopbgr140117.outbound.protection.outlook.com
- ([40.107.14.117]:12791 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jJfxj-0003Ul-0S; Wed, 01 Apr 2020 12:11:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hZxmX7UrDLs9uaj8e/e1vwQPo6ZLxtNBsGORqABoQH9WftlL16JrSCJwvd76n9gfFW0Ey/gu3L3Ds0IB74uo8KDGdI9BwzdLcYM7PN0BYzmgG/Mj9/6gDRIAWq3S834GhJfkyXPy/qLvPrZj6Bji6oU/E882v+xwge54XQdPGtXe8YCwe2sUySVO8c3Z9FIcdDd30pnheATf3jDAuyyY31yfPSv+cvBVFpWIN7n/CdoRQ6UoFs9McfvLbtwjsn54UGi0g3bJ1iVZQ7Q8NxqfT1KV5G1UYBg23sGbiAqKjngkWNe+iYy8E9EXcaNAGOuznXh9pZzLUVi2em4GXdn96A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1gP6+2SKdlv/LkzIlwD/fkkdmbT1EEIksqyYB84AMsg=;
- b=MZ6HN8Hvie0mGnS4GoZ10lw9JDC10wFUnAMpzUEnQxL3xHYB8ZJ8lmGuk5Ig0v4JxZB+Kz+MumFsZb3IgQ9IHPDFw0iMFyOaaIo1kKQ7RnLMEB5p2hkBWsmCG/C3BQLytiIKby8D7tBVX3G+gKMmLOvBDQIWQ9mB907KiqgXIgB0/0jZmpehll+78ZqQh4FX1YJrLhSFmou+DLQ9lHTZzA46jkTSdpz+Uact3LD1ENCyPH27cIn/WTUDfIXmmoOlSm0dOeH0CS48ozJbuj+6FtyApnJteMgszPpC2LK2FYRVIsHyrMWadHV6GVJkqjvwcsAuCNNl6IwC+YCZK8v0Kg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1gP6+2SKdlv/LkzIlwD/fkkdmbT1EEIksqyYB84AMsg=;
- b=ltEWjMvGe4QP6M6FcS4ux1aC8XoryBfWrdasWafIbk41IDBsW65RyKm07egu64qdiwbTB6papq4J7wno+ukFmkJoOQVFGY5ZNvXQlodzI3IFldIm8P32oDrPIQlJDPJw6oslOQENVXzsuu/sdOxIlDb3opK17tbcvsgKOCCWDKE=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5413.eurprd08.prod.outlook.com (10.141.173.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.15; Wed, 1 Apr 2020 16:11:27 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
- 16:11:27 +0000
-Subject: Re: [PATCH v16 4/4] iotests: 287: add qcow2 compression type test
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200401143719.21639-1-dplotnikov@virtuozzo.com>
- <20200401143719.21639-5-dplotnikov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200401191118576
-Message-ID: <85747d2b-f5c2-cb4c-1408-8df98b337c07@virtuozzo.com>
-Date: Wed, 1 Apr 2020 19:11:18 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200401143719.21639-5-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0011.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <peter.maydell@linaro.org>) id 1jJfz7-0005m7-PP
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:12:58 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37501)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jJfz7-0005iB-DA
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:12:57 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u20so17939359oic.4
+ for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 09:12:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6rTdWjxxfBHqXL4GAaIiZ6TeZHsUjfkSpFGdVmkDUm8=;
+ b=hb8jER1uPo7WMt3UhoZwMVBqLKg77OKJr0S3dF/tl9uE8Ay9ZYq0CArAUL7N6bfIfb
+ YwuxOYKDTKKnRLJIpl3ErkM3zcdsaHSSGwtSV9lEFLVM1zipoMvVBsRO5tmX+c6TMUmI
+ C/rHeCx7AJenLUceg/CFx2PAOyu6SSr79oUoe2UFnDb7THf03igbKaII8PndkKRBceQz
+ ME0tvsHE+ul0PkrrZlgAykwwkJaoOaCGTqNyyksklD4h+apMMxX/wF4hThPMbreuZ4qO
+ 5kfyMZiLN8xradx9DfcLIUVmRRMzZZQ+c//NrrxxNoeNLcMBvPhu8A3R3yI4LLkjI3XQ
+ RraQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6rTdWjxxfBHqXL4GAaIiZ6TeZHsUjfkSpFGdVmkDUm8=;
+ b=KWj/1dLfLf28eS5+KtLihU+IhwJ3VlQ5b2O9+jaAHlpToWA5reRIu5Bu1h87zfO7F3
+ wiHW1W+fwGOFKhMnk9vbSqTl6aVpwKDo6ErfaZY2LbI79AhPjHCaB13BnhnHIfIifgw5
+ zXPhfe+i3EU+xFwFK8E/qCfms+ndncT2uVSTWSaeTNOjdaghw/7A7+3x5S05amZB2dVp
+ 1n3/CFeE9ObFr8sgK5mQs93Zh9JsBjL7Ho4l0HABkl2U8byq+q7VyQoLzqNm4DxFAID7
+ Z2A12M02JP3K/KuIoYwICc6fBJMkq2WPxBMFf19Bvppu2U4Hf9hH1lrYDAuA+Nw1IL4v
+ lKcg==
+X-Gm-Message-State: AGi0Pubhth/cxan3kZucLKjE2NUfFxcjNLfIVxQjbJTXLVqIYLuUeWAL
+ Qq0XEdRYg3gvB6NPGWqzJGO/g944lQ5FWoR2Su4Ifg==
+X-Google-Smtp-Source: APiQypIrsrlj2GN+WjPeGIfTjzIghKdO+TtVNU8/BJqWUSSj2BYSCgQGvfGWBq+AFdlsv+zj3ydLNq2lKMGV4C+a4b8=
+X-Received: by 2002:a05:6808:64c:: with SMTP id
+ z12mr3266802oih.146.1585757576135; 
+ Wed, 01 Apr 2020 09:12:56 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.23) by
- FR2P281CA0011.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.20 via Frontend Transport; Wed, 1 Apr 2020 16:11:26 +0000
-X-Tagtoolbar-Keys: D20200401191118576
-X-Originating-IP: [185.215.60.23]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1742a9e1-cf2a-433a-b157-08d7d65754d4
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5413:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5413F22D2BAEEDC7803450DBC1C90@AM7PR08MB5413.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-Forefront-PRVS: 03607C04F0
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(136003)(376002)(39850400004)(396003)(346002)(366004)(81156014)(8676002)(81166006)(186003)(16526019)(86362001)(66556008)(66476007)(66946007)(6486002)(31696002)(6666004)(478600001)(36756003)(5660300002)(316002)(16576012)(26005)(2906002)(8936002)(2616005)(52116002)(956004)(4326008)(31686004)(2004002);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ICN/kDuGA0/RoU34KcvsQQWo03ofN2uY9h4/VAyqwzuuv9vH8mGjODYg5IKRQQoyKEGeSX4A/c/D63jNc351lT69R4vTICBzQnQ5uaNB06ynq6Ct3r6m+pBf67QfIPRRQp7TsEE+9PQPkPfPef+Iji9MJdEAkKbfSHqdIqyPf9r/MAbhgskE7AqMuXTZrJ7vXHvankLH/hPUZFTZ5yV1yQYsMvtSUxonm+V0Dhigiy0ztY/BaJv63nQBHZc8/etJvp03orxkGQvpjjag9w3Y4PlSL7sAOGkN9259b1ohDr2jklbRJ57mHLlRe3k7MUEqFZ9OBYrsVFyh4y8uhL4F2J3j1qBwbcNFzirUidS0MpahbSS3cvccDHv0PxZ5+QPgALg+g8cZkDZSDxt3nHnHEKG4af7olF6atz1DiWIdRnAp5rs5Ze4mty+82/jfP0mG2q25mNncU6s8hmj01WcMucCORpzNm0GlvovG6iL15D2Ov8pFMsqLiLParKi+XWU9/N+CALaOviTUnBDDgIpeCW4czXsMA8aqNJrW+MjWbyq4XbfrKxieA+xj7hjrhQAS
-X-MS-Exchange-AntiSpam-MessageData: gfGYtXGp9MRxwyzl92G95AWeDTtaisdnytzulBskwiqcfkga/osQd+BOngX3ufO0HS4QC31OovfpqvFEN4QbrYgiXkMtPxahp3Yf73ABwTIfDUadcVh2s8WfBLdx8qG03DyXwsuQYCrQFh9gmwzdQg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1742a9e1-cf2a-433a-b157-08d7d65754d4
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 16:11:27.1212 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IpUaYlO3StuJRmhdCX6Ic/9sejNNb+312ZHZYqYMewXI+XWFqdHErZY65mqLuQV1n3tKtanRZ0ct83N8DEidNLxpSYXPK0frZR7BeSU5foM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5413
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.14.117
+References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+ <20200324153630.11882-2-vsementsov@virtuozzo.com>
+ <87bloc3nmr.fsf@dusky.pond.sub.org>
+ <CAFEAcA-c_gX4=Be0oMLCmQy+PWc4uEHpQatuyNQjbrZXvsv1+w@mail.gmail.com>
+ <87wo6zoku0.fsf@dusky.pond.sub.org>
+ <CAFEAcA-mZ5nPOoPz0kafmEjUORYQj-DvieMeWqgbFarp1_DhNg@mail.gmail.com>
+ <87tv23fepa.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tv23fepa.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 1 Apr 2020 16:12:44 +0000
+Message-ID: <CAFEAcA82AzhV3DSO=nogJg1YLwKk3RrGPVRe85ByhFbaW=YCJQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] scripts/coccinelle: add error-use-after-free.cocci
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,145 +92,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, "Denis V. Lunev" <den@openvz.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-01.04.2020 17:37, Denis Plotnikov wrote:
-> The test checks fulfilling qcow2 requiriements for the compression
-> type feature and zstd compression type operability.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/287     | 162 +++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/287.out |  70 ++++++++++++++++
->   tests/qemu-iotests/group   |   1 +
->   3 files changed, 233 insertions(+)
->   create mode 100755 tests/qemu-iotests/287
->   create mode 100644 tests/qemu-iotests/287.out
-> 
-> diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
-> new file mode 100755
-> index 0000000000..699dccd72c
-> --- /dev/null
-> +++ b/tests/qemu-iotests/287
-> @@ -0,0 +1,162 @@
-> +#!/usr/bin/env bash
-> +#
-> +# Test case for an image using zstd compression
-> +#
-> +# Copyright (c) 2020 Virtuozzo International GmbH
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +# creator
-> +owner=dplotnikov@virtuozzo.com
-> +
-> +seq="$(basename $0)"
-> +echo "QA output created by $seq"
-> +
-> +status=1	# failure is the default!
-> +
-> +# standard environment
-> +. ./common.rc
-> +. ./common.filter
-> +
-> +# This tests qocw2-specific low-level functionality
-> +_supported_fmt qcow2
-> +_supported_proto file
-> +_supported_os Linux
-> +
-> +COMPR_IMG=$TEST_IMG.compressed
-> +RAND_FILE=$TEST_DIR/rand_data
+On Wed, 1 Apr 2020 at 15:44, Markus Armbruster <armbru@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> > On Wed, 1 Apr 2020 at 06:07, Markus Armbruster <armbru@redhat.com> wrote:
+> > But then as a coccinelle script author I need to know which of
+> > the options I needed are standard, which are for-this-script-only,
+> > and which are just 'workflow'.
+>
+> If you're capable of writing a Coccinelle script that actually does what
+> you want, I bet you dollars to donuts that you can decide which options
+> actually affect the patch in comparably no time whatsoever ;)
 
-Always quote file paths, to don't worry about whitespaces.
+I use this thing maybe once a month at most, more likely once
+every three months, and the documentation is notoriously
+impenetrable. I really really don't want to have to start looking in it
+and guessing about how the original author ran the script, when
+they could have just told me.
 
-> +
-> +_cleanup()
-> +{
-> +	_cleanup_test_img
-> +	rm -f $COMPR_IMG
-> +	rm -f $RAND_FILE
-> +}
+> If you prefer to bother your reader with your personal choices, that's
+> between you and your reviewers.  Myself, I prefer less noise around the
+> signal.
 
-[..]
+> If you got Coccinelle installed and know the very basics, then the
+> incantation in the script should suffice to use the script, and the
+> incantation in the commit message should suffice to reproduce the patch.
 
-  data should be identical
-> +echo
-> +echo "=== Testing incompressible cluster processing with zstd ==="
-> +echo
-> +
-> +dd if=/dev/urandom of=$RAND_FILE bs=1M count=1
-> +
-> +_make_test_img 64M
-> +# fill the image with likely incompressible and compressible clusters
-> +$QEMU_IO -c "write -c -s "$RAND_FILE" 0 1M " "$TEST_IMG" | _filter_qemu_io
+So I need to now look in the git log for the script to find the commit
+message? Why not just put the command in the file and save steps?
 
-hmm quotes around RAND_FILE here doesn't make things better: if RAND_FILE variable has
-whitespace inside, the argemunt after -c will be split into two arguments.
+> Example:
+>
+>     commit 4e20c1becba3fd2e8e71a2663cefb9627fd2a6e0
+>     Author: Markus Armbruster <armbru@redhat.com>
+>     Date:   Thu Dec 13 18:51:54 2018 +0100
+>
+>         block: Replace qdict_put() by qdict_put_obj() where appropriate
+>
+>         Patch created mechanically by rerunning:
+>
+>           $  spatch --sp-file scripts/coccinelle/qobject.cocci \
+>                     --macro-file scripts/cocci-macro-file.h \
+>                     --dir block --in-place
 
-What we need here is to support quotes inside the string argument for qemu-io. It's a
-separate thing to do. Let's just don't worry about whitespaces here now.
+Yep, that command line would be great to see in the script file.
 
+> scripts/coccinelle/qobject.cocci has no usage comment.  I doubt it needs
+> one, but I'd certainly tolerate something like
 
-With the following squashed in:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+    // Usage:
+    // spatch --sp-file scripts/coccinelle/qobject.cocci \
+    //        --macro-file scripts/cocci-macro-file.h \
+    //        FILES ...
 
---- a/tests/qemu-iotests/287
-+++ b/tests/qemu-iotests/287
-@@ -35,14 +35,14 @@ _supported_fmt qcow2
-  _supported_proto file
-  _supported_os Linux
+I think that should be about the minimum. I think every
+.cocci file should say how it was used or is supposed to be used.
+The least-effort way for the author of the script to do that is to
+simply give the command line they used to run it.
 
--COMPR_IMG=$TEST_IMG.compressed
--RAND_FILE=$TEST_DIR/rand_data
-+COMPR_IMG="$TEST_IMG.compressed"
-+RAND_FILE="$TEST_DIR/rand_data"
+> >       That's more work for the author *and* more work for the
+> > reader than just "put the command line you used into the script
+> > as a comment" -- so who's it benefiting?
+>
+> Anyone with basic Coccinelle proficiency benefits slightly from the
+> reduction of noise.
 
-  _cleanup()
-  {
-      _cleanup_test_img
--    rm -f $COMPR_IMG
--    rm -f $RAND_FILE
-+    rm -f "$COMPR_IMG"
-+    rm -f "$RAND_FILE"
-  }
-  trap "_cleanup; exit \$status" 0 1 2 3 15
+How 'basic' is basic? I think that being specific is useful for
+anybody who's at my level or lower (ie, can write a script, doesn't
+do so often enough to be able to write a script or run spatch
+without looking at documentation and cribbing from other scripts
+as examples). How many people do we have at a higher level
+than that for whom this is noise? 2? 3? And people who do
+know Coccinelle well should have no difficulty in quickly
+looking at a command line and mentally filtering out the options
+that they don't feel they need.
 
-@@ -146,11 +146,14 @@ echo
-  echo "=== Testing incompressible cluster processing with zstd ==="
-  echo
-
--dd if=/dev/urandom of=$RAND_FILE bs=1M count=1
-+dd if=/dev/urandom of="$RAND_FILE" bs=1M count=1
-
-  _make_test_img 64M
-  # fill the image with likely incompressible and compressible clusters
--$QEMU_IO -c "write -c -s "$RAND_FILE" 0 1M " "$TEST_IMG" | _filter_qemu_io
-+# TODO: if RAND_FILE variable contain a whitespace, the following will fail.
-+# We need to support some kind of quotes to make possible file paths with
-+# white spaces for -s option
-+$QEMU_IO -c "write -c -s $RAND_FILE 0 1M " "$TEST_IMG" | _filter_qemu_io
-  $QEMU_IO -c "write -c -P 0xFA 1M 1M " "$TEST_IMG" | _filter_qemu_io
-  $QEMU_IMG convert -O $IMGFMT -c -o compression_type=zstd \
-                    "$TEST_IMG" "$COMPR_IMG"
-
-
--- 
-Best regards,
-Vladimir
+thanks
+-- PMM
 
