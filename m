@@ -2,50 +2,78 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4C5C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7147C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D9692077D
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:15:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D9692077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F2E22077D
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 10:15:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VmIDrN4e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2E22077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJaP9-0000oy-IU
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 06:15:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45808)
+	id 1jJaPP-0001C1-KT
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 06:15:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jJaMh-0004bQ-8n
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:12:57 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jJaNO-0006Fk-PY
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jJaMf-0006BB-7Z
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:12:54 -0400
-Received: from relay.sw.ru ([185.231.240.75]:36518)
+ (envelope-from <cohuck@redhat.com>) id 1jJaNN-0006gI-2U
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:13:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43634
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jJaMe-000695-Vh; Wed, 01 Apr 2020 06:12:53 -0400
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jJaMX-0003qA-FP; Wed, 01 Apr 2020 13:12:45 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v15 4/4] iotests: 287: add qcow2 compression type test
-Date: Wed,  1 Apr 2020 13:12:13 +0300
-Message-Id: <20200401101213.24505-5-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20200401101213.24505-1-dplotnikov@virtuozzo.com>
-References: <20200401101213.24505-1-dplotnikov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jJaNM-0006ef-Pv
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 06:13:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585736016;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sfTPjGLQAzoYlDfdQ6i07Pm+toKV6cSO5T+iFH+IbRI=;
+ b=VmIDrN4eCktZXfWwhamVUmRKeyXU6fR5bMJDGwsorvAqmEDoqeUGsp7ANTPJWKAwegEiu0
+ bT59GH8WtNIS+fBrQlSGdqctE2moKhd/QpRRT79aUwaVk65Gq4WvUnABkw9I78vtAG03p+
+ ICWh04xJ/ZbzxbP2LTg6/iu83L9Vbws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-NLUXwDw7MvKtDMRq1gx1sg-1; Wed, 01 Apr 2020 06:13:34 -0400
+X-MC-Unique: NLUXwDw7MvKtDMRq1gx1sg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0FB5DBB1;
+ Wed,  1 Apr 2020 10:13:32 +0000 (UTC)
+Received: from gondolin (ovpn-112-252.ams2.redhat.com [10.36.112.252])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BCA9218A85;
+ Wed,  1 Apr 2020 10:13:27 +0000 (UTC)
+Date: Wed, 1 Apr 2020 12:13:24 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Re: [PATCH v2] vl/s390: fixup ram sizes for compat machines
+Message-ID: <20200401121324.379cfd0d.cohuck@redhat.com>
+In-Reply-To: <20200401085014.100125-1-borntraeger@de.ibm.com>
+References: <20200401085014.100125-1-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,277 +85,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: =?UTF-8?B?THVr?= =?UTF-8?B?w6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The test checks fulfilling qcow2 requiriements for the compression
-type feature and zstd compression type operability.
+On Wed,  1 Apr 2020 04:50:14 -0400
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- tests/qemu-iotests/287     | 159 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/287.out |  70 ++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 230 insertions(+)
- create mode 100755 tests/qemu-iotests/287
- create mode 100644 tests/qemu-iotests/287.out
+> Older QEMU versions did fixup the ram size to match what can be reported
+> via sclp. We need to mimic this behaviour for machine types 4.2 and
+> older to not fail on inbound migration for memory sizes that do not fit.
+> Old machines with proper aligned memory sizes are not affected.
+>=20
+> Alignment table:
+>  VM size (<=3D) | Alignment
+> --------------------------
+>       1020M   |     1M
+>       2040M   |     2M
+>       4080M   |     4M
+>       8160M   |     8M
+>      16320M   |    16M
+>      32640M   |    32M
+>      65280M   |    64M
+>     130560M   |   128M
+>     261120M   |   256M
+>     522240M   |   512M
+>    1044480M   |     1G
+>    2088960M   |     2G
+>    4177920M   |     4G
+>    8355840M   |     8G
+>=20
+> Suggested action is to replace unaligned -m value with a suitable
 
-diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
-new file mode 100755
-index 0000000000..9925a2a14f
---- /dev/null
-+++ b/tests/qemu-iotests/287
-@@ -0,0 +1,159 @@
-+#!/usr/bin/env bash
-+#
-+# Test case for an image using zstd compression
-+#
-+# Copyright (c) 2020 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=dplotnikov@virtuozzo.com
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# standard environment
-+. ./common.rc
-+. ./common.filter
-+
-+# This tests qocw2-specific low-level functionality
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+# for all the cases
-+CLUSTER_SIZE=65536
-+
-+# Check if we can run this test.
-+if IMGOPTS='compression_type=zstd' _make_test_img 64M |
-+    grep "Invalid parameter 'zstd'"; then
-+    _notrun "ZSTD is disabled"
-+fi
-+
-+# Test: when compression is zlib the incompatible bit is unset
-+echo
-+echo "=== Testing compression type incompatible bit setting for zlib ==="
-+echo
-+
-+IMGOPTS='compression_type=zlib' _make_test_img 64M
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-+
-+# Test: when compression differs from zlib the incompatible bit is set
-+echo
-+echo "=== Testing compression type incompatible bit setting for zstd ==="
-+echo
-+
-+IMGOPTS='compression_type=zstd' _make_test_img 64M
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-+
-+# Test: an image can't be opened if compression type is zlib and
-+#       incompatible feature compression type is set
-+echo
-+echo "=== Testing zlib with incompatible bit set ==="
-+echo
-+
-+IMGOPTS='compression_type=zlib' _make_test_img 64M
-+$PYTHON qcow2.py "$TEST_IMG" set-feature-bit incompatible 3
-+# to make sure the bit was actually set
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-+$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
-+if (($?==0)); then
-+    echo "Error: The image opened successfully. The image must not be opened"
-+fi
-+
-+# Test: an image can't be opened if compression type is NOT zlib and
-+#       incompatible feature compression type is UNSET
-+echo
-+echo "=== Testing zstd with incompatible bit unset ==="
-+echo
-+
-+IMGOPTS='compression_type=zstd' _make_test_img 64M
-+$PYTHON qcow2.py "$TEST_IMG" set-header incompatible_features 0
-+# to make sure the bit was actually unset
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-+$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
-+if (($?==0)); then
-+    echo "Error: The image opened successfully. The image must not be opened"
-+fi
-+# Test: check compression type values
-+echo
-+echo "=== Testing compression type values ==="
-+echo
-+# zlib=0
-+IMGOPTS='compression_type=zlib' _make_test_img 64M
-+od -j104 -N1 -An -vtu1 "$TEST_IMG"
-+
-+# zstd=1
-+IMGOPTS='compression_type=zstd' _make_test_img 64M
-+od -j104 -N1 -An -vtu1 "$TEST_IMG"
-+
-+# Test: using zstd compression, write to and read from an image
-+echo
-+echo "=== Testing simple reading and writing with zstd ==="
-+echo
-+
-+IMGOPTS='compression_type=zstd' _make_test_img 64M
-+$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-+# read on the cluster boundaries
-+$QEMU_IO -c "read -v 131070 8 " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -v 65534 8" "$TEST_IMG" | _filter_qemu_io
-+
-+# Test: using zstd compression, write and verify three adjacent
-+#       compressed clusters
-+echo
-+echo "=== Testing adjacent clusters reading and writing with zstd ==="
-+echo
-+
-+IMGOPTS='compression_type=zstd' _make_test_img 64M
-+$QEMU_IO -c "write -c -P 0xAB 0 64k " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -c -P 0xAD 131072 64k " "$TEST_IMG" | _filter_qemu_io
-+
-+$QEMU_IO -c "read -P 0xAB 0 64k " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0xAD 131072 64k " "$TEST_IMG" | _filter_qemu_io
-+
-+# Test: create an image, write 1M likely uncompressible data from urandom,
-+#       write 1M of compressible data, convert the image with zstd
-+#       and compare these two images - their data should be identical
-+echo
-+echo "=== Testing incompressible cluster processing with zstd ==="
-+echo
-+
-+RAND_FILE="./287_rand_data"
-+dd if=/dev/urandom of=$RAND_FILE bs=1M count=1
-+
-+IMGOPTS='' _make_test_img 64M
-+# fill the image with likely incompressible and compressible clusters
-+$QEMU_IO -c "write -c -s $RAND_FILE 0 1M " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -c -P 0xFA 1M 1M " "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG convert -O $IMGFMT -c -o compression_type=zstd \
-+                  "$TEST_IMG" "$TEST_IMG".orig
-+$QEMU_IMG compare "$TEST_IMG" "$TEST_IMG".orig
-+
-+rm -f $RAND_FILE
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/287.out b/tests/qemu-iotests/287.out
-new file mode 100644
-index 0000000000..3f47528b20
---- /dev/null
-+++ b/tests/qemu-iotests/287.out
-@@ -0,0 +1,70 @@
-+QA output created by 287
-+
-+=== Testing compression type incompatible bit setting for zlib ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+incompatible_features     []
-+
-+=== Testing compression type incompatible bit setting for zstd ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+incompatible_features     [3]
-+
-+=== Testing zlib with incompatible bit set  ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+incompatible_features     [3]
-+
-+=== Testing zstd with incompatible bit unset  ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+incompatible_features     []
-+
-+=== Testing compression type values  ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+   0
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+   1
-+
-+=== Testing simple reading and writing with zstd ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+wrote 65536/65536 bytes at offset 65536
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 65536
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+0001fffe:  ac ac 00 00 00 00 00 00  ........
-+read 8/8 bytes at offset 131070
-+8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+0000fffe:  00 00 ac ac ac ac ac ac  ........
-+read 8/8 bytes at offset 65534
-+8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Testing adjacent clusters reading and writing with zstd ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 65536
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 131072
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 65536
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 131072
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Testing incompressible cluster processing with zstd ===
-+
-+1+0 records in
-+1+0 records out
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Images are identical.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 79c6dfc85d..dacbcfc12d 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -294,5 +294,6 @@
- 283 auto quick
- 284 rw
- 286 rw quick
-+287 auto quick
- 288 quick
- 289 rw quick
--- 
-2.17.0
+"to replace any unaligned -m value" ?
+
+> aligned one or to use a machine version >=3D 5.0 as future versions might
+> remove the compatibility handling.
+
+I'm confused by the second part of the sentence. Warning about possible
+future removal of the compat stuff is fine, but I don't understand the
+suggestion to use a machine type >=3D 5.0. If I create a new machine that
+does not need be migrated to an old QEMU, using the latest machine type
+always seems like the best idea, right? And for a migration target it's
+not like we can choose the version freely anyway.
+
+>=20
+> For machine types >=3D 5.0 we can simply use an increment size of 1M and
+> use the full range of increment number which allows for all possible
+> memory sizes. The old limitation of having a maximum of 1020 increments
+> was added for standby memory, which we no longer support. With that we
+> can now support even weird memory sizes like 10001234 MB.
+>=20
+> Fixes: 3a12fc61af5c ("390x/s390-virtio-ccw: use memdev for RAM")
+> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/s390x/s390-skeys.c        |  2 +-
+>  hw/s390x/s390-stattrib-kvm.c |  4 ++--
+>  hw/s390x/s390-virtio-ccw.c   | 19 +++++++++++++++++++
+>  hw/s390x/sclp.c              | 19 ++++++-------------
+>  include/hw/boards.h          |  7 +++++++
+>  softmmu/vl.c                 |  3 +++
+>  6 files changed, 38 insertions(+), 16 deletions(-)
+>=20
+
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 236d239c19..0532143327 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -152,6 +152,12 @@ typedef struct {
+>   *    It also will be used as a way to optin into "-m" option support.
+>   *    If it's not set by board, '-m' will be ignored and generic code wi=
+ll
+>   *    not create default RAM MemoryRegion.
+> + * @fixup_ram_size:
+> + *    amends user provided ram size (with -m option) using machine
+> + *    specific algorithm. to be used by old machine types for compat
+> + *    purposes only.
+> + *    Applies only to default memory backend, i.e. explicit memory backe=
+nd
+> + *    wasn't used.
+
+"Applies only to the default memory backend, i.e., an explicitly
+specified memory backend will not be affected."
+
+?
+
+>   */
+>  struct MachineClass {
+>      /*< private >*/
 
 
