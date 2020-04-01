@@ -2,109 +2,80 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF3E6C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C9DC2D0F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:45:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8786E2078C
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:43:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DE9920675
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:45:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuAXtCWd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8786E2078C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSxHtxTY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE9920675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJchy-0007Tp-Kz
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:43:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56386)
+	id 1jJckF-0000lk-6v
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:45:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jJchH-0006pS-Bo
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:42:20 -0400
+ (envelope-from <berrange@redhat.com>) id 1jJcjW-00008l-0d
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:44:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jJchG-0005Fv-2Z
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:42:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37112
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1jJcjU-00085B-Kf
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:44:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29464
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jJchF-00055K-TG
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:42:18 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jJcjU-0007zp-Fk
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:44:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585744933;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=DwqtEZKkQG0oKISNpEUkmhoJqSzrYNRh3EeKuH5w2uo=;
- b=NuAXtCWdci3g7gflmf3lVTOqu/7P5xl2H+/g8fRWmLsls7uLddenHUkcA6drpLURFKRV5L
- m2SJtVRuSbIxWkhfTWpl4iVIH5siSLxOhFkT+sidye4E42d/i0xRS2+u0woVLpnEtSkYNr
- 8GnTACVyFd+VAK3ypiEFxaX4XCwLScg=
+ s=mimecast20190719; t=1585745075;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uywxQoBqHHe3087FmumeXx2GemrlDvKTgT2rZ+zWEc0=;
+ b=QSxHtxTYNLyCXP/AHzwNpLmg0DcXC5rqFqodEQccVg/viChG+fEyATDoL5nGEwMQGmJAEP
+ 9rqNLj2v93S4gYfQ5X7H0X5zaa2Ljbgkq/nhVOMevcSapNk9T5mHVIunIBFNLgBzV7Ddjg
+ 2DMdcEzxMo/2IQvuQu1Dm5fAJCO6zAk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-McwJiV1cOcShpXsf5RO4lA-1; Wed, 01 Apr 2020 08:42:11 -0400
-X-MC-Unique: McwJiV1cOcShpXsf5RO4lA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-340-WQIsV3ubMf6dczy1GhadzA-1; Wed, 01 Apr 2020 08:44:28 -0400
+X-MC-Unique: WQIsV3ubMf6dczy1GhadzA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D484800D4E;
- Wed,  1 Apr 2020 12:42:10 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-115-160.ams2.redhat.com
- [10.36.115.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AFC560C05;
- Wed,  1 Apr 2020 12:42:07 +0000 (UTC)
-Subject: Re: [PATCH v10 10/14] iotests: add hmp helper with logging
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200331000014.11581-1-jsnow@redhat.com>
- <20200331000014.11581-11-jsnow@redhat.com>
- <88146808-4acc-247e-d34b-5dd16baad0b4@redhat.com>
- <20200331140057.GG7030@linux.fritz.box>
- <19eedbae-0660-5a28-e20b-ddf82a36fe73@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f50b169a-1210-21b0-b34a-89979a9db291@redhat.com>
-Date: Wed, 1 Apr 2020 14:42:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 546D1107ACC7;
+ Wed,  1 Apr 2020 12:44:27 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.75])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9068F19C70;
+ Wed,  1 Apr 2020 12:44:25 +0000 (UTC)
+Date: Wed, 1 Apr 2020 13:44:22 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+Message-ID: <20200401124422.GC393810@redhat.com>
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <19eedbae-0660-5a28-e20b-ddf82a36fe73@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <87o8sblgto.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="q5Bc4p5fXAyUKnYWOU8C8Ic6dFtiEdWOP"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,160 +87,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, armbru@redhat.com, philmd@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---q5Bc4p5fXAyUKnYWOU8C8Ic6dFtiEdWOP
-Content-Type: multipart/mixed; boundary="CEwUDsYBv9BHX5BhWfjHUZj6A6m98JRoD"
-
---CEwUDsYBv9BHX5BhWfjHUZj6A6m98JRoD
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 01.04.20 14:28, Max Reitz wrote:
-> On 31.03.20 16:00, Kevin Wolf wrote:
->> Am 31.03.2020 um 12:21 hat Max Reitz geschrieben:
->>> On 31.03.20 02:00, John Snow wrote:
->>>> Minor cleanup for HMP functions; helps with line length and consolidat=
-es
->>>> HMP helpers through one implementation function.
->>>>
->>>> Although we are adding a universal toggle to turn QMP logging on or of=
-f,
->>>> many existing callers to hmp functions don't expect that output to be
->>>> logged, which causes quite a few changes in the test output.
->>>>
->>>> For now, offer a use_log parameter.
->>>>
->>>>
->>>> Typing notes:
->>>>
->>>> QMPResponse is just an alias for Dict[str, Any]. It holds no special
->>>> meanings and it is not a formal subtype of Dict[str, Any]. It is best
->>>> thought of as a lexical synonym.
->>>>
->>>> We may well wish to add stricter subtypes in the future for certain
->>>> shapes of data that are not formalized as Python objects, at which poi=
-nt
->>>> we can simply retire the alias and allow mypy to more strictly check
->>>> usages of the name.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> ---
->>>>  tests/qemu-iotests/iotests.py | 35 ++++++++++++++++++++++------------=
--
->>>>  1 file changed, 22 insertions(+), 13 deletions(-)
->>>
->>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>>
->>>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
-s.py
->>>> index b08bcb87e1..dfc753c319 100644
->>>> --- a/tests/qemu-iotests/iotests.py
->>>> +++ b/tests/qemu-iotests/iotests.py
->>>> @@ -37,6 +37,10 @@
->>>> =20
->>>>  assert sys.version_info >=3D (3, 6)
->>>> =20
->>>> +# Type Aliases
->>>> +QMPResponse =3D Dict[str, Any]
->>>> +
->>>> +
->>>>  faulthandler.enable()
->>>> =20
->>>>  # This will not work if arguments contain spaces but is necessary if =
-we
->>>> @@ -540,25 +544,30 @@ def add_incoming(self, addr):
->>>>          self._args.append(addr)
->>>>          return self
->>>> =20
->>>> -    def pause_drive(self, drive, event=3DNone):
->>>> -        '''Pause drive r/w operations'''
->>>> +    def hmp(self, command_line: str, use_log: bool =3D False) -> QMPR=
-esponse:
->>>> +        cmd =3D 'human-monitor-command'
->>>> +        kwargs =3D {'command-line': command_line}
->>>> +        if use_log:
->>>> +            return self.qmp_log(cmd, **kwargs)
->>>> +        else:
->>>> +            return self.qmp(cmd, **kwargs)
->>>
->>> Hm.  I suppose I should take this chance to understand something about
->>> mypy.  QEMUMachine.qmp() isn=E2=80=99t typed, so mypy can=E2=80=99t che=
-ck that this
->>> really returns QMPResponse.  Is there some flag to make it?  Like
->>> --actually-check-types?
->>
->> There is --check-untyped-defs, but I'm not sure if that actually changes
->> the return type of untyped functions from Any to an inferred type. I
->> kind of doubt it.
+On Wed, Apr 01, 2020 at 11:02:11AM +0200, Markus Armbruster wrote:
+> QEMU's Error was patterned after GLib's GError.  Differences include:
 >=20
-> Well, but Any doesn=E2=80=99t fit into QMPResponse, so there should be an=
- error
-> reported somewhere.
+> * &error_fatal, &error_abort for convenience
+
+I think this doesn't really need to exist, and is an artifact
+of the later point "return values" where we commonly make methds
+return void.  If we adopted a non-void return value, then these
+are no longer so compelling.
+
+Consider if we didn't have &error_fatal right now, then we would
+need to
+
+   Error *local_err =3D NULL;
+   qemu_boot_set(boot_once, &local_err)
+   if (*local_err)
+      abort();
+
+This is tedious, so we invented &error_abort to make our lives
+better
+
+   qemu_boot_set(boot_once, &error_abort)
+
+
+If we had a "bool" return value though, we would probably have just
+ended up doing:
+
+   assert(qemu_boot_set(boot_once, NULL));
+
+or
+
+   if (!qemu_boot_set(boot_once, NULL))
+       abort()
+
+and would never have invented &error_fatal.
+
+> * Distinguishing different errors
 >=20
->>> (--strict seems, well, overly strict?  Like not allowing generics, I
->>> don=E2=80=99t see why.  Or I suppose for the time being we want to allo=
-w untyped
->>> definitions, as long as they don=E2=80=99t break type assertions such a=
-s it kind
->>> of does here...?)
->>
->> At least, --strict does actually complain about this one because Any
->> isn't good enough any more (it includes --warn-return-any):
+>   Where Error has ErrorClass, GError has Gquark domain, gint code.  Use
+>   of ErrorClass other than ERROR_CLASS_GENERIC_ERROR is strongly
+>   discouraged.  When we need callers to distinguish errors, we return
+>   suitable error codes separately.
+
+The GQuark is just a static string, and in most cases this ends up being
+defined per-file, or sometimes per functional group. So essentially you
+can consider it to approximately a source file in most cases. The code
+is a constant of some arbitrary type that is generally considered to be
+scoped within the context of the GQuark domain.
+
+> * Return value conventions
 >=20
-> Hm, yes, but we=E2=80=99re not at a point where it=E2=80=99s really feasi=
-ble to enable
-> --strict...
+>   Common: non-void functions return a distinct error value on failure
+>   when such a value can be defined.  Patterns:
 >=20
->> iotests.py:560: warning: Returning Any from function declared to return =
-"Dict[str, Any]"
->> iotests.py:560: error: Call to untyped function "qmp_log" in typed conte=
-xt
->> iotests.py:562: warning: Returning Any from function declared to return =
-"Dict[str, Any]"
->>
->> Not sure why you think it doesn't allow generics? I never had problems
->> with that, even in my Python museum. :-)
+>   - Functions returning non-null pointers on success return null pointer
+>     on failure.
 >=20
-> I thought --disallow-any-generics would mean that.  But I suppose mypy
-> understands a =E2=80=9Cgeneric=E2=80=9D to be something else than I do, a=
-s John
-> described... *shrug*
+>   - Functions returning non-negative integers on success return a
+>     negative error code on failure.
+>=20
+>   Different: GLib discourages void functions, because these lead to
+>   awkward error checking code.  We have tons of them, and tons of
+>   awkward error checking code:
+>=20
+>     Error *err =3D NULL;
+>     frobnicate(arg, &err);
+>     if (err) {
+>         ... recover ...
+>         error_propagate(errp, err);
+>     }
 
-Oh.  John didn=E2=80=99t describe that.  I just read the =E2=80=9CAny=E2=80=
-=9D thing wrong,
-again.  (On my first read, I thought he just used the back ticks to
-stress the word =E2=80=9Cany=E2=80=9D, not to refer to the type =E2=80=9CAn=
-y=E2=80=9D.)
+Yeah, I really dislike this verbose style...
 
-Max
+>=20
+>   instead of
+>=20
+>     if (!frobnicate(arg, errp))
+>         ... recover ...
+>     }
 
+...so I've followed this style for any code I've written in QEMU
+where possible.
 
---CEwUDsYBv9BHX5BhWfjHUZj6A6m98JRoD--
+>=20
+>   Can also lead to pointless creation of Error objects.
+>=20
+>   I consider this a design mistake.  Can we still fix it?  We have more
+>   than 2000 void functions taking an Error ** parameter...
 
---q5Bc4p5fXAyUKnYWOU8C8Ic6dFtiEdWOP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Even if we don't do full conversion, we can at least encourage the
+simpler style - previously reviewers have told me to rewrite code
+to use the more verbose style, which I resisted. So at the very
+least setting the expectations for preferred style is useful.
 
------BEGIN PGP SIGNATURE-----
+>   Transforming code that receives and checks for errors with Coccinelle
+>   shouldn't be hard.  Transforming code that returns errors seems more
+>   difficult.  We need to transform explicit and implicit return to
+>   either return true or return false, depending on what we did to the
+>   @errp parameter on the way to the return.  Hmm.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6EjB0ACgkQ9AfbAGHV
-z0AB6Qf+JoaC4od17baah5E/UVvB8qQCfIuiWnHksHmebnhaSEuNgf+hD22wkfRy
-B4SgpzV9nnNg0NOkdK/sASSjg98eAIe6xchpnHWwh5cVncddZvYEDaZlU0RTYV8K
-dHGR98RmReqDo1CItLkQiFDWEoaST5pbPZj/j/ro8X3uMVoQvUA88N3t7f2UQZz3
-m+fobdxBRxGWfeQ9zBhHMPLNqa5nyKtD0PSrbX0o90CuQFKpKoRn0SNPtMxrEzft
-5a8aV4mAG/gITMQ9TL9+4RNvg1KH9HgI3Na7s/SVXVKd0WpkeYyZIMnJHWO+bGfl
-bkCAdnOEuq66i+k9JmBlO6Qr5nAXVg==
-=79Zk
------END PGP SIGNATURE-----
+Even if we only converted methods which are currently void, that
+would be a notable benefit I think.
 
---q5Bc4p5fXAyUKnYWOU8C8Ic6dFtiEdWOP--
+It is a shame we didn't just use GError from the start, but I guess
+its probably too late to consider changing that now.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
