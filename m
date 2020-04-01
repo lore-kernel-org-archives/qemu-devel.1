@@ -2,73 +2,112 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CF8C43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EC9C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:32:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 308D520714
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:21:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308D520714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1074020714
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 12:32:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZBmctcg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1074020714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJcNC-0006ox-Ai
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:21:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46884)
+	id 1jJcXo-0006eN-2Y
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 08:32:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50475)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jJcMQ-0006PD-8Q
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:20:47 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jJcUY-0002FK-Lf
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jJcMO-0003EI-O7
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55968)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jJcMO-0003Ds-IJ
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:20:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jJcMN-0001aK-LZ
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 12:20:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 90C4F2E8107
- for <qemu-devel@nongnu.org>; Wed,  1 Apr 2020 12:20:43 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1jJcUW-0004sB-4N
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:29:10 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49203
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jJcUV-0004pw-Ty
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 08:29:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585744146;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=F4GiOjNR2UGA4Zmn8EojPCWjIYX7xsqkaX+g6WGrokw=;
+ b=bZBmctcgLtTs3iSz0uUSxkVYhrXON2KiZ5sM5/XkiS27LeATVT8c96HAQS5fC+oUCDv5Rr
+ e1gH45LubVoltImLsvxYvGJ246FGfm3LP8xhqylfJvX31H6fzF2cUFnlxnZhWpdVFPh9N0
+ oJaZIm68PhrSwVKzuc9V9KB9xcgsqp0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-Ibt4fi1UNkS9VroCYgZJQg-1; Wed, 01 Apr 2020 08:28:50 -0400
+X-MC-Unique: Ibt4fi1UNkS9VroCYgZJQg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25EC9DB66;
+ Wed,  1 Apr 2020 12:28:49 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-115-160.ams2.redhat.com
+ [10.36.115.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 87B3719C6A;
+ Wed,  1 Apr 2020 12:28:46 +0000 (UTC)
+Subject: Re: [PATCH v10 10/14] iotests: add hmp helper with logging
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200331000014.11581-1-jsnow@redhat.com>
+ <20200331000014.11581-11-jsnow@redhat.com>
+ <88146808-4acc-247e-d34b-5dd16baad0b4@redhat.com>
+ <20200331140057.GG7030@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <19eedbae-0660-5a28-e20b-ddf82a36fe73@redhat.com>
+Date: Wed, 1 Apr 2020 14:28:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Apr 2020 12:11:41 -0000
-From: Andrew Randrianasulu <1847525@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-randrianasulu
-X-Launchpad-Bug-Reporter: Andrew Randrianasulu (andrew-randrianasulu)
-X-Launchpad-Bug-Modifier: Andrew Randrianasulu (andrew-randrianasulu)
-References: <157065019192.22617.14242881910317034171.malonedeb@gac.canonical.com>
-Message-Id: <158574310113.20881.5244999669362509189.malone@gac.canonical.com>
-Subject: [Bug 1847525] Re: qemu-system-i386 eats a lot of cpu after just few
- hours, with sdl, gl=on
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a296f04231dee355be5db73cc878b9e21689a253";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 517a7db1dbde68ead4f9a533c2d0da772614e23e
+In-Reply-To: <20200331140057.GG7030@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="HpTyZ2eQnJBBJYyV2DJNrgzKtw0YpFhpS"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,150 +116,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847525 <1847525@bugs.launchpad.net>
+Cc: ehabkost@redhat.com, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, armbru@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-this one still with me.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HpTyZ2eQnJBBJYyV2DJNrgzKtw0YpFhpS
+Content-Type: multipart/mixed; boundary="Eo1oPHBq0nefpYFhnPyAP7q7S6oiIG9pN"
 
-qemu-system-x86_64 --version
-QEMU emulator version 4.2.91 (v5.0.0-rc1-dirty)
+--Eo1oPHBq0nefpYFhnPyAP7q7S6oiIG9pN
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-on 32-bit host (Slackware, but with 64-bit kernel) compiled with gcc
-5.5.0
+On 31.03.20 16:00, Kevin Wolf wrote:
+> Am 31.03.2020 um 12:21 hat Max Reitz geschrieben:
+>> On 31.03.20 02:00, John Snow wrote:
+>>> Minor cleanup for HMP functions; helps with line length and consolidate=
+s
+>>> HMP helpers through one implementation function.
+>>>
+>>> Although we are adding a universal toggle to turn QMP logging on or off=
+,
+>>> many existing callers to hmp functions don't expect that output to be
+>>> logged, which causes quite a few changes in the test output.
+>>>
+>>> For now, offer a use_log parameter.
+>>>
+>>>
+>>> Typing notes:
+>>>
+>>> QMPResponse is just an alias for Dict[str, Any]. It holds no special
+>>> meanings and it is not a formal subtype of Dict[str, Any]. It is best
+>>> thought of as a lexical synonym.
+>>>
+>>> We may well wish to add stricter subtypes in the future for certain
+>>> shapes of data that are not formalized as Python objects, at which poin=
+t
+>>> we can simply retire the alias and allow mypy to more strictly check
+>>> usages of the name.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>  tests/qemu-iotests/iotests.py | 35 ++++++++++++++++++++++-------------
+>>>  1 file changed, 22 insertions(+), 13 deletions(-)
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
+.py
+>>> index b08bcb87e1..dfc753c319 100644
+>>> --- a/tests/qemu-iotests/iotests.py
+>>> +++ b/tests/qemu-iotests/iotests.py
+>>> @@ -37,6 +37,10 @@
+>>> =20
+>>>  assert sys.version_info >=3D (3, 6)
+>>> =20
+>>> +# Type Aliases
+>>> +QMPResponse =3D Dict[str, Any]
+>>> +
+>>> +
+>>>  faulthandler.enable()
+>>> =20
+>>>  # This will not work if arguments contain spaces but is necessary if w=
+e
+>>> @@ -540,25 +544,30 @@ def add_incoming(self, addr):
+>>>          self._args.append(addr)
+>>>          return self
+>>> =20
+>>> -    def pause_drive(self, drive, event=3DNone):
+>>> -        '''Pause drive r/w operations'''
+>>> +    def hmp(self, command_line: str, use_log: bool =3D False) -> QMPRe=
+sponse:
+>>> +        cmd =3D 'human-monitor-command'
+>>> +        kwargs =3D {'command-line': command_line}
+>>> +        if use_log:
+>>> +            return self.qmp_log(cmd, **kwargs)
+>>> +        else:
+>>> +            return self.qmp(cmd, **kwargs)
+>>
+>> Hm.  I suppose I should take this chance to understand something about
+>> mypy.  QEMUMachine.qmp() isn=E2=80=99t typed, so mypy can=E2=80=99t chec=
+k that this
+>> really returns QMPResponse.  Is there some flag to make it?  Like
+>> --actually-check-types?
+>=20
+> There is --check-untyped-defs, but I'm not sure if that actually changes
+> the return type of untyped functions from Any to an inferred type. I
+> kind of doubt it.
 
--- =
+Well, but Any doesn=E2=80=99t fit into QMPResponse, so there should be an e=
+rror
+reported somewhere.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847525
+>> (--strict seems, well, overly strict?  Like not allowing generics, I
+>> don=E2=80=99t see why.  Or I suppose for the time being we want to allow=
+ untyped
+>> definitions, as long as they don=E2=80=99t break type assertions such as=
+ it kind
+>> of does here...?)
+>=20
+> At least, --strict does actually complain about this one because Any
+> isn't good enough any more (it includes --warn-return-any):
 
-Title:
-  qemu-system-i386 eats a lot of cpu after just few hours,  with
-  sdl,gl=3Don
+Hm, yes, but we=E2=80=99re not at a point where it=E2=80=99s really feasibl=
+e to enable
+--strict...
 
-Status in QEMU:
-  New
+> iotests.py:560: warning: Returning Any from function declared to return "=
+Dict[str, Any]"
+> iotests.py:560: error: Call to untyped function "qmp_log" in typed contex=
+t
+> iotests.py:562: warning: Returning Any from function declared to return "=
+Dict[str, Any]"
+>=20
+> Not sure why you think it doesn't allow generics? I never had problems
+> with that, even in my Python museum. :-)
 
-Bug description:
-  I already send this email to qemu-discuss@nongnu.org , but I can't see
-  it arriving in archives, so here  is copy.
+I thought --disallow-any-generics would mean that.  But I suppose mypy
+understands a =E2=80=9Cgeneric=E2=80=9D to be something else than I do, as =
+John
+described... *shrug*
 
-  Hello, all!
+Max
 
-  I use qemu-system-i386/qemu-system_x86_64 for rebuilding Slax-like live c=
-d/dvd.
-  Usually guests (with various self-compiled kernels and X stack with kde3 =
-on top of them)
-  boot up normally, but if I left them to run in GUI mode for few hours - q=
-emu process on host
-  started to eat more and more cpu for itself - more notiecable if I set ho=
-st cpu to lowest possible
-  frequency via trayfreq applet (1400Mhz in my case).
 
-  Boot line a bit complicated, but I really prefer to have sound and usb in=
-side VM.
-  qemu-system-i386 -cdrom /dev/shm/CDROM-4.4.194_5.iso -m 1.9G -enable-kvm =
--soundhw es1370 -smp 2 -display sdl,gl=3Don -usb -cpu host -rtc clock=3Dvm
+--Eo1oPHBq0nefpYFhnPyAP7q7S6oiIG9pN--
 
-  rtc clock=3Dvm was taken from https://bugs.launchpad.net/qemu/+bug/117465=
-4 but apparently not helping.
-  After just 3 hours of uptime (copied line from 'top' on host)
+--HpTyZ2eQnJBBJYyV2DJNrgzKtw0YpFhpS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  31943 guest     20   0 2412m 791m  38m R   51  6.7  66:36.51 qemu-
-  system-i38
+-----BEGIN PGP SIGNATURE-----
 
-  I use Xorg 1.19.7 on host, with mesa git/nouveau as GL driver. But my car=
-d has not very big amount of VRAM - only 384Mb.
-  May be this limitation is playing some role .. but 'end-user' result was =
-after 1-2 day of guest uptime I run into completely frozen guest =
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6EiPsACgkQ9AfbAGHV
+z0A2Ywf/XSf6ubg8809e3P+hi6WGndOiL0BTULeyUFkkrQ/IQy0jsf9h7hInCRl2
+KB3aVoFUGWT6xJ0KVQ+R4/xEDduWv0kFSOvdmV7UO5kNQJfz/9Hnk6TlaLkQg4rU
+95r1yJIP52WhU2QVsKqX0OUEPZlwgl6rUxTZN7QK6t7RNduRkBy4hKp/IRRZtEeL
+wnowGMWl0CLQlJZ8UQZQbxp4a2Jp1P1oKWmiyCb9V/AJr868mH9QQ3gUyqzt+2UQ
+wn/mIGLfocUZptR4r/81ZNilTXzeMSIWsbpkIuXt4mEKgyFU04+JQza7em8Xm5WW
+popJE1SPuhZSZk0LUaZyCUY/EVmZ2w==
+=YTyE
+-----END PGP SIGNATURE-----
 
-  (may be when qemu was hitting 100 one core usage on host some internal ti=
-mer just made guest kernel too upset/froze?
-   I was sleeping or doing other things on host  for all this time, with VM=
- just supposedly running at another virtual desktop - =
+--HpTyZ2eQnJBBJYyV2DJNrgzKtw0YpFhpS--
 
-  in KDE3 + built-in compositor ....)
-
-  I wonder if more mainstream desktop users (on GNOME, Xfce, etc) and/or us=
-ers of other distros (I use self-re-compiled Slackware)
-  actually can see same problem?
-
-  qemu-system-i386 --version
-  QEMU emulator version 4.1.50 (v4.1.0-1188-gc6f5012ba5-dirty)
-  but I saw same behavior for quite some time .. just never reported it in =
-hope it will go away.
-
-  cat /proc/cpuinfo
-  processor       : 0
-  vendor_id       : AuthenticAMD
-  cpu family      : 21
-  model           : 2
-  model name      : AMD FX(tm)-4300 Quad-Core Processor
-  stepping        : 0
-  microcode       : 0x6000852
-  cpu MHz         : 1399.977
-  cache size      : 2048 KB
-  physical id     : 0
-  siblings        : 4
-  core id         : 0
-  cpu cores       : 2
-  apicid          : 16
-  initial apicid  : 0
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 13
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pd=
-pe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid ap=
-erfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsav=
-e avx f16c lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse =
-3dnowprefetch osvw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext p=
-erfctr_core perfctr_nb cpb hw_pstate ssbd vmmcall bmi1 arat npt lbrv svm_lo=
-ck nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pft=
-hreshold
-  bugs            : fxsave_leak sysret_ss_attrs null_seg spectre_v1 spectre=
-_v2 spec_store_bypass
-  bogomips        : 7600.06
-  TLB size        : 1536 4K pages
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  [and 3x more of the same, for 3 remaining cores]
-
-  Gcc is Slackware 14.2's gcc 5.5.0, but I saw this with 4.9.2 too.
-  This might be 32-bit host problem. But may be just no-one tried to run qe=
-mu with GUI guest for literaly days?
-
-  Host kernel is
-   uname -a
-  Linux slax 5.1.12-x64 #1 SMP PREEMPT Wed Jun 19 12:31:05 MSK 2019 x86_64 =
-AMD FX(tm)-4300 Quad-Core Processor AuthenticAMD GNU/Linux
-
-  I was trying newish 5.3.2 but my compilation was not as stable as this on=
-e =
-
-  (I tend to change few things, like max cpu count, preemption mode, numa s=
-upport .... =
-
-  for more distribution-like, yet most stable  and performant for me kernel)
-
-  Kernel world is moving fast, so I'll try to recompile new 5.3.x too
-  ....
-
-  =
-
-  I guess I  should provide perf/profiler output, but for  this I need to r=
-ecompile qemu. =
-
-  I'll try to come back with more details soon.
-
-  Thanks for your attention and possible feedback!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847525/+subscriptions
 
