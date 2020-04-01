@@ -2,104 +2,60 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5632DC2D0F2
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B45FFC43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:48:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BA24208FE
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:47:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ggklT40H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA24208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F9162063A
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 16:48:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F9162063A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJgWj-0006Zk-85
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:47:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37015)
+	id 1jJgXl-0008T3-C1
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 12:48:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jJgVG-0005GB-6O
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:46:10 -0400
+ (envelope-from <clg@kaod.org>) id 1jJgWE-0006c3-3M
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jJgVE-0006Ld-Tc
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:46:09 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27229
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1jJgWD-0007FB-0Y
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:47:10 -0400
+Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:45933)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jJgVE-0006L4-P9
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:46:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585759567;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HkhII9tNKFDfsz5Qtq1hjfgPrJXhcYUSWPyUqpxsBGM=;
- b=ggklT40Htfd6t1XIWGIDlZ/6FsLewImJ1hau615UthweLNwCPk9LqE+oyb0J3oCts+/OFs
- sC/061XmaMEYomlt7Pr5+9NQmnM/ZoqMQV8S0oeak8Cu7weWZ3xTRV8U2oOWBuEyYcKI4D
- jtbgcAJTbgLcAvLP9m8K5VPiDOzZqlM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-4h1msyHqO-K8pfqsB8bUeQ-1; Wed, 01 Apr 2020 12:46:06 -0400
-X-MC-Unique: 4h1msyHqO-K8pfqsB8bUeQ-1
-Received: by mail-wr1-f70.google.com with SMTP id c8so97650wru.20
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 09:46:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=odRhbTKrDc2m+vbCKmDnpGdfBHEWXOh2VX1ULBxZ80w=;
- b=OqvLHoB2XS+l9mTaBtNS/z8Yh6Z2p5tO/mSVZ0VDvnrbXvRSOmaf9Ngh9ULAxAq8Aj
- WlXgxYpuOGcShno1Kwu1jYXNeHb+w+7g2Tzca0NRV2F/uuxZFWlfPQlg761vovLzs3kS
- By7Imr4Qns4ZZI9D67fGpPIjcvXPyVkxsBjew9eRjxUpKAsqAfJ/zLsJCCW/4wODeJX8
- xNv+hIgKQbZec1umRYznQ84l3I5gbI3YkDk5wbap+H4LxdBJWejzZc1PSFcmhfJ2tlHp
- iC3LMWqG2yCs3CdkgU57CYM7PmU/gqfG3pL6US/nSyhTd7ahIqb2o7FfrK42qy175d8f
- pDmw==
-X-Gm-Message-State: ANhLgQ1zAQm+EkXp7CGwRMw7MAVRJ8yNXqDOlvXksxw0PKTA9qvik4fY
- F6YScfnaQWgozRhOywgNCLERT1OKGjQ7N61uNqozxJOObU2uIfljVGQUwM5AqBPLxptI1Rk1xuA
- 70/n6f+wUqF6lEc4=
-X-Received: by 2002:adf:f74f:: with SMTP id z15mr26540906wrp.354.1585759564961; 
- Wed, 01 Apr 2020 09:46:04 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvznq4gfeLWe5D3z5pmlWhVG/sGvVeoKtXnHY8WpuMabJoAAO5GZ6KZKIRpQmt9cWKcrTiqIw==
-X-Received: by 2002:adf:f74f:: with SMTP id z15mr26540886wrp.354.1585759564675; 
- Wed, 01 Apr 2020 09:46:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b83b:7ec7:7b6d:d969?
- ([2001:b07:6468:f312:b83b:7ec7:7b6d:d969])
- by smtp.gmail.com with ESMTPSA id c6sm894593wrm.85.2020.04.01.09.46.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Apr 2020 09:46:04 -0700 (PDT)
-Subject: Re: QEMU participation to Google Season of Docs
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- John Snow <jsnow@redhat.com>, Stefan Weil <sw@weilnetz.de>
-References: <de92e66d-c474-dd1b-ddab-194b2f92d1dd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <36614289-5498-7a78-5f8e-1b4da84261ad@redhat.com>
-Date: Wed, 1 Apr 2020 18:46:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jJgWC-0007Eg-Rq
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 12:47:08 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.54.59])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 9AC97161A82
+ for <qemu-devel@nongnu.org>; Wed,  1 Apr 2020 18:47:06 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id AEC9E1112C097;
+ Wed,  1 Apr 2020 16:47:00 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v2 1/2] ppc/xive: export PQ routines
+Date: Wed,  1 Apr 2020 18:46:52 +0200
+Message-Id: <20200401164653.28231-2-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200401164653.28231-1-clg@kaod.org>
+References: <20200401164653.28231-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <de92e66d-c474-dd1b-ddab-194b2f92d1dd@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 14234189573486709734
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrtddvgddutdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.52.162
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,25 +67,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- qemu-discuss@nongnu.org
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/04/20 18:37, Philippe Mathieu-Daud=C3=A9 wrote:
->=20
-> * Refactor the open source project's existing documentation to
-> =C2=A0 provide an improved user experience or a more accessible
-> =C2=A0 information architecture.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ include/hw/ppc/xive.h    | 4 ++++
+ hw/intc/spapr_xive_kvm.c | 8 ++++----
+ hw/intc/xive.c           | 6 +++---
+ 3 files changed, 11 insertions(+), 7 deletions(-)
 
-This kind of project would be indeed very suitable to QEMU.  Stefan,
-perhaps you could help by providing the text for our Summer of Code
-submission?
-
-Thanks,
-
-Paolo
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 705cf48176fc..112fb6fb6dbe 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -255,6 +255,10 @@ static inline hwaddr xive_source_esb_mgmt(XiveSource=
+ *xsrc, int srcno)
+ #define XIVE_ESB_QUEUED       (XIVE_ESB_VAL_P | XIVE_ESB_VAL_Q)
+ #define XIVE_ESB_OFF          XIVE_ESB_VAL_Q
+=20
++bool xive_esb_trigger(uint8_t *pq);
++bool xive_esb_eoi(uint8_t *pq);
++uint8_t xive_esb_set(uint8_t *pq, uint8_t value);
++
+ /*
+  * "magic" Event State Buffer (ESB) MMIO offsets.
+  *
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index edb7ee0e74f1..43f4d56b958c 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -308,7 +308,7 @@ static uint8_t xive_esb_read(XiveSource *xsrc, int sr=
+cno, uint32_t offset)
+     return xive_esb_rw(xsrc, srcno, offset, 0, 0) & 0x3;
+ }
+=20
+-static void xive_esb_trigger(XiveSource *xsrc, int srcno)
++static void kvmppc_xive_esb_trigger(XiveSource *xsrc, int srcno)
+ {
+     uint64_t *addr =3D xsrc->esb_mmap + xive_source_esb_page(xsrc, srcno=
+);
+=20
+@@ -331,7 +331,7 @@ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int src=
+no, uint32_t offset,
+         offset =3D=3D XIVE_ESB_LOAD_EOI) {
+         xive_esb_read(xsrc, srcno, XIVE_ESB_SET_PQ_00);
+         if (xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
+-            xive_esb_trigger(xsrc, srcno);
++            kvmppc_xive_esb_trigger(xsrc, srcno);
+         }
+         return 0;
+     } else {
+@@ -375,7 +375,7 @@ void kvmppc_xive_source_set_irq(void *opaque, int src=
+no, int val)
+         }
+     }
+=20
+-    xive_esb_trigger(xsrc, srcno);
++    kvmppc_xive_esb_trigger(xsrc, srcno);
+ }
+=20
+ /*
+@@ -544,7 +544,7 @@ static void kvmppc_xive_change_state_handler(void *op=
+aque, int running,
+              * generate a trigger.
+              */
+             if (pq =3D=3D XIVE_ESB_RESET && old_pq =3D=3D XIVE_ESB_QUEUE=
+D) {
+-                xive_esb_trigger(xsrc, i);
++                kvmppc_xive_esb_trigger(xsrc, i);
+             }
+         }
+=20
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index d6183f8ae40a..b8825577f719 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -789,7 +789,7 @@ void xive_tctx_destroy(XiveTCTX *tctx)
+  * XIVE ESB helpers
+  */
+=20
+-static uint8_t xive_esb_set(uint8_t *pq, uint8_t value)
++uint8_t xive_esb_set(uint8_t *pq, uint8_t value)
+ {
+     uint8_t old_pq =3D *pq & 0x3;
+=20
+@@ -799,7 +799,7 @@ static uint8_t xive_esb_set(uint8_t *pq, uint8_t valu=
+e)
+     return old_pq;
+ }
+=20
+-static bool xive_esb_trigger(uint8_t *pq)
++bool xive_esb_trigger(uint8_t *pq)
+ {
+     uint8_t old_pq =3D *pq & 0x3;
+=20
+@@ -819,7 +819,7 @@ static bool xive_esb_trigger(uint8_t *pq)
+     }
+ }
+=20
+-static bool xive_esb_eoi(uint8_t *pq)
++bool xive_esb_eoi(uint8_t *pq)
+ {
+     uint8_t old_pq =3D *pq & 0x3;
+=20
+--=20
+2.21.1
 
 
