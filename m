@@ -2,89 +2,86 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C49FC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F88C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 05:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00AAF20678
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 03:21:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00AAF20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 45C502074D
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 05:08:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SSkfNe5X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45C502074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJTwT-00073v-77
-	for qemu-devel@archiver.kernel.org; Tue, 31 Mar 2020 23:21:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42115)
+	id 1jJVbv-0004IT-CU
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 01:08:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jJTvr-0006Yi-KV
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:20:48 -0400
+ (envelope-from <armbru@redhat.com>) id 1jJVb8-0003rv-1k
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 01:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jJTvq-0002Vj-FF
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:20:47 -0400
-Received: from mga07.intel.com ([134.134.136.100]:38810)
+ (envelope-from <armbru@redhat.com>) id 1jJVb6-0002om-Pu
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 01:07:29 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36856
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jJTvq-0002SY-6Y
- for qemu-devel@nongnu.org; Tue, 31 Mar 2020 23:20:46 -0400
-IronPort-SDR: d6MS9V6fDv7m4/4QegVX0niWf7tImiN1pxjTlRt360FoE8x2vdYIhbFNgKzRb+6BQ/5XyMCtyB
- vBezko+RAzOg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 31 Mar 2020 20:20:45 -0700
-IronPort-SDR: DPK9gyQBnEe3V8YRFGyinPVh5PBvRNVxBeQIZ+D4NvjJv4fxznqQzxh6YPavIs5efZ9H7Ygq3b
- 9kqc4lwjuDXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,330,1580803200"; d="scan'208";a="450387728"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga006.fm.intel.com with ESMTP; 31 Mar 2020 20:20:44 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 20:20:44 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 31 Mar 2020 20:20:44 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 31 Mar 2020 20:20:44 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
- Wed, 1 Apr 2020 11:20:40 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "alex.williamson@redhat.com"
- <alex.williamson@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>
-Subject: RE: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
-Thread-Topic: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
-Thread-Index: AQHWBkpjlWASVTcKHUCJ2vYuB9rbdahiPwyAgAFDflA=
-Date: Wed, 1 Apr 2020 03:20:40 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21C0FB@SHSMSX104.ccr.corp.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-11-git-send-email-yi.l.liu@intel.com>
- <564d1a55-04df-a3bd-5241-e30f958a4e89@redhat.com>
-In-Reply-To: <564d1a55-04df-a3bd-5241-e30f958a4e89@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="iso-2022-jp"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jJVb6-0002m1-Hs
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 01:07:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585717647;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Cn9kMeae/3nJ58VfDW06RQT4Td2JzJbYKqJ6E3BOz8k=;
+ b=SSkfNe5X7LdQisLk8pT8Fe39/iqBPx55GjrXNA6bXBKozSKq+pd4Hu+f+KGl3fiMB7PFn6
+ l+AqDEgzEGfyhgf3tlS3E80KV0flLkozPJD3Mo1dPmkLW5ZfyUk3hnzxAd41N4g/hS4JjF
+ 8JCCkgAJTtAyix15Ld8mrMLVh3vHZJw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-FnCqUP58MsudZI0CUCbD8g-1; Wed, 01 Apr 2020 01:07:25 -0400
+X-MC-Unique: FnCqUP58MsudZI0CUCbD8g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A4B9107ACCC;
+ Wed,  1 Apr 2020 05:07:24 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 197115C1B0;
+ Wed,  1 Apr 2020 05:07:20 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1E71711385E2; Wed,  1 Apr 2020 07:07:19 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 1/6] scripts/coccinelle: add error-use-after-free.cocci
+References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+ <20200324153630.11882-2-vsementsov@virtuozzo.com>
+ <87bloc3nmr.fsf@dusky.pond.sub.org>
+ <CAFEAcA-c_gX4=Be0oMLCmQy+PWc4uEHpQatuyNQjbrZXvsv1+w@mail.gmail.com>
+Date: Wed, 01 Apr 2020 07:07:19 +0200
+In-Reply-To: <CAFEAcA-c_gX4=Be0oMLCmQy+PWc4uEHpQatuyNQjbrZXvsv1+w@mail.gmail.com>
+ (Peter Maydell's message of "Tue, 31 Mar 2020 19:56:34 +0100")
+Message-ID: <87wo6zoku0.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.100
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,76 +93,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, 
- Jun J" <jun.j.tian@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Denis
+ V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric=1B$B!$=1B(B
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> From: Auger Eric <eric.auger@redhat.com>
-> Sent: Tuesday, March 31, 2020 10:30 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
-> Subject: Re: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
->=20
-> Yi,
->=20
-> On 3/30/20 6:24 AM, Liu Yi L wrote:
-> > For vfio-pci devices, it could use pci_device_set/unset_iommu() to
-> > expose host iommu context to vIOMMU emulators. vIOMMU emulators could
-> > make use the methods provided by host iommu context. e.g.
-> > propagate requests to host iommu.
-> I think I would squash this patch into the previous one.
+> On Tue, 31 Mar 2020 at 10:01, Markus Armbruster <armbru@redhat.com> wrote=
+:
+>> I doubt including basic spatch instructions with every script is a good
+>> idea.  Better explain it in one place, with proper maintenance.
+>> scripts/coccinelle/README?  We could be a bit more verbose there,
+>> e.g. to clarify required vs. suggested options.
+>
+> I find it useful -- you (hopefully) get the actual command line
+> the original author used, rather than having to guess which
+> options might be significant. (eg the last one I added uses
+> --keep-comments --smpl-spacing --include-headers --dir target
+> which aren't all always used but which do all matter here for
+> getting the change that went in in the commit that used the script.)
+> Most of us use coccinelle as an occasional tool, not an
+> everyday one, so not having to look through the docs to figure
+> out the right rune is a benefit, even for the options that
+> we do use on pretty much every spatch run.
 
-sure, I can make it. :-)
+Generic instructions for using .cocci scripts should go into README.
+Enough to get you started if you know nothing about Coccinelle.
 
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  hw/vfio/pci.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> >
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c index 5e75a95..c140c88
-> > 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -2717,6 +2717,7 @@ static void vfio_realize(PCIDevice *pdev, Error *=
-*errp)
-> >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-> >      VFIODevice *vbasedev_iter;
-> >      VFIOGroup *group;
-> > +    VFIOContainer *container;
-> >      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
-> >      Error *err =3D NULL;
-> >      ssize_t len;
-> > @@ -3028,6 +3029,11 @@ static void vfio_realize(PCIDevice *pdev, Error =
-**errp)
-> >      vfio_register_req_notifier(vdev);
-> >      vfio_setup_resetfn_quirk(vdev);
-> >
-> > +    container =3D vdev->vbasedev.group->container;
-> > +    if (container->iommu_ctx.initialized) {
-> Sin't it possible to dynamically allocate the iommu_ctx so that you can s=
-imply check
-> container->iommu_ctx and discard the initialized field?
+Options that should always be used with a certain script should be
+documented in that script.
 
-iommu_ctx is allocated along with container as it is not a pointer in VFIOC=
-ontainer.
-The only way to check it is to have flag. :-)
+Options that only affect work-flow, not the patch, I'd rather keep out
+of the script.  If there are any we feel we should mention, do that in
+README.  Example: --no-show-diff.
 
-Regards,
-Yi Liu
+Brief instructions for how a patch was created should be included in the
+commit message.  They should suffice for readers familiar with
+Coccinelle.  Yes, there's a bit of redundancy with README and the
+script.
+
 
