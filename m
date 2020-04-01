@@ -2,121 +2,131 @@ Return-Path: <SRS0=uFRu=5R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB8FC43331
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88140C43331
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:23:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C545F2063A
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:22:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C4F32080C
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Apr 2020 11:23:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LOWJmueB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C545F2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BzBd9qyj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C4F32080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJbS4-000161-0B
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:22:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33457)
+	id 1jJbTO-0002kM-B6
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 07:23:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJbRB-0000bY-Qi
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:21:39 -0400
+ (envelope-from <david@redhat.com>) id 1jJbRJ-0000ik-2j
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jJbRA-000615-8Y
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:21:37 -0400
-Received: from mail-eopbgr00113.outbound.protection.outlook.com
- ([40.107.0.113]:11191 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jJbR4-0005yZ-HU; Wed, 01 Apr 2020 07:21:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rl6fKyKXz+UhUBFvYvJtTgMWQYCrhog9b7uomijsX6LPFNL5kFwkf31cubkmJZ0ECeGyXxDeXRRUn8LW1Jzm6WFWlPJxXG4VGcEPFpptj4gt9m7KSHphR3OIIdZzABVCqCrRRHW5BMm+vW8ZP77FGQj48yNebG+3SSgDSPIaNZCAR2Fy6tKOHdV5Q46+VF4SmpvTjauNpwSthN4JciVnUcEBZ+q8knxKrpzMgHcn83vX+Fhl7byCf2Gts3G+CuSo+cwOY4ZJLRk3c8y+LfxXtf3s6FWtYrKpUSWra0xJd2ilmRtDdUp7k41/BeQl3Ct2JqkEynBVgyZktvr1XRQ6VQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1Zq4f765ywyAYukakTx9N1p46/BAd42L77irPzqvZj8=;
- b=CefRI358TDHTaLbwUBk8gLuORgnUaxSYes84vChHLIoyIjMKf7pbSkOJ2tVaWlu8zHJ1DtmleT1PSjSclw21xxDaMS4mYROTIU1c8z7FmVeuJ0M+pE5f81EIHTTfIyT9qynU0fzTuJLsYHSI3KcdxFJ4EF6zZQq0TVT1BkhhbmrTSUBV+1pHoATtEarT12ppV4oVc6K1MAFliFuZSDHHecur+79iPo7YgZhVMVj5y8UOSepkf35fJib3KYTMOahMS4lGszIw+qg7ndyGC7oBrxbFgAe9RZ3v7rIYGFJKH/c8xHhVNnmAdS+HmwSkAAb8zbXEXpC0rG80+tsXlLCLVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1Zq4f765ywyAYukakTx9N1p46/BAd42L77irPzqvZj8=;
- b=LOWJmueB64aXtjZGqzdjT0yDgh+/k5Br1THA+wmuNBVn1YtMI374cWAt7fm8AN9ttcEOzY5aAVX9tKRF5qVm8YlJPRkQn1pIzAExgZ3uQbjSObgYl44LON35Zz6rp9UmXhXY8X62tVV88ZmkztkoqlEDqrzCA8JXlXgLbJySHYw=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5352.eurprd08.prod.outlook.com (10.141.174.136) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.20; Wed, 1 Apr 2020 11:21:27 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.014; Wed, 1 Apr 2020
- 11:21:27 +0000
-Subject: Re: [PATCH v14 3/4] qcow2: add zstd cluster compression
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200331174455.31792-1-dplotnikov@virtuozzo.com>
- <20200331174455.31792-4-dplotnikov@virtuozzo.com>
- <434f359a-998f-1c60-ecad-fa6cb25e9374@virtuozzo.com>
- <aee58e22-cddb-0cff-4044-f558f207a30d@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200401142125695
-Message-ID: <54c95fa9-012c-8217-39f3-88f84e605213@virtuozzo.com>
-Date: Wed, 1 Apr 2020 14:21:25 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <aee58e22-cddb-0cff-4044-f558f207a30d@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: AM3PR05CA0119.eurprd05.prod.outlook.com
- (2603:10a6:207:2::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <david@redhat.com>) id 1jJbRG-00066H-Lq
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:21:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36859
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jJbRG-00064x-GL
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 07:21:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585740101;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=cyECR4aJG/7CeIBblQy9M1dejlYBqUo0wJPVJet5SNA=;
+ b=BzBd9qyjXSCSyYBSOVL17iPRQtmQ6yg51F4L2Dn8mdK2T6w5BVcjpzvPzyRu+oEV5jb+0F
+ dFh66EFDK+kWsmG1x25WRQWA5N9SJcebwuGpmFLQv6Ap0uZuRMmv3nU8shNsJedsT0hujQ
+ KNQvAdLYOoyhgfVj21W+Ev3W8lBKRfM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-131-QxhtB1ISNFmLfsksWmjf3w-1; Wed, 01 Apr 2020 07:21:39 -0400
+X-MC-Unique: QxhtB1ISNFmLfsksWmjf3w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8F0C8014D7;
+ Wed,  1 Apr 2020 11:21:37 +0000 (UTC)
+Received: from [10.36.114.59] (ovpn-114-59.ams2.redhat.com [10.36.114.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3BA6E19C6A;
+ Wed,  1 Apr 2020 11:21:29 +0000 (UTC)
+Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER to
+ handle THP spilt issue
+To: Nadav Amit <namit@vmware.com>
+References: <20200326031817-mutt-send-email-mst@kernel.org>
+ <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
+ <20200326054554-mutt-send-email-mst@kernel.org>
+ <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
+ <20200331091718-mutt-send-email-mst@kernel.org>
+ <02a393ce-c4b4-ede9-7671-76fa4c19097a@redhat.com>
+ <DD651B97-C7C2-4071-BD8D-EB5BC00A3A52@vmware.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <de0371da-3bf8-7873-559d-665a0e7c0fc5@redhat.com>
+Date: Wed, 1 Apr 2020 13:21:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.23) by
- AM3PR05CA0119.eurprd05.prod.outlook.com (2603:10a6:207:2::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.19 via Frontend Transport; Wed, 1 Apr 2020 11:21:26 +0000
-X-Tagtoolbar-Keys: D20200401142125695
-X-Originating-IP: [185.215.60.23]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bdcbc14f-da28-47f8-eea1-08d7d62ed1da
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5352:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5352FADCD92D0685D4694523C1C90@AM7PR08MB5352.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 03607C04F0
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(376002)(396003)(366004)(346002)(39840400004)(136003)(186003)(4326008)(8676002)(31686004)(26005)(5660300002)(956004)(81156014)(81166006)(16576012)(36756003)(86362001)(16526019)(316002)(66946007)(2616005)(66556008)(66476007)(6486002)(478600001)(31696002)(2906002)(53546011)(52116002)(8936002);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yGX9VEmzjN4kidE4WgpWu93iZfcE6iRyMg6hTRBoG3wg86MaLJZQhKxuCZIz635z81IS+jOljPZ1GfhIm56Z9HLBlytqPFvQKbzRqyok29Vh1XLMLKKWOXo1aaj9SlDav0wEg5x5uKl0rftJ3GVMz+7K8j12Es9fXlO60T4Jx9rnSJwGrG6fCMEueL2UqSoZmZ18YVDP1UU7gDr/1GeBgMsn3VJNHrSGdDWTi/ezx4ikikI0Sr/uuEyu12EtDWlhdIJJtzJETQbYst146W2YhGkAu9CSpMmot2y7D86jhKjyt09LaOPNXMBFVE55j3j+CoxxnfvegjwEpJqPvhLKop+yRHXVZ7DOirXrda4vBgbpXfDFYVdg3jprK/xmTwgTgPfu4Wz+bmXXBaCRGWMhOdnsvO99Ok81j3ssJ7WRqYuNtB9uNe90sclhdRgXuEq/
-X-MS-Exchange-AntiSpam-MessageData: VTSmcwmAt/pEFcQKzoAGEkGONFb0WfIfwH3k6bb3knoleR1Em49SJAeB0QQ7WBwnsf1mY5utUOyk90NFtNKLzhk3dkPr1Ddcye0Awl/oJZvAaMa/ggfcOLbOp/E/HM7X/LxQ3VNngJcG9Aj13VjQFQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdcbc14f-da28-47f8-eea1-08d7d62ed1da
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2020 11:21:27.6807 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2pjDPnAWpQQTyBQjH/IxwB3GMocV4+T9ZHwRX/vhQyVOJM0d0k1obZuHvgbxQUKTVL4Sh9QYSmAOlom6dPRG7RfnPJog1n3joRN8C/y+KkE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5352
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+In-Reply-To: <DD651B97-C7C2-4071-BD8D-EB5BC00A3A52@vmware.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 40.107.0.113
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,292 +138,366 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: "pagupta@redhat.com" <pagupta@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "mojha@codeaurora.org" <mojha@codeaurora.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ LKML <linux-kernel@vger.kernel.org>, Hui Zhu <teawaterz@linux.alibaba.com>,
+ Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ Linux Virtualization <virtualization@lists.linux-foundation.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-01.04.2020 10:02, Denis Plotnikov wrote:
->=20
->=20
-> On 01.04.2020 08:49, Vladimir Sementsov-Ogievskiy wrote:
->> 31.03.2020 20:44, Denis Plotnikov wrote:
->>> zstd significantly reduces cluster compression time.
->>> It provides better compression performance maintaining
->>> the same level of the compression ratio in comparison with
->>> zlib, which, at the moment, is the only compression
->>> method available.
->>>
->>> The performance test results:
->>> Test compresses and decompresses qemu qcow2 image with just
->>> installed rhel-7.6 guest.
->>> Image cluster size: 64K. Image on disk size: 2.2G
->>>
->>> The test was conducted with brd disk to reduce the influence
->>> of disk subsystem to the test results.
->>> The results is given in seconds.
->>>
->>> compress cmd:
->>> =C2=A0=C2=A0 time ./qemu-img convert -O qcow2 -c -o compression_type=3D=
-[zlib|zstd]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 src.img [zlib|zstd]_compressed.img
->>> decompress cmd
->>> =C2=A0=C2=A0 time ./qemu-img convert -O qcow2
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [zlib|zstd]_compressed.img uncompre=
-ssed.img
->>>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 comp=
-ression=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 decompression
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 zlib=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 zstd=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 zlib=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 zstd
->>> ------------------------------------------------------------
->>> real=C2=A0=C2=A0=C2=A0=C2=A0 65.5=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1=
-6.3 (-75 %)=C2=A0=C2=A0=C2=A0 1.9=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 1.6 (-16 %)
->>> user=C2=A0=C2=A0=C2=A0=C2=A0 65.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1=
-5.8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5.3=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2.5
->>> sys=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 3.3=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 0.2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 2.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2.0
->>>
->>> Both ZLIB and ZSTD gave the same compression ratio: 1.57
->>> compressed image size in both cases: 1.4G
->>>
->>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
->>> QAPI part:
->>> Acked-by: Markus Armbruster <armbru@redhat.com>
->>> ---
+On 31.03.20 18:27, Nadav Amit wrote:
+>> On Mar 31, 2020, at 6:32 AM, David Hildenbrand <david@redhat.com> wrot=
+e:
 >>
->>
->> [..]
->>
->>> +static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const void *sr=
-c, size_t src_size)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 ssize_t ret;
->>> +=C2=A0=C2=A0=C2=A0 size_t zstd_ret =3D 0;
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_outBuffer output =3D { dest, dest_size, 0 };
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_inBuffer input =3D { src, src_size, 0 };
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_CCtx *cctx =3D ZSTD_createCCtx();
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (!cctx) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EIO;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * We want to use zstd streamed interface on d=
-ecompression,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * as we won't know the exact size of the comp=
-ressed data.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 *
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * In the loop, we try to compress all the dat=
-a into one zstd frame.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * ZSTD_compressStream2 potentially can finish=
- a frame earlier
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * than the full input data is consumed. That'=
-s why we are looping
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * until all the input data is consumed.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 while (input.pos < input.size) {
->>
->> zstd_ret may be defined here.
-> yep!
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * ZSTD spec: "You mus=
-t continue calling ZSTD_compressStream2()
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * with ZSTD_e_end unt=
-il it returns 0, at which point you are
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * free to start a new=
- frame". We assume that "start a new frame"
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * means call ZSTD_com=
-pressStream2 in the very beginning or when
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * ZSTD_compressStream=
-2 has returned with 0.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 do {
->>
->> Hmm. Why did you decide to use nested loop?=C2=A0 Ok, it works too.
-> The previous condition was error prone. It led to loop ending once we fin=
-ished the "first frame"
-> but there could be a number of them.
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 zst=
-d_ret =3D ZSTD_compressStream2(cctx, &output, &input, ZSTD_e_end);
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
-(ZSTD_isError(zstd_ret)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 ret =3D -EIO;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 goto out;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* =
-Dest buffer isn't big enough to store compressed content */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
-(zstd_ret > output.size - output.pos) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 ret =3D -ENOMEM;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 goto out;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } while (zstd_ret);
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 /* make sure we can safely return compressed buffer=
- size with ssize_t */
->>> +=C2=A0=C2=A0=C2=A0 assert(output.pos <=3D SSIZE_MAX);
->>> +=C2=A0=C2=A0=C2=A0 ret =3D output.pos;
->>> +out:
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_freeCCtx(cctx);
->>> +=C2=A0=C2=A0=C2=A0 return ret;
->>> +}
->>> +
->>> +/*
->>> + * qcow2_zstd_decompress()
->>> + *
->>> + * Decompress some data (not more than @src_size bytes) to produce exa=
-ctly
->>> + * @dest_size bytes using zstd compression method
->>> + *
->>> + * @dest - destination buffer, @dest_size bytes
->>> + * @src - source buffer, @src_size bytes
->>> + *
->>> + * Returns: 0 on success
->>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -EIO on any e=
-rror
->>> + */
->>> +static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 co=
-nst void *src, size_t src_size)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 size_t ret =3D 0;
->>
->> You forget to fix ret here. ret of the function should be ssize_t and fo=
+>> On 31.03.20 15:24, Michael S. Tsirkin wrote:
+>>> On Tue, Mar 31, 2020 at 12:35:24PM +0200, David Hildenbrand wrote:
+>>>> On 26.03.20 10:49, Michael S. Tsirkin wrote:
+>>>>> On Thu, Mar 26, 2020 at 08:54:04AM +0100, David Hildenbrand wrote:
+>>>>>>> Am 26.03.2020 um 08:21 schrieb Michael S. Tsirkin <mst@redhat.com=
+>:
+>>>>>>>
+>>>>>>> =EF=BB=BFOn Thu, Mar 12, 2020 at 09:51:25AM +0100, David Hildenbr=
+and wrote:
+>>>>>>>>> On 12.03.20 09:47, Michael S. Tsirkin wrote:
+>>>>>>>>> On Thu, Mar 12, 2020 at 09:37:32AM +0100, David Hildenbrand wro=
+te:
+>>>>>>>>>> 2. You are essentially stealing THPs in the guest. So the fast=
+est
+>>>>>>>>>> mapping (THP in guest and host) is gone. The guest won't be ab=
+le to make
+>>>>>>>>>> use of THP where it previously was able to. I can imagine this=
+ implies a
+>>>>>>>>>> performance degradation for some workloads. This needs a prope=
 r
->> ZSTD - size_t.
-> I decided not to use two vars since we can return only 0 or -EIO. I added=
- an assert at the very end of the function to check it.
-
-But size_t is unsigned type. Bad idea to assign -EIO to it. And that's why =
-we've moved to zstd_ret in _compress
-
+>>>>>>>>>> performance evaluation.
+>>>>>>>>>
+>>>>>>>>> I think the problem is more with the alloc_pages API.
+>>>>>>>>> That gives you exactly the given order, and if there's
+>>>>>>>>> a larger chunk available, it will split it up.
+>>>>>>>>>
+>>>>>>>>> But for balloon - I suspect lots of other users,
+>>>>>>>>> we do not want to stress the system but if a large
+>>>>>>>>> chunk is available anyway, then we could handle
+>>>>>>>>> that more optimally by getting it all in one go.
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> So if we want to address this, IMHO this calls for a new API.
+>>>>>>>>> Along the lines of
+>>>>>>>>>
+>>>>>>>>>   struct page *alloc_page_range(gfp_t gfp, unsigned int min_ord=
+er,
+>>>>>>>>>                   unsigned int max_order, unsigned int *order)
+>>>>>>>>>
+>>>>>>>>> the idea would then be to return at a number of pages in the gi=
+ven
+>>>>>>>>> range.
+>>>>>>>>>
+>>>>>>>>> What do you think? Want to try implementing that?
+>>>>>>>>
+>>>>>>>> You can just start with the highest order and decrement the orde=
+r until
+>>>>>>>> your allocation succeeds using alloc_pages(), which would be eno=
+ugh for
+>>>>>>>> a first version. At least I don't see the immediate need for a n=
+ew
+>>>>>>>> kernel API.
+>>>>>>>
+>>>>>>> OK I remember now.  The problem is with reclaim. Unless reclaim i=
+s
+>>>>>>> completely disabled, any of these calls can sleep. After it wakes=
+ up,
+>>>>>>> we would like to get the larger order that has become available
+>>>>>>> meanwhile.
+>>>>>>
+>>>>>> Yes, but that=E2=80=98s a pure optimization IMHO.
+>>>>>> So I think we should do a trivial implementation first and then se=
+e what we gain from a new allocator API. Then we might also be able to ju=
+stify it using real numbers.
+>>>>>
+>>>>> Well how do you propose implement the necessary semantics?
+>>>>> I think we are both agreed that alloc_page_range is more or
+>>>>> less what's necessary anyway - so how would you approximate it
+>>>>> on top of existing APIs?
+>>>>
+>>>> Looking at drivers/misc/vmw_balloon.c:vmballoon_inflate(), it first
+>>>> tries to allocate huge pages using
+>>>>
+>>>> 	alloc_pages(__GFP_HIGHMEM|__GFP_NOWARN| __GFP_NOMEMALLOC,=20
+>>>>                    VMW_BALLOON_2M_ORDER)
+>>>>
+>>>> And then falls back to 4k allocations (balloon_page_alloc()) in case
+>>>> allocation fails.
+>>>>
+>>>> I'm roughly thinking of something like the following, but with an
+>>>> optimized reporting interface/bigger pfn array so we can report >
+>>>> 1MB at a time. Also, it might make sense to remember the order that
+>>>> succeeded across some fill_balloon() calls.
+>>>>
+>>>> Don't even expect it to compile ...
+>>>>
+>>>>
+>>>>
+>>>>> From 4305f989672ccca4be9293e6d4167e929f3e299b Mon Sep 17 00:00:00 2=
+001
+>>>> From: David Hildenbrand <david@redhat.com>
+>>>> Date: Tue, 31 Mar 2020 12:28:07 +0200
+>>>> Subject: [PATCH RFC] tmp
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>> drivers/virtio/virtio_balloon.c    | 38 ++++++++++++++++++--------
+>>>> include/linux/balloon_compaction.h |  7 ++++-
+>>>> mm/balloon_compaction.c            | 43 +++++++++++++++++++++++-----=
+--
+>>>> 3 files changed, 67 insertions(+), 21 deletions(-)
+>>>>
+>>>> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio=
+_balloon.c
+>>>> index 8511d258dbb4..0660b1b988f0 100644
+>>>> --- a/drivers/virtio/virtio_balloon.c
+>>>> +++ b/drivers/virtio/virtio_balloon.c
+>>>> @@ -187,7 +187,7 @@ int virtballoon_free_page_report(struct page_rep=
+orting_dev_info *pr_dev_info,
+>>>> }
+>>>>
+>>>> static void set_page_pfns(struct virtio_balloon *vb,
+>>>> -			  __virtio32 pfns[], struct page *page)
+>>>> +			  __virtio32 pfns[], struct page *page, int order)
+>>>> {
+>>>> 	unsigned int i;
+>>>>
+>>>> @@ -197,7 +197,7 @@ static void set_page_pfns(struct virtio_balloon =
+*vb,
+>>>> 	 * Set balloon pfns pointing at this page.
+>>>> 	 * Note that the first pfn points at start of the page.
+>>>> 	 */
+>>>> -	for (i =3D 0; i < VIRTIO_BALLOON_PAGES_PER_PAGE; i++)
+>>>> +	for (i =3D 0; i < VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order); i+=
++)
+>>>> 		pfns[i] =3D cpu_to_virtio32(vb->vdev,
+>>>> 					  page_to_balloon_pfn(page) + i);
+>>>> }
+>>>> @@ -205,6 +205,7 @@ static void set_page_pfns(struct virtio_balloon =
+*vb,
+>>>> static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>>>> {
+>>>> 	unsigned num_allocated_pages;
+>>>> +	int order =3D MAX_ORDER - 1;
+>>>> 	unsigned num_pfns;
+>>>> 	struct page *page;
+>>>> 	LIST_HEAD(pages);
+>>>> @@ -212,9 +213,20 @@ static unsigned fill_balloon(struct virtio_ball=
+oon *vb, size_t num)
+>>>> 	/* We can only do one array worth at a time. */
+>>>> 	num =3D min(num, ARRAY_SIZE(vb->pfns));
+>>>>
+>>>> +	/*
+>>>> +	 * Note: we will currently never allocate more than 1MB due to the
+>>>> +	 * pfn array size, so we will not allocate MAX_ORDER - 1 ...
+>>>> +	 */
+>>>> +
+>>>> 	for (num_pfns =3D 0; num_pfns < num;
+>>>> -	     num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE) {
+>>>> -		struct page *page =3D balloon_page_alloc();
+>>>> +	     num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order)) {
+>>>> +		const unsigned long remaining =3D num - num_pfns;
+>>>> +
+>>>> +		order =3D MIN(order,
+>>>> +			    get_order(remaining << VIRTIO_BALLOON_PFN_SHIFT));
+>>>> +		if ((1 << order) * VIRTIO_BALLOON_PAGES_PER_PAGE > remaining)
+>>>> +			order--;
+>>>> +		page =3D balloon_pages_alloc(order);
+>>>>
+>>>> 		if (!page) {
+>>>> 			dev_info_ratelimited(&vb->vdev->dev,
+>>>> @@ -225,6 +237,8 @@ static unsigned fill_balloon(struct virtio_ballo=
+on *vb, size_t num)
+>>>> 			break;
+>>>> 		}
+>>>>
+>>>> +		/* Continue with the actual order that succeeded. */
+>>>> +		order =3D page_private(page);
+>>>> 		balloon_page_push(&pages, page);
+>>>> 	}
+>>>>
+>>>> @@ -233,14 +247,16 @@ static unsigned fill_balloon(struct virtio_bal=
+loon *vb, size_t num)
+>>>> 	vb->num_pfns =3D 0;
+>>>>
+>>>> 	while ((page =3D balloon_page_pop(&pages))) {
+>>>> +		order =3D page_order(page);
+>>>> +		/* enqueuing will split the page and clear the order */
+>>>> 		balloon_page_enqueue(&vb->vb_dev_info, page);
+>>>>
+>>>> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+>>>> -		vb->num_pages +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+>>>> +		set_page_pfns(vb, vb->pfns + vb->num_pfns, page, order);
+>>>> +		vb->num_pages +=3D VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order);
+>>>> 		if (!virtio_has_feature(vb->vdev,
+>>>> 					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+>>>> -			adjust_managed_page_count(page, -1);
+>>>> -		vb->num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+>>>> +			adjust_managed_page_count(page, -1 * (1 << order));
+>>>> +		vb->num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE * (1 << order);
+>>>> 	}
+>>>>
+>>>> 	num_allocated_pages =3D vb->num_pfns;
+>>>> @@ -284,7 +300,7 @@ static unsigned leak_balloon(struct virtio_ballo=
+on *vb, size_t num)
+>>>> 		page =3D balloon_page_dequeue(vb_dev_info);
+>>>> 		if (!page)
+>>>> 			break;
+>>>> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+>>>> +		set_page_pfns(vb, vb->pfns + vb->num_pfns, page, 0);
+>>>> 		list_add(&page->lru, &pages);
+>>>> 		vb->num_pages -=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+>>>> 	}
+>>>> @@ -786,7 +802,7 @@ static int virtballoon_migratepage(struct balloo=
+n_dev_info *vb_dev_info,
+>>>> 	__count_vm_event(BALLOON_MIGRATE);
+>>>> 	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
+>>>> 	vb->num_pfns =3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+>>>> -	set_page_pfns(vb, vb->pfns, newpage);
+>>>> +	set_page_pfns(vb, vb->pfns, newpage, 0);
+>>>> 	tell_host(vb, vb->inflate_vq);
+>>>>
+>>>> 	/* balloon's page migration 2nd step -- deflate "page" */
+>>>> @@ -794,7 +810,7 @@ static int virtballoon_migratepage(struct balloo=
+n_dev_info *vb_dev_info,
+>>>> 	balloon_page_delete(page);
+>>>> 	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
+>>>> 	vb->num_pfns =3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+>>>> -	set_page_pfns(vb, vb->pfns, page);
+>>>> +	set_page_pfns(vb, vb->pfns, page, 0);
+>>>> 	tell_host(vb, vb->deflate_vq);
+>>>>
+>>>> 	mutex_unlock(&vb->balloon_lock);
+>>>> diff --git a/include/linux/balloon_compaction.h b/include/linux/ball=
+oon_compaction.h
+>>>> index 338aa27e4773..ed93fe5704d1 100644
+>>>> --- a/include/linux/balloon_compaction.h
+>>>> +++ b/include/linux/balloon_compaction.h
+>>>> @@ -60,7 +60,7 @@ struct balloon_dev_info {
+>>>> 	struct inode *inode;
+>>>> };
+>>>>
+>>>> -extern struct page *balloon_page_alloc(void);
+>>>> +extern struct page *balloon_pages_alloc(int order);
+>>>> extern void balloon_page_enqueue(struct balloon_dev_info *b_dev_info=
+,
+>>>> 				 struct page *page);
+>>>> extern struct page *balloon_page_dequeue(struct balloon_dev_info *b_=
+dev_info);
+>>>> @@ -78,6 +78,11 @@ static inline void balloon_devinfo_init(struct ba=
+lloon_dev_info *balloon)
+>>>> 	balloon->inode =3D NULL;
+>>>> }
+>>>>
+>>>> +static inline struct page *balloon_page_alloc(void)
+>>>> +{
+>>>> +	return balloon_pages_alloc(0);
+>>>> +}
+>>>> +
+>>>> #ifdef CONFIG_BALLOON_COMPACTION
+>>>> extern const struct address_space_operations balloon_aops;
+>>>> extern bool balloon_page_isolate(struct page *page,
+>>>> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+>>>> index 26de020aae7b..067810b32813 100644
+>>>> --- a/mm/balloon_compaction.c
+>>>> +++ b/mm/balloon_compaction.c
+>>>> @@ -112,23 +112,35 @@ size_t balloon_page_list_dequeue(struct balloo=
+n_dev_info *b_dev_info,
+>>>> EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
+>>>>
+>>>> /*
+>>>> - * balloon_page_alloc - allocates a new page for insertion into the=
+ balloon
+>>>> - *			page list.
+>>>> + * balloon_pages_alloc - allocates a new page (of at most the given=
+ order)
+>>>> + * 			 for insertion into the balloon page list.
+>>>>  *
+>>>>  * Driver must call this function to properly allocate a new balloon=
+ page.
+>>>>  * Driver must call balloon_page_enqueue before definitively removin=
+g the page
+>>>>  * from the guest system.
+>>>>  *
+>>>> + * Will fall back to smaller orders if allocation fails. The order =
+of the
+>>>> + * allocated page is stored in page->private.
+>>>> + *
+>>>>  * Return: struct page for the allocated page or NULL on allocation =
+failure.
+>>>>  */
+>>>> -struct page *balloon_page_alloc(void)
+>>>> +struct page *balloon_pages_alloc(int order)
+>>>> {
+>>>> -	struct page *page =3D alloc_page(balloon_mapping_gfp_mask() |
+>>>> -				       __GFP_NOMEMALLOC | __GFP_NORETRY |
+>>>> -				       __GFP_NOWARN);
+>>>> -	return page;
+>>>> +	struct page *page;
+>>>> +
+>>>> +	while (order >=3D 0) {
+>>>> +		page =3D alloc_pages(balloon_mapping_gfp_mask() |
+>>>> +				   __GFP_NOMEMALLOC | __GFP_NORETRY |
+>>>> +				   __GFP_NOWARN, order);
+>>>> +		if (page) {
+>>>> +			set_page_private(page, order);
+>>>> +			return page;
+>>>> +		}
+>>>> +		order--;
+>>>> +	}
+>>>> +	return NULL;
+>>>> }
+>>>> -EXPORT_SYMBOL_GPL(balloon_page_alloc);
+>>>> +EXPORT_SYMBOL_GPL(balloon_pages_alloc);
+>>>>
+>>>> /*
+>>>>  * balloon_page_enqueue - inserts a new page into the balloon page l=
+ist.
+>>>
+>>>
+>>> I think this will try to invoke direct reclaim from the first iterati=
+on
+>>> to free up the max order.
+>>
+>> %__GFP_NORETRY: The VM implementation will try only very lightweight
+>> memory direct reclaim to get some memory under memory pressure (thus i=
+t
+>> can sleep). It will avoid disruptive actions like OOM killer.
+>>
+>> Certainly good enough for a first version I would say, no? Looking at
+>> the vmware balloon, they don't even set __GFP_NORETRY.
 >=20
->>
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_outBuffer output =3D { dest, dest_size, 0 };
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_inBuffer input =3D { src, src_size, 0 };
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_DCtx *dctx =3D ZSTD_createDCtx();
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (!dctx) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EIO;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * The compressed stream from input buffer may=
- consist from more
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * than one zstd frames. So we iterate until w=
-e get a fully
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * uncompressed cluster.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * from zstd docs related to ZSTD_decompressSt=
-ream:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * "return : 0 when a frame is completely deco=
-ded and fully flushed"
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * We suppose that this means: each time ZSTD_=
-decompressStream reads
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * only ONE full frame and return 0 if and onl=
-y if that frame
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * is completely decoded and flushed. Only aft=
-er returning 0,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * ZSTD_decompressStream reads another ONE ful=
-l frame.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 while (output.pos < output.size) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t last_in_pos =3D inpu=
-t.pos;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t last_out_pos =3D out=
-put.pos;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D ZSTD_decompressStre=
-am(dctx, &output, &input);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * zstd manual doesn't=
- explicitly states what happens,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * if ZSTD_decompressS=
-tream reads the frame partially.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * But, based on our t=
-ests, if we don't fully populate
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * the output and have=
- read all the frames from the input,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * we end up with erro=
-r here.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ZSTD_isError(ret)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
- =3D -EIO;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
-ak;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * As ZSTD manual is v=
-ague about what to do if it
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * reads the buffer pa=
-rtially, we afraid of case
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * when we stuck in th=
-e infinite loop, because
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * output isn't full a=
-nd input has read partially, so
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * ZSTD_decompressStre=
-am returns > 0 waiting for
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * another input chunk=
-. So, we add a paranoid check
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * that on each step t=
-he loop makes some progress.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (last_in_pos >=3D input.=
-pos &&
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 las=
-t_out_pos >=3D output.pos) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
- =3D -EIO;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
-ak;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Make sure that we have the frame fully flus=
-hed here
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * if not, we somehow managed to get uncompres=
-sed cluster
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * greater then the cluster size, possibly bec=
-ause of its
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * damage.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 if (ret > 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D -EIO;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 ZSTD_freeDCtx(dctx);
->>> +=C2=A0=C2=A0=C2=A0 assert(ret =3D=3D 0 || ret =3D=3D -EIO);
->>> +=C2=A0=C2=A0=C2=A0 return ret;
->>> +}
->>
->>
->> [..]
->>
->>
+> Yes, it does seem that we are missing __GFP_NORETRY. I really do not kn=
+ow
+> what I was thinking when I did not add it for huge-pages allocation. I =
+will
+> send a patch. Thanks for noticing :)
 >=20
+> In regard to your patch, I would be happy to consolidate the allocation
+> mechanisms, so VMware balloon driver would also use your code. In gener=
+al
+> your code looks good, take-away some style issues.
 
+Yeah, let's see in which direction we'll be bringing
+balloon_page_alloc(), I think there are still some questions to be
+answered (mostly performance implications).
+
+Cheers!
 
 --=20
-Best regards,
-Vladimir
+Thanks,
+
+David / dhildenb
+
 
