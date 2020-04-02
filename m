@@ -2,85 +2,89 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F044C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 06:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7414C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 06:56:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BA2020784
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 06:52:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE620208E4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 06:56:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHbplEaX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BA2020784
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FhHMqcoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE620208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJtiQ-0004t7-Eo
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 02:52:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49972)
+	id 1jJtmK-0006N6-RX
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 02:56:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <singhalsimran0@gmail.com>) id 1jJtgb-0002hm-Gv
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 02:50:47 -0400
+ (envelope-from <armbru@redhat.com>) id 1jJtlW-0005b3-2G
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 02:55:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <singhalsimran0@gmail.com>) id 1jJtgZ-0005SB-UL
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 02:50:45 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45018)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <singhalsimran0@gmail.com>)
- id 1jJtgZ-0005Rl-DY
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 02:50:43 -0400
-Received: by mail-pl1-x643.google.com with SMTP id h11so972960plr.11
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 23:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:mime-version:content-disposition
- :user-agent; bh=TDZ5CnfeNXghIA9f6Ou0fvdmTp8E2Tj43AhBn/pmGRI=;
- b=iHbplEaX4JX9H6ldm56x2bXE8z9zuHQCWGIiJ+c8q619Ri2KxY4S51w7CltRiY3oCB
- PAjGrMXFDqJRAp0zmRZWTKXPBkwXzCzWp7iX7BwL+ZpfXuxAhYDRqbdIIRxVyT+CIMbh
- S5hy0ZlOm9Q0zxNXLlA3ylJ8oOAn7udKwsX+Tkt0dQbXvai8K3AvU7uet0/b/E8Ak3j7
- l4r+PAJl70idY1TsYnU4XwsrV1uWm6UCZ/yL4QVr/Jg1ztpWOEXP41Ldpf2lM4qvNPVI
- IhFHbzZPXHUqYUTD3ttgrODBwjTs+BsY9wtCeIrlTFEGKSBcrCynbg+2gNelNu2TT59c
- KIwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition:user-agent;
- bh=TDZ5CnfeNXghIA9f6Ou0fvdmTp8E2Tj43AhBn/pmGRI=;
- b=GXEf0w5/NHy4eVfWNaIOVPhwy4eZFRT7l+UM3WlAS8WFlx5ckPqWlhHWjMl9KkPM1n
- zmcKAvL5z1g2A4yGgmOSxCf3BcsAQjww5mrYXVWJFzEbvpH2XCqJFiAHUsblsPvKh55H
- n49uZqh90WolDOemIFYAfJarwGQrg3WeBCrOhf2EBHVMexr29naIpqTlRuGH3M+5ZNN8
- FfjvtsplRorCat7Tr+Gv4q6zXVv7OVC1GMLea+Ib5J+4xulBPRhKMs5Fm0SBpvP1aISl
- 591r8WeQM8tqAWf/eJeB2zahovlPtF0zzvg1sNYZAjoxiQBu6+nbkHQ0NLKmVwOPpQZk
- 6RXw==
-X-Gm-Message-State: AGi0PubQxsGNrLkkdWRpD6Up6OwBr8Pr5wR2r+kUINiIVyuM6H7pOSv3
- /Pmd2AGV5YSCJosQPoD4COs=
-X-Google-Smtp-Source: APiQypIOl0d17PEgbBfc09bCD4I8paMAYMaPQ0sy8r7JCtmV4rqlEkNmSsrZtwVtGqr2H58o4MjR8Q==
-X-Received: by 2002:a17:902:26a:: with SMTP id 97mr1680561plc.82.1585810242119; 
- Wed, 01 Apr 2020 23:50:42 -0700 (PDT)
-Received: from simran-Inspiron-5558 ([2409:4052:99d:cf8:4926:6e0b:60ca:635c])
- by smtp.gmail.com with ESMTPSA id
- e9sm3012349pfl.179.2020.04.01.23.50.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Apr 2020 23:50:41 -0700 (PDT)
-Date: Thu, 2 Apr 2020 12:20:35 +0530
-From: Simran Singhal <singhalsimran0@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] lockable: Replace locks with lock guard macros
-Message-ID: <20200402065035.GA15477@simran-Inspiron-5558>
+ (envelope-from <armbru@redhat.com>) id 1jJtlU-0000PF-6r
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 02:55:49 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43760
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jJtlU-0000Or-1d
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 02:55:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585810547;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jwP1KFcbFh5gXb0r+rx7MYtZCbuKDCn8lA5qQkB7T/4=;
+ b=FhHMqcoBSr+31369piSfgoA3AvTtFNhNSbrk/N/OKK0M/0ARQ/xMKCPVvmhy9rV+cTwCer
+ RGyTd50T9FiDWBSJM5Ht+Wv826j6B5DRpL+3aOMKhaUGaedtZjv5oHur6Ja264s1zFTxLp
+ h0fGNqDSp2/BqnyCke/FFwHD98DRyFE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-w2t_pxsgN_C33xt4n5_liA-1; Thu, 02 Apr 2020 02:55:43 -0400
+X-MC-Unique: w2t_pxsgN_C33xt4n5_liA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6531B107B28A;
+ Thu,  2 Apr 2020 06:55:34 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8476B5E037;
+ Thu,  2 Apr 2020 06:55:33 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0FFA811385E2; Thu,  2 Apr 2020 08:55:32 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 1/6] scripts/coccinelle: add error-use-after-free.cocci
+References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
+ <20200324153630.11882-2-vsementsov@virtuozzo.com>
+ <87bloc3nmr.fsf@dusky.pond.sub.org>
+ <CAFEAcA-c_gX4=Be0oMLCmQy+PWc4uEHpQatuyNQjbrZXvsv1+w@mail.gmail.com>
+ <87wo6zoku0.fsf@dusky.pond.sub.org>
+ <CAFEAcA-mZ5nPOoPz0kafmEjUORYQj-DvieMeWqgbFarp1_DhNg@mail.gmail.com>
+ <87tv23fepa.fsf@dusky.pond.sub.org>
+ <CAFEAcA82AzhV3DSO=nogJg1YLwKk3RrGPVRe85ByhFbaW=YCJQ@mail.gmail.com>
+Date: Thu, 02 Apr 2020 08:55:32 +0200
+In-Reply-To: <CAFEAcA82AzhV3DSO=nogJg1YLwKk3RrGPVRe85ByhFbaW=YCJQ@mail.gmail.com>
+ (Peter Maydell's message of "Wed, 1 Apr 2020 16:12:44 +0000")
+Message-ID: <87d08qbcm3.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,180 +96,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Denis
+ V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace manual lock()/unlock() calls with lock guard macros
-(QEMU_LOCK_GUARD/WITH_QEMU_LOCK_GUARD).
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
----
-Changes in v2:
-        -Drop changes in file hw/rdma/rdma_utils.c
+> On Wed, 1 Apr 2020 at 15:44, Markus Armbruster <armbru@redhat.com> wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>> > On Wed, 1 Apr 2020 at 06:07, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> > But then as a coccinelle script author I need to know which of
+>> > the options I needed are standard, which are for-this-script-only,
+>> > and which are just 'workflow'.
+>>
+>> If you're capable of writing a Coccinelle script that actually does what
+>> you want, I bet you dollars to donuts that you can decide which options
+>> actually affect the patch in comparably no time whatsoever ;)
+>
+> I use this thing maybe once a month at most, more likely once
+> every three months, and the documentation is notoriously
+> impenetrable. I really really don't want to have to start looking in it
+> and guessing about how the original author ran the script, when
+> they could have just told me.
 
- hw/hyperv/hyperv.c     | 15 ++++++-------
- hw/rdma/rdma_backend.c | 50 +++++++++++++++++++++---------------------
- hw/rdma/rdma_rm.c      |  3 +--
- 3 files changed, 33 insertions(+), 35 deletions(-)
+I'm afraid we're talking part each other.
 
-diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-index 8ca3706f5b..4ddafe1de1 100644
---- a/hw/hyperv/hyperv.c
-+++ b/hw/hyperv/hyperv.c
-@@ -15,6 +15,7 @@
- #include "sysemu/kvm.h"
- #include "qemu/bitops.h"
- #include "qemu/error-report.h"
-+#include "qemu/lockable.h"
- #include "qemu/queue.h"
- #include "qemu/rcu.h"
- #include "qemu/rcu_queue.h"
-@@ -491,7 +492,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
-     int ret;
-     MsgHandler *mh;
- 
--    qemu_mutex_lock(&handlers_mutex);
-+    QEMU_LOCK_GUARD(&handlers_mutex);
-     QLIST_FOREACH(mh, &msg_handlers, link) {
-         if (mh->conn_id == conn_id) {
-             if (handler) {
-@@ -501,7 +502,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
-                 g_free_rcu(mh, rcu);
-                 ret = 0;
-             }
--            goto unlock;
-+            return ret;
-         }
-     }
- 
-@@ -515,8 +516,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
-     } else {
-         ret = -ENOENT;
-     }
--unlock:
--    qemu_mutex_unlock(&handlers_mutex);
-+
-     return ret;
- }
- 
-@@ -565,7 +565,7 @@ static int set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier)
-     int ret;
-     EventFlagHandler *handler;
- 
--    qemu_mutex_lock(&handlers_mutex);
-+    QEMU_LOCK_GUARD(&handlers_mutex);
-     QLIST_FOREACH(handler, &event_flag_handlers, link) {
-         if (handler->conn_id == conn_id) {
-             if (notifier) {
-@@ -575,7 +575,7 @@ static int set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier)
-                 g_free_rcu(handler, rcu);
-                 ret = 0;
-             }
--            goto unlock;
-+            return ret;
-         }
-     }
- 
-@@ -588,8 +588,7 @@ static int set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier)
-     } else {
-         ret = -ENOENT;
-     }
--unlock:
--    qemu_mutex_unlock(&handlers_mutex);
-+
-     return ret;
- }
- 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index 3dd39fe1a7..db7e5c8be5 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -95,36 +95,36 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
-     struct ibv_wc wc[2];
-     RdmaProtectedGSList *cqe_ctx_list;
- 
--    qemu_mutex_lock(&rdma_dev_res->lock);
--    do {
--        ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
-+    WITH_QEMU_LOCK_GUARD(&rdma_dev_res->lock) {
-+        do {
-+            ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
- 
--        trace_rdma_poll_cq(ne, ibcq);
-+            trace_rdma_poll_cq(ne, ibcq);
- 
--        for (i = 0; i < ne; i++) {
--            bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
--            if (unlikely(!bctx)) {
--                rdma_error_report("No matching ctx for req %"PRId64,
--                                  wc[i].wr_id);
--                continue;
--            }
-+            for (i = 0; i < ne; i++) {
-+                bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-+                if (unlikely(!bctx)) {
-+                    rdma_error_report("No matching ctx for req %"PRId64,
-+                                      wc[i].wr_id);
-+                    continue;
-+                }
- 
--            comp_handler(bctx->up_ctx, &wc[i]);
-+                comp_handler(bctx->up_ctx, &wc[i]);
- 
--            if (bctx->backend_qp) {
--                cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
--            } else {
--                cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
--            }
-+                if (bctx->backend_qp) {
-+                    cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
-+                } else {
-+                    cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
-+                }
- 
--            rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
--            rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
--            g_free(bctx);
--        }
--        total_ne += ne;
--    } while (ne > 0);
--    atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
--    qemu_mutex_unlock(&rdma_dev_res->lock);
-+                rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
-+                rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-+                g_free(bctx);
-+            }
-+            total_ne += ne;
-+        } while (ne > 0);
-+        atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
-+    }
- 
-     if (ne < 0) {
-         rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 7e9ea283c9..60957f88db 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -147,14 +147,13 @@ static inline void rdma_res_tbl_dealloc(RdmaRmResTbl *tbl, uint32_t handle)
- {
-     trace_rdma_res_tbl_dealloc(tbl->name, handle);
- 
--    qemu_mutex_lock(&tbl->lock);
-+    QEMU_LOCK_GUARD(&tbl->lock);
- 
-     if (handle < tbl->tbl_sz) {
-         clear_bit(handle, tbl->bitmap);
-         tbl->used--;
-     }
- 
--    qemu_mutex_unlock(&tbl->lock);
- }
- 
- int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
--- 
-2.17.1
+>> If you prefer to bother your reader with your personal choices, that's
+>> between you and your reviewers.  Myself, I prefer less noise around the
+>> signal.
+>
+>> If you got Coccinelle installed and know the very basics, then the
+>> incantation in the script should suffice to use the script, and the
+>> incantation in the commit message should suffice to reproduce the patch.
+>
+> So I need to now look in the git log for the script to find the commit
+> message? Why not just put the command in the file and save steps?
+
+I'm not opposed to usage comments in .cocci.
+
+I *am* apposed to noise in usage comments.
+
+>> Example:
+>>
+>>     commit 4e20c1becba3fd2e8e71a2663cefb9627fd2a6e0
+>>     Author: Markus Armbruster <armbru@redhat.com>
+>>     Date:   Thu Dec 13 18:51:54 2018 +0100
+>>
+>>         block: Replace qdict_put() by qdict_put_obj() where appropriate
+>>
+>>         Patch created mechanically by rerunning:
+>>
+>>           $  spatch --sp-file scripts/coccinelle/qobject.cocci \
+>>                     --macro-file scripts/cocci-macro-file.h \
+>>                     --dir block --in-place
+>
+> Yep, that command line would be great to see in the script file.
+
+Except for the --dir block part, which is even worse than noise: it
+suggests this is just for block/, which is wrong.
+
+>> scripts/coccinelle/qobject.cocci has no usage comment.  I doubt it needs
+>> one, but I'd certainly tolerate something like
+>
+>     // Usage:
+>     // spatch --sp-file scripts/coccinelle/qobject.cocci \
+>     //        --macro-file scripts/cocci-macro-file.h \
+>     //        FILES ...
+>
+> I think that should be about the minimum. I think every
+> .cocci file should say how it was used or is supposed to be used.
+
+Fine with me.
+
+> The least-effort way for the author of the script to do that is to
+> simply give the command line they used to run it.
+
+If you're capable of writing a Coccinelle script that actually does what
+you want, you're certainly capable of doing better than blindly paste
+from your shell history.  Kindly drop the options that are specific to
+just this particular use of the script.  Keep the ones that future users
+will actually need.
+
+>> >       That's more work for the author *and* more work for the
+>> > reader than just "put the command line you used into the script
+>> > as a comment" -- so who's it benefiting?
+>>
+>> Anyone with basic Coccinelle proficiency benefits slightly from the
+>> reduction of noise.
+>
+> How 'basic' is basic? I think that being specific is useful for
+> anybody who's at my level or lower (ie, can write a script, doesn't
+> do so often enough to be able to write a script or run spatch
+> without looking at documentation and cribbing from other scripts
+> as examples). How many people do we have at a higher level
+> than that for whom this is noise? 2? 3? And people who do
+> know Coccinelle well should have no difficulty in quickly
+> looking at a command line and mentally filtering out the options
+> that they don't feel they need.
+
+Two proficiencies: using a script somebody else wrote, and writing
+simple scripts.  Let me try to sketch just about the most basic of basic
+levels for the former.  Note that I'm making *liberal* allowance for
+reluctance to learn tools[*].
+
+Understand
+
+* that .cocci means Coccinelle
+* how to install Coccinelle
+* that you need to feed the .cocci to spatch
+* that this produces a patch
+* how to apply the patch to the tree
+
+None of this I want to explain in every .cocci script.  All of this
+I want be explained in scripts/coccinelle/README.
+
+
+[*] Not a trait I like to see in craftsmen.
 
 
