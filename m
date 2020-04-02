@@ -4,81 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 153E1C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10286C18E5B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D689E208E4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3C65208FE
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvgGl/T3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D689E208E4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A03OIWkH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3C65208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJvY8-0004Gm-03
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44765)
+	id 1jJvYL-0004XR-VB
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:50:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jJvVa-0001SL-U2
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:32 -0400
+ (envelope-from <berrange@redhat.com>) id 1jJvXE-0003DH-EV
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jJvVZ-0005jG-Gw
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:30 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49440
+ (envelope-from <berrange@redhat.com>) id 1jJvXD-0007Ap-C5
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:12 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59331
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jJvVZ-0005iP-C8
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:29 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jJvXD-000798-83
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585817248;
+ s=mimecast20190719; t=1585817349;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iTekKKCPc758a1jnx1olfZfMBfwq/Fz4ZvFrm+PuqcA=;
- b=JvgGl/T3rgCl2mt9BlW6nFLrxlNE6GZ3fOaxpzIooV00vOBhlKyEIdmcXjUv9Q65XGwJTc
- KFwi7asZ50wFgrjZzCYgq/U4lQbhTEEObzxtmTlii2BHj88ujVpYHP80y3TdtTgTl6SrqB
- Yn5e/eLKk3nUWnTfmouHYK5PNoSKHGw=
+ bh=2XDEZ1pSqxPT8sDOjjV36n+WVrQyECeFCwEDdd6kKW4=;
+ b=A03OIWkHGg06hSzJK+WxujtkeLkN4v2d08PNL/zMyNEtZtISoQDvq8itzdhtJREHjWJSGI
+ JV+JK2H8ZTa/dDDqpkgaRdTgoygADqnyhH7XVXNGDx+LJB+rTvYJUyK24BoOZ37nYbJsUo
+ 2kU0c0mWE72pbHPBQwt6yTDj2C+j01c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-BZ6BUx9ZPXKx1jb894-m3g-1; Thu, 02 Apr 2020 04:47:25 -0400
-X-MC-Unique: BZ6BUx9ZPXKx1jb894-m3g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-417-snTd0CHcMmuNUUaSClIBsg-1; Thu, 02 Apr 2020 04:49:07 -0400
+X-MC-Unique: snTd0CHcMmuNUUaSClIBsg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 034AE108442D;
- Thu,  2 Apr 2020 08:47:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE02F13F7;
+ Thu,  2 Apr 2020 08:49:05 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B2285C1B0;
- Thu,  2 Apr 2020 08:47:22 +0000 (UTC)
-Date: Thu, 2 Apr 2020 09:47:19 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 337ED5D9CA;
+ Thu,  2 Apr 2020 08:49:03 +0000 (UTC)
+Date: Thu, 2 Apr 2020 09:49:00 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Subject: Re: Questionable aspects of QEMU Error's design
-Message-ID: <20200402084719.GB423991@redhat.com>
+Message-ID: <20200402084900.GC423991@redhat.com>
 References: <87o8sblgto.fsf@dusky.pond.sub.org>
  <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
  <87sghmbfgc.fsf@dusky.pond.sub.org>
+ <44b5ff2c-6dce-e516-a9cc-9d80354c5a72@virtuozzo.com>
+ <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87sghmbfgc.fsf@dusky.pond.sub.org>
+In-Reply-To: <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
 User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,101 +94,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 02, 2020 at 07:54:11AM +0200, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
-> > On Wed, 1 Apr 2020 at 10:03, Markus Armbruster <armbru@redhat.com> wrot=
-e:
-> >>
-> >> QEMU's Error was patterned after GLib's GError.  Differences include:
+On Thu, Apr 02, 2020 at 08:11:11AM +0000, Peter Maydell wrote:
+> On Thu, 2 Apr 2020 at 07:11, Vladimir Sementsov-Ogievskiy
+> <vsementsov@virtuozzo.com> wrote:
+> > Somehow, in general, especially with long function names and long param=
+eter lists I prefer
 > >
-> > From my POV the major problem with Error as we have it today
-> > is that it makes the simple process of writing code like
-> > device realize functions horrifically boilerplate heavy;
-> > for instance this is from hw/arm/armsse.c:
+> > ret =3D func(..);
+> > if (ret < 0) {
+> >      return ret;
+> > }
+>=20
+> Personally I prefer the other approach -- this one has an extra line
+> in the source and
+> needs an extra local variable.
+>=20
+> > Are you sure that adding a lot of boolean functions is a good idea? I s=
+omehow feel better with more usual int functions with -errno on failure.
 > >
-> >         object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
-> >                                  "memory", &err);
-> >         if (err) {
-> >             error_propagate(errp, err);
-> >             return;
-> >         }
-> >         object_property_set_link(cpuobj, OBJECT(s), "idau", &err);
-> >         if (err) {
-> >             error_propagate(errp, err);
-> >             return;
-> >         }
-> >         object_property_set_bool(cpuobj, true, "realized", &err);
-> >         if (err) {
-> >             error_propagate(errp, err);
-> >             return;
-> >         }
-> >
-> > 16 lines of code just to set 2 properties on an object
-> > and realize it. It's a lot of boilerplate and as
-> > a result we frequently get it wrong or take shortcuts
-> > (eg forgetting the error-handling entirely, calling
-> > error_propagate just once for a whole sequence of
-> > calls, taking the lazy approach and using err_abort
-> > or err_fatal when we ought really to be propagating
-> > an error, etc). I haven't looked at 'auto propagation'
-> > yet, hopefully it will help?
+> > Bool is a good return value for functions which are boolean by nature: =
+checks, is something correspond to some criteria. But for reporting an erro=
+r I'd prefer -errno.
 >=20
-> With that, you can have
->=20
->         object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
->                                  "memory", errp);
->         if (*errp) {
->             return;
->         }
->         object_property_set_link(cpuobj, OBJECT(s), "idau", errp);
->         if (*errp) {
->             return;
->         }
->         object_property_set_bool(cpuobj, true, "realized", errp);
->         if (*errp) {
->             return;
->         }
->=20
-> but you have to add
->=20
->         ERRP_AUTO_PROPAGATE();
->=20
-> right at the beginning of the function.
->=20
-> It's a small improvement.  A bigger one is
->=20
->         if (object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i])=
-,
->                                      "memory", errp)) {
->             return;
->         }
->         if (object_property_set_link(cpuobj, OBJECT(s), "idau", errp)) {
->             return;
->         }
->         if (object_property_set_bool(cpuobj, true, "realized", errp)) {
->             return;
->         }
->=20
-> This is item "Return value conventions" in the message you replied to.
+> When would we want to return an errno? I thought the whole point of the
+> Error* was that that was where information about the error was returned.
+> If all your callsites are just going to do "if (ret < 0) { ... } then hav=
+ing
+> the functions pick an errno value to return is just extra work.
 
-Even better, we can then string the checks together
+IMHO errno should only be returned if the callers are likely to have=20
+a genuine need to take action based on the errno in a way that isn't
+possible from the Error alone. I expect very few scenarios need that.
 
-        if (object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
-                                      "memory", errp) ||
-            object_property_set_link(cpuobj, OBJECT(s), "idau", errp) ||
-            object_property_set_bool(cpuobj, true, "realized", errp)) {
-             return;
-        }
-=20
 Regards,
 Daniel
 --=20
