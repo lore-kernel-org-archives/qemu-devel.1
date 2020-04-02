@@ -2,66 +2,81 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA123C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6084BC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:12:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF9CE2078B
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:02:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF9CE2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2BAF72078B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:12:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r7zn8nQB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BAF72078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJunZ-0006a5-Ps
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:02:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33456)
+	id 1jJuxN-0000vD-71
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:12:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <teawaterz@linux.alibaba.com>) id 1jJumP-00065T-6X
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:00:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jJuwg-0000UJ-Ae
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <teawaterz@linux.alibaba.com>) id 1jJumD-0000Mf-89
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:00:42 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:39456)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <teawaterz@linux.alibaba.com>)
- id 1jJumC-0000Af-2H
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:00:36 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R321e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04407; MF=teawaterz@linux.alibaba.com;
- NM=1; PH=DS; RN=12; SR=0; TI=SMTPD_---0TuOs01r_1585814406; 
-Received: from 127.0.0.1(mailfrom:teawaterz@linux.alibaba.com
- fp:SMTPD_---0TuOs01r_1585814406) by smtp.aliyun-inc.com(127.0.0.1);
- Thu, 02 Apr 2020 16:00:11 +0800
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER to
- handle THP spilt issue
-From: teawater <teawaterz@linux.alibaba.com>
-In-Reply-To: <20200331100359-mutt-send-email-mst@kernel.org>
-Date: Thu, 2 Apr 2020 16:00:05 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <02745FD3-E30D-453B-8664-94B8EBF3B313@linux.alibaba.com>
-References: <20200326031817-mutt-send-email-mst@kernel.org>
- <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
- <20200326054554-mutt-send-email-mst@kernel.org>
- <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
- <20200331091718-mutt-send-email-mst@kernel.org>
- <02a393ce-c4b4-ede9-7671-76fa4c19097a@redhat.com>
- <20200331093300-mutt-send-email-mst@kernel.org>
- <b69796e0-fa41-a219-c3e5-a11e9f5f18bf@redhat.com>
- <20200331100359-mutt-send-email-mst@kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 47.88.44.36
+ (envelope-from <peter.maydell@linaro.org>) id 1jJuwe-00014a-7q
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:11:26 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:38233)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jJuwe-00014L-2b
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:11:24 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id t28so2537531ott.5
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 01:11:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Jl03zAfBRyS/zPhFBaUaBjIcAVffVlpYdy56/V1aR6M=;
+ b=r7zn8nQB9vQD2yQV3Lx644IVO839l452l91mvRXbRHifGrrmD1h9GPh7xkUOZL/dV3
+ wLDVl5e9EIu1GZgDjO0YrGEqRbaVzaOWTxZcRRTPCSxnJuB+8FNbmj/99Q3Pwzzkvzic
+ 3h3dw4lh18I+OcoUFkFV24oAu0KJ4ynEGJvcJO+B8AVnYK22CEydN/mDcNNtuJFwJ7uj
+ Y6RIOiflGUz/GemY6Y3sU9HiT/kdieAB8NX4Nai+wmbPaodGGbZQ4ZTR2gFPe06TgRaP
+ kARdhHTwhvRgcn8iJCocQmtLQ/WTx9DFviqRsohp+Yz1tQn0SpqKmoL/RS2yHR8mi4+W
+ GOrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Jl03zAfBRyS/zPhFBaUaBjIcAVffVlpYdy56/V1aR6M=;
+ b=SGazHCT39Q9K8jzNZxbnkp+mH1HNThvGcQM2xwjCvl1SlZLRYtjyESdFNzv3OYAfb6
+ bsuwjAhrNOHVFBB2do+RWj3Zh2RX6dYIC8aJncJp03WereUbuinjbTMGPKv5CMubThGS
+ 5+MzwQXkMFyM9RxV+CawlPkkfrgRTfQ5T+JEHz77J7ilTGOxdcnf48SzEn7u0XXGZrFJ
+ VvyJII+A1HOV+ZI/6pj1g1i4IIut6tfSyFrYZ7uxulwpeFc+r1ZuWE/O+DfJVztvqmKm
+ SxcIp9cRJAgNyz34YClRvmYTyHaxr39cbT3ljYN4RN96moxmbVVOXr+DEp5z7bTxwNOL
+ 2rNw==
+X-Gm-Message-State: AGi0Pub4m+zOrzv2SDqP1xyBac3JLOnWkxHHiNS26gXTG3aBUlB7PHYx
+ YcWFHhqA4evP42YCCvfQgHSmKzS0CCdHEgLyT9p3Tw==
+X-Google-Smtp-Source: APiQypLCAv0fjSg5jw2eCj4cXSFHg4J3FqfP1sswQP7lraaxASgiIitouXOVjaitru7sYCFkRPYCgqTNsRzjR44JCVc=
+X-Received: by 2002:a9d:1920:: with SMTP id j32mr1346868ota.221.1585815082632; 
+ Thu, 02 Apr 2020 01:11:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+ <87sghmbfgc.fsf@dusky.pond.sub.org>
+ <44b5ff2c-6dce-e516-a9cc-9d80354c5a72@virtuozzo.com>
+In-Reply-To: <44b5ff2c-6dce-e516-a9cc-9d80354c5a72@virtuozzo.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Apr 2020 08:11:11 +0000
+Message-ID: <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,226 +88,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, Alexander Duyck <alexander.h.duyck@linux.intel.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- mojha@codeaurora.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux-foundation.org, namit@vmware.com,
- Andrew Morton <akpm@linux-foundation.org>, Jason Wang <jasowang@redhat.com>,
- Hui Zhu <teawater@gmail.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 2 Apr 2020 at 07:11, Vladimir Sementsov-Ogievskiy
+<vsementsov@virtuozzo.com> wrote:
+> Somehow, in general, especially with long function names and long parameter lists I prefer
+>
+> ret = func(..);
+> if (ret < 0) {
+>      return ret;
+> }
 
+Personally I prefer the other approach -- this one has an extra line
+in the source and
+needs an extra local variable.
 
-> 2020=E5=B9=B43=E6=9C=8831=E6=97=A5 22:07=EF=BC=8CMichael S. Tsirkin =
-<mst@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Tue, Mar 31, 2020 at 04:03:18PM +0200, David Hildenbrand wrote:
->> On 31.03.20 15:37, Michael S. Tsirkin wrote:
->>> On Tue, Mar 31, 2020 at 03:32:05PM +0200, David Hildenbrand wrote:
->>>> On 31.03.20 15:24, Michael S. Tsirkin wrote:
->>>>> On Tue, Mar 31, 2020 at 12:35:24PM +0200, David Hildenbrand wrote:
->>>>>> On 26.03.20 10:49, Michael S. Tsirkin wrote:
->>>>>>> On Thu, Mar 26, 2020 at 08:54:04AM +0100, David Hildenbrand =
-wrote:
->>>>>>>>=20
->>>>>>>>=20
->>>>>>>>> Am 26.03.2020 um 08:21 schrieb Michael S. Tsirkin =
-<mst@redhat.com>:
->>>>>>>>>=20
->>>>>>>>> =EF=BB=BFOn Thu, Mar 12, 2020 at 09:51:25AM +0100, David =
-Hildenbrand wrote:
->>>>>>>>>>> On 12.03.20 09:47, Michael S. Tsirkin wrote:
->>>>>>>>>>> On Thu, Mar 12, 2020 at 09:37:32AM +0100, David Hildenbrand =
-wrote:
->>>>>>>>>>>> 2. You are essentially stealing THPs in the guest. So the =
-fastest
->>>>>>>>>>>> mapping (THP in guest and host) is gone. The guest won't be =
-able to make
->>>>>>>>>>>> use of THP where it previously was able to. I can imagine =
-this implies a
->>>>>>>>>>>> performance degradation for some workloads. This needs a =
-proper
->>>>>>>>>>>> performance evaluation.
->>>>>>>>>>>=20
->>>>>>>>>>> I think the problem is more with the alloc_pages API.
->>>>>>>>>>> That gives you exactly the given order, and if there's
->>>>>>>>>>> a larger chunk available, it will split it up.
->>>>>>>>>>>=20
->>>>>>>>>>> But for balloon - I suspect lots of other users,
->>>>>>>>>>> we do not want to stress the system but if a large
->>>>>>>>>>> chunk is available anyway, then we could handle
->>>>>>>>>>> that more optimally by getting it all in one go.
->>>>>>>>>>>=20
->>>>>>>>>>>=20
->>>>>>>>>>> So if we want to address this, IMHO this calls for a new =
-API.
->>>>>>>>>>> Along the lines of
->>>>>>>>>>>=20
->>>>>>>>>>> struct page *alloc_page_range(gfp_t gfp, unsigned int =
-min_order,
->>>>>>>>>>>                 unsigned int max_order, unsigned int *order)
->>>>>>>>>>>=20
->>>>>>>>>>> the idea would then be to return at a number of pages in the =
-given
->>>>>>>>>>> range.
->>>>>>>>>>>=20
->>>>>>>>>>> What do you think? Want to try implementing that?
->>>>>>>>>>=20
->>>>>>>>>> You can just start with the highest order and decrement the =
-order until
->>>>>>>>>> your allocation succeeds using alloc_pages(), which would be =
-enough for
->>>>>>>>>> a first version. At least I don't see the immediate need for =
-a new
->>>>>>>>>> kernel API.
->>>>>>>>>=20
->>>>>>>>> OK I remember now.  The problem is with reclaim. Unless =
-reclaim is
->>>>>>>>> completely disabled, any of these calls can sleep. After it =
-wakes up,
->>>>>>>>> we would like to get the larger order that has become =
-available
->>>>>>>>> meanwhile.
->>>>>>>>>=20
->>>>>>>>=20
->>>>>>>> Yes, but that=E2=80=98s a pure optimization IMHO.
->>>>>>>> So I think we should do a trivial implementation first and then =
-see what we gain from a new allocator API. Then we might also be able to =
-justify it using real numbers.
->>>>>>>>=20
->>>>>>>=20
->>>>>>> Well how do you propose implement the necessary semantics?
->>>>>>> I think we are both agreed that alloc_page_range is more or
->>>>>>> less what's necessary anyway - so how would you approximate it
->>>>>>> on top of existing APIs?
->>>>>> diff --git a/include/linux/balloon_compaction.h =
-b/include/linux/balloon_compaction.h
->>>=20
->>> .....
->>>=20
->>>=20
->>>>>> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
->>>>>> index 26de020aae7b..067810b32813 100644
->>>>>> --- a/mm/balloon_compaction.c
->>>>>> +++ b/mm/balloon_compaction.c
->>>>>> @@ -112,23 +112,35 @@ size_t balloon_page_list_dequeue(struct =
-balloon_dev_info *b_dev_info,
->>>>>> EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
->>>>>>=20
->>>>>> /*
->>>>>> - * balloon_page_alloc - allocates a new page for insertion into =
-the balloon
->>>>>> - *			page list.
->>>>>> + * balloon_pages_alloc - allocates a new page (of at most the =
-given order)
->>>>>> + * 			 for insertion into the balloon page =
-list.
->>>>>> *
->>>>>> * Driver must call this function to properly allocate a new =
-balloon page.
->>>>>> * Driver must call balloon_page_enqueue before definitively =
-removing the page
->>>>>> * from the guest system.
->>>>>> *
->>>>>> + * Will fall back to smaller orders if allocation fails. The =
-order of the
->>>>>> + * allocated page is stored in page->private.
->>>>>> + *
->>>>>> * Return: struct page for the allocated page or NULL on =
-allocation failure.
->>>>>> */
->>>>>> -struct page *balloon_page_alloc(void)
->>>>>> +struct page *balloon_pages_alloc(int order)
->>>>>> {
->>>>>> -	struct page *page =3D =
-alloc_page(balloon_mapping_gfp_mask() |
->>>>>> -				       __GFP_NOMEMALLOC | =
-__GFP_NORETRY |
->>>>>> -				       __GFP_NOWARN);
->>>>>> -	return page;
->>>>>> +	struct page *page;
->>>>>> +
->>>>>> +	while (order >=3D 0) {
->>>>>> +		page =3D alloc_pages(balloon_mapping_gfp_mask() =
-|
->>>>>> +				   __GFP_NOMEMALLOC | =
-__GFP_NORETRY |
->>>>>> +				   __GFP_NOWARN, order);
->>>>>> +		if (page) {
->>>>>> +			set_page_private(page, order);
->>>>>> +			return page;
->>>>>> +		}
->>>>>> +		order--;
->>>>>> +	}
->>>>>> +	return NULL;
->>>>>> }
->>>>>> -EXPORT_SYMBOL_GPL(balloon_page_alloc);
->>>>>> +EXPORT_SYMBOL_GPL(balloon_pages_alloc);
->>>>>>=20
->>>>>> /*
->>>>>> * balloon_page_enqueue - inserts a new page into the balloon page =
-list.
->>>>>=20
->>>>>=20
->>>>> I think this will try to invoke direct reclaim from the first =
-iteration
->>>>> to free up the max order.
->>>>=20
->>>> %__GFP_NORETRY: The VM implementation will try only very =
-lightweight
->>>> memory direct reclaim to get some memory under memory pressure =
-(thus it
->>>> can sleep). It will avoid disruptive actions like OOM killer.
->>>>=20
->>>> Certainly good enough for a first version I would say, no?
->>>=20
->>> Frankly how well that behaves would depend a lot on the workload.
->>> Can regress just as well.
->>>=20
->>> For the 1st version I'd prefer something that is the least =
-disruptive,
->>> and that IMHO means we only trigger reclaim at all in the same =
-configuration
->>> as now - when we can't satisfy the lowest order allocation.
->>=20
->> Agreed.
->>=20
->>>=20
->>> Anything else would be a huge amount of testing with all kind of
->>> workloads.
->>>=20
->>=20
->> So doing a "& ~__GFP_RECLAIM" in case order > 0? (as done in
->> GFP_TRANSHUGE_LIGHT)
->=20
-> That will improve the situation when reclaim is not needed, but leave
-> the problem in place for when it's needed: if reclaim does trigger, we
-> can get a huge free page and immediately break it up.
->=20
-> So it's ok as a first step but it will make the second step harder as
-> we'll need to test with reclaim :).
+> Are you sure that adding a lot of boolean functions is a good idea? I somehow feel better with more usual int functions with -errno on failure.
+>
+> Bool is a good return value for functions which are boolean by nature: checks, is something correspond to some criteria. But for reporting an error I'd prefer -errno.
 
+When would we want to return an errno? I thought the whole point of the
+Error* was that that was where information about the error was returned.
+If all your callsites are just going to do "if (ret < 0) { ... } then having
+the functions pick an errno value to return is just extra work.
 
-I worry that will increases the allocation failure rate for large pages.
-
-I tried alloc 2M memory without __GFP_RECLAIM when I wrote the =
-VIRTIO_BALLOON_F_THP_ORDER first version.
-It will fail when I use usemem punch-holes function generates 400m =
-fragmentation pages in the guest kernel.
-
-What about add another option to balloon to control with __GFP_RECLAIM =
-or without it?
-
-Best,
-Hui
-
->=20
->=20
->> --=20
->> Thanks,
->>=20
->> David / dhildenb
-
+thanks
+-- PMM
 
