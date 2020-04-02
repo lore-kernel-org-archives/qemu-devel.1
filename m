@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF630C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D98EFC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:45:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3EE5206F6
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:41:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3EE5206F6
+	by mail.kernel.org (Postfix) with ESMTPS id AE0E52063A
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:45:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0E52063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK1yc-0002ps-QT
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 11:41:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53592)
+	id 1jK21x-0004tP-RS
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 11:45:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jK1xj-0002CT-Fh
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 11:41:00 -0400
+ (envelope-from <dietmar@proxmox.com>) id 1jK21L-0004HM-Sk
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 11:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jK1xi-0000S4-H6
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 11:40:59 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:32260)
+ (envelope-from <dietmar@proxmox.com>) id 1jK21K-0003WQ-Rp
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 11:44:43 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:28861)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dietmar@proxmox.com>)
- id 1jK1xf-0000Lw-Sv; Thu, 02 Apr 2020 11:40:56 -0400
+ id 1jK21H-0003Uz-W4; Thu, 02 Apr 2020 11:44:40 -0400
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 9BA5B45979;
- Thu,  2 Apr 2020 17:40:51 +0200 (CEST)
-Date: Thu, 2 Apr 2020 17:40:50 +0200 (CEST)
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id EC0E445977;
+ Thu,  2 Apr 2020 17:44:38 +0200 (CEST)
+Date: Thu, 2 Apr 2020 17:44:37 +0200 (CEST)
 From: Dietmar Maurer <dietmar@proxmox.com>
 To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1043934808.59.1585842050330@webmail.proxmox.com>
+Message-ID: <1734893624.60.1585842277722@webmail.proxmox.com>
 In-Reply-To: <20200402142524.GD4006@linux.fritz.box>
 References: <713436887.61.1585668262838@webmail.proxmox.com>
  <20200331153719.GI7030@linux.fritz.box>
@@ -82,20 +82,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> Can you reproduce the problem with my script, but pointing it to your
-> Debian image and running stress-ng instead of dd? 
+> It does looks more like your case because I now have bs.in_flight == 0
+> and the BlockBackend of the scsi-hd device has in_flight == 8. 
 
-yes
+yes, this looks very familiar.
 
-> If so, how long does
-> it take to reproduce for you?
+> Of course, this still doesn't answer why it happens, and I'm not sure if we
+> can tell without adding some debug code.
+> 
+> I'm testing on my current block branch with Stefan's fixes on top.
 
-I sometimes need up to 130 iterations ...
-
-Worse, I thought several times the bug is gone, but then it triggered again (sigh).
-
-But most times below 30 iteration (if you run "stress-ng -d 5").
-
-Also note that it can happen at different places, but always inside a drained section ...
+Note: I can trigger it with and without Stefans patches on top
 
 
