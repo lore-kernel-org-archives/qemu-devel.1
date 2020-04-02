@@ -2,97 +2,62 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6311AC2BA13
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 00:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94526C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 00:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C8BC2078C
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 00:03:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D1EF2063A
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 00:33:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+nPmPRP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C8BC2078C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="o5OD2zV8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D1EF2063A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJnKK-0000bA-4L
-	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 20:03:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50188)
+	id 1jJnnx-0003Me-Fh
+	for qemu-devel@archiver.kernel.org; Wed, 01 Apr 2020 20:33:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42405)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jJnJK-0008K9-8I
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 20:02:21 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jJnmF-0002mZ-3h
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 20:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jJnJF-0006cY-UN
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 20:02:17 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52427
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1jJnmB-0008NZ-IO
+ for qemu-devel@nongnu.org; Wed, 01 Apr 2020 20:32:10 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58569 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jJnJF-0006ZO-LB
- for qemu-devel@nongnu.org; Wed, 01 Apr 2020 20:02:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585785732;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fDXJ5V7H75ACgpFK3NNWLjmYCO4590QPdqpcpvA1i0Q=;
- b=c+nPmPRPJn2NSljvYao3dhB1isq9gjBdwocyC1K3t9HXQkCsCNkdhoD+FYGXEHHhgFhJdP
- gSwTCoQ61U8Fjul2AUG1s935Tn+LpBteW4AfhkXT/AQxDROqxkDDuR4TSAt+dDt6J3MwVV
- 5pjzsYJH03Hx17ga3vefye9ylYY0VHQ=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-EdvV1KcUMAGHx5UH6GBm5A-1; Wed, 01 Apr 2020 20:02:08 -0400
-X-MC-Unique: EdvV1KcUMAGHx5UH6GBm5A-1
-Received: by mail-qt1-f197.google.com with SMTP id b3so1562905qte.13
- for <qemu-devel@nongnu.org>; Wed, 01 Apr 2020 17:02:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=uIJYYn2NeVMCKGyrdn4Lf656W2JczoXPev0SAGVZRl8=;
- b=ks41W/YbS7VsqVdFsCnbiilWZNcjy252rDe+VVGVAvi3dJ2ZF2XqR3or5fpK6mbiYz
- hzdmONOX4xLW+GIvVZQKAUwSCavxs7tjAXk7+3meGP6Vq7sbqUjx6IXzV+ljGk9nLbeX
- QSTKER2A0tEGtIK+Fy2XaVKfD2l+aeLOCjmTmnLACb9Q0x0WEtNfdpnVdXqucZEyV4rA
- TXqB84V8p71Sid067s4Isfb5BDckrEmWlDon5hmeL7SLO9rpgQwgtdOi5rSG6t0VDneK
- NGKw1X6RYJLIe/tB1mzKWQdjV/Ag8hsEqWogKSryA8z/yor/PWOBksSwRgrPlOQoja9r
- rPEw==
-X-Gm-Message-State: AGi0PubPSBDc1KX4cop4t4yBtoiQu4DB+rkkRichEbDItWfgdOcePNqe
- gbZn/xxEJuT6oiRvB6ZLiZdykQzyP946z8r/ttjhpKr7a01LeFk+xwrqL1UwXU2xuD9hZzNZDf3
- Glv8asM5eGK56FXo=
-X-Received: by 2002:a37:86c6:: with SMTP id i189mr902516qkd.274.1585785727987; 
- Wed, 01 Apr 2020 17:02:07 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKofQ2f1q5wOTau9r+gjpH/S76lYEdmOarzS3zEcWaebXVP9IvKWeIeoXrReDFktY42DEy+UQ==
-X-Received: by 2002:a37:86c6:: with SMTP id i189mr902458qkd.274.1585785727491; 
- Wed, 01 Apr 2020 17:02:07 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id q7sm2487083qti.58.2020.04.01.17.02.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Apr 2020 17:02:06 -0700 (PDT)
-Date: Wed, 1 Apr 2020 20:02:25 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 13/22] intel_iommu: add PASID cache management
- infrastructure
-Message-ID: <20200402000225.GC7174@xz-x1>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-14-git-send-email-yi.l.liu@intel.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jJnm9-0007ut-WD; Wed, 01 Apr 2020 20:32:07 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48t3sk2ZSvz9sRR; Thu,  2 Apr 2020 11:31:54 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1585787514;
+ bh=pDFr/baEp54GAFTdfErPJbMXtDwJBgvhFkHU192jK1M=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=o5OD2zV8LWGt3fSnAbBlp6n1dsdv3pYZ5uMAgPjefRDjsFnAd3LonQAQ64wjXtUxv
+ Kv/d41aFdPG0UVcfenDWj/ju5lGRo+Aa9SkjZ1D2fhuo2ZSHiREtk7uqxOQYKrIn1s
+ kXnYbPxUOnNrsG6+W58hPVy2J+EasxUGC01UVhC0=
+Date: Thu, 2 Apr 2020 11:31:18 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH] ppc/pnv: Introduce common PNV_SETFIELD() and
+ PNV_GETFIELD() macros
+Message-ID: <20200402003118.GJ47772@umbus.fritz.box>
+References: <20200401152633.1375-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-14-git-send-email-yi.l.liu@intel.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="+Hr//EUsa8//ouuB"
 Content-Disposition: inline
+In-Reply-To: <20200401152633.1375-1-clg@kaod.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,801 +69,722 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, hao.wu@intel.com,
- yi.y.sun@intel.com, Richard Henderson <rth@twiddle.net>,
- david@gibson.dropbear.id.au
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 29, 2020 at 09:24:52PM -0700, Liu Yi L wrote:
-> This patch adds a PASID cache management infrastructure based on
-> new added structure VTDPASIDAddressSpace, which is used to track
-> the PASID usage and future PASID tagged DMA address translation
-> support in vIOMMU.
+
+--+Hr//EUsa8//ouuB
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Apr 01, 2020 at 05:26:33PM +0200, C=E9dric Le Goater wrote:
+> Most of QEMU definitions of the register fields of the PowerNV machine
+> come from skiboot and the models duplicate a set of macros for this
+> purpose. Make them common under the pnv_utils.h file.
 >=20
->     struct VTDPASIDAddressSpace {
->         VTDBus *vtd_bus;
->         uint8_t devfn;
->         AddressSpace as;
->         uint32_t pasid;
->         IntelIOMMUState *iommu_state;
->         VTDContextCacheEntry context_cache_entry;
->         QLIST_ENTRY(VTDPASIDAddressSpace) next;
->         VTDPASIDCacheEntry pasid_cache_entry;
->     };
->=20
-> Ideally, a VTDPASIDAddressSpace instance is created when a PASID
-> is bound with a DMA AddressSpace. Intel VT-d spec requires guest
-> software to issue pasid cache invalidation when bind or unbind a
-> pasid with an address space under caching-mode. However, as
-> VTDPASIDAddressSpace instances also act as pasid cache in this
-> implementation, its creation also happens during vIOMMU PASID
-> tagged DMA translation. The creation in this path will not be
-> added in this patch since no PASID-capable emulated devices for
-> now.
->=20
-> The implementation in this patch manages VTDPASIDAddressSpace
-> instances per PASID+BDF (lookup and insert will use PASID and
-> BDF) since Intel VT-d spec allows per-BDF PASID Table. When a
-> guest bind a PASID with an AddressSpace, QEMU will capture the
-> guest pasid selective pasid cache invalidation, and allocate
-> remove a VTDPASIDAddressSpace instance per the invalidation
-> reasons:
->=20
->     *) a present pasid entry moved to non-present
->     *) a present pasid entry to be a present entry
->     *) a non-present pasid entry moved to present
->=20
-> vIOMMU emulator could figure out the reason by fetching latest
-> guest pasid entry.
->=20
-> v1 -> v2: - merged this patch with former replay binding patch, makes
->             PSI/DSI/GSI use the unified function to do cache invalidation
->             and pasid binding replay.
->           - dropped pasid_cache_gen in both iommu_state and vtd_pasid_as
->             as it is not necessary so far, we may want it when one day
->             initroduce emulated SVA-capable device.
->=20
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Hrm.  If we're touching these, would it make sense to rewrite them in
+terms of the cross-qemu generic extract64() and deposit64()?
+
 > ---
->  hw/i386/intel_iommu.c          | 473 +++++++++++++++++++++++++++++++++++=
-++++++
->  hw/i386/intel_iommu_internal.h |  18 ++
->  hw/i386/trace-events           |   1 +
->  include/hw/i386/intel_iommu.h  |  24 +++
->  4 files changed, 516 insertions(+)
+>  include/hw/pci-host/pnv_phb3_regs.h | 16 ------
+>  include/hw/ppc/pnv_utils.h          | 29 +++++++++++
+>  hw/intc/pnv_xive.c                  | 76 ++++++++++++-----------------
+>  hw/pci-host/pnv_phb3.c              | 32 ++++++------
+>  hw/pci-host/pnv_phb3_msi.c          | 24 ++++-----
+>  hw/pci-host/pnv_phb4.c              | 51 ++++++++-----------
+>  6 files changed, 108 insertions(+), 120 deletions(-)
+>  create mode 100644 include/hw/ppc/pnv_utils.h
 >=20
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 2eb60c3..a7e9973 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -40,6 +40,7 @@
->  #include "kvm_i386.h"
->  #include "migration/vmstate.h"
->  #include "trace.h"
-> +#include "qemu/jhash.h"
+> diff --git a/include/hw/pci-host/pnv_phb3_regs.h b/include/hw/pci-host/pn=
+v_phb3_regs.h
+> index a174ef1f7045..38f8ce9d7406 100644
+> --- a/include/hw/pci-host/pnv_phb3_regs.h
+> +++ b/include/hw/pci-host/pnv_phb3_regs.h
+> @@ -12,22 +12,6 @@
 > =20
->  /* context entry operations */
->  #define VTD_CE_GET_RID2PASID(ce) \
-> @@ -65,6 +66,8 @@
->  static void vtd_address_space_refresh_all(IntelIOMMUState *s);
->  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *=
-n);
+>  #include "qemu/host-utils.h"
 > =20
-> +static void vtd_pasid_cache_reset(IntelIOMMUState *s);
-> +
->  static void vtd_panic_require_caching_mode(void)
->  {
->      error_report("We need to set caching-mode=3Don for intel-iommu to en=
-able "
-> @@ -276,6 +279,7 @@ static void vtd_reset_caches(IntelIOMMUState *s)
->      vtd_iommu_lock(s);
->      vtd_reset_iotlb_locked(s);
->      vtd_reset_context_cache_locked(s);
-> +    vtd_pasid_cache_reset(s);
->      vtd_iommu_unlock(s);
->  }
-> =20
-> @@ -686,6 +690,16 @@ static inline bool vtd_pe_type_check(X86IOMMUState *=
-x86_iommu,
->      return true;
->  }
-> =20
-> +static inline uint16_t vtd_pe_get_domain_id(VTDPASIDEntry *pe)
-> +{
-> +    return VTD_SM_PASID_ENTRY_DID((pe)->val[1]);
-> +}
-> +
-> +static inline uint32_t vtd_sm_ce_get_pdt_entry_num(VTDContextEntry *ce)
-> +{
-> +    return 1U << (VTD_SM_CONTEXT_ENTRY_PDTS(ce->val[0]) + 7);
-> +}
-> +
->  static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
->  {
->      return pdire->val & 1;
-> @@ -2395,9 +2409,452 @@ static bool vtd_process_iotlb_desc(IntelIOMMUStat=
-e *s, VTDInvDesc *inv_desc)
->      return true;
->  }
-> =20
-> +static inline void vtd_init_pasid_key(uint32_t pasid,
-> +                                     uint16_t sid,
-> +                                     struct pasid_key *key)
-> +{
-> +    key->pasid =3D pasid;
-> +    key->sid =3D sid;
-> +}
-> +
-> +static guint vtd_pasid_as_key_hash(gconstpointer v)
-> +{
-> +    struct pasid_key *key =3D (struct pasid_key *)v;
-> +    uint32_t a, b, c;
-> +
-> +    /* Jenkins hash */
-> +    a =3D b =3D c =3D JHASH_INITVAL + sizeof(*key);
-> +    a +=3D key->sid;
-> +    b +=3D extract32(key->pasid, 0, 16);
-> +    c +=3D extract32(key->pasid, 16, 16);
-> +
-> +    __jhash_mix(a, b, c);
-> +    __jhash_final(a, b, c);
-> +
-> +    return c;
-> +}
-> +
-> +static gboolean vtd_pasid_as_key_equal(gconstpointer v1, gconstpointer v=
-2)
-> +{
-> +    const struct pasid_key *k1 =3D v1;
-> +    const struct pasid_key *k2 =3D v2;
-> +
-> +    return (k1->pasid =3D=3D k2->pasid) && (k1->sid =3D=3D k2->sid);
-> +}
-> +
-> +static inline int vtd_dev_get_pe_from_pasid(IntelIOMMUState *s,
-> +                                            uint8_t bus_num,
-> +                                            uint8_t devfn,
-> +                                            uint32_t pasid,
-> +                                            VTDPASIDEntry *pe)
-> +{
-> +    VTDContextEntry ce;
-> +    int ret;
-> +    dma_addr_t pasid_dir_base;
-> +
-> +    if (!s->root_scalable) {
-> +        return -VTD_FR_PASID_TABLE_INV;
-> +    }
-> +
-> +    ret =3D vtd_dev_to_context_entry(s, bus_num, devfn, &ce);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    pasid_dir_base =3D VTD_CE_GET_PASID_DIR_TABLE(&ce);
-> +    ret =3D vtd_get_pe_from_pasid_table(s,
-> +                                  pasid_dir_base, pasid, pe);
-> +
-> +    return ret;
-> +}
-> +
-> +static bool vtd_pasid_entry_compare(VTDPASIDEntry *p1, VTDPASIDEntry *p2=
-)
-> +{
-> +    return !memcmp(p1, p2, sizeof(*p1));
-> +}
-> +
-> +/**
-> + * This function fills in the pasid entry in &vtd_pasid_as. Caller
-> + * of this function should hold iommu_lock.
+> -/*
+> - * QEMU version of the GETFIELD/SETFIELD macros
+> - *
+> - * These are common with the PnvXive model.
+> - */
+> -static inline uint64_t GETFIELD(uint64_t mask, uint64_t word)
+> -{
+> -    return (word & mask) >> ctz64(mask);
+> -}
+> -
+> -static inline uint64_t SETFIELD(uint64_t mask, uint64_t word,
+> -                                uint64_t value)
+> -{
+> -    return (word & ~mask) | ((value << ctz64(mask)) & mask);
+> -}
+> -
+>  /*
+>   * PBCQ XSCOM registers
+>   */
+> diff --git a/include/hw/ppc/pnv_utils.h b/include/hw/ppc/pnv_utils.h
+> new file mode 100644
+> index 000000000000..8521e13b5149
+> --- /dev/null
+> +++ b/include/hw/ppc/pnv_utils.h
+> @@ -0,0 +1,29 @@
+> +/*
+> + * QEMU PowerPC PowerNV utilities
+> + *
+> + * Copyright (c) 2020, IBM Corporation.
+> + *
+> + * This code is licensed under the GPL version 2 or later. See the
+> + * COPYING file in the top-level directory.
 > + */
-> +static void vtd_fill_pe_in_cache(IntelIOMMUState *s,
-> +                                 VTDPASIDAddressSpace *vtd_pasid_as,
-> +                                 VTDPASIDEntry *pe)
-> +{
-> +    VTDPASIDCacheEntry *pc_entry =3D &vtd_pasid_as->pasid_cache_entry;
 > +
-> +    if (vtd_pasid_entry_compare(pe, &pc_entry->pasid_entry)) {
-> +        /* No need to go further as cached pasid entry is latest */
-> +        return;
-> +    }
-> +
-> +    pc_entry->pasid_entry =3D *pe;
-> +    /*
-> +     * TODO:
-> +     * - send pasid bind to host for passthru devices
-> +     */
-> +}
-> +
-> +/**
-> + * This function is used to clear cached pasid entry in vtd_pasid_as
-> + * instances. Caller of this function should hold iommu_lock.
-> + */
-> +static gboolean vtd_flush_pasid(gpointer key, gpointer value,
-> +                                gpointer user_data)
-> +{
-> +    VTDPASIDCacheInfo *pc_info =3D user_data;
-> +    VTDPASIDAddressSpace *vtd_pasid_as =3D value;
-> +    IntelIOMMUState *s =3D vtd_pasid_as->iommu_state;
-> +    VTDPASIDCacheEntry *pc_entry =3D &vtd_pasid_as->pasid_cache_entry;
-> +    VTDBus *vtd_bus =3D vtd_pasid_as->vtd_bus;
-> +    VTDPASIDEntry pe;
-> +    uint16_t did;
-> +    uint32_t pasid;
-> +    uint16_t devfn;
-> +    int ret;
-> +
-> +    did =3D vtd_pe_get_domain_id(&pc_entry->pasid_entry);
-> +    pasid =3D vtd_pasid_as->pasid;
-> +    devfn =3D vtd_pasid_as->devfn;
-> +
-> +    switch (pc_info->flags & VTD_PASID_CACHE_INFO_MASK) {
-> +    case VTD_PASID_CACHE_FORCE_RESET:
-> +        goto remove;
-> +    case VTD_PASID_CACHE_PASIDSI:
-> +        if (pc_info->pasid !=3D pasid) {
-> +            return false;
-> +        }
-> +        /* Fall through */
-> +    case VTD_PASID_CACHE_DOMSI:
-> +        if (pc_info->domain_id !=3D did) {
-> +            return false;
-> +        }
-> +        /* Fall through */
-> +    case VTD_PASID_CACHE_GLOBAL:
-> +        break;
-> +    default:
-> +        error_report("invalid pc_info->flags");
-> +        abort();
-> +    }
-> +
-> +    /*
-> +     * pasid cache invalidation may indicate a present pasid
-> +     * entry to present pasid entry modification. To cover such
-> +     * case, vIOMMU emulator needs to fetch latest guest pasid
-> +     * entry and check cached pasid entry, then update pasid
-> +     * cache and send pasid bind/unbind to host properly.
-> +     */
-> +    ret =3D vtd_dev_get_pe_from_pasid(s, pci_bus_num(vtd_bus->bus),
-> +                                    devfn, pasid, &pe);
-> +    if (ret) {
-> +        /*
-> +         * No valid pasid entry in guest memory. e.g. pasid entry
-> +         * was modified to be either all-zero or non-present. Either
-> +         * case means existing pasid cache should be removed.
-> +         */
-> +        goto remove;
-> +    }
-> +
-> +    vtd_fill_pe_in_cache(s, vtd_pasid_as, &pe);
-> +    /*
-> +     * TODO:
-> +     * - when pasid-base-iotlb(piotlb) infrastructure is ready,
-> +     *   should invalidate QEMU piotlb togehter with this change.
-> +     */
-> +    return false;
-> +remove:
-> +    /*
-> +     * TODO:
-> +     * - send pasid bind to host for passthru devices
-> +     * - when pasid-base-iotlb(piotlb) infrastructure is ready,
-> +     *   should invalidate QEMU piotlb togehter with this change.
-> +     */
-> +    return true;
-> +}
-> +
-> +/**
-> + * This function finds or adds a VTDPASIDAddressSpace for a device
-> + * when it is bound to a pasid. Caller of this function should hold
-> + * iommu_lock.
-> + */
-> +static VTDPASIDAddressSpace *vtd_add_find_pasid_as(IntelIOMMUState *s,
-> +                                                   VTDBus *vtd_bus,
-> +                                                   int devfn,
-> +                                                   uint32_t pasid)
-> +{
-> +    struct pasid_key key;
-> +    struct pasid_key *new_key;
-> +    VTDPASIDAddressSpace *vtd_pasid_as;
-> +    uint16_t sid;
-> +
-> +    sid =3D vtd_make_source_id(pci_bus_num(vtd_bus->bus), devfn);
-> +    vtd_init_pasid_key(pasid, sid, &key);
-> +    vtd_pasid_as =3D g_hash_table_lookup(s->vtd_pasid_as, &key);
-> +
-> +    if (!vtd_pasid_as) {
-> +        new_key =3D g_malloc0(sizeof(*new_key));
-> +        vtd_init_pasid_key(pasid, sid, new_key);
-> +        /*
-> +         * Initiate the vtd_pasid_as structure.
-> +         *
-> +         * This structure here is used to track the guest pasid
-> +         * binding and also serves as pasid-cache mangement entry.
-> +         *
-> +         * TODO: in future, if wants to support the SVA-aware DMA
-> +         *       emulation, the vtd_pasid_as should have include
-> +         *       AddressSpace to support DMA emulation.
-> +         */
-> +        vtd_pasid_as =3D g_malloc0(sizeof(VTDPASIDAddressSpace));
-> +        vtd_pasid_as->iommu_state =3D s;
-> +        vtd_pasid_as->vtd_bus =3D vtd_bus;
-> +        vtd_pasid_as->devfn =3D devfn;
-> +        vtd_pasid_as->pasid =3D pasid;
-> +        g_hash_table_insert(s->vtd_pasid_as, new_key, vtd_pasid_as);
-> +    }
-> +    return vtd_pasid_as;
-> +}
-> +
-> +/**
-> + * Constant information used during pasid table walk
-> +   @vtd_bus, @devfn: device info
-> + * @flags: indicates if it is domain selective walk
-> + * @did: domain ID of the pasid table walk
-> + */
-> +typedef struct {
-> +    VTDBus *vtd_bus;
-> +    uint16_t devfn;
-> +#define VTD_PASID_TABLE_DID_SEL_WALK   (1ULL << 0)
-> +    uint32_t flags;
-> +    uint16_t did;
-> +} vtd_pasid_table_walk_info;
-> +
-> +/**
-> + * Caller of this function should hold iommu_lock.
-> + */
-> +static void vtd_sm_pasid_table_walk_one(IntelIOMMUState *s,
-> +                                        dma_addr_t pt_base,
-> +                                        int start,
-> +                                        int end,
-> +                                        vtd_pasid_table_walk_info *info)
-> +{
-> +    VTDPASIDEntry pe;
-> +    int pasid =3D start;
-> +    int pasid_next;
-> +    VTDPASIDAddressSpace *vtd_pasid_as;
-> +
-> +    while (pasid < end) {
-> +        pasid_next =3D pasid + 1;
-> +
-> +        if (!vtd_get_pe_in_pasid_leaf_table(s, pasid, pt_base, &pe)
-> +            && vtd_pe_present(&pe)) {
-> +            vtd_pasid_as =3D vtd_add_find_pasid_as(s,
-> +                                       info->vtd_bus, info->devfn, pasid=
-);
-> +            if ((info->flags & VTD_PASID_TABLE_DID_SEL_WALK) &&
-> +                !(info->did =3D=3D vtd_pe_get_domain_id(&pe))) {
-> +                pasid =3D pasid_next;
-> +                continue;
-> +            }
-> +            vtd_fill_pe_in_cache(s, vtd_pasid_as, &pe);
-> +        }
-> +        pasid =3D pasid_next;
-> +    }
-> +}
+> +#ifndef PPC_PNV_UTILS_H
+> +#define PPC_PNV_UTILS_H
 > +
 > +/*
-> + * Currently, VT-d scalable mode pasid table is a two level table,
-> + * this function aims to loop a range of PASIDs in a given pasid
-> + * table to identify the pasid config in guest.
-> + * Caller of this function should hold iommu_lock.
+> + * QEMU version of the GETFIELD/SETFIELD macros used in skiboot to
+> + * define the register fields.
 > + */
-> +static void vtd_sm_pasid_table_walk(IntelIOMMUState *s,
-> +                                    dma_addr_t pdt_base,
-> +                                    int start,
-> +                                    int end,
-> +                                    vtd_pasid_table_walk_info *info)
-> +{
-> +    VTDPASIDDirEntry pdire;
-> +    int pasid =3D start;
-> +    int pasid_next;
-> +    dma_addr_t pt_base;
 > +
-> +    while (pasid < end) {
-> +        pasid_next =3D ((end - pasid) > VTD_PASID_TBL_ENTRY_NUM) ?
-> +                      (pasid + VTD_PASID_TBL_ENTRY_NUM) : end;
-> +        if (!vtd_get_pdire_from_pdir_table(pdt_base, pasid, &pdire)
-> +            && vtd_pdire_present(&pdire)) {
-> +            pt_base =3D pdire.val & VTD_PASID_TABLE_BASE_ADDR_MASK;
-> +            vtd_sm_pasid_table_walk_one(s, pt_base, pasid, pasid_next, i=
-nfo);
-> +        }
-> +        pasid =3D pasid_next;
-> +    }
+> +static inline uint64_t PNV_GETFIELD(uint64_t mask, uint64_t word)
+> +{
+> +    return (word & mask) >> ctz64(mask);
 > +}
 > +
-> +static void vtd_replay_pasid_bind_for_dev(IntelIOMMUState *s,
-> +                                          int start, int end,
-> +                                          vtd_pasid_table_walk_info *inf=
-o)
+> +static inline uint64_t PNV_SETFIELD(uint64_t mask, uint64_t word,
+> +                                    uint64_t value)
 > +{
-> +    VTDContextEntry ce;
-> +    int bus_n, devfn;
-> +
-> +    bus_n =3D pci_bus_num(info->vtd_bus->bus);
-> +    devfn =3D info->devfn;
-> +
-> +    if (!vtd_dev_to_context_entry(s, bus_n, devfn, &ce)) {
-> +        uint32_t max_pasid;
-> +
-> +        max_pasid =3D vtd_sm_ce_get_pdt_entry_num(&ce) * VTD_PASID_TBL_E=
-NTRY_NUM;
-> +        if (end > max_pasid) {
-> +            end =3D max_pasid;
-> +        }
-> +        vtd_sm_pasid_table_walk(s,
-> +                                VTD_CE_GET_PASID_DIR_TABLE(&ce),
-> +                                start,
-> +                                end,
-> +                                info);
-> +    }
+> +    return (word & ~mask) | ((value << ctz64(mask)) & mask);
 > +}
 > +
-> +/**
-> + * This function replay the guest pasid bindings to hots by
-> + * walking the guest PASID table. This ensures host will have
-> + * latest guest pasid bindings. Caller should hold iommu_lock.
-> + */
-> +static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
-> +                                            VTDPASIDCacheInfo *pc_info)
-> +{
-> +    VTDHostIOMMUContext *vtd_dev_icx;
-> +    int start =3D 0, end =3D VTD_HPASID_MAX;
-> +    vtd_pasid_table_walk_info walk_info =3D {.flags =3D 0};
-
-So vtd_pasid_table_walk_info is still used.  I thought we had reached
-a consensus that this can be dropped?
-
-> +
-> +    switch (pc_info->flags & VTD_PASID_CACHE_INFO_MASK) {
-> +    case VTD_PASID_CACHE_PASIDSI:
-> +        start =3D pc_info->pasid;
-> +        end =3D pc_info->pasid + 1;
-> +        /*
-> +         * PASID selective invalidation is within domain,
-> +         * thus fall through.
-> +         */
-> +    case VTD_PASID_CACHE_DOMSI:
-> +        walk_info.did =3D pc_info->domain_id;
-> +        walk_info.flags |=3D VTD_PASID_TABLE_DID_SEL_WALK;
-> +        /* loop all assigned devices */
-> +        break;
-> +    case VTD_PASID_CACHE_FORCE_RESET:
-> +        /* For force reset, no need to go further replay */
-> +        return;
-> +    case VTD_PASID_CACHE_GLOBAL:
-> +        break;
-> +    default:
-> +        error_report("%s, invalid pc_info->flags", __func__);
-> +        abort();
-> +    }
-> +
-> +    /*
-> +     * In this replay, only needs to care about the devices which
-> +     * are backed by host IOMMU. For such devices, their vtd_dev_icx
-> +     * instances are in the s->vtd_dev_icx_list. For devices which
-> +     * are not backed byhost IOMMU, it is not necessary to replay
-> +     * the bindings since their cache could be re-created in the future
-> +     * DMA address transaltion.
-> +     */
-> +    QLIST_FOREACH(vtd_dev_icx, &s->vtd_dev_icx_list, next) {
-> +        walk_info.vtd_bus =3D vtd_dev_icx->vtd_bus;
-> +        walk_info.devfn =3D vtd_dev_icx->devfn;
-> +        vtd_replay_pasid_bind_for_dev(s, start, end, &walk_info);
-> +    }
-> +}
-> +
-> +/**
-> + * This function syncs the pasid bindings between guest and host.
-> + * It includes updating the pasid cache in vIOMMU and updating the
-> + * pasid bindings per guest's latest pasid entry presence.
-> + */
-> +static void vtd_pasid_cache_sync(IntelIOMMUState *s,
-> +                                 VTDPASIDCacheInfo *pc_info)
-> +{
-> +    /*
-> +     * Regards to a pasid cache invalidation, e.g. a PSI.
-> +     * it could be either cases of below:
-> +     * a) a present pasid entry moved to non-present
-> +     * b) a present pasid entry to be a present entry
-> +     * c) a non-present pasid entry moved to present
-> +     *
-> +     * Different invalidation granularity may affect different device
-> +     * scope and pasid scope. But for each invalidation granularity,
-> +     * it needs to do two steps to sync host and guest pasid binding.
-> +     *
-> +     * Here is the handling of a PSI:
-> +     * 1) loop all the existing vtd_pasid_as instances to update them
-> +     *    according to the latest guest pasid entry in pasid table.
-> +     *    this will make sure affected existing vtd_pasid_as instances
-> +     *    cached the latest pasid entries. Also, during the loop, the
-> +     *    host should be notified if needed. e.g. pasid unbind or pasid
-> +     *    update. Should be able to cover case a) and case b).
-> +     *
-> +     * 2) loop all devices to cover case c)
-> +     *    - For devices which have HostIOMMUContext instances,
-> +     *      we loop them and check if guest pasid entry exists. If yes,
-> +     *      it is case c), we update the pasid cache and also notify
-> +     *      host.
-> +     *    - For devices which have no HostIOMMUContext, it is not
-> +     *      necessary to create pasid cache at this phase since it
-> +     *      could be created when vIOMMU does DMA address translation.
-> +     *      This is not yet implemented since there is no emulated
-> +     *      pasid-capable devices today. If we have such devices in
-> +     *      future, the pasid cache shall be created there.
-> +     * Other granularity follow the same steps, just with different scop=
-e
-> +     *
-> +     */
-> +
-> +    vtd_iommu_lock(s);
-> +    /* Step 1: loop all the exisitng vtd_pasid_as instances */
-> +    g_hash_table_foreach_remove(s->vtd_pasid_as,
-> +                                vtd_flush_pasid, pc_info);
-
-OK the series is evolving along with our discussions, and /me too on
-understanding your series... Now I'm not very sure whether this
-operation is still useful...
-
-The major point is you'll need to do pasid table walk for all the
-registered devices below.  So IIUC vtd_replay_guest_pasid_bindings()
-will be able to also detect addition, removal or modification of pasid
-address spaces.  Am I right?
-
-If this can be dropped, then vtd_flush_pasid() will be only used below
-for device reset, and it can be greatly simplifed - just UNBIND every
-address space we have.
-
-> +
-> +    /*
-> +     * Step 2: loop all the exisitng vtd_dev_icx instances.
-> +     * Ideally, needs to loop all devices to find if there is any new
-> +     * PASID binding regards to the PASID cache invalidation request.
-> +     * But it is enough to loop the devices which are backed by host
-> +     * IOMMU. For devices backed by vIOMMU (a.k.a emulated devices),
-> +     * if new PASID happened on them, their vtd_pasid_as instance could
-> +     * be created during future vIOMMU DMA translation.
-> +     */
-> +    vtd_replay_guest_pasid_bindings(s, pc_info);
-> +    vtd_iommu_unlock(s);
-> +}
-> +
-> +/**
-> + * Caller of this function should hold iommu_lock
-> + */
-> +static void vtd_pasid_cache_reset(IntelIOMMUState *s)
-> +{
-> +    VTDPASIDCacheInfo pc_info;
-> +
-> +    trace_vtd_pasid_cache_reset();
-> +
-> +    pc_info.flags =3D VTD_PASID_CACHE_FORCE_RESET;
-> +
-> +    /*
-> +     * Reset pasid cache is a big hammer, so use
-> +     * g_hash_table_foreach_remove which will free
-> +     * the vtd_pasid_as instances. Also, as a big
-> +     * hammer, use VTD_PASID_CACHE_FORCE_RESET to
-> +     * ensure all the vtd_pasid_as instances are
-> +     * dropped, meanwhile the change will be pass
-> +     * to host if HostIOMMUContext is available.
-> +     */
-> +    g_hash_table_foreach_remove(s->vtd_pasid_as,
-> +                                vtd_flush_pasid, &pc_info);
-> +}
-> +
->  static bool vtd_process_pasid_desc(IntelIOMMUState *s,
->                                     VTDInvDesc *inv_desc)
+> +#endif /* PPC_PNV_UTILS_H */
+> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+> index aeda488bd113..77cacdd6c623 100644
+> --- a/hw/intc/pnv_xive.c
+> +++ b/hw/intc/pnv_xive.c
+> @@ -21,6 +21,7 @@
+>  #include "hw/ppc/pnv_core.h"
+>  #include "hw/ppc/pnv_xscom.h"
+>  #include "hw/ppc/pnv_xive.h"
+> +#include "hw/ppc/pnv_utils.h" /* SETFIELD() and GETFIELD() macros */
+>  #include "hw/ppc/xive_regs.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/ppc/ppc.h"
+> @@ -65,26 +66,6 @@ static const XiveVstInfo vst_infos[] =3D {
+>      qemu_log_mask(LOG_GUEST_ERROR, "XIVE[%x] - " fmt "\n",              \
+>                    (xive)->chip->chip_id, ## __VA_ARGS__);
+> =20
+> -/*
+> - * QEMU version of the GETFIELD/SETFIELD macros
+> - *
+> - * TODO: It might be better to use the existing extract64() and
+> - * deposit64() but this means that all the register definitions will
+> - * change and become incompatible with the ones found in skiboot.
+> - *
+> - * Keep it as it is for now until we find a common ground.
+> - */
+> -static inline uint64_t GETFIELD(uint64_t mask, uint64_t word)
+> -{
+> -    return (word & mask) >> ctz64(mask);
+> -}
+> -
+> -static inline uint64_t SETFIELD(uint64_t mask, uint64_t word,
+> -                                uint64_t value)
+> -{
+> -    return (word & ~mask) | ((value << ctz64(mask)) & mask);
+> -}
+> -
+>  /*
+>   * When PC_TCTXT_CHIPID_OVERRIDE is configured, the PC_TCTXT_CHIPID
+>   * field overrides the hardwired chip ID in the Powerbus operations
+> @@ -96,7 +77,7 @@ static uint8_t pnv_xive_block_id(PnvXive *xive)
+>      uint64_t cfg_val =3D xive->regs[PC_TCTXT_CFG >> 3];
+> =20
+>      if (cfg_val & PC_TCTXT_CHIPID_OVERRIDE) {
+> -        blk =3D GETFIELD(PC_TCTXT_CHIPID, cfg_val);
+> +        blk =3D PNV_GETFIELD(PC_TCTXT_CHIPID, cfg_val);
+>      }
+> =20
+>      return blk;
+> @@ -145,7 +126,7 @@ static uint64_t pnv_xive_vst_addr_direct(PnvXive *xiv=
+e, uint32_t type,
 >  {
-> +    uint16_t domain_id;
-> +    uint32_t pasid;
-> +    VTDPASIDCacheInfo pc_info;
-> +
->      if ((inv_desc->val[0] & VTD_INV_DESC_PASIDC_RSVD_VAL0) ||
->          (inv_desc->val[1] & VTD_INV_DESC_PASIDC_RSVD_VAL1) ||
->          (inv_desc->val[2] & VTD_INV_DESC_PASIDC_RSVD_VAL2) ||
-> @@ -2407,14 +2864,26 @@ static bool vtd_process_pasid_desc(IntelIOMMUStat=
-e *s,
->          return false;
+>      const XiveVstInfo *info =3D &vst_infos[type];
+>      uint64_t vst_addr =3D vsd & VSD_ADDRESS_MASK;
+> -    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
+> +    uint64_t vst_tsize =3D 1ull << (PNV_GETFIELD(VSD_TSIZE, vsd) + 12);
+>      uint32_t idx_max;
+> =20
+>      idx_max =3D vst_tsize / info->size - 1;
+> @@ -180,7 +161,7 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+>          return 0;
 >      }
 > =20
-> +    domain_id =3D VTD_INV_DESC_PASIDC_DID(inv_desc->val[0]);
-> +    pasid =3D VTD_INV_DESC_PASIDC_PASID(inv_desc->val[0]);
-> +
->      switch (inv_desc->val[0] & VTD_INV_DESC_PASIDC_G) {
->      case VTD_INV_DESC_PASIDC_DSI:
-> +        trace_vtd_pasid_cache_dsi(domain_id);
-> +        pc_info.flags =3D VTD_PASID_CACHE_DOMSI;
-> +        pc_info.domain_id =3D domain_id;
->          break;
+> -    page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
+> +    page_shift =3D PNV_GETFIELD(VSD_TSIZE, vsd) + 12;
 > =20
->      case VTD_INV_DESC_PASIDC_PASID_SI:
-> +        /* PASID selective implies a DID selective */
-> +        pc_info.flags =3D VTD_PASID_CACHE_PASIDSI;
-> +        pc_info.domain_id =3D domain_id;
-> +        pc_info.pasid =3D pasid;
->          break;
+>      if (!pnv_xive_vst_page_size_allowed(page_shift)) {
+>          xive_error(xive, "VST: invalid %s page shift %d", info->name,
+> @@ -207,7 +188,7 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+>           * Check that the pages have a consistent size across the
+>           * indirect table
+>           */
+> -        if (page_shift !=3D GETFIELD(VSD_TSIZE, vsd) + 12) {
+> +        if (page_shift !=3D PNV_GETFIELD(VSD_TSIZE, vsd) + 12) {
+>              xive_error(xive, "VST: %s entry %x indirect page size differ=
+ !?",
+>                         info->name, idx);
+>              return 0;
+> @@ -232,7 +213,7 @@ static uint64_t pnv_xive_vst_addr(PnvXive *xive, uint=
+32_t type, uint8_t blk,
+>      vsd =3D xive->vsds[type][blk];
 > =20
->      case VTD_INV_DESC_PASIDC_GLOBAL:
-> +        trace_vtd_pasid_cache_gsi();
-> +        pc_info.flags =3D VTD_PASID_CACHE_GLOBAL;
->          break;
+>      /* Remote VST access */
+> -    if (GETFIELD(VSD_MODE, vsd) =3D=3D VSD_MODE_FORWARD) {
+> +    if (PNV_GETFIELD(VSD_MODE, vsd) =3D=3D VSD_MODE_FORWARD) {
+>          xive =3D pnv_xive_get_remote(blk);
 > =20
->      default:
-> @@ -2423,6 +2892,7 @@ static bool vtd_process_pasid_desc(IntelIOMMUState =
-*s,
->          return false;
->      }
+>          return xive ? pnv_xive_vst_addr(xive, type, blk, idx) : 0;
+> @@ -295,9 +276,9 @@ static int pnv_xive_write_end(XiveRouter *xrtr, uint8=
+_t blk, uint32_t idx,
 > =20
-> +    vtd_pasid_cache_sync(s, &pc_info);
->      return true;
+>  static int pnv_xive_end_update(PnvXive *xive)
+>  {
+> -    uint8_t  blk =3D GETFIELD(VC_EQC_CWATCH_BLOCKID,
+> +    uint8_t  blk =3D PNV_GETFIELD(VC_EQC_CWATCH_BLOCKID,
+>                             xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+> -    uint32_t idx =3D GETFIELD(VC_EQC_CWATCH_OFFSET,
+> +    uint32_t idx =3D PNV_GETFIELD(VC_EQC_CWATCH_OFFSET,
+>                             xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+>      int i;
+>      uint64_t eqc_watch[4];
+> @@ -312,9 +293,9 @@ static int pnv_xive_end_update(PnvXive *xive)
+> =20
+>  static void pnv_xive_end_cache_load(PnvXive *xive)
+>  {
+> -    uint8_t  blk =3D GETFIELD(VC_EQC_CWATCH_BLOCKID,
+> +    uint8_t  blk =3D PNV_GETFIELD(VC_EQC_CWATCH_BLOCKID,
+>                             xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+> -    uint32_t idx =3D GETFIELD(VC_EQC_CWATCH_OFFSET,
+> +    uint32_t idx =3D PNV_GETFIELD(VC_EQC_CWATCH_OFFSET,
+>                             xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+>      uint64_t eqc_watch[4] =3D { 0 };
+>      int i;
+> @@ -343,9 +324,9 @@ static int pnv_xive_write_nvt(XiveRouter *xrtr, uint8=
+_t blk, uint32_t idx,
+> =20
+>  static int pnv_xive_nvt_update(PnvXive *xive)
+>  {
+> -    uint8_t  blk =3D GETFIELD(PC_VPC_CWATCH_BLOCKID,
+> +    uint8_t  blk =3D PNV_GETFIELD(PC_VPC_CWATCH_BLOCKID,
+>                             xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+> -    uint32_t idx =3D GETFIELD(PC_VPC_CWATCH_OFFSET,
+> +    uint32_t idx =3D PNV_GETFIELD(PC_VPC_CWATCH_OFFSET,
+>                             xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+>      int i;
+>      uint64_t vpc_watch[8];
+> @@ -360,9 +341,9 @@ static int pnv_xive_nvt_update(PnvXive *xive)
+> =20
+>  static void pnv_xive_nvt_cache_load(PnvXive *xive)
+>  {
+> -    uint8_t  blk =3D GETFIELD(PC_VPC_CWATCH_BLOCKID,
+> +    uint8_t  blk =3D PNV_GETFIELD(PC_VPC_CWATCH_BLOCKID,
+>                             xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+> -    uint32_t idx =3D GETFIELD(PC_VPC_CWATCH_OFFSET,
+> +    uint32_t idx =3D PNV_GETFIELD(PC_VPC_CWATCH_OFFSET,
+>                             xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+>      uint64_t vpc_watch[8] =3D { 0 };
+>      int i;
+> @@ -518,7 +499,7 @@ static uint64_t pnv_xive_pc_size(PnvXive *xive)
+>  static uint32_t pnv_xive_nr_ipis(PnvXive *xive, uint8_t blk)
+>  {
+>      uint64_t vsd =3D xive->vsds[VST_TSEL_SBE][blk];
+> -    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
+> +    uint64_t vst_tsize =3D 1ull << (PNV_GETFIELD(VSD_TSIZE, vsd) + 12);
+> =20
+>      return VSD_INDIRECT & vsd ? 0 : vst_tsize * SBE_PER_BYTE;
 >  }
+> @@ -550,7 +531,7 @@ static uint64_t pnv_xive_vst_per_subpage(PnvXive *xiv=
+e, uint32_t type)
+>          return 0;
+>      }
 > =20
-> @@ -4085,6 +4555,9 @@ static void vtd_realize(DeviceState *dev, Error **e=
-rrp)
->                                       g_free, g_free);
->      s->vtd_as_by_busptr =3D g_hash_table_new_full(vtd_uint64_hash, vtd_u=
-int64_equal,
->                                                g_free, g_free);
-> +    s->vtd_pasid_as =3D g_hash_table_new_full(vtd_pasid_as_key_hash,
-> +                                            vtd_pasid_as_key_equal,
-> +                                            g_free, g_free);
->      vtd_init(s);
->      sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, Q35_HOST_BRIDGE_IOMMU_ADDR);
->      pci_setup_iommu(bus, &vtd_iommu_ops, dev);
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_interna=
-l.h
-> index 9a76f20..451ef4c 100644
-> --- a/hw/i386/intel_iommu_internal.h
-> +++ b/hw/i386/intel_iommu_internal.h
-> @@ -307,6 +307,7 @@ typedef enum VTDFaultReason {
->      VTD_FR_IR_SID_ERR =3D 0x26,   /* Invalid Source-ID */
+> -    page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
+> +    page_shift =3D PNV_GETFIELD(VSD_TSIZE, vsd) + 12;
 > =20
->      VTD_FR_PASID_TABLE_INV =3D 0x58,  /*Invalid PASID table entry */
-> +    VTD_FR_PASID_ENTRY_P =3D 0x59, /* The Present(P) field of pasidt-ent=
-ry is 0 */
+>      if (!pnv_xive_vst_page_size_allowed(page_shift)) {
+>          xive_error(xive, "VST: invalid %s page shift %d", info->name,
+> @@ -582,7 +563,7 @@ static uint64_t pnv_xive_edt_size(PnvXive *xive, uint=
+64_t type)
+>      int i;
 > =20
->      /* This is not a normal fault reason. We use this to indicate some f=
-aults
->       * that are not referenced by the VT-d specification.
-> @@ -511,10 +512,26 @@ typedef struct VTDRootEntry VTDRootEntry;
->  #define VTD_CTX_ENTRY_LEGACY_SIZE     16
->  #define VTD_CTX_ENTRY_SCALABLE_SIZE   32
+>      for (i =3D 0; i < XIVE_TABLE_EDT_MAX; i++) {
+> -        uint64_t edt_type =3D GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[i]);
+> +        uint64_t edt_type =3D PNV_GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[i]=
+);
 > =20
-> +#define VTD_SM_CONTEXT_ENTRY_PDTS(val)      (((val) >> 9) & 0x3)
->  #define VTD_SM_CONTEXT_ENTRY_RID2PASID_MASK 0xfffff
->  #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL0(aw)  (0x1e0ULL | ~VTD_HAW_MASK(aw=
-))
->  #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL1      0xffffffffffe00000ULL
+>          if (edt_type =3D=3D type) {
+>              size +=3D edt_size;
+> @@ -604,7 +585,7 @@ static uint64_t pnv_xive_edt_offset(PnvXive *xive, ui=
+nt64_t vc_offset,
+>      uint64_t edt_offset =3D vc_offset;
 > =20
-> +struct VTDPASIDCacheInfo {
-> +#define VTD_PASID_CACHE_FORCE_RESET    (1ULL << 0)
-> +#define VTD_PASID_CACHE_GLOBAL         (1ULL << 1)
-> +#define VTD_PASID_CACHE_DOMSI          (1ULL << 2)
-> +#define VTD_PASID_CACHE_PASIDSI        (1ULL << 3)
-> +    uint32_t flags;
-> +    uint16_t domain_id;
-> +    uint32_t pasid;
-> +};
-> +#define VTD_PASID_CACHE_INFO_MASK    (VTD_PASID_CACHE_FORCE_RESET | \
-> +                                      VTD_PASID_CACHE_GLOBAL  | \
-> +                                      VTD_PASID_CACHE_DOMSI  | \
-> +                                      VTD_PASID_CACHE_PASIDSI)
-
-I think this is not needed at all?  The naming "flags" is confusing
-too because it's not really a bitmap but an enum.  How about drop this
-and rename "flags" to "type"?
-
-> +typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
-> +
->  /* PASID Table Related Definitions */
->  #define VTD_PASID_DIR_BASE_ADDR_MASK  (~0xfffULL)
->  #define VTD_PASID_TABLE_BASE_ADDR_MASK (~0xfffULL)
-> @@ -526,6 +543,7 @@ typedef struct VTDRootEntry VTDRootEntry;
->  #define VTD_PASID_TABLE_BITS_MASK     (0x3fULL)
->  #define VTD_PASID_TABLE_INDEX(pasid)  ((pasid) & VTD_PASID_TABLE_BITS_MA=
-SK)
->  #define VTD_PASID_ENTRY_FPD           (1ULL << 1) /* Fault Processing Di=
-sable */
-> +#define VTD_PASID_TBL_ENTRY_NUM       (1ULL << 6)
+>      for (i =3D 0; i < XIVE_TABLE_EDT_MAX && (i * edt_size) < vc_offset; =
+i++) {
+> -        uint64_t edt_type =3D GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[i]);
+> +        uint64_t edt_type =3D PNV_GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[i]=
+);
 > =20
->  /* PASID Granular Translation Type Mask */
->  #define VTD_PASID_ENTRY_P              1ULL
-> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-> index f7cd4e5..60d20c1 100644
-> --- a/hw/i386/trace-events
-> +++ b/hw/i386/trace-events
-> @@ -23,6 +23,7 @@ vtd_inv_qi_tail(uint16_t head) "write tail %d"
->  vtd_inv_qi_fetch(void) ""
->  vtd_context_cache_reset(void) ""
->  vtd_pasid_cache_gsi(void) ""
-> +vtd_pasid_cache_reset(void) ""
->  vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation do=
-main 0x%"PRIx16
->  vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC =
-invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
->  vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.=
-h
-> index 42a58d6..626c1cd 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -65,6 +65,8 @@ typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
->  typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
->  typedef struct VTDPASIDEntry VTDPASIDEntry;
->  typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
-> +typedef struct VTDPASIDCacheEntry VTDPASIDCacheEntry;
-> +typedef struct VTDPASIDAddressSpace VTDPASIDAddressSpace;
+>          if (edt_type !=3D type) {
+>              edt_offset -=3D edt_size;
+> @@ -632,7 +613,8 @@ static void pnv_xive_edt_resize(PnvXive *xive)
+>  static int pnv_xive_table_set_data(PnvXive *xive, uint64_t val)
+>  {
+>      uint64_t tsel =3D xive->regs[CQ_TAR >> 3] & CQ_TAR_TSEL;
+> -    uint8_t tsel_index =3D GETFIELD(CQ_TAR_TSEL_INDEX, xive->regs[CQ_TAR=
+ >> 3]);
+> +    uint8_t tsel_index =3D PNV_GETFIELD(CQ_TAR_TSEL_INDEX,
+> +                                      xive->regs[CQ_TAR >> 3]);
+>      uint64_t *xive_table;
+>      uint8_t max_index;
 > =20
->  /* Context-Entry */
->  struct VTDContextEntry {
-> @@ -97,6 +99,26 @@ struct VTDPASIDEntry {
->      uint64_t val[8];
->  };
+> @@ -667,7 +649,8 @@ static int pnv_xive_table_set_data(PnvXive *xive, uin=
+t64_t val)
 > =20
-> +struct pasid_key {
-> +    uint32_t pasid;
-> +    uint16_t sid;
-> +};
-> +
-> +struct VTDPASIDCacheEntry {
-> +    struct VTDPASIDEntry pasid_entry;
-> +};
-> +
-> +struct VTDPASIDAddressSpace {
-> +    VTDBus *vtd_bus;
-> +    uint8_t devfn;
-> +    AddressSpace as;
-
-Can this be dropped?
-
-> +    uint32_t pasid;
-> +    IntelIOMMUState *iommu_state;
-> +    VTDContextCacheEntry context_cache_entry;
-
-Can this be dropped too?
-
-> +    QLIST_ENTRY(VTDPASIDAddressSpace) next;
-> +    VTDPASIDCacheEntry pasid_cache_entry;
-> +};
-> +
->  struct VTDAddressSpace {
->      PCIBus *bus;
->      uint8_t devfn;
-> @@ -267,6 +289,7 @@ struct IntelIOMMUState {
+>      if (xive->regs[CQ_TAR >> 3] & CQ_TAR_TBL_AUTOINC) {
+>          xive->regs[CQ_TAR >> 3] =3D
+> -            SETFIELD(CQ_TAR_TSEL_INDEX, xive->regs[CQ_TAR >> 3], ++tsel_=
+index);
+> +            PNV_SETFIELD(CQ_TAR_TSEL_INDEX, xive->regs[CQ_TAR >> 3],
+> +                         ++tsel_index);
+>      }
 > =20
->      GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus*=
- reference */
->      VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexe=
-d by bus number */
-> +    GHashTable *vtd_pasid_as;       /* VTDPASIDAddressSpace instances */
->      /* list of registered notifiers */
->      QLIST_HEAD(, VTDAddressSpace) vtd_as_with_notifiers;
+>      /*
+> @@ -690,7 +673,7 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xive,=
+ uint8_t type,
+>      XiveENDSource *end_xsrc =3D &xive->end_source;
+>      XiveSource *xsrc =3D &xive->ipi_source;
+>      const XiveVstInfo *info =3D &vst_infos[type];
+> -    uint32_t page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
+> +    uint32_t page_shift =3D PNV_GETFIELD(VSD_TSIZE, vsd) + 12;
+>      uint64_t vst_tsize =3D 1ull << page_shift;
+>      uint64_t vst_addr =3D vsd & VSD_ADDRESS_MASK;
 > =20
-> @@ -292,6 +315,7 @@ struct IntelIOMMUState {
->       * - per-IOMMU IOTLB caches
->       * - context entry cache in VTDAddressSpace
->       * - HostIOMMUContext pointer cached in vIOMMU
-> +     * - PASID cache in VTDPASIDAddressSpace
->       */
->      QemuMutex iommu_lock;
->  };
-> --=20
-> 2.7.4
->=20
+> @@ -777,10 +760,10 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xiv=
+e, uint8_t type,
+>   */
+>  static void pnv_xive_vst_set_data(PnvXive *xive, uint64_t vsd, bool pc_e=
+ngine)
+>  {
+> -    uint8_t mode =3D GETFIELD(VSD_MODE, vsd);
+> -    uint8_t type =3D GETFIELD(VST_TABLE_SELECT,
+> +    uint8_t mode =3D PNV_GETFIELD(VSD_MODE, vsd);
+> +    uint8_t type =3D PNV_GETFIELD(VST_TABLE_SELECT,
+>                              xive->regs[VC_VSD_TABLE_ADDR >> 3]);
+> -    uint8_t blk =3D GETFIELD(VST_TABLE_BLOCK,
+> +    uint8_t blk =3D PNV_GETFIELD(VST_TABLE_BLOCK,
+>                             xive->regs[VC_VSD_TABLE_ADDR >> 3]);
+>      uint64_t vst_addr =3D vsd & VSD_ADDRESS_MASK;
+> =20
+> @@ -1456,7 +1439,8 @@ static XiveTCTX *pnv_xive_get_indirect_tctx(PnvXive=
+ *xive)
+>          return NULL;
+>      }
+> =20
+> -    pir =3D (chip->chip_id << 8) | GETFIELD(PC_TCTXT_INDIR_THRDID, tctxt=
+_indir);
+> +    pir =3D (chip->chip_id << 8) |
+> +        PNV_GETFIELD(PC_TCTXT_INDIR_THRDID, tctxt_indir);
+>      cpu =3D pnv_chip_find_cpu(chip, pir);
+>      if (!cpu) {
+>          xive_error(xive, "IC: invalid PIR %x for indirect access", pir);
+> @@ -1583,7 +1567,7 @@ static uint64_t pnv_xive_vc_read(void *opaque, hwad=
+dr offset,
+>      uint64_t ret =3D -1;
+> =20
+>      if (edt_index < XIVE_TABLE_EDT_MAX) {
+> -        edt_type =3D GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[edt_index]);
+> +        edt_type =3D PNV_GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[edt_index]);
+>      }
+> =20
+>      switch (edt_type) {
+> @@ -1625,7 +1609,7 @@ static void pnv_xive_vc_write(void *opaque, hwaddr =
+offset,
+>      AddressSpace *edt_as =3D NULL;
+> =20
+>      if (edt_index < XIVE_TABLE_EDT_MAX) {
+> -        edt_type =3D GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[edt_index]);
+> +        edt_type =3D PNV_GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[edt_index]);
+>      }
+> =20
+>      switch (edt_type) {
+> diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+> index 74618fadf085..a2d5815d3485 100644
+> --- a/hw/pci-host/pnv_phb3.c
+> +++ b/hw/pci-host/pnv_phb3.c
+> @@ -16,6 +16,7 @@
+>  #include "hw/pci/pcie_host.h"
+>  #include "hw/pci/pcie_port.h"
+>  #include "hw/ppc/pnv.h"
+> +#include "hw/ppc/pnv_utils.h" /* SETFIELD() and GETFIELD() macros */
+>  #include "hw/irq.h"
+>  #include "hw/qdev-properties.h"
+> =20
+> @@ -171,11 +172,11 @@ static void pnv_phb3_check_m64(PnvPHB3 *phb, uint32=
+_t index)
+>      }
+> =20
+>      /* Grab geometry from registers */
+> -    base =3D GETFIELD(IODA2_M64BT_BASE, m64) << 20;
+> +    base =3D PNV_GETFIELD(IODA2_M64BT_BASE, m64) << 20;
+>      if (m64 & IODA2_M64BT_SINGLE_PE) {
+>          base &=3D ~0x1ffffffull;
+>      }
+> -    size =3D GETFIELD(IODA2_M64BT_MASK, m64) << 20;
+> +    size =3D PNV_GETFIELD(IODA2_M64BT_MASK, m64) << 20;
+>      size |=3D 0xfffc000000000000ull;
+>      size =3D ~size + 1;
+>      start =3D base | (phb->regs[PHB_M64_UPPER_BITS >> 3]);
+> @@ -217,8 +218,8 @@ static void pnv_phb3_lxivt_write(PnvPHB3 *phb, unsign=
+ed idx, uint64_t val)
+>      phb->ioda_LXIVT[idx] =3D val & (IODA2_LXIVT_SERVER |
+>                                    IODA2_LXIVT_PRIORITY |
+>                                    IODA2_LXIVT_NODE_ID);
+> -    server =3D GETFIELD(IODA2_LXIVT_SERVER, val);
+> -    prio =3D GETFIELD(IODA2_LXIVT_PRIORITY, val);
+> +    server =3D PNV_GETFIELD(IODA2_LXIVT_SERVER, val);
+> +    prio =3D PNV_GETFIELD(IODA2_LXIVT_PRIORITY, val);
+> =20
+>      /*
+>       * The low order 2 bits are the link pointer (Type II interrupts).
+> @@ -233,8 +234,8 @@ static uint64_t *pnv_phb3_ioda_access(PnvPHB3 *phb,
+>                                        unsigned *out_table, unsigned *out=
+_idx)
+>  {
+>      uint64_t adreg =3D phb->regs[PHB_IODA_ADDR >> 3];
+> -    unsigned int index =3D GETFIELD(PHB_IODA_AD_TADR, adreg);
+> -    unsigned int table =3D GETFIELD(PHB_IODA_AD_TSEL, adreg);
+> +    unsigned int index =3D PNV_GETFIELD(PHB_IODA_AD_TADR, adreg);
+> +    unsigned int table =3D PNV_GETFIELD(PHB_IODA_AD_TSEL, adreg);
+>      unsigned int mask;
+>      uint64_t *tptr =3D NULL;
+> =20
+> @@ -297,7 +298,7 @@ static uint64_t *pnv_phb3_ioda_access(PnvPHB3 *phb,
+>      }
+>      if (adreg & PHB_IODA_AD_AUTOINC) {
+>          index =3D (index + 1) & mask;
+> -        adreg =3D SETFIELD(PHB_IODA_AD_TADR, adreg, index);
+> +        adreg =3D PNV_SETFIELD(PHB_IODA_AD_TADR, adreg, index);
+>      }
+>      phb->regs[PHB_IODA_ADDR >> 3] =3D adreg;
+>      return tptr;
+> @@ -363,10 +364,11 @@ void pnv_phb3_remap_irqs(PnvPHB3 *phb)
+>      }
+> =20
+>      /* Grab local LSI source ID */
+> -    local =3D GETFIELD(PHB_LSI_SRC_ID, phb->regs[PHB_LSI_SOURCE_ID >> 3]=
+) << 3;
+> +    local =3D PNV_GETFIELD(PHB_LSI_SRC_ID,
+> +                         phb->regs[PHB_LSI_SOURCE_ID >> 3]) << 3;
+> =20
+>      /* Grab global one and compare */
+> -    global =3D GETFIELD(PBCQ_NEST_LSI_SRC,
+> +    global =3D PNV_GETFIELD(PBCQ_NEST_LSI_SRC,
+>                        pbcq->nest_regs[PBCQ_NEST_LSI_SRC_ID]) << 3;
+>      if (global !=3D local) {
+>          /*
+> @@ -378,9 +380,9 @@ void pnv_phb3_remap_irqs(PnvPHB3 *phb)
+>      }
+> =20
+>      /* Get the base on the powerbus */
+> -    comp =3D GETFIELD(PBCQ_NEST_IRSN_COMP,
+> +    comp =3D PNV_GETFIELD(PBCQ_NEST_IRSN_COMP,
+>                      pbcq->nest_regs[PBCQ_NEST_IRSN_COMPARE]);
+> -    mask =3D GETFIELD(PBCQ_NEST_IRSN_COMP,
+> +    mask =3D PNV_GETFIELD(PBCQ_NEST_IRSN_COMP,
+>                      pbcq->nest_regs[PBCQ_NEST_IRSN_MASK]);
+>      count =3D ((~mask) + 1) & 0x7ffff;
+>      phb->total_irq =3D count;
+> @@ -735,10 +737,10 @@ static void pnv_phb3_translate_tve(PnvPhb3DMASpace =
+*ds, hwaddr addr,
+>                                     bool is_write, uint64_t tve,
+>                                     IOMMUTLBEntry *tlb)
+>  {
+> -    uint64_t tta =3D GETFIELD(IODA2_TVT_TABLE_ADDR, tve);
+> -    int32_t  lev =3D GETFIELD(IODA2_TVT_NUM_LEVELS, tve);
+> -    uint32_t tts =3D GETFIELD(IODA2_TVT_TCE_TABLE_SIZE, tve);
+> -    uint32_t tps =3D GETFIELD(IODA2_TVT_IO_PSIZE, tve);
+> +    uint64_t tta =3D PNV_GETFIELD(IODA2_TVT_TABLE_ADDR, tve);
+> +    int32_t  lev =3D PNV_GETFIELD(IODA2_TVT_NUM_LEVELS, tve);
+> +    uint32_t tts =3D PNV_GETFIELD(IODA2_TVT_TCE_TABLE_SIZE, tve);
+> +    uint32_t tps =3D PNV_GETFIELD(IODA2_TVT_IO_PSIZE, tve);
+>      PnvPHB3 *phb =3D ds->phb;
+> =20
+>      /* Invalid levels */
+> diff --git a/hw/pci-host/pnv_phb3_msi.c b/hw/pci-host/pnv_phb3_msi.c
+> index d645468f4a6f..f283d5cd7dc1 100644
+> --- a/hw/pci-host/pnv_phb3_msi.c
+> +++ b/hw/pci-host/pnv_phb3_msi.c
+> @@ -13,6 +13,7 @@
+>  #include "hw/pci-host/pnv_phb3_regs.h"
+>  #include "hw/pci-host/pnv_phb3.h"
+>  #include "hw/ppc/pnv.h"
+> +#include "hw/ppc/pnv_utils.h" /* SETFIELD() and GETFIELD() macros */
+>  #include "hw/pci/msi.h"
+>  #include "monitor/monitor.h"
+>  #include "hw/irq.h"
+> @@ -105,14 +106,15 @@ static void phb3_msi_try_send(Phb3MsiState *msi, in=
+t srcno, bool force)
+>          return;
+>      }
+> =20
+> -    server =3D GETFIELD(IODA2_IVT_SERVER, ive);
+> -    prio =3D GETFIELD(IODA2_IVT_PRIORITY, ive);
+> +    server =3D PNV_GETFIELD(IODA2_IVT_SERVER, ive);
+> +    prio =3D PNV_GETFIELD(IODA2_IVT_PRIORITY, ive);
+>      if (!force) {
+> -        pq =3D GETFIELD(IODA2_IVT_Q, ive) | (GETFIELD(IODA2_IVT_P, ive) =
+<< 1);
+> +        pq =3D PNV_GETFIELD(IODA2_IVT_Q, ive) |
+> +            (PNV_GETFIELD(IODA2_IVT_P, ive) << 1);
+>      } else {
+>          pq =3D 0;
+>      }
+> -    gen =3D GETFIELD(IODA2_IVT_GEN, ive);
+> +    gen =3D PNV_GETFIELD(IODA2_IVT_GEN, ive);
+> =20
+>      /*
+>       * The low order 2 bits are the link pointer (Type II interrupts).
+> @@ -169,7 +171,7 @@ void pnv_phb3_msi_send(Phb3MsiState *msi, uint64_t ad=
+dr, uint16_t data,
+>          if (!phb3_msi_read_ive(msi->phb, src, &ive)) {
+>              return;
+>          }
+> -        pe =3D GETFIELD(IODA2_IVT_PE, ive);
+> +        pe =3D PNV_GETFIELD(IODA2_IVT_PE, ive);
+>          if (pe !=3D dev_pe) {
+>              qemu_log_mask(LOG_GUEST_ERROR,
+>                            "MSI %d send by PE#%d but assigned to PE#%d",
+> @@ -334,16 +336,16 @@ void pnv_phb3_msi_pic_print_info(Phb3MsiState *msi,=
+ Monitor *mon)
+>              return;
+>          }
+> =20
+> -        if (GETFIELD(IODA2_IVT_PRIORITY, ive) =3D=3D 0xff) {
+> +        if (PNV_GETFIELD(IODA2_IVT_PRIORITY, ive) =3D=3D 0xff) {
+>              continue;
+>          }
+> =20
+>          monitor_printf(mon, "  %4x %c%c server=3D%04x prio=3D%02x gen=3D=
+%d\n",
+>                         ics->offset + i,
+> -                       GETFIELD(IODA2_IVT_P, ive) ? 'P' : '-',
+> -                       GETFIELD(IODA2_IVT_Q, ive) ? 'Q' : '-',
+> -                       (uint32_t) GETFIELD(IODA2_IVT_SERVER, ive) >> 2,
+> -                       (uint32_t) GETFIELD(IODA2_IVT_PRIORITY, ive),
+> -                       (uint32_t) GETFIELD(IODA2_IVT_GEN, ive));
+> +                       PNV_GETFIELD(IODA2_IVT_P, ive) ? 'P' : '-',
+> +                       PNV_GETFIELD(IODA2_IVT_Q, ive) ? 'Q' : '-',
+> +                       (uint32_t) PNV_GETFIELD(IODA2_IVT_SERVER, ive) >>=
+ 2,
+> +                       (uint32_t) PNV_GETFIELD(IODA2_IVT_PRIORITY, ive),
+> +                       (uint32_t) PNV_GETFIELD(IODA2_IVT_GEN, ive));
+>      }
+>  }
+> diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
+> index 23cf093928ed..ac824f877cf1 100644
+> --- a/hw/pci-host/pnv_phb4.c
+> +++ b/hw/pci-host/pnv_phb4.c
+> @@ -19,6 +19,7 @@
+>  #include "hw/pci/pcie_port.h"
+>  #include "hw/ppc/pnv.h"
+>  #include "hw/ppc/pnv_xscom.h"
+> +#include "hw/ppc/pnv_utils.h" /* SETFIELD() and GETFIELD() macros */
+>  #include "hw/irq.h"
+>  #include "hw/qdev-properties.h"
+> =20
+> @@ -26,22 +27,6 @@
+>      qemu_log_mask(LOG_GUEST_ERROR, "phb4[%d:%d]: " fmt "\n",            \
+>                    (phb)->chip_id, (phb)->phb_id, ## __VA_ARGS__)
+> =20
+> -/*
+> - * QEMU version of the GETFIELD/SETFIELD macros
+> - *
+> - * These are common with the PnvXive model.
+> - */
+> -static inline uint64_t GETFIELD(uint64_t mask, uint64_t word)
+> -{
+> -    return (word & mask) >> ctz64(mask);
+> -}
+> -
+> -static inline uint64_t SETFIELD(uint64_t mask, uint64_t word,
+> -                                uint64_t value)
+> -{
+> -    return (word & ~mask) | ((value << ctz64(mask)) & mask);
+> -}
+> -
+>  static PCIDevice *pnv_phb4_find_cfg_dev(PnvPHB4 *phb)
+>  {
+>      PCIHostState *pci =3D PCI_HOST_BRIDGE(phb);
+> @@ -196,8 +181,8 @@ static void pnv_phb4_check_mbt(PnvPHB4 *phb, uint32_t=
+ index)
+>      }
+> =20
+>      /* Grab geometry from registers */
+> -    base =3D GETFIELD(IODA3_MBT0_BASE_ADDR, mbe0) << 12;
+> -    size =3D GETFIELD(IODA3_MBT1_MASK, mbe1) << 12;
+> +    base =3D PNV_GETFIELD(IODA3_MBT0_BASE_ADDR, mbe0) << 12;
+> +    size =3D PNV_GETFIELD(IODA3_MBT1_MASK, mbe1) << 12;
+>      size |=3D 0xff00000000000000ull;
+>      size =3D ~size + 1;
+> =20
+> @@ -252,8 +237,8 @@ static uint64_t *pnv_phb4_ioda_access(PnvPHB4 *phb,
+>                                        unsigned *out_table, unsigned *out=
+_idx)
+>  {
+>      uint64_t adreg =3D phb->regs[PHB_IODA_ADDR >> 3];
+> -    unsigned int index =3D GETFIELD(PHB_IODA_AD_TADR, adreg);
+> -    unsigned int table =3D GETFIELD(PHB_IODA_AD_TSEL, adreg);
+> +    unsigned int index =3D PNV_GETFIELD(PHB_IODA_AD_TADR, adreg);
+> +    unsigned int table =3D PNV_GETFIELD(PHB_IODA_AD_TSEL, adreg);
+>      unsigned int mask;
+>      uint64_t *tptr =3D NULL;
+> =20
+> @@ -318,7 +303,7 @@ static uint64_t *pnv_phb4_ioda_access(PnvPHB4 *phb,
+>      }
+>      if (adreg & PHB_IODA_AD_AUTOINC) {
+>          index =3D (index + 1) & mask;
+> -        adreg =3D SETFIELD(PHB_IODA_AD_TADR, adreg, index);
+> +        adreg =3D PNV_SETFIELD(PHB_IODA_AD_TADR, adreg, index);
+>      }
+> =20
+>      phb->regs[PHB_IODA_ADDR >> 3] =3D adreg;
+> @@ -369,7 +354,7 @@ static void pnv_phb4_ioda_write(PnvPHB4 *phb, uint64_=
+t val)
+>      case IODA3_TBL_MIST: {
+>          /* Special mask for MIST partial write */
+>          uint64_t adreg =3D phb->regs[PHB_IODA_ADDR >> 3];
+> -        uint32_t mmask =3D GETFIELD(PHB_IODA_AD_MIST_PWV, adreg);
+> +        uint32_t mmask =3D PNV_GETFIELD(PHB_IODA_AD_MIST_PWV, adreg);
+>          uint64_t v =3D *tptr;
+>          if (mmask =3D=3D 0) {
+>              mmask =3D 0xf;
+> @@ -476,7 +461,7 @@ static void pnv_phb4_update_xsrc(PnvPHB4 *phb)
+>      phb->xsrc.esb_shift =3D shift;
+>      phb->xsrc.esb_flags =3D flags;
+> =20
+> -    lsi_base =3D GETFIELD(PHB_LSI_SRC_ID, phb->regs[PHB_LSI_SOURCE_ID >>=
+ 3]);
+> +    lsi_base =3D PNV_GETFIELD(PHB_LSI_SRC_ID, phb->regs[PHB_LSI_SOURCE_I=
+D >> 3]);
+>      lsi_base <<=3D 3;
+> =20
+>      /* TODO: handle reset values of PHB_LSI_SRC_ID */
+> @@ -747,12 +732,13 @@ static uint64_t pnv_phb4_xscom_read(void *opaque, h=
+waddr addr, unsigned size)
+>              return ~0ull;
+>          }
+>          size =3D (phb->scom_hv_ind_addr_reg & PHB_SCOM_HV_IND_ADDR_4B) ?=
+ 4 : 8;
+> -        offset =3D GETFIELD(PHB_SCOM_HV_IND_ADDR_ADDR, phb->scom_hv_ind_=
+addr_reg);
+> +        offset =3D PNV_GETFIELD(PHB_SCOM_HV_IND_ADDR_ADDR,
+> +                              phb->scom_hv_ind_addr_reg);
+>          val =3D pnv_phb4_reg_read(phb, offset, size);
+>          if (phb->scom_hv_ind_addr_reg & PHB_SCOM_HV_IND_ADDR_AUTOINC) {
+>              offset +=3D size;
+>              offset &=3D 0x3fff;
+> -            phb->scom_hv_ind_addr_reg =3D SETFIELD(PHB_SCOM_HV_IND_ADDR_=
+ADDR,
+> +            phb->scom_hv_ind_addr_reg =3D PNV_SETFIELD(PHB_SCOM_HV_IND_A=
+DDR_ADDR,
+>                                                   phb->scom_hv_ind_addr_r=
+eg,
+>                                                   offset);
+>          }
+> @@ -799,12 +785,13 @@ static void pnv_phb4_xscom_write(void *opaque, hwad=
+dr addr,
+>              break;
+>          }
+>          size =3D (phb->scom_hv_ind_addr_reg & PHB_SCOM_HV_IND_ADDR_4B) ?=
+ 4 : 8;
+> -        offset =3D GETFIELD(PHB_SCOM_HV_IND_ADDR_ADDR, phb->scom_hv_ind_=
+addr_reg);
+> +        offset =3D PNV_GETFIELD(PHB_SCOM_HV_IND_ADDR_ADDR,
+> +                              phb->scom_hv_ind_addr_reg);
+>          pnv_phb4_reg_write(phb, offset, val, size);
+>          if (phb->scom_hv_ind_addr_reg & PHB_SCOM_HV_IND_ADDR_AUTOINC) {
+>              offset +=3D size;
+>              offset &=3D 0x3fff;
+> -            phb->scom_hv_ind_addr_reg =3D SETFIELD(PHB_SCOM_HV_IND_ADDR_=
+ADDR,
+> +            phb->scom_hv_ind_addr_reg =3D PNV_SETFIELD(PHB_SCOM_HV_IND_A=
+DDR_ADDR,
+>                                                   phb->scom_hv_ind_addr_r=
+eg,
+>                                                   offset);
+>          }
+> @@ -860,7 +847,7 @@ static void pnv_phb4_set_irq(void *opaque, int irq_nu=
+m, int level)
+>      if (irq_num > 3) {
+>          phb_error(phb, "IRQ %x is not an LSI", irq_num);
+>      }
+> -    lsi_base =3D GETFIELD(PHB_LSI_SRC_ID, phb->regs[PHB_LSI_SOURCE_ID >>=
+ 3]);
+> +    lsi_base =3D PNV_GETFIELD(PHB_LSI_SRC_ID, phb->regs[PHB_LSI_SOURCE_I=
+D >> 3]);
+>      lsi_base <<=3D 3;
+>      qemu_set_irq(phb->qirqs[lsi_base + irq_num], level);
+>  }
+> @@ -910,10 +897,10 @@ static void pnv_phb4_translate_tve(PnvPhb4DMASpace =
+*ds, hwaddr addr,
+>                                     bool is_write, uint64_t tve,
+>                                     IOMMUTLBEntry *tlb)
+>  {
+> -    uint64_t tta =3D GETFIELD(IODA3_TVT_TABLE_ADDR, tve);
+> -    int32_t  lev =3D GETFIELD(IODA3_TVT_NUM_LEVELS, tve);
+> -    uint32_t tts =3D GETFIELD(IODA3_TVT_TCE_TABLE_SIZE, tve);
+> -    uint32_t tps =3D GETFIELD(IODA3_TVT_IO_PSIZE, tve);
+> +    uint64_t tta =3D PNV_GETFIELD(IODA3_TVT_TABLE_ADDR, tve);
+> +    int32_t  lev =3D PNV_GETFIELD(IODA3_TVT_NUM_LEVELS, tve);
+> +    uint32_t tts =3D PNV_GETFIELD(IODA3_TVT_TCE_TABLE_SIZE, tve);
+> +    uint32_t tps =3D PNV_GETFIELD(IODA3_TVT_IO_PSIZE, tve);
+> =20
+>      /* Invalid levels */
+>      if (lev > 4) {
 
 --=20
-Peter Xu
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--+Hr//EUsa8//ouuB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6FMlYACgkQbDjKyiDZ
+s5JdgRAAhqLbARKtm+4e6kxp1gbfY93Kh99gwxeTTr9wmW5HPHfnlU8MS5Phh9xJ
+DAJ84NrNcUof9eRLOsFs6ZLfUFewjRpP3VWNcZWsRmpsz9rc3wvOMe5IZWQoOrsk
+U/jg2gi7J/7yXLSs04OAjWkHgv93gGs0DQkP4sfK1HBme5BehTyj5oBG3yN6h9ub
+NBE56V/fDYNo+ruE6KnSRyGxwFRVoyMYq5NB0wCVEZj6ULAgtDYwTVdVnxLHKcCj
+1AfcuYVRvFNIUtXa7pGQZcQ6tfldszQd9A1Q2QjeFw1A2xcMpnTUo6d8YpBYU7EJ
+pzC0SMXS9RzhseuMiA7rmhsz3TN6SIGX4hqMXZDcLfniy+gj9Omg5PWVGuojyLgB
+G49WuBmMn3dWu682GXbU3DxezTURFVGdH7MPKf5fE/tJq8nNsVnuJrTm1RRAXqOp
+dKjRa4okN6QEiCDaEHV4r+GSxOscxkU3ipq6EvUnHCmG9Q1fAl6tzmcnIZuY3iRD
+xBHUS71iN8wJee1D2WIn3/ioPWY/P6wRq0WDcBZIGiV/qFPamT+cc/I2oEFBXNuY
+mUwgGQ6WuMs+iaptBf7OTzXyB6soEtWFZM44fN0qoQyTmA1Yj29T1/r/LKH8l9OF
+jwGUootrDEJmRS1v8wX3KB+fvwSw6K0fhwksgu2dPfjPz2t18Nw=
+=5SWM
+-----END PGP SIGNATURE-----
+
+--+Hr//EUsa8//ouuB--
 
