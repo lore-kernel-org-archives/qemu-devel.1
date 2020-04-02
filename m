@@ -2,80 +2,90 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D85C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CC4C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:20:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFBC32063A
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:17:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 892A4206D3
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:20:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9+AwPF6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFBC32063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BmIqn9fg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 892A4206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJvyO-00027m-Ul
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 05:17:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51422)
+	id 1jJw18-0003Q9-LD
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 05:20:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bharata.rao@gmail.com>) id 1jJvxa-0001YW-DV
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:16:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jJw0W-0002ub-HP
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bharata.rao@gmail.com>) id 1jJvxZ-0000aR-9P
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:16:26 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46295)
+ (envelope-from <alex.bennee@linaro.org>) id 1jJw0V-0006V3-25
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:19:28 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:41800)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bharata.rao@gmail.com>)
- id 1jJvxW-0000IJ-1o; Thu, 02 Apr 2020 05:16:22 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j17so3202179wru.13;
- Thu, 02 Apr 2020 02:16:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iAhtxVtaOds6eK1YH4pS9WVZaNOsJiu1o5+S01e/E4o=;
- b=Q9+AwPF6u/Pc1/7MLTUdfDnQ0H9ejTMCIJv45qfpFafyMRrEguMCcM1rZ0L/Zc7p+s
- oyl7oAawQ1CEN1RYm0eMqkAFCM73w5YsZ3FS3rMSh8Vd9lEmD28Gg8SSIyF9hUuCi6Re
- /FMbXYt56EV7cps9YiFQ8Opb7QXSirWnSrKIV2bnRop/9iV7MthDqrzOUzH+FH3/f/OX
- vz2kR2he06ummjXSfn0XnwLX7F5gabj/Es8TAg9BGWMbx8RRIOjh5+5TVOCh3Ho2IFHG
- u2XJnkBPZWN/iQGK3S9sOQ+yb1Ey/3PfDu4+qKlpF43W6d6SB+wCYSb3mhYlhAQbrEte
- HWgw==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jJw0U-0006Ur-Rc
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:19:27 -0400
+Received: by mail-wr1-x434.google.com with SMTP id h9so3270384wrc.8
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 02:19:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=lawQHY34iyxvcPzgvRM9obOKitLdPP16oBDM81cQ+hg=;
+ b=BmIqn9fgTp7EC1bBYVnwS+2fQUyKMaQXeQUWeOFzo8ucg6UeigMod65rBufDpLj3vq
+ sOS/vWHJRD+/VO2wMIG07T3GbBeNSWVAM+OkH/x5Ouns2k0GIqmzj09su5wxLi8Ywoeu
+ PkY3zeZDjkkbwzSoavQwC3wqJa31eE5Y9b67Z447smmZq1EltwflviKHRRi6ktmLhHhW
+ 5Us+dOEnyl7OMSLnAHYDXdx0LL79cHJpt+szba2aEj1gRH8fo5rU8xp43YESamF4mf43
+ al6f8xrk3OWWF8UAJKLtvBOgwC9LH+Iwn2bzL4M0zvrWxJtrZIS0CPSfAKcjI/tr1jP+
+ m+/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=iAhtxVtaOds6eK1YH4pS9WVZaNOsJiu1o5+S01e/E4o=;
- b=Ic9p2UxDnB27+hM0MdXvd7+Jky0Xy5p68AI8iguNv+FJiT4/T4FlHM/fU37I/fYbsc
- OL7gNkkKY3OKX5RkEbg7sT+VhbT34wu6mg4Brrb8RPu7Vi/a/AqU5dwP7ueuY7rNyErY
- f7f4p4BNGv9KsAIDxx8ENlVGd0EVRkMV4UEEW5O3e34eosVN5UzcpIP3XgbIi4CBdsRP
- 3SyX+EFhQHFSvSmuK9JW5ei78adSb6gFKghJB/twBIOJepnvrc+QzelNBUanRNfrB6aK
- UyL+h8dN+K0x+PZOfQ9KN9g24jRk0ql97VF2hjkO3R3L94cB/1vd3vJgvuPEJXI/Es7H
- ZYMw==
-X-Gm-Message-State: AGi0PuaJhPRTs21+vfrPVMv7c45luIa96mC4aQFdw+QtAU+ah+ahVW4R
- qWDQLxSwgXHlo3AOmrK2wheEUvS1KheVoQGtOPo=
-X-Google-Smtp-Source: APiQypJ3rxa+z2fsndWOX60AnFEaTG85k8T1fndG5w2dcXgKQrXmoAms+pikOWIJtcK2hqe96vdwjLUdUbI79XWBJ/s=
-X-Received: by 2002:adf:f1c2:: with SMTP id z2mr2609375wro.40.1585818980633;
- Thu, 02 Apr 2020 02:16:20 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=lawQHY34iyxvcPzgvRM9obOKitLdPP16oBDM81cQ+hg=;
+ b=bXT+IB2Rog3AM26xYSTWlC/BYtqR3Xzd35LtrJQNqIeh4DhTyLD4RDYQGiXTetXQ9B
+ wtH4trfvKOP3+AeTJTGM2L6QAOueB2xHojFw3+Q0KIgzTsWsnQEFpzKel1Tw+xvnpebs
+ woIyemXmXd91utOwe55GvlRCsmkjO+8auhuvjDEG1ufAk6znqpGqGDbKaZV/vXH+7U6j
+ XCAYlnIm6l3ST4xe1elWDmhu9tNVRtP7Fv0KnKBBn3dNXFVqjzQ1ZVXCwk/wSP+lO2Ga
+ rie227F9kzVdon+O/K6LSFn7Xx6nEr93RaM25MVUp0aGIaGkn9bnbgpOd0ukN7brIYlX
+ qpGw==
+X-Gm-Message-State: AGi0PubuoIcq2Z/SRrtWG+3zOrsEksqAEeTJ8pJx7U6wwBtgfwDJKGXI
+ loaDkLoooPz6lf6tWtuLvaTQNQ==
+X-Google-Smtp-Source: APiQypLUvCwbQgMjIbHVdknu84NVSPLf7foHVUl+9x4QcaqTBpKtk44vyLEh9/1z8j9C9wuzAGcOnw==
+X-Received: by 2002:adf:ce0d:: with SMTP id p13mr2471828wrn.8.1585819165512;
+ Thu, 02 Apr 2020 02:19:25 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r9sm6439041wma.47.2020.04.02.02.19.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Apr 2020 02:19:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AD61F1FF7E;
+ Thu,  2 Apr 2020 10:19:23 +0100 (BST)
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+ <87sghmbfgc.fsf@dusky.pond.sub.org> <20200402084719.GB423991@redhat.com>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+In-reply-to: <20200402084719.GB423991@redhat.com>
+Date: Thu, 02 Apr 2020 10:19:23 +0100
+Message-ID: <87k12ydz38.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200306002202.176732-1-leonardo@linux.ibm.com>
- <20200310023943.GH660117@umbus.fritz.box>
-In-Reply-To: <20200310023943.GH660117@umbus.fritz.box>
-From: Bharata B Rao <bharata.rao@gmail.com>
-Date: Thu, 2 Apr 2020 14:46:09 +0530
-Message-ID: <CAGZKiBpO4HxrE06dT39sj95_qcTvQK_g5Ev5TKC5T9wimphM_Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/1] ppc/spapr: Add hotplugged flag on DIMM LMBs on
- drmem_v2
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::434
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,42 +97,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Leonardo Bras <leonardo@linux.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Bharata B Rao <bharata.rao@in.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 10, 2020 at 8:24 AM David Gibson
-<david@gibson.dropbear.id.au> wrote:
+
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+
+> On Thu, Apr 02, 2020 at 07:54:11AM +0200, Markus Armbruster wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>=20
+>> > On Wed, 1 Apr 2020 at 10:03, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> >>
+>> >> QEMU's Error was patterned after GLib's GError.  Differences include:
+>> >
+>> > From my POV the major problem with Error as we have it today
+>> > is that it makes the simple process of writing code like
+>> > device realize functions horrifically boilerplate heavy;
+>> > for instance this is from hw/arm/armsse.c:
+>> >
+>> >         object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
+>> >                                  "memory", &err);
+>> >         if (err) {
+>> >             error_propagate(errp, err);
+>> >             return;
+>> >         }
+>> >         object_property_set_link(cpuobj, OBJECT(s), "idau", &err);
+>> >         if (err) {
+>> >             error_propagate(errp, err);
+>> >             return;
+>> >         }
+>> >         object_property_set_bool(cpuobj, true, "realized", &err);
+>> >         if (err) {
+>> >             error_propagate(errp, err);
+>> >             return;
+>> >         }
+>> >
+>> > 16 lines of code just to set 2 properties on an object
+>> > and realize it. It's a lot of boilerplate and as
+>> > a result we frequently get it wrong or take shortcuts
+>> > (eg forgetting the error-handling entirely, calling
+>> > error_propagate just once for a whole sequence of
+>> > calls, taking the lazy approach and using err_abort
+>> > or err_fatal when we ought really to be propagating
+>> > an error, etc). I haven't looked at 'auto propagation'
+>> > yet, hopefully it will help?
+>>=20
+>> With that, you can have
+>>=20
+>>         object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
+>>                                  "memory", errp);
+>>         if (*errp) {
+>>             return;
+>>         }
+>>         object_property_set_link(cpuobj, OBJECT(s), "idau", errp);
+>>         if (*errp) {
+>>             return;
+>>         }
+>>         object_property_set_bool(cpuobj, true, "realized", errp);
+>>         if (*errp) {
+>>             return;
+>>         }
+>>=20
+>> but you have to add
+>>=20
+>>         ERRP_AUTO_PROPAGATE();
+>>=20
+>> right at the beginning of the function.
+>>=20
+>> It's a small improvement.  A bigger one is
+>>=20
+>>         if (object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]=
+),
+>>                                      "memory", errp)) {
+>>             return;
+>>         }
+>>         if (object_property_set_link(cpuobj, OBJECT(s), "idau", errp)) {
+>>             return;
+>>         }
+>>         if (object_property_set_bool(cpuobj, true, "realized", errp)) {
+>>             return;
+>>         }
+>>=20
+>> This is item "Return value conventions" in the message you replied to.
 >
-> On Thu, Mar 05, 2020 at 09:22:02PM -0300, Leonardo Bras wrote:
-> > On reboot, all memory that was previously added using object_add and
-> > device_add is placed in this DIMM area.
-> >
-> > The new SPAPR_LMB_FLAGS_HOTPLUGGED flag helps Linux to put this memory in
-> > the correct memory zone, so no unmovable allocations are made there,
-> > allowing the object to be easily hot-removed by device_del and
-> > object_del.
-> >
-> > Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
-> >
-> > ---
-> > The new flag was already proposed on Power Architecture documentation,
-> > and it's waiting for approval.
-> >
-> > I would like to get your comments on this change, but it's still not
-> > ready for being merged.
+> Even better, we can then string the checks together
 >
-> This looks reasonable to me - at the very least it doesn't look like
-> it could do much harm.
+>         if (object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
+>                                       "memory", errp) ||
+>             object_property_set_link(cpuobj, OBJECT(s), "idau", errp) ||
+>             object_property_set_bool(cpuobj, true, "realized", errp)) {
+>              return;
+>         }
 
-Looks good to me, also tested with PowerKVM guests.
+You know at this point I wonder if we can't come up with some data table
+that describes all these object interactions and a helper function that
+processes it and tells us if it worked or not?
 
-Reviewed-by: Bharata B Rao <bharata@linux.ibm.com>
+We are essentially just filling out an data structure anyway with all
+this stuff.
 
-Regards,
-Bharata.
--- 
-http://raobharata.wordpress.com/
+>=20=20
+> Regards,
+> Daniel
+
+
+--=20
+Alex Benn=C3=A9e
 
