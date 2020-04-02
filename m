@@ -2,69 +2,120 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3498C2D0F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 04:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 922BBC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 05:32:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A59E720747
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 04:04:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59E720747
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 485D120784
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 05:32:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nDDcFxQy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485D120784
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJr5r-0001KV-OG
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 00:04:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50721)
+	id 1jJsSz-0003C8-BD
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 01:32:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <teawaterz@linux.alibaba.com>) id 1jJr4W-0000sR-Kh
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 00:03:18 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJsS5-0002mm-E0
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 01:31:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <teawaterz@linux.alibaba.com>) id 1jJr4P-0004pA-3Z
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 00:03:10 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:58504)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <teawaterz@linux.alibaba.com>)
- id 1jJr4O-0004CV-PD
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 00:03:09 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R171e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04357; MF=teawaterz@linux.alibaba.com;
- NM=1; PH=DS; RN=12; SR=0; TI=SMTPD_---0TuNonMf_1585800168; 
-Received: from 127.0.0.1(mailfrom:teawaterz@linux.alibaba.com
- fp:SMTPD_---0TuNonMf_1585800168) by smtp.aliyun-inc.com(127.0.0.1);
- Thu, 02 Apr 2020 12:02:53 +0800
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER to
- handle THP spilt issue
-From: teawater <teawaterz@linux.alibaba.com>
-In-Reply-To: <5e0e0659-5f70-2162-96be-5fcd0d3f46ad@redhat.com>
-Date: Thu, 2 Apr 2020 12:02:47 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <07AF0005-2711-4137-A96D-DA264A05C302@linux.alibaba.com>
-References: <20200326031817-mutt-send-email-mst@kernel.org>
- <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
- <20200326054554-mutt-send-email-mst@kernel.org>
- <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
- <20200331091718-mutt-send-email-mst@kernel.org>
- <02a393ce-c4b4-ede9-7671-76fa4c19097a@redhat.com>
- <20200331093300-mutt-send-email-mst@kernel.org>
- <b69796e0-fa41-a219-c3e5-a11e9f5f18bf@redhat.com>
- <20200331100359-mutt-send-email-mst@kernel.org>
- <85f699d4-459a-a319-0a8f-96c87d345c49@redhat.com>
- <BABD09DC-217E-4F00-9C05-74ABB4B1E13D@vmware.com>
- <5e0e0659-5f70-2162-96be-5fcd0d3f46ad@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 47.88.44.36
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jJsS3-0004Ie-KD
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 01:31:40 -0400
+Received: from mail-db8eur05on2138.outbound.protection.outlook.com
+ ([40.107.20.138]:22241 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jJsS3-0004Hp-0k
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 01:31:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O6hPWBQzy7w/FgNPUbERJSEvNhUdvbiccVWCIg9zZsWEGdeBO8eoKWSF2A0KmKM6DFf4wMbaqoAUtIk3TWUgSCQZtQFiG/oClTErIrryGkiy5rQeCnRzX1h26IkXx0JxHUbjlSUmWzlcMQqTBO4sF3wA9Xzb1Lpg2eS84P+zsiOdflBSNqmHFPbF/rOAT0HM9PElvFghz/ci/Qk3DeGfNJZv2WXcg4L8sSl6hd+CBDjJTwRcaahpYQj1W5RVysZE4UbxjGEQZr+d1kT7SQEjc2JQrHSb98Fcm/5FggbHTgFFkmewYKLfowu4FnBZTjGFCd67wVfi7lZ4BXGHgCvQmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pPERsdTnWGCvFEAedgVPqGnzi5M+Noqu+3TGZx1Juas=;
+ b=DsHc/IuZiZP4Gq1aAG3kXd1yrOQP7SmQdgWRSMdLhOKhru8XqXCttffZ3/0cty793x8968CZYrMBbk1Mt1v9tOSYO8+9f7N6voDTKtIMVbZMTJP511ON3BNlLdAHFqnIkrzEH+KDAf2sKS8mR2neZc5CpqDWa2YcEajvd1ZE5DxE24DzBXvFkcNWJb0k8OklWzE0P2uZoRw+UIHwlJxJc4JL/1Z0Uu4X37MP8uYfr94W3zcvD3SiCT7KWLcZP+fwnCWxtFsaCL2A+OONoS9OQLRXyGxZy6ZWLBcrpbl/wSK+d19mXGHPlupemXbztwHJ2LfqpbUyXa/4ueS2R0p9/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pPERsdTnWGCvFEAedgVPqGnzi5M+Noqu+3TGZx1Juas=;
+ b=nDDcFxQygE9I2H26yUVwQB8j6kZg84x5/pPYUMbN8wevdQWLNAkU6IjG/9mbfFldXsBaZ9ePo7lPtCP4fJpUoSCTtAukmZhCGW8r/AzJIYE+8Sg5j5QFjsdaTX9fp31mB9jBk97qIH+iujT86jLoHnEHt06SsM1Mj8BWDFxz9Bw=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5495.eurprd08.prod.outlook.com (10.141.172.19) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.16; Thu, 2 Apr 2020 05:31:36 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.016; Thu, 2 Apr 2020
+ 05:31:36 +0000
+Subject: Re: Questionable aspects of QEMU Error's design
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200402083134343
+Message-ID: <a3ca8c60-dd83-ea7b-c268-0c94e441bb52@virtuozzo.com>
+Date: Thu, 2 Apr 2020 08:31:34 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0011.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.23) by
+ FR2P281CA0011.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.16 via Frontend Transport; Thu, 2 Apr 2020 05:31:35 +0000
+X-Tagtoolbar-Keys: D20200402083134343
+X-Originating-IP: [185.215.60.23]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b1fc8563-d3ef-4a04-d5cc-08d7d6c71c65
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5495:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5495B4267F1F2D5F04D977BEC1C60@AM7PR08MB5495.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
+X-Forefront-PRVS: 0361212EA8
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(39850400004)(346002)(376002)(366004)(396003)(136003)(81156014)(186003)(31686004)(5660300002)(31696002)(81166006)(8676002)(16576012)(110136005)(26005)(16526019)(478600001)(2906002)(86362001)(66556008)(66476007)(36756003)(316002)(956004)(2616005)(6486002)(52116002)(4326008)(8936002)(54906003)(66946007);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iKXk/ZGDWOZOgIqEtmit6ugh44fL94RQM3j70rTAOhFdWXXWvMC/iwFkruAKo7OmcELPy5tsWGDP3dNnUk8gYBKaPVFF6DFShbdM3DhS5iScyB+KCC4Zx44+PNvM/lsKwPqlWxvDgTLB8MRZ6Q1H2FHEs8DwB/0naG1IpcS6LgtlcR2XCdoOjUifZa8cXKpbabiwkRmWTHOmLSVuvGHHlCShGT4VqqrGoAEsa6ZSW/3iq1TiiPHP3uasty6lU2flc6dUIR4h3qgk/QaU9LBifRtqANyupIaX9cIwUo0qvrWNj0LBznPD+x/RS3O1/cJTHBsOuk7oi04tSTqKEnqEjB64/yeLxTyi5DkzDCut0nquvl/q+lQxo/VvC/VgFYxsQeW/hs2uq5ATeY42PKBmYzMCVp6odzJ/7y//LeWjdanWT4KHyTD9ku06aurTorD7
+X-MS-Exchange-AntiSpam-MessageData: CGoWcTNfNHRhOS3KW4bIjeacD3vC1SHGGUfACmfggW2pzFLm/JMOtDGT2Jnt6MV5C8H221iWfawy6eAi+VAryQADZBRzV+EqsoqAjrjG6MGdjzGINbWzqVAiOUbtRydnIwk4PBtv+hFpqRq54NJfeQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1fc8563-d3ef-4a04-d5cc-08d7d6c71c65
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2020 05:31:36.1666 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 61XoKgNpaEQQ2yuPrs3JPXOJDXAr2G8N0ubpUzpBObKhHyJCYhGE8jRsL8n5569iExi+hgI3yow/Q3J9nlm8q7yCtsg8zsk8usfnZ3v4LG4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5495
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.20.138
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,264 +127,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pagupta@redhat.com" <pagupta@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "mojha@codeaurora.org" <mojha@codeaurora.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- LKML <linux-kernel@vger.kernel.org>, Nadav Amit <namit@vmware.com>,
- Alexander Duyck <alexander.h.duyck@linux.intel.com>,
- Linux Virtualization <virtualization@lists.linux-foundation.org>,
- Andrew Morton <akpm@linux-foundation.org>, Hui Zhu <teawater@gmail.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+01.04.2020 23:15, Peter Maydell wrote:
+> On Wed, 1 Apr 2020 at 10:03, Markus Armbruster <armbru@redhat.com> wrote:
+>>
+>> QEMU's Error was patterned after GLib's GError.  Differences include:
+> 
+>  From my POV the major problem with Error as we have it today
+> is that it makes the simple process of writing code like
+> device realize functions horrifically boilerplate heavy;
+> for instance this is from hw/arm/armsse.c:
+> 
+>          object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
+>                                   "memory", &err);
+>          if (err) {
+>              error_propagate(errp, err);
+>              return;
+>          }
+>          object_property_set_link(cpuobj, OBJECT(s), "idau", &err);
+>          if (err) {
+>              error_propagate(errp, err);
+>              return;
+>          }
+>          object_property_set_bool(cpuobj, true, "realized", &err);
+>          if (err) {
+>              error_propagate(errp, err);
+>              return;
+>          }
+> 
+> 16 lines of code just to set 2 properties on an object
+> and realize it. It's a lot of boilerplate and as
+> a result we frequently get it wrong or take shortcuts
+> (eg forgetting the error-handling entirely, calling
+> error_propagate just once for a whole sequence of
+> calls, taking the lazy approach and using err_abort
+> or err_fatal when we ought really to be propagating
+> an error, etc). I haven't looked at 'auto propagation'
+> yet, hopefully it will help?
+
+Yes, after it the code above will look like this:
+
+... some_func(..., errp)
+{
+     ERRP_AUTO_PROPAGATE(); # magic macro at function start, and no "Error *err" definition
+
+...
+           object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
+                                    "memory", errp);
+           if (*errp) {
+               return;
+           }
+           object_property_set_link(cpuobj, OBJECT(s), "idau", errp);
+           if (*errp) {
+               return;
+           }
+           object_property_set_bool(cpuobj, true, "realized", errp);
+           if (*errp) {
+               return;
+           }
+...
+}
+
+  - propagation is automatic, errp is used directly and may be safely dereferenced.
 
 
-> 2020=E5=B9=B44=E6=9C=881=E6=97=A5 17:48=EF=BC=8CDavid Hildenbrand =
-<david@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On 31.03.20 18:37, Nadav Amit wrote:
->>> On Mar 31, 2020, at 7:09 AM, David Hildenbrand <david@redhat.com> =
-wrote:
->>>=20
->>> On 31.03.20 16:07, Michael S. Tsirkin wrote:
->>>> On Tue, Mar 31, 2020 at 04:03:18PM +0200, David Hildenbrand wrote:
->>>>> On 31.03.20 15:37, Michael S. Tsirkin wrote:
->>>>>> On Tue, Mar 31, 2020 at 03:32:05PM +0200, David Hildenbrand =
-wrote:
->>>>>>> On 31.03.20 15:24, Michael S. Tsirkin wrote:
->>>>>>>> On Tue, Mar 31, 2020 at 12:35:24PM +0200, David Hildenbrand =
-wrote:
->>>>>>>>> On 26.03.20 10:49, Michael S. Tsirkin wrote:
->>>>>>>>>> On Thu, Mar 26, 2020 at 08:54:04AM +0100, David Hildenbrand =
-wrote:
->>>>>>>>>>>> Am 26.03.2020 um 08:21 schrieb Michael S. Tsirkin =
-<mst@redhat.com>:
->>>>>>>>>>>>=20
->>>>>>>>>>>> =EF=BB=BFOn Thu, Mar 12, 2020 at 09:51:25AM +0100, David =
-Hildenbrand wrote:
->>>>>>>>>>>>>> On 12.03.20 09:47, Michael S. Tsirkin wrote:
->>>>>>>>>>>>>> On Thu, Mar 12, 2020 at 09:37:32AM +0100, David =
-Hildenbrand wrote:
->>>>>>>>>>>>>>> 2. You are essentially stealing THPs in the guest. So =
-the fastest
->>>>>>>>>>>>>>> mapping (THP in guest and host) is gone. The guest won't =
-be able to make
->>>>>>>>>>>>>>> use of THP where it previously was able to. I can =
-imagine this implies a
->>>>>>>>>>>>>>> performance degradation for some workloads. This needs a =
-proper
->>>>>>>>>>>>>>> performance evaluation.
->>>>>>>>>>>>>>=20
->>>>>>>>>>>>>> I think the problem is more with the alloc_pages API.
->>>>>>>>>>>>>> That gives you exactly the given order, and if there's
->>>>>>>>>>>>>> a larger chunk available, it will split it up.
->>>>>>>>>>>>>>=20
->>>>>>>>>>>>>> But for balloon - I suspect lots of other users,
->>>>>>>>>>>>>> we do not want to stress the system but if a large
->>>>>>>>>>>>>> chunk is available anyway, then we could handle
->>>>>>>>>>>>>> that more optimally by getting it all in one go.
->>>>>>>>>>>>>>=20
->>>>>>>>>>>>>>=20
->>>>>>>>>>>>>> So if we want to address this, IMHO this calls for a new =
-API.
->>>>>>>>>>>>>> Along the lines of
->>>>>>>>>>>>>>=20
->>>>>>>>>>>>>>  struct page *alloc_page_range(gfp_t gfp, unsigned int =
-min_order,
->>>>>>>>>>>>>>                  unsigned int max_order, unsigned int =
-*order)
->>>>>>>>>>>>>>=20
->>>>>>>>>>>>>> the idea would then be to return at a number of pages in =
-the given
->>>>>>>>>>>>>> range.
->>>>>>>>>>>>>>=20
->>>>>>>>>>>>>> What do you think? Want to try implementing that?
->>>>>>>>>>>>>=20
->>>>>>>>>>>>> You can just start with the highest order and decrement =
-the order until
->>>>>>>>>>>>> your allocation succeeds using alloc_pages(), which would =
-be enough for
->>>>>>>>>>>>> a first version. At least I don't see the immediate need =
-for a new
->>>>>>>>>>>>> kernel API.
->>>>>>>>>>>>=20
->>>>>>>>>>>> OK I remember now.  The problem is with reclaim. Unless =
-reclaim is
->>>>>>>>>>>> completely disabled, any of these calls can sleep. After it =
-wakes up,
->>>>>>>>>>>> we would like to get the larger order that has become =
-available
->>>>>>>>>>>> meanwhile.
->>>>>>>>>>>=20
->>>>>>>>>>> Yes, but that=E2=80=98s a pure optimization IMHO.
->>>>>>>>>>> So I think we should do a trivial implementation first and =
-then see what we gain from a new allocator API. Then we might also be =
-able to justify it using real numbers.
->>>>>>>>>>=20
->>>>>>>>>> Well how do you propose implement the necessary semantics?
->>>>>>>>>> I think we are both agreed that alloc_page_range is more or
->>>>>>>>>> less what's necessary anyway - so how would you approximate =
-it
->>>>>>>>>> on top of existing APIs?
->>>>>>>>> diff --git a/include/linux/balloon_compaction.h =
-b/include/linux/balloon_compaction.h
->>>>>>=20
->>>>>> .....
->>>>>>=20
->>>>>>=20
->>>>>>>>> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
->>>>>>>>> index 26de020aae7b..067810b32813 100644
->>>>>>>>> --- a/mm/balloon_compaction.c
->>>>>>>>> +++ b/mm/balloon_compaction.c
->>>>>>>>> @@ -112,23 +112,35 @@ size_t balloon_page_list_dequeue(struct =
-balloon_dev_info *b_dev_info,
->>>>>>>>> EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
->>>>>>>>>=20
->>>>>>>>> /*
->>>>>>>>> - * balloon_page_alloc - allocates a new page for insertion =
-into the balloon
->>>>>>>>> - *			page list.
->>>>>>>>> + * balloon_pages_alloc - allocates a new page (of at most the =
-given order)
->>>>>>>>> + * 			 for insertion into the balloon page =
-list.
->>>>>>>>> *
->>>>>>>>> * Driver must call this function to properly allocate a new =
-balloon page.
->>>>>>>>> * Driver must call balloon_page_enqueue before definitively =
-removing the page
->>>>>>>>> * from the guest system.
->>>>>>>>> *
->>>>>>>>> + * Will fall back to smaller orders if allocation fails. The =
-order of the
->>>>>>>>> + * allocated page is stored in page->private.
->>>>>>>>> + *
->>>>>>>>> * Return: struct page for the allocated page or NULL on =
-allocation failure.
->>>>>>>>> */
->>>>>>>>> -struct page *balloon_page_alloc(void)
->>>>>>>>> +struct page *balloon_pages_alloc(int order)
->>>>>>>>> {
->>>>>>>>> -	struct page *page =3D =
-alloc_page(balloon_mapping_gfp_mask() |
->>>>>>>>> -				       __GFP_NOMEMALLOC | =
-__GFP_NORETRY |
->>>>>>>>> -				       __GFP_NOWARN);
->>>>>>>>> -	return page;
->>>>>>>>> +	struct page *page;
->>>>>>>>> +
->>>>>>>>> +	while (order >=3D 0) {
->>>>>>>>> +		page =3D alloc_pages(balloon_mapping_gfp_mask() =
-|
->>>>>>>>> +				   __GFP_NOMEMALLOC | =
-__GFP_NORETRY |
->>>>>>>>> +				   __GFP_NOWARN, order);
->>>>>>>>> +		if (page) {
->>>>>>>>> +			set_page_private(page, order);
->>>>>>>>> +			return page;
->>>>>>>>> +		}
->>>>>>>>> +		order--;
->>>>>>>>> +	}
->>>>>>>>> +	return NULL;
->>>>>>>>> }
->>>>>>>>> -EXPORT_SYMBOL_GPL(balloon_page_alloc);
->>>>>>>>> +EXPORT_SYMBOL_GPL(balloon_pages_alloc);
->>>>>>>>>=20
->>>>>>>>> /*
->>>>>>>>> * balloon_page_enqueue - inserts a new page into the balloon =
-page list.
->>>>>>>>=20
->>>>>>>>=20
->>>>>>>> I think this will try to invoke direct reclaim from the first =
-iteration
->>>>>>>> to free up the max order.
->>>>>>>=20
->>>>>>> %__GFP_NORETRY: The VM implementation will try only very =
-lightweight
->>>>>>> memory direct reclaim to get some memory under memory pressure =
-(thus it
->>>>>>> can sleep). It will avoid disruptive actions like OOM killer.
->>>>>>>=20
->>>>>>> Certainly good enough for a first version I would say, no?
->>>>>>=20
->>>>>> Frankly how well that behaves would depend a lot on the workload.
->>>>>> Can regress just as well.
->>>>>>=20
->>>>>> For the 1st version I'd prefer something that is the least =
-disruptive,
->>>>>> and that IMHO means we only trigger reclaim at all in the same =
-configuration
->>>>>> as now - when we can't satisfy the lowest order allocation.
->>>>>=20
->>>>> Agreed.
->>>>>=20
->>>>>> Anything else would be a huge amount of testing with all kind of
->>>>>> workloads.
->>>>>=20
->>>>> So doing a "& ~__GFP_RECLAIM" in case order > 0? (as done in
->>>>> GFP_TRANSHUGE_LIGHT)
->>>>=20
->>>> That will improve the situation when reclaim is not needed, but =
-leave
->>>> the problem in place for when it's needed: if reclaim does trigger, =
-we
->>>> can get a huge free page and immediately break it up.
->>>>=20
->>>> So it's ok as a first step but it will make the second step harder =
-as
->>>> we'll need to test with reclaim :).
->>>=20
->>> I expect the whole "steal huge pages from your guest" to be =
-problematic,
->>> as I already mentioned to Alex. This needs a performance evaluation.
->>>=20
->>> This all smells like a lot of workload dependent fine-tuning. :)
->>=20
->> AFAIK the hardware overheads of keeping huge-pages in the guest and =
-backing
->> them with 4KB pages are non-negligible. Did you take those into =
-account?
->=20
-> Of course, the fastest mapping will be huge pages in host and guest.
-> Having huge pages in your guest but not in your host cannot really be
-> solved using ballooning AFAIKs. Hopefully THP in the host will be =
-doing
-> its job properly :)
->=20
-> ... however, so far, we haven't done any performance comparisons at =
-all.
-> The only numbers from Hui Zhu that I can spot are number of THP in the
-> host, which is not really expressing actual guest performance IMHO. =
-That
-> definitely has to be done to evaluate the different optimizations we
-> might want to try out.
->=20
 
-I did some tests with vm-scalability on Monday comparing their =
-performance in VM:
-//4 processes random r/w
-usemem -R -a -Z  -n 4 1g
-
-write:
-hugepage: 146367 KB/s
-thp:	  133550 KB/s
-normal:   124248 KB/s
-
-read:
-hugepage: 103969 KB/s
-thp:	  100622 KB/s
-normal:   88755 KB/s
-
-Best,
-Hui
-
-
-> --=20
-> Thanks,
->=20
-> David / dhildenb
-
+-- 
+Best regards,
+Vladimir
 
