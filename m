@@ -4,72 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC354C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AD7C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:02:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76043206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E884206CC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:02:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsJADy3X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76043206CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+WeZ85u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E884206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK1Lo-0007yk-EK
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 11:01:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40470)
+	id 1jK1MU-0000Wz-4T
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 11:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40779)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jK1EC-0003x7-Rb
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:53:58 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jK1El-0004qu-G6
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jK1EB-00010Q-8B
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:53:56 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56152
+ (envelope-from <imammedo@redhat.com>) id 1jK1Ek-0001Sf-EG
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:54:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30442
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jK1EB-0000zr-0Q
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:53:55 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jK1Ek-0001ST-AM
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:54:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585839234;
+ s=mimecast20190719; t=1585839270;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CnmHcvAzlYerfEhzxJ/5Dt9qcTxe4wP+0MOD1yMQ9wI=;
- b=RsJADy3XXQJGSrDw9XbV13p1cDhz5NXgmfMss9g9eDKzsEzrfrEqgfxQThvxotVoQ5EQfG
- wYk8UMPWLFegIE7sgkuoGwpB5CTxh97Gty5WKwrcdGwg0g6Dmynn0nfKQwVb/wvAXk7PWz
- Va7uBCAGbZB3+gm4kESB6Vg+b5KkNtA=
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=pAWLrBkCg471xZMC4vYlRsSQX3KPz345VQNtx7UC/ns=;
+ b=H+WeZ85uNQW6AKdpNSAMBmbJABA9XDtQfw6CdMrCStTWHE/MJua0vAX04mYTGctKXPHT22
+ BEgDo+l6SwYeAcyQ18l3ltene5gBZXaiK7K6FBHHoC/a6pfzKVmnaQAtQs+vxr0BIBruOT
+ NE1NdHWAO06NbCdEvJ4YDq97nUTWexM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-2zWo83tSNwCnwjJQLM56Jw-1; Thu, 02 Apr 2020 10:53:53 -0400
-X-MC-Unique: 2zWo83tSNwCnwjJQLM56Jw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-387-H4YGWISwPP2iFwxJrcAaNg-1; Thu, 02 Apr 2020 10:54:28 -0400
+X-MC-Unique: H4YGWISwPP2iFwxJrcAaNg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 516598017CE;
- Thu,  2 Apr 2020 14:53:51 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE0135D9C9;
- Thu,  2 Apr 2020 14:53:45 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v8 11/13] arm/run: Allow Migration tests
-Date: Thu,  2 Apr 2020 16:52:25 +0200
-Message-Id: <20200402145227.20109-12-eric.auger@redhat.com>
-In-Reply-To: <20200402145227.20109-1-eric.auger@redhat.com>
-References: <20200402145227.20109-1-eric.auger@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 475A6101FC72;
+ Thu,  2 Apr 2020 14:54:26 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7F2E5C290;
+ Thu,  2 Apr 2020 14:54:21 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.0 v2] xen: fixup RAM memory region initialization
+Date: Thu,  2 Apr 2020 10:54:18 -0400
+Message-Id: <20200402145418.5139-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -85,111 +82,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
- thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
+ anthony.perard@citrix.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's link getchar.o to use puts and getchar from the
-tests.
+Since bd457782b3b0 ("x86/pc: use memdev for RAM") Xen
+machine fails to start with:
+   qemu-system-i386: xen: failed to populate ram at 0
 
-Then allow tests belonging to the migration group to
-trigger the migration from the test code by putting
-"migrate" into the uart. Then the code can wait for the
-migration completion by using getchar().
+The reason is that xen_ram_alloc() which is called by
+memory_region_init_ram(), compares memory region with
+statically allocated 'global' ram_memory memory region
+that it uses for RAM, and does nothing in case it matches.
 
-The __getchar implement is minimalist as it just reads the
-data register. It is just meant to read the single character
-emitted at the end of the migration by the runner script.
+While it's possible feed machine->ram to xen_ram_alloc()
+in the same manner to keep that hack working, I'd prefer
+not to keep that circular dependency and try to untangle that.
 
-It is not meant to read more data (FIFOs are not enabled).
+However it doesn't look trivial to fix, so as temporary
+fixup opt out Xen machine from memdev based RAM allocation,
+and let xen_ram_alloc() do its trick for now.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
+Reported-by: Anthony PERARD <anthony.perard@citrix.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-
-v3 -> v4:
-- remove space around Elvis operator
-- rename ___getchar into do_getchar
-
-v2 -> v3:
-- take the lock
-- assert if more than 16 chars
-- removed Thomas' R-b
+v2:
+  * make it work with -M pc,accel=3Dxen
 ---
- arm/Makefile.common |  2 +-
- arm/run             |  2 +-
- lib/arm/io.c        | 28 ++++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+), 2 deletions(-)
+ hw/xen/xen-common.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index b8988f2..a123e85 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -32,7 +32,7 @@ CFLAGS +=3D -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I=
- lib
- asm-offsets =3D lib/$(ARCH)/asm-offsets.h
- include $(SRCDIR)/scripts/asm-offsets.mak
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 15650d7f6a..a15070f7f6 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -19,6 +19,7 @@
+ #include "sysemu/runstate.h"
+ #include "migration/misc.h"
+ #include "migration/global_state.h"
++#include "hw/boards.h"
 =20
--cflatobjs +=3D lib/util.o
-+cflatobjs +=3D lib/util.o lib/getchar.o
- cflatobjs +=3D lib/alloc_phys.o
- cflatobjs +=3D lib/alloc_page.o
- cflatobjs +=3D lib/vmalloc.o
-diff --git a/arm/run b/arm/run
-index 277db9b..a390ca5 100755
---- a/arm/run
-+++ b/arm/run
-@@ -61,6 +61,6 @@ fi
- M+=3D",accel=3D$ACCEL"
- command=3D"$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testde=
-v"
- command+=3D" -display none -serial stdio -kernel"
--command=3D"$(timeout_cmd) $command"
-+command=3D"$(migration_cmd) $(timeout_cmd) $command"
+ //#define DEBUG_XEN
 =20
- run_qemu $command "$@"
-diff --git a/lib/arm/io.c b/lib/arm/io.c
-index 99fd315..343e108 100644
---- a/lib/arm/io.c
-+++ b/lib/arm/io.c
-@@ -87,6 +87,34 @@ void puts(const char *s)
- 	spin_unlock(&uart_lock);
+@@ -151,6 +152,8 @@ static void xen_setup_post(MachineState *ms, AccelState=
+ *accel)
+=20
+ static int xen_init(MachineState *ms)
+ {
++    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
++
+     xen_xc =3D xc_interface_open(0, 0, 0);
+     if (xen_xc =3D=3D NULL) {
+         xen_pv_printf(NULL, 0, "can't open xen interface\n");
+@@ -170,6 +173,10 @@ static int xen_init(MachineState *ms)
+         return -1;
+     }
+     qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
++    /*
++     * opt out of system RAM being allocated by generic code
++     */
++    mc->default_ram_id =3D NULL;
+     return 0;
  }
 =20
-+static int do_getchar(void)
-+{
-+	int c;
-+
-+	spin_lock(&uart_lock);
-+	c =3D readb(uart0_base);
-+	spin_unlock(&uart_lock);
-+
-+	return c ?: -1;
-+}
-+
-+/*
-+ * Minimalist implementation for migration completion detection.
-+ * Without FIFOs enabled on the QEMU UART device we just read
-+ * the data register: we cannot read more than 16 characters.
-+ */
-+int __getchar(void)
-+{
-+	int c =3D do_getchar();
-+	static int count;
-+
-+	if (c !=3D -1)
-+		++count;
-+
-+	assert(count < 16);
-+
-+	return c;
-+}
-=20
- /*
-  * Defining halt to take 'code' as an argument guarantees that it will
 --=20
-2.20.1
+2.18.1
 
 
