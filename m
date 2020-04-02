@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C3FC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 22:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BC3C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 22:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AB012072E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 22:54:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A6D92072E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 22:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGNGhERq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AB012072E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3WFS0Sh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A6D92072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK8iv-0007tk-Jc
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 18:54:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38637)
+	id 1jK8lV-00013c-9w
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 18:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38887)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jK8iC-00072r-TN
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 18:53:26 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jK8kt-0000VJ-LZ
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 18:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jK8iB-0004jy-Mi
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 18:53:24 -0400
-Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:40832)
+ (envelope-from <alistair23@gmail.com>) id 1jK8ks-0007TC-Iz
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 18:56:11 -0400
+Received: from mail-ua1-x942.google.com ([2607:f8b0:4864:20::942]:37718)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jK8iB-0004hk-Gj
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 18:53:23 -0400
-Received: by mail-vs1-xe41.google.com with SMTP id w14so3743396vsf.7
- for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 15:53:23 -0700 (PDT)
+ id 1jK8ks-0007SN-FG; Thu, 02 Apr 2020 18:56:10 -0400
+Received: by mail-ua1-x942.google.com with SMTP id l18so2028758uak.4;
+ Thu, 02 Apr 2020 15:56:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=DyaHOBqcyLyHNDo2qYUchooJ7RL3/VvYZYFexnWAhN8=;
- b=dGNGhERqUNByk7SGLAiFadrh3fxy/lvOHy9FJt3qpxiQa0a3gse1X6MyDjlBGGqIDN
- +qLLSSoe3XY0DI5F4a10IDzWdYgRMTe35XF6E7RlHiOJ+MAvuTaVD3SLM2cKwV80O7qs
- tkWPNfT9mqdJbZ+IhH+leqVFP3pVO32iQjVtlno9o6dnJmU8JWH6Fqy6UQh/QkFUgTGf
- f9GMdNnSOCTGj9l1+yExOV3MK+FtT5ITfQJ4LAAryXhjwixKFJzFHJvYq/quYBNYyFQ0
- 6TCWW1DfaoxJACbkH6IEQlK26uIQ2XrCaNN4TfRW6yIJYl0JGENfhAgbpCL3TuhozPOt
- mqnA==
+ :cc; bh=1nkyQA9MCDPk2sT0OluSIvutSIHYXPNrx24fVKKyB8c=;
+ b=l3WFS0ShdCI70o02BEnsIH4nHqW2TGTkgUgDct73lz4Ceo93NMgHKTfajiUSkltsKV
+ 0zyA2hKCi2izp/L/dj22tiIV7SYIlqaz6UWF8s8Ju1Cy8Xe7X+qHsCicc/GJXRf27SyP
+ H0XNiUmuE8oBkQVCgzaLC6KJm36dbSSEQmO5Z9EAN/QvA820je9C69HXoyqT5/R8IG/k
+ ByzjA0kiAwLIOmumFv6plIc5bs/YI7my6o5yTz6E0MxarGC52MuSR9JxVFXCRCDdlb5A
+ DUlLn5bAejwlQtBQH7us9mTBMr7/a9XToRmflQl3oR6d4+nwhfOMYiN114a7ZBqK3YNX
+ TWfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=DyaHOBqcyLyHNDo2qYUchooJ7RL3/VvYZYFexnWAhN8=;
- b=DPvfWyzLOCsb+ysBxBP4U8mLaPZ2rtHFG/p/04MIt+CbYjiwziIA3fNRZlO9bhrUII
- gqj5cW0MeraT0YhyGKvgmFr8GQ5SNnDILKcxYnL4OCwgUWYN+TnFVAMNG5KO4ha7AHJe
- Hm5vP8JLeFQP5JqIOqrUeeNJWO4LpvrIO4RSALOrvUML5UOiv9ZOIeU6q6XO5WVLmb5E
- f2ugOdXg+A0+N+U4edt4JxPkHb+N/BFrsDHrx50j6SuCFFiRlRg1x0tNsgfeaBHu/HvK
- kgMc4GzXwysNcrkcYoG6/UrvWadSHLXz1PKPDr5IOoOIQ52sbWKiU4X5iyPmFWPFzt4R
- long==
-X-Gm-Message-State: AGi0PuZ6/Lh+eoKw0WZ9Wf7qmGTijAQ4/0eWxPUNGwC7YZVaTKWFPsrj
- CWbIuCUUvWjSXVSo2sJXNiGlBmw6TirIuGfYPvE=
-X-Google-Smtp-Source: APiQypJmWurAV4wUR4URR9eT9AHp/N0w/ZTKnZzatogGRW9XEPD1Hni7qJd+g/08Hqhx1b4C4wiyzNQIZ+v12de6E1Q=
-X-Received: by 2002:a67:1b81:: with SMTP id b123mr4278597vsb.172.1585868002655; 
- Thu, 02 Apr 2020 15:53:22 -0700 (PDT)
+ bh=1nkyQA9MCDPk2sT0OluSIvutSIHYXPNrx24fVKKyB8c=;
+ b=LDNErjQH6+O+4c/1pfuvDRxrYDZ4F2+vFUbrYEP2xL4mJTVMCB0CD7WsvdsOEtdVeL
+ 62et4OUNrpg+W9BDrASuvzapblyuaHbpD5YdrRFHUA0L0g9hE2+VreKvGkeUyOUvOo0p
+ eify9tviaFOLnGrslXrE7MsknMSp7lRbsxCbnmvh/Y+3XYg8hrVjLgWUD6fU0JnWF87H
+ GE2H8/4CQ2fPqFDjddbswdL0zkuwUW06kbLG9Cjdic/jfQwX+tl3HCgIuy+t9SC6t1K/
+ JNqFWkOt/LhoSjEBLOY0B3nq6IAG0NVAbBt7/GxEOaJvBizyT3CH++ogI6LZTD/QeOy9
+ DXUA==
+X-Gm-Message-State: AGi0PuYq9mGWx8MED6JtUGf8r5SDl0t7uDT0DjgpzMVlRnLC7ZmMAkoY
+ I7r5ushU/pZAkhlexIG3/WHh1RFuag4MkPJOLv4=
+X-Google-Smtp-Source: APiQypKx//hFud6VhFzgjiKTRsoAeJUPL2Zzmei88OVUzlOeyj3aGVFOlA3htj+Gwzv3EXJji6GNQG0Ttn69/kVGpbI=
+X-Received: by 2002:a9f:2964:: with SMTP id t91mr4481268uat.21.1585868168528; 
+ Thu, 02 Apr 2020 15:56:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200402162839.76636-1-me@xcancerberox.com.ar>
-In-Reply-To: <20200402162839.76636-1-me@xcancerberox.com.ar>
+References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
+ <20200402134721.27863-6-edgar.iglesias@gmail.com>
+In-Reply-To: <20200402134721.27863-6-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 2 Apr 2020 15:45:10 -0700
-Message-ID: <CAKmqyKMrH=4X-ryFYBgSenaM4H4+HZ-uWbCf2hx8oYiHovFbng@mail.gmail.com>
-Subject: Re: [PATCH-for-5.1 v2] hw/core/register: Add register_init_block8
- helper.
-To: Joaquin de Andres <me@xcancerberox.com.ar>
+Date: Thu, 2 Apr 2020 15:47:56 -0700
+Message-ID: <CAKmqyKPjF8KQBEAkBJRTj02OuT3RutNHmA1BkZgbJ8tsztQ2EA@mail.gmail.com>
+Subject: Re: [PATCH v1 5/5] dma/xlnx-zdma: Reorg to fix CUR_DSCR
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::e41
+X-Received-From: 2607:f8b0:4864:20::942
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,134 +86,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>,
+Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
  Richard Henderson <richard.henderson@linaro.org>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 2, 2020 at 9:29 AM Joaquin de Andres <me@xcancerberox.com.ar> wrote:
+On Thu, Apr 2, 2020 at 6:50 AM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
 >
-> There was no support for 8 bits block registers. Changed
-> register_init_block32 to be generic and static, adding register
-> size in bits as parameter. Created one helper for each size.
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Signed-off-by: Joaquin de Andres <me@xcancerberox.com.ar>
+> Reorganize the descriptor handling so that CUR_DSCR always
+> points to the next descriptor to be processed.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
-> This patch is small and I could see that there is not much movement with
-> the release, so, I let my self send this. Also this is my first patch :)
-> Reviews are welcome.
-> ---
->  hw/core/register.c    | 46 +++++++++++++++++++++++++++++++++----------
->  include/hw/register.h |  8 ++++++++
->  2 files changed, 44 insertions(+), 10 deletions(-)
+>  hw/dma/xlnx-zdma.c | 47 ++++++++++++++++++++++------------------------
+>  1 file changed, 22 insertions(+), 25 deletions(-)
 >
-> diff --git a/hw/core/register.c b/hw/core/register.c
-> index 3c77396587..ddf91eb445 100644
-> --- a/hw/core/register.c
-> +++ b/hw/core/register.c
-> @@ -246,16 +246,18 @@ uint64_t register_read_memory(void *opaque, hwaddr addr,
->      return extract64(read_val, 0, size * 8);
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index e856d233f2..1c45367f3c 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -333,10 +333,28 @@ static void zdma_load_src_descriptor(XlnxZDMA *s)
+>      }
 >  }
 >
-> -RegisterInfoArray *register_init_block32(DeviceState *owner,
-> -                                         const RegisterAccessInfo *rae,
-> -                                         int num, RegisterInfo *ri,
-> -                                         uint32_t *data,
-> -                                         const MemoryRegionOps *ops,
-> -                                         bool debug_enabled,
-> -                                         uint64_t memory_size)
-> +static RegisterInfoArray *register_init_block(DeviceState *owner,
-> +                                              const RegisterAccessInfo *rae,
-> +                                              int num, RegisterInfo *ri,
-> +                                              void *data,
-> +                                              const MemoryRegionOps *ops,
-> +                                              bool debug_enabled,
-> +                                              uint64_t memory_size,
-> +                                              size_t data_size_bits)
+> +static void zdma_update_descr_addr(XlnxZDMA *s, bool type,
+> +                                   unsigned int basereg)
+> +{
+> +    uint64_t addr, next;
+> +
+> +    if (type == DTYPE_LINEAR) {
+> +        addr = zdma_get_regaddr64(s, basereg);
+> +        next = addr + sizeof(s->dsc_dst);
+> +    } else {
+> +        addr = zdma_get_regaddr64(s, basereg);
+> +        addr += sizeof(s->dsc_dst);
+> +        address_space_read(s->dma_as, addr, s->attr, (void *) &next, 8);
+> +    }
+> +
+> +    zdma_put_regaddr64(s, basereg, next);
+> +}
+> +
+>  static void zdma_load_dst_descriptor(XlnxZDMA *s)
 >  {
->      const char *device_prefix = object_get_typename(OBJECT(owner));
->      RegisterInfoArray *r_array = g_new0(RegisterInfoArray, 1);
-> +    int data_size = data_size_bits >> 3;
->      int i;
+>      uint64_t dst_addr;
+>      unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
+> +    bool dst_type;
 >
->      r_array->r = g_new0(RegisterInfo *, num);
-> @@ -264,12 +266,12 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
->      r_array->prefix = device_prefix;
+>      if (ptype == PT_REG) {
+>          memcpy(&s->dsc_dst, &s->regs[R_ZDMA_CH_DST_DSCR_WORD0],
+> @@ -349,24 +367,10 @@ static void zdma_load_dst_descriptor(XlnxZDMA *s)
+>      if (!zdma_load_descriptor(s, dst_addr, &s->dsc_dst)) {
+>          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, AXI_RD_DST_DSCR, true);
+>      }
+> -}
+> -
+> -static uint64_t zdma_update_descr_addr(XlnxZDMA *s, bool type,
+> -                                       unsigned int basereg)
+> -{
+> -    uint64_t addr, next;
 >
->      for (i = 0; i < num; i++) {
-> -        int index = rae[i].addr / 4;
-> +        int index = rae[i].addr / data_size;
->          RegisterInfo *r = &ri[index];
->
->          *r = (RegisterInfo) {
-> -            .data = &data[index],
-> -            .data_size = sizeof(uint32_t),
-> +            .data = data + data_size * index,
-> +            .data_size = data_size,
->              .access = &rae[i],
->              .opaque = owner,
->          };
-> @@ -284,6 +286,30 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
->      return r_array;
+> -    if (type == DTYPE_LINEAR) {
+> -        next = zdma_get_regaddr64(s, basereg);
+> -        next += sizeof(s->dsc_dst);
+> -        zdma_put_regaddr64(s, basereg, next);
+> -    } else {
+> -        addr = zdma_get_regaddr64(s, basereg);
+> -        addr += sizeof(s->dsc_dst);
+> -        address_space_read(s->dma_as, addr, s->attr, &next, 8);
+> -        zdma_put_regaddr64(s, basereg, next);
+> -    }
+> -    return next;
+> +    /* Advance the descriptor pointer.  */
+> +    dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3, TYPE);
+> +    zdma_update_descr_addr(s, dst_type, R_ZDMA_CH_DST_CUR_DSCR_LSB);
 >  }
 >
-> +RegisterInfoArray *register_init_block8(DeviceState *owner,
-> +                                        const RegisterAccessInfo *rae,
-> +                                        int num, RegisterInfo *ri,
-> +                                        uint8_t *data,
-> +                                        const MemoryRegionOps *ops,
-> +                                        bool debug_enabled,
-> +                                        uint64_t memory_size)
-> +{
-> +    return register_init_block(owner, rae, num, ri, (void *)
-> +                               data, ops, debug_enabled, memory_size, 8);
-> +}
-> +
-> +RegisterInfoArray *register_init_block32(DeviceState *owner,
-> +                                         const RegisterAccessInfo *rae,
-> +                                         int num, RegisterInfo *ri,
-> +                                         uint32_t *data,
-> +                                         const MemoryRegionOps *ops,
-> +                                         bool debug_enabled,
-> +                                         uint64_t memory_size)
-> +{
-> +    return register_init_block(owner, rae, num, ri, (void *)
-> +                               data, ops, debug_enabled, memory_size, 32);
-> +}
-> +
->  void register_finalize_block(RegisterInfoArray *r_array)
->  {
->      object_unparent(OBJECT(&r_array->mem));
-> diff --git a/include/hw/register.h b/include/hw/register.h
-> index 5796584588..5d2c565ae0 100644
-> --- a/include/hw/register.h
-> +++ b/include/hw/register.h
-> @@ -185,6 +185,14 @@ uint64_t register_read_memory(void *opaque, hwaddr addr, unsigned size);
->   *          memory region (r_array->mem) the caller should add to a container.
->   */
->
-> +RegisterInfoArray *register_init_block8(DeviceState *owner,
-> +                                        const RegisterAccessInfo *rae,
-> +                                        int num, RegisterInfo *ri,
-> +                                        uint8_t *data,
-> +                                        const MemoryRegionOps *ops,
-> +                                        bool debug_enabled,
-> +                                        uint64_t memory_size);
-> +
->  RegisterInfoArray *register_init_block32(DeviceState *owner,
->                                           const RegisterAccessInfo *rae,
->                                           int num, RegisterInfo *ri,
+>  static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
+> @@ -387,14 +391,7 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
+>          dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
+>                                SIZE);
+>          if (dst_size == 0 && ptype == PT_MEM) {
+> -            uint64_t next;
+> -            bool dst_type = FIELD_EX32(s->dsc_dst.words[3],
+> -                                       ZDMA_CH_DST_DSCR_WORD3,
+> -                                       TYPE);
+> -
+> -            next = zdma_update_descr_addr(s, dst_type,
+> -                                          R_ZDMA_CH_DST_CUR_DSCR_LSB);
+> -            zdma_load_descriptor(s, next, &s->dsc_dst);
+> +            zdma_load_dst_descriptor(s);
+>              dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
+>                                    SIZE);
+>          }
 > --
-> 2.26.0
+> 2.20.1
 >
 >
 
