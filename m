@@ -7,74 +7,76 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CC1C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1094C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:25:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9962F20757
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:24:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82FB820757
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:25:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tW3RDJCH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9962F20757
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJSJc4J3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82FB820757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK3aK-0007rX-RD
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 13:24:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46421)
+	id 1jK3b1-0000Mv-Mg
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 13:25:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jK3Za-0006lU-76
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:24:11 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jK3a0-0007aF-M1
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jK3ZZ-0001pV-9J
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:24:10 -0400
-Received: from mail-vk1-xa41.google.com ([2607:f8b0:4864:20::a41]:34191)
+ (envelope-from <alistair23@gmail.com>) id 1jK3Zz-00024b-Q1
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:24:36 -0400
+Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:45961)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jK3ZZ-0001pI-5m; Thu, 02 Apr 2020 13:24:09 -0400
-Received: by mail-vk1-xa41.google.com with SMTP id p123so1154908vkg.1;
- Thu, 02 Apr 2020 10:24:09 -0700 (PDT)
+ id 1jK3Zz-00024P-Ly; Thu, 02 Apr 2020 13:24:35 -0400
+Received: by mail-vs1-xe41.google.com with SMTP id x82so2875498vsc.12;
+ Thu, 02 Apr 2020 10:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dbAYIMSchJGpMWKqvejXOWtcSWVyoR+mTLe6byftqeY=;
- b=tW3RDJCHWookHb3ZcWLSYXHBPZZEDJlUikDZQT5mO/v/lj1biKBnZWIMz15kX6zq5Y
- PifwBBjtjjwH0G/y9BGuT+ITIOKxHKyNcsMOmGmxCLuhUgcyRrZcGpEekY6eVr+HyfoP
- IJZAclRku/OqgTyhHxXW59cH84Hpcm2HLIZuOAmFghj7fVzYtZdRGs+KKooKBDBPDeyp
- 2S7joBe9Kpl2WpaT0/eDIKGmw0jvDcRCyyOhtlYQu9IXfNfXW5kxFhMO33hGTA8HwYr2
- /Wz7Z1Ou5WLWjLBBKvRc49LytKCBf5jcrZtzTaBw++xQ6XbY1IDFbyf6GiwqWN8MDo0B
- xnBQ==
+ :cc; bh=A+GesOk1+6PETBtTbbLRdBl6FhGJsXGy10qpnFGgeJ8=;
+ b=bJSJc4J3yG/eGh8k68tFGI1IBnmWj1b1fayNK4C6I/b+dP18/iUxHEa3Lx3J10fz1K
+ lx1Qc1rBTASWD3MO9K66Gm8FJo/sc9AtivhQi8X9ft03jppLSF+q0RnaSQTZ4mTpru0s
+ kwv3+pNBq5hPzW1YCEnxUgsv/CBkSwA6DQr2ZdnfLwWKheKE//YfDgkLHOqilgfDxKT7
+ AeaWaXs5i+rmCSZEG5L0WDc98p0rafWQ6RSFlJlXKu4DySgVTI8qu/pg8sn+6VQ3TYYh
+ LVJYoy7UR+k3LhQDzmXidDlcPmW4hKfKtGHSVl18zQ1erJ8mjN5ukGcmYMGC5lohbbew
+ A/uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=dbAYIMSchJGpMWKqvejXOWtcSWVyoR+mTLe6byftqeY=;
- b=B8mkRQwzgLTvnfghwxpCY23Pd8JXOMig9F3N1Ao4x3Lx48vNSg11Iu+0VOFhA5AubY
- v/l7+0UMkjgz6VvKNMk3BbNin5oxHxAH/C75i9QaNVGINflBreeNze66tO9m1lLMtHHp
- FkPp5VB300AQ3NqamLK9U0hmMYkVG1rR2KHx2rFfxatEaWUQLqzmQ2PuGM4nNUp+c1nM
- DBacfRappJ7lU8o5MzfW2HUIE+DDr+3Wlc77j/hLQLZs2WQ8BpDeVcZK4HaTJdRY3nqT
- Ein9TdcnYoxH9Y1Sjs3U7c6cAIIioktjOmYsRTzV7/HTQoWgcCCqicOhb4u+mtYahWXX
- 0lpA==
-X-Gm-Message-State: AGi0PuYJWdMxLCoPx2oCWtdGL6Hpzc0owskrz7dPB99juvbS3roLAtZP
- cB8LW1v2huT1fPn6JdOkBbZYt90IsWHFcxBCXMBg6gDI
-X-Google-Smtp-Source: APiQypJqlkYpmP3NKaSAbfvMeUusyh7f2+p+3OCw4dPtLPZJs2riMRN9RQj9USdpqnc+VZZ5JH9uW8bdGKmteDclBrw=
-X-Received: by 2002:a1f:a2d0:: with SMTP id l199mr3118706vke.77.1585848248617; 
- Thu, 02 Apr 2020 10:24:08 -0700 (PDT)
+ bh=A+GesOk1+6PETBtTbbLRdBl6FhGJsXGy10qpnFGgeJ8=;
+ b=Xye41fmWNnQZuuDWg7VHknH0KOndo6tf3epkzbXlelFB7P+As2y3H5xF6lr/RJZieU
+ eig32Tweoz+Xnn3vsxlUGUhMguSsw+U3Gtlt7+aUFagAY/bHkbiCsA4FbrT0C0ykA+2q
+ UlmV3KjLRunUy82m7h1hkhKHI+eGdEo+S2mi0jXij/zqu0M6ng9sB0EtqqW+jyP0f/uC
+ nwyPppIoR3VIE2B81gYtw91p0fCo9yuDEUf6MPRDWP8VXBEpffelDdj0nKTVkEE2z2TJ
+ K5oX1liAslmOWw6zyynbfSFNBwNQ1vd7MWu+EAs55KC/i7wxslKfGxDDT9Ee2UwLDG0F
+ zhlA==
+X-Gm-Message-State: AGi0PuaLGahaSCl/MCHza0g+NiwQfBFtKdOxmNMG5ma9n3pYxy1SDj5J
+ vvqhNHrtvCQloAplltfQP/0TCje9FPM1bNnVWwgGcGDm
+X-Google-Smtp-Source: APiQypJdxLq5PljA/aLvRC8RPTaFrZfioiruxQ8+37Fm4J2OYo5wqTnfR0oyavMubYEc5nOsXqK9sBKW7hqnYeIlB9s=
+X-Received: by 2002:a05:6102:730:: with SMTP id
+ u16mr2960891vsg.70.1585848274998; 
+ Thu, 02 Apr 2020 10:24:34 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
- <20200402134721.27863-4-edgar.iglesias@gmail.com>
-In-Reply-To: <20200402134721.27863-4-edgar.iglesias@gmail.com>
+ <20200402134721.27863-5-edgar.iglesias@gmail.com>
+In-Reply-To: <20200402134721.27863-5-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 2 Apr 2020 10:15:56 -0700
-Message-ID: <CAKmqyKMKiDXHcPP0+WxmoN_6cQvTcxC-cYpkDfT7YYur+0N8NQ@mail.gmail.com>
-Subject: Re: [PATCH v1 3/5] dma/xlnx-zdma: Clear DMA_DONE when halting
+Date: Thu, 2 Apr 2020 10:16:23 -0700
+Message-ID: <CAKmqyKMhxT6BTssk=Lx9g0ffBex+fxb6ZSE9GeCCeE0sFc4pVg@mail.gmail.com>
+Subject: Re: [PATCH v1 4/5] dma/xlnx-zdma: Advance the descriptor address when
+ stopping
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::a41
+X-Received-From: 2607:f8b0:4864:20::e41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,12 +103,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 2, 2020 at 6:50 AM Edgar E. Iglesias
+On Thu, Apr 2, 2020 at 6:47 AM Edgar E. Iglesias
 <edgar.iglesias@gmail.com> wrote:
 >
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Clear DMA_DONE when halting the DMA channel.
+> Advance the descriptor address when stopping the channel.
 >
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
@@ -115,21 +117,21 @@ Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/dma/xlnx-zdma.c | 1 +
->  1 file changed, 1 insertion(+)
+>  hw/dma/xlnx-zdma.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
 > diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index 6a4699757a..dd893bc420 100644
+> index dd893bc420..e856d233f2 100644
 > --- a/hw/dma/xlnx-zdma.c
 > +++ b/hw/dma/xlnx-zdma.c
-> @@ -520,6 +520,7 @@ static void zdma_process_descr(XlnxZDMA *s)
->      if (src_cmd == CMD_HALT) {
->          zdma_set_state(s, PAUSED);
->          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_PAUSE, 1);
-> +        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_DONE, false);
->          zdma_ch_imr_update_irq(s);
->          return;
+> @@ -514,7 +514,6 @@ static void zdma_process_descr(XlnxZDMA *s)
+>      if (ptype == PT_REG || src_cmd == CMD_STOP) {
+>          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_CTRL2, EN, 0);
+>          zdma_set_state(s, DISABLED);
+> -        return;
 >      }
+>
+>      if (src_cmd == CMD_HALT) {
 > --
 > 2.20.1
 >
