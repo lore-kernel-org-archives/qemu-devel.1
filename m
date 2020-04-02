@@ -2,91 +2,79 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F10BC2D0F3
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F8A2C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:22:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BB802078B
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:20:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADFB820757
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:22:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q48eN1qI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BB802078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yyjw5OUU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADFB820757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK3Vp-0002Km-RD
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 13:20:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45064)
+	id 1jK3Xq-0004k6-Tm
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 13:22:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jK3Ta-0000PY-Dt
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:17:59 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jK3X3-0003lp-JX
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:21:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jK3TZ-0007Ip-7p
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:17:58 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:32911)
+ (envelope-from <alistair23@gmail.com>) id 1jK3X2-000715-Kb
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:21:33 -0400
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:45940)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jK3TY-0007HJ-PQ
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:17:57 -0400
-Received: by mail-pl1-x642.google.com with SMTP id ay1so1591771plb.0
- for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 10:17:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=qNMuSy6myQERHMzlzFwavqf8HUhcKDEUQ/y2TeKt/W8=;
- b=Q48eN1qIgfBSGB008QFETon0+zBn6G9va49ZXitU7SxtMMMRvrgNFxbImGvgaeXuam
- 6uvEBGM/PJaaxa9Tl5s4RixZJ7/DX4uNyJRHl/0SuxyP/NkUpPoyqdr4H+zVMEJAxoFF
- qJ7VzTdhqNeIok6CSOa71kXrkFLBqw0Ln/i5dX0xrmlBl4Woic9dsWZoLTwcFtz914CL
- WId8Jr+n7qM50K1VWHHDIfDwdO1M1fBdKTNAA7fsJyHncVbd2WjpJBmCsUrf1XKEU14m
- XJWvmE6QICPXfR7gC3Gz6FXezz6H8SvSZVxRJh5jpCUGT4yXL1Y8VgFFJvbx/IR6SDW4
- Mwfg==
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jK3X2-00070q-Gi; Thu, 02 Apr 2020 13:21:32 -0400
+Received: by mail-vs1-xe43.google.com with SMTP id x82so2866573vsc.12;
+ Thu, 02 Apr 2020 10:21:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oekO7Iey/J+A25klZ5udo88BsGYzcw759MzkmKCIw7I=;
+ b=Yyjw5OUUGqmZDd+hbAZZJr3vBaJH10dqL/IeHbbmJ15NIXnzKSSEw4V/Y6J3Wadzht
+ AJp52TwXMZiG7+7IcHqpMIoB086/sPq+iZfwk1NnLNT1Zpsm1hxpHfHy9oZjo0dRYAOT
+ qT6zvjqfPSEfSMZ3AREJfTBGib75ZmWfxm+wvwYOQ0Jx8hEGcEptj6d1343fIdEd7/LC
+ YGMFYOcO9ylPETm3aqwXlFCFse9wjOwF3FIGv6L91GW8NNakm9bxpYv3vqKioerHh8fl
+ qhyfMxF7A0ZfQIZIJ8zHFjc0qJq7Z40GK41fgFptWvUcdTxpE/moV4Xq3blfKnG/wWTb
+ nA+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qNMuSy6myQERHMzlzFwavqf8HUhcKDEUQ/y2TeKt/W8=;
- b=b07Judcd3ljnqdBF2hxBmAy/Q49Va7O+34rytRFShlIAnnN3ck6TuhSdplq847/78b
- kEi6An5rtoy+qIfFuaj7scuWNq4pLH+cnbK47GubxQ4MItAtzBUrcZ7DKbJlQMsiTx00
- iB3DJymy4LebzCybbsXp87e3HUILkslq+hBXtWYTPj11z0wBpbnZuysvg/206Y0pyE7v
- cenFN63NOsLlHcRY4WqshrixvMyXiV6+PYIZje4BMkR54sVQ9S9ChWROUe4aqJKDbLl8
- ZSgTO2yFpVvkR74/QzVXNOxwSQ0DrhwUdPC0+/ucWYzaqa/lodli3ewmtJlKyEP/WKtW
- QgxA==
-X-Gm-Message-State: AGi0PuZffuM+XZ+RCDfkAOM8oA9x8oATMH3ZejX/jd8xcpXzK1Ea/r2Q
- KpCIplq98FUWB+OEdzv4q/M8aA==
-X-Google-Smtp-Source: APiQypIsfrFFHbcxytlP/1obJ17DVib2VGdCFwq7Rl//gsK9WvUTmh2+cNLxdWp26tIk8M2ugY2P5Q==
-X-Received: by 2002:a17:902:7d8f:: with SMTP id
- a15mr3771722plm.265.1585847875560; 
- Thu, 02 Apr 2020 10:17:55 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id h198sm4104607pfe.76.2020.04.02.10.17.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Apr 2020 10:17:54 -0700 (PDT)
-Subject: Re: [PATCH] target/arm: don't expose "ieee_half" via gdbstub
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-References: <20200402143913.24005-1-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e6b3a94f-b7db-942c-2611-c9881c2da5d6@linaro.org>
-Date: Thu, 2 Apr 2020 10:17:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oekO7Iey/J+A25klZ5udo88BsGYzcw759MzkmKCIw7I=;
+ b=onxIgQUJC03WEgzMVMEwA8z2z5NvuIWV4Am351zkjbbH1Y+Jc9NOOA6pWhIczleIyp
+ YboTCXjnLlR7tfCmBb/S0ZWnmGqvcqt8QE7bZLPjz0Pe6pRl8kN4VKzKFhVuUcGJWpp0
+ mHcuz+EWsHXF9QS6EsvP4CUszyysFouYygKs0/EDuEw0FQL4Ja3iVEi9WF22JzQ6GylU
+ Lf8oO2rSmIYnxYuI2qiqVyXLuHhtqKY0cbu9c3cg4wHp+qalu2tnieIrJkvJUDsYS1fd
+ 8Gvyq0LI0M+BAnT1fc3HPdR1YV2XrGh9lkHPNcSe/5ePbDH/ynYBXliXHAqBvjzOU89f
+ xdRg==
+X-Gm-Message-State: AGi0PuZvx7wFjGroN3JdImPCu5r+FhjRVRzEl6xP0EJ0Gzlmcw97fY6p
+ 9/SNJglVXmvupCMMbvn+J5YvgSg5fqkNQJ7XSDI=
+X-Google-Smtp-Source: APiQypLjpBvwjPcUGDckkK+JIFI7+N1j/u9APL6KxTZ2vsPmPjH8NErMxZs49o49DsLvfz3AQT/31/i0bqcm7kN+AU0=
+X-Received: by 2002:a67:26c2:: with SMTP id m185mr3304616vsm.180.1585848091833; 
+ Thu, 02 Apr 2020 10:21:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200402143913.24005-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
+ <20200402134721.27863-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20200402134721.27863-3-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 2 Apr 2020 10:13:19 -0700
+Message-ID: <CAKmqyKNY0qv8iwJCheC0x7EQgdUgLsMtJzwkyS6CpcRzOiJLZw@mail.gmail.com>
+Subject: Re: [PATCH v1 2/5] dma/xlnx-zdma: Populate DBG0.CMN_BUF_FREE
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2607:f8b0:4864:20::e43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,25 +86,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/2/20 7:39 AM, Alex Bennée wrote:
-> While support for parsing ieee_half in the XML description was added
-> to gdb in 2019 (a6d0f249) there is no easy way for the gdbstub to know
-> if the gdb end will understand it. Disable it for now and allow older
-> gdbs to successfully connect to the default -cpu max SVE enabled
-> QEMUs.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On Thu, Apr 2, 2020 at 6:46 AM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Populate DBG0.CMN_BUF_FREE so that SW can see some free space.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->  target/arm/gdbstub.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
-
+>  hw/dma/xlnx-zdma.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index a6c5b2304a..6a4699757a 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -680,6 +680,12 @@ static RegisterAccessInfo zdma_regs_info[] = {
+>      },{ .name = "ZDMA_CH_DBG0",  .addr = A_ZDMA_CH_DBG0,
+>          .rsvd = 0xfffffe00,
+>          .ro = 0x1ff,
+> +
+> +        /*
+> +         * There's SW out there that will check the debug regs for free space.
+> +         * Claim that we always have 0x100 free.
+> +         */
+> +        .reset = 0x100
+>      },{ .name = "ZDMA_CH_DBG1",  .addr = A_ZDMA_CH_DBG1,
+>          .rsvd = 0xfffffe00,
+>          .ro = 0x1ff,
+> --
+> 2.20.1
+>
+>
 
