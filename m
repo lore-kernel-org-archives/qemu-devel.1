@@ -2,81 +2,88 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1094C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF97C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:26:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82FB820757
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:25:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJSJc4J3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82FB820757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C6F3120757
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 17:26:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6F3120757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK3b1-0000Mv-Mg
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 13:25:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46497)
+	id 1jK3bd-0001Y9-Vl
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 13:26:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jK3a0-0007aF-M1
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:24:37 -0400
+ (envelope-from <leonardo@linux.ibm.com>) id 1jK3aR-0008KS-Sh
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:25:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jK3Zz-00024b-Q1
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:24:36 -0400
-Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:45961)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jK3Zz-00024P-Ly; Thu, 02 Apr 2020 13:24:35 -0400
-Received: by mail-vs1-xe41.google.com with SMTP id x82so2875498vsc.12;
- Thu, 02 Apr 2020 10:24:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=A+GesOk1+6PETBtTbbLRdBl6FhGJsXGy10qpnFGgeJ8=;
- b=bJSJc4J3yG/eGh8k68tFGI1IBnmWj1b1fayNK4C6I/b+dP18/iUxHEa3Lx3J10fz1K
- lx1Qc1rBTASWD3MO9K66Gm8FJo/sc9AtivhQi8X9ft03jppLSF+q0RnaSQTZ4mTpru0s
- kwv3+pNBq5hPzW1YCEnxUgsv/CBkSwA6DQr2ZdnfLwWKheKE//YfDgkLHOqilgfDxKT7
- AeaWaXs5i+rmCSZEG5L0WDc98p0rafWQ6RSFlJlXKu4DySgVTI8qu/pg8sn+6VQ3TYYh
- LVJYoy7UR+k3LhQDzmXidDlcPmW4hKfKtGHSVl18zQ1erJ8mjN5ukGcmYMGC5lohbbew
- A/uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=A+GesOk1+6PETBtTbbLRdBl6FhGJsXGy10qpnFGgeJ8=;
- b=Xye41fmWNnQZuuDWg7VHknH0KOndo6tf3epkzbXlelFB7P+As2y3H5xF6lr/RJZieU
- eig32Tweoz+Xnn3vsxlUGUhMguSsw+U3Gtlt7+aUFagAY/bHkbiCsA4FbrT0C0ykA+2q
- UlmV3KjLRunUy82m7h1hkhKHI+eGdEo+S2mi0jXij/zqu0M6ng9sB0EtqqW+jyP0f/uC
- nwyPppIoR3VIE2B81gYtw91p0fCo9yuDEUf6MPRDWP8VXBEpffelDdj0nKTVkEE2z2TJ
- K5oX1liAslmOWw6zyynbfSFNBwNQ1vd7MWu+EAs55KC/i7wxslKfGxDDT9Ee2UwLDG0F
- zhlA==
-X-Gm-Message-State: AGi0PuaLGahaSCl/MCHza0g+NiwQfBFtKdOxmNMG5ma9n3pYxy1SDj5J
- vvqhNHrtvCQloAplltfQP/0TCje9FPM1bNnVWwgGcGDm
-X-Google-Smtp-Source: APiQypJdxLq5PljA/aLvRC8RPTaFrZfioiruxQ8+37Fm4J2OYo5wqTnfR0oyavMubYEc5nOsXqK9sBKW7hqnYeIlB9s=
-X-Received: by 2002:a05:6102:730:: with SMTP id
- u16mr2960891vsg.70.1585848274998; 
- Thu, 02 Apr 2020 10:24:34 -0700 (PDT)
+ (envelope-from <leonardo@linux.ibm.com>) id 1jK3aQ-0002Qs-2k
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 13:25:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53172)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <leonardo@linux.ibm.com>)
+ id 1jK3aL-0002OR-H4; Thu, 02 Apr 2020 13:24:57 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 032H2g2Y092163; Thu, 2 Apr 2020 13:24:53 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 303wrynt70-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 02 Apr 2020 13:24:52 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 032HMhaJ003806;
+ Thu, 2 Apr 2020 17:24:52 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma04dal.us.ibm.com with ESMTP id 301x7756ut-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 02 Apr 2020 17:24:52 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 032HOoVl41812280
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 2 Apr 2020 17:24:50 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3F2B7112061;
+ Thu,  2 Apr 2020 17:24:50 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D753B112062;
+ Thu,  2 Apr 2020 17:24:44 +0000 (GMT)
+Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.85.174.86])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu,  2 Apr 2020 17:24:43 +0000 (GMT)
+From: Leonardo Bras <leonardo@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Bharata B Rao <bharata.rao@in.ibm.com>
+Subject: [PATCH v3 1/1] ppc/spapr: Add hotremovable flag on DIMM LMBs on
+ drmem_v2
+Date: Thu,  2 Apr 2020 14:23:40 -0300
+Message-Id: <20200402172339.622720-1-leonardo@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
- <20200402134721.27863-5-edgar.iglesias@gmail.com>
-In-Reply-To: <20200402134721.27863-5-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 2 Apr 2020 10:16:23 -0700
-Message-ID: <CAKmqyKMhxT6BTssk=Lx9g0ffBex+fxb6ZSE9GeCCeE0sFc4pVg@mail.gmail.com>
-Subject: Re: [PATCH v1 4/5] dma/xlnx-zdma: Advance the descriptor address when
- stopping
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e41
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-02_06:2020-04-02,
+ 2020-04-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 lowpriorityscore=0
+ mlxlogscore=999 clxscore=1015 bulkscore=0 malwarescore=0 suspectscore=0
+ phishscore=0 priorityscore=1501 spamscore=0 adultscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020133
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,52 +95,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Leonardo Bras <leonardo@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 2, 2020 at 6:47 AM Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Advance the descriptor address when stopping the channel.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On reboot, all memory that was previously added using object_add and
+device_add is placed in this DIMM area.
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+The new SPAPR_LMB_FLAGS_HOTREMOVABLE flag helps Linux to put this memory in
+the correct memory zone, so no unmovable allocations are made there,
+allowing the object to be easily hot-removed by device_del and
+object_del.
 
-Alistair
+This new flag was accepted in Power Architecture documentation.
 
-> ---
->  hw/dma/xlnx-zdma.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index dd893bc420..e856d233f2 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -514,7 +514,6 @@ static void zdma_process_descr(XlnxZDMA *s)
->      if (ptype == PT_REG || src_cmd == CMD_STOP) {
->          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_CTRL2, EN, 0);
->          zdma_set_state(s, DISABLED);
-> -        return;
->      }
->
->      if (src_cmd == CMD_HALT) {
-> --
-> 2.20.1
->
->
+Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
+Reviewed-by: Bharata B Rao <bharata@linux.ibm.com>
+
+---
+Changes since v1:
+- Flag name changed from SPAPR_LMB_FLAGS_HOTPLUGGED to
+	SPAPR_LMB_FLAGS_HOTREMOVABLE
+---
+ hw/ppc/spapr.c         | 3 ++-
+ include/hw/ppc/spapr.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9a2bd501aa..fe662e297e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -446,7 +446,8 @@ static int spapr_dt_dynamic_memory_v2(SpaprMachineState *spapr, void *fdt,
+         g_assert(drc);
+         elem = spapr_get_drconf_cell(size / lmb_size, addr,
+                                      spapr_drc_index(drc), node,
+-                                     SPAPR_LMB_FLAGS_ASSIGNED);
++                                     (SPAPR_LMB_FLAGS_ASSIGNED |
++                                      SPAPR_LMB_FLAGS_HOTREMOVABLE);
+         QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
+         nr_entries++;
+         cur_addr = addr + size;
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 42d64a0368..93e0d43051 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -880,6 +880,7 @@ int spapr_rtc_import_offset(SpaprRtcState *rtc, int64_t legacy_offset);
+ #define SPAPR_LMB_FLAGS_ASSIGNED 0x00000008
+ #define SPAPR_LMB_FLAGS_DRC_INVALID 0x00000020
+ #define SPAPR_LMB_FLAGS_RESERVED 0x00000080
++#define SPAPR_LMB_FLAGS_HOTREMOVABLE 0x00000100
+ 
+ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+ 
+-- 
+2.25.1
+
 
