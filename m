@@ -2,81 +2,86 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05682C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 652FFC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:35:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C43F92073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:35:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E5B32073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:35:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXgIppP/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C43F92073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYpBn896"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E5B32073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK0w3-000208-VK
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 10:35:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33292)
+	id 1jK0wo-0003Cn-B0
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 10:35:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jK0uh-0000KN-V5
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:33:49 -0400
+ (envelope-from <armbru@redhat.com>) id 1jK0vd-0001bf-L2
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jK0uf-0000nt-Qp
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:33:47 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37687)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jK0ud-0000gs-UJ
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:33:45 -0400
-Received: by mail-wr1-x442.google.com with SMTP id w10so4519888wrm.4
- for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 07:33:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mHZ6ym8A69U7vZrPntJZpcPKtAWrjDoU5MWj9xz1hFQ=;
- b=EXgIppP/qsw9mOGUuibjk9vEGyXPmf+v8jJ1ceEVog1Ckw1cxxKAe4EENSmbytNowa
- CzVqRaYmdvVGpu3PrhuiLh+qEMNwZQgDny7EoqHzLKBFshVo/yoRcE1pWJQkLqbiyb0O
- hsRYs/NSF4SV3TIepR14Cwj6GSBqvfFQRRwuoAX2ABbbFCR7J480oQItLNdTSyQ5Mmqo
- 6E6KPsKKBm+bDwirkYM5D1fwDSYRE+8G4S2X/keJh7iyguTdIWOqArq9KiZdJl76fHBH
- hGbkYSjIMhfiPbcGe6ttt+IInVe8g+vswHPjk59usC/WY3zlAeEmMyohyOwWy0oOPT37
- 0iNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mHZ6ym8A69U7vZrPntJZpcPKtAWrjDoU5MWj9xz1hFQ=;
- b=J6E31MLfOdDkwt/cO1IBjvzze//pfe0PeQNW4AfcggLJ43BHYTCN+/WX5Zif5naK3H
- 6H4fmDyCbc3QhBHNJHx+PD0U+ofwJIp4h2lvCF8W7XD7EinTnvKQnsFvsDUj1guQcdas
- kJ0X/id5fWhoQupJluSF8rPtvbp01UXDj/b7UMJUw+4SkDNBdfKKCy7kabFYLJbos6a+
- 5Ofgn80THgHsUQMs/GPAQKbEdaPx26VDWTqDpUtYGWUCGmFo+mXApQlJuLpbj7MSeadq
- 3BvMQv7WxlPHJquzjFNakJkqqK9kmSH7sZbYVMiIVICJuqdvMxW542/47AZGRXFKiXl2
- flFA==
-X-Gm-Message-State: AGi0PuY+YNo64+wnWtsKC2h3xocxIrVaPyEp6l3zu2MQJ624Xte+S9qz
- yMZHANif+RNpKkWcNRLVCq1qbC87nbTi2wXFoPA=
-X-Google-Smtp-Source: APiQypL1jAdROH6sJefg4YEvXDijNSlMYF1zyNCHD7rzGez+fvfMe5JSMVEb/fFwHgxY+bU1EBazVjXEdCDWOFj9YQM=
-X-Received: by 2002:adf:c442:: with SMTP id a2mr1317414wrg.381.1585838022300; 
- Thu, 02 Apr 2020 07:33:42 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1jK0vc-0001kH-7l
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:34:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23561
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jK0vc-0001j2-3J
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:34:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585838083;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7RlhH1aMNpBHd87KQK1n4Ry0fINGXScOTp9bEq66FZs=;
+ b=BYpBn896TIIGpRLGNkr7dXM6fKG44o0o9wnXJFz2Cx8w5oCTzyzkFuA3H4bXg//jmc3LFr
+ 1C7lfHa+Q6LZzs4SYozYCPnzMyfOvKYNAQtR6CXYRpGjd8Z8vpnaWQGcFygM0L/Krsm6Yj
+ +d+98Rl/H1Ffw72kXQ1f8sDCyp4X5V0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-sH-7Yty6PVSsVu-vbmS1jg-1; Thu, 02 Apr 2020 10:34:42 -0400
+X-MC-Unique: sH-7Yty6PVSsVu-vbmS1jg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2B868017F5;
+ Thu,  2 Apr 2020 14:34:40 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8853B5DA76;
+ Thu,  2 Apr 2020 14:34:40 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id DD29F11385E2; Thu,  2 Apr 2020 16:34:38 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+ <a3ca8c60-dd83-ea7b-c268-0c94e441bb52@virtuozzo.com>
+ <alpine.BSF.2.22.395.2004021132270.75834@zero.eik.bme.hu>
+ <53df0069-8a7a-9de8-29cb-21362d88bb4e@virtuozzo.com>
+Date: Thu, 02 Apr 2020 16:34:38 +0200
+In-Reply-To: <53df0069-8a7a-9de8-29cb-21362d88bb4e@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Thu, 2 Apr 2020 17:11:55 +0300")
+Message-ID: <87pncq0xdt.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200402100302.833267-1-lvivier@redhat.com>
-In-Reply-To: <20200402100302.833267-1-lvivier@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 2 Apr 2020 16:33:29 +0200
-Message-ID: <CAJ+F1CLejBjX7Q6Ttb4jh96juPdWAGx8fvc3FRVSY-TfXJcoUQ@mail.gmail.com>
-Subject: Re: [RFC 0/5] hmp, qmp: Add some commands to introspect virtio devices
-To: Laurent Vivier <lvivier@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,284 +93,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPiB3
+cml0ZXM6DQoNCj4gMDIuMDQuMjAyMCAxMjozNiwgQkFMQVRPTiBab2x0YW4gd3JvdGU6DQo+PiBP
+biBUaHUsIDIgQXByIDIwMjAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+
+Pj4gMDEuMDQuMjAyMCAyMzoxNSwgUGV0ZXIgTWF5ZGVsbCB3cm90ZToNCj4+Pj4gT24gV2VkLCAx
+IEFwciAyMDIwIGF0IDEwOjAzLCBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+
+IHdyb3RlOg0KPj4+Pj4NCj4+Pj4+IFFFTVUncyBFcnJvciB3YXMgcGF0dGVybmVkIGFmdGVyIEdM
+aWIncyBHRXJyb3IuwqAgRGlmZmVyZW5jZXMgaW5jbHVkZToNCj4+Pj4NCj4+Pj4gwqBGcm9tIG15
+IFBPViB0aGUgbWFqb3IgcHJvYmxlbSB3aXRoIEVycm9yIGFzIHdlIGhhdmUgaXQgdG9kYXkNCj4+
+Pj4gaXMgdGhhdCBpdCBtYWtlcyB0aGUgc2ltcGxlIHByb2Nlc3Mgb2Ygd3JpdGluZyBjb2RlIGxp
+a2UNCj4+Pj4gZGV2aWNlIHJlYWxpemUgZnVuY3Rpb25zIGhvcnJpZmljYWxseSBib2lsZXJwbGF0
+ZSBoZWF2eTsNCj4+Pj4gZm9yIGluc3RhbmNlIHRoaXMgaXMgZnJvbSBody9hcm0vYXJtc3NlLmM6
+DQo+Pj4+DQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqAgb2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNw
+dW9iaiwgT0JKRUNUKCZzLT5jcHVfY29udGFpbmVyW2ldKSwNCj4+Pj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICJtZW1v
+cnkiLCAmZXJyKTsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBpZiAoZXJyKSB7DQo+Pj4+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsNCj4+Pj4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCB9DQo+
+Pj4+IMKgwqDCoMKgwqDCoMKgwqAgb2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNwdW9iaiwgT0JK
+RUNUKHMpLCAiaWRhdSIsICZlcnIpOw0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmIChlcnIpIHsN
+Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIp
+Ow0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPj4+PiDCoMKgwqDCoMKg
+wqDCoMKgIH0NCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBvYmplY3RfcHJvcGVydHlfc2V0X2Jvb2wo
+Y3B1b2JqLCB0cnVlLCAicmVhbGl6ZWQiLCAmZXJyKTsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBp
+ZiAoZXJyKSB7DQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcm9wYWdhdGUo
+ZXJycCwgZXJyKTsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+Pj4g
+wqDCoMKgwqDCoMKgwqDCoCB9DQo+Pj4+DQo+Pj4+IDE2IGxpbmVzIG9mIGNvZGUganVzdCB0byBz
+ZXQgMiBwcm9wZXJ0aWVzIG9uIGFuIG9iamVjdA0KPj4+PiBhbmQgcmVhbGl6ZSBpdC4gSXQncyBh
+IGxvdCBvZiBib2lsZXJwbGF0ZSBhbmQgYXMNCj4+Pj4gYSByZXN1bHQgd2UgZnJlcXVlbnRseSBn
+ZXQgaXQgd3Jvbmcgb3IgdGFrZSBzaG9ydGN1dHMNCj4+Pj4gKGVnIGZvcmdldHRpbmcgdGhlIGVy
+cm9yLWhhbmRsaW5nIGVudGlyZWx5LCBjYWxsaW5nDQo+Pj4+IGVycm9yX3Byb3BhZ2F0ZSBqdXN0
+IG9uY2UgZm9yIGEgd2hvbGUgc2VxdWVuY2Ugb2YNCj4+Pj4gY2FsbHMsIHRha2luZyB0aGUgbGF6
+eSBhcHByb2FjaCBhbmQgdXNpbmcgZXJyX2Fib3J0DQo+Pj4+IG9yIGVycl9mYXRhbCB3aGVuIHdl
+IG91Z2h0IHJlYWxseSB0byBiZSBwcm9wYWdhdGluZw0KPj4+PiBhbiBlcnJvciwgZXRjKS4gSSBo
+YXZlbid0IGxvb2tlZCBhdCAnYXV0byBwcm9wYWdhdGlvbicNCj4+Pj4geWV0LCBob3BlZnVsbHkg
+aXQgd2lsbCBoZWxwPw0KPj4+DQo+Pj4gWWVzLCBhZnRlciBpdCB0aGUgY29kZSBhYm92ZSB3aWxs
+IGxvb2sgbGlrZSB0aGlzOg0KPj4+DQo+Pj4gLi4uIHNvbWVfZnVuYyguLi4sIGVycnApDQo+Pj4g
+ew0KPj4+IMKgwqAgRVJSUF9BVVRPX1BST1BBR0FURSgpOyAjIG1hZ2ljIG1hY3JvIGF0IGZ1bmN0
+aW9uIHN0YXJ0LCBhbmQgbm8gIkVycm9yICplcnIiIGRlZmluaXRpb24NCj4+Pg0KPj4+IC4uLg0K
+Pj4+IMKgwqDCoMKgwqDCoMKgwqAgb2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNwdW9iaiwgT0JK
+RUNUKCZzLT5jcHVfY29udGFpbmVyW2ldKSwNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgIm1lbW9yeSIsIGVycnAp
+Ow0KPj4+IMKgwqDCoMKgwqDCoMKgwqAgaWYgKCplcnJwKSB7DQo+Pj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHJldHVybjsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+PiDCoMKgwqDCoMKg
+wqDCoMKgIG9iamVjdF9wcm9wZXJ0eV9zZXRfbGluayhjcHVvYmosIE9CSkVDVChzKSwgImlkYXUi
+LCBlcnJwKTsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmICgqZXJycCkgew0KPj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCByZXR1cm47DQo+Pj4gwqDCoMKgwqDCoMKgwqDCoCB9DQo+Pj4gwqDC
+oMKgwqDCoMKgwqDCoCBvYmplY3RfcHJvcGVydHlfc2V0X2Jvb2woY3B1b2JqLCB0cnVlLCAicmVh
+bGl6ZWQiLCBlcnJwKTsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmICgqZXJycCkgew0KPj4+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm47DQo+Pj4gwqDCoMKgwqDCoMKgwqDCoCB9DQo+
+Pj4gLi4uDQo+Pj4gfQ0KPj4+DQo+Pj4gLSBwcm9wYWdhdGlvbiBpcyBhdXRvbWF0aWMsIGVycnAg
+aXMgdXNlZCBkaXJlY3RseSBhbmQgbWF5IGJlIHNhZmVseSBkZXJlZmVyZW5jZWQuDQo+Pg0KPj4g
+Tm90IG11Y2ggYmV0dGVyLiBDb3VsZCBpdCBiZSBzb21ldGhpbmcgbGlrZToNCj4NCj4gQWN0dWFs
+bHksIG11Y2ggYmV0dGVyLCBhcyBpdCBzb2x2ZXMgc29tZSByZWFsIHByb2JsZW1zIGFyb3VuZCBl
+cnJvciBwcm9wYWdhdGlvbi4NCg0KVGhlIGF1dG8gcHJvcGFnYXRpb24gcGF0Y2hlcycgc3RhdGVk
+IGFpbSBpcyB0byBmaXggJmVycm9yX2ZhdGFsIG5vdCB0bw0KZWF0IGhpbnRzLCBhbmQgdG8gcHJv
+dmlkZSBtb3JlIHVzZWZ1bCBzdGFjayBiYWNrdHJhY2VzIHdpdGgNCiZlcnJvcl9hYm9ydC4gIFRo
+ZSBzbGlnaHQgc2hyaW5raW5nIG9mIGJvaWxlcnBsYXRlIGlzIGEgd2VsY29tZSBib251cy4NCg0K
+Rm9yIGEgYmlnZ2VyIGltcHJvdmVtZW50LCBoYXZlIHRoZSBmdW5jdGlvbnMgcmV0dXJuIGEgdXNl
+ZnVsIHZhbHVlLCBhcw0KZGlzY3Vzc2VkIGVsc2V3aGVyZSBpbiB0aGlzIHRocmVhZC4NCg0KPj4N
+Cj4+ICDCoMKgwqAgRVJSUF9SRVQob2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNwdW9iaiwgT0JK
+RUNUKCZzLT5jcHVfY29udGFpbmVyW2ldKSwNCj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAibWVtb3J5
+IiwgZXJycCkpOw0KPj4gIMKgwqDCoCBFUlJQX1JFVChvYmplY3RfcHJvcGVydHlfc2V0X2xpbmso
+Y3B1b2JqLCBPQkpFQ1QocyksICJpZGF1IiwgZXJycCkpOw0KPj4gIMKgwqDCoCBFUlJQX1JFVChv
+YmplY3RfcHJvcGVydHlfc2V0X2Jvb2woY3B1b2JqLCB0cnVlLCAicmVhbGl6ZWQiLCBlcnJwKSk7
+DQo+Pg0KPg0KPiBhbmQgdHVybiBhbGwNCj4NCj4gcmV0ID0gZnVuYyguLi4pOw0KPiBpZiAocmV0
+IDwgMCkgew0KPiAgICAgcmV0dXJuIHJldDsNCj4gfQ0KPg0KPiBpbnRvDQo+DQo+IEZBSUxfUkVU
+KGZ1bmMoLi4uKSkNCj4NCj4gPw0KPg0KPiBOb3QgYSBwcm9ibGVtIHRvIG1ha2Ugc3VjaCBtYWNy
+by4uIEJ1dCBJIHRoaW5rIGl0J3MgYSBiYWQgaWRlYSB0byB0dXJuIGFsbCB0aGUgY29kZQ0KPiBp
+bnRvIHNlcXVlbmNlIG9mIG1hY3JvIGludm9jYXRpb25zLiBJdCdzIGhhcmQgdG8gZGVidWcgYW5k
+IGZvbGxvdy4NCg0KWWVzLiAgSGlkaW5nIGNvbnRyb2wgZmxvdyBpbiBtYWNyb3MgaXMgYWxtb3N0
+IGFsd2F5cyB0b28gbXVjaCBtYWdpYy4NClRoZXJlIGFyZSBleGNlcHRpb25zLCBidXQgdGhpcyBk
+b2Vzbid0IGxvb2sgbGlrZSBvbmUuDQo=
 
-On Thu, Apr 2, 2020 at 12:03 PM Laurent Vivier <lvivier@redhat.com> wrote:
->
-> This series introduces new QMP/HMP commands to dump the status
-> of a a virtio device at different levels.
-
-Looks nice, but my feeling is that we are growing qemu with debugging
-facilities in general with HMP/QMP.
-
-If this is only for debugging purposes, why don't we compile it only
-when --enable-debug?
-
-A guest that would need to be debugged could have its state loaded in
-a debug version of qemu.
-
-Alternatively, I think most of the data you provide here could
-probably be introspected via gdb scripts.
-
-Just some thoughts
-
->
-> 1. Main command
->
->  HMP Only:
->
->      virtio [subcommand]
->
->    Example:
->
->     List all sub-commands:
->
->     (qemu) virtio
->     virtio query  -- List all available virtio devices
->     virtio status path -- Display status of a given virtio device
->     virtio queue-status path queue -- Display status of a given virtio qu=
-eue
->     virtio queue-element path queue [index] -- Display element of a given=
- virtio queue
->
-> 2. List available virtio devices in the machine
->
->   HMP Form:
->
->     virtio query
->
->   Example:
->
->     (qemu) virtio query
->     /machine/peripheral-anon/device[3]/virtio-backend [virtio-net]
->     /machine/peripheral-anon/device[1]/virtio-backend [virtio-serial]
->     /machine/peripheral-anon/device[0]/virtio-backend [virtio-blk]
->
->   QMP Form:
->
->     { 'command': 'query-virtio', 'returns': ['VirtioInfo'] }
->
->   Example:
->
->   -> { "execute": "query-virtio" }
->   <- { "return": [
->          {
->              "path": "/machine/peripheral-anon/device[3]/virtio-backend",
->              "type": "virtio-net"
->          },
->          {
->              "path": "/machine/peripheral-anon/device[1]/virtio-backend",
->              "type": "virtio-serial"
->          },
->          {
->              "path": "/machine/peripheral-anon/device[0]/virtio-backend",
->              "type": "virtio-blk"
->          }
->        ]
->      }
->
-> 3. Display status of a given virtio device
->
->   HMP Form:
->
->     virtio status <path>
->
->   Example:
->
->     (qemu) virtio status /machine/peripheral-anon/device[3]/virtio-backen=
-d
->     /machine/peripheral-anon/device[3]/virtio-backend:
->       Device Id:        1
->       Guest features:   0x0000000130afffa7
->       Host features:    0x0000000179bfffe7
->       Backend features: 0x0000000000000000
->       Endianness:       little
->       VirtQueues:       3
->
->   QMP Form:
->
->     { 'command': 'virtio-status',
->       'data': { 'path': 'str' },
->       'returns': 'VirtioStatus'
->     }
->
->   Example:
->
->   -> { "execute": "virtio-status",
->        "arguments": {
->            "path": "/machine/peripheral-anon/device[3]/virtio-backend"
->        }
->     }
->   <- { "return": {
->            "backend_features": 0,
->            "guest_features": 5111807911,
->            "num_vqs": 3,
->            "host_features": 6337593319,
->            "device_endian": "little",
->            "device_id": 1
->        }
->      }
->
-> 4. Display status of a given virtio queue
->
->   HMP Form:
->
->     virtio queue-status <path> <queue>
->
->   Example:
->
->     (qemu) virtio queue-status /machine/peripheral-anon/device[3]/virtio-=
-backend 0
->     /machine/peripheral-anon/device[3]/virtio-backend:
->       index:                0
->       inuse:                0
->       last_avail_idx:       61
->       shadow_avail_idx:     292
->       signalled_used:       61
->       signalled_used_valid: 1
->       VRing:
->         num:         256
->         num_default: 256
->         align:       4096
->         desc:        0x000000006c352000
->         avail:       0x000000006c353000
->         used:        0x000000006c353240
->
->   QMP Form:
->
->     { 'command': 'virtio-queue-status',
->       'data': { 'path': 'str', 'queue': 'uint16' },
->       'returns': 'VirtQueueStatus'
->     }
->
->   Example:
->
->   -> { "execute": "virtio-queue-status",
->        "arguments": {
->            "path": "/machine/peripheral-anon/device[3]/virtio-backend",
->            "queue": 0
->        }
->     }
->   <- { "return": {
->        "signalled_used": 373,
->        "inuse": 0,
->        "vring_desc": 864411648,
->        "vring_num_default": 256,
->        "signalled_used_valid": 1,
->        "vring_avail": 864415744,
->        "last_avail_idx": 373,
->        "queue_index": 0,
->        "vring_used": 864416320,
->        "shadow_avail_idx": 619,
->        "used_idx": 373,
->        "vring_num": 256,
->        "vring_align": 4096
->        }
->      }
->
-> 5. Display element of a given virtio queue
->
->   HMP Form:
->
->     virtio queue-element <path> <queue> [index]
->
->   Example:
->
->     Dump the information of the head element of the first queue of
->     the first virtio device::
->
->       (qemu) virtio queue-element/machine/peripheral-anon/device[3]/virti=
-o-backend 0
->       index:  67
->       ndescs: 1
->       descs:  addr 0x6fe69800 len 1536 (write-only)
->
->       (qemu) xp/128bx 0x6fe69800
->       000000006fe69800: 0x02 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->       000000006fe69808: 0x00 0x00 0x01 0x00 0x52 0x54 0x00 0x12
->       000000006fe69810: 0x34 0x56 0x52 0x54 0x00 0x09 0x51 0xde
->       000000006fe69818: 0x08 0x00 0x45 0x00 0x00 0x4c 0x8f 0x32
->
->     device[3] is a virtio-net device and we can see in the element buffer=
- the
->     MAC address of the card::
->
->       [root@localhost ~]# ip link show ens4
->       2: ens4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel =
-state UP m0
->           link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
->
->     and the MAC address of the gateway::
->
->       [root@localhost ~]# arp -a
->       _gateway (192.168.122.1) at 52:54:00:09:51:de [ether] on ens4
->
->   QMP Form:
->
->     { 'command': 'virtio-queue-element',
->       'data': { 'path': 'str', 'queue': 'uint16', '*index': 'uint16' },
->       'returns': 'VirtioQueueElement'
->     }
->
->   Example:
->
->   -> { "execute": "virtio-queue-element",
->        "arguments": {
->            "path": "/machine/peripheral-anon/device[3]/virtio-backend",
->            "queue": 0
->        }
->     }
->   -> { "return": {
->           "index": 109,
->           "len": 0,
->           "ndescs": 1,
->           "descs": [
->               { "flags": 2, "len": 2048, "addr": 853145600 }
->           ]
->        }
->     }
->
-> Laurent Vivier (5):
->   qmp: add QMP command query-virtio
->   qmp: add QMP command virtio-status
->   qmp: add QMP command virtio-queue-status
->   qmp: add QMP command virtio-queue-element
->   hmp: add virtio commands
->
->  Makefile                   |   2 +-
->  Makefile.target            |   7 +-
->  docs/system/monitor.rst    |   2 +
->  hmp-commands-virtio.hx     | 148 ++++++++++++++++++
->  hmp-commands.hx            |  10 ++
->  hw/virtio/Makefile.objs    |   2 +
->  hw/virtio/virtio-stub.c    |  32 ++++
->  hw/virtio/virtio.c         | 313 +++++++++++++++++++++++++++++++++++++
->  include/hw/virtio/virtio.h |   1 +
->  include/monitor/hmp.h      |   4 +
->  monitor/misc.c             |  17 ++
->  qapi/Makefile.objs         |   2 +-
->  qapi/qapi-schema.json      |   1 +
->  qapi/virtio.json           | 302 +++++++++++++++++++++++++++++++++++
->  tests/qtest/qmp-cmd-test.c |   1 +
->  15 files changed, 840 insertions(+), 4 deletions(-)
->  create mode 100644 hmp-commands-virtio.hx
->  create mode 100644 hw/virtio/virtio-stub.c
->  create mode 100644 qapi/virtio.json
->
-> --
-> 2.25.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
 
