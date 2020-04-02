@@ -2,83 +2,97 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48310C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2D6C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:45:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D175206E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 649452073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:45:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XQ7UoaN/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D175206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5O4Oi/1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 649452073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK06z-0004W8-8G
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49836)
+	id 1jK09t-0005UP-Kd
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:45:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jK06N-00042f-53
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:41:48 -0400
+ (envelope-from <peterx@redhat.com>) id 1jK09H-00054T-Kh
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:44:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jK06M-0003zW-0Z
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:41:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34839
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1jK09G-0007YZ-AP
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:44:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59768
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jK06L-0003yP-TJ
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:41:45 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jK09G-0007Xa-5f
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:44:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585834905;
+ s=mimecast20190719; t=1585835085;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6/Azu/dxUOGB9qqjJfs0I7T/Xl2C8GgnCyzjg0MKAkc=;
- b=XQ7UoaN/p6MJOWOln2Sa0/juWE7tsqp/Kn6AXpjp0o0NrK67KeVIGNosSfrzJ0PIo0GOwq
- FCDgXXGcHZqOyH0oxbUyvW6x5nL4bh1gHLXXoAU+dJosx6i30pZmrKrz6thqJcY62yfhG3
- LsKrq3FPnkRtZvePrSfUCMM+nPCIOb8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-7pXCHvutPx6ajlBsSRRrLQ-1; Thu, 02 Apr 2020 09:41:42 -0400
-X-MC-Unique: 7pXCHvutPx6ajlBsSRRrLQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D3A3190B2D6;
- Thu,  2 Apr 2020 13:41:35 +0000 (UTC)
-Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F1551E2C0;
- Thu,  2 Apr 2020 13:41:32 +0000 (UTC)
-Subject: Re: [PATCH for-5.0?] nbd: Attempt reconnect after server error of
- ESHUTDOWN
-To: "Richard W.M. Jones" <rjones@redhat.com>
-References: <20200401223841.312793-1-eblake@redhat.com>
- <20200402083826.GY3888@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <6b66952d-24a4-593c-2160-8c2877e42f49@redhat.com>
-Date: Thu, 2 Apr 2020 08:41:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ bh=cLXVzBqh9zhhwh/CVXGrcgRs/dfHXfqYNtY+tAoSi+Y=;
+ b=W5O4Oi/1Q8yhSCscqpBHHn1oTM2zGnD/6sNGEhNoTp1kDLkyzblO0IW17jHQfsluog1hia
+ B++fUpT4YsrxNg/ZRHa2CZ0M8Sh59l8AgkUNpC3zV6a1bUp1PH1kuHaYepo8JQ0iD9jBfd
+ lBy3jbsD3wuqaqHro3se/gj68pwVw34=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-X0FmSxGBO82IxbgrbgCM8g-1; Thu, 02 Apr 2020 09:44:44 -0400
+X-MC-Unique: X0FmSxGBO82IxbgrbgCM8g-1
+Received: by mail-wr1-f70.google.com with SMTP id b2so1496424wrq.8
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 06:44:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=gvQ2R8y99CBBi8RZRazk2nffx/pgU8Suz+ahqIPXbdM=;
+ b=NJx2Q9b7/PTYGO0GYFW6Ju+XEhRMkx3tQLWTu2Oq6aOY37aXwWXjX72m8e+SUdzLH2
+ SWTSDlBanSnVnu4GzV2tman+PV6npsh0g/wJpeTruVZ7hzErI1z8oc/wwvXdkF65xMFf
+ oBAq3BA35U5m1HJ7/GT9mdthrisR/YtWQi6AEyF6/KdFoPiXrCMjjyz5pm1yqyFy3YLr
+ U5NSbtNKAGlbEzKNUotxJBzp0JuwjVPYJYjG3/Qp3lw2+XoVIMD/51fG3X0O+gIncNW1
+ tQrau6llyjiUSXJva6ToEGAG1ciKSjUjLf1JXBA3IN7h25AUJ8+/521bGOIt+kbyfiDI
+ rlxQ==
+X-Gm-Message-State: AGi0PuZnOKY3HHZIwK8nkFpOJQN14+iqUd9eT8/BWEEca2o/OjeIkDLB
+ A+bBk67FKCEGHy7zpoVb6HB9PJqLMnJeUNhcTsHqkAcqohcx6JmwAg9YAZTQHrQf3P5Ikl0yeMf
+ b//qRBuE8xejOJJI=
+X-Received: by 2002:a7b:c148:: with SMTP id z8mr3475053wmi.31.1585835082983;
+ Thu, 02 Apr 2020 06:44:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLx20559FBmzYn1zSgVJF/1OJmxG/m/FZix8ZKxUksypGr3hxHYdG87RbmNwxVxHM8SPltmSw==
+X-Received: by 2002:a7b:c148:: with SMTP id z8mr3475005wmi.31.1585835082622;
+ Thu, 02 Apr 2020 06:44:42 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id z129sm7277739wmb.7.2020.04.02.06.44.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Apr 2020 06:44:41 -0700 (PDT)
+Date: Thu, 2 Apr 2020 09:44:36 -0400
+From: Peter Xu <peterx@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 13/22] intel_iommu: add PASID cache management
+ infrastructure
+Message-ID: <20200402134436.GI7174@xz-x1>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-14-git-send-email-yi.l.liu@intel.com>
+ <20200402000225.GC7174@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A21EAAD@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402083826.GY3888@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A21EAAD@SHSMSX104.ccr.corp.intel.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,65 +104,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/2/20 3:38 AM, Richard W.M. Jones wrote:
-> 
-> On Wed, Apr 01, 2020 at 05:38:41PM -0500, Eric Blake wrote:
->> I was trying to test qemu's reconnect-delay parameter by using nbdkit
->> as a server that I could easily make disappear and resume.  A bit of
->> experimenting shows that when nbdkit is abruptly killed (SIGKILL),
->> qemu detects EOF on the socket and manages to reconnect just fine; but
->> when nbdkit is gracefully killed (SIGTERM), it merely fails all
->> further guest requests with NBD_ESHUTDOWN until the client disconnects
->> first, and qemu was blindly failing the I/O request with ESHUTDOWN
->> from the server instead of attempting to reconnect.
->>
->> While most NBD server failures are unlikely to change by merely
->> retrying the same transaction, our decision to not start a retry loop
->> in the common case is correct.  But NBD_ESHUTDOWN is rare enough, and
->> really is indicative of a transient situation, that it is worth
->> special-casing.
->>
+On Thu, Apr 02, 2020 at 06:46:11AM +0000, Liu, Yi L wrote:
 
-> 
-> For the case I care about (long running virt-v2v conversions with an
-> intermittent network) we don't expect that nbdkit will be killed nor
-> gracefully shut down.  Instead what we expect is that nbdkit returns
-> an error such as NBD_EIO and keeps running.
-> 
-> Indeed if nbdkit actually dies then reconnecting will not help since
-> there will be no server to reconnect to.
+[...]
 
-Hmm.  The idea of reconnect-delay in qemu is that if the connection to 
-the server is dropped, we try to reconnect and then retry the I/O 
-operation.  Maybe what we want is an nbdkit filter which turns EIO 
-errors from the v2v plugin into forced server connection drops, but 
-leave nbdkit up and running to allow the next client to connect.  That's 
-different from the existing --filter=retry behavior (where we try to 
-keep the client connection alive and reopen the plugin), but has a 
-similar effect (because we force the connection to the client to drop, 
-the client would have to reconnect to get more data, and reconnecting 
-triggers a retry on connecting to the plugin).  And it's different from 
---filter=exitlast (that says to quit nbdkit altogether, rather than just 
-the current connection with a client).
+> > > +/**
+> > > + * This function replay the guest pasid bindings to hots by
+> > > + * walking the guest PASID table. This ensures host will have
+> > > + * latest guest pasid bindings. Caller should hold iommu_lock.
+> > > + */
+> > > +static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
+> > > +                                            VTDPASIDCacheInfo
+> > > +*pc_info) {
+> > > +    VTDHostIOMMUContext *vtd_dev_icx;
+> > > +    int start =3D 0, end =3D VTD_HPASID_MAX;
+> > > +    vtd_pasid_table_walk_info walk_info =3D {.flags =3D 0};
+> >=20
+> > So vtd_pasid_table_walk_info is still used.  I thought we had reached a=
+ consensus
+> > that this can be dropped?
+>=20
+> yeah, I did have considered your suggestion and plan to do it. But when
+> I started coding, it looks a little bit weird to me:
+> For one, there is an input VTDPASIDCacheInfo in this function. It may be
+> nature to think about passing the parameter to further calling
+> (vtd_replay_pasid_bind_for_dev()). But, we can't do that. The vtd_bus/dev=
+fn
+> fields should be filled when looping the assigned devices, not the one
+> passed by vtd_replay_guest_pasid_bindings() caller.
 
-> 
-> So I'm neutral about this patch.  If you want it for qemu that's fine
-> but I don't think it will affect v2v.
+Hacky way is we can directly modify VTDPASIDCacheInfo* with bus/devfn
+for the loop.  Otherwise we can duplicate the object when looping, so
+that we can avoid introducing a new struct which seems to contain
+mostly the same information.
 
-Then this patch is no longer 5.0 material.  We may still want to improve 
-shutdown handling in qemu (both in the client and in the server), but 
-doing it correctly will be bigger than just one patch, based on 
-Vladimir's response.
+> For two, reusing the VTDPASIDCacheInfo for passing walk info may require
+> the final user do the same thing as what the vtd_replay_guest_pasid_bindi=
+ngs()
+> has done here.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+I don't see it happen, could you explain?
+
+>=20
+> So kept the vtd_pasid_table_walk_info.
+
+[...]
+
+> > > +/**
+> > > + * This function syncs the pasid bindings between guest and host.
+> > > + * It includes updating the pasid cache in vIOMMU and updating the
+> > > + * pasid bindings per guest's latest pasid entry presence.
+> > > + */
+> > > +static void vtd_pasid_cache_sync(IntelIOMMUState *s,
+> > > +                                 VTDPASIDCacheInfo *pc_info) {
+> > > +    /*
+> > > +     * Regards to a pasid cache invalidation, e.g. a PSI.
+> > > +     * it could be either cases of below:
+> > > +     * a) a present pasid entry moved to non-present
+> > > +     * b) a present pasid entry to be a present entry
+> > > +     * c) a non-present pasid entry moved to present
+> > > +     *
+> > > +     * Different invalidation granularity may affect different devic=
+e
+> > > +     * scope and pasid scope. But for each invalidation granularity,
+> > > +     * it needs to do two steps to sync host and guest pasid binding=
+.
+> > > +     *
+> > > +     * Here is the handling of a PSI:
+> > > +     * 1) loop all the existing vtd_pasid_as instances to update the=
+m
+> > > +     *    according to the latest guest pasid entry in pasid table.
+> > > +     *    this will make sure affected existing vtd_pasid_as instanc=
+es
+> > > +     *    cached the latest pasid entries. Also, during the loop, th=
+e
+> > > +     *    host should be notified if needed. e.g. pasid unbind or pa=
+sid
+> > > +     *    update. Should be able to cover case a) and case b).
+> > > +     *
+> > > +     * 2) loop all devices to cover case c)
+> > > +     *    - For devices which have HostIOMMUContext instances,
+> > > +     *      we loop them and check if guest pasid entry exists. If y=
+es,
+> > > +     *      it is case c), we update the pasid cache and also notify
+> > > +     *      host.
+> > > +     *    - For devices which have no HostIOMMUContext, it is not
+> > > +     *      necessary to create pasid cache at this phase since it
+> > > +     *      could be created when vIOMMU does DMA address translatio=
+n.
+> > > +     *      This is not yet implemented since there is no emulated
+> > > +     *      pasid-capable devices today. If we have such devices in
+> > > +     *      future, the pasid cache shall be created there.
+> > > +     * Other granularity follow the same steps, just with different =
+scope
+> > > +     *
+> > > +     */
+> > > +
+> > > +    vtd_iommu_lock(s);
+> > > +    /* Step 1: loop all the exisitng vtd_pasid_as instances */
+> > > +    g_hash_table_foreach_remove(s->vtd_pasid_as,
+> > > +                                vtd_flush_pasid, pc_info);
+> >=20
+> > OK the series is evolving along with our discussions, and /me too on un=
+derstanding
+> > your series... Now I'm not very sure whether this operation is still us=
+eful...
+> >=20
+> > The major point is you'll need to do pasid table walk for all the regis=
+tered
+> > devices
+> > below.  So IIUC vtd_replay_guest_pasid_bindings() will be able to also =
+detect
+> > addition, removal or modification of pasid address spaces.  Am I right?
+>=20
+> It's true if there is only assigned pasid-capable devices. If there is
+> emualted pasid-capable device, it would be a problem as emualted devices
+> won't register HostIOMMUContext. Somehow, the pasid cahce invalidation
+> for emualted device would be missed. So I chose to make the step 1 cover
+> the "real" cache invalidation(a.k.a. removal), while step 2 to cover
+> addition and modification.
+
+OK.  Btw, I think modification should still belongs to step 1 then (I
+think you're doing that, though).
+
+Thanks,
+
+--=20
+Peter Xu
 
 
