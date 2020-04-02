@@ -2,104 +2,99 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F134BC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 21:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8EFC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 21:46:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE6A220719
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 21:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95FC820737
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 21:46:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TUX6Cjga"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE6A220719
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDEJw+qX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95FC820737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK7Zt-00008r-Pc
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 17:40:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57542)
+	id 1jK7fE-0001cP-OS
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 17:46:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jK7Z1-0007jZ-AS
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 17:39:52 -0400
+ (envelope-from <philmd@redhat.com>) id 1jK7e3-000109-0W
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 17:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jK7Z0-0000fO-5o
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 17:39:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40793
+ (envelope-from <philmd@redhat.com>) id 1jK7e1-0005B0-Rt
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 17:45:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34569
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jK7Z0-0000en-2h
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 17:39:50 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jK7e1-00059N-Oa
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 17:45:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585863589;
+ s=mimecast20190719; t=1585863901;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0RxtPlEXlcaqYBxg2eIAiSh0pgnLGNrMETIvIu2cV6A=;
- b=TUX6CjgaMr8p/2T+BEB5hpqUQGe4LrIg7w10mqUMBVzxal3ud1bl3ZkiggIT+tWuT0acWF
- Yw35q1WGu9g6RGT1HZouVfWp05CDFdDgMUydzWUn5ouP1dn8h58PI006+7R+uJtqLATHKb
- y0dx8ik5NgIKhXe59u5alLeMsVYmJ+A=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-bxJBRn1OO6C_HikMkFX8gA-1; Thu, 02 Apr 2020 17:39:42 -0400
-X-MC-Unique: bxJBRn1OO6C_HikMkFX8gA-1
-Received: by mail-wr1-f70.google.com with SMTP id j12so2029253wrr.18
- for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 14:39:42 -0700 (PDT)
+ bh=CPvMwUw0ah03gET9cru3CNufjC9IXWQYXjr1GCg6rek=;
+ b=bDEJw+qXgJ60SVRh/i01Zm76K1pYkS0CpbnypphO/uuGNdMANjCvT+CTqpH32wg2vgAnDw
+ HS47PFPXS/gSiB7XvpWOXCwdyFNF01AqiFFmwN3VJGWYZYpD9y09sQcV5FC6sVqOSn/1nv
+ ykugkJXZ0LM1iQwP8QFe5XeR/Ex6/r4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-smppz1WRP9uv0vNyvtT_JA-1; Thu, 02 Apr 2020 17:44:59 -0400
+X-MC-Unique: smppz1WRP9uv0vNyvtT_JA-1
+Received: by mail-wr1-f71.google.com with SMTP id e10so2065380wrm.2
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 14:44:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=FyipcZIYUNRe6GAqKKoOZyJtkWs4AFhOBTa9X+9XkJ8=;
- b=L5rjFY9/e4ysLUPEOZ3ha6Nv4/4WDjulgSNXdW5WZ7rt0sohi18XG5ZGky3Di46tRQ
- qOWYTHoV4g0bn4mi7KWT4ecuI1g+id3Y2l1gw4wqAdjeWXK3B80gDFExZM0G0E55a6Uc
- KIsdub6DXzQcRieNPPhj13A2VWfumQGaGGBIHyu+yCXGVJ24wF8SWUc4WxVT5m2EbKcb
- amIM73bZYnMldSVJkjPt/BY+u/Vweq4fEkZCVNkiK3NeVLv2NuS35ESc5Y+dVuC7x50o
- IaW5J4CsinBmYoOyB2Vt/+HDTDnu7frYqyqpHmcx1FzNcjtsILIltyS/Ut4i0MhD+uat
- 7Isw==
-X-Gm-Message-State: AGi0PuaILdgk6enX1foe3hNO6wWrQJy+fNl67ufnEflaFK592EDXi7gP
- xRO39GNyxdDntIbziwNgGXQ1ZHrbcTl/cU/8YjBL7myZq2OBX7VdqoVGYqN1n2jQau8aLxMd6Z8
- 7Knqyd97hgEQJzSk=
-X-Received: by 2002:adf:dd8f:: with SMTP id x15mr5799881wrl.201.1585863581694; 
- Thu, 02 Apr 2020 14:39:41 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ6t7UKcKf0I9CnK3u1NAifn1pK8xAXVx1G3La2M64cwPthK/6eGcuQlqrD0kackVEQo288PA==
-X-Received: by 2002:adf:dd8f:: with SMTP id x15mr5799868wrl.201.1585863581470; 
- Thu, 02 Apr 2020 14:39:41 -0700 (PDT)
+ bh=SucngxGIsg1jO4fhhkoD14vVoqO9rTRmFbi7i+9UKhI=;
+ b=JSC5u0/CuuhEVgclAynTBu9N3bu8zYvQgr1j7sfYl8JWpjYcfo5IOhCwou2QCm/5+S
+ jOl7c+rdjctgHbKBWggVl5wWs0YJC9T7rhWy700xkcyFklv+ROYiCL088upHcq3297Yz
+ HsivjLiKfYwHRpVh7xetoDI5bX10Xcn98Z1MvQpKND97AwMB2cNuOb199Bn7rR6dFrno
+ L2dnHErGB04fcfVIlHFaPcTufVCtD9yJd55cGh9AvcuggeC/7pvNKhdaC/2zCBL/8fL1
+ eeEv1IWzw2Q0nzgI8om/Nz4maPzwRNjoaLDti9/VQ6NUwypuOghzR93lWg/fl/9L1ccS
+ Z7Ew==
+X-Gm-Message-State: AGi0PuamaiXIo4nGAb9XI9eZMBYA+NC6+fDcQqIXnMs+hJyKw1/CPNWE
+ UkHLPmCRwjLBxXl3t9KwK/Z33zLXWkCwISqq77SdFUvttNTNHfvqEXBw0aOBTAxpMXnd0IuBegN
+ R/0crqmhdP75nfeY=
+X-Received: by 2002:a1c:e242:: with SMTP id z63mr5517757wmg.72.1585863896869; 
+ Thu, 02 Apr 2020 14:44:56 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKDSqTdPhCZbTIjlLLqgYQ1e42ZHb0OgA0g3axM1LmqH1cca4U3p1acOReWIh3i0MIVZWqX0g==
+X-Received: by 2002:a1c:e242:: with SMTP id z63mr5517730wmg.72.1585863896521; 
+ Thu, 02 Apr 2020 14:44:56 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id s66sm9016438wme.40.2020.04.02.14.39.39
+ by smtp.gmail.com with ESMTPSA id z3sm8355491wma.22.2020.04.02.14.44.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Apr 2020 14:39:40 -0700 (PDT)
-Subject: Re: [PATCH-for-5.0 1/7] tests/acceptance/machine_sparc_leon3: Disable
- HelenOS test
-To: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200331105048.27989-1-f4bug@amsat.org>
- <20200331105048.27989-2-f4bug@amsat.org>
- <3dd36ad8-53c1-7dd0-3934-88a2c14afd28@linaro.org>
+ Thu, 02 Apr 2020 14:44:55 -0700 (PDT)
+Subject: Re: [PATCH for-5.0? v3] qemu-img: Report convert errors by bytes, not
+ sectors
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200402135717.476398-1-eblake@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1007053b-0f31-c459-2199-07d62ae36427@redhat.com>
-Date: Thu, 2 Apr 2020 23:39:39 +0200
+Message-ID: <a0cc9691-22d1-d533-a66e-701524bb3628@redhat.com>
+Date: Thu, 2 Apr 2020 23:44:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <3dd36ad8-53c1-7dd0-3934-88a2c14afd28@linaro.org>
+In-Reply-To: <20200402135717.476398-1-eblake@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,41 +106,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Jiri Gaisler <jiri@gaisler.se>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard,
-
-On 3/31/20 6:18 PM, Richard Henderson wrote:
-> On 3/31/20 3:50 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> This test was written/tested around beginning of 2019, but was
->> extracted from a bigger series and posted end of June 2019 [*].
->> Unfortunately I did not notice commit 162abf1a8 was merged by
->> then, which implements the AHB and APB plug and play devices.
->>
-[...]
+On 4/2/20 3:57 PM, Eric Blake wrote:
+> Various qemu-img commands are inconsistent on whether they report
+> status/errors in terms of bytes or sector offsets.  The latter is
+> confusing (especially as more places move to 4k block sizes), so let's
+> switch everything to just use bytes everywhere.  One iotest is
+> impacted.
 >=20
-> Thanks!
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 >=20
-> Reviewed-by: Richard Henderson <richard.hendersion@linaro.org>
-> Tested-by: Richard Henderson <richard.hendersion@linaro.org>
+> v3: Fix affected iotest [patchew]
+>=20
+>   qemu-img.c                 | 8 ++++----
+>   tests/qemu-iotests/244.out | 2 +-
+>   2 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b167376bd72e..821cbf610e5f 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1924,8 +1924,8 @@ retry:
+>           if (status =3D=3D BLK_DATA && !copy_range) {
+>               ret =3D convert_co_read(s, sector_num, n, buf);
+>               if (ret < 0) {
+> -                error_report("error while reading sector %" PRId64
+> -                             ": %s", sector_num, strerror(-ret));
+> +                error_report("error while reading at byte %lld: %s",
+> +                             sector_num * BDRV_SECTOR_SIZE, strerror(-re=
+t));
+>                   s->ret =3D ret;
+>               }
+>           } else if (!s->min_sparse && status =3D=3D BLK_ZERO) {
+> @@ -1953,8 +1953,8 @@ retry:
+>                   ret =3D convert_co_write(s, sector_num, n, buf, status)=
+;
+>               }
+>               if (ret < 0) {
+> -                error_report("error while writing sector %" PRId64
+> -                             ": %s", sector_num, strerror(-ret));
+> +                error_report("error while writing at byte %lld: %s",
+> +                             sector_num * BDRV_SECTOR_SIZE, strerror(-re=
+t));
+>                   s->ret =3D ret;
+>               }
+>           }
+> diff --git a/tests/qemu-iotests/244.out b/tests/qemu-iotests/244.out
+> index e6f4dc79934b..56329deb4b9f 100644
+> --- a/tests/qemu-iotests/244.out
+> +++ b/tests/qemu-iotests/244.out
+> @@ -33,7 +33,7 @@ Convert to compressed target with data file:
+>   Formatting 'TEST_DIR/t.IMGFMT.src', fmt=3DIMGFMT size=3D67108864
+>   wrote 1048576/1048576 bytes at offset 0
+>   1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> -qemu-img: error while writing sector 0: Operation not supported
+> +qemu-img: error while writing at byte 0: Operation not supported
+>=20
+>   Convert uncompressed, then write compressed data manually:
+>   Images are identical.
+>=20
 
-While queuing this I noticed a change in your email.
-
-Since you replied to Alex patch later [*] with your usual email:
-Richard Henderson <richard.henderson@linaro.org>
-I think it was a typo, so I fixed it.
-
-[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg694068.html
-
-Regards,
-
-Phil.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
