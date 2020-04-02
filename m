@@ -2,107 +2,86 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDAEC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45032C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:10:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BBF020757
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:00:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13FDA20784
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:10:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCnMh6hT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BBF020757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0eNRhV7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13FDA20784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJzSR-0002WM-6w
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:00:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36483)
+	id 1jJzcU-0005Ht-7f
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:10:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jJzRV-00021l-Ho
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:59:34 -0400
+ (envelope-from <armbru@redhat.com>) id 1jJzbp-0004lj-3m
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:10:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jJzRU-00072B-1O
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:59:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32868
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jJzbm-0005U9-MO
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:10:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31750
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jJzRT-00071v-Sq
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:59:31 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jJzbm-0005Tv-3n
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:10:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585832371;
+ s=mimecast20190719; t=1585833009;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=jzHIYaBzCrIskqpeDrFxFg4TLVQ/TMjKLy3j+HD4LKs=;
- b=QCnMh6hTev/kwPGNG/diDlaWMmizRqdcCeI7vdTmrN/r71BlxKUZOgEnkfxiEI9yhIRdUG
- BlZFvNSHZtXiui6bncyNnzC4hIhzvcm/I66s4Yf+97OdNAqj9HN1lKy5vwh8Ve8MvplUdW
- s9Y3Y4EQxwKWPsjHNYRheczOj7Hh6f8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=K4lJHnbN/1slg+JDMkmAvpYJ6x1YI1TYOmYL0AVqZAk=;
+ b=C0eNRhV7ZkfOrrqMSzSBW6ilR4RDNfxSLM5FgcTTYjfS7H/h6Sgei2UlUrt4g0Mu6e/p8b
+ 3zOumlKCmsojshQPRq2Hxtw6p/M5qOY1Lak43GTCYAeGiFL/knrzTawXci8F0yhBKh6Rey
+ 3CSk0I8Y1mrpzdDMfXbeH9bLWCkzadY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237--CISKgo4MgeCZGhlnJeBSw-1; Thu, 02 Apr 2020 08:59:28 -0400
-X-MC-Unique: -CISKgo4MgeCZGhlnJeBSw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-269-tr_hpxvBOsy167fg0q0U0Q-1; Thu, 02 Apr 2020 09:10:01 -0400
+X-MC-Unique: tr_hpxvBOsy167fg0q0U0Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 240791084434;
- Thu,  2 Apr 2020 12:59:26 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-246.ams2.redhat.com
- [10.36.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 919594D9E9;
- Thu,  2 Apr 2020 12:59:17 +0000 (UTC)
-Subject: Re: [PATCH v4 3/3] backup: don't acquire aio_context in backup_clean
-To: Stefan Reiter <s.reiter@proxmox.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <20200401081504.200017-1-s.reiter@proxmox.com>
- <20200401081504.200017-4-s.reiter@proxmox.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d342623b-c799-6103-18c8-656b036c60de@redhat.com>
-Date: Thu, 2 Apr 2020 14:59:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C83A801E5C;
+ Thu,  2 Apr 2020 13:10:00 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BD7AA18A85;
+ Thu,  2 Apr 2020 13:09:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 419FF11385E2; Thu,  2 Apr 2020 15:09:55 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0 v2 4/4] qga: Restrict guest-file-read count to 10
+ MB to avoid crashes
+References: <20200331140638.16464-1-philmd@redhat.com>
+ <20200331140638.16464-5-philmd@redhat.com>
+Date: Thu, 02 Apr 2020 15:09:55 +0200
+In-Reply-To: <20200331140638.16464-5-philmd@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 31 Mar 2020 16:06:38
+ +0200")
+Message-ID: <87v9mi3ufw.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200401081504.200017-4-s.reiter@proxmox.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="xxGY4oDKo9foq0PszwJfH49sehk2pzCDi"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,66 +93,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, slp@redhat.com,
- stefanha@redhat.com, jsnow@redhat.com, dietmar@proxmox.com
+Cc: "Daniel P . =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>, qemu-devel@nongnu.org,
+ Sameeh Jubran <sjubran@redhat.com>, Basil Salman <basil@daynix.com>,
+ Dietmar Maurer <dietmar@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xxGY4oDKo9foq0PszwJfH49sehk2pzCDi
-Content-Type: multipart/mixed; boundary="TgL4KbXxdZ5xRmNxJ1eEcEWlsCSLY62x5"
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
---TgL4KbXxdZ5xRmNxJ1eEcEWlsCSLY62x5
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 01.04.20 10:15, Stefan Reiter wrote:
-> All code-paths leading to backup_clean (via job_clean) have the job's
-> context already acquired. The job's context is guaranteed to be the same
-> as the one used by backup_top via backup_job_create.
->=20
-> Since the previous logic effectively acquired the lock twice, this
-> broke cleanup of backups for disks using IO threads, since the BDRV_POLL_=
-WHILE
-> in bdrv_backup_top_drop -> bdrv_do_drained_begin would only release the l=
-ock
-> once, thus deadlocking with the IO thread.
->=20
-> This is a partial revert of 0abf2581717a19.
->=20
-> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+> On https://www.mail-archive.com/qemu-devel@nongnu.org/msg693176.html
+> Daniel Berrang=C3=A9 commented:
+>
+>   The QEMU guest agent protocol is not sensible way to access huge
+>   files inside the guest. It requires the inefficient process of
+>   reading the entire data into memory than duplicating it again in
+>   base64 format, and then copying it again in the JSON serializer /
+>   monitor code.
+>
+>   For arbitrary general purpose file access, especially for large
+>   files, use a real file transfer program or use a network block
+>   device, not the QEMU guest agent.
+>
+> To avoid bug reports as BZ#1594054, follow his suggestion to put a
+> low, hard limit on "count" in the guest agent QAPI schema, and don't
+> allow count to be larger than 10 MB.
+>
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
+> Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
+> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->=20
-> With the two previous patches applied, the commit message should now hold=
- true.
->=20
->  block/backup.c | 4 ----
->  1 file changed, 4 deletions(-)
+>  qga/qapi-schema.json | 6 ++++--
+>  qga/commands.c       | 6 +++++-
+>  2 files changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index f6fcb59f34..7758d9daf8 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -266,11 +266,13 @@
+>  ##
+>  # @guest-file-read:
+>  #
+> -# Read from an open file in the guest. Data will be base64-encoded
+> +# Read from an open file in the guest. Data will be base64-encoded.
+> +# As this command is just for limited, ad-hoc debugging, such as log
+> +# file access, the number of bytes to read is limited to 10 MB.
+>  #
+>  # @handle: filehandle returned by guest-file-open
+>  #
+> -# @count: maximum number of bytes to read (default is 4KB)
+> +# @count: maximum number of bytes to read (default is 4KB, maximum is 10=
+MB)
+>  #
+>  # Returns: @GuestFileRead on success.
+>  #
+> diff --git a/qga/commands.c b/qga/commands.c
+> index 8ee1244ebb..c130d1b0f5 100644
+> --- a/qga/commands.c
+> +++ b/qga/commands.c
+> @@ -11,6 +11,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "guest-agent-core.h"
+>  #include "qga-qapi-commands.h"
+>  #include "qapi/error.h"
+> @@ -18,11 +19,14 @@
+>  #include "qemu/base64.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/atomic.h"
+> +#include "commands-common.h"
+> =20
+>  /* Maximum captured guest-exec out_data/err_data - 16MB */
+>  #define GUEST_EXEC_MAX_OUTPUT (16*1024*1024)
+>  /* Allocation and I/O buffer for reading guest-exec out_data/err_data - =
+4KB */
+>  #define GUEST_EXEC_IO_SIZE (4*1024)
+> +/* Maximum file size to read - 10MB */
+> +#define GUEST_FILE_READ_COUNT_MAX (10 * MiB)
+> =20
+>  /* Note: in some situations, like with the fsfreeze, logging may be
+>   * temporarilly disabled. if it is necessary that a command be able
+> @@ -559,7 +563,7 @@ GuestFileRead *qmp_guest_file_read(int64_t handle, bo=
+ol has_count,
+>      }
+>      if (!has_count) {
+>          count =3D QGA_READ_COUNT_DEFAULT;
+> -    } else if (count < 0 || count >=3D UINT32_MAX) {
+> +    } else if (count < 0 || count > GUEST_FILE_READ_COUNT_MAX) {
+>          error_setg(errp, "value '%" PRId64 "' is invalid for argument co=
+unt",
+>                     count);
+>          return NULL;
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+What about qmp-guest-file-write?
 
+Hmm, the JSON parser already puts a limit on the base-64 encoded data,
+namely MAX_TOKEN_SIZE, which is 64MiB.  Yes, MAX_TOKEN_SIZE is
+ridiculously generous.
 
---TgL4KbXxdZ5xRmNxJ1eEcEWlsCSLY62x5--
+In case you look at the code: there are *two* MAX_TOKEN_SIZE, both
+64MiB.  One actually applies to tokens, the other to all the tokens in a
+top-level expression.  Yes, this is criminally confusing.
 
---xxGY4oDKo9foq0PszwJfH49sehk2pzCDi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+We additionally limit the number of tokens within a top-level
+expression, and its nesting depth.
 
------BEGIN PGP SIGNATURE-----
+The stated reason for these limits is
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6F4aMACgkQ9AfbAGHV
-z0CCvgf+NR7TamTud8WORVauca4dDo0mRZ/YyiJ+fB++mQfxZLQjU2yH59d1mNg/
-URDFrQZ2gJwniTL0pYY00aNeJ9Q35qiFIG5LEaomyl5s1guBSfSHGKaLARSJKxxU
-GjNN0/jRWk0r/9v+JHRI7gJGUJT6LqeA9OOY/RKqE6ycF3oJ+Ly7GlMkySZPzk/o
-UvnWLWH8f44GUsR49PyIYfWiNe8JtUQ5LXGhWu+3hIqL3A92clDr62NDJ02fXWfW
-LVZ/1ytYCHaCZib+3pFluWlNp7g79Eaz2L51TTPnTN8QzF89gBm2voiqX+2QaX1F
-Jq0tQKRO0We/+LSYPcjcaSihPmL9Dw==
-=pzd1
------END PGP SIGNATURE-----
+    /*
+     * Security consideration, we limit total memory allocated per object
+     * and the maximum recursion depth that a message can force.
+     */
 
---xxGY4oDKo9foq0PszwJfH49sehk2pzCDi--
+"Security" is misleading; we use this parser only for parsing QMP input,
+QGA input, and string literals.  All trusted.  It's actually a
+robustness consideration.
+
+We fail to put similar limits on JSON output.
+
+While we protect you from the rather far-fetched mistake of driving QEMU
+into OOM state by sending ridiculously huge QMP/QGA input, we do nothing
+to protect you from the more realistic mistake of sending a QMP/QGA
+command that produces ridiculously huge output.
+
+Could use a rethink, I guess :)
 
 
