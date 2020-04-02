@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA64C2BA12
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6B0FC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:00:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B0C8206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:59:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F68E206CC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 15:00:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i7dOatTT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0C8206CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OexIA4qe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F68E206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK1Jk-0005KI-Ku
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 10:59:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40562)
+	id 1jK1Ki-0006QR-FC
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 11:00:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39947)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jK1EK-00048d-T8
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:54:06 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jK1Db-0002cR-0s
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:53:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jK1EJ-00014X-Bw
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:54:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20583
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1jK1DZ-0000TG-Jo
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:53:18 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29011
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jK1EJ-00013A-6j
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:54:03 -0400
+ id 1jK1DZ-0000T5-Fh
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:53:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585839240;
+ s=mimecast20190719; t=1585839197;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=J4DOH8XWli/HMNH/+OslqOJNq8kw0A9oWrDd1ayDlhY=;
- b=i7dOatTTmLn5RPwxOJk5OPhQZRzZv1FmaC84AINojGH/pH0R58CFy/b8s/Fk0MUUl1EH/w
- FaCY2phfjP11+JDRBkNw6lAKBNYF2h3vj6A39/E4nn1Hvillv4CCAehh58IDqK+DJgmqxp
- 3nZ4mTuaQFuMCMtyjJGEDkfdaINrtn4=
+ bh=Zl9FDtxwOI/FksilYChFV1G9aFjsIXI5j5prCQSwE+w=;
+ b=OexIA4qeK0+M0CGtSw3UnGI5nHkui3nA1kFe43d8D7AAmZbxNRWOYJpLVPcYiipngbRPKa
+ ciKol2T2ztzq/7FcISU+XCmIrDMEJqpzbN+sxe9t6GK/QVAtDvYuxSK6Um2NrFqIrbS6sr
+ SQzuCR3M0I0oPQwC3MbnDboRT32SGX8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-bdL7AMF_NKWBZ_kweFWuBA-1; Thu, 02 Apr 2020 10:53:56 -0400
-X-MC-Unique: bdL7AMF_NKWBZ_kweFWuBA-1
+ us-mta-1-VHbW30qwMDCk_O8UzByfdQ-1; Thu, 02 Apr 2020 10:53:15 -0400
+X-MC-Unique: VHbW30qwMDCk_O8UzByfdQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A56D1107B267;
- Thu,  2 Apr 2020 14:53:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B84E101FC68;
+ Thu,  2 Apr 2020 14:53:13 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AB5E45D9C9;
- Thu,  2 Apr 2020 14:53:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 660955D9CD;
+ Thu,  2 Apr 2020 14:53:10 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v8 12/13] arm/arm64: ITS: migration tests
-Date: Thu,  2 Apr 2020 16:52:26 +0200
-Message-Id: <20200402145227.20109-13-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v8 05/13] arm/arm64: gicv3: Set the LPI config
+ and pending tables
+Date: Thu,  2 Apr 2020 16:52:19 +0200
+Message-Id: <20200402145227.20109-6-eric.auger@redhat.com>
 In-Reply-To: <20200402145227.20109-1-eric.auger@redhat.com>
 References: <20200402145227.20109-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -91,211 +92,160 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test maps LPIs (populates the device table, the collection table,
-interrupt translation tables, configuration table), migrates and make
-sure the translation is correct on the destination.
+Allocate the LPI configuration and per re-distributor pending table.
+Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
+by default in the config table.
+
+Also introduce a helper routine that allows to set the pending
+table bit for a given LPI and macros to set/get its configuration.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 
 ---
 
-v7 -> v8:
-- typo: s/en PE #3/on PE #3/
-- added Zenghui's R-b
+v5 -> v6:
+- fix the assert()
+- remove GICR_PROPBASER_IDBITS_MASK
+- remove gicv3_lpi_set_config and gicv3_lpi_get_config declarations
+  and move macros in this patch
 
 v4 -> v5:
-- move stub from header to arm/gic.c
+- Moved some reformattings previously done in
+  "arm/arm64: ITS: its_enable_defaults", in this patch
+- added assert(!gicv3_redist_base()) in gicv3_lpi_alloc_tables()
+- revert for_each_present_cpu() change
 
-v3 -> v4:
-- assert in its_get_device/collection if the id is not found
+v2 -> v3:
+- Move the helpers in lib/arm/gic-v3.c and prefix them with "gicv3_"
+  and add _lpi prefix too
+
+v1 -> v2:
+- remove memory attributes
 ---
- arm/gic.c                  | 58 ++++++++++++++++++++++++++++++++++----
- arm/unittests.cfg          |  8 ++++++
- lib/arm64/asm/gic-v3-its.h |  3 ++
- lib/arm64/gic-v3-its.c     | 22 +++++++++++++++
- 4 files changed, 85 insertions(+), 6 deletions(-)
+ lib/arm/asm/gic-v3.h | 17 ++++++++++++++
+ lib/arm/gic-v3.c     | 53 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 54ae83d..6ae5515 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -592,6 +592,7 @@ static void gic_test_mmio(void)
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index 47df051..fedffa8 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -50,6 +50,13 @@
+ #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+ 	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level=
+ ## _SHIFT)
 =20
- static void test_its_introspection(void) {}
- static void test_its_trigger(void) {}
-+static void test_its_migration(void) {}
++#define GICR_PENDBASER_PTZ		BIT_ULL(62)
++
++#define LPI_PROP_GROUP1			(1 << 1)
++#define LPI_PROP_ENABLED		(1 << 0)
++#define LPI_PROP_DEFAULT_PRIO		0xa0
++#define LPI_PROP_DEFAULT		(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | LPI=
+_PROP_ENABLED)
++
+ #include <asm/arch_gicv3.h>
 =20
- #else /* __aarch64__ */
+ #ifndef __ASSEMBLY__
+@@ -66,6 +73,8 @@ struct gicv3_data {
+ 	void *dist_base;
+ 	void *redist_bases[GICV3_NR_REDISTS];
+ 	void *redist_base[NR_CPUS];
++	u8 *lpi_prop;
++	void *lpi_pend[NR_CPUS];
+ 	unsigned int irq_nr;
+ };
+ extern struct gicv3_data gicv3_data;
+@@ -82,6 +91,8 @@ extern void gicv3_write_eoir(u32 irqstat);
+ extern void gicv3_ipi_send_single(int irq, int cpu);
+ extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest);
+ extern void gicv3_set_redist_base(size_t stride);
++extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
++extern void gicv3_lpi_alloc_tables(void);
 =20
-@@ -660,13 +661,19 @@ static int its_prerequisites(int nb_cpus)
- 	return 0;
- }
-=20
--static void test_its_trigger(void)
-+/*
-+ * Setup the configuration for those mappings:
-+ * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
-+ * dev_id=3D7 event=3D255 -> vcpu 2, intid=3D8196
-+ * LPIs ready to hit
-+ */
-+static int its_setup1(void)
+ static inline void gicv3_do_wait_for_rwp(void *base)
  {
- 	struct its_collection *col3, *col2;
- 	struct its_device *dev2, *dev7;
+@@ -127,5 +138,11 @@ static inline u64 mpidr_uncompress(u32 compressed)
+ 	return mpidr;
+ }
 =20
- 	if (its_prerequisites(4))
--		return;
-+		return -1;
-=20
- 	dev2 =3D its_create_device(2 /* dev id */, 8 /* nb_ites */);
- 	dev7 =3D its_create_device(7 /* dev id */, 8 /* nb_ites */);
-@@ -677,14 +684,10 @@ static void test_its_trigger(void)
- 	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
- 	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
-=20
--	report_prefix_push("int");
- 	/*
- 	 * dev=3D2, eventid=3D20  -> lpi=3D 8195, col=3D3
- 	 * dev=3D7, eventid=3D255 -> lpi=3D 8196, col=3D2
--	 * Trigger dev2, eventid=3D20 and dev7, eventid=3D255
--	 * Check both LPIs hit
- 	 */
--
- 	its_send_mapd(dev2, true);
- 	its_send_mapd(dev7, true);
-=20
-@@ -696,6 +699,22 @@ static void test_its_trigger(void)
-=20
- 	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
- 	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
-+	return 0;
-+}
++#define gicv3_lpi_set_config(intid, value) ({		\
++	gicv3_data.lpi_prop[LPI_OFFSET(intid)] =3D value;	\
++})
 +
-+static void test_its_trigger(void)
-+{
-+	struct its_collection *col3;
-+	struct its_device *dev2, *dev7;
++#define gicv3_lpi_get_config(intid) (gicv3_data.lpi_prop[LPI_OFFSET(inti=
+d)])
 +
-+	if (its_setup1())
-+		return;
-+
-+	col3 =3D its_get_collection(3);
-+	dev2 =3D its_get_device(2);
-+	dev7 =3D its_get_device(7);
-+
-+	report_prefix_push("int");
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_V3_H_ */
+diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+index feecb5e..6cf1d1d 100644
+--- a/lib/arm/gic-v3.c
++++ b/lib/arm/gic-v3.c
+@@ -5,6 +5,7 @@
+  */
+ #include <asm/gic.h>
+ #include <asm/io.h>
++#include <alloc_page.h>
 =20
- 	lpi_stats_expect(3, 8195);
- 	its_send_int(dev2, 20);
-@@ -750,6 +769,29 @@ static void test_its_trigger(void)
- 	check_lpi_stats("no LPI after device unmap");
- 	report_prefix_pop();
+ void gicv3_set_redist_base(size_t stride)
+ {
+@@ -147,3 +148,55 @@ void gicv3_ipi_send_single(int irq, int cpu)
+ 	cpumask_set_cpu(cpu, &dest);
+ 	gicv3_ipi_send_mask(irq, &dest);
  }
 +
-+static void test_its_migration(void)
++#if defined(__aarch64__)
++
++/*
++ * alloc_lpi_tables - Allocate LPI config and pending tables
++ * and set PROPBASER (shared by all rdistributors) and per
++ * redistributor PENDBASER.
++ *
++ * gicv3_set_redist_base() must be called before
++ */
++void gicv3_lpi_alloc_tables(void)
 +{
-+	struct its_device *dev2, *dev7;
++	unsigned long n =3D SZ_64K >> PAGE_SHIFT;
++	unsigned long order =3D fls(n);
++	u64 prop_val;
++	int cpu;
 +
-+	if (its_setup1())
-+		return;
++	assert(gicv3_redist_base());
 +
-+	dev2 =3D its_get_device(2);
-+	dev7 =3D its_get_device(7);
++	gicv3_data.lpi_prop =3D alloc_pages(order);
 +
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report_info("Migration complete");
++	/* ID bits =3D 13, ie. up to 14b LPI INTID */
++	prop_val =3D (u64)(virt_to_phys(gicv3_data.lpi_prop)) | 13;
 +
-+	lpi_stats_expect(3, 8195);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats("dev2/eventid=3D20 triggers LPI 8195 on PE #3 after mig=
-ration");
++	for_each_present_cpu(cpu) {
++		u64 pend_val;
++		void *ptr;
 +
-+	lpi_stats_expect(2, 8196);
-+	its_send_int(dev7, 255);
-+	check_lpi_stats("dev7/eventid=3D255 triggers LPI 8196 on PE #2 after mi=
-gration");
-+}
- #endif
-=20
- int main(int argc, char **argv)
-@@ -787,6 +829,10 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_its_trigger();
- 		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-migration")) {
-+		report_prefix_push(argv[1]);
-+		test_its_migration();
-+		report_prefix_pop();
- 	} else if (strcmp(argv[1], "its-introspection") =3D=3D 0) {
- 		report_prefix_push(argv[1]);
- 		test_its_introspection();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index b9a7a2c..480adec 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -136,6 +136,14 @@ extra_params =3D -machine gic-version=3D3 -append 'i=
-ts-trigger'
- groups =3D its
- arch =3D arm64
-=20
-+[its-migration]
-+file =3D gic.flat
-+smp =3D $MAX_SMP
-+accel =3D kvm
-+extra_params =3D -machine gic-version=3D3 -append 'its-migration'
-+groups =3D its migration
-+arch =3D arm64
++		ptr =3D gicv3_data.redist_base[cpu];
 +
- # Test PSCI emulation
- [psci]
- file =3D psci.flat
-diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-index c203293..0258daa 100644
---- a/lib/arm64/asm/gic-v3-its.h
-+++ b/lib/arm64/asm/gic-v3-its.h
-@@ -168,4 +168,7 @@ extern void __its_send_sync(struct its_collection *co=
-l, bool verbose);
- #define its_send_movi_nv(dev, col, id)			__its_send_movi(dev, col, id, f=
-alse)
- #define its_send_sync_nv(col)				__its_send_sync(col, false)
-=20
-+extern struct its_device *its_get_device(u32 id);
-+extern struct its_collection *its_get_collection(u32 id);
++		writeq(prop_val, ptr + GICR_PROPBASER);
 +
- #endif /* _ASMARM64_GIC_V3_ITS_H_ */
-diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
-index ca91c3d..c22bda3 100644
---- a/lib/arm64/gic-v3-its.c
-+++ b/lib/arm64/gic-v3-its.c
-@@ -147,3 +147,25 @@ struct its_collection *its_create_collection(u16 col=
-_id, u32 pe)
- 	its_data.nr_collections++;
- 	return new;
- }
-+
-+struct its_device *its_get_device(u32 id)
-+{
-+	int i;
-+
-+	for (i =3D 0; i < GITS_MAX_DEVICES; i++) {
-+		if (its_data.devices[i].device_id =3D=3D id)
-+			return &its_data.devices[i];
++		gicv3_data.lpi_pend[cpu] =3D alloc_pages(order);
++		pend_val =3D (u64)(virt_to_phys(gicv3_data.lpi_pend[cpu]));
++		writeq(pend_val, ptr + GICR_PENDBASER);
 +	}
-+	assert(0);
 +}
 +
-+struct its_collection *its_get_collection(u32 id)
++void gicv3_lpi_set_clr_pending(int rdist, int n, bool set)
 +{
-+	int i;
++	u8 *ptr =3D gicv3_data.lpi_pend[rdist];
++	u8 mask =3D 1 << (n % 8), byte;
 +
-+	for (i =3D 0; i < GITS_MAX_COLLECTIONS; i++) {
-+		if (its_data.collections[i].col_id =3D=3D id)
-+			return &its_data.collections[i];
-+	}
-+	assert(0);
++	ptr +=3D (n / 8);
++	byte =3D *ptr;
++	if (set)
++		byte |=3D  mask;
++	else
++		byte &=3D ~mask;
++	*ptr =3D byte;
 +}
++#endif /* __aarch64__ */
 --=20
 2.20.1
 
