@@ -2,86 +2,81 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6598C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D25C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91EA92078E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:20:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4545D2078E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:34:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JRT51vDC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91EA92078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwsdPZsV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4545D2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJv54-0002e6-Oq
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:20:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36559)
+	id 1jJvIi-00055d-Fd
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jJv4T-00029c-Cm
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:19:30 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jJvIA-0004gj-Hz
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:33:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jJv4R-0007xq-Vb
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:19:29 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43421)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jJv4R-0007x5-IU
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:19:27 -0400
-Received: by mail-oi1-x241.google.com with SMTP id k5so2045898oiw.10
- for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 01:19:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OAIiNJp5EcSVlgCqlJKhQ/RtGyDFw5Tgd1X1Blh8PNA=;
- b=JRT51vDC5d2ugjmv4cCgh2VXVO8wfO5tjOhhBzG0ibAcoeNibykd7FT4fCVmaq6LJr
- cBikArC8qE2d0AuWEEV6Zxzwn4+x7NC3lt+lgW4GNQ6RGpaUxbIqBdk6wA0/A3yDp1LB
- 0unZsSqtzPcncSUl6tDPYUB59hrqZaJE67+mFeSiJW1DODeHXM8Ha2WMBkx8+tz6fQv4
- aK2RshWj66U8tvIBzQXVwA8OVOrp7KIbaLgSYHHhKBb1LzDVL8cfiiT3TTV/6Ps67g2l
- v4lNLbmbB9Sjci9nZsOHHp8qRWGcMPZuyvIIKwQVhjCLlEC9W0AE7TJ+g2EVUHRVS0gf
- PFTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OAIiNJp5EcSVlgCqlJKhQ/RtGyDFw5Tgd1X1Blh8PNA=;
- b=LcrRKznqMFfhTgZ930+ZNEvC9A+sMqire8Xs7RGleTXQAX+us058i6Wbh1RWv8n6FZ
- xJ0a2TDJDq8M6mILma4DD21Wc+sGBAuxJFTP4EYJlvcui4L60un6/THfeaefmR/a94Vs
- /buyHOmONuGvjIt2g7Hx69ayK3ADTuh8248/ev0heEk+anURZ51lvBtPX5Y5MRuuC1BH
- YERq0ivmbAFBk8zrSLGO0DqNe6cbmgYxirLZDYiSt7BWswIm0sfvVuTwW/wkjKwWckrA
- bzUAF1QKdR7UlCXezTeMYO5h4Hr/0qtWjm72fXA3W7Zf/Ir+3o6Fl0rVI26D1q4vyBAo
- MTYg==
-X-Gm-Message-State: AGi0PuZqezPPU2kYSJkbCMiD5YoZXT5K+hQ1EAs5XLMp8zQEj6/XxYBh
- b2xRIg5K6EoXzUsOJ6M+nk82UDkb1ytvklZ9Gu0H+w==
-X-Google-Smtp-Source: APiQypLamOjJajBTflltdu4SfFMYgRrFGj5oeQKc9B4GJ9+sp6aYHofKRwEJCf+QFWh/5/rGc5FfpjvoV+nHjs7yFc0=
-X-Received: by 2002:aca:c608:: with SMTP id w8mr1369082oif.163.1585815566407; 
- Thu, 02 Apr 2020 01:19:26 -0700 (PDT)
+ (envelope-from <jasowang@redhat.com>) id 1jJvI8-0003hK-Gq
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:33:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32840
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jJvI8-0003dk-7w
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:33:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585816415;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vF5jPTjMAXWG5nK+NfmmXnNhmeLxxH3USCdZc5XlsGU=;
+ b=GwsdPZsVvbtujt7kO1djmf42wZyOpDGq32vWoHbPoC9IC6cJuAmuhOItIYIQcnm8Tx+CgE
+ w54XV/wMtWwIi6tB0MppSA6g92jt2vV7ZsPWUdmEzWcWocwOrSgLUFtmeZ3gvNjzZny0Dl
+ wPnbZgcq5LRqSUKqPBID42Zfxd6gfrs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-sX4YZp29N12m13l0esWiOQ-1; Thu, 02 Apr 2020 04:33:29 -0400
+X-MC-Unique: sX4YZp29N12m13l0esWiOQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A5C310CE7AC;
+ Thu,  2 Apr 2020 08:33:27 +0000 (UTC)
+Received: from [10.72.13.209] (ovpn-13-209.pek2.redhat.com [10.72.13.209])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BAA7F261D5;
+ Thu,  2 Apr 2020 08:33:04 +0000 (UTC)
+Subject: Re: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing to
+ VMs
+To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, peterx@redhat.com
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <984e6f47-2717-44fb-7ff2-95ca61d1858f@redhat.com>
+Date: Thu, 2 Apr 2020 16:33:02 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200324153630.11882-1-vsementsov@virtuozzo.com>
- <20200324153630.11882-2-vsementsov@virtuozzo.com>
- <87bloc3nmr.fsf@dusky.pond.sub.org>
- <CAFEAcA-c_gX4=Be0oMLCmQy+PWc4uEHpQatuyNQjbrZXvsv1+w@mail.gmail.com>
- <87wo6zoku0.fsf@dusky.pond.sub.org>
- <CAFEAcA-mZ5nPOoPz0kafmEjUORYQj-DvieMeWqgbFarp1_DhNg@mail.gmail.com>
- <87tv23fepa.fsf@dusky.pond.sub.org>
- <CAFEAcA82AzhV3DSO=nogJg1YLwKk3RrGPVRe85ByhFbaW=YCJQ@mail.gmail.com>
- <87d08qbcm3.fsf@dusky.pond.sub.org>
-In-Reply-To: <87d08qbcm3.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Apr 2020 08:19:15 +0000
-Message-ID: <CAFEAcA82V5tMJs7jiuVov7-GFBG+4O037UkDngUKuKFqLj-6HA@mail.gmail.com>
-Subject: Re: [PATCH 1/6] scripts/coccinelle: add error-use-after-free.cocci
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,80 +88,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com, kvm@vger.kernel.org,
+ mst@redhat.com, jun.j.tian@intel.com, eric.auger@redhat.com,
+ yi.y.sun@intel.com, pbonzini@redhat.com, david@gibson.dropbear.id.au,
+ hao.wu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2 Apr 2020 at 07:55, Markus Armbruster <armbru@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> > I use this thing maybe once a month at most, more likely once
-> > every three months, and the documentation is notoriously
-> > impenetrable. I really really don't want to have to start looking in it
-> > and guessing about how the original author ran the script, when
-> > they could have just told me.
+
+On 2020/3/30 =E4=B8=8B=E5=8D=8812:24, Liu Yi L wrote:
+> Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+> Intel platforms allows address space sharing between device DMA and
+> applications. SVA can reduce programming complexity and enhance securit=
+y.
 >
-> I'm afraid we're talking part each other.
-
-Perhaps; but I think we're also genuinely disagreeing.
-
-> >>           $  spatch --sp-file scripts/coccinelle/qobject.cocci \
-> >>                     --macro-file scripts/cocci-macro-file.h \
-> >>                     --dir block --in-place
-> >
-> > Yep, that command line would be great to see in the script file.
+> This QEMU series is intended to expose SVA usage to VMs. i.e. Sharing
+> guest application address space with passthru devices. This is called
+> vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+> changes.
 >
-> Except for the --dir block part, which is even worse than noise: it
-> suggests this is just for block/, which is wrong.
-
-It tells the reader that the original author only tested
-the script to work inside block/, which is useful information.
-(This is why scripts/coccinelle/cpu-reset.cocci specifies
---dir target in its command.)
-
-> > The least-effort way for the author of the script to do that is to
-> > simply give the command line they used to run it.
+> The high-level architecture for SVA virtualization is as below, the key
+> design of vSVA support is to utilize the dual-stage IOMMU translation (
+> also known as IOMMU nesting translation) capability in host IOMMU.
 >
-> If you're capable of writing a Coccinelle script that actually does what
-> you want, you're certainly capable of doing better than blindly paste
-> from your shell history.  Kindly drop the options that are specific to
-> just this particular use of the script.  Keep the ones that future users
-> will actually need.
-
-I'm a future user; in fact I'm the future user whose needs I have
-the best information on. I want to see the whole command, please.
-
-> Two proficiencies: using a script somebody else wrote, and writing
-> simple scripts.  Let me try to sketch just about the most basic of basic
-> levels for the former.  Note that I'm making *liberal* allowance for
-> reluctance to learn tools[*].
+>      .-------------.  .---------------------------.
+>      |   vIOMMU    |  | Guest process CR3, FL only|
+>      |             |  '---------------------------'
+>      .----------------/
+>      | PASID Entry |--- PASID cache flush -
+>      '-------------'                       |
+>      |             |                       V
+>      |             |                CR3 in GPA
+>      '-------------'
+> Guest
+> ------| Shadow |--------------------------|--------
+>        v        v                          v
+> Host
+>      .-------------.  .----------------------.
+>      |   pIOMMU    |  | Bind FL for GVA-GPA  |
+>      |             |  '----------------------'
+>      .----------------/  |
+>      | PASID Entry |     V (Nested xlate)
+>      '----------------\.------------------------------.
+>      |             ||SL for GPA-HPA, default domain|
+>      |             |   '------------------------------'
+>      '-------------'
+> Where:
+>   - FL =3D First level/stage one page tables
+>   - SL =3D Second level/stage two page tables
 >
-> Understand
+> The complete vSVA kernel upstream patches are divided into three phases=
+:
+>      1. Common APIs and PCI device direct assignment
+>      2. IOMMU-backed Mediated Device assignment
+>      3. Page Request Services (PRS) support
 >
-> * that .cocci means Coccinelle
-> * how to install Coccinelle
-> * that you need to feed the .cocci to spatch
-> * that this produces a patch
-> * how to apply the patch to the tree
+> This QEMU patchset is aiming for the phase 1 and phase 2. It is based
+> on the two kernel series below.
+> [1] [PATCH V10 00/11] Nested Shared Virtual Address (SVA) VT-d support:
+> https://lkml.org/lkml/2020/3/20/1172
+> [2] [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing to VM=
+s
+> https://lkml.org/lkml/2020/3/22/116
 >
-> None of this I want to explain in every .cocci script.  All of this
-> I want be explained in scripts/coccinelle/README.
+> There are roughly two parts:
+>   1. Introduce HostIOMMUContext as abstract of host IOMMU. It provides =
+explicit
+>      method for vIOMMU emulators to communicate with host IOMMU. e.g. p=
+ropagate
+>      guest page table binding to host IOMMU to setup dual-stage DMA tra=
+nslation
+>      in host IOMMU and flush iommu iotlb.
+>   2. Setup dual-stage IOMMU translation for Intel vIOMMU. Includes
+>      - Check IOMMU uAPI version compatibility and VFIO Nesting capabili=
+ties which
+>        includes hardware compatibility (stage 1 format) and VFIO_PASID_=
+REQ
+>        availability. This is preparation for setting up dual-stage DMA =
+translation
+>        in host IOMMU.
+>      - Propagate guest PASID allocation and free request to host.
+>      - Propagate guest page table binding to host to setup dual-stage I=
+OMMU DMA
+>        translation in host IOMMU.
+>      - Propagate guest IOMMU cache invalidation to host to ensure iotlb
+>        correctness.
+>
+> The complete QEMU set can be found in below link:
+> https://github.com/luxis1999/qemu.git: sva_vtd_v10_v2
 
-I'm certainly not arguing against having a README which helps
-people with onboarding into the world of coccinelle scripts;
-I think that would be great. I just don't really see much benefit
-to either authors or script readers in asking authors to do more
-than quote the coccinelle command line they used in the
-comments at the top of their script.
 
-thanks
--- PMM
+Hi Yi:
+
+I could not find the branch there.
+
+Thanks
+
 
