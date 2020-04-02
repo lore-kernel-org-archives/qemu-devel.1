@@ -2,88 +2,72 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 353D5C2BA15
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C516C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 043802073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:52:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgSKFV1n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043802073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0EB652073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:53:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EB652073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK0Gi-0005wE-5y
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:52:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50977)
+	id 1jK0HS-0007QD-5o
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:53:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jK0Bw-000801-41
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:47:33 -0400
+ (envelope-from <bounces@canonical.com>) id 1jJyDR-0007jQ-Gv
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 07:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jK0Bu-0004HZ-ET
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:47:32 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41891
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jK0Bu-0004GQ-AA
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:47:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585835249;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pWD7O1HxTYjNj1puh1fmFI6Lsj+CFiJCyC/FAin4oTI=;
- b=YgSKFV1nwz5YubnlOY9C0CFLwu4DeABAEI7z5c0SZvWaaDjpHj+YcrVWJEe2VhQArSVcM4
- U+HUiqDkkwSBJZrN2adCxajD9gBRrtr8pFSzCKj3GiTlOvQGgX1Om74eKuZQuh5BXZcd1H
- qQEANjyL5c8ZFo9GLEWt8cNIFbGLYRg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-_hpKKDiBMeGSe3RGsJhZBA-1; Thu, 02 Apr 2020 09:47:16 -0400
-X-MC-Unique: _hpKKDiBMeGSe3RGsJhZBA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77DA6101FC6E;
- Thu,  2 Apr 2020 13:47:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 614F15ED3F;
- Thu,  2 Apr 2020 13:47:14 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C40BC11385E2; Thu,  2 Apr 2020 15:47:12 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: Function-like macro with the same name as a typedef confuses
- Coccinelle
-References: <87k12y5by1.fsf@dusky.pond.sub.org>
- <31eed279-5ef9-4d11-62de-51c0eeaff589@redhat.com>
-Date: Thu, 02 Apr 2020 15:47:12 +0200
-In-Reply-To: <31eed279-5ef9-4d11-62de-51c0eeaff589@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 2 Apr 2020 14:29:58
- +0200")
-Message-ID: <871rp63spr.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <bounces@canonical.com>) id 1jJyDP-0007rP-OI
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 07:40:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44560)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jJyDP-0007q6-I4
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 07:40:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jJyDN-00085C-LJ
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 11:40:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7AFBC2E810F
+ for <qemu-devel@nongnu.org>; Thu,  2 Apr 2020 11:40:53 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 02 Apr 2020 11:35:01 -0000
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: r-volkmer
+X-Launchpad-Bug-Reporter: Ruben (r-volkmer)
+X-Launchpad-Bug-Modifier: Ruben (r-volkmer)
+Message-Id: <158582730148.12209.12098183760358013098.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1870331] [NEW] default nic device created even though supplied
+ by configfile
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a296f04231dee355be5db73cc878b9e21689a253";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7e05b36bb5618e4b5691041324133b735dc43817
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Thu, 02 Apr 2020 09:52:34 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,110 +76,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Bug 1870331 <1870331@bugs.launchpad.net>, Ruben <R.Volkmer@ITB-Solutions.de>
+From: Ruben via <qemu-devel@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Public bug reported:
 
-> On 4/2/20 2:06 PM, Markus Armbruster wrote:
->> I discovered that Vladimir's auto-propagated-errp.cocci leaves
->> hw/arm/armsse.c unchanged, even though it clearly should change it.
->> Running spatch with --debug prints (among lots of other things)
->>
->>      let's go
->>      -------------------------------------------------------------------=
-----
->>      -------------------------------------------------------------------=
-----
->>      parse error
->>       =3D error in hw/arm/armsse.c; set verbose_parsing for more info
->>      badcount: 7
->>      bad: }
->>      bad:
->>      bad: static void nsccfg_handler(void *opaque, int n, int level)
->>      bad: {
->>      BAD:!!!!!     ARMSSE *s =3D ARMSSE(opaque);
->>      bad:
->>      bad:     s->nsccfg =3D level;
->>      bad: }
->>      parse error
->>
->> Alright, what's wrong with this?  ARMSSE is both a function-like macro
->> and a typedef:
->>
->>      #define ARMSSE(obj) OBJECT_CHECK(ARMSSE, (obj), TYPE_ARMSSE)
->>
->>      typedef struct ARMSSE {
->>          ...
->>      } ARMSSE;
->>
->> This appears to spook Coccinelle badly enough to skip code using ARMSSE.
->>
->> If I rename the macro to ARMSSE_() just for testing, it produces the
->> transformation I'd expect.
->>
->> Grepping for typedef names is bothersome, so I used ctags -x to build a
->> cross reference table, and searched that for function-like macros
->> clashing with typedefs.  Result:
->>
->> include/hw/arm/armsse.h:#define ARMSSE(obj) OBJECT_CHECK(ARMSSE, (obj), =
-TYPE_ARMSSE)
->> include/hw/arm/armsse.h:} ARMSSE;
->> include/hw/block/swim.h:#define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE=
-_SWIM)
->> include/hw/block/swim.h:} SWIM;
->> target/rx/cpu-qom.h:#define RXCPU(obj) \
->> target/rx/cpu.h:typedef struct RXCPU RXCPU;
->> target/s390x/translate.c:#define BD(N, BB, BD) { BB,  4, 0, FLD_C_b##N, =
-FLD_O_b##N }, \
->> hw/audio/ac97.c:} BD;
->>
->> The last one is a name clash in unrelated files; should not bother
->> Coccinelle.
->>
->> The first three are due to QOM.  By convention, the name of the
->> function-like macro to convert to the QOM type is the QOM type in
->> ALL_CAPS.  Clash when the QOM type is ALL_CAPS already.
->
-> To add to this list, another problem I'm having is with QOM interfaces.
->
-> For example this line:
->
->   isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2));
->
-> The definitions are:
->
-> #define ISADMA(obj) INTERFACE_CHECK(IsaDma, (obj), TYPE_ISADMA)
-> typedef struct IsaDma IsaDma;
->
-> This is used as opaque pointer, so it compiles fine, but coccinelle is
-> confused because the actual 'struct IsaDma' is never defined.
+QEMU emulator version 4.1.94
 
-Can you give me an example where Coccinelle gets confused by it?
+Documentation states that qemu will create a default nic as long as not
+explicitly forbidden (-nic none) or defined ( e.g. -nic <options>).
 
-> The only 'documentation' I found about this is commit 00ed3da9b5 which
-> describes this as 'common practice'.
+Observation:
+Even though qemu-system-ppc is started with "-readconfig" (which defines a =
+nic), another nic gets created. When additionally suppling "-nic none", onl=
+y the nic of the config file is created.
+As matter of fact, if all items that are defined in config file are supplie=
+d as command line arguments, no further nic is created. =
 
-We discussed this in the thread
 
-    Subject: Issues around TYPE_INTERFACE
-    To: qemu-devel@nongnu.org
-    Date: Tue, 12 Mar 2019 11:50:54 +0100
-    Message-ID: <87h8c82woh.fsf@dusky.pond.sub.org>
+Expectation:
+When a nic is defined in config file, the default guest-nic should not get =
+created.
+That would match behavior when all items, defined in config file are suppli=
+ed as command line arguments.
 
-Perhaps start with Paolo's reply:
 
-    Message-ID: <fdaa779c-ed79-647b-6038-3df2353fe502@redhat.com>
-    https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg00749.html
+Attached config file.
 
-I just suggested to have a future docs/devel/qom.rst cover the topic:
+(qemu) info pci
+ Bus 0, device 0, function 0:
+ Host bridge: PCI device 1057:0002
+ PCI subsystem 1af4:1100
+ id ""
+ Bus 0, device 1, function 0:
+ VGA controller: PCI device 1234:1111
+ PCI subsystem 1af4:1100
+ BAR0: 32 bit prefetchable memory at 0x80000000 [0x80ffffff].
+ BAR2: 32 bit memory at 0x81000000 [0x81000fff].
+ BAR6: 32 bit memory at 0xffffffffffffffff [0x0000fffe].
+ id ""
+ Bus 0, device 2, function 0:
+ Ethernet controller: PCI device 10ec:8029
+ PCI subsystem 1af4:1100
+ IRQ 23.
+ BAR0: I/O at 0x1000 [0x10ff].
+ BAR6: 32 bit memory at 0xffffffffffffffff [0x0007fffe].
+ id ""
+ Bus 0, device 3, function 0:
+ Ethernet controller: PCI device 10ec:8029
+ PCI subsystem 1af4:1100
+ IRQ 24.
+ BAR0: I/O at 0x1100 [0x11ff].
+ BAR6: 32 bit memory at 0xffffffffffffffff [0x0007fffe].
+ id ""
 
-    Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 =
-device in mac_via
-    Message-ID: <87369m3t18.fsf@dusky.pond.sub.org>
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
+** Attachment added: "readconfig file"
+   https://bugs.launchpad.net/bugs/1870331/+attachment/5344765/+files/qemu.=
+config
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1870331
+
+Title:
+  default nic device created even though supplied by configfile
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU emulator version 4.1.94
+
+  Documentation states that qemu will create a default nic as long as
+  not explicitly forbidden (-nic none) or defined ( e.g. -nic
+  <options>).
+
+  Observation:
+  Even though qemu-system-ppc is started with "-readconfig" (which defines =
+a nic), another nic gets created. When additionally suppling "-nic none", o=
+nly the nic of the config file is created.
+  As matter of fact, if all items that are defined in config file are suppl=
+ied as command line arguments, no further nic is created. =
+
+
+  Expectation:
+  When a nic is defined in config file, the default guest-nic should not ge=
+t created.
+  That would match behavior when all items, defined in config file are supp=
+lied as command line arguments.
+
+  =
+
+  Attached config file.
+
+  (qemu) info pci
+   Bus 0, device 0, function 0:
+   Host bridge: PCI device 1057:0002
+   PCI subsystem 1af4:1100
+   id ""
+   Bus 0, device 1, function 0:
+   VGA controller: PCI device 1234:1111
+   PCI subsystem 1af4:1100
+   BAR0: 32 bit prefetchable memory at 0x80000000 [0x80ffffff].
+   BAR2: 32 bit memory at 0x81000000 [0x81000fff].
+   BAR6: 32 bit memory at 0xffffffffffffffff [0x0000fffe].
+   id ""
+   Bus 0, device 2, function 0:
+   Ethernet controller: PCI device 10ec:8029
+   PCI subsystem 1af4:1100
+   IRQ 23.
+   BAR0: I/O at 0x1000 [0x10ff].
+   BAR6: 32 bit memory at 0xffffffffffffffff [0x0007fffe].
+   id ""
+   Bus 0, device 3, function 0:
+   Ethernet controller: PCI device 10ec:8029
+   PCI subsystem 1af4:1100
+   IRQ 24.
+   BAR0: I/O at 0x1100 [0x11ff].
+   BAR6: 32 bit memory at 0xffffffffffffffff [0x0007fffe].
+   id ""
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1870331/+subscriptions
 
