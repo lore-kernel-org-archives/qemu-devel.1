@@ -2,86 +2,86 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86EC7C2BA14
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E3AC18E5B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:56:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DE8020B1F
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:53:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DE8020B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40D42208E4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:56:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TpmhXyvm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D42208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJvbS-0007Sr-HG
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:53:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46217)
+	id 1jJvdz-000057-Fx
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:56:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jJvao-00073n-Dj
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:52:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1jJvdN-00085o-PQ
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jJval-0001RK-CP
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:52:53 -0400
-Received: from mga09.intel.com ([134.134.136.24]:15732)
+ (envelope-from <armbru@redhat.com>) id 1jJvdM-0003pB-LJ
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:55:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55584
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jJval-0001MX-1R
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:52:51 -0400
-IronPort-SDR: LuBO87/7oqOBZKHI4lBJ5hHYT0UzIjAgCAHi8mxJurmQafBLY7EDPoSiRQbW48U2H3/Tug3cV/
- mYffXC3rKAYA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Apr 2020 01:52:46 -0700
-IronPort-SDR: 8EJljdY07VLZBap2wMNzqJqdfLLEwonCRWdERy/w+euvtrUmQLEdQXHaLqafFGFPf9+H3YhqJw
- zYTtxcnrHaqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,335,1580803200"; d="scan'208";a="240768732"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by fmsmga007.fm.intel.com with ESMTP; 02 Apr 2020 01:52:46 -0700
-Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 2 Apr 2020 01:52:46 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 2 Apr 2020 01:52:46 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
- Thu, 2 Apr 2020 16:52:42 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "alex.williamson@redhat.com"
- <alex.williamson@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>
-Subject: RE: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
- PCIIOMMUOps
-Thread-Topic: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
- PCIIOMMUOps
-Thread-Index: AQHWBkplYx1wDloSfEiqLsnvUo9sNqhgcquAgAUOJcA=
-Date: Thu, 2 Apr 2020 08:52:41 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21EDF9@SHSMSX104.ccr.corp.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-6-git-send-email-yi.l.liu@intel.com>
- <d7185758-701e-03f0-b804-f71587d65e65@redhat.com>
-In-Reply-To: <d7185758-701e-03f0-b804-f71587d65e65@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jJvdM-0003op-H4
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:55:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585817732;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MxdEI8IwH8agF7xqrTLB1OHJ32dmiprD83VD70aDNU4=;
+ b=TpmhXyvmtYzPfxq21v/79OtbdMDipFPNjO8hYvb9aN2a+WKKwOpzeFvQISj/kdJbarVp2i
+ h2nsrikG19mjxxIT5MBXemIEncL0JZ0evz45F51M7dQ64FLC8BcmNVlr+4eHD8BAYXMb5q
+ 3k/A+6uPByNgMTnE+lkUfhZcz2k8F6U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350--9ipTrWzPGuUjqVwsL8rwQ-1; Thu, 02 Apr 2020 04:55:30 -0400
+X-MC-Unique: -9ipTrWzPGuUjqVwsL8rwQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A6208017F4;
+ Thu,  2 Apr 2020 08:55:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B2D25D9CA;
+ Thu,  2 Apr 2020 08:55:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E936711385E2; Thu,  2 Apr 2020 10:55:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: Questionable aspects of QEMU Error's design
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+ <87sghmbfgc.fsf@dusky.pond.sub.org>
+ <44b5ff2c-6dce-e516-a9cc-9d80354c5a72@virtuozzo.com>
+ <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
+Date: Thu, 02 Apr 2020 10:55:27 +0200
+In-Reply-To: <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
+ (Peter Maydell's message of "Thu, 2 Apr 2020 08:11:11 +0000")
+Message-ID: <877dyy9shs.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.24
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,377 +93,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>, "Sun,
- Yi Y" <yi.y.sun@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "Wu,
- Hao" <hao.wu@intel.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Auger Eric < eric.auger@redhat.com>
-> Sent: Monday, March 30, 2020 7:02 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
-> Subject: Re: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
-> PCIIOMMUOps
->=20
->=20
->=20
-> On 3/30/20 6:24 AM, Liu Yi L wrote:
-> > This patch modifies pci_setup_iommu() to set PCIIOMMUOps instead of
-> > setting PCIIOMMUFunc. PCIIOMMUFunc is used to get an address space for
-> > a PCI device in vendor specific way. The PCIIOMMUOps still offers this
-> > functionality. But using PCIIOMMUOps leaves space to add more iommu
-> > related vendor specific operations.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  hw/alpha/typhoon.c       |  6 +++++-
-> >  hw/arm/smmu-common.c     |  6 +++++-
-> >  hw/hppa/dino.c           |  6 +++++-
-> >  hw/i386/amd_iommu.c      |  6 +++++-
-> >  hw/i386/intel_iommu.c    |  6 +++++-
-> >  hw/pci-host/designware.c |  6 +++++-
-> >  hw/pci-host/pnv_phb3.c   |  6 +++++-
-> >  hw/pci-host/pnv_phb4.c   |  6 +++++-
-> >  hw/pci-host/ppce500.c    |  6 +++++-
-> >  hw/pci-host/prep.c       |  6 +++++-
-> >  hw/pci-host/sabre.c      |  6 +++++-
-> >  hw/pci/pci.c             | 12 +++++++-----
-> >  hw/ppc/ppc440_pcix.c     |  6 +++++-
-> >  hw/ppc/spapr_pci.c       |  6 +++++-
-> >  hw/s390x/s390-pci-bus.c  |  8 ++++++--  hw/virtio/virtio-iommu.c |  6
-> > +++++-
-> >  include/hw/pci/pci.h     |  8 ++++++--
-> >  include/hw/pci/pci_bus.h |  2 +-
-> >  18 files changed, 90 insertions(+), 24 deletions(-)
-> >
-> > diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c index
-> > 1795e2f..f271de1 100644
-> > --- a/hw/alpha/typhoon.c
-> > +++ b/hw/alpha/typhoon.c
-> > @@ -740,6 +740,10 @@ static AddressSpace *typhoon_pci_dma_iommu(PCIBus
-> *bus, void *opaque, int devfn)
-> >      return &s->pchip.iommu_as;
-> >  }
-> >
-> > +static const PCIIOMMUOps typhoon_iommu_ops =3D {
-> > +    .get_address_space =3D typhoon_pci_dma_iommu, };
-> > +
-> >  static void typhoon_set_irq(void *opaque, int irq, int level)  {
-> >      TyphoonState *s =3D opaque;
-> > @@ -897,7 +901,7 @@ PCIBus *typhoon_init(MemoryRegion *ram, ISABus
-> **isa_bus, qemu_irq *p_rtc_irq,
-> >                               "iommu-typhoon", UINT64_MAX);
-> >      address_space_init(&s->pchip.iommu_as, MEMORY_REGION(&s-
-> >pchip.iommu),
-> >                         "pchip0-pci");
-> > -    pci_setup_iommu(b, typhoon_pci_dma_iommu, s);
-> > +    pci_setup_iommu(b, &typhoon_iommu_ops, s);
-> >
-> >      /* Pchip0 PCI special/interrupt acknowledge, 0x801.F800.0000, 64MB=
-.  */
-> >      memory_region_init_io(&s->pchip.reg_iack, OBJECT(s),
-> > &alpha_pci_iack_ops, diff --git a/hw/arm/smmu-common.c
-> > b/hw/arm/smmu-common.c index e13a5f4..447146e 100644
-> > --- a/hw/arm/smmu-common.c
-> > +++ b/hw/arm/smmu-common.c
-> > @@ -343,6 +343,10 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus,
-> void *opaque, int devfn)
-> >      return &sdev->as;
-> >  }
-> >
-> > +static const PCIIOMMUOps smmu_ops =3D {
-> > +    .get_address_space =3D smmu_find_add_as, };
-> > +
-> >  IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)  {
-> >      uint8_t bus_n, devfn;
-> > @@ -437,7 +441,7 @@ static void smmu_base_realize(DeviceState *dev, Err=
-or
-> **errp)
-> >      s->smmu_pcibus_by_busptr =3D g_hash_table_new(NULL, NULL);
-> >
-> >      if (s->primary_bus) {
-> > -        pci_setup_iommu(s->primary_bus, smmu_find_add_as, s);
-> > +        pci_setup_iommu(s->primary_bus, &smmu_ops, s);
-> >      } else {
-> >          error_setg(errp, "SMMU is not attached to any PCI bus!");
-> >      }
-> > diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c index 2b1b38c..3da4f84
-> > 100644
-> > --- a/hw/hppa/dino.c
-> > +++ b/hw/hppa/dino.c
-> > @@ -459,6 +459,10 @@ static AddressSpace *dino_pcihost_set_iommu(PCIBus
-> *bus, void *opaque,
-> >      return &s->bm_as;
-> >  }
-> >
-> > +static const PCIIOMMUOps dino_iommu_ops =3D {
-> > +    .get_address_space =3D dino_pcihost_set_iommu, };
-> > +
-> >  /*
-> >   * Dino interrupts are connected as shown on Page 78, Table 23
-> >   * (Little-endian bit numbers)
-> > @@ -580,7 +584,7 @@ PCIBus *dino_init(MemoryRegion *addr_space,
-> >      memory_region_add_subregion(&s->bm, 0xfff00000,
-> >                                  &s->bm_cpu_alias);
-> >      address_space_init(&s->bm_as, &s->bm, "pci-bm");
-> > -    pci_setup_iommu(b, dino_pcihost_set_iommu, s);
-> > +    pci_setup_iommu(b, &dino_iommu_ops, s);
-> >
-> >      *p_rtc_irq =3D qemu_allocate_irq(dino_set_timer_irq, s, 0);
-> >      *p_ser_irq =3D qemu_allocate_irq(dino_set_serial_irq, s, 0); diff
-> > --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c index
-> > b1175e5..5fec30e 100644
-> > --- a/hw/i386/amd_iommu.c
-> > +++ b/hw/i386/amd_iommu.c
-> > @@ -1451,6 +1451,10 @@ static AddressSpace
-> *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-> >      return &iommu_as[devfn]->as;
-> >  }
-> >
-> > +static const PCIIOMMUOps amdvi_iommu_ops =3D {
-> > +    .get_address_space =3D amdvi_host_dma_iommu, };
-> > +
-> >  static const MemoryRegionOps mmio_mem_ops =3D {
-> >      .read =3D amdvi_mmio_read,
-> >      .write =3D amdvi_mmio_write,
-> > @@ -1577,7 +1581,7 @@ static void amdvi_realize(DeviceState *dev,
-> > Error **errp)
-> >
-> >      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->mmio);
-> >      sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, AMDVI_BASE_ADDR);
-> > -    pci_setup_iommu(bus, amdvi_host_dma_iommu, s);
-> > +    pci_setup_iommu(bus, &amdvi_iommu_ops, s);
-> >      s->devid =3D object_property_get_int(OBJECT(&s->pci), "addr", errp=
-);
-> >      msi_init(&s->pci.dev, 0, 1, true, false, errp);
-> >      amdvi_init(s);
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
-> > df7ad25..4b22910 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -3729,6 +3729,10 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus
-> *bus, void *opaque, int devfn)
-> >      return &vtd_as->as;
-> >  }
-> >
-> > +static PCIIOMMUOps vtd_iommu_ops =3D {
-> static const
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-got it.
+> On Thu, 2 Apr 2020 at 07:11, Vladimir Sementsov-Ogievskiy
+> <vsementsov@virtuozzo.com> wrote:
+>> Somehow, in general, especially with long function names and long parame=
+ter lists I prefer
+>>
+>> ret =3D func(..);
+>> if (ret < 0) {
+>>      return ret;
+>> }
+>
+> Personally I prefer the other approach -- this one has an extra line
+> in the source and
+> needs an extra local variable.
 
-> > +    .get_address_space =3D vtd_host_dma_iommu, };
-> > +
-> >  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)  {
-> >      X86IOMMUState *x86_iommu =3D X86_IOMMU_DEVICE(s); @@ -3840,7
-> > +3844,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
-> >                                                g_free, g_free);
-> >      vtd_init(s);
-> >      sysbus_mmio_map(SYS_BUS_DEVICE(s), 0,
-> Q35_HOST_BRIDGE_IOMMU_ADDR);
-> > -    pci_setup_iommu(bus, vtd_host_dma_iommu, dev);
-> > +    pci_setup_iommu(bus, &vtd_iommu_ops, dev);
-> >      /* Pseudo address space under root PCI bus. */
-> >      x86ms->ioapic_as =3D vtd_host_dma_iommu(bus, s,
-> Q35_PSEUDO_DEVFN_IOAPIC);
-> >      qemu_add_machine_init_done_notifier(&vtd_machine_done_notify);
-> > diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c index
-> > dd24551..4c6338a 100644
-> > --- a/hw/pci-host/designware.c
-> > +++ b/hw/pci-host/designware.c
-> > @@ -645,6 +645,10 @@ static AddressSpace
-> *designware_pcie_host_set_iommu(PCIBus *bus, void *opaque,
-> >      return &s->pci.address_space;
-> >  }
-> >
-> > +static const PCIIOMMUOps designware_iommu_ops =3D {
-> > +    .get_address_space =3D designware_pcie_host_set_iommu, };
-> > +
-> >  static void designware_pcie_host_realize(DeviceState *dev, Error
-> > **errp)  {
-> >      PCIHostState *pci =3D PCI_HOST_BRIDGE(dev); @@ -686,7 +690,7 @@
-> > static void designware_pcie_host_realize(DeviceState *dev, Error **errp=
-)
-> >      address_space_init(&s->pci.address_space,
-> >                         &s->pci.address_space_root,
-> >                         "pcie-bus-address-space");
-> > -    pci_setup_iommu(pci->bus, designware_pcie_host_set_iommu, s);
-> > +    pci_setup_iommu(pci->bus, &designware_iommu_ops, s);
-> >
-> >      qdev_set_parent_bus(DEVICE(&s->root), BUS(pci->bus));
-> >      qdev_init_nofail(DEVICE(&s->root));
-> > diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c index
-> > 74618fa..ecfe627 100644
-> > --- a/hw/pci-host/pnv_phb3.c
-> > +++ b/hw/pci-host/pnv_phb3.c
-> > @@ -961,6 +961,10 @@ static AddressSpace *pnv_phb3_dma_iommu(PCIBus
-> *bus, void *opaque, int devfn)
-> >      return &ds->dma_as;
-> >  }
-> >
-> > +static PCIIOMMUOps pnv_phb3_iommu_ops =3D {
-> static const
-got it. :-)
+Me too, except when func(...) is so long that
 
-> > +    .get_address_space =3D pnv_phb3_dma_iommu, };
-> > +
-> >  static void pnv_phb3_instance_init(Object *obj)  {
-> >      PnvPHB3 *phb =3D PNV_PHB3(obj);
-> > @@ -1059,7 +1063,7 @@ static void pnv_phb3_realize(DeviceState *dev, Er=
-ror
-> **errp)
-> >                                       &phb->pci_mmio, &phb->pci_io,
-> >                                       0, 4, TYPE_PNV_PHB3_ROOT_BUS);
-> >
-> > -    pci_setup_iommu(pci->bus, pnv_phb3_dma_iommu, phb);
-> > +    pci_setup_iommu(pci->bus, &pnv_phb3_iommu_ops, phb);
-> >
-> >      /* Add a single Root port */
-> >      qdev_prop_set_uint8(DEVICE(&phb->root), "chassis", phb->chip_id);
-> > diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c index
-> > 23cf093..04e95e3 100644
-> > --- a/hw/pci-host/pnv_phb4.c
-> > +++ b/hw/pci-host/pnv_phb4.c
-> > @@ -1148,6 +1148,10 @@ static AddressSpace *pnv_phb4_dma_iommu(PCIBus
-> *bus, void *opaque, int devfn)
-> >      return &ds->dma_as;
-> >  }
-> >
-> > +static PCIIOMMUOps pnv_phb4_iommu_ops =3D {
-> idem
-will add const.
+    if (func(...) < 0) {
 
-> > +    .get_address_space =3D pnv_phb4_dma_iommu, };
-> > +
-> >  static void pnv_phb4_instance_init(Object *obj)  {
-> >      PnvPHB4 *phb =3D PNV_PHB4(obj);
-> > @@ -1205,7 +1209,7 @@ static void pnv_phb4_realize(DeviceState *dev, Er=
-ror
-> **errp)
-> >                                       pnv_phb4_set_irq, pnv_phb4_map_ir=
-q, phb,
-> >                                       &phb->pci_mmio, &phb->pci_io,
-> >                                       0, 4, TYPE_PNV_PHB4_ROOT_BUS);
-> > -    pci_setup_iommu(pci->bus, pnv_phb4_dma_iommu, phb);
-> > +    pci_setup_iommu(pci->bus, &pnv_phb4_iommu_ops, phb);
-> >
-> >      /* Add a single Root port */
-> >      qdev_prop_set_uint8(DEVICE(&phb->root), "chassis", phb->chip_id);
-> > diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c index
-> > d710727..5baf5db 100644
-> > --- a/hw/pci-host/ppce500.c
-> > +++ b/hw/pci-host/ppce500.c
-> > @@ -439,6 +439,10 @@ static AddressSpace *e500_pcihost_set_iommu(PCIBus
-> *bus, void *opaque,
-> >      return &s->bm_as;
-> >  }
-> >
-> > +static const PCIIOMMUOps ppce500_iommu_ops =3D {
-> > +    .get_address_space =3D e500_pcihost_set_iommu, };
-> > +
-> >  static void e500_pcihost_realize(DeviceState *dev, Error **errp)  {
-> >      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev); @@ -473,7 +477,7 @@
-> > static void e500_pcihost_realize(DeviceState *dev, Error **errp)
-> >      memory_region_init(&s->bm, OBJECT(s), "bm-e500", UINT64_MAX);
-> >      memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
-> >      address_space_init(&s->bm_as, &s->bm, "pci-bm");
-> > -    pci_setup_iommu(b, e500_pcihost_set_iommu, s);
-> > +    pci_setup_iommu(b, &ppce500_iommu_ops, s);
-> >
-> >      pci_create_simple(b, 0, "e500-host-bridge");
-> >
-> > diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c index
-> > 1a02e9a..7c57311 100644
-> > --- a/hw/pci-host/prep.c
-> > +++ b/hw/pci-host/prep.c
-> > @@ -213,6 +213,10 @@ static AddressSpace *raven_pcihost_set_iommu(PCIBu=
-s
-> *bus, void *opaque,
-> >      return &s->bm_as;
-> >  }
-> >
-> > +static const PCIIOMMUOps raven_iommu_ops =3D {
-> > +    .get_address_space =3D raven_pcihost_set_iommu, };
-> > +
-> >  static void raven_change_gpio(void *opaque, int n, int level)  {
-> >      PREPPCIState *s =3D opaque;
-> > @@ -303,7 +307,7 @@ static void raven_pcihost_initfn(Object *obj)
-> >      memory_region_add_subregion(&s->bm, 0         , &s->bm_pci_memory_=
-alias);
-> >      memory_region_add_subregion(&s->bm, 0x80000000, &s->bm_ram_alias);
-> >      address_space_init(&s->bm_as, &s->bm, "raven-bm");
-> > -    pci_setup_iommu(&s->pci_bus, raven_pcihost_set_iommu, s);
-> > +    pci_setup_iommu(&s->pci_bus, &raven_iommu_ops, s);
-> >
-> >      h->bus =3D &s->pci_bus;
-> >
-> > diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c index
-> > 2b8503b..251549b 100644
-> > --- a/hw/pci-host/sabre.c
-> > +++ b/hw/pci-host/sabre.c
-> > @@ -112,6 +112,10 @@ static AddressSpace *sabre_pci_dma_iommu(PCIBus
-> *bus, void *opaque, int devfn)
-> >      return &is->iommu_as;
-> >  }
-> >
-> > +static const PCIIOMMUOps sabre_iommu_ops =3D {
-> > +    .get_address_space =3D sabre_pci_dma_iommu, };
-> > +
-> >  static void sabre_config_write(void *opaque, hwaddr addr,
-> >                                 uint64_t val, unsigned size)  { @@
-> > -402,7 +406,7 @@ static void sabre_realize(DeviceState *dev, Error **er=
-rp)
-> >      /* IOMMU */
-> >      memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
-> >                      sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0=
-), 1);
-> > -    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
-> > +    pci_setup_iommu(phb->bus, &sabre_iommu_ops, s->iommu);
-> >
-> >      /* APB secondary busses */
-> >      pci_dev =3D pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0),
-> > true, diff --git a/hw/pci/pci.c b/hw/pci/pci.c index e1ed667..aa9025c
-> > 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -2644,7 +2644,7 @@ AddressSpace
-> *pci_device_iommu_address_space(PCIDevice *dev)
-> >      PCIBus *iommu_bus =3D bus;
-> >      uint8_t devfn =3D dev->devfn;
-> >
-> > -    while (iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev)
-> {
-> > +    while (iommu_bus && !iommu_bus->iommu_ops &&
-> > + iommu_bus->parent_dev) {
-> Depending on future usage, this is not strictly identical to the original
-> code. You exit
-> the loop as soon as a iommu_bus->iommu_ops is set whatever the presence o=
-f
-> get_address_space().
+becomes illegible like
 
-To be identical with original code, may adding the get_address_space()
-presence check. Then the loop exits when the iommu_bus->iommu_ops is
-set and meanwhile iommu_bus->iommu_ops->get_address_space() is set.
-But is it possible that there is an intermediate iommu_bus which has
-iommu_ops set but the get_address_space() is clear. I guess not as
-iommu_ops is set by vIOMMU and vIOMMU won't differentiate buses?
+    if (func(... yadda, yadda,
+             yadda, ...) < 0) {
 
-Also the get_address_space() presence will be checked when trying to
-use it. right?
+Then an extra variable can improve things.
 
-Regards,
-Yi Liu
+>> Are you sure that adding a lot of boolean functions is a good idea? I so=
+mehow feel better with more usual int functions with -errno on failure.
+>>
+>> Bool is a good return value for functions which are boolean by nature: c=
+hecks, is something correspond to some criteria. But for reporting an error=
+ I'd prefer -errno.
+>
+> When would we want to return an errno? I thought the whole point of the
+> Error* was that that was where information about the error was returned.
+> If all your callsites are just going to do "if (ret < 0) { ... } then hav=
+ing
+> the functions pick an errno value to return is just extra work.
+
+0/-1 vs. true/false is a matter of convention.  Lacking convention, it's
+a matter of taste.
+
+0/-1 vs. 0/-errno depends on the function and its callers.  When -errno
+enables callers to distinguish failures in a sane and simple way, use
+it.  When -errno feels "natural", I'd say feel free to use it even when
+all existing callers only check < 0.
+
+When you return non-null/null or true/false on success/error, neglecting
+to document that in a function contract can perhaps be tolerated; you're
+using the return type the common, obvious way.  But when you return 0/-1
+or 0/-errno, please spell it out.  I've seen too many "Operation not
+permitted" that were actually -1 mistaken for -EPERM.  Also too many
+functions that return -1 for some failures and -errno for others.
+
 
