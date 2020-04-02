@@ -2,86 +2,100 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10286C18E5B
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA77C18E5B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3C65208FE
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28E25208E4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:50:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A03OIWkH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3C65208FE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tc4B1p6+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E25208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJvYL-0004XR-VB
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:50:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45396)
+	id 1jJvYQ-0004fV-9Z
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:50:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jJvXE-0003DH-EV
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:13 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jJvXI-0003K6-97
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jJvXD-0007Ap-C5
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59331
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1jJvXH-0007Ew-Cu
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24048
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jJvXD-000798-83
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:11 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jJvXH-0007Dd-8a
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:49:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585817349;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1585817354;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2XDEZ1pSqxPT8sDOjjV36n+WVrQyECeFCwEDdd6kKW4=;
- b=A03OIWkHGg06hSzJK+WxujtkeLkN4v2d08PNL/zMyNEtZtISoQDvq8itzdhtJREHjWJSGI
- JV+JK2H8ZTa/dDDqpkgaRdTgoygADqnyhH7XVXNGDx+LJB+rTvYJUyK24BoOZ37nYbJsUo
- 2kU0c0mWE72pbHPBQwt6yTDj2C+j01c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-snTd0CHcMmuNUUaSClIBsg-1; Thu, 02 Apr 2020 04:49:07 -0400
-X-MC-Unique: snTd0CHcMmuNUUaSClIBsg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE02F13F7;
- Thu,  2 Apr 2020 08:49:05 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 337ED5D9CA;
- Thu,  2 Apr 2020 08:49:03 +0000 (UTC)
-Date: Thu, 2 Apr 2020 09:49:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: Questionable aspects of QEMU Error's design
-Message-ID: <20200402084900.GC423991@redhat.com>
-References: <87o8sblgto.fsf@dusky.pond.sub.org>
- <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
- <87sghmbfgc.fsf@dusky.pond.sub.org>
- <44b5ff2c-6dce-e516-a9cc-9d80354c5a72@virtuozzo.com>
- <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
+ bh=O0dV5/63rZLQh3fvBJCNm0GxYjPUIZk+Khphu8cahis=;
+ b=Tc4B1p6+fTwjJ7/15wnYav9+Ai8kWobUhbMD3b6DMLNl8pwnVzLwk737fdCygAO5h1h9AT
+ bsofHCTLBF9qjHsrcbfuT0CqggGJDeyQKY9sYdPOfC8vfQtdO9m6mPskqzDztW2PJUYL8D
+ gk7WP4uHKVOSYjK7+PWpyemcPKgnR6Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-8YVgqSioO2OtKs2T0iPVog-1; Thu, 02 Apr 2020 04:49:13 -0400
+X-MC-Unique: 8YVgqSioO2OtKs2T0iPVog-1
+Received: by mail-wm1-f72.google.com with SMTP id f8so1102571wmh.4
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 01:49:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=O0dV5/63rZLQh3fvBJCNm0GxYjPUIZk+Khphu8cahis=;
+ b=J0XX3Pj5dbI+9QFDWdM6ZrixWepR0RIbW9hlJ6Mwkmt5ck5kYefzh0thupAiuNRuWJ
+ JjC7M2WyRDPS/2AG+sEoiVcIC1U4FNKypV3CvwMJST5g+dDOfLUVB5XRBTYeDWOO8gL3
+ 2GXDmYTK+xRSy1IJhBo/a5uahfMEia6QzWn3FrFkn0CmPwwqe7U2lZu2+42Ij5O/0ubo
+ pB9f2JjqqNBz1r9pPfGnBel6XvVbKupsQ3VnnWy+WSpsqzchfwh4wY6zxfv/tdFWzKDJ
+ VWNt/wfZErAEuS7Nsf3Vucf5/A3Gi7bfmzo6nagZ6tdQEWB/NcOCjPCLns/B4l4MuExl
+ JeOg==
+X-Gm-Message-State: AGi0PuZqzPIYOGfi0SwfJUNEMPsA8D/DL5dCBa4+jinpajbfBKcY83tf
+ y6FJB+O2tUa3ui498Up0FS61o5gWIJ0vzHXRMqAjT/GoJDyMUBgjeiDdMWimXIn2gCM8FJzaQPa
+ ryWQtJKfbJ8AO5f0=
+X-Received: by 2002:a5d:6441:: with SMTP id d1mr2514656wrw.301.1585817352436; 
+ Thu, 02 Apr 2020 01:49:12 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIxHpTTxem/c5FkCC2hAVRxofsUY0XMiIq2foB0Ob24iY9pqWLzrcVN+vRqax0+vigcw5aMng==
+X-Received: by 2002:a5d:6441:: with SMTP id d1mr2514636wrw.301.1585817352191; 
+ Thu, 02 Apr 2020 01:49:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1868:42dd:216c:2c09?
+ ([2001:b07:6468:f312:1868:42dd:216c:2c09])
+ by smtp.gmail.com with ESMTPSA id p10sm6500851wre.15.2020.04.02.01.49.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 02 Apr 2020 01:49:11 -0700 (PDT)
+Subject: Re: Question about scsi device hotplug (e.g scsi-hd)
+To: Markus Armbruster <armbru@redhat.com>
+References: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
+ <20200401150944.GA4500@stefanha-x1.localdomain>
+ <4bc42bf2-939f-f6c4-ea45-0d08eb42fc2b@redhat.com>
+ <87zhbubg80.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b59caec6-062d-735d-dc4e-2fc4db57b607@redhat.com>
+Date: Thu, 2 Apr 2020 10:49:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <87zhbubg80.fsf@dusky.pond.sub.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,54 +107,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 02, 2020 at 08:11:11AM +0000, Peter Maydell wrote:
-> On Thu, 2 Apr 2020 at 07:11, Vladimir Sementsov-Ogievskiy
-> <vsementsov@virtuozzo.com> wrote:
-> > Somehow, in general, especially with long function names and long param=
-eter lists I prefer
-> >
-> > ret =3D func(..);
-> > if (ret < 0) {
-> >      return ret;
-> > }
->=20
-> Personally I prefer the other approach -- this one has an extra line
-> in the source and
-> needs an extra local variable.
->=20
-> > Are you sure that adding a lot of boolean functions is a good idea? I s=
-omehow feel better with more usual int functions with -errno on failure.
-> >
-> > Bool is a good return value for functions which are boolean by nature: =
-checks, is something correspond to some criteria. But for reporting an erro=
-r I'd prefer -errno.
->=20
-> When would we want to return an errno? I thought the whole point of the
-> Error* was that that was where information about the error was returned.
-> If all your callsites are just going to do "if (ret < 0) { ... } then hav=
-ing
-> the functions pick an errno value to return is just extra work.
+On 02/04/20 07:37, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> On 01/04/20 17:09, Stefan Hajnoczi wrote:
+>>>> What do you think about it?
+>>>
+>>> Maybe aio_disable_external() is needed to postpone device emulation
+>>> until after realize has finished?
+>>>
+>>> Virtqueue kick ioeventfds are marked "external" and won't be processed
+>>> while external events are disabled.  See also
+>>> virtio_queue_aio_set_host_notifier_handler() ->
+>>> aio_set_event_notifier().
+>>
+>> Yes, I think Stefan is right.
+> 
+> Is this issue limited to SCSI devices?
 
-IMHO errno should only be returned if the callers are likely to have=20
-a genuine need to take action based on the errno in a way that isn't
-possible from the Error alone. I expect very few scenarios need that.
+Yes, because they (and more specifically virtio-scsi) are the only ones
+that can be processed
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+1) outside the BQL
+
+2) by a device other than themselves (in this case, by the adapter).
+
+Paolo
 
 
