@@ -2,96 +2,76 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90315C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EBBC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:04:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 591BA2074D
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 151D52054F
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:04:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VY8enEoC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591BA2074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvdE0vlT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 151D52054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJwde-0008D6-IK
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 05:59:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60981)
+	id 1jJwhk-0002JA-8P
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 06:04:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jJwd1-0007Z1-JT
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:59:16 -0400
+ (envelope-from <lvivier@redhat.com>) id 1jJwgu-0001G4-44
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jJwd0-00063v-EE
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:59:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51359
+ (envelope-from <lvivier@redhat.com>) id 1jJwgs-0000He-FH
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:15 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52857
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jJwd0-00063S-At
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:59:14 -0400
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1jJwgs-0000HO-AE
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585821553;
+ s=mimecast20190719; t=1585821792;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bYJz8UBRrNj3MPpag7qiVmHNTPTcSrtNZp7+exnqYA8=;
- b=VY8enEoCxxANlFBDaWveceq7O9Noe2WvfKEHbe0OsZyyd1nd1TflDn7k+GA8WLjuTF8IEu
- KwefT9fWzXlXMHBsoGhwRsx92Bd9Ddpx/3nKLnY8Qm8DzDKJwwnBfgHqu/alE/wiQgkOMB
- mbMuNGUW3MnCt3kmv9Jumpkz6ic+wyc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-F_FuS2RJO_Oy_Tl6EpMUKw-1; Thu, 02 Apr 2020 05:59:10 -0400
-X-MC-Unique: F_FuS2RJO_Oy_Tl6EpMUKw-1
-Received: by mail-wm1-f70.google.com with SMTP id c21so845913wmb.3
- for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 02:59:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=kcM+lIQaFPCujnSX/yJSGlUbqRxnq+GCz6SpXdNKbLU=;
- b=o+GXPqQQ9NiP3NHKe7ykIxQXEA+6WmXZ3IAtSrFj66E+WwPgTDnzkHutXe8hr3rNlL
- +AmCM6NjOkMxPPpo+k1r/4hJD9gtY/Bga3eUSlCAPsN1NMEdXmd7TruuC85kzF+3gFdW
- TvyMGBoillwVRHV9Tupcv7VrrtVzXMrdBPQ8Dl+4iIDNSL0WIC6PgAvPMu8vkKjbNq4P
- Q6LQJYFuIskrB6+EdoUD7El9PusJD2sOl1dcuRQVNctfKRwvgGv849vQTKT9TeMvlywQ
- 4mHZ5S61fm0SoMWoelWlNoM5i24diNAaAQzntt2bcPNuTvHR2X/DUDUVACUeWah+/OPp
- tl2A==
-X-Gm-Message-State: AGi0PubFBA32wUTiAV4vUEw/ZlyuN/HSE8ejA9fdwXvJMFcKCq2LTrFN
- oDn6EF+Zrg8YDd0lkGTvv5x754KAVDxvKU2n2jXtDG8X//ShpS5u69/8CPEct+X+J4DTA2FKK3f
- HrNpAOvnQ+9RoOMQ=
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr2640261wmq.169.1585821548720; 
- Thu, 02 Apr 2020 02:59:08 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJKvesvk4MEiJaQwj1KlrmIwFAj6ww+JwcmKoiGzWFwdKrZtauDfOOupZAwB8lon75RXuLs5g==
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr2640243wmq.169.1585821548459; 
- Thu, 02 Apr 2020 02:59:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1868:42dd:216c:2c09?
- ([2001:b07:6468:f312:1868:42dd:216c:2c09])
- by smtp.gmail.com with ESMTPSA id t6sm6250937wma.30.2020.04.02.02.59.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Apr 2020 02:59:07 -0700 (PDT)
-Subject: Re: [PATCH v2] util/async: Add memory barrier to aio_ctx_prepare
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200402024431.1629-1-fangying1@huawei.com>
- <20200402093221.GD28280@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7de4d886-d861-5c80-f669-098b730906c8@redhat.com>
-Date: Thu, 2 Apr 2020 11:59:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=906pWHE6Lxu9rnLPhXDKLbnEmPzzwjBIf6OKQiLT/HM=;
+ b=gvdE0vlTWbJ7ye4lhEKpHnCqvwywu9uJaBBROslzF9VnM9BX73hSASsgshQMcpbcTbE2AQ
+ aRfNc601NzaYKCGwSCZ4ZLQS7Tk34SdcLB3X7dnPPJytm9WceAYcFFVJGIAvo1vqOL76rK
+ ScvsX5aU00DiEnbyu0aS1lTUX3iuanw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-5Ce-Gy3iP7WOogXb0DVqwg-1; Thu, 02 Apr 2020 06:03:09 -0400
+X-MC-Unique: 5Ce-Gy3iP7WOogXb0DVqwg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A33DF18A5511;
+ Thu,  2 Apr 2020 10:03:08 +0000 (UTC)
+Received: from thinkpad.redhat.com (ovpn-113-198.ams2.redhat.com
+ [10.36.113.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E609B5D9CD;
+ Thu,  2 Apr 2020 10:03:03 +0000 (UTC)
+From: Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC 0/5] hmp,qmp: Add some commands to introspect virtio devices
+Date: Thu,  2 Apr 2020 12:02:57 +0200
+Message-Id: <20200402100302.833267-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402093221.GD28280@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="7fYZeEc37bDDNzeSKpHMy6djmskiuXbhL"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,72 +83,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org, qemu-arm@nongnu.org, Ying Fang <fangying1@huawei.com>,
- wu.wubin@huawei.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7fYZeEc37bDDNzeSKpHMy6djmskiuXbhL
-Content-Type: multipart/mixed; boundary="ARsgMU4D6t2OXgPmm6TrvkE6RHKAjBl9w"
+This series introduces new QMP/HMP commands to dump the status
+of a a virtio device at different levels.
 
---ARsgMU4D6t2OXgPmm6TrvkE6RHKAjBl9w
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+1. Main command
 
-On 02/04/20 11:32, Stefan Hajnoczi wrote:
-> Paolo, I'm not sure how to interpret this case according to
-> docs/devel/atomics.txt.  Maybe you can clarify.
->=20
-> atomic_or() is sequentially consistent and I therefore expected it to
-> act as a barrier.  Or does sequential consistency only cover the memory
-> accessed via the sequentially consistent atomics APIs and everything
-> else (like aio_compute_timeout()) can be reordered?
+ HMP Only:
 
-Yes, that's what I expected too when I wrote that code. :(  But Torvald
-Riegel explained a while ago that seq-cst accesses are actually weaker
-than e.g. the Linux kernel atomics[1].
+     virtio [subcommand]
 
-The difference basically only matters if you are writing the relatively
-common synchronization pattern
+   Example:
 
-=09write A=09=09=09=09write B
-=09smp_mb()=09=09=09smp_mb()
-=09read B=09=09=09=09read A
-=09if not B then sleep=09=09if A then wake up the other side
-=09do something
+    List all sub-commands:
 
-because you must either use memory barriers as above, or use seq-cst
-writes *and* reads.  You cannot rely on having a memory barrier implicit
-in the writes.
+    (qemu) virtio
+    virtio query  -- List all available virtio devices
+    virtio status path -- Display status of a given virtio device
+    virtio queue-status path queue -- Display status of a given virtio queu=
+e
+    virtio queue-element path queue [index] -- Display element of a given v=
+irtio queue
 
-Paolo
+2. List available virtio devices in the machine
 
-[1] https://lists.gnu.org/archive/html/qemu-arm/2019-10/msg00051.html
+  HMP Form:
 
+    virtio query
 
---ARsgMU4D6t2OXgPmm6TrvkE6RHKAjBl9w--
+  Example:
 
---7fYZeEc37bDDNzeSKpHMy6djmskiuXbhL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+    (qemu) virtio query
+    /machine/peripheral-anon/device[3]/virtio-backend [virtio-net]
+    /machine/peripheral-anon/device[1]/virtio-backend [virtio-serial]
+    /machine/peripheral-anon/device[0]/virtio-backend [virtio-blk]
 
------BEGIN PGP SIGNATURE-----
+  QMP Form:
 
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl6Ft2oACgkQv/vSX3jH
-roMn6gf9G8iYNeFAnctSRlfxhtoLOahjINkoihuLe14ZwXCPJXugXey7TUiY7y6t
-H30E1NGCfcgqxtMZhFVDl18AyptkE3kMXAJiI083YUcm6gZVYji8YWKq16EROk58
-N1Y2YbSj9PXchZboZLXMfhho0fRCOA5kP+bXpEOOHOlcxMmgLXg9SYNVXIGy/hsK
-+oUIF3WHn+AJyu1B7l3DLl+7HRGcR9VL5qp+Ka418KbtFs3m3TWpfNVVFOkWe9Kx
-oVJmmR8GM1Ow1sWaYAtaNSKVUVgr5sjzroLleC2Y+52gUehV9jEKkMxKjCerNwiD
-BvTYzBOxxuE374YmXGXlHxHtL1rhww==
-=+IeU
------END PGP SIGNATURE-----
+    { 'command': 'query-virtio', 'returns': ['VirtioInfo'] }
 
---7fYZeEc37bDDNzeSKpHMy6djmskiuXbhL--
+  Example:
+
+  -> { "execute": "query-virtio" }
+  <- { "return": [
+         {
+             "path": "/machine/peripheral-anon/device[3]/virtio-backend",
+             "type": "virtio-net"
+         },
+         {
+             "path": "/machine/peripheral-anon/device[1]/virtio-backend",
+             "type": "virtio-serial"
+         },
+         {
+             "path": "/machine/peripheral-anon/device[0]/virtio-backend",
+             "type": "virtio-blk"
+         }
+       ]
+     }
+
+3. Display status of a given virtio device
+
+  HMP Form:
+
+    virtio status <path>
+
+  Example:
+
+    (qemu) virtio status /machine/peripheral-anon/device[3]/virtio-backend
+    /machine/peripheral-anon/device[3]/virtio-backend:
+      Device Id:        1
+      Guest features:   0x0000000130afffa7
+      Host features:    0x0000000179bfffe7
+      Backend features: 0x0000000000000000
+      Endianness:       little
+      VirtQueues:       3
+
+  QMP Form:
+
+    { 'command': 'virtio-status',
+      'data': { 'path': 'str' },
+      'returns': 'VirtioStatus'
+    }
+
+  Example:
+
+  -> { "execute": "virtio-status",
+       "arguments": {
+           "path": "/machine/peripheral-anon/device[3]/virtio-backend"
+       }
+    }
+  <- { "return": {
+           "backend_features": 0,
+           "guest_features": 5111807911,
+           "num_vqs": 3,
+           "host_features": 6337593319,
+           "device_endian": "little",
+           "device_id": 1
+       }
+     }
+
+4. Display status of a given virtio queue
+
+  HMP Form:
+
+    virtio queue-status <path> <queue>
+
+  Example:
+
+    (qemu) virtio queue-status /machine/peripheral-anon/device[3]/virtio-ba=
+ckend 0
+    /machine/peripheral-anon/device[3]/virtio-backend:
+      index:                0
+      inuse:                0
+      last_avail_idx:       61
+      shadow_avail_idx:     292
+      signalled_used:       61
+      signalled_used_valid: 1
+      VRing:
+        num:         256
+        num_default: 256
+        align:       4096
+        desc:        0x000000006c352000
+        avail:       0x000000006c353000
+        used:        0x000000006c353240
+
+  QMP Form:
+
+    { 'command': 'virtio-queue-status',
+      'data': { 'path': 'str', 'queue': 'uint16' },
+      'returns': 'VirtQueueStatus'
+    }
+
+  Example:
+
+  -> { "execute": "virtio-queue-status",
+       "arguments": {
+           "path": "/machine/peripheral-anon/device[3]/virtio-backend",
+           "queue": 0
+       }
+    }
+  <- { "return": {
+       "signalled_used": 373,
+       "inuse": 0,
+       "vring_desc": 864411648,
+       "vring_num_default": 256,
+       "signalled_used_valid": 1,
+       "vring_avail": 864415744,
+       "last_avail_idx": 373,
+       "queue_index": 0,
+       "vring_used": 864416320,
+       "shadow_avail_idx": 619,
+       "used_idx": 373,
+       "vring_num": 256,
+       "vring_align": 4096
+       }
+     }
+
+5. Display element of a given virtio queue
+
+  HMP Form:
+
+    virtio queue-element <path> <queue> [index]
+
+  Example:
+
+    Dump the information of the head element of the first queue of
+    the first virtio device::
+
+      (qemu) virtio queue-element/machine/peripheral-anon/device[3]/virtio-=
+backend 0
+      index:  67
+      ndescs: 1
+      descs:  addr 0x6fe69800 len 1536 (write-only)
+
+      (qemu) xp/128bx 0x6fe69800
+      000000006fe69800: 0x02 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+      000000006fe69808: 0x00 0x00 0x01 0x00 0x52 0x54 0x00 0x12
+      000000006fe69810: 0x34 0x56 0x52 0x54 0x00 0x09 0x51 0xde
+      000000006fe69818: 0x08 0x00 0x45 0x00 0x00 0x4c 0x8f 0x32
+
+    device[3] is a virtio-net device and we can see in the element buffer t=
+he
+    MAC address of the card::
+
+      [root@localhost ~]# ip link show ens4
+      2: ens4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel st=
+ate UP m0
+          link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
+
+    and the MAC address of the gateway::
+
+      [root@localhost ~]# arp -a
+      _gateway (192.168.122.1) at 52:54:00:09:51:de [ether] on ens4
+
+  QMP Form:
+
+    { 'command': 'virtio-queue-element',
+      'data': { 'path': 'str', 'queue': 'uint16', '*index': 'uint16' },
+      'returns': 'VirtioQueueElement'
+    }
+
+  Example:
+
+  -> { "execute": "virtio-queue-element",
+       "arguments": {
+           "path": "/machine/peripheral-anon/device[3]/virtio-backend",
+           "queue": 0
+       }
+    }
+  -> { "return": {
+          "index": 109,
+          "len": 0,
+          "ndescs": 1,
+          "descs": [
+              { "flags": 2, "len": 2048, "addr": 853145600 }
+          ]
+       }
+    }
+
+Laurent Vivier (5):
+  qmp: add QMP command query-virtio
+  qmp: add QMP command virtio-status
+  qmp: add QMP command virtio-queue-status
+  qmp: add QMP command virtio-queue-element
+  hmp: add virtio commands
+
+ Makefile                   |   2 +-
+ Makefile.target            |   7 +-
+ docs/system/monitor.rst    |   2 +
+ hmp-commands-virtio.hx     | 148 ++++++++++++++++++
+ hmp-commands.hx            |  10 ++
+ hw/virtio/Makefile.objs    |   2 +
+ hw/virtio/virtio-stub.c    |  32 ++++
+ hw/virtio/virtio.c         | 313 +++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/virtio.h |   1 +
+ include/monitor/hmp.h      |   4 +
+ monitor/misc.c             |  17 ++
+ qapi/Makefile.objs         |   2 +-
+ qapi/qapi-schema.json      |   1 +
+ qapi/virtio.json           | 302 +++++++++++++++++++++++++++++++++++
+ tests/qtest/qmp-cmd-test.c |   1 +
+ 15 files changed, 840 insertions(+), 4 deletions(-)
+ create mode 100644 hmp-commands-virtio.hx
+ create mode 100644 hw/virtio/virtio-stub.c
+ create mode 100644 qapi/virtio.json
+
+--=20
+2.25.1
 
 
