@@ -2,89 +2,89 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31159C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 16:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 803ACC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 16:49:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFF6D20737
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 16:48:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F38420737
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 16:49:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aD6bZg6t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF6D20737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c6RE2yx9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F38420737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK31B-0006cx-5o
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 12:48:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39781)
+	id 1jK322-0007Sf-Bc
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 12:49:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39909)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jK2zt-0005yy-Rm
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 12:47:19 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jK30X-0006Rj-BT
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 12:47:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jK2zs-0006ck-AO
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 12:47:17 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47813
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1jK30W-0007Lw-7z
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 12:47:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47132
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jK2zr-0006bC-A6
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 12:47:15 -0400
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jK30W-0007Kf-3x
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 12:47:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585846034;
+ s=mimecast20190719; t=1585846074;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=k5V0yigrc2CwpTkB3juzLB9oQMb4n2kUeWssfkY1zfQ=;
- b=aD6bZg6tu95B02LsTUZU+U2Y3qgOf2kKPBka8jgyhFY4JqPDm3PGujYu8mGUBkQw+wfUBN
- 0n9mfYWYLJ6rEgImBOa4OaMvbsOftA62HCzGqgs5coLwdlEE1dJ1jEQXOwWF9JSwkX7heB
- x7DC24Hw3sD2YDLNHhQ2tofu8+hFSJ8=
+ bh=dzavvN38StXFpLYsuLqj1ni7xJGO4Fu6kYvwoNBCMTo=;
+ b=c6RE2yx9FUG66MVmFm99azOucpJJbNTG00bKudhA5HmMXuT+wAcaI/jkmmhpEcl2dZQmuv
+ kXm3Xy+bgg/hmi/bLKaNxuDKDAWj7m+LferlTeTZGSBhJkQiKOzjP89SHOZI2mbsXrTeb+
+ 2uzJ23ksf9ZZVB55QB8eaHSyjnv6EGQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-DW2gLHcqNMqKTxyLy4ykpg-1; Thu, 02 Apr 2020 12:47:05 -0400
-X-MC-Unique: DW2gLHcqNMqKTxyLy4ykpg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-351-5cKmGcxNPBWiPnwZDy3FHw-1; Thu, 02 Apr 2020 12:47:52 -0400
+X-MC-Unique: 5cKmGcxNPBWiPnwZDy3FHw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 287B81005516;
- Thu,  2 Apr 2020 16:47:02 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF85D9B924;
- Thu,  2 Apr 2020 16:46:50 +0000 (UTC)
-Subject: Re: [RFC v6 00/24] vSMMUv3/pSMMUv3 2 stage VFIO integration
-To: Zhangfei Gao <zhangfei.gao@linaro.org>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- mst@redhat.com, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
- yi.l.liu@intel.com
-References: <20200320165840.30057-1-eric.auger@redhat.com>
- <73b1c3e1-a418-f57c-d949-261250d6a79b@linaro.org>
- <c15f98fb-01d7-cb2f-5401-4b648997fcba@redhat.com>
- <fbae2237-11ed-9527-0c01-340d5092ddcc@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <86c0b1e4-8073-1644-f420-0b548c8f8895@redhat.com>
-Date: Thu, 2 Apr 2020 18:46:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90DF3800D5C;
+ Thu,  2 Apr 2020 16:47:50 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-227.ams2.redhat.com [10.36.114.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 71BC248;
+ Thu,  2 Apr 2020 16:47:46 +0000 (UTC)
+Date: Thu, 2 Apr 2020 18:47:44 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Dietmar Maurer <dietmar@proxmox.com>
+Subject: Re: bdrv_drained_begin deadlock with io-threads
+Message-ID: <20200402164744.GE4006@linux.fritz.box>
+References: <518198448.62.1585671498399@webmail.proxmox.com>
+ <20200401103748.GA4680@linux.fritz.box>
+ <997901084.0.1585755465486@webmail.proxmox.com>
+ <20200401181256.GB27663@linux.fritz.box>
+ <1403939459.52.1585765681569@webmail.proxmox.com>
+ <20200401184431.GD27663@linux.fritz.box>
+ <903538836.29.1585818619688@webmail.proxmox.com>
+ <20200402121403.GB4006@linux.fritz.box>
+ <20200402142524.GD4006@linux.fritz.box>
+ <1043934808.59.1585842050330@webmail.proxmox.com>
 MIME-Version: 1.0
-In-Reply-To: <fbae2237-11ed-9527-0c01-340d5092ddcc@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <1043934808.59.1585842050330@webmail.proxmox.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,122 +96,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, tnowicki@marvell.com, maz@kernel.org,
- shameerali.kolothum.thodi@huawei.com, peterx@redhat.com, bbhushan2@marvell.com,
- will@kernel.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Zhangfei,
+Am 02.04.2020 um 17:40 hat Dietmar Maurer geschrieben:
+> > Can you reproduce the problem with my script, but pointing it to your
+> > Debian image and running stress-ng instead of dd?=20
+>=20
+> yes
+>=20
+> > If so, how long does
+> > it take to reproduce for you?
+>=20
+> I sometimes need up to 130 iterations ...
+>=20
+> Worse, I thought several times the bug is gone, but then it triggered aga=
+in (sigh).
+>=20
+> But most times below 30 iteration (if you run "stress-ng -d 5").
+>=20
+> Also note that it can happen at different places, but always inside a dra=
+ined section ...
 
-On 3/31/20 10:24 AM, Zhangfei Gao wrote:
-> Hi, Eric
->=20
-> On 2020/3/31 =E4=B8=8B=E5=8D=884:12, Auger Eric wrote:
->> Hi Zhangfei,
->>
->> On 3/31/20 8:42 AM, Zhangfei Gao wrote:
->>> Hi, Eric
->>>
->>> On 2020/3/21 =E4=B8=8A=E5=8D=8812:58, Eric Auger wrote:
->>>> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
->>>> integration requires to program the physical IOMMU consistently
->>>> with the guest mappings. However, as opposed to VTD, SMMUv3 has
->>>> no "Caching Mode" which allows easy trapping of guest mappings.
->>>> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
->>>>
->>>> However SMMUv3 has 2 translation stages. This was devised with
->>>> virtualization use case in mind where stage 1 is "owned" by the
->>>> guest whereas the host uses stage 2 for VM isolation.
->>>>
->>>> This series sets up this nested translation stage. It only works
->>>> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
->>>> other words, it does not work if there is a physical SMMUv2).
->>>>
->>>> - We force the host to use stage 2 instead of stage 1, when we
->>>> =C2=A0=C2=A0=C2=A0 detect a vSMMUV3 is behind a VFIO device. For a VFI=
-O device
->>>> =C2=A0=C2=A0=C2=A0 without any virtual IOMMU, we still use stage 1 as =
-many existing
->>>> =C2=A0=C2=A0=C2=A0 SMMUs expect this behavior.
->>>> - We use PCIPASIDOps to propage guest stage1 config changes on
->>>> =C2=A0=C2=A0=C2=A0 STE (Stream Table Entry) changes.
->>>> - We implement a specific UNMAP notifier that conveys guest
->>>> =C2=A0=C2=A0=C2=A0 IOTLB invalidations to the host
->>>> - We register MSI IOVA/GPA bindings to the host so that this latter
->>>> =C2=A0=C2=A0=C2=A0 can build a nested stage translation
->>>> - As the legacy MAP notifier is not called anymore, we must make
->>>> =C2=A0=C2=A0=C2=A0 sure stage 2 mappings are set. This is achieved thr=
-ough another
->>>> =C2=A0=C2=A0=C2=A0 prereg memory listener.
->>>> - Physical SMMU stage 1 related faults are reported to the guest
->>>> =C2=A0=C2=A0=C2=A0 via en eventfd mechanism and exposed trhough a dedi=
-cated VFIO-PCI
->>>> =C2=A0=C2=A0=C2=A0 region. Then they are reinjected into the guest.
->>>>
->>>> Best Regards
->>>>
->>>> Eric
->>>>
->>>> This series can be found at:
->>>> https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
->>>>
->>>> Kernel Dependencies:
->>>> [1] [PATCH v10 00/11] SMMUv3 Nested Stage Setup (VFIO part)
->>>> [2] [PATCH v10 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
->>>> branch at:
->>>> https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10
->>> Really appreciated that you re-start this work.
->>>
->>> I tested your branch and some update.
->>>
->>> Guest: https://github.com/Linaro/linux-kernel-warpdrive/tree/sva-devel
->>> <https://github.com/Linaro/linux-kernel-warpdrive/tree/sva-devel>
->>> Host:
->>> https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10
->>> <https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10>
->>> qemu: https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
->>> <https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6>
->>>
->>> The guest I am using is contains Jean's sva patches.
->>> Since currently they are many patch conflict, so use two different tree=
-.
->>>
->>> Result
->>> No-sva mode works.
->>> This mode, guest directly get physical address via ioctl.
->> OK thanks for testing
->>> While vSVA can not work, there are still much work to do.
->>> I am trying to SVA mode, and it fails, so choose no-sva instead.
->>> iommu_dev_enable_feature(parent, IOMMU_DEV_FEAT_SVA)
->> Indeed I assume there are plenty of things missing to make vSVM work on
->> ARM (iommu, vfio, QEMU). I am currently reviewing Jacob and Yi's kernel
->> and QEMU series on Intel side. After that, I will come back to you to
->> help. Also vSMMUv3 does not support multiple contexts at the moment. I
->> will add this soon.
->>
->>
->> Still the problem I have is testing. Any suggestion welcome.
->>
->>
-> To make sure
-> Do you mean you need a environment for testing?
->=20
-> How about Hisilicon kunpeng920, arm64 platform supporting SVA in host now=
-.
-> There is such a platform in linaro mlab that I think we can share.
-> Currently I am testing with uacce,
-> By testing a user driver (hisi zip accelerator) in guest, we can test
-> vSVA and PASID easily.
-Sorry for the delay. I am currently investigating if this could be
-possible. Thank you for the suggestion!
+I got a stracktrace of a hanging coroutine:
 
-Best Regards
+(gdb) qemu coroutine 0x7fd8c00132c0
+#0  0x00005630e16e9840 in qemu_coroutine_switch (from_=3Dfrom_@entry=3D0x7f=
+d8c00132c0, to_=3Dto_@entry=3D0x7fd8cda865b8, action=3Daction@entry=3DCOROU=
+TINE_YIELD) at util/coroutine-ucontext.c:218
+#1  0x00005630e16e8521 in qemu_coroutine_yield () at util/qemu-coroutine.c:=
+193
+#2  0x00005630e16e8ba5 in qemu_co_queue_wait_impl (queue=3Dqueue@entry=3D0x=
+5630e48ab580, lock=3Dlock@entry=3D0x0) at util/qemu-coroutine-lock.c:56
+#3  0x00005630e161f1ae in blk_wait_while_drained (blk=3Dblk@entry=3D0x5630e=
+48ab260) at /home/kwolf/source/qemu/include/qemu/lockable.h:46
+#4  0x00005630e1620600 in blk_wait_while_drained (blk=3D0x5630e48ab260) at =
+block/block-backend.c:1189
+#5  0x00005630e1620600 in blk_co_pwritev_part (blk=3D0x5630e48ab260, offset=
+=3D2922381312, bytes=3D856064, qiov=3Dqiov@entry=3D0x7fd8c002cd70, qiov_off=
+set=3Dqiov_offset@entry=3D0, flags=3D0)
+    at block/block-backend.c:1189
+#6  0x00005630e16207ce in blk_co_pwritev (flags=3D<optimized out>, qiov=3D0=
+x7fd8c002cd70, bytes=3D<optimized out>, offset=3D<optimized out>, blk=3D<op=
+timized out>) at block/block-backend.c:1429
+#7  0x00005630e16207ce in blk_aio_write_entry (opaque=3D0x7fd8c002cdc0) at =
+block/block-backend.c:1429
+#8  0x00005630e16e98bb in coroutine_trampoline (i0=3D<optimized out>, i1=3D=
+<optimized out>) at util/coroutine-ucontext.c:115
 
-Eric
->=20
-> Thanks
->=20
+So I think this is the bug: Calling blk_wait_while_drained() from
+anywhere between blk_inc_in_flight() and blk_dec_in_flight() is wrong
+because it will deadlock the drain operation.
+
+blk_aio_read/write_entry() take care of this and drop their reference
+around blk_wait_while_drained(). But if we hit the race condition that
+drain hasn't yet started there, but it has when we get to
+blk_co_preadv() or blk_co_pwritev_part(), then we're in a buggy code
+path.
+
+Kevin
 
 
