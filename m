@@ -2,65 +2,79 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C84FC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B508CC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:22:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21120206D3
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21120206D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D6DC206D3
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 09:22:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lq7dql23"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D6DC206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJw2x-0004o0-90
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 05:21:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52506)
+	id 1jJw3r-0005oP-Om
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 05:22:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dietmar@proxmox.com>) id 1jJw2L-0004H8-BA
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:21:22 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jJw3I-0005N1-U7
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dietmar@proxmox.com>) id 1jJw2K-0007ru-4K
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:21:21 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:13430)
+ (envelope-from <cohuck@redhat.com>) id 1jJw3I-0008Un-0Z
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:22:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38330
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dietmar@proxmox.com>)
- id 1jJw2I-0007ox-0n; Thu, 02 Apr 2020 05:21:18 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 0DA9845967;
- Thu,  2 Apr 2020 11:21:15 +0200 (CEST)
-Date: Thu, 2 Apr 2020 11:21:13 +0200 (CEST)
-From: Dietmar Maurer <dietmar@proxmox.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1519397884.31.1585819273840@webmail.proxmox.com>
-In-Reply-To: <20200401181256.GB27663@linux.fritz.box>
-References: <658260883.24.1585644382441@webmail.proxmox.com>
- <20200331125804.GE7030@linux.fritz.box>
- <303038276.59.1585665152860@webmail.proxmox.com>
- <787d7517-bf56-72c7-d197-2313a864e05f@virtuozzo.com>
- <713436887.61.1585668262838@webmail.proxmox.com>
- <20200331153719.GI7030@linux.fritz.box>
- <518198448.62.1585671498399@webmail.proxmox.com>
- <20200401103748.GA4680@linux.fritz.box>
- <997901084.0.1585755465486@webmail.proxmox.com>
- <20200401181256.GB27663@linux.fritz.box>
-Subject: Re: bdrv_drained_begin deadlock with io-threads
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jJw3H-0008Uc-Tj
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 05:22:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585819339;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vddQOmvtxg6zWkptO4fPxV4A9VXzTF4H9XbwvtgvWHs=;
+ b=Lq7dql230eS+cCMH2GqLYiyMZoT+N8Y3pc+Ck+nrqF9ZWfynpV2YfatarzJRVh6VVdvMhm
+ fUiEu3jfSPHDyku2IxG6AOkFh1wHWbY9aYiqlinBS6+nx1883fJwQ/edhiO/Gba4UOUyth
+ j1TJAaTad4QqdUoap8tFQuUUJsqjvmY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-duJSzTU1OCWEKNjomFST9Q-1; Thu, 02 Apr 2020 05:22:15 -0400
+X-MC-Unique: duJSzTU1OCWEKNjomFST9Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49976107ACCC;
+ Thu,  2 Apr 2020 09:22:14 +0000 (UTC)
+Received: from gondolin (ovpn-113-176.ams2.redhat.com [10.36.113.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E603C101F96B;
+ Thu,  2 Apr 2020 09:22:09 +0000 (UTC)
+Date: Thu, 2 Apr 2020 11:22:06 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v3 1/1] vl/s390x: fixup ram sizes for compat machines
+Message-ID: <20200402112206.17c942de.cohuck@redhat.com>
+In-Reply-To: <285819e0-e23e-32ac-b061-a0b683baeb5a@redhat.com>
+References: <20200401123754.109602-1-borntraeger@de.ibm.com>
+ <285819e0-e23e-32ac-b061-a0b683baeb5a@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Mailer: Open-Xchange Mailer v7.10.2-Rev23
-X-Originating-Client: open-xchange-appsuite
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.186.127.180
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,22 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Dietmar Maurer <dietmar@proxmox.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: =?UTF-8?B?THVr?= =?UTF-8?B?w6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > Do you also run "stress-ng -d 5" indied the VM?
-> 
-> I'm not using the exact same test case, but something that I thought
-> would be similar enough. Specifically, I run the script below, which
-> boots from a RHEL 8 CD and in the rescue shell, I'll do 'dd if=/dev/zero
-> of=/dev/sda' 
+On Wed, 1 Apr 2020 15:14:12 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-This test does not trigger the bug - you need to run "stress-ng -d 5" inside the VM.
+> On 01.04.20 14:37, Christian Borntraeger wrote:
+
+> > +static ram_addr_t s390_fixup_ram_size(ram_addr_t sz)
+> > +{
+> > +    /* same logic as in sclp.c */
+> > +    int increment_size = 20;
+> > +    ram_addr_t newsz;
+> > +
+> > +    while ((sz >> increment_size) > MAX_STORAGE_INCREMENTS) {
+> > +        increment_size++;
+> > +    }
+> > +    newsz = sz >> increment_size << increment_size;
+> > +
+> > +    if (sz != newsz) {
+> > +        qemu_printf("Ram size %" PRIu64 "MB was fixed up to %" PRIu64
+> > +                    "MB to match machine restrictions. Consider updating "
+> > +                    "the guest definition.i\n", sz / MiB, newsz / MiB);  
+> 
+> Not sure if news/zs will be printed correctly in case ram_addr_t !=
+> uint64_t.
+
+RAM_ADDR_FMT might be the right thing to use here?
 
 
