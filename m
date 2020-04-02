@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F89C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EF8C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:05:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A4752074D
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8E8A2077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:05:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gId4pP80"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4752074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3GSzdjG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E8A2077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJwjA-0004jF-BD
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 06:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33832)
+	id 1jJwjD-0004o6-4s
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 06:05:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33846)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jJwgz-0001K3-8N
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:22 -0400
+ (envelope-from <lvivier@redhat.com>) id 1jJwh3-0001RC-OI
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1jJwgy-0000Rs-0s
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22083
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1jJwh2-0000Uf-CR
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:25 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38912
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1jJwgx-0000RF-Pu
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:19 -0400
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1jJwh2-0000TO-8o
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585821799;
+ s=mimecast20190719; t=1585821803;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=O3I/cokbs6mFo+fIVGu+390hXkIUUIIvuyOMxyh2eEc=;
- b=gId4pP804dH1TjfLzNfD6e8PAhCiwXInsnZCI/kAgEvFX9EkBtHZNnPXTetIhxrKw0JtX9
- PoMMEt0g5NFwiqz6GVyMYsmCvVF1LFtUXWecOrxuWTZ2l2jYeCbUs63YdBw4lvgr3eZTyS
- 0m4jHc5CHnXWoZXKNDRQFl7y3IvIjB8=
+ bh=Kep3V9mG5AJTYZhlUeT2WOe008YTZEEiwjQV6Q9cMjM=;
+ b=N3GSzdjGxmwQNtOMw63/E+cmJB8zYyTo5OltD+1NTwSMLf7QJyZlA0g6uH/9VycEWu/Qw4
+ f46qZNEcl9M8LacX66ZHG/Y+IYyuPP31KsXA/sIp7amU6PMIVimw+b04QSPP9wqyDuRsrs
+ Q6sat3ugFBiSpoj3QclypAPhebHjDFM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-1hTzJb0ZOhS8NcwnyZgGbA-1; Thu, 02 Apr 2020 06:03:17 -0400
-X-MC-Unique: 1hTzJb0ZOhS8NcwnyZgGbA-1
+ us-mta-220-QymQzCAcOsuahTgZarNpnw-1; Thu, 02 Apr 2020 06:03:20 -0400
+X-MC-Unique: QymQzCAcOsuahTgZarNpnw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFBE018A5526;
- Thu,  2 Apr 2020 10:03:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E27F8017F5;
+ Thu,  2 Apr 2020 10:03:19 +0000 (UTC)
 Received: from thinkpad.redhat.com (ovpn-113-198.ams2.redhat.com
  [10.36.113.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B34E75DA66;
- Thu,  2 Apr 2020 10:03:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4413B5DA2C;
+ Thu,  2 Apr 2020 10:03:17 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC 2/5] qmp: add QMP command virtio-status
-Date: Thu,  2 Apr 2020 12:02:59 +0200
-Message-Id: <20200402100302.833267-3-lvivier@redhat.com>
+Subject: [RFC 3/5] qmp: add QMP command virtio-queue-status
+Date: Thu,  2 Apr 2020 12:03:00 +0200
+Message-Id: <20200402100302.833267-4-lvivier@redhat.com>
 In-Reply-To: <20200402100302.833267-1-lvivier@redhat.com>
 References: <20200402100302.833267-1-lvivier@redhat.com>
 MIME-Version: 1.0
@@ -73,7 +73,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,57 +93,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This new command shows the status of a VirtIODevice
-(features, endianness and number of virtqueues)
+This new command shows internal status of a VirtQueue.
+(vrings and indexes).
 
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/virtio/virtio-stub.c |  5 ++++
- hw/virtio/virtio.c      | 51 ++++++++++++++++++++++++++++++++
- qapi/virtio.json        | 65 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 121 insertions(+)
+ hw/virtio/virtio-stub.c |  6 +++
+ hw/virtio/virtio.c      | 35 +++++++++++++++
+ qapi/virtio.json        | 98 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 139 insertions(+)
 
 diff --git a/hw/virtio/virtio-stub.c b/hw/virtio/virtio-stub.c
-index d9e4a815ecf1..8fe2d6cd8892 100644
+index 8fe2d6cd8892..5b4ed6fd531e 100644
 --- a/hw/virtio/virtio-stub.c
 +++ b/hw/virtio/virtio-stub.c
-@@ -12,3 +12,8 @@ VirtioInfoList *qmp_query_virtio(Error **errp)
+@@ -17,3 +17,9 @@ VirtioStatus *qmp_virtio_status(const char* path, Error *=
+*errp)
  {
      return qmp_virtio_unsupported(errp);
  }
 +
-+VirtioStatus *qmp_virtio_status(const char* path, Error **errp)
++VirtQueueStatus *qmp_virtio_queue_status(const char *path, uint16_t queue,
++                                         Error **errp)
 +{
 +    return qmp_virtio_unsupported(errp);
 +}
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 3cebc3d169c8..7f6e21e4ab2c 100644
+index 7f6e21e4ab2c..271d4ca3417f 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -3839,6 +3839,57 @@ VirtioInfoList *qmp_query_virtio(Error **errp)
-     return list;
+@@ -3855,6 +3855,41 @@ static VirtIODevice *virtio_device_find(const char *=
+path)
+     return NULL;
  }
 =20
-+static VirtIODevice *virtio_device_find(const char *path)
++VirtQueueStatus *qmp_virtio_queue_status(const char *path, uint16_t queue,
++                                         Error **errp)
 +{
 +    VirtIODevice *vdev;
-+
-+    QTAILQ_FOREACH(vdev, &virtio_list, next) {
-+        DeviceState *dev =3D DEVICE(vdev);
-+
-+        if (strcmp(dev->canonical_path, path) !=3D 0) {
-+            continue;
-+        }
-+        return vdev;
-+    }
-+
-+    return NULL;
-+}
-+
-+VirtioStatus *qmp_virtio_status(const char* path, Error **errp)
-+{
-+    VirtIODevice *vdev;
-+    VirtioStatus *status;
++    VirtQueueStatus *status;
 +
 +    vdev =3D virtio_device_find(path);
 +    if (vdev =3D=3D NULL) {
@@ -151,105 +139,138 @@ index 3cebc3d169c8..7f6e21e4ab2c 100644
 +        return NULL;
 +    }
 +
-+    status =3D g_new0(VirtioStatus, 1);
-+    status->guest_features =3D vdev->guest_features;
-+    status->host_features =3D vdev->host_features;
-+    status->backend_features =3D vdev->backend_features;
-+    status->device_id =3D vdev->device_id;
-+
-+    switch (vdev->device_endian) {
-+    case VIRTIO_DEVICE_ENDIAN_LITTLE:
-+        status->device_endian =3D g_strdup("little");
-+        break;
-+    case VIRTIO_DEVICE_ENDIAN_BIG:
-+        status->device_endian =3D g_strdup("big");
-+        break;
-+    case VIRTIO_DEVICE_ENDIAN_UNKNOWN:
-+    default:
-+        status->device_endian =3D g_strdup("unknown");
-+        break;
++    if (queue >=3D VIRTIO_QUEUE_MAX || !virtio_queue_get_num(vdev, queue))=
+ {
++        error_setg(errp, "Invalid virtqueue number %d", queue);
++        return NULL;
 +    }
 +
-+    status->num_vqs =3D virtio_get_num_queues(vdev);
++    status =3D g_new0(VirtQueueStatus, 1);
++    status->queue_index =3D vdev->vq[queue].queue_index;
++    status->inuse =3D vdev->vq[queue].inuse;
++    status->vring_num =3D vdev->vq[queue].vring.num;
++    status->vring_num_default =3D vdev->vq[queue].vring.num_default;
++    status->vring_align =3D vdev->vq[queue].vring.align;
++    status->vring_desc =3D vdev->vq[queue].vring.desc;
++    status->vring_avail =3D vdev->vq[queue].vring.avail;
++    status->vring_used =3D vdev->vq[queue].vring.used;
++    status->last_avail_idx =3D vdev->vq[queue].last_avail_idx;
++    status->shadow_avail_idx =3D vdev->vq[queue].shadow_avail_idx;
++    status->used_idx =3D vdev->vq[queue].used_idx;
++    status->signalled_used =3D vdev->vq[queue].signalled_used;
++    status->signalled_used_valid =3D vdev->vq[queue].signalled_used_valid;
 +
 +    return status;
 +}
 +
- static const TypeInfo virtio_device_info =3D {
-     .name =3D TYPE_VIRTIO_DEVICE,
-     .parent =3D TYPE_DEVICE,
+ VirtioStatus *qmp_virtio_status(const char* path, Error **errp)
+ {
+     VirtIODevice *vdev;
 diff --git a/qapi/virtio.json b/qapi/virtio.json
-index 2a95d08a8b9e..2af4d95b9893 100644
+index 2af4d95b9893..ab70500d919b 100644
 --- a/qapi/virtio.json
 +++ b/qapi/virtio.json
-@@ -52,3 +52,68 @@
- ##
-=20
- { 'command': 'query-virtio', 'returns': ['VirtioInfo'] }
+@@ -117,3 +117,101 @@
+   'data': { 'path': 'str' },
+   'returns': 'VirtioStatus'
+ }
 +
 +##
-+# @VirtioStatus:
++# @VirtQueueStatus:
 +#
-+# @device_id: VirtIODevice status
++# Status of a VirtQueue
 +#
-+# @device_endian: VirtIODevice device_endian
++# @queue_index: VirtQueue queue_index
 +#
-+# @guest_features: VirtIODevice guest_features
++# @inuse: VirtQueue inuse
 +#
-+# @host_features: VirtIODevice host_features
++# @vring_num: VirtQueue vring.num
 +#
-+# @backend_features: VirtIODevice backend_features
++# @vring_num_default: VirtQueue vring.num_default
 +#
-+# @num_vqs: number of VirtIODevice queues
++# @vring_align: VirtQueue vring.align
++#
++# @vring_desc: VirtQueue vring.desc
++#
++# @vring_avail: VirtQueue vring.avail
++#
++# @vring_used: VirtQueue vring.used
++#
++# @last_avail_idx: VirtQueue last_avail_idx
++#
++# @shadow_avail_idx: VirtQueue shadow_avail_idx
++#
++# @used_idx: VirtQueue used_idx
++#
++# @signalled_used: VirtQueue signalled_used
++#
++# @signalled_used_valid: VirtQueue signalled_used_valid
 +#
 +# Since: 5.1
 +#
 +##
 +
-+{ 'struct': 'VirtioStatus',
++{ 'struct': 'VirtQueueStatus',
 +  'data': {
-+    'device_id': 'int',
-+    'device_endian': 'str',
-+    'guest_features': 'uint64',
-+    'host_features': 'uint64',
-+    'backend_features': 'uint64',
-+    'num_vqs': 'uint16'
++    'queue_index': 'uint16',
++    'inuse': 'uint32',
++    'vring_num': 'int',
++    'vring_num_default': 'int',
++    'vring_align': 'int',
++    'vring_desc': 'uint64',
++    'vring_avail': 'uint64',
++    'vring_used': 'uint64',
++    'last_avail_idx': 'uint16',
++    'shadow_avail_idx': 'uint16',
++    'used_idx': 'uint16',
++    'signalled_used': 'uint16',
++    'signalled_used_valid': 'uint16'
 +  }
 +}
 +
 +##
-+# @virtio-status:
++# @virtio-queue-status:
 +#
-+# Return the status of virtio device
++# Return the status of a given VirtQueue
 +#
 +# @path: QOBject path of the VirtIODevice
 +#
-+# Returns: status of the VirtIODevice
++# @queue: queue number to examine
++#
++# Returns: Status of the VirtQueue
 +#
 +# Since: 5.1
 +#
 +# Example:
 +#
-+# -> { "execute": "virtio-status",
++# -> { "execute": "virtio-queue-status",
 +#      "arguments": {
-+#          "path": "/machine/peripheral-anon/device[3]/virtio-backend"
++#          "path": "/machine/peripheral-anon/device[3]/virtio-backend",
++#          "queue": 0
 +#      }
 +#   }
 +# <- { "return": {
-+#          "backend_features": 0,
-+#          "guest_features": 5111807911,
-+#          "num_vqs": 3,
-+#          "host_features": 6337593319,
-+#          "device_endian": "little",
-+#          "device_id": 1
++#      "signalled_used": 373,
++#      "inuse": 0,
++#      "vring_desc": 864411648,
++#      "vring_num_default": 256,
++#      "signalled_used_valid": 1,
++#      "vring_avail": 864415744,
++#      "last_avail_idx": 373,
++#      "queue_index": 0,
++#      "vring_used": 864416320,
++#      "shadow_avail_idx": 619,
++#      "used_idx": 373,
++#      "vring_num": 256,
++#      "vring_align": 4096
 +#      }
 +#    }
 +#
 +##
 +
-+{ 'command': 'virtio-status',
-+  'data': { 'path': 'str' },
-+  'returns': 'VirtioStatus'
++{ 'command': 'virtio-queue-status',
++  'data': { 'path': 'str', 'queue': 'uint16' },
++  'returns': 'VirtQueueStatus'
 +}
 --=20
 2.25.1
