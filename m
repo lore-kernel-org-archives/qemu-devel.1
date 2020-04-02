@@ -2,76 +2,95 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6B8C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:47:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F30EC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:48:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28716208E4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:47:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B798208E4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 08:48:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UyFpcqdo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28716208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZO47m7Ym"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B798208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJvVw-0001aV-5A
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:47:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44560)
+	id 1jJvWK-000284-Gj
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 04:48:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jJvVA-0000rm-O0
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:05 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jJvVM-00011e-6M
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jJvV9-0005EQ-I3
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53520
+ (envelope-from <pbonzini@redhat.com>) id 1jJvVL-0005VU-6d
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50423
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jJvV9-0005Da-DC
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:03 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jJvVL-0005Un-3T
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 04:47:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585817222;
+ s=mimecast20190719; t=1585817234;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Fzgta2RbzHFri8u6QWgqC99rK5tDlTydYIsFMOMuVWo=;
- b=UyFpcqdoVSX5DyvXiEexZj1xugE8JRffYh2lxJb6plXhiktCe/RMW7gvEZ7wru+/5BG+Lb
- si8XuGZwLVndeP6VROQHNyaoLem6yVqPNCwsIkzKp38L5znwrRooVm8Gu+Td1m2VAezq/3
- TFm3wV75lu0fUB5oqH7BF52GCzYu9Io=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-VNJIcMrTPVKbGjPkbOiNcQ-1; Thu, 02 Apr 2020 04:47:01 -0400
-X-MC-Unique: VNJIcMrTPVKbGjPkbOiNcQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10D3A8017F3;
- Thu,  2 Apr 2020 08:47:00 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.234])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D3C51100EBAF;
- Thu,  2 Apr 2020 08:46:58 +0000 (UTC)
-Message-ID: <ffa77fc719232b8dc0e6e78bd3781fd77c5adcf8.camel@redhat.com>
-Subject: Re: Question about scsi device hotplug (e.g scsi-hd)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 02 Apr 2020 11:46:57 +0300
-In-Reply-To: <4bc42bf2-939f-f6c4-ea45-0d08eb42fc2b@redhat.com>
-References: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
- <20200401150944.GA4500@stefanha-x1.localdomain>
- <4bc42bf2-939f-f6c4-ea45-0d08eb42fc2b@redhat.com>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ bh=lj30UAt8X7wWPT0eCo7ZWeFtSAuq0vDSwO2ZWdmBTpk=;
+ b=ZO47m7YmGjJF+EyfutvutV8RqGYeACncopNMkP9OLC1yvNPsZX86wqce64+gM6BOAOojFl
+ LkA96mnlFMu7YpkgRKRIup1wc8Y46f3NQ2IEBIMQjb1+YX3tqrlYgiVE7da9tfoRLYESiy
+ eVRwZr2gHJjqFcDXndWZJLpp7YVvsgc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-4VHVMsCHOzGCAzzcxfI6Lw-1; Thu, 02 Apr 2020 04:47:11 -0400
+X-MC-Unique: 4VHVMsCHOzGCAzzcxfI6Lw-1
+Received: by mail-wm1-f72.google.com with SMTP id l13so1093159wme.7
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 01:47:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lj30UAt8X7wWPT0eCo7ZWeFtSAuq0vDSwO2ZWdmBTpk=;
+ b=g953D+xfisNggQTkobEoxRy0y29e2RbvTvLAMIPbRwzCt7JiQxk5lAiXxkXSJ7PUnK
+ gPoIqBT536PZoU5cy66xDGBpKm7Q9a1ltM0QJIm/je1XKVl5lODzlOz12D/L9mG35xLM
+ w7uI+niDaL7wLAEeBWtTQkSdDhIwz2sypdlL1JZkFApEMnAT3Pa/AOpTtkRQts94TbMk
+ Ib0DYfG83ZCqp1vEYzUrkbmp5dUgOIWfvfG4wa9H0RsLj4Uj95wNr0Xb4O8dXRAfh5wB
+ zqqdhYuwX7HihTy93h3zZrRXWguvV+59iUIT8G3GkvafpEW41NvUU3N5gsMIeUxa+VmC
+ 39Cw==
+X-Gm-Message-State: AGi0Puboq914nciwK4laX/vJWC1yuNjI1U94bFTZTC981kfcGwcX83+I
+ Gc5p+zymmLSBxjE1UHkrQSd6c3G8jJG7I6BGycUT87ePCMpyuhR5q2+W3CM1WistO1J4jJlhvyf
+ QzSouL2RlHYpxuqs=
+X-Received: by 2002:adf:800e:: with SMTP id 14mr2251244wrk.369.1585817230134; 
+ Thu, 02 Apr 2020 01:47:10 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIRwDyciQab9fYIL7Z0uFsyjw8Z9Iz8SeUpLF6hygeqDlRZRP1vLIe4/1VTBMsO09Q68n8MBA==
+X-Received: by 2002:adf:800e:: with SMTP id 14mr2251222wrk.369.1585817229828; 
+ Thu, 02 Apr 2020 01:47:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1868:42dd:216c:2c09?
+ ([2001:b07:6468:f312:1868:42dd:216c:2c09])
+ by smtp.gmail.com with ESMTPSA id z12sm6722573wrt.27.2020.04.02.01.47.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 02 Apr 2020 01:47:09 -0700 (PDT)
+Subject: Re: [PATCH v2] util/async: Add memory barrier to aio_ctx_prepare
+To: Ying Fang <fangying1@huawei.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <20200402024431.1629-1-fangying1@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2f8406fa-ae18-856b-938f-a804ff1b11c7@redhat.com>
+Date: Thu, 2 Apr 2020 10:47:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200402024431.1629-1-fangying1@huawei.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -86,50 +105,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: fam@euphon.net, wu.wubin@huawei.com, qemu-stable@nongnu.org,
+ stefanha@redhat.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2020-04-01 at 18:36 +0200, Paolo Bonzini wrote:
-> On 01/04/20 17:09, Stefan Hajnoczi wrote:
-> > > What do you think about it?
-> > 
-> > Maybe aio_disable_external() is needed to postpone device emulation
-> > until after realize has finished?
+On 02/04/20 04:44, Ying Fang wrote:
+> Normal VM runtime is not affected by this hang since there is always some
+> timer timeout or subsequent io worker come and notify the main thead.
+> To fix this problem, a memory barrier is added to aio_ctx_prepare and
+> it is proved to have the hang fixed in our test.
 
-Isn't that virtio specific? In theory this issue can touch any driver that
-behaves similar to scsi.
+Hi Ying Fang,
 
-Also due to racing, the request might already be in virtqueue and the virtio-scsi iothread might have already
-fetched it when we place the device on the bus.
+this part of the patch is correct, but I am not sure if a memory barrier
+is needed in aio_poll too.
 
-In fact I don't see any locking in bus_add_child / scsi_device_find so in fact if the timing is right
-and iothread calls the scsi_device_find while main thread adds the device on the bus that will cause
-the whole thing go south.
+In addition, the memory barrier is quite slow on x86 and not needed there.
 
-IMHO the right solution for this is first to realize the device and then place it
-on the bus, and even that I am not sure that will fix the race completely.
+I am sorry for dropping the ball on this bug; I had a patch using
+relaxed atomics (atomic_set/atomic_read) but I never submitted it
+because I had placed it in a larger series.  Let me post it now.
 
-IMHO the correct solution here is to stop querying the bus children on the guest controlled IO path 
-(scsi_device_find) but rather use the hotplug handlers to
-store the active luns of the scsi device in parallel (and with proper locking).
+Thanks,
 
+Paolo
 
-Best regards,
-	Maxim Levitsky
-
-
-> > 
-> > Virtqueue kick ioeventfds are marked "external" and won't be processed
-> > while external events are disabled.  See also
-> > virtio_queue_aio_set_host_notifier_handler() ->
-> > aio_set_event_notifier().
 > 
-> Yes, I think Stefan is right.
+> diff --git a/util/async.c b/util/async.c
+> index b94518b..89a4f3e 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -250,7 +250,8 @@ aio_ctx_prepare(GSource *source, gint    *timeout)
+>      AioContext *ctx = (AioContext *) source;
+>  
+>      atomic_or(&ctx->notify_me, 1);
+> -
+> +    /* Make sure notify_me is set before aio_compute_timeout */
+> +    smp_mb();
+>      /* We assume there is no timeout already supplied */
+>      *timeout = qemu_timeout_ns_to_ms(aio_compute_timeout(ctx));
+>  
 > 
-> Paolo
-> 
-
 
 
