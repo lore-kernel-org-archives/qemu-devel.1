@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 594C1C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC81C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:50:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2425E2073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 144F32073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 13:50:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qm+SzTwP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2425E2073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IOmR3ADU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 144F32073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK0Dh-0002ZN-Bh
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:49:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50685)
+	id 1jK0Ed-0003Tp-1p
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 09:50:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jK0Ai-0006OY-FR
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:46:17 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jK0Ak-0006Rj-Mz
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:46:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jK0Ah-0001sD-Bx
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:46:16 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:39278)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jK0Aj-0001yh-Px
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 09:46:18 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40080)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jK0Ah-0001oj-4e; Thu, 02 Apr 2020 09:46:15 -0400
-Received: by mail-lf1-x142.google.com with SMTP id h6so2765409lfp.6;
- Thu, 02 Apr 2020 06:46:15 -0700 (PDT)
+ id 1jK0Aj-0001wd-It; Thu, 02 Apr 2020 09:46:17 -0400
+Received: by mail-lj1-x242.google.com with SMTP id 19so3265684ljj.7;
+ Thu, 02 Apr 2020 06:46:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=h4Q7MSpHXVMJ49cK44wbGbgCP5J9MGmDVmW1uuYRWUs=;
- b=Qm+SzTwPSelbgQGrPXZ0eRecqfbd6cMSBxsf+s198QHT+gl8uK1hQQlDnIfTa/OyOY
- yOx6T2K49fZbybzn1i0iDKyxwfaEq4J6/n93gtIO+PerrYZrhvRQaNP4D/Q/tD9MchZ3
- +UO6r94GyrcM0AXr8PHLdeuSldt9NI2bUZ8Y6IBC/EIrSDhRYaKar8EHbAON4zkvQKIB
- VfRpqkMsW11mpwxJ8dZU5B7i6TkbSCPn4CqZ71QGSBO5n4z0Atd/Po2j4XuSeEy8Ixl0
- 6NxV3SrMtzoXJaAVahYnp8zTpMyOKnIYkJugOPZJRnmwGRmt+i5kuGHcKvnuJftVd4ma
- ou7w==
+ bh=aG0858uXhmYhe8n44TDMUkVLiuz53/ZFtxLaB/tbPg4=;
+ b=IOmR3ADUmr+8jzCAe+DYZi9aEQv6+t+KFVnhymtLxnC4mLXagSxddBaq/6EC/nY7l3
+ KhHifSstFQQLQfLcsCJaQH3eXQf/yvnGa3fHb0UkzPb84QEt+2+QrRasE2fRphgmN63r
+ QDDUHKbP77/j85MWog0GY0WDxTv5yNXlct3z7sNsjW2TfcPc3a0VOXYTWF9WfJxmEbnm
+ u20QPmjOHDtswvaMX0hDuKksuk8md0P3Fmoxi2f2qJaIODMscwPn1SqX8ECd7VWQWWrc
+ s50H5/ZL76tLt/jNTBWtnOgUabPfPKn7UeiZs1MMmXakCjePgKJ6hrahfx6M+L11neAK
+ srmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=h4Q7MSpHXVMJ49cK44wbGbgCP5J9MGmDVmW1uuYRWUs=;
- b=gSEkghOm7G+wwSl6GEA+8Fs0JOBo3WzB0zLrGhwNUmCMif+1JemLKGWTNNLiNSaJKM
- U86B/4sYqJ3fLt/L5c1a7Z9vwcUdBCPwUs+Z7uLAnRYx8XL4zGZZB4YAIixiXUzCpic6
- 2EjG2AnzVO2+h62t7YhuYO708loqI0z3IKGkKko4WWLrKS443wlpB9EmtRNFPRXVuhNY
- Pdltd/FYH9yhlXTvtLuvLvWPFuwVNQkZXDeh35WASDAMZHq7JLY1dz1VPqFRr1ZE3ua1
- qnLHDkBDz1K7k6GVzV2t9UnkvXhGTqUGcxRiVLv0ohBZ+2cQVG03ImEaTdG1B0W1BJFA
- R7wg==
-X-Gm-Message-State: AGi0PubE3J/cBo8mGPI9kbS0KrPGw2ouqOB1FD3m5A0wDDwS1K9utacT
- Fh7MW0GmeatOF1ZZfP8M8LdyYoJPHhMuSw==
-X-Google-Smtp-Source: APiQypJkOFn70kEGDneFetAwp5e+JQMjtiQRNcEuBF0dQhYCga23iQI1oVdZBOdNOyBcWjzAhck2Dg==
-X-Received: by 2002:a19:5519:: with SMTP id n25mr2280129lfe.198.1585835173457; 
- Thu, 02 Apr 2020 06:46:13 -0700 (PDT)
+ bh=aG0858uXhmYhe8n44TDMUkVLiuz53/ZFtxLaB/tbPg4=;
+ b=V3H5lHzCp/+l58cORYVIXudbPY74G1kqiA0kR4+duj+ZI6LSDx6JnIrUig9/7nFCc9
+ CClVsS1aEO7ouMFd//BD0IShWF42UwMaDJo6kwFeyVqNxkJoFBPxTMlVxL3HYKEWtMDA
+ wMs7bxXa1fZOLYHuTOS9t869sHPd+a09Ql+JwUuz5ZkgALfhRFl381ADRhkfEs1ZEs7N
+ Tpiy+xykpiC3llKzmqjnSnBP3DXQwIyaEyoOr2rufQISZnLN+EOD4KJRLS07ELaqAIBC
+ dFNO3VynGTFc8cD5JHUjC1+Ll8fliU/aQ8tIOXCGG9IoWzeem9GnpXMHtqx3tOXGpEqG
+ sZCw==
+X-Gm-Message-State: AGi0PuahXqYe7Y1g86KrsFQE6zDaai5qjLBroPJ+niljAjzpB8ST39gB
+ tPvaa/nIBUL0vOalsmpbTqHeUr7rWqDy5A==
+X-Google-Smtp-Source: APiQypIql4k96jW+Hnwpu7NGBalRh784Q/LWaGXy+aU7KwRDQubChWnid0/H59X9cY48lPsU+wSFVw==
+X-Received: by 2002:a2e:8693:: with SMTP id l19mr2226293lji.132.1585835176058; 
+ Thu, 02 Apr 2020 06:46:16 -0700 (PDT)
 Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id e1sm3202774ljo.16.2020.04.02.06.46.12
+ by smtp.gmail.com with ESMTPSA id q10sm3858710lfa.29.2020.04.02.06.46.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Apr 2020 06:46:12 -0700 (PDT)
+ Thu, 02 Apr 2020 06:46:15 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/5] dma/xlnx-zdma: Remove comment
-Date: Thu,  2 Apr 2020 15:47:17 +0200
-Message-Id: <20200402134721.27863-2-edgar.iglesias@gmail.com>
+Subject: [PATCH v1 3/5] dma/xlnx-zdma: Clear DMA_DONE when halting
+Date: Thu,  2 Apr 2020 15:47:19 +0200
+Message-Id: <20200402134721.27863-4-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200402134721.27863-1-edgar.iglesias@gmail.com>
 References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
@@ -80,7 +80,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,25 +103,25 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Remove comment.
+Clear DMA_DONE when halting the DMA channel.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/dma/xlnx-zdma.c | 1 -
- 1 file changed, 1 deletion(-)
+ hw/dma/xlnx-zdma.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-index 2d9c0a0d5e..a6c5b2304a 100644
+index 6a4699757a..dd893bc420 100644
 --- a/hw/dma/xlnx-zdma.c
 +++ b/hw/dma/xlnx-zdma.c
-@@ -511,7 +511,6 @@ static void zdma_process_descr(XlnxZDMA *s)
-         zdma_src_done(s);
+@@ -520,6 +520,7 @@ static void zdma_process_descr(XlnxZDMA *s)
+     if (src_cmd == CMD_HALT) {
+         zdma_set_state(s, PAUSED);
+         ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_PAUSE, 1);
++        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_DONE, false);
+         zdma_ch_imr_update_irq(s);
+         return;
      }
- 
--    /* Load next descriptor.  */
-     if (ptype == PT_REG || src_cmd == CMD_STOP) {
-         ARRAY_FIELD_DP32(s->regs, ZDMA_CH_CTRL2, EN, 0);
-         zdma_set_state(s, DISABLED);
 -- 
 2.20.1
 
