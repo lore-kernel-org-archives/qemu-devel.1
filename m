@@ -2,78 +2,81 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 794EFC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F31C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:20:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BEC72074D
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:07:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBB9F206F8
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 10:20:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xau213ac"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BEC72074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FHhPbbq6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB9F206F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJwkW-0006Bl-8T
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 06:07:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33873)
+	id 1jJwxm-0008Qg-Rr
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 06:20:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jJwh8-0001ZC-LF
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:32 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jJwx3-00081B-EJ
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:19:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1jJwh6-0000WG-Fh
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27963
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1jJwx1-0007pq-Ez
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:19:56 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44695
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1jJwh6-0000WA-Ak
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:03:28 -0400
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jJwx1-0007pK-8I
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 06:19:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585821808;
+ s=mimecast20190719; t=1585822794;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oyR+Fb8NPCcaSj6z5odo744T7i6AULnc2fVc7wIjzUs=;
- b=Xau213ac/R17bDv8QAsBLguvGE7rbEcAL3YgWg8Tq3HbMTuqZtHgBs3cSuOwQIBt+3Yft+
- v2tqlSQGBG4Ayz7ftJWK9niBVVVZNLiDTjfW20LCLhSdR2j2/lhWUdmIwahAV1OShym9cR
- 0EbGCrBiE6N7ejcf+vuONK5CYD7w8R4=
+ bh=2pk3cqeH/CBB4KbuZIr9+0E6SBnjhx32aYNvUxwYYCM=;
+ b=FHhPbbq6D6m7iGAxqggKNV0PA+2jrbKBG3i42br4nHegpgVu5Dk2V6OLTTtFgAlwvyUEpF
+ FzqGpAYsr6bVQzvem9UcWWysAuzFjJRfQzPgFmfBOsod17XgxaK86lYzX4nfimsGzq3DdV
+ Jot3Js9THipVj9LAuIF7i+W1PjYge8M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-RBxLpcNbMdOB2ITkCTsQ7g-1; Thu, 02 Apr 2020 06:03:26 -0400
-X-MC-Unique: RBxLpcNbMdOB2ITkCTsQ7g-1
+ us-mta-160-oBDWE0o5M5CCiNRbJ0F65w-1; Thu, 02 Apr 2020 06:19:50 -0400
+X-MC-Unique: oBDWE0o5M5CCiNRbJ0F65w-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2345B800D5C;
- Thu,  2 Apr 2020 10:03:25 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-113-198.ams2.redhat.com
- [10.36.113.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8C3F05DA76;
- Thu,  2 Apr 2020 10:03:22 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC 5/5] hmp: add virtio commands
-Date: Thu,  2 Apr 2020 12:03:02 +0200
-Message-Id: <20200402100302.833267-6-lvivier@redhat.com>
-In-Reply-To: <20200402100302.833267-1-lvivier@redhat.com>
-References: <20200402100302.833267-1-lvivier@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEDA610CE798;
+ Thu,  2 Apr 2020 10:19:47 +0000 (UTC)
+Received: from localhost (ovpn-113-134.ams2.redhat.com [10.36.113.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 07BAB5DA76;
+ Thu,  2 Apr 2020 10:19:43 +0000 (UTC)
+Date: Thu, 2 Apr 2020 11:19:42 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+Message-ID: <20200402101942.GF28280@stefanha-x1.localdomain>
+References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <20200401091712.GA221892@stefanha-x1.localdomain>
+ <MN2PR02MB620500A5010B71F1C0D8695E8BC90@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <CAJ+F1CLU4kPK1Tw3X7oTAWtUp0Q4Q=wm3-Uj-_2JO09vq0paBg@mail.gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <CAJ+F1CLU4kPK1Tw3X7oTAWtUp0Q4Q=wm3-Uj-_2JO09vq0paBg@mail.gmail.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="JSkcQAAxhB1h8DcT"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,509 +88,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
+ Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>, "Harris,
+ James R" <james.r.harris@intel.com>,
+ "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Felipe Franciosi <felipe@nutanix.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Zhang, Tina" <tina.zhang@intel.com>,
+ Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements HMP version of the virtio QMP commands
+--JSkcQAAxhB1h8DcT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- Makefile                |   2 +-
- Makefile.target         |   7 +-
- docs/system/monitor.rst |   2 +
- hmp-commands-virtio.hx  | 148 ++++++++++++++++++++++++++++++++++++++++
- hmp-commands.hx         |  10 +++
- hw/virtio/virtio.c      | 115 +++++++++++++++++++++++++++++++
- include/monitor/hmp.h   |   4 ++
- monitor/misc.c          |  17 +++++
- 8 files changed, 302 insertions(+), 3 deletions(-)
- create mode 100644 hmp-commands-virtio.hx
+On Wed, Apr 01, 2020 at 06:58:20PM +0200, Marc-Andr=E9 Lureau wrote:
+> On Wed, Apr 1, 2020 at 5:51 PM Thanos Makatos
+> <thanos.makatos@nutanix.com> wrote:
+> > > On Thu, Mar 26, 2020 at 09:47:38AM +0000, Thanos Makatos wrote:
+> > > > Build MUSER with vfio-over-socket:
+> > > >
+> > > >         git clone --single-branch --branch vfio-over-socket
+> > > git@github.com:tmakatos/muser.git
+> > > >         cd muser/
+> > > >         git submodule update --init
+> > > >         make
+> > > >
+> > > > Run device emulation, e.g.
+> > > >
+> > > >         ./build/dbg/samples/gpio-pci-idio-16 -s <N>
+> > > >
+> > > > Where <N> is an available IOMMU group, essentially the device ID, w=
+hich
+> > > must not
+> > > > previously exist in /dev/vfio/.
+> > > >
+> > > > Run QEMU using the vfio wrapper library and specifying the MUSER de=
+vice:
+> > > >
+> > > >         LD_PRELOAD=3Dmuser/build/dbg/libvfio/libvfio.so qemu-system=
+-x86_64
+> > > \
+> > > >                 ... \
+> > > >                 -device vfio-pci,sysfsdev=3D/dev/vfio/<N> \
+> > > >                 -object memory-backend-file,id=3Dram-node0,prealloc=
+=3Dyes,mem-
+> > > path=3Dmem,share=3Dyes,size=3D1073741824 \
+> > > >                 -numa node,nodeid=3D0,cpus=3D0,memdev=3Dram-node0
+> > > >
+>=20
+> fyi, with 5.0 you no longer need -numa!:
+>=20
+> -object memory-backend-memfd,id=3Dmem,size=3D2G -M memory-backend=3Dmem
+>=20
+> (hopefully, we will get something even simpler one day)
+>=20
+> > > > Bear in mind that since this is just a PoC lots of things can break=
+, e.g. some
+> > > > system call not intercepted etc.
+> > >
+> > > Cool, I had a quick look at libvfio and how the transport integrates
+> > > into libmuser.  The integration on the libmuser side is nice and smal=
+l.
+> > >
+> > > It seems likely that there will be several different implementations =
+of
+> > > the vfio-over-socket device side (server):
+> > > 1. libmuser
+> > > 2. A Rust equivalent to libmuser
+> > > 3. Maybe a native QEMU implementation for multi-process QEMU (I think=
+ JJ
+> > >    has been investigating this?)
+> > >
+> > > In order to interoperate we'll need to maintain a protocol
+> > > specification.  Mayb You and JJ could put that together and CC the vf=
+io,
+> > > rust-vmm, and QEMU communities for discussion?
+> >
+> > Sure, I can start by drafting a design doc and share it.
+>=20
+> ok! I am quite amazed you went this far with a ldpreload hack. This
+> demonstrates some limits of gpl projects, if it was necessary.
+>=20
+> I think with this work, and the muser experience, you have a pretty
+> good idea of what the protocol could look like. My approach, as I
+> remember, was a quite straightforward VFIO over socket translation,
+> while trying to see if it could share some aspects with vhost-user,
+> such as memory handling etc.
+>=20
+> To contrast with the work done on qemu-mp series, I'd also prefer we
+> focus our work on a vfio-like protocol, before trying to see how qemu
+> code and interface could be changed over multiple binaries etc. We
+> will start with some limitations, similar to the one that apply to
+> VFIO: migration, introspection, managements etc are mostly left out
+> for now. (iow, qemu-mp is trying to do too many things simultaneously)
 
-diff --git a/Makefile b/Makefile
-index 84ef88160006..5f70ea16a566 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1100,7 +1100,7 @@ $(MANUAL_BUILDDIR)/interop/index.html: $(call manual-=
-deps,interop)
- $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
- =09$(call build-manual,specs,html)
-=20
--$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system) $(SRC_PAT=
-H)/hmp-commands.hx $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/qemu-option=
-s.hx
-+$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system) $(SRC_PAT=
-H)/hmp-commands.hx $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/qemu-option=
-s.hx $(SRC_PATH)/hmp-commands-virtio.hx
- =09$(call build-manual,system,html)
-=20
- $(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools) $(SRC_PATH)=
-/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc
-diff --git a/Makefile.target b/Makefile.target
-index 8ed1eba95b9c..66d3ff9bc350 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -171,7 +171,7 @@ else
- obj-y +=3D hw/$(TARGET_BASE_ARCH)/
- endif
-=20
--generated-files-y +=3D hmp-commands.h hmp-commands-info.h
-+generated-files-y +=3D hmp-commands.h hmp-commands-info.h hmp-commands-vir=
-tio.h
- generated-files-y +=3D config-devices.h
-=20
- endif # CONFIG_SOFTMMU
-@@ -220,10 +220,13 @@ hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PAT=
-H)/scripts/hxtool
- hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/=
-hxtool
- =09$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","=
-$(TARGET_DIR)$@")
-=20
-+hmp-commands-virtio.h: $(SRC_PATH)/hmp-commands-virtio.hx $(SRC_PATH)/scri=
-pts/hxtool
-+=09$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","=
-$(TARGET_DIR)$@")
-+
- clean: clean-target
- =09rm -f *.a *~ $(PROGS)
- =09rm -f $(shell find . -name '*.[od]')
--=09rm -f hmp-commands.h gdbstub-xml.c
-+=09rm -f hmp-commands.h hmp-commands-virtio.h gdbstub-xml.c
- =09rm -f trace/generated-helpers.c trace/generated-helpers.c-timestamp
- ifdef CONFIG_TRACE_SYSTEMTAP
- =09rm -f *.stp
-diff --git a/docs/system/monitor.rst b/docs/system/monitor.rst
-index 0bcd5da21644..985c3f51ffe7 100644
---- a/docs/system/monitor.rst
-+++ b/docs/system/monitor.rst
-@@ -21,6 +21,8 @@ The following commands are available:
-=20
- .. hxtool-doc:: hmp-commands.hx
-=20
-+.. hxtool-doc:: hmp-commands-virtio.hx
-+
- .. hxtool-doc:: hmp-commands-info.hx
-=20
- Integer expressions
-diff --git a/hmp-commands-virtio.hx b/hmp-commands-virtio.hx
-new file mode 100644
-index 000000000000..a8d49f0b2b46
---- /dev/null
-+++ b/hmp-commands-virtio.hx
-@@ -0,0 +1,148 @@
-+HXCOMM Use DEFHEADING() to define headings in both help text and rST.
-+HXCOMM Text between SRST and ERST is copied to the rST version and
-+HXCOMM discarded from C version.
-+HXCOMM DEF(command, args, callback, arg_string, help) is used to construct
-+HXCOMM monitor info commands
-+HXCOMM HXCOMM can be used for comments, discarded from both rST and C.
-+HXCOMM
-+HXCOMM In this file, generally SRST fragments should have two extra
-+HXCOMM spaces of indent, so that the documentation list item for "virtio c=
-md"
-+HXCOMM appears inside the documentation list item for the top level
-+HXCOMM "virtio" documentation entry. The exception is the first SRST
-+HXCOMM fragment that defines that top level entry.
-+
-+SRST
-+``virtio`` *subcommand*
-+  Show various information about virtio.
-+
-+ERST
-+
-+    {
-+        .name       =3D "query",
-+        .args_type  =3D "",
-+        .params     =3D "",
-+        .help       =3D "List all available virtio devices",
-+        .cmd        =3D hmp_virtio_query,
-+        .flags      =3D "p",
-+    },
-+
-+SRST
-+  ``virtio query``
-+    List all available virtio devices
-+
-+    Example:
-+
-+    List all available virtio devices in the machine::
-+
-+      (qemu) virtio query
-+      /machine/peripheral-anon/device[3]/virtio-backend [virtio-net]
-+      /machine/peripheral-anon/device[1]/virtio-backend [virtio-serial]
-+      /machine/peripheral-anon/device[0]/virtio-backend [virtio-blk]
-+
-+ERST
-+
-+    {
-+        .name       =3D "status",
-+        .args_type  =3D "path:s",
-+        .params     =3D "path",
-+        .help       =3D "Display status of a given virtio device",
-+        .cmd        =3D hmp_virtio_status,
-+        .flags      =3D "p",
-+    },
-+
-+SRST
-+  ``virtio status`` *path*
-+    Display status of a given virtio device
-+
-+    Example:
-+
-+    Dump the status of the first virtio device::
-+
-+      (qemu) virtio status /machine/peripheral-anon/device[3]/virtio-backe=
-nd
-+      /machine/peripheral-anon/device[3]/virtio-backend:
-+        Device Id:        1
-+        Guest features:   0x0000000130afffa7
-+        Host features:    0x0000000179bfffe7
-+        Backend features: 0x0000000000000000
-+        Endianness:       little
-+        VirtQueues:       3
-+
-+ERST
-+
-+    {
-+        .name       =3D "queue-status",
-+        .args_type  =3D "path:s,queue:i",
-+        .params     =3D "path queue",
-+        .help       =3D "Display status of a given virtio queue",
-+        .cmd        =3D hmp_virtio_queue_status,
-+        .flags      =3D "p",
-+    },
-+
-+SRST
-+  ``virtio queue-status`` *path* *queue*
-+    Display status of a given virtio queue
-+
-+    Example:
-+
-+    Dump the status of the first queue of the first virtio device::
-+
-+      (qemu) virtio queue-status /machine/peripheral-anon/device[3]/virtio=
--backend 0
-+      /machine/peripheral-anon/device[3]/virtio-backend:
-+        index:                0
-+        inuse:                0
-+        last_avail_idx:       61
-+        shadow_avail_idx:     292
-+        signalled_used:       61
-+        signalled_used_valid: 1
-+        VRing:
-+          num:         256
-+          num_default: 256
-+          align:       4096
-+          desc:        0x000000006c352000
-+          avail:       0x000000006c353000
-+          used:        0x000000006c353240
-+
-+ERST
-+
-+    {
-+        .name       =3D "queue-element",
-+        .args_type  =3D "path:s,queue:i,index:i?",
-+        .params     =3D "path queue [index]",
-+        .help       =3D "Display element of a given virtio queue",
-+        .cmd        =3D hmp_virtio_queue_element,
-+        .flags      =3D "p",
-+    },
-+
-+SRST
-+  ``virtio queue-element`` *path* *queue* [*index*]
-+    Display element of a given virtio queue
-+
-+    Example:
-+
-+    Dump the information of the head element of the first queue of
-+    the first virtio device::
-+
-+      (qemu) virtio queue-element/machine/peripheral-anon/device[3]/virtio=
--backend 0
-+      index:  67
-+      ndescs: 1
-+      descs:  addr 0x6fe69800 len 1536 (write-only)
-+
-+      (qemu) xp/128bx 0x6fe69800
-+      000000006fe69800: 0x02 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-+      000000006fe69808: 0x00 0x00 0x01 0x00 0x52 0x54 0x00 0x12
-+      000000006fe69810: 0x34 0x56 0x52 0x54 0x00 0x09 0x51 0xde
-+      000000006fe69818: 0x08 0x00 0x45 0x00 0x00 0x4c 0x8f 0x32
-+
-+    device[3] is a virtio-net device and we can see in the element buffer =
-the
-+    MAC address of the card::
-+
-+      [root@localhost ~]# ip link show ens4
-+      2: ens4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel s=
-tate UP m0
-+          link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
-+
-+    and the MAC address of the gateway::
-+
-+      [root@localhost ~]# arp -a
-+      _gateway (192.168.122.1) at 52:54:00:09:51:de [ether] on ens4
-+
-+ERST
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 7f0f3974ad90..14568b406dbc 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1804,6 +1804,16 @@ SRST
-   Set QOM property *property* of object at location *path* to value *value=
-*
- ERST
-=20
-+    {
-+        .name       =3D "virtio",
-+        .args_type  =3D "name:S?",
-+        .params     =3D "[cmd]",
-+        .help       =3D "show various information about virtio",
-+        .cmd        =3D hmp_virtio_help,
-+        .sub_table  =3D hmp_virtio_cmds,
-+        .flags      =3D "p",
-+    },
-+
-     {
-         .name       =3D "info",
-         .args_type  =3D "item:s?",
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 28848b9e64cf..d52d41169fb4 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -29,6 +29,9 @@
- #include "hw/virtio/virtio-access.h"
- #include "sysemu/dma.h"
- #include "sysemu/runstate.h"
-+#include "monitor/hmp.h"
-+#include "monitor/monitor.h"
-+#include "qapi/qmp/qdict.h"
-=20
- static QTAILQ_HEAD(, VirtIODevice) virtio_list;
-=20
-@@ -3839,6 +3842,29 @@ VirtioInfoList *qmp_query_virtio(Error **errp)
-     return list;
- }
-=20
-+void hmp_virtio_query(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err =3D NULL;
-+    VirtioInfoList *l =3D qmp_query_virtio(&err);
-+
-+    if (err !=3D NULL) {
-+        hmp_handle_error(mon, err);
-+        return;
-+    }
-+
-+    if (l =3D=3D NULL) {
-+        monitor_printf(mon, "No VirtIO devices\n");
-+        return;
-+    }
-+
-+    while (l) {
-+        monitor_printf(mon, "%s [%s]\n", l->value->path, l->value->type);
-+        l =3D l->next;
-+    }
-+
-+    qapi_free_VirtioInfoList(l);
-+}
-+
- static VirtIODevice *virtio_device_find(const char *path)
- {
-     VirtIODevice *vdev;
-@@ -3890,6 +3916,36 @@ VirtQueueStatus *qmp_virtio_queue_status(const char =
-*path, uint16_t queue,
-     return status;
- }
-=20
-+void hmp_virtio_queue_status(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err =3D NULL;
-+    const char *path =3D qdict_get_try_str(qdict, "path");
-+    int queue =3D qdict_get_int(qdict, "queue");
-+    VirtQueueStatus *s =3D qmp_virtio_queue_status(path, queue, &err);
-+
-+    if (err !=3D NULL) {
-+        hmp_handle_error(mon, err);
-+        return;
-+    }
-+    monitor_printf(mon, "%s:\n", path);
-+    monitor_printf(mon, "  index:                %d\n", s->queue_index);
-+    monitor_printf(mon, "  inuse:                %d\n", s->inuse);
-+    monitor_printf(mon, "  last_avail_idx:       %d\n", s->last_avail_idx)=
-;
-+    monitor_printf(mon, "  shadow_avail_idx:     %d\n", s->shadow_avail_id=
-x);
-+    monitor_printf(mon, "  signalled_used:       %d\n", s->signalled_used)=
-;
-+    monitor_printf(mon, "  signalled_used_valid: %d\n",
-+                   s->signalled_used_valid);
-+    monitor_printf(mon, "  VRing:\n");
-+    monitor_printf(mon, "    num:         %"PRId64"\n", s->vring_num);
-+    monitor_printf(mon, "    num_default: %"PRId64"\n", s->vring_num_defau=
-lt);
-+    monitor_printf(mon, "    align:       %"PRId64"\n", s->vring_align);
-+    monitor_printf(mon, "    desc:        0x%016"PRIx64"\n", s->vring_desc=
-);
-+    monitor_printf(mon, "    avail:       0x%016"PRIx64"\n", s->vring_avai=
-l);
-+    monitor_printf(mon, "    used:        0x%016"PRIx64"\n", s->vring_used=
-);
-+
-+    qapi_free_VirtQueueStatus(s);
-+}
-+
- VirtioStatus *qmp_virtio_status(const char* path, Error **errp)
- {
-     VirtIODevice *vdev;
-@@ -3925,6 +3981,31 @@ VirtioStatus *qmp_virtio_status(const char* path, Er=
-ror **errp)
-     return status;
- }
-=20
-+void hmp_virtio_status(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err =3D NULL;
-+    const char *path =3D qdict_get_try_str(qdict, "path");
-+    VirtioStatus *s =3D qmp_virtio_status(path, &err);
-+
-+    if (err !=3D NULL) {
-+        hmp_handle_error(mon, err);
-+        return;
-+    }
-+
-+    monitor_printf(mon, "%s:\n", path);
-+    monitor_printf(mon, "  Device Id:        %"PRId64"\n", s->device_id);
-+    monitor_printf(mon, "  Guest features:   0x%016"PRIx64"\n",
-+                   s->guest_features);
-+    monitor_printf(mon, "  Host features:    0x%016"PRIx64"\n",
-+                   s->host_features);
-+    monitor_printf(mon, "  Backend features: 0x%016"PRIx64"\n",
-+                   s->backend_features);
-+    monitor_printf(mon, "  Endianness:       %s\n", s->device_endian);
-+    monitor_printf(mon, "  VirtQueues:       %d\n", s->num_vqs);
-+
-+    qapi_free_VirtioStatus(s);
-+}
-+
- VirtioQueueElement *qmp_virtio_queue_element(const char* path, uint16_t qu=
-eue,
-                                              bool has_index, uint16_t inde=
-x,
-                                              Error **errp)
-@@ -4010,6 +4091,40 @@ VirtioQueueElement *qmp_virtio_queue_element(const c=
-har* path, uint16_t queue,
-     return element;
- }
-=20
-+void hmp_virtio_queue_element(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err =3D NULL;
-+    const char *path =3D qdict_get_try_str(qdict, "path");
-+    int queue =3D qdict_get_int(qdict, "queue");
-+    int index =3D qdict_get_try_int(qdict, "index", -1);
-+    VirtioQueueElement *element;
-+    VirtioRingDescList *list;
-+
-+    element =3D qmp_virtio_queue_element(path, queue, index !=3D -1, index=
-, &err);
-+    if (err !=3D NULL) {
-+        hmp_handle_error(mon, err);
-+        return;
-+    }
-+
-+    monitor_printf(mon, "index:  %d\n", element->index);
-+    monitor_printf(mon, "ndescs: %d\n", element->ndescs);
-+    monitor_printf(mon, "descs:  ");
-+
-+    list =3D element->descs;
-+    while (list) {
-+        monitor_printf(mon, "addr 0x%"PRIx64" len %d %s", list->value->add=
-r,
-+                       list->value->len, list->value->flags &
-+                       VRING_DESC_F_WRITE ? "(write-only)" : "(read-only)"=
-);
-+        list =3D list->next;
-+        if (list) {
-+            monitor_printf(mon, ", ");
-+        }
-+    }
-+    monitor_printf(mon, "\n");
-+
-+    qapi_free_VirtioQueueElement(element);
-+}
-+
- static const TypeInfo virtio_device_info =3D {
-     .name =3D TYPE_VIRTIO_DEVICE,
-     .parent =3D TYPE_DEVICE,
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index e33ca5a911a5..9f1c118dde31 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -98,6 +98,10 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *=
-qdict);
- void hmp_qom_list(Monitor *mon, const QDict *qdict);
- void hmp_qom_set(Monitor *mon, const QDict *qdict);
- void hmp_info_qom_tree(Monitor *mon, const QDict *dict);
-+void hmp_virtio_query(Monitor *mon, const QDict *qdict);
-+void hmp_virtio_status(Monitor *mon, const QDict *qdict);
-+void hmp_virtio_queue_status(Monitor *mon, const QDict *qdict);
-+void hmp_virtio_queue_element(Monitor *mon, const QDict *qdict);
- void object_add_completion(ReadLineState *rs, int nb_args, const char *str=
-);
- void object_del_completion(ReadLineState *rs, int nb_args, const char *str=
-);
- void device_add_completion(ReadLineState *rs, int nb_args, const char *str=
-);
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 6c45fa490ff5..5eacfa7079fc 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -23,6 +23,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "config-devices.h"
- #include "monitor-internal.h"
- #include "cpu.h"
- #include "monitor/qdev.h"
-@@ -232,6 +233,15 @@ static void hmp_info_help(Monitor *mon, const QDict *q=
-dict)
-     help_cmd(mon, "info");
- }
-=20
-+static void hmp_virtio_help(Monitor *mon, const QDict *qdict)
-+{
-+#if defined(CONFIG_VIRTIO)
-+    help_cmd(mon, "virtio");
-+#else
-+    monitor_printf(mon, "Virtio is disabled\n");
-+#endif
-+}
-+
- static void monitor_init_qmp_commands(void)
- {
-     /*
-@@ -1683,6 +1693,13 @@ static HMPCommand hmp_info_cmds[] =3D {
-     { NULL, NULL, },
- };
-=20
-+static HMPCommand hmp_virtio_cmds[] =3D {
-+#if defined(CONFIG_VIRTIO)
-+#include "hmp-commands-virtio.h"
-+#endif
-+    { NULL, NULL, },
-+};
-+
- /* hmp_cmds and hmp_info_cmds would be sorted at runtime */
- HMPCommand hmp_cmds[] =3D {
- #include "hmp-commands.h"
---=20
-2.25.1
+qemu-mp has been cut down significantly in order to make it
+non-invasive.  The model is now much cleaner:
+1. No monitor command or command-line option forwarding.  The device
+   emulation program has its own command-line and monitor that QEMU
+   doesn't know about.
+2. No per-device proxy objects.  A single RemotePCIDevice is added to
+   QEMU.  In the current patch series it only supports the LSI SCSI
+   controller but once the socket protocol is changed to
+   vfio-over-socket it will be possible to use any PCI device.
+
+We recently agreed on dropping live migration to further reduce the
+patch series.  If you have specific suggestions, please post reviews on
+the latest patch series.
+
+The RemotePCIDevice and device emulation program infrastructure it puts
+in place are intended to be used by vfio-over-socket in the future.  I
+see it as complementary to vfio-over-socket rather than as a
+replacement.  Elena, Jag, and JJ have been working on it for a long time
+and I think we should build on top of it (replacing parts as needed)
+rather than propose a new plan that sidelines their work.
+
+> That's the rough ideas/plan I have in mind:
+> - draft/define a "vfio over unix" protocol
+> - similar to vhost-user, also define some backend conventions
+> https://github.com/qemu/qemu/blob/master/docs/interop/vhost-user.rst#back=
+end-program-conventions
+> - modify qemu vfio code to allow using a socket backend. Ie something
+> like "-chardev socket=3Dfoo -device vfio-pci,chardev=3Dfoo"
+
+I think JJ has been working on this already.  Not sure what the status
+is.
+
+> - implement some test devices (and outside qemu, in whatever
+> language/framework - the more the merrier!)
+> - investigate how existing qemu binary could expose some devices over
+> "vfio-unix", for ex: "qemu -machine none -chardev socket=3Dfoo,server
+> -device pci-serial,vfio=3Dfoo". This would avoid a lot of proxy and code
+> churn proposed in qemu-mp.
+
+This is similar to the qemu-mp approach.  I think they found that doing
+this in practice requires a RemotePCIBus and a
+RemoteInterruptController.  Something along these lines:
+
+  qemu -machine none \
+       -chardev socket=3Dfoo,server \
+       -device remote-pci-bus,chardev=3Dfoo \
+       -device pci-serial # added to the remote-pci-bus
+
+PCI devices you want to instantiate are completely unmodified - no need
+to even add a vfio=3D parameter.  They just happen to be on a RemotePCIBus
+instead of a regular PCI bus.  That way they can be accessed via
+vfio-over-socket and interrupts are also handled remotely.
+
+Stefan
+
+--JSkcQAAxhB1h8DcT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6FvD4ACgkQnKSrs4Gr
+c8iFrAf/Rxobho7vZZ9wPrlczTyoUnLrnCt0157Pw9+p2BL+09b/NKHrLt8zEJu2
+9aDwXtzuPLJe/DeuQkr9fwmylBjC1b9tuazKOEwE6fA8kIe6uWhec2IOKQqNCxy9
+Bd+tcoCoHCW0t25GDh6EnwUMuu10XVlkEc36LKr7DZagLtb2SEa7dAS7P8Yb4Bb5
+KIiCZlQRN5rUnrtVDJvg33gWHQUWXM9ipczOAZsBxsTJx3QCDuTcTd2Fogh+rAbE
+RnU3sjMrxAnvXUKF+n8JcY8X1EPtcowNoEpqX9f7tgwyD8BhaH4zotWpQgq7b6vF
+U4qcThFq6hSHK1QnAjEKBCtOpW4HRQ==
+=17JM
+-----END PGP SIGNATURE-----
+
+--JSkcQAAxhB1h8DcT--
 
 
