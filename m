@@ -2,86 +2,124 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 652FFC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F15C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E5B32073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA7F32073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 14:37:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYpBn896"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E5B32073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uiMRjpOU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA7F32073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK0wo-0003Cn-B0
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 10:35:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33704)
+	id 1jK0xq-0004Ln-TN
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 10:37:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jK0vd-0001bf-L2
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:34:46 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jK0wy-0003Rc-7J
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jK0vc-0001kH-7l
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:34:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23561
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jK0vc-0001j2-3J
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:34:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585838083;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7RlhH1aMNpBHd87KQK1n4Ry0fINGXScOTp9bEq66FZs=;
- b=BYpBn896TIIGpRLGNkr7dXM6fKG44o0o9wnXJFz2Cx8w5oCTzyzkFuA3H4bXg//jmc3LFr
- 1C7lfHa+Q6LZzs4SYozYCPnzMyfOvKYNAQtR6CXYRpGjd8Z8vpnaWQGcFygM0L/Krsm6Yj
- +d+98Rl/H1Ffw72kXQ1f8sDCyp4X5V0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-sH-7Yty6PVSsVu-vbmS1jg-1; Thu, 02 Apr 2020 10:34:42 -0400
-X-MC-Unique: sH-7Yty6PVSsVu-vbmS1jg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2B868017F5;
- Thu,  2 Apr 2020 14:34:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8853B5DA76;
- Thu,  2 Apr 2020 14:34:40 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DD29F11385E2; Thu,  2 Apr 2020 16:34:38 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jK0ww-0002eZ-2O
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:36:07 -0400
+Received: from mail-db3eur04on0718.outbound.protection.outlook.com
+ ([2a01:111:f400:fe0c::718]:26818
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jK0wu-0002cc-6k
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 10:36:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dpGge8/ePpcbUHMqmMVcD2qz7zund2Syj5fGA8irtuaiByrHR6cuwcSXtQyYbqjLGdvdXIPOBamkPpodQIvrNzJLKTS+1f0b3d7YHpUAA2FJGk7GaJ1+nOm8dtjuE1B0MlsmdRzSq404nc1REdEK0v8nv4KH06szvxPRfl/pPtb4Of0Bgp24bdWXM9M2PtR92y+m7wNtgn5XXqwfoyN1zMWKL06lktrmhr+wT+5OapEaEhDlx7oebn5mNZgESoJFpnBhUvqL0di+60zudCeqI35spkiLVZwNhMXuwqDG3jDRKQSclc0aHwVkPcfh7UwSLgbAHDpbeKYwylqx40cSiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AsKkww9Akfdi0bIiLeY1ZGLRcZulbCV/EJ1vzsmZSuw=;
+ b=bM6JWGnAvfBicGdlscRxAZlM+2dHxciRGkZaJHscyPBPTM0HNrzK3/PFtzhF2wJ1WFwDHI48bhBaptOqUmLFJmLFoluh4mKNXIyXz0HvDdtrTClg1oiZaZ/DFQpRGKbz7OsnZC3egCwW4I67YjhW67L7GTmHlpmdEU4PTIge5BvevCOyPI5DDfxkE0hEoYsE7OW+SQPeDHm6WGwrYHi/78BL8+CHclQ9mgL7r9cM+dSuRtrGyXmqVjOHesNcqosS1JBP4oLseIY/EuUb2MQFWA3QaluKQqGHwe6Uf1yhmlbpPDEuakAyb4mgEwjAe2tXiE3Yla8wzPYJwXTlbOAXgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AsKkww9Akfdi0bIiLeY1ZGLRcZulbCV/EJ1vzsmZSuw=;
+ b=uiMRjpOU4oV6IJVhETriOTHFOw5JuzvDd3nCZPUF8V+sK1hFIgGF3Ko9LZfB1fKiq2dfH+cjS8O3h048ObaAXqhSww3p1UrBC0LX/A48ejduZhm24yP2xGblDWl4hxsaDzzLc8V0fVu6zB3cGWqXkP9QABiPvNs5MVs3LKL+yCA=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5336.eurprd08.prod.outlook.com (10.141.172.73) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.20; Thu, 2 Apr 2020 14:36:01 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.016; Thu, 2 Apr 2020
+ 14:36:01 +0000
 Subject: Re: Questionable aspects of QEMU Error's design
+To: Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 References: <87o8sblgto.fsf@dusky.pond.sub.org>
  <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
- <a3ca8c60-dd83-ea7b-c268-0c94e441bb52@virtuozzo.com>
- <alpine.BSF.2.22.395.2004021132270.75834@zero.eik.bme.hu>
- <53df0069-8a7a-9de8-29cb-21362d88bb4e@virtuozzo.com>
-Date: Thu, 02 Apr 2020 16:34:38 +0200
-In-Reply-To: <53df0069-8a7a-9de8-29cb-21362d88bb4e@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Thu, 2 Apr 2020 17:11:55 +0300")
-Message-ID: <87pncq0xdt.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ <87sghmbfgc.fsf@dusky.pond.sub.org>
+ <44b5ff2c-6dce-e516-a9cc-9d80354c5a72@virtuozzo.com>
+ <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
+ <877dyy9shs.fsf@dusky.pond.sub.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200402173559702
+Message-ID: <045198b9-29d8-231c-d35c-440723308003@virtuozzo.com>
+Date: Thu, 2 Apr 2020 17:35:59 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <877dyy9shs.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR05CA0141.eurprd05.prod.outlook.com
+ (2603:10a6:207:3::19) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.23) by
+ AM3PR05CA0141.eurprd05.prod.outlook.com (2603:10a6:207:3::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.20 via Frontend Transport; Thu, 2 Apr 2020 14:36:00 +0000
+X-Tagtoolbar-Keys: D20200402173559702
+X-Originating-IP: [185.215.60.23]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 95859def-20c5-424a-731e-08d7d7132a48
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5336:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5336C2C496A85896A992459EC1C60@AM7PR08MB5336.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0361212EA8
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(366004)(346002)(376002)(136003)(396003)(39840400004)(2906002)(52116002)(6486002)(66946007)(2616005)(26005)(66476007)(54906003)(81156014)(81166006)(31686004)(5660300002)(956004)(66556008)(8936002)(110136005)(478600001)(31696002)(16576012)(4326008)(16526019)(186003)(36756003)(316002)(8676002)(86362001);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: O8s8gAookDhuYoU3t/ogiQvvr0hUbQlbOmKWJGrENHcSM3euFlMlU2LVjFCgOBvxaC1YpNaeSERosgVMbDxzF+lTYsWZ939Qc7SJivn5zHm5KzJNHaBZvjJVkbEu5RF5VzY5J6fDJqKLQ+lVuP7nhmVHIRg0GocBQLMy7qTY+dQdKfx7qjfFntIdrOLjwQThwd/sm47UpMeQYOeDw6LB2EUoNYR/eYtz0Yz32VyL2EQfemmPds6cuZTea0/uxMg57O0Yq91pKRd9goRII3RHsHEt4RIlTe3LSkUOjUWTKd7hUO/PeFHUwemD4VJdC5lx/RvWlcMEz6HAU6L8uImzSZjnwFYyD9LSPJEBrIMpdRdmbmvKdnFhk7sUtVEtW3tLPO5BUPqIG2oKtbn4/3rqQ8n3mNe5Xp0IOIT1XnAMlvgeWlfFju1+uW6oVIdDfMX4
+X-MS-Exchange-AntiSpam-MessageData: FaPfjw8zcSJIHaQvbdIlg/oOMjibSm5yLlSNztKJMoUH8psV8tm/PRCKwLpjvP13eQk2lgQcu2ml6R+AxtXft/NA2IvrKyh+0yFRQJsf5QDi3q3zua7h8CrHSacDGaCZ0TlpckSYvbBv5djgqaebQQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95859def-20c5-424a-731e-08d7d7132a48
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2020 14:36:01.0822 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2xllKGlTg5gFUvRT1wXlBg7J9S9Cq+8Ksp3N+hjvwgZ7OpFNajIoFKliaJmEbVyHozp2TwmGh3rfLiLBPZ3oxr0bVbHFx9Yz4TgHxPG2Afk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5336
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe0c::718
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,85 +131,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPiB3
-cml0ZXM6DQoNCj4gMDIuMDQuMjAyMCAxMjozNiwgQkFMQVRPTiBab2x0YW4gd3JvdGU6DQo+PiBP
-biBUaHUsIDIgQXByIDIwMjAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+
-Pj4gMDEuMDQuMjAyMCAyMzoxNSwgUGV0ZXIgTWF5ZGVsbCB3cm90ZToNCj4+Pj4gT24gV2VkLCAx
-IEFwciAyMDIwIGF0IDEwOjAzLCBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+
-IHdyb3RlOg0KPj4+Pj4NCj4+Pj4+IFFFTVUncyBFcnJvciB3YXMgcGF0dGVybmVkIGFmdGVyIEdM
-aWIncyBHRXJyb3IuwqAgRGlmZmVyZW5jZXMgaW5jbHVkZToNCj4+Pj4NCj4+Pj4gwqBGcm9tIG15
-IFBPViB0aGUgbWFqb3IgcHJvYmxlbSB3aXRoIEVycm9yIGFzIHdlIGhhdmUgaXQgdG9kYXkNCj4+
-Pj4gaXMgdGhhdCBpdCBtYWtlcyB0aGUgc2ltcGxlIHByb2Nlc3Mgb2Ygd3JpdGluZyBjb2RlIGxp
-a2UNCj4+Pj4gZGV2aWNlIHJlYWxpemUgZnVuY3Rpb25zIGhvcnJpZmljYWxseSBib2lsZXJwbGF0
-ZSBoZWF2eTsNCj4+Pj4gZm9yIGluc3RhbmNlIHRoaXMgaXMgZnJvbSBody9hcm0vYXJtc3NlLmM6
-DQo+Pj4+DQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqAgb2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNw
-dW9iaiwgT0JKRUNUKCZzLT5jcHVfY29udGFpbmVyW2ldKSwNCj4+Pj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICJtZW1v
-cnkiLCAmZXJyKTsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBpZiAoZXJyKSB7DQo+Pj4+IMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsNCj4+Pj4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCB9DQo+
-Pj4+IMKgwqDCoMKgwqDCoMKgwqAgb2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNwdW9iaiwgT0JK
-RUNUKHMpLCAiaWRhdSIsICZlcnIpOw0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmIChlcnIpIHsN
-Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIp
-Ow0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPj4+PiDCoMKgwqDCoMKg
-wqDCoMKgIH0NCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBvYmplY3RfcHJvcGVydHlfc2V0X2Jvb2wo
-Y3B1b2JqLCB0cnVlLCAicmVhbGl6ZWQiLCAmZXJyKTsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBp
-ZiAoZXJyKSB7DQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcm9wYWdhdGUo
-ZXJycCwgZXJyKTsNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+Pj4g
-wqDCoMKgwqDCoMKgwqDCoCB9DQo+Pj4+DQo+Pj4+IDE2IGxpbmVzIG9mIGNvZGUganVzdCB0byBz
-ZXQgMiBwcm9wZXJ0aWVzIG9uIGFuIG9iamVjdA0KPj4+PiBhbmQgcmVhbGl6ZSBpdC4gSXQncyBh
-IGxvdCBvZiBib2lsZXJwbGF0ZSBhbmQgYXMNCj4+Pj4gYSByZXN1bHQgd2UgZnJlcXVlbnRseSBn
-ZXQgaXQgd3Jvbmcgb3IgdGFrZSBzaG9ydGN1dHMNCj4+Pj4gKGVnIGZvcmdldHRpbmcgdGhlIGVy
-cm9yLWhhbmRsaW5nIGVudGlyZWx5LCBjYWxsaW5nDQo+Pj4+IGVycm9yX3Byb3BhZ2F0ZSBqdXN0
-IG9uY2UgZm9yIGEgd2hvbGUgc2VxdWVuY2Ugb2YNCj4+Pj4gY2FsbHMsIHRha2luZyB0aGUgbGF6
-eSBhcHByb2FjaCBhbmQgdXNpbmcgZXJyX2Fib3J0DQo+Pj4+IG9yIGVycl9mYXRhbCB3aGVuIHdl
-IG91Z2h0IHJlYWxseSB0byBiZSBwcm9wYWdhdGluZw0KPj4+PiBhbiBlcnJvciwgZXRjKS4gSSBo
-YXZlbid0IGxvb2tlZCBhdCAnYXV0byBwcm9wYWdhdGlvbicNCj4+Pj4geWV0LCBob3BlZnVsbHkg
-aXQgd2lsbCBoZWxwPw0KPj4+DQo+Pj4gWWVzLCBhZnRlciBpdCB0aGUgY29kZSBhYm92ZSB3aWxs
-IGxvb2sgbGlrZSB0aGlzOg0KPj4+DQo+Pj4gLi4uIHNvbWVfZnVuYyguLi4sIGVycnApDQo+Pj4g
-ew0KPj4+IMKgwqAgRVJSUF9BVVRPX1BST1BBR0FURSgpOyAjIG1hZ2ljIG1hY3JvIGF0IGZ1bmN0
-aW9uIHN0YXJ0LCBhbmQgbm8gIkVycm9yICplcnIiIGRlZmluaXRpb24NCj4+Pg0KPj4+IC4uLg0K
-Pj4+IMKgwqDCoMKgwqDCoMKgwqAgb2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNwdW9iaiwgT0JK
-RUNUKCZzLT5jcHVfY29udGFpbmVyW2ldKSwNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgIm1lbW9yeSIsIGVycnAp
-Ow0KPj4+IMKgwqDCoMKgwqDCoMKgwqAgaWYgKCplcnJwKSB7DQo+Pj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIHJldHVybjsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+PiDCoMKgwqDCoMKg
-wqDCoMKgIG9iamVjdF9wcm9wZXJ0eV9zZXRfbGluayhjcHVvYmosIE9CSkVDVChzKSwgImlkYXUi
-LCBlcnJwKTsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmICgqZXJycCkgew0KPj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCByZXR1cm47DQo+Pj4gwqDCoMKgwqDCoMKgwqDCoCB9DQo+Pj4gwqDC
-oMKgwqDCoMKgwqDCoCBvYmplY3RfcHJvcGVydHlfc2V0X2Jvb2woY3B1b2JqLCB0cnVlLCAicmVh
-bGl6ZWQiLCBlcnJwKTsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmICgqZXJycCkgew0KPj4+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm47DQo+Pj4gwqDCoMKgwqDCoMKgwqDCoCB9DQo+
-Pj4gLi4uDQo+Pj4gfQ0KPj4+DQo+Pj4gLSBwcm9wYWdhdGlvbiBpcyBhdXRvbWF0aWMsIGVycnAg
-aXMgdXNlZCBkaXJlY3RseSBhbmQgbWF5IGJlIHNhZmVseSBkZXJlZmVyZW5jZWQuDQo+Pg0KPj4g
-Tm90IG11Y2ggYmV0dGVyLiBDb3VsZCBpdCBiZSBzb21ldGhpbmcgbGlrZToNCj4NCj4gQWN0dWFs
-bHksIG11Y2ggYmV0dGVyLCBhcyBpdCBzb2x2ZXMgc29tZSByZWFsIHByb2JsZW1zIGFyb3VuZCBl
-cnJvciBwcm9wYWdhdGlvbi4NCg0KVGhlIGF1dG8gcHJvcGFnYXRpb24gcGF0Y2hlcycgc3RhdGVk
-IGFpbSBpcyB0byBmaXggJmVycm9yX2ZhdGFsIG5vdCB0bw0KZWF0IGhpbnRzLCBhbmQgdG8gcHJv
-dmlkZSBtb3JlIHVzZWZ1bCBzdGFjayBiYWNrdHJhY2VzIHdpdGgNCiZlcnJvcl9hYm9ydC4gIFRo
-ZSBzbGlnaHQgc2hyaW5raW5nIG9mIGJvaWxlcnBsYXRlIGlzIGEgd2VsY29tZSBib251cy4NCg0K
-Rm9yIGEgYmlnZ2VyIGltcHJvdmVtZW50LCBoYXZlIHRoZSBmdW5jdGlvbnMgcmV0dXJuIGEgdXNl
-ZnVsIHZhbHVlLCBhcw0KZGlzY3Vzc2VkIGVsc2V3aGVyZSBpbiB0aGlzIHRocmVhZC4NCg0KPj4N
-Cj4+ICDCoMKgwqAgRVJSUF9SRVQob2JqZWN0X3Byb3BlcnR5X3NldF9saW5rKGNwdW9iaiwgT0JK
-RUNUKCZzLT5jcHVfY29udGFpbmVyW2ldKSwNCj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAibWVtb3J5
-IiwgZXJycCkpOw0KPj4gIMKgwqDCoCBFUlJQX1JFVChvYmplY3RfcHJvcGVydHlfc2V0X2xpbmso
-Y3B1b2JqLCBPQkpFQ1QocyksICJpZGF1IiwgZXJycCkpOw0KPj4gIMKgwqDCoCBFUlJQX1JFVChv
-YmplY3RfcHJvcGVydHlfc2V0X2Jvb2woY3B1b2JqLCB0cnVlLCAicmVhbGl6ZWQiLCBlcnJwKSk7
-DQo+Pg0KPg0KPiBhbmQgdHVybiBhbGwNCj4NCj4gcmV0ID0gZnVuYyguLi4pOw0KPiBpZiAocmV0
-IDwgMCkgew0KPiAgICAgcmV0dXJuIHJldDsNCj4gfQ0KPg0KPiBpbnRvDQo+DQo+IEZBSUxfUkVU
-KGZ1bmMoLi4uKSkNCj4NCj4gPw0KPg0KPiBOb3QgYSBwcm9ibGVtIHRvIG1ha2Ugc3VjaCBtYWNy
-by4uIEJ1dCBJIHRoaW5rIGl0J3MgYSBiYWQgaWRlYSB0byB0dXJuIGFsbCB0aGUgY29kZQ0KPiBp
-bnRvIHNlcXVlbmNlIG9mIG1hY3JvIGludm9jYXRpb25zLiBJdCdzIGhhcmQgdG8gZGVidWcgYW5k
-IGZvbGxvdy4NCg0KWWVzLiAgSGlkaW5nIGNvbnRyb2wgZmxvdyBpbiBtYWNyb3MgaXMgYWxtb3N0
-IGFsd2F5cyB0b28gbXVjaCBtYWdpYy4NClRoZXJlIGFyZSBleGNlcHRpb25zLCBidXQgdGhpcyBk
-b2Vzbid0IGxvb2sgbGlrZSBvbmUuDQo=
+02.04.2020 11:55, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> 
+>> On Thu, 2 Apr 2020 at 07:11, Vladimir Sementsov-Ogievskiy
+>> <vsementsov@virtuozzo.com> wrote:
+>>> Somehow, in general, especially with long function names and long parameter lists I prefer
+>>>
+>>> ret = func(..);
+>>> if (ret < 0) {
+>>>       return ret;
+>>> }
+>>
+>> Personally I prefer the other approach -- this one has an extra line
+>> in the source and
+>> needs an extra local variable.
+> 
+> Me too, except when func(...) is so long that
+> 
+>      if (func(...) < 0) {
+> 
+> becomes illegible like
+> 
+>      if (func(... yadda, yadda,
+>               yadda, ...) < 0) {
+> 
+> Then an extra variable can improve things.
+> 
+>>> Are you sure that adding a lot of boolean functions is a good idea? I somehow feel better with more usual int functions with -errno on failure.
+>>>
+>>> Bool is a good return value for functions which are boolean by nature: checks, is something correspond to some criteria. But for reporting an error I'd prefer -errno.
+>>
+>> When would we want to return an errno? I thought the whole point of the
+>> Error* was that that was where information about the error was returned.
+>> If all your callsites are just going to do "if (ret < 0) { ... } then having
+>> the functions pick an errno value to return is just extra work.
+> 
+> 0/-1 vs. true/false is a matter of convention.  Lacking convention, it's
+> a matter of taste. >
+> 0/-1 vs. 0/-errno depends on the function and its callers.  When -errno
+> enables callers to distinguish failures in a sane and simple way, use
+> it.  When -errno feels "natural", I'd say feel free to use it even when
+> all existing callers only check < 0.
+> 
+> When you return non-null/null or true/false on success/error, neglecting
+> to document that in a function contract can perhaps be tolerated; you're
+> using the return type the common, obvious way.  But when you return 0/-1
+> or 0/-errno, please spell it out.  I've seen too many "Operation not
+> permitted" that were actually -1 mistaken for -EPERM.  Also too many
+> functions that return -1 for some failures and -errno for others.
+> 
 
+I just want to add one note:
+
+OK, you like the pattern
+
+   if (func()) {
+       <handle error>
+   }
+
+, I can live with it.
+
+I believe, we have a lot of such patterns already in code.
+
+Now, we are going to add a lot of functions, returning true on success and false on failure, so add a lot of patterns
+
+   if (!func()) {
+       <handle error>
+   }
+
+---
+
+After it, looking at something like
+
+   if (!func()) {} / if (func()) {}
+
+I'll have to always jump to function definition, to check is it int or bool function, to understand what exactly is meant and is there a mistake in the code..
+So, I'm afraid that such conversion will not help reviewing/understanding the code. I'd prefer to avoid using two opposite conventions in on project.
+
+I can also imagine combining different function types (int/bool) in if conditions o_O, what will save us from it?
+
+And don't forget about bool functions, which just check something, and false is not an error, but just negative answer on some question.
+
+-- 
+Best regards,
+Vladimir
 
