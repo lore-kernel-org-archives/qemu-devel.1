@@ -4,67 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F7AC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 19:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7853C2BA16
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 19:17:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B0A7206F8
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 19:16:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7778B20737
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 19:17:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLk1pIlv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B0A7206F8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dj9NnzU3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7778B20737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK5KQ-0008F2-Ni
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 15:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33902)
+	id 1jK5LT-0000nv-Me
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 15:17:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jK5B2-0002V3-Dn
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 15:06:57 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jK5B3-0002Ym-H1
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 15:06:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jK5B1-0000Rb-Er
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 15:06:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26966
+ (envelope-from <pbonzini@redhat.com>) id 1jK5B2-0000TF-Bl
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 15:06:57 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59942
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jK5B1-0000Qf-BB
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 15:06:55 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jK5B2-0000Rj-7j
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 15:06:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1585854415;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5nHVcHcfWe51+/F45Sy6N9CFUeM4/arakR0i0s8GPLo=;
- b=MLk1pIlvCRo9Ti5x9gPTeRWoxe0A6tdVAQErka2M6Hf+Ki9Gmh3XKLZXKQ1Rnb/CFQiuRU
- zdO1NY7UkKbnfj7p22wFxXJN3GXJAQLH3O/2gU2kmHBDzW7vsn5GY0UWyJc8FcTH+bXMAe
- NdAvnPkfwC8kgxyJiqcBSShIL98QQSc=
+ bh=zv8TTUduTZlk08NL96V82mVLPiq6S4mbqrii21algvw=;
+ b=dj9NnzU39+hZ5v00hwh4BPPefloXoeHtkxdDp3yJpPOjEfJHrnZomKvpQcBGtaxKgGE2r2
+ 71FgOXHgIIWiLcVFpNCT1t2FbcRz7lOtt3+JHpUnSzQ10NDCNMNmVmhRUZ+klHgFghJY6e
+ DkJVkhS3vVNqsUGAf5HBAbnPXiEjfD0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-tRmVu9sEPqSjiFsQbK0i2Q-1; Thu, 02 Apr 2020 15:06:51 -0400
-X-MC-Unique: tRmVu9sEPqSjiFsQbK0i2Q-1
+ us-mta-8-mL_1fTygOniWNvDSlg7XWQ-1; Thu, 02 Apr 2020 15:06:53 -0400
+X-MC-Unique: mL_1fTygOniWNvDSlg7XWQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB1ED107ACCA;
- Thu,  2 Apr 2020 19:06:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2DF410509A0
+ for <qemu-devel@nongnu.org>; Thu,  2 Apr 2020 19:06:52 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6899CDA0F2;
- Thu,  2 Apr 2020 19:06:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9890D50BEE;
+ Thu,  2 Apr 2020 19:06:52 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/15] i386: hvf: Reset IRQ inhibition after moving RIP
-Date: Thu,  2 Apr 2020 15:06:34 -0400
-Message-Id: <20200402190640.1693-10-pbonzini@redhat.com>
+Subject: [PULL 15/15] xen: fixup RAM memory region initialization
+Date: Thu,  2 Apr 2020 15:06:40 -0400
+Message-Id: <20200402190640.1693-16-pbonzini@redhat.com>
 In-Reply-To: <20200402190640.1693-1-pbonzini@redhat.com>
 References: <20200402190640.1693-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
@@ -73,8 +73,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,58 +85,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roman Bolshakov <r.bolshakov@yadro.com>, Cameron Esfahani <dirty@apple.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Roman Bolshakov <r.bolshakov@yadro.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-The sequence of instructions exposes an issue:
-  sti
-  hlt
+Since bd457782b3b0 ("x86/pc: use memdev for RAM") Xen
+machine fails to start with:
+   qemu-system-i386: xen: failed to populate ram at 0
 
-Interrupts cannot be delivered to hvf after hlt instruction cpu because
-HF_INHIBIT_IRQ_MASK is set just before hlt is handled and never reset
-after moving instruction pointer beyond hlt.
+The reason is that xen_ram_alloc() which is called by
+memory_region_init_ram(), compares memory region with
+statically allocated 'global' ram_memory memory region
+that it uses for RAM, and does nothing in case it matches.
 
-So, after hvf_vcpu_exec() returns, CPU thread gets locked up forever in
-qemu_wait_io_event() (cpu_thread_is_idle() evaluates inhibition
-flag and considers the CPU idle if the flag is set).
+While it's possible feed machine->ram to xen_ram_alloc()
+in the same manner to keep that hack working, I'd prefer
+not to keep that circular dependency and try to untangle that.
 
-Cc: Cameron Esfahani <dirty@apple.com>
-Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-Id: <20200328174411.51491-1-r.bolshakov@yadro.com>
+However it doesn't look trivial to fix, so as temporary
+fixup opt out Xen machine from memdev based RAM allocation,
+and let xen_ram_alloc() do its trick for now.
+
+Reported-by: Anthony PERARD <anthony.perard@citrix.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20200402145418.5139-1-imammedo@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/hvf/vmx.h | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/xen/xen-common.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
-index 03d2c79b9c..ce2a1532d5 100644
---- a/target/i386/hvf/vmx.h
-+++ b/target/i386/hvf/vmx.h
-@@ -167,6 +167,8 @@ static inline void macvm_set_cr4(hv_vcpuid_t vcpu, uint=
-64_t cr4)
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 15650d7f6a..a15070f7f6 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -19,6 +19,7 @@
+ #include "sysemu/runstate.h"
+ #include "migration/misc.h"
+ #include "migration/global_state.h"
++#include "hw/boards.h"
 =20
- static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+ //#define DEBUG_XEN
+=20
+@@ -151,6 +152,8 @@ static void xen_setup_post(MachineState *ms, AccelState=
+ *accel)
+=20
+ static int xen_init(MachineState *ms)
  {
-+    X86CPU *x86_cpu =3D X86_CPU(cpu);
-+    CPUX86State *env =3D &x86_cpu->env;
-     uint64_t val;
++    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
++
+     xen_xc =3D xc_interface_open(0, 0, 0);
+     if (xen_xc =3D=3D NULL) {
+         xen_pv_printf(NULL, 0, "can't open xen interface\n");
+@@ -170,6 +173,10 @@ static int xen_init(MachineState *ms)
+         return -1;
+     }
+     qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
++    /*
++     * opt out of system RAM being allocated by generic code
++     */
++    mc->default_ram_id =3D NULL;
+     return 0;
+ }
 =20
-     /* BUG, should take considering overlap.. */
-@@ -176,6 +178,7 @@ static inline void macvm_set_rip(CPUState *cpu, uint64_=
-t rip)
-    val =3D rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
-    if (val & (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
-                VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING)) {
-+        env->hflags &=3D ~HF_INHIBIT_IRQ_MASK;
-         wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY,
-                val & ~(VMCS_INTERRUPTIBILITY_STI_BLOCKING |
-                VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING));
 --=20
 2.18.2
-
 
 
