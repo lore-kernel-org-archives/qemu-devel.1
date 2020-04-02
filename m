@@ -2,79 +2,93 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BC3C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 22:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76673C2BA12
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 23:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A6D92072E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 22:56:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3WFS0Sh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A6D92072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 444542077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 23:02:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444542077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jK8lV-00013c-9w
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 18:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38887)
+	id 1jK8qt-0003lc-Dh
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 19:02:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jK8kt-0000VJ-LZ
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 18:56:12 -0400
+ (envelope-from <leonardo@linux.ibm.com>) id 1jK8pr-0002nL-Lo
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 19:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jK8ks-0007TC-Iz
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 18:56:11 -0400
-Received: from mail-ua1-x942.google.com ([2607:f8b0:4864:20::942]:37718)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jK8ks-0007SN-FG; Thu, 02 Apr 2020 18:56:10 -0400
-Received: by mail-ua1-x942.google.com with SMTP id l18so2028758uak.4;
- Thu, 02 Apr 2020 15:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1nkyQA9MCDPk2sT0OluSIvutSIHYXPNrx24fVKKyB8c=;
- b=l3WFS0ShdCI70o02BEnsIH4nHqW2TGTkgUgDct73lz4Ceo93NMgHKTfajiUSkltsKV
- 0zyA2hKCi2izp/L/dj22tiIV7SYIlqaz6UWF8s8Ju1Cy8Xe7X+qHsCicc/GJXRf27SyP
- H0XNiUmuE8oBkQVCgzaLC6KJm36dbSSEQmO5Z9EAN/QvA820je9C69HXoyqT5/R8IG/k
- ByzjA0kiAwLIOmumFv6plIc5bs/YI7my6o5yTz6E0MxarGC52MuSR9JxVFXCRCDdlb5A
- DUlLn5bAejwlQtBQH7us9mTBMr7/a9XToRmflQl3oR6d4+nwhfOMYiN114a7ZBqK3YNX
- TWfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1nkyQA9MCDPk2sT0OluSIvutSIHYXPNrx24fVKKyB8c=;
- b=LDNErjQH6+O+4c/1pfuvDRxrYDZ4F2+vFUbrYEP2xL4mJTVMCB0CD7WsvdsOEtdVeL
- 62et4OUNrpg+W9BDrASuvzapblyuaHbpD5YdrRFHUA0L0g9hE2+VreKvGkeUyOUvOo0p
- eify9tviaFOLnGrslXrE7MsknMSp7lRbsxCbnmvh/Y+3XYg8hrVjLgWUD6fU0JnWF87H
- GE2H8/4CQ2fPqFDjddbswdL0zkuwUW06kbLG9Cjdic/jfQwX+tl3HCgIuy+t9SC6t1K/
- JNqFWkOt/LhoSjEBLOY0B3nq6IAG0NVAbBt7/GxEOaJvBizyT3CH++ogI6LZTD/QeOy9
- DXUA==
-X-Gm-Message-State: AGi0PuYq9mGWx8MED6JtUGf8r5SDl0t7uDT0DjgpzMVlRnLC7ZmMAkoY
- I7r5ushU/pZAkhlexIG3/WHh1RFuag4MkPJOLv4=
-X-Google-Smtp-Source: APiQypKx//hFud6VhFzgjiKTRsoAeJUPL2Zzmei88OVUzlOeyj3aGVFOlA3htj+Gwzv3EXJji6GNQG0Ttn69/kVGpbI=
-X-Received: by 2002:a9f:2964:: with SMTP id t91mr4481268uat.21.1585868168528; 
- Thu, 02 Apr 2020 15:56:08 -0700 (PDT)
+ (envelope-from <leonardo@linux.ibm.com>) id 1jK8pq-0001H3-PA
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 19:01:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10976
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <leonardo@linux.ibm.com>)
+ id 1jK8po-0001EB-Id; Thu, 02 Apr 2020 19:01:16 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 032MiPOV055126; Thu, 2 Apr 2020 19:01:11 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 303uj5suym-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 02 Apr 2020 19:01:11 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 032Mp2xi009297;
+ Thu, 2 Apr 2020 23:01:10 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma05wdc.us.ibm.com with ESMTP id 301x77cchy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 02 Apr 2020 23:01:10 +0000
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 032N18l141812452
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 2 Apr 2020 23:01:08 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0F7A0BE04F;
+ Thu,  2 Apr 2020 23:01:08 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CD4A7BE051;
+ Thu,  2 Apr 2020 23:01:04 +0000 (GMT)
+Received: from LeoBras (unknown [9.85.174.86])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu,  2 Apr 2020 23:01:03 +0000 (GMT)
+Message-ID: <6eaedb1c412f1e5194b5e9a6e6718af98da5abdd.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 1/1] ppc/spapr: Add hotremovable flag on DIMM LMBs on
+ drmem_v2
+From: Leonardo Bras <leonardo@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 02 Apr 2020 20:00:57 -0300
+In-Reply-To: <20200402224925.GN47772@umbus.fritz.box>
+References: <20200402172339.622720-1-leonardo@linux.ibm.com>
+ <20200402224925.GN47772@umbus.fritz.box>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+ protocol="application/pgp-signature"; boundary="=-CkHMGi805wZf3gxbdL2d"
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
 MIME-Version: 1.0
-References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
- <20200402134721.27863-6-edgar.iglesias@gmail.com>
-In-Reply-To: <20200402134721.27863-6-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 2 Apr 2020 15:47:56 -0700
-Message-ID: <CAKmqyKPjF8KQBEAkBJRTj02OuT3RutNHmA1BkZgbJ8tsztQ2EA@mail.gmail.com>
-Subject: Re: [PATCH v1 5/5] dma/xlnx-zdma: Reorg to fix CUR_DSCR
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::942
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-02_12:2020-04-02,
+ 2020-04-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 suspectscore=0
+ impostorscore=0 adultscore=0 mlxlogscore=763 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 priorityscore=1501 phishscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004020164
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,118 +100,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Bharata B Rao <bharata.rao@in.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 2, 2020 at 6:50 AM Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Reorganize the descriptor handling so that CUR_DSCR always
-> points to the next descriptor to be processed.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+--=-CkHMGi805wZf3gxbdL2d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Alistair
+Hello David,
 
-> ---
->  hw/dma/xlnx-zdma.c | 47 ++++++++++++++++++++++------------------------
->  1 file changed, 22 insertions(+), 25 deletions(-)
->
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index e856d233f2..1c45367f3c 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -333,10 +333,28 @@ static void zdma_load_src_descriptor(XlnxZDMA *s)
->      }
->  }
->
-> +static void zdma_update_descr_addr(XlnxZDMA *s, bool type,
-> +                                   unsigned int basereg)
-> +{
-> +    uint64_t addr, next;
-> +
-> +    if (type == DTYPE_LINEAR) {
-> +        addr = zdma_get_regaddr64(s, basereg);
-> +        next = addr + sizeof(s->dsc_dst);
-> +    } else {
-> +        addr = zdma_get_regaddr64(s, basereg);
-> +        addr += sizeof(s->dsc_dst);
-> +        address_space_read(s->dma_as, addr, s->attr, (void *) &next, 8);
-> +    }
-> +
-> +    zdma_put_regaddr64(s, basereg, next);
-> +}
-> +
->  static void zdma_load_dst_descriptor(XlnxZDMA *s)
->  {
->      uint64_t dst_addr;
->      unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
-> +    bool dst_type;
->
->      if (ptype == PT_REG) {
->          memcpy(&s->dsc_dst, &s->regs[R_ZDMA_CH_DST_DSCR_WORD0],
-> @@ -349,24 +367,10 @@ static void zdma_load_dst_descriptor(XlnxZDMA *s)
->      if (!zdma_load_descriptor(s, dst_addr, &s->dsc_dst)) {
->          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, AXI_RD_DST_DSCR, true);
->      }
-> -}
-> -
-> -static uint64_t zdma_update_descr_addr(XlnxZDMA *s, bool type,
-> -                                       unsigned int basereg)
-> -{
-> -    uint64_t addr, next;
->
-> -    if (type == DTYPE_LINEAR) {
-> -        next = zdma_get_regaddr64(s, basereg);
-> -        next += sizeof(s->dsc_dst);
-> -        zdma_put_regaddr64(s, basereg, next);
-> -    } else {
-> -        addr = zdma_get_regaddr64(s, basereg);
-> -        addr += sizeof(s->dsc_dst);
-> -        address_space_read(s->dma_as, addr, s->attr, &next, 8);
-> -        zdma_put_regaddr64(s, basereg, next);
-> -    }
-> -    return next;
-> +    /* Advance the descriptor pointer.  */
-> +    dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3, TYPE);
-> +    zdma_update_descr_addr(s, dst_type, R_ZDMA_CH_DST_CUR_DSCR_LSB);
->  }
->
->  static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
-> @@ -387,14 +391,7 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
->          dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
->                                SIZE);
->          if (dst_size == 0 && ptype == PT_MEM) {
-> -            uint64_t next;
-> -            bool dst_type = FIELD_EX32(s->dsc_dst.words[3],
-> -                                       ZDMA_CH_DST_DSCR_WORD3,
-> -                                       TYPE);
-> -
-> -            next = zdma_update_descr_addr(s, dst_type,
-> -                                          R_ZDMA_CH_DST_CUR_DSCR_LSB);
-> -            zdma_load_descriptor(s, next, &s->dsc_dst);
-> +            zdma_load_dst_descriptor(s);
->              dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
->                                    SIZE);
->          }
-> --
-> 2.20.1
->
->
+On Fri, 2020-04-03 at 09:49 +1100, David Gibson wrote:
+>=20
+> The change looks reasonable.  Is there a PAPR RFC I can see describing
+> the new bit, though?
+
+The ACR is approved and I already added the change to LoPAPR/LOPAR,
+it's just a matter of time to get it released.
+(I think it's accessible to members of OpenPower Foundation)
+
+This is the snippet of the change:
+
+At the bottom of "Table 3.11: Flag Word", add another line containing:
+Hot-removable Memory	| 0x00000100 	| If b'1', this LMB can be hot-
+removed.=20
+			|		| If b'0', this LMB may not be hot-
+removed
+
+Best regards,
+Leonardo Bras
+
+--=-CkHMGi805wZf3gxbdL2d
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl6GbqkACgkQlQYWtz9S
+ttRhQxAAiwE03GBGudVlVLbXXXhvrc7G3BtR4PkbeUXS4fLW9dHqsz2IOCVO23Op
+s/fNGw+/0bNHXM9dABidURFoD3i6SMNcMTwMc/uLf2J3fLky/noepRLYu53BCT7W
+DfHh860rtkEhzEhUN1Jfkr17C2f5EaDJ9SJS4+M2sWKKd/jD4BZC++A2RWKy8CYw
+BJwpKaqQ9t/fa6NuMRUM2mk8bkTWIgPiV8C1NRha1yT3UkZzQWbX1AgWlTYRktra
+pf53JbiVB2XXKhZbuuVhSpbqp595xczHF8IPpNSAWwzJX+BAyq+l0x9N/L0XsJTm
+B2sNAN540IQBKBAKnNqa95+hAVwaXOyz0AZKpwSYmAlwjcOrJ27C3D68WbBmh9Ga
+oBnv3MAmkSQtQoHHgV+dqyKy0LavV2e0CTE2yBOWJ6R0rQxjn0xV0c2rnpCpLUbC
+2zaVMf7xYqpCX/BIhDvbslWMYpowtGWTUYRXc27eOwZcDvDOVI2Km55YOeVZFakM
+1rdAz4U0sIyZQnuDbn43/1mxSeRWNysciFugLCP8HxQmBHYiGoctcBR/7imXd125
+gozK2CunYLyHxUgxP657frvvSnRIOewgH9wxGRdGHxBYiGfq0u384W5foREAVUQg
+o9d6uqfDRNynUWCbMK9xoMoBqLO5zmthHu08QGwup4u/tMTkK9M=
+=O6nL
+-----END PGP SIGNATURE-----
+
+--=-CkHMGi805wZf3gxbdL2d--
+
 
