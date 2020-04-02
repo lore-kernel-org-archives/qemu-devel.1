@@ -2,108 +2,147 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2098C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B98C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:36:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA2D520757
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:34:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebcDBrFh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA2D520757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17C5420757
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:36:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17C5420757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJz2t-0000VN-QH
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 08:34:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60176)
+	id 1jJz4u-0001Ys-7Y
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 08:36:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jJz26-0008QN-UG
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:33:20 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jJz4H-00017a-3l
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jJz25-00087H-Pp
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:33:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22727
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jJz25-000875-Ki
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:33:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585830797;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=kcYhnHzskkAli9F+wZwRqE8rMmOG0MWOU/DSvVK23UM=;
- b=ebcDBrFhqHnVjRDTlF+cvd8vDaVWo5hcQVA4Dtj4IRI6LUKeoMHFw9WYtfFLeZLHKNjt17
- Xyf7AnTaC/ef3RigROy+DytlP5AApcdmCrg92FH7tYAb0sKbtUENWIx3fvqpyOkgzqQmN/
- iaAII1/3TGqCLGGqpCNTUPQgaqtK7B8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-3PbrEd8yP9mDdHs_LC1Vcg-1; Thu, 02 Apr 2020 08:33:15 -0400
-X-MC-Unique: 3PbrEd8yP9mDdHs_LC1Vcg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 326A28017F3;
- Thu,  2 Apr 2020 12:33:14 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-246.ams2.redhat.com
- [10.36.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 128DE6EF97;
- Thu,  2 Apr 2020 12:33:05 +0000 (UTC)
-Subject: Re: [PATCH v4 1/3] job: take each job's lock individually in
- job_txn_apply
-To: Stefan Reiter <s.reiter@proxmox.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <20200401081504.200017-1-s.reiter@proxmox.com>
- <20200401081504.200017-2-s.reiter@proxmox.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e6319083-4ba0-9d30-3ecd-1c81bf7c20f9@redhat.com>
-Date: Thu, 2 Apr 2020 14:33:03 +0200
+ (envelope-from <borntraeger@de.ibm.com>) id 1jJz4G-00039Y-3k
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:35:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1928)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jJz4F-00035g-Rv
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:35:32 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 032CWJh5108833
+ for <qemu-devel@nongnu.org>; Thu, 2 Apr 2020 08:35:30 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 304hjba8du-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 08:35:30 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Thu, 2 Apr 2020 13:35:12 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 2 Apr 2020 13:35:08 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 032CZMaa62849178
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 2 Apr 2020 12:35:22 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 49FB9A4057;
+ Thu,  2 Apr 2020 12:35:22 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A7C89A4040;
+ Thu,  2 Apr 2020 12:35:21 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.6.23])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  2 Apr 2020 12:35:21 +0000 (GMT)
+Subject: Re: [PATCH v3 1/1] vl/s390x: fixup ram sizes for compat machines
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200401123754.109602-1-borntraeger@de.ibm.com>
+ <20200401183456.09ba3540@redhat.com>
+ <20200402112735.6961297d.cohuck@redhat.com>
+ <20200402133958.72fabf45@redhat.com>
+ <e3dfecd4-2905-dc8b-92e7-2194a52ea9ea@de.ibm.com>
+ <20200402140536.1b9e7c41@redhat.com>
+ <03077928-4d17-f860-1907-3d1fcea3ab3c@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Thu, 2 Apr 2020 14:35:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200401081504.200017-2-s.reiter@proxmox.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="V1Tr6CzMg7mrLlbjLyhWoDxIrVhZ9mVf5"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <03077928-4d17-f860-1907-3d1fcea3ab3c@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20040212-4275-0000-0000-000003B83591
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040212-4276-0000-0000-000038CD8B9C
+Message-Id: <98d87752-ba5d-7ac1-6074-978ade3d2652@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-02_03:2020-03-31,
+ 2020-04-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 impostorscore=0
+ suspectscore=0 adultscore=0 priorityscore=1501 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 spamscore=0 mlxlogscore=820
+ malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004020110
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,128 +154,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, slp@redhat.com,
- stefanha@redhat.com, jsnow@redhat.com, dietmar@proxmox.com
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---V1Tr6CzMg7mrLlbjLyhWoDxIrVhZ9mVf5
-Content-Type: multipart/mixed; boundary="tvFE6GHX3D7mAS0sQsV2XOEess47rlxft"
-
---tvFE6GHX3D7mAS0sQsV2XOEess47rlxft
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 01.04.20 10:15, Stefan Reiter wrote:
-> All callers of job_txn_apply hold a single job's lock, but different
-> jobs within a transaction can have different contexts, thus we need to
-> lock each one individually before applying the callback function.
->=20
-> Similar to job_completed_txn_abort this also requires releasing the
-> caller's context before and reacquiring it after to avoid recursive
-> locks which might break AIO_WAIT_WHILE in the callback.
->=20
-> This also brings to light a different issue: When a callback function in
-> job_txn_apply moves it's job to a different AIO context, job_exit will
-> try to release the wrong lock (now that we re-acquire the lock
-> correctly, previously it would just continue with the old lock, leaving
-> the job unlocked for the rest of the codepath back to job_exit). Fix
-> this by not caching the job's context in job_exit and add a comment
-> about why this is done.
->=20
-> One test needed adapting, since it calls job_finalize directly, so it
-> manually needs to acquire the correct context.
->=20
-> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
-> ---
->  job.c                 | 48 ++++++++++++++++++++++++++++++++++---------
->  tests/test-blockjob.c |  2 ++
->  2 files changed, 40 insertions(+), 10 deletions(-)
->=20
-> diff --git a/job.c b/job.c
-> index 134a07b92e..5fbaaabf78 100644
-> --- a/job.c
-> +++ b/job.c
-> @@ -136,17 +136,36 @@ static void job_txn_del_job(Job *job)
->      }
->  }
-> =20
-> -static int job_txn_apply(JobTxn *txn, int fn(Job *))
-> +static int job_txn_apply(Job *job, int fn(Job *))
->  {
-> -    Job *job, *next;
-> +    AioContext *inner_ctx;
-> +    Job *other_job, *next;
-> +    JobTxn *txn =3D job->txn;
->      int rc =3D 0;
-> =20
-> -    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
-> -        rc =3D fn(job);
-> +    /*
-> +     * Similar to job_completed_txn_abort, we take each job's lock befor=
-e
-> +     * applying fn, but since we assume that outer_ctx is held by the ca=
-ller,
-> +     * we need to release it here to avoid holding the lock twice - whic=
-h would
-> +     * break AIO_WAIT_WHILE from within fn.
-> +     */
-> +    aio_context_release(job->aio_context);
-
-Hm, is it safe to drop the lock here and then reacquire it later?  I.e.,
-is the job in a consistent state in between?  I don=92t know.  Looks like
-it.  Maybe someone else knows better.
-
-(I find the job code rather confusing.)
-
-> +
-> +    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
-> +        inner_ctx =3D other_job->aio_context;
-> +        aio_context_acquire(inner_ctx);
-> +        rc =3D fn(other_job);
-> +        aio_context_release(inner_ctx);
->          if (rc) {
->              break;
->          }
->      }
-> +
-> +    /*
-> +     * Note that job->aio_context might have been changed by calling fn,=
- so we
-> +     * can't use a local variable to cache it.
-> +     */
-> +    aio_context_acquire(job->aio_context);
-
-But all callers of job_txn_apply() (but job_exit(), which you fix in
-this patch) cache it.  Won=92t they release the wrong context then?  Or is
-a context change only possible when job_txn_apply() is called from
-job_exit()?
-
-Max
 
 
---tvFE6GHX3D7mAS0sQsV2XOEess47rlxft--
+On 02.04.20 14:09, Christian Borntraeger wrote:
+> 
+> 
+> On 02.04.20 14:05, Igor Mammedov wrote:
+>> On Thu, 2 Apr 2020 13:42:22 +0200
+>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>
+>>> On 02.04.20 13:39, Igor Mammedov wrote:
+>>> [...]
+>>>>>>     
+>>>>>>> +                    "MB to match machine restrictions. Consider updating "
+>>>>>>> +                    "the guest definition.i\n", sz / MiB, newsz / MiB);      
+>>>>>>
+>>>>>> also it might be better to use size_to_str() to format numbers    
+>>>>>
+>>>>> The text explicitly talks about 'MB'... not sure if it would be
+>>>>> confusing if the user specified MB and ended up with GB or so in this
+>>>>> message.  
+>>>>
+>>>> MB can be dropped, since it still might not match what user specified with -m
+>>>> it could be specified in b/kb/mb/gb over there
+>>>>
+>>>> so I'd drop MB and print value size_to_str() returns
+>>>> (it will add appropriate suffix if I'm not mistaken)
+> 
+> Another thing: size_to_str is also do rounding (whenever the integer part is >1000).
+> Doesnt this result in potential messages where both numbers are the same?
 
---V1Tr6CzMg7mrLlbjLyhWoDxIrVhZ9mVf5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+For example
 
------BEGIN PGP SIGNATURE-----
+10241263616-> 9.54 GiB
+10241262592-> 9.54 GiB
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6F238ACgkQ9AfbAGHV
-z0DZugf9FPP4qrx5bInbjxuvrp/qeYdZW34GZA71SVWIvfHAYnyb2TXoCFz0SO1Z
-C1icY4F/rdaDvlsL2kfeEF8HtW8YYytNN8YGSYNgaUO14Ky5BfePAbBFev0+3lvQ
-+n4kf3y5gzBjZBBkqk5+P4E7sOfMg4mk4lcRDm6tZlT6QsU/pFowGkxd+jII0x8T
-oCgvYTUHIM2aNaKSYAWZzhqdjQz+rJgjYyGS1gCY03EXZP6gzbpVcEVGRFOfwhsQ
-eJD3PODVUrWbKXRpYwXmIVBbE8ilkD/Ebhb0dQUHzTB+pGM9Ipgyj1OSlCrgAvSI
-qC35Ls4zXp2TCDx5FuajC9hoP/D4MA==
-=lBd/
------END PGP SIGNATURE-----
-
---V1Tr6CzMg7mrLlbjLyhWoDxIrVhZ9mVf5--
+The only guaranteed way to actually see a difference is to use MB.
 
 
