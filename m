@@ -2,147 +2,105 @@ Return-Path: <SRS0=DsKm=5S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B98C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 944A5C2D0F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17C5420757
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:36:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17C5420757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5F52C20757
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Apr 2020 12:38:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FusEvIbo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F52C20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jJz4u-0001Ys-7Y
-	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 08:36:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60402)
+	id 1jJz6t-0002YE-Hs
+	for qemu-devel@archiver.kernel.org; Thu, 02 Apr 2020 08:38:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60721)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jJz4H-00017a-3l
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:35:34 -0400
+ (envelope-from <mst@redhat.com>) id 1jJz64-00027o-EZ
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:37:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jJz4G-00039Y-3k
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:35:33 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1928)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jJz4F-00035g-Rv
- for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:35:32 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 032CWJh5108833
- for <qemu-devel@nongnu.org>; Thu, 2 Apr 2020 08:35:30 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 304hjba8du-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 08:35:30 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Thu, 2 Apr 2020 13:35:12 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 2 Apr 2020 13:35:08 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 032CZMaa62849178
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 2 Apr 2020 12:35:22 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 49FB9A4057;
- Thu,  2 Apr 2020 12:35:22 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A7C89A4040;
- Thu,  2 Apr 2020 12:35:21 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.6.23])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  2 Apr 2020 12:35:21 +0000 (GMT)
-Subject: Re: [PATCH v3 1/1] vl/s390x: fixup ram sizes for compat machines
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20200401123754.109602-1-borntraeger@de.ibm.com>
- <20200401183456.09ba3540@redhat.com>
- <20200402112735.6961297d.cohuck@redhat.com>
- <20200402133958.72fabf45@redhat.com>
- <e3dfecd4-2905-dc8b-92e7-2194a52ea9ea@de.ibm.com>
- <20200402140536.1b9e7c41@redhat.com>
- <03077928-4d17-f860-1907-3d1fcea3ab3c@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Thu, 2 Apr 2020 14:35:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <mst@redhat.com>) id 1jJz62-0004yt-SV
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:37:24 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22358
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jJz62-0004yW-Nx
+ for qemu-devel@nongnu.org; Thu, 02 Apr 2020 08:37:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585831041;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mwEfL7hjUmH+D1QfQMX/lWWgneZeqzM5uKhlnZP9EKQ=;
+ b=FusEvIbo21n8LadyLHwpkTGxqoVxIqGObxp923nOrinhlusmD9vsbbOgeUn/oDumWJFs5p
+ fDtFDJJ/D1koLXmHpiw9AIL+3kWyiXpSz1SsMRRjIqFljABGcL6iGs2KBuDp97FI+i9tHM
+ k7PlxhofzNHdYjSXymaU/gchKCOqgu4=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-VWbGefUrOmmcufvVrRO0ew-1; Thu, 02 Apr 2020 08:37:20 -0400
+X-MC-Unique: VWbGefUrOmmcufvVrRO0ew-1
+Received: by mail-qt1-f197.google.com with SMTP id d18so2964083qtq.16
+ for <qemu-devel@nongnu.org>; Thu, 02 Apr 2020 05:37:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=z83ZFN7U6iOT0EPOREo66Rtq033CFmiu/su55XugOps=;
+ b=OHThvDZhwbGlA8i/TsOnHvC9mJc4GVUrDdK5re1zwP0i6UXKGAoU6Z7xkaUKuG/VpO
+ prvr2MXYQvAIpGYpHnTFUw9AaZ7DrsFv6C3eupJI14mF7MEeoG/SOMpHE3rgIFYkmM43
+ CDZWN1Yw0UAwYcZ4lvRj1XOFVuP05F6dGcc2ZzVaUXFZdrdHMnYf/xXb5NM5aAMliC5X
+ 0yFFgR53pT9w6NLwLJfvs4l+jlgLE6N12qkbsezVCYK43uxbsYfgE14G+WSdl4R11Jq5
+ ZFLsvaHc+nqIbNLfeFU2ZIMOj4XZMPqfhn6AyylK516nM50jCL6b0MbYy6fPr1cv9w1c
+ Er0Q==
+X-Gm-Message-State: AGi0PuZk4fvIgiiI2VbG4J7yYyO1UMjfbQp4rHSH7T38w5gDO88NvPmY
+ jIoA7kgBvvBep+vUxRvU0K0BA9mYNZmzFMsKTvQtpeUiglhY7thl+oLpSwqGsq0uO+tcgj7ZzLR
+ /SS1b+C3NiITxWP4=
+X-Received: by 2002:a37:a7cd:: with SMTP id q196mr2960683qke.447.1585831039544; 
+ Thu, 02 Apr 2020 05:37:19 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ0I00cVKswz3vNdf6Dr0WhRrTlZgEbT2Br3s+aMGt4SrYp5fv90+mvLN93pvzAK4++FO8L4w==
+X-Received: by 2002:a37:a7cd:: with SMTP id q196mr2960665qke.447.1585831039221; 
+ Thu, 02 Apr 2020 05:37:19 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+ by smtp.gmail.com with ESMTPSA id 68sm3343978qkh.75.2020.04.02.05.37.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Apr 2020 05:37:17 -0700 (PDT)
+Date: Thu, 2 Apr 2020 08:37:12 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: teawater <teawaterz@linux.alibaba.com>
+Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER
+ to handle THP spilt issue
+Message-ID: <20200402083630-mutt-send-email-mst@kernel.org>
+References: <20200326031817-mutt-send-email-mst@kernel.org>
+ <C4C6BAF7-C040-403D-997C-48C7AB5A7D6B@redhat.com>
+ <20200326054554-mutt-send-email-mst@kernel.org>
+ <f26dc94a-7296-90c9-56cd-4586b78bc03d@redhat.com>
+ <20200331091718-mutt-send-email-mst@kernel.org>
+ <02a393ce-c4b4-ede9-7671-76fa4c19097a@redhat.com>
+ <20200331093300-mutt-send-email-mst@kernel.org>
+ <b69796e0-fa41-a219-c3e5-a11e9f5f18bf@redhat.com>
+ <20200331100359-mutt-send-email-mst@kernel.org>
+ <02745FD3-E30D-453B-8664-94B8EBF3B313@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <03077928-4d17-f860-1907-3d1fcea3ab3c@de.ibm.com>
+In-Reply-To: <02745FD3-E30D-453B-8664-94B8EBF3B313@linux.alibaba.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20040212-4275-0000-0000-000003B83591
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040212-4276-0000-0000-000038CD8B9C
-Message-Id: <98d87752-ba5d-7ac1-6074-978ade3d2652@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-02_03:2020-03-31,
- 2020-04-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 mlxlogscore=820
- malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004020110
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,52 +112,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: pagupta@redhat.com, Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ mojha@codeaurora.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, namit@vmware.com,
+ Andrew Morton <akpm@linux-foundation.org>, Jason Wang <jasowang@redhat.com>,
+ Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Apr 02, 2020 at 04:00:05PM +0800, teawater wrote:
+>=20
+>=20
+> > 2020=E5=B9=B43=E6=9C=8831=E6=97=A5 22:07=EF=BC=8CMichael S. Tsirkin <ms=
+t@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+> >=20
+> > On Tue, Mar 31, 2020 at 04:03:18PM +0200, David Hildenbrand wrote:
+> >> On 31.03.20 15:37, Michael S. Tsirkin wrote:
+> >>> On Tue, Mar 31, 2020 at 03:32:05PM +0200, David Hildenbrand wrote:
+> >>>> On 31.03.20 15:24, Michael S. Tsirkin wrote:
+> >>>>> On Tue, Mar 31, 2020 at 12:35:24PM +0200, David Hildenbrand wrote:
+> >>>>>> On 26.03.20 10:49, Michael S. Tsirkin wrote:
+> >>>>>>> On Thu, Mar 26, 2020 at 08:54:04AM +0100, David Hildenbrand wrote=
+:
+> >>>>>>>>=20
+> >>>>>>>>=20
+> >>>>>>>>> Am 26.03.2020 um 08:21 schrieb Michael S. Tsirkin <mst@redhat.c=
+om>:
+> >>>>>>>>>=20
+> >>>>>>>>> =EF=BB=BFOn Thu, Mar 12, 2020 at 09:51:25AM +0100, David Hilden=
+brand wrote:
+> >>>>>>>>>>> On 12.03.20 09:47, Michael S. Tsirkin wrote:
+> >>>>>>>>>>> On Thu, Mar 12, 2020 at 09:37:32AM +0100, David Hildenbrand w=
+rote:
+> >>>>>>>>>>>> 2. You are essentially stealing THPs in the guest. So the fa=
+stest
+> >>>>>>>>>>>> mapping (THP in guest and host) is gone. The guest won't be =
+able to make
+> >>>>>>>>>>>> use of THP where it previously was able to. I can imagine th=
+is implies a
+> >>>>>>>>>>>> performance degradation for some workloads. This needs a pro=
+per
+> >>>>>>>>>>>> performance evaluation.
+> >>>>>>>>>>>=20
+> >>>>>>>>>>> I think the problem is more with the alloc_pages API.
+> >>>>>>>>>>> That gives you exactly the given order, and if there's
+> >>>>>>>>>>> a larger chunk available, it will split it up.
+> >>>>>>>>>>>=20
+> >>>>>>>>>>> But for balloon - I suspect lots of other users,
+> >>>>>>>>>>> we do not want to stress the system but if a large
+> >>>>>>>>>>> chunk is available anyway, then we could handle
+> >>>>>>>>>>> that more optimally by getting it all in one go.
+> >>>>>>>>>>>=20
+> >>>>>>>>>>>=20
+> >>>>>>>>>>> So if we want to address this, IMHO this calls for a new API.
+> >>>>>>>>>>> Along the lines of
+> >>>>>>>>>>>=20
+> >>>>>>>>>>> struct page *alloc_page_range(gfp_t gfp, unsigned int min_ord=
+er,
+> >>>>>>>>>>>                 unsigned int max_order, unsigned int *order)
+> >>>>>>>>>>>=20
+> >>>>>>>>>>> the idea would then be to return at a number of pages in the =
+given
+> >>>>>>>>>>> range.
+> >>>>>>>>>>>=20
+> >>>>>>>>>>> What do you think? Want to try implementing that?
+> >>>>>>>>>>=20
+> >>>>>>>>>> You can just start with the highest order and decrement the or=
+der until
+> >>>>>>>>>> your allocation succeeds using alloc_pages(), which would be e=
+nough for
+> >>>>>>>>>> a first version. At least I don't see the immediate need for a=
+ new
+> >>>>>>>>>> kernel API.
+> >>>>>>>>>=20
+> >>>>>>>>> OK I remember now.  The problem is with reclaim. Unless reclaim=
+ is
+> >>>>>>>>> completely disabled, any of these calls can sleep. After it wak=
+es up,
+> >>>>>>>>> we would like to get the larger order that has become available
+> >>>>>>>>> meanwhile.
+> >>>>>>>>>=20
+> >>>>>>>>=20
+> >>>>>>>> Yes, but that=E2=80=98s a pure optimization IMHO.
+> >>>>>>>> So I think we should do a trivial implementation first and then =
+see what we gain from a new allocator API. Then we might also be able to ju=
+stify it using real numbers.
+> >>>>>>>>=20
+> >>>>>>>=20
+> >>>>>>> Well how do you propose implement the necessary semantics?
+> >>>>>>> I think we are both agreed that alloc_page_range is more or
+> >>>>>>> less what's necessary anyway - so how would you approximate it
+> >>>>>>> on top of existing APIs?
+> >>>>>> diff --git a/include/linux/balloon_compaction.h b/include/linux/ba=
+lloon_compaction.h
+> >>>=20
+> >>> .....
+> >>>=20
+> >>>=20
+> >>>>>> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+> >>>>>> index 26de020aae7b..067810b32813 100644
+> >>>>>> --- a/mm/balloon_compaction.c
+> >>>>>> +++ b/mm/balloon_compaction.c
+> >>>>>> @@ -112,23 +112,35 @@ size_t balloon_page_list_dequeue(struct ball=
+oon_dev_info *b_dev_info,
+> >>>>>> EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
+> >>>>>>=20
+> >>>>>> /*
+> >>>>>> - * balloon_page_alloc - allocates a new page for insertion into t=
+he balloon
+> >>>>>> - *=09=09=09page list.
+> >>>>>> + * balloon_pages_alloc - allocates a new page (of at most the giv=
+en order)
+> >>>>>> + * =09=09=09 for insertion into the balloon page list.
+> >>>>>> *
+> >>>>>> * Driver must call this function to properly allocate a new balloo=
+n page.
+> >>>>>> * Driver must call balloon_page_enqueue before definitively removi=
+ng the page
+> >>>>>> * from the guest system.
+> >>>>>> *
+> >>>>>> + * Will fall back to smaller orders if allocation fails. The orde=
+r of the
+> >>>>>> + * allocated page is stored in page->private.
+> >>>>>> + *
+> >>>>>> * Return: struct page for the allocated page or NULL on allocation=
+ failure.
+> >>>>>> */
+> >>>>>> -struct page *balloon_page_alloc(void)
+> >>>>>> +struct page *balloon_pages_alloc(int order)
+> >>>>>> {
+> >>>>>> -=09struct page *page =3D alloc_page(balloon_mapping_gfp_mask() |
+> >>>>>> -=09=09=09=09       __GFP_NOMEMALLOC | __GFP_NORETRY |
+> >>>>>> -=09=09=09=09       __GFP_NOWARN);
+> >>>>>> -=09return page;
+> >>>>>> +=09struct page *page;
+> >>>>>> +
+> >>>>>> +=09while (order >=3D 0) {
+> >>>>>> +=09=09page =3D alloc_pages(balloon_mapping_gfp_mask() |
+> >>>>>> +=09=09=09=09   __GFP_NOMEMALLOC | __GFP_NORETRY |
+> >>>>>> +=09=09=09=09   __GFP_NOWARN, order);
+> >>>>>> +=09=09if (page) {
+> >>>>>> +=09=09=09set_page_private(page, order);
+> >>>>>> +=09=09=09return page;
+> >>>>>> +=09=09}
+> >>>>>> +=09=09order--;
+> >>>>>> +=09}
+> >>>>>> +=09return NULL;
+> >>>>>> }
+> >>>>>> -EXPORT_SYMBOL_GPL(balloon_page_alloc);
+> >>>>>> +EXPORT_SYMBOL_GPL(balloon_pages_alloc);
+> >>>>>>=20
+> >>>>>> /*
+> >>>>>> * balloon_page_enqueue - inserts a new page into the balloon page =
+list.
+> >>>>>=20
+> >>>>>=20
+> >>>>> I think this will try to invoke direct reclaim from the first itera=
+tion
+> >>>>> to free up the max order.
+> >>>>=20
+> >>>> %__GFP_NORETRY: The VM implementation will try only very lightweight
+> >>>> memory direct reclaim to get some memory under memory pressure (thus=
+ it
+> >>>> can sleep). It will avoid disruptive actions like OOM killer.
+> >>>>=20
+> >>>> Certainly good enough for a first version I would say, no?
+> >>>=20
+> >>> Frankly how well that behaves would depend a lot on the workload.
+> >>> Can regress just as well.
+> >>>=20
+> >>> For the 1st version I'd prefer something that is the least disruptive=
+,
+> >>> and that IMHO means we only trigger reclaim at all in the same config=
+uration
+> >>> as now - when we can't satisfy the lowest order allocation.
+> >>=20
+> >> Agreed.
+> >>=20
+> >>>=20
+> >>> Anything else would be a huge amount of testing with all kind of
+> >>> workloads.
+> >>>=20
+> >>=20
+> >> So doing a "& ~__GFP_RECLAIM" in case order > 0? (as done in
+> >> GFP_TRANSHUGE_LIGHT)
+> >=20
+> > That will improve the situation when reclaim is not needed, but leave
+> > the problem in place for when it's needed: if reclaim does trigger, we
+> > can get a huge free page and immediately break it up.
+> >=20
+> > So it's ok as a first step but it will make the second step harder as
+> > we'll need to test with reclaim :).
+>=20
+>=20
+> I worry that will increases the allocation failure rate for large pages.
+>=20
+> I tried alloc 2M memory without __GFP_RECLAIM when I wrote the VIRTIO_BAL=
+LOON_F_THP_ORDER first version.
+> It will fail when I use usemem punch-holes function generates 400m fragme=
+ntation pages in the guest kernel.
+>=20
+> What about add another option to balloon to control with __GFP_RECLAIM or=
+ without it?
+>=20
+> Best,
+> Hui
 
+That is why I suggested a new API so we do not fragment memory.
 
-On 02.04.20 14:09, Christian Borntraeger wrote:
-> 
-> 
-> On 02.04.20 14:05, Igor Mammedov wrote:
->> On Thu, 2 Apr 2020 13:42:22 +0200
->> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>
->>> On 02.04.20 13:39, Igor Mammedov wrote:
->>> [...]
->>>>>>     
->>>>>>> +                    "MB to match machine restrictions. Consider updating "
->>>>>>> +                    "the guest definition.i\n", sz / MiB, newsz / MiB);      
->>>>>>
->>>>>> also it might be better to use size_to_str() to format numbers    
->>>>>
->>>>> The text explicitly talks about 'MB'... not sure if it would be
->>>>> confusing if the user specified MB and ended up with GB or so in this
->>>>> message.  
->>>>
->>>> MB can be dropped, since it still might not match what user specified with -m
->>>> it could be specified in b/kb/mb/gb over there
->>>>
->>>> so I'd drop MB and print value size_to_str() returns
->>>> (it will add appropriate suffix if I'm not mistaken)
-> 
-> Another thing: size_to_str is also do rounding (whenever the integer part is >1000).
-> Doesnt this result in potential messages where both numbers are the same?
-
-For example
-
-10241263616-> 9.54 GiB
-10241262592-> 9.54 GiB
-
-The only guaranteed way to actually see a difference is to use MB.
+> >=20
+> >=20
+> >> --=20
+> >> Thanks,
+> >>=20
+> >> David / dhildenb
 
 
