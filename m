@@ -2,88 +2,86 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D329C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FB6C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:13:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BBDB20719
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:08:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83C3120719
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:13:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kvEDPaNK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBDB20719
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f2llox1j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83C3120719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKRfp-0001gR-4V
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 15:08:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57311)
+	id 1jKRkm-0004ob-KW
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 15:13:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jKRey-0001Ee-GR
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:07:21 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jKRjQ-0003FH-En
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jKRew-0001Xq-Qj
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:07:19 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:38092)
+ (envelope-from <alex.bennee@linaro.org>) id 1jKRjP-0001zp-1L
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:56 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36953)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jKRew-0001VG-Fn
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:07:18 -0400
-Received: by mail-wm1-x329.google.com with SMTP id f6so8881566wmj.3
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 12:07:18 -0700 (PDT)
+ id 1jKRjO-0001tU-QA
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:54 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w10so9850861wrm.4
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 12:11:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=iqNQqLRb0n5m9dKc0PzrrFHPrlBe/P++RLLzQM6nYAE=;
- b=kvEDPaNK46p6euHwrRornUdd3vxo2jFKXHCmVX2+23GI+pJ6n2+uKD+u0ZOqDeJtrn
- bd3G0BV7auKyTmXpHk60XKMKqq5xjp6naRFRvxTu3e8QmJRIQ4IFCl4CXknyYWMNEvWB
- rYLYxN+qiVYJ3qYFFGTMnBwPoEZlWBQMbACnpLVF5JyjL1gr3ac3Pess4jMbzTvZ2c8z
- +FoYdNmQjnJsMos4XxK9+zI/tR3oP3w7zA983YR4TRiih3VPakz8aEL1F8noq67naa45
- UUtrmJkWob//pGe1Iq+mJqfcYgC6o1DFjcTDpTuBBcGQ1A5U5c9s/IMyoZNX0czFftb+
- Kr0w==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=QM2GUwMlwOQI4R+pF21geQZvYdTelcCEt6+CkufBHlU=;
+ b=f2llox1jGooyR8qprfnqDuYhI2WM4fnQrmmIhiqQwMnUgAseLQ+PjTNsO5LGYe+WrN
+ nqF2b69iTPPumNKKkUK58ZMZB4ER8diZEU6bJt0111tV9pfvBdsiXwi4Dirf6kAVgRYQ
+ Jdl7N7zV483CUyo2BFNZDPhBowT112XOmx9g31cSLxpRR3onhImccKOd7KOV8nZLqd/A
+ N6ga2pdtMNDQBcZjns0OT6XXzIvC/n16bVWTJg9GLeFYGnWHWGgkB61zWDPoc/RppA2C
+ Em1vb6cBI6b7Zfymn9PNZNuI271hIVVxSlmpgZthdiNHTb0kXXpkfkTu6WCu1Jro679J
+ +zSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=iqNQqLRb0n5m9dKc0PzrrFHPrlBe/P++RLLzQM6nYAE=;
- b=ijZiRiv0OIgdFmcwADVzAlBEOD5xo77zPhXTyukeUlFfC0ZSc0PDyRamKHPQ+8Dylv
- g1j4n2D1Sbe5p+Kz7hkYBl8dtFLcHTGC9ay+9xFkxD43qM6FDZpmrfw7CHQFUerBWw2D
- eQRDp9i8AiXPkL2oiNhyLT+2GBGGcW1yjeExfyccZXKvX0FIorypWrbaYCBqjEMTWQ9g
- Ag3QYS0D1PdwfP9B8QKj0ONzZ6P4usSLs0TMprwl78eFjiY4GdBYt3p0TS0at0Aj9fJj
- 577b0rQGY+TNzaaa7woLkLMJS9PDGsc0TOgZau5jsyShzT6Kw3eS3PA/xvkZF/Cf/41u
- 6ikw==
-X-Gm-Message-State: AGi0PuZ2Hzhfu8iBkJ0wR7xNyu3+iyn0KCFCQ7EbT9b4zHaDJHJjPq7V
- +GQhPnf1SPFTjAETLo//iu0B7w==
-X-Google-Smtp-Source: APiQypL5ptIfw95A9vOl1jnyySsHmzw8CzjADxMvbcg/XkcLGNnYglNO1kTmZKtKCZ3t2m3tEmoaeg==
-X-Received: by 2002:a1c:e203:: with SMTP id z3mr10378871wmg.71.1585940837084; 
- Fri, 03 Apr 2020 12:07:17 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=QM2GUwMlwOQI4R+pF21geQZvYdTelcCEt6+CkufBHlU=;
+ b=p3vyZ7TkJRlW+cEQXd52zSKd4lZeHA1be6T06mICVaeZTqaAAVUx6FCMo8LHorllF4
+ uggRN/aYZtFjXrLxZet3Gz2FJt7SMZL67z1KZU4awlITB19rBtIEzUk5PxAxadypBlj5
+ IyeiAbYHxgSIIUz3hVmTcHkqQYGSMdvUX+pOWSEHGpKjOkhBuzS8Ptl7brnTG+rq56EC
+ v3ByXeKoewMzode3uL3M/AEojovLW97+K01zD0gjbc+2KhYAL1ltyHUSBLlJDC6jfaYa
+ 2qE08MOxClY6hlLrwUC2BVO6lL867WgL95ezzgmpX4NbGxKIbmtJygeGK0oDQgQEi84f
+ 2SEg==
+X-Gm-Message-State: AGi0PuZEtmjF9vSmjcl5XEn10BMIhDPillr5BlTTELVNc/e1J7qCYxo+
+ IciyKZzm2erkZhLx+82j83iEkR+kg5c=
+X-Google-Smtp-Source: APiQypKaWoJzs7oCUKdJ0svRcgRrlv/zK9ZTxpIACH3q/deDFVoV8Y9iTm+qT3XflpUirH1eIqYlMQ==
+X-Received: by 2002:adf:dd01:: with SMTP id a1mr11483964wrm.153.1585941112588; 
+ Fri, 03 Apr 2020 12:11:52 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y20sm3687143wmi.31.2020.04.03.12.07.15
+ by smtp.gmail.com with ESMTPSA id a82sm13537977wmh.0.2020.04.03.12.11.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 12:07:15 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EFA271FF7E;
- Fri,  3 Apr 2020 20:07:14 +0100 (BST)
-References: <BL0PR2101MB1026B7A4C994BE826CF95DFFD6C60@BL0PR2101MB1026.namprd21.prod.outlook.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Henry <robhenry@microsoft.com>
-Subject: Re: qemu plugin exposure of register addresses
-In-reply-to: <BL0PR2101MB1026B7A4C994BE826CF95DFFD6C60@BL0PR2101MB1026.namprd21.prod.outlook.com>
-Date: Fri, 03 Apr 2020 20:07:14 +0100
-Message-ID: <87369ke6cd.fsf@linaro.org>
+ Fri, 03 Apr 2020 12:11:51 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 97D221FF7E;
+ Fri,  3 Apr 2020 20:11:50 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 for 5.0-rc2 00/12] a selection of random fixes
+Date: Fri,  3 Apr 2020 20:11:38 +0100
+Message-Id: <20200403191150.863-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,70 +93,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
-Robert Henry <robhenry@microsoft.com> writes:
+Here is version 3 of my random fixes series. 
 
-> There is now a qemu plugin interface function
-> qemu_plugin_register_vcpu_mem_cb which registers a plugin-side
-> callback. This callback is later invoked at the start of each emulated
-> instruction, and it receives information about memory addresses and
-> read/write indicators.
->
-> I'm wondering how hard it is to add a similar callback to expose
-> register addresses and read/write indicators.  For example, executing
-> `add r3, r1, $1` would generate two callbacks, one {write r3} and the
-> other {read r1}. I'd like this for all kinds of registers such as simd
-> regs, and, gulp, flags registers.
+I've dropped the more involved re-factoring of init_guest_space as
+it's going to take more thought and is best left to 5.1. I've left in
+the earlier clean-ups which fix the spacing and of the /proc/self/maps
+but I can drop them if they seem too radical for rc2.
 
-The problem with tracking registers directly from the plugin is the
-internal variability of how QEMU does things. The core TCG isn't really
-aware of registers as such and the individual translators can take all
-sorts of approaches to loading and storing the results. Then you have
-the issue of helper functions which TCG is only vaguely aware of if it
-needs to save "globals" or not.
+The elf-ops fix is a little cleaner, dropping the return ignored
+value and using autoptr to avoid the goto magic.
 
-> With this information ISA simulators could examine the data flow graph
-> and register dependencies.
+I've includes the .hex and ARM gdbstub fixes which were posted
+separately because I didn't have another series to put them in.
+Richard's configure fix is there just so I can run my CI runs but may
+well get picked up via another tree?
 
-The plugin itself can still do this by disassembling the instruction at
-translation time and decoding which registers are going to be accessed.
-It can pass this data to the callback via userdata mechanism.
+Anyway I intend to cut the PR on Monday with whatever hasn't been
+already pulled in by other trees.
 
-> I'm not asking for register contents; we don't get memory contents
-> either!
+The only un-reviewed patch is:
 
-There is no conceptual problem with adding access to register contents
-even if it's only read-only. The main issue is coming up with a clean
-API for it.
+ - linux-user: factor out reading of /proc/self/maps
 
-See thread @
+Alex Bennée (9):
+  elf-ops: bail out if we have no function symbols
+  linux-user: protect fcntl64 with an #ifdef
+  tests/tcg: remove extraneous pasting macros
+  linux-user: more debug for init_guest_space
+  target/xtensa: add FIXME for translation memory leak
+  linux-user: factor out reading of /proc/self/maps
+  linux-user: clean-up padding on /proc/self/maps
+  target/arm: don't expose "ieee_half" via gdbstub
+  hw/core: properly terminate loading .hex on EOF record
 
-  Subject: Re: Qemu TCG Plugins - how to access guest registers?
-  In-reply-to: <20200329111311.272958fe@luklap>
-  Date: Mon, 30 Mar 2020 16:15:47 +0100
-  Message-ID: <878sjhho0s.fsf@linaro.org>
+Denis Plotnikov (1):
+  gdbstub: fix compiler complaining
 
+Richard Henderson (2):
+  softfloat: Fix BAD_SHIFT from normalizeFloatx80Subnormal
+  configure: Add -Werror to PIE probe
 
-> I gather there is some concern about exposing too much functionality
-> to the plugin API, as a plugin might then be used to subvert some
-> aspects of the GPL.  I don't understand the details of this concern,
-> nor know where the "line in the sand" is.
+ configure                      |  4 +-
+ include/hw/elf_ops.h           | 48 ++++++++++----------
+ include/qemu/selfmap.h         | 44 +++++++++++++++++++
+ fpu/softfloat.c                |  3 ++
+ gdbstub.c                      |  4 +-
+ hw/core/loader.c               |  5 ++-
+ linux-user/elfload.c           |  8 +++-
+ linux-user/syscall.c           | 80 ++++++++++++++++++----------------
+ target/arm/gdbstub.c           |  7 ++-
+ target/xtensa/translate.c      |  5 +++
+ util/selfmap.c                 | 77 ++++++++++++++++++++++++++++++++
+ tests/tcg/x86_64/system/boot.S |  5 +--
+ util/Makefile.objs             |  1 +
+ 13 files changed, 219 insertions(+), 72 deletions(-)
+ create mode 100644 include/qemu/selfmap.h
+ create mode 100644 util/selfmap.c
 
-We need to better document this - but basically we don't want 3rd
-parties implementing what would be core functionality (e.g. device
-models) but using plugins as some sort of end run around the GPL. While
-I would love there to be more analysis plugins contributed upstream it's
-less of a concern.
+-- 
+2.20.1
 
->
-> Robert Henry
-
-
---=20
-Alex Benn=C3=A9e
 
