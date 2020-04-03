@@ -2,82 +2,84 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B29DC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912F2C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:21:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 469E52077D
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:15:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Su51Dp/w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 469E52077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 622EA2077D
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:21:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622EA2077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKN6p-0001vH-Dm
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:15:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39869)
+	id 1jKNC8-0004rD-HM
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:21:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jKN5s-0001JE-Do
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:14:49 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jKNBT-0004Ov-89
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jKN5r-0000sO-9C
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:14:48 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34091)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jKN5r-0000qH-0H
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:14:47 -0400
-Received: by mail-oi1-x242.google.com with SMTP id d3so6234757oic.1
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 07:14:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=e1HaIQXkpHa1yj7z7dXrSSTl+pvmyeEFc/LJeeVH4AM=;
- b=Su51Dp/waOKvg89XPaXjizWFwIftwj9iI4Oe8l+tfBwh5N2ivA1RrEdy/Vpa8hehAP
- 9Wpl/x8fD1ILwsCFGmCzMc+Tkw5zgwOnAVHjBnrjK3/lJXHvVIZmi/gZqdg7025vK3vB
- kL8Pq/DZq1R4QvhJJByJmkEQZjRrTpQWe8Vdzj1XMd76nDg0GT9V/l3VsBWFMa1F1LvA
- b0kj8nzInxxrbj6d/adyQH40oSxcalrbE4vSffSNlDYlcxTbAFAz/6oUBosiJES5qF9Q
- Zf5XMd760FNPK7ufsEaAvFKZtUi3iQyr7jZrTuPQgcLVALjsq9Bmc13z3e4T66z/bhXb
- 9Nyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=e1HaIQXkpHa1yj7z7dXrSSTl+pvmyeEFc/LJeeVH4AM=;
- b=YTRXTIDcgqrorn10XOzi0wewQ67UF9snSokW1kvRy59CMQEnMLdOcoHDzlWqMG1ZaR
- 4KgElt9Dd+KcFkiXbc6LzN6ET38SLWyxY9UpvliDYy06zRzOhJymoqoXavGX5+N+qmSI
- C30Ukc66ted+1Gqy1t2jyzhl9s+JrcJQEBptcjqJDOkqKq/0dNKscXkQhC5zLUl7nak4
- KWh5bpnfnMzEHMVLwaN3+B3vnaPhhLTdaYJvPcIqbbUU7ETakK49Oss6ZP2gMv9ckSa9
- d7xMaDcQIJpVgRzmZQRbfFbCIo9ger7RTcJWnSwi/08RgPxwiTL1EOI1TeBUMIFURIPj
- odXQ==
-X-Gm-Message-State: AGi0PuYZC9cG/vRMEryJwqoplw0NsPOy+n4sk41lhBOx22aYuTPmYLwP
- 7s3QfrHpqxcBprefQGUDSbOC1Ch6jZIUivvsbusAmA==
-X-Google-Smtp-Source: APiQypIxhjDn24R2infGtPWxFac4HGDH8gf4ipXBYVIATrGqzYkObvov1WqX6pfXL58b9QcKD4uu/87ys/aynUJmV4w=
-X-Received: by 2002:a05:6808:8cb:: with SMTP id
- k11mr2951529oij.48.1585923285947; 
- Fri, 03 Apr 2020 07:14:45 -0700 (PDT)
+ (envelope-from <yi.l.liu@intel.com>) id 1jKNBR-0004iC-8Q
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:20:34 -0400
+Received: from mga11.intel.com ([192.55.52.93]:40211)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jKNBR-0004OS-0j
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:20:33 -0400
+IronPort-SDR: ncnmN8L6Sq2uUPRWnwQWX89MmodqwY6bKEK9Jc3Y9KCCyMJQK72zDZztD0obBB4aSbJ3NLwzoH
+ oL4fEK9Wt9xQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Apr 2020 07:20:24 -0700
+IronPort-SDR: 2rpQ7rIuR4YUY0xutP8EPYCYieB6vL0BcBNl35QFYD1nMs86yI801vsSY3VF1kc6yr5wB5UD2u
+ Xfc9cs/52umA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,339,1580803200"; d="scan'208";a="250182018"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by orsmga003.jf.intel.com with ESMTP; 03 Apr 2020 07:20:23 -0700
+Received: from fmsmsx102.amr.corp.intel.com (10.18.124.200) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Apr 2020 07:20:22 -0700
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ FMSMSX102.amr.corp.intel.com (10.18.124.200) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Apr 2020 07:20:22 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.7]) with mapi id 14.03.0439.000;
+ Fri, 3 Apr 2020 22:20:19 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>
+Subject: RE: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VMs
+Thread-Topic: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VMs
+Thread-Index: AQHWBkpi4SFlYLfwBEaCXIDf+JnUMqhk//QAgABXcoCAAiHikA==
+Date: Fri, 3 Apr 2020 14:20:18 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A220CF8@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <984e6f47-2717-44fb-7ff2-95ca61d1858f@redhat.com>
+ <20200402134601.GJ7174@xz-x1>
+In-Reply-To: <20200402134601.GJ7174@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200403140018.13531-1-imammedo@redhat.com>
- <CAFEAcA_cyK+1+BjYqVB+nu70jiShx861NM=W0ezp_8g5eV6qcw@mail.gmail.com>
- <20200403161259.6af638b7@redhat.com>
-In-Reply-To: <20200403161259.6af638b7@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Apr 2020 15:14:34 +0100
-Message-ID: <CAFEAcA8pi6Kd40PRz8SPdLUb_K-KFkVy47LUTJJdbNBT6Sx_qQ@mail.gmail.com>
-Subject: Re: [PATCH] nvdimm-utils: clean up headers and add license comment
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,45 +91,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Shivaprasad G Bhat <sbhat@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "Sun,
+ Yi Y" <yi.y.sun@intel.com>, "Wu, Hao" <hao.wu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 3 Apr 2020 at 15:13, Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Fri, 3 Apr 2020 15:06:14 +0100
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> > On Fri, 3 Apr 2020 at 15:00, Igor Mammedov <imammedo@redhat.com> wrote:
-> > >
-> > > Fixes: 3f350f6bb36233be50fc2bc18dc78b6a948a5dbe
-> > > Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > >  include/qemu/nvdimm-utils.h |  2 --
-> > >  util/nvdimm-utils.c         | 29 +++++++++++++++++++++++++++++
-> > >  2 files changed, 29 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/include/qemu/nvdimm-utils.h b/include/qemu/nvdimm-utils.h
-> > > index 4b8b198ba7..1f1dae477f 100644
-> > > --- a/include/qemu/nvdimm-utils.h
-> > > +++ b/include/qemu/nvdimm-utils.h
-> > > @@ -1,7 +1,5 @@
-> > >  #ifndef NVDIMM_UTILS_H
-> > >  #define NVDIMM_UTILS_H
-> > >
-> >
-> > .h file still missing the copyright-n-license comment ?
-> do we have to add that for headers as well?
-
-Yes; ideally every source file should state its license.
-
-thanks
--- PMM
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBB
+cHJpbCAyLCAyMDIwIDk6NDYgUE0NCj4gVG86IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5j
+b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDAvMjJdIGludGVsX2lvbW11OiBleHBvc2Ug
+U2hhcmVkIFZpcnR1YWwgQWRkcmVzc2luZyB0bw0KPiBWTXMNCj4gDQo+IE9uIFRodSwgQXByIDAy
+LCAyMDIwIGF0IDA0OjMzOjAyUE0gKzA4MDAsIEphc29uIFdhbmcgd3JvdGU6DQo+ID4gPiBUaGUg
+Y29tcGxldGUgUUVNVSBzZXQgY2FuIGJlIGZvdW5kIGluIGJlbG93IGxpbms6DQo+ID4gPiBodHRw
+czovL2dpdGh1Yi5jb20vbHV4aXMxOTk5L3FlbXUuZ2l0OiBzdmFfdnRkX3YxMF92Mg0KPiA+DQo+
+ID4NCj4gPiBIaSBZaToNCj4gPg0KPiA+IEkgY291bGQgbm90IGZpbmQgdGhlIGJyYW5jaCB0aGVy
+ZS4NCj4gDQo+IEphc29uLA0KPiANCj4gSGUgdHlwZWQgd3JvbmcuLi4gSXQncyBhY3R1YWxseSAo
+SSBmb3VuZCBpdCBteXNlbGYpOg0KPiANCj4gaHR0cHM6Ly9naXRodWIuY29tL2x1eGlzMTk5OS9x
+ZW11L3RyZWUvc3ZhX3Z0ZF92MTBfcWVtdV92Mg0KdGhhbmtzLCByZWFsbHkgYSBzaWxseSB0eXBl
+IG1pc3Rha2UuDQoNClJlZ2FyZHMsDQpZaSBMaXUNCg==
 
