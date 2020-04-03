@@ -2,89 +2,77 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F2A2C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C1DC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:11:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 574CF20737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:08:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEfnhaw7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 574CF20737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43BF120659
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:11:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43BF120659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKL7H-00013u-IO
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:08:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51358)
+	id 1jKLAf-0002g9-Ev
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:11:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51594)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jKL6f-0000bt-IR
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:07:30 -0400
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1jKL9h-0001zn-P3
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:10:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jKL6e-0005LE-4S
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:07:29 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32775
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1jKL9f-0008E9-Da
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:10:37 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2097 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jKL6e-0005L3-1F
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:07:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585915647;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OB3Fn22cgl8MB9i5c9owbzaM20Rq8fA8Q5v/WdKes3I=;
- b=FEfnhaw7LwM/+KdEmyN9jIgtf0NNaIpgP1CRcxU4lmrmmw7dX/Txsahp07AIIfiCLkpISg
- ELt5b+VlsP4Na7RoTIn5JF7myJCGk2lgIHFGDt+IddgocuQZWpyfbW2w5DpsnFG5TCtsp6
- zUWOvclkyj2c7rVlOHv5r1FGhAgwVZw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-iAl1B2O1MhS0qaAoZ0Ym7A-1; Fri, 03 Apr 2020 08:07:23 -0400
-X-MC-Unique: iAl1B2O1MhS0qaAoZ0Ym7A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22B2E101FC73;
- Fri,  3 Apr 2020 12:07:22 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
- [10.36.112.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CBC541001B30;
- Fri,  3 Apr 2020 12:07:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 45F6F11385E2; Fri,  3 Apr 2020 14:07:15 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH-for-5.0 v2 4/4] qga: Restrict guest-file-read count to 10
- MB to avoid crashes
-References: <20200331140638.16464-1-philmd@redhat.com>
- <20200331140638.16464-5-philmd@redhat.com>
- <87v9mi3ufw.fsf@dusky.pond.sub.org>
- <20200403092334.GC559148@redhat.com>
-Date: Fri, 03 Apr 2020 14:07:15 +0200
-In-Reply-To: <20200403092334.GC559148@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
- =?utf-8?Q?rrang=C3=A9=22's?=
- message of "Fri, 3 Apr 2020 10:23:34 +0100")
-Message-ID: <87r1x4pybw.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1jKL9Y-0008Ai-Qq; Fri, 03 Apr 2020 08:10:29 -0400
+Received: from lhreml720-chm.china.huawei.com (unknown [172.18.7.108])
+ by Forcepoint Email with ESMTP id 21F2CB0E129483F7FDE4;
+ Fri,  3 Apr 2020 13:10:25 +0100 (IST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml720-chm.china.huawei.com (10.201.108.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 3 Apr 2020 13:10:24 +0100
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1713.004; Fri, 3 Apr 2020 13:10:24 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org"
+ <peter.maydell@linaro.org>, "mst@redhat.com" <mst@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>
+Subject: RE: [RFC v6 00/24] vSMMUv3/pSMMUv3 2 stage VFIO integration
+Thread-Topic: [RFC v6 00/24] vSMMUv3/pSMMUv3 2 stage VFIO integration
+Thread-Index: AQHV/tjtElUg3ooerkCv3iR9cLdbcqhZLR3wgA4OWoCAABuFAA==
+Date: Fri, 3 Apr 2020 12:10:24 +0000
+Message-ID: <4795d8fcf5d244e79f0db6558a38bd21@huawei.com>
+References: <20200320165840.30057-1-eric.auger@redhat.com>
+ <779801971e964109bc46120dda541078@huawei.com>
+ <93dccfc9-774c-9976-15ad-b484f0c5956c@redhat.com>
+In-Reply-To: <93dccfc9-774c-9976-15ad-b484f0c5956c@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.24.31]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,135 +84,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Sameeh Jubran <sjubran@redhat.com>,
- Basil Salman <basil@daynix.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Dietmar Maurer <dietmar@proxmox.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "tnowicki@marvell.com" <tnowicki@marvell.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "zhangfei.gao@foxmail.com" <zhangfei.gao@foxmail.com>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+ "bbhushan2@marvell.com" <bbhushan2@marvell.com>,
+ "will@kernel.org" <will@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+Hi Eric,
 
-> On Thu, Apr 02, 2020 at 03:09:55PM +0200, Markus Armbruster wrote:
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>=20
->> > On https://www.mail-archive.com/qemu-devel@nongnu.org/msg693176.html
->> > Daniel Berrang=C3=A9 commented:
->> >
->> >   The QEMU guest agent protocol is not sensible way to access huge
->> >   files inside the guest. It requires the inefficient process of
->> >   reading the entire data into memory than duplicating it again in
->> >   base64 format, and then copying it again in the JSON serializer /
->> >   monitor code.
->> >
->> >   For arbitrary general purpose file access, especially for large
->> >   files, use a real file transfer program or use a network block
->> >   device, not the QEMU guest agent.
->> >
->> > To avoid bug reports as BZ#1594054, follow his suggestion to put a
->> > low, hard limit on "count" in the guest agent QAPI schema, and don't
->> > allow count to be larger than 10 MB.
->> >
->> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
->> > Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
->> > Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> > ---
->> >  qga/qapi-schema.json | 6 ++++--
->> >  qga/commands.c       | 6 +++++-
->> >  2 files changed, 9 insertions(+), 3 deletions(-)
->> >
->> > diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
->> > index f6fcb59f34..7758d9daf8 100644
->> > --- a/qga/qapi-schema.json
->> > +++ b/qga/qapi-schema.json
->> > @@ -266,11 +266,13 @@
->> >  ##
->> >  # @guest-file-read:
->> >  #
->> > -# Read from an open file in the guest. Data will be base64-encoded
->> > +# Read from an open file in the guest. Data will be base64-encoded.
->> > +# As this command is just for limited, ad-hoc debugging, such as log
->> > +# file access, the number of bytes to read is limited to 10 MB.
->> >  #
->> >  # @handle: filehandle returned by guest-file-open
->> >  #
->> > -# @count: maximum number of bytes to read (default is 4KB)
->> > +# @count: maximum number of bytes to read (default is 4KB, maximum is=
- 10MB)
->> >  #
->> >  # Returns: @GuestFileRead on success.
->> >  #
->> > diff --git a/qga/commands.c b/qga/commands.c
->> > index 8ee1244ebb..c130d1b0f5 100644
->> > --- a/qga/commands.c
->> > +++ b/qga/commands.c
->> > @@ -11,6 +11,7 @@
->> >   */
->> > =20
->> >  #include "qemu/osdep.h"
->> > +#include "qemu/units.h"
->> >  #include "guest-agent-core.h"
->> >  #include "qga-qapi-commands.h"
->> >  #include "qapi/error.h"
->> > @@ -18,11 +19,14 @@
->> >  #include "qemu/base64.h"
->> >  #include "qemu/cutils.h"
->> >  #include "qemu/atomic.h"
->> > +#include "commands-common.h"
->> > =20
->> >  /* Maximum captured guest-exec out_data/err_data - 16MB */
->> >  #define GUEST_EXEC_MAX_OUTPUT (16*1024*1024)
->> >  /* Allocation and I/O buffer for reading guest-exec out_data/err_data=
- - 4KB */
->> >  #define GUEST_EXEC_IO_SIZE (4*1024)
->> > +/* Maximum file size to read - 10MB */
->> > +#define GUEST_FILE_READ_COUNT_MAX (10 * MiB)
->> > =20
->> >  /* Note: in some situations, like with the fsfreeze, logging may be
->> >   * temporarilly disabled. if it is necessary that a command be able
->> > @@ -559,7 +563,7 @@ GuestFileRead *qmp_guest_file_read(int64_t handle,=
- bool has_count,
->> >      }
->> >      if (!has_count) {
->> >          count =3D QGA_READ_COUNT_DEFAULT;
->> > -    } else if (count < 0 || count >=3D UINT32_MAX) {
->> > +    } else if (count < 0 || count > GUEST_FILE_READ_COUNT_MAX) {
->> >          error_setg(errp, "value '%" PRId64 "' is invalid for argument=
- count",
->> >                     count);
->> >          return NULL;
->>=20
->> What about qmp-guest-file-write?
->>=20
->> Hmm, the JSON parser already puts a limit on the base-64 encoded data,
->> namely MAX_TOKEN_SIZE, which is 64MiB.  Yes, MAX_TOKEN_SIZE is
->> ridiculously generous.
->>=20
->> In case you look at the code: there are *two* MAX_TOKEN_SIZE, both
->> 64MiB.  One actually applies to tokens, the other to all the tokens in a
->> top-level expression.  Yes, this is criminally confusing.
->
-> Oh fun :-(
->
-> Anyway, if the JSON parser has 64 MB limits in various places, then
-> I'd be inclined to set the QGA guest-file-read limit such that the
-> encoded JSON is at approx the 64 MB limit too so we're somewhat
-> consistent in limits.
->
-> Base64 has a 3:4 overhead, so that would suggest setting guest-file-read
-> to be 48 MB limit.
+> -----Original Message-----
+> From: Auger Eric [mailto:eric.auger@redhat.com]
+> Sent: 03 April 2020 11:45
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> eric.auger.pro@gmail.com; qemu-devel@nongnu.org; qemu-arm@nongnu.org;
+> peter.maydell@linaro.org; mst@redhat.com; alex.williamson@redhat.com;
+> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com
+> Cc: peterx@redhat.com; jean-philippe@linaro.org; will@kernel.org;
+> tnowicki@marvell.com; zhangfei.gao@foxmail.com; zhangfei.gao@linaro.org;
+> maz@kernel.org; bbhushan2@marvell.com
+> Subject: Re: [RFC v6 00/24] vSMMUv3/pSMMUv3 2 stage VFIO integration
+>=20
+> Hi Shameer,
+>=20
+> On 3/25/20 12:35 PM, Shameerali Kolothum Thodi wrote:
+> > Hi Eric,
+> >
+> >> -----Original Message-----
+> >> From: Eric Auger [mailto:eric.auger@redhat.com]
+> >> Sent: 20 March 2020 16:58
+> >> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> >> qemu-devel@nongnu.org; qemu-arm@nongnu.org;
+> peter.maydell@linaro.org;
+> >> mst@redhat.com; alex.williamson@redhat.com;
+> >> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com
+> >> Cc: peterx@redhat.com; jean-philippe@linaro.org; will@kernel.org;
+> >> tnowicki@marvell.com; Shameerali Kolothum Thodi
+> >> <shameerali.kolothum.thodi@huawei.com>; zhangfei.gao@foxmail.com;
+> >> zhangfei.gao@linaro.org; maz@kernel.org; bbhushan2@marvell.com
+> >> Subject: [RFC v6 00/24] vSMMUv3/pSMMUv3 2 stage VFIO integration
+> >>
+> >> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
+> >> integration requires to program the physical IOMMU consistently
+> >> with the guest mappings. However, as opposed to VTD, SMMUv3 has
+> >> no "Caching Mode" which allows easy trapping of guest mappings.
+> >> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
+> >>
+> >> However SMMUv3 has 2 translation stages. This was devised with
+> >> virtualization use case in mind where stage 1 is "owned" by the
+> >> guest whereas the host uses stage 2 for VM isolation.
+> >>
+> >> This series sets up this nested translation stage. It only works
+> >> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
+> >> other words, it does not work if there is a physical SMMUv2).
+> >
+> > I was testing this series on one of our hardware board with SMMUv3. I d=
+id
+> > observe an issue while trying to bring up Guest with and without the
+> vsmmuV3.
+>=20
+> I am currently investigating and up to now I fail to reproduce on my end.
+> >
+> > Steps are like below,
+> >
+> > 1. start a guest with "iommu=3Dsmmuv3" and a n/w vf device.
+> >
+> > 2.Exit the VM.
+> how to you exit the VM?
 
-If a command imposes its own limit in addition to the JSON parser
-limits, it should be lower, or else it's dead code.
+QMP system_powerdown
 
-Parse errors can be nasty.  Could be improved, but doesn't seem to be
-worthwhile.  Commands can do better easily.
+> >
+> > 3. start the guest again without "iommu=3Dsmmuv3"
+> >
+> > This time qemu crashes with,
+> >
+> > [ 0.447830] hns3 0000:00:01.0: enabling device (0000 -> 0002)
+> >
+> /home/shameer/qemu-eric/qemu/hw/vfio/pci.c:2851:vfio_dma_fault_notifier_
+> handler:
+> > Object 0xaaaaeeb47c00 is not an instance of type
+> So I think I understand the qemu crash. At the moment the vfio_pci
+> registers a fault handler even if we are not in nested mode. The smmuv3
+> host driver calls any registered fault handler when it encounters an
+> error in !nested mode. So the eventfd is triggered to userspace but qemu
+> does not expect that. However the root case is we got some physical
+> faults on the second run.
 
-The parser's limits could theoretically change.  I consider them overly
-generous for control plane.
+True. And qemu works fine if I run again with iommu=3Dsmmuv3 option.=20
+That's why I suspect the mapping for the device in the phys smmu
+is not cleared and on vfio-pci enable dev path it encounters error ?
+
+> > qemu:iommu-memory-region
+> > ./qemu_run-vsmmu-hns: line 9: 13609 Aborted                 (core
+> > dumped) ./qemu-system-aarch64-vsmmuv3v10 -machine
+> > virt,kernel_irqchip=3Don,gic-version=3D3 -cpu host -smp cpus=3D1 -kerne=
+l
+> > Image-ericv10-uacce -initrd rootfs-iperf.cpio -bios
+> Just to double check with you,
+> host: will-arm-smmu-updates-2stage-v10
+> qemu: v4.2.0-2stage-rfcv6
+> guest version?
+
+Yes. And guest =3D host image.
+
+> > QEMU_EFI_Dec2018.fd -device vfio-pci,host=3D0000:7d:02.1 -net none -m
+> Do you assign exactly the same VF as during the 1st run?
+
+Yes same. Only change is "iommu=3Dsmmuv3" omission.=20
+
+> > 4096 -nographic -D -d -enable-kvm -append "console=3DttyAMA0
+> > root=3D/dev/vda -m 4096 rw earlycon=3Dpl011,0x9000000"
+> >
+> > And you can see that host kernel receives smmuv3 C_BAD_STE event,
+> >
+> > [10499.379288] vfio-pci 0000:7d:02.1: enabling device (0000 -> 0002)
+> > [10501.943881] arm-smmu-v3 arm-smmu-v3.2.auto: event 0x04 received:
+> > [10501.943884] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00007d1100000004
+> > [10501.943886] arm-smmu-v3 arm-smmu-v3.2.auto: 0x0000100800000080
+> > [10501.943887] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00000000fe040000
+> > [10501.943889] arm-smmu-v3 arm-smmu-v3.2.auto: 0x000000007e04c440
+> I will try to prepare a kernel branch with additional traces.
+
+Ok. You can find the qemu traces below (vfio*/smmu*) for with and without
+iommu=3Dsmmuv3 runs(may be not that useful).
+
+https://github.com/hisilicon/qemu/tree/v4.2.0-2stage-rfcv6-eric/traces
+
+Thanks,
+Shameer
+
+> Thanks
+>=20
+> Eric
+> >
+> > So I suspect we didn't clear nested stage configuration and that affect=
+s the
+> > translation in the second run. I tried to issue(force) a
+> vfio_detach_pasid_table() but
+> > that didn't solve the problem.
+> >
+> > May be I am missing something. Could you please take a look and let me
+> know.
+> >
+> > Thanks,
+> > Shameer
+> >
+> >> - We force the host to use stage 2 instead of stage 1, when we
+> >>   detect a vSMMUV3 is behind a VFIO device. For a VFIO device
+> >>   without any virtual IOMMU, we still use stage 1 as many existing
+> >>   SMMUs expect this behavior.
+> >> - We use PCIPASIDOps to propage guest stage1 config changes on
+> >>   STE (Stream Table Entry) changes.
+> >> - We implement a specific UNMAP notifier that conveys guest
+> >>   IOTLB invalidations to the host
+> >> - We register MSI IOVA/GPA bindings to the host so that this latter
+> >>   can build a nested stage translation
+> >> - As the legacy MAP notifier is not called anymore, we must make
+> >>   sure stage 2 mappings are set. This is achieved through another
+> >>   prereg memory listener.
+> >> - Physical SMMU stage 1 related faults are reported to the guest
+> >>   via en eventfd mechanism and exposed trhough a dedicated VFIO-PCI
+> >>   region. Then they are reinjected into the guest.
+> >>
+> >> Best Regards
+> >>
+> >> Eric
+> >>
+> >> This series can be found at:
+> >> https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
+> >>
+> >> Kernel Dependencies:
+> >> [1] [PATCH v10 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+> >> [2] [PATCH v10 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+> >> branch at:
+> >> https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10
+> >>
+> >> History:
+> >>
+> >> v5 -> v6:
+> >> - just rebase work
+> >>
+> >> v4 -> v5:
+> >> - Use PCIPASIDOps for config update notifications
+> >> - removal of notification for MSI binding which is not needed
+> >>   anymore
+> >> - Use a single fault region
+> >> - use the specific interrupt index
+> >>
+> >> v3 -> v4:
+> >> - adapt to changes in uapi (asid cache invalidation)
+> >> - check VFIO_PCI_DMA_FAULT_IRQ_INDEX is supported at kernel level
+> >>   before attempting to set signaling for it.
+> >> - sync on 5.2-rc1 kernel headers + Drew's patch that imports sve_conte=
+xt.h
+> >> - fix MSI binding for MSI (not MSIX)
+> >> - fix mingw compilation
+> >>
+> >> v2 -> v3:
+> >> - rework fault handling
+> >> - MSI binding registration done in vfio-pci. MSI binding tear down cal=
+led
+> >>   on container cleanup path
+> >> - leaf parameter propagated
+> >>
+> >> v1 -> v2:
+> >> - Fixed dual assignment (asid now correctly propagated on TLB invalida=
+tions)
+> >> - Integrated fault reporting
+> >>
+> >>
+> >> Eric Auger (23):
+> >>   update-linux-headers: Import iommu.h
+> >>   header update against 5.6.0-rc3 and IOMMU/VFIO nested stage APIs
+> >>   memory: Add IOMMU_ATTR_VFIO_NESTED IOMMU memory region
+> >> attribute
+> >>   memory: Add IOMMU_ATTR_MSI_TRANSLATE IOMMU memory region
+> >> attribute
+> >>   memory: Introduce IOMMU Memory Region inject_faults API
+> >>   memory: Add arch_id and leaf fields in IOTLBEntry
+> >>   iommu: Introduce generic header
+> >>   vfio: Force nested if iommu requires it
+> >>   vfio: Introduce hostwin_from_range helper
+> >>   vfio: Introduce helpers to DMA map/unmap a RAM section
+> >>   vfio: Set up nested stage mappings
+> >>   vfio: Pass stage 1 MSI bindings to the host
+> >>   vfio: Helper to get IRQ info including capabilities
+> >>   vfio/pci: Register handler for iommu fault
+> >>   vfio/pci: Set up the DMA FAULT region
+> >>   vfio/pci: Implement the DMA fault handler
+> >>   hw/arm/smmuv3: Advertise MSI_TRANSLATE attribute
+> >>   hw/arm/smmuv3: Store the PASID table GPA in the translation config
+> >>   hw/arm/smmuv3: Fill the IOTLBEntry arch_id on NH_VA invalidation
+> >>   hw/arm/smmuv3: Fill the IOTLBEntry leaf field on NH_VA invalidation
+> >>   hw/arm/smmuv3: Pass stage 1 configurations to the host
+> >>   hw/arm/smmuv3: Implement fault injection
+> >>   hw/arm/smmuv3: Allow MAP notifiers
+> >>
+> >> Liu Yi L (1):
+> >>   pci: introduce PCIPASIDOps to PCIDevice
+> >>
+> >>  hw/arm/smmuv3.c                 | 189 ++++++++++--
+> >>  hw/arm/trace-events             |   3 +-
+> >>  hw/pci/pci.c                    |  34 +++
+> >>  hw/vfio/common.c                | 506
+> >> +++++++++++++++++++++++++-------
+> >>  hw/vfio/pci.c                   | 267 ++++++++++++++++-
+> >>  hw/vfio/pci.h                   |   9 +
+> >>  hw/vfio/trace-events            |   9 +-
+> >>  include/exec/memory.h           |  49 +++-
+> >>  include/hw/arm/smmu-common.h    |   1 +
+> >>  include/hw/iommu/iommu.h        |  28 ++
+> >>  include/hw/pci/pci.h            |  11 +
+> >>  include/hw/vfio/vfio-common.h   |  16 +
+> >>  linux-headers/COPYING           |   2 +
+> >>  linux-headers/asm-x86/kvm.h     |   1 +
+> >>  linux-headers/linux/iommu.h     | 375 +++++++++++++++++++++++
+> >>  linux-headers/linux/vfio.h      | 109 ++++++-
+> >>  memory.c                        |  10 +
+> >>  scripts/update-linux-headers.sh |   2 +-
+> >>  18 files changed, 1478 insertions(+), 143 deletions(-)
+> >>  create mode 100644 include/hw/iommu/iommu.h
+> >>  create mode 100644 linux-headers/linux/iommu.h
+> >>
+> >> --
+> >> 2.20.1
+> >
 
 
