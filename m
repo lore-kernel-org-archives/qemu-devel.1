@@ -2,82 +2,90 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_KAM_HTML_FONT_INVALID,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C583C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F86CC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34067206A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:07:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2375F206F5
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:10:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=tencent.com header.i=@tencent.com header.b="myADIEYy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34067206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=tencent.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gz/0S2Ox"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2375F206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKGPw-00017g-AR
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:07:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36049)
+	id 1jKGT2-0002I9-8i
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:10:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36563)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bauerchen@tencent.com>) id 1jKGOR-0008PL-UG
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:05:34 -0400
+ (envelope-from <armbru@redhat.com>) id 1jKGSN-0001rT-UA
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bauerchen@tencent.com>) id 1jKGOH-0004A4-UT
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:05:23 -0400
-Received: from mail6.tencent.com ([220.249.245.26]:40977)
+ (envelope-from <armbru@redhat.com>) id 1jKGSM-0007LI-5L
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:09:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54046
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bauerchen@tencent.com>)
- id 1jKGOG-00046d-RH
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:05:21 -0400
-Received: from EX-SZ018.tencent.com (unknown [10.28.6.39])
- by mail6.tencent.com (Postfix) with ESMTP id 932C5CC33A;
- Fri,  3 Apr 2020 15:05:52 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tencent.com;
- s=s202002; t=1585897552;
- bh=ikrUR6zNa6/7d6K5npAEYTHJTiNUqMoGEAN/0FAy/YQ=;
- h=From:To:CC:Subject:Date:References;
- b=myADIEYyj0b5u1RnUCdDKfJKElVYTxL9aiNuGJtk6O3RvSPU+JSvXmU9DoOdR8CNU
- R3hwhJExAUDDFcIHWBV1+XpgmShhBdon18XeUR83+2IRcOUy3+cwmHFwV3MlrN6WjE
- yR6KRl4Nkl2Jy4PzruD4UcMjIz8DR/528H2wHfhE=
-Received: from EX-SZ003.tencent.com (10.28.6.15) by EX-SZ018.tencent.com
- (10.28.6.39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1847.3; Fri, 3 Apr 2020
- 15:05:14 +0800
-Received: from EX-SZ005.tencent.com (10.28.6.29) by EX-SZ003.tencent.com
- (10.28.6.15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1847.3; Fri, 3 Apr 2020
- 15:05:13 +0800
-Received: from EX-SZ005.tencent.com ([fe80::5d14:1c60:ce53:dbd6]) by
- EX-SZ005.tencent.com ([fe80::5d14:1c60:ce53:dbd6%4]) with mapi id
- 15.01.1847.007; Fri, 3 Apr 2020 15:05:13 +0800
-From: =?utf-8?B?YmF1ZXJjaGVuKOmZiOiSmeiSmSk=?= <bauerchen@tencent.com>
-To: kraxel <kraxel@redhat.com>
-Subject: Re: Re: is just a wrong function name of libusb_get_port_number?
- request for a review of the bug fix(Internet mail)
-Thread-Topic: Re: is just a wrong function name of libusb_get_port_number?
- request for a review of the bug fix(Internet mail)
-Thread-Index: AQHWCYQ6V+mBBhiCJU+g9oIUdmRwbg==
-Date: Fri, 3 Apr 2020 07:05:13 +0000
-Message-ID: <ffdaa53629a94b20aa7b1023911e41a6@tencent.com>
-References: <02a07a59c3964199b73b1145e4abe0e9@tencent.com>,
- <20200403065042.cirj4ih3fl45wlqb@sirius.home.kraxel.org>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.14.87.252]
-Content-Type: multipart/alternative;
- boundary="_000_ffdaa53629a94b20aa7b1023911e41a6tencentcom_"
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jKGSL-0007Ia-Vq
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:09:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585897772;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jhtCOwt5am9z+PHZtAPPvk/K/7tKyqoyZeiFIAO1V5w=;
+ b=Gz/0S2OxE0eV3uZoYOSLYL4mQbVWBdIsJBIIAUgJUmoNxT+4JBaimOPGDsMGqsp2B/cUjH
+ Ul/hooMv9Of0580pp0MPmvH7wuWq8MPM241vDgiOBwUOnxUUsE9bG5tYW3ohX1HuQkOwYk
+ DpQA1z+8bQ6Y5y/e8qnGdCSsSnaK9ZA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-IJuazVP6N1-rJUAJYkHK9A-1; Fri, 03 Apr 2020 03:09:31 -0400
+X-MC-Unique: IJuazVP6N1-rJUAJYkHK9A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB61613F6;
+ Fri,  3 Apr 2020 07:09:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86F8494960;
+ Fri,  3 Apr 2020 07:09:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E234611385E2; Fri,  3 Apr 2020 09:09:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: Questionable aspects of QEMU Error's design
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+ <a3ca8c60-dd83-ea7b-c268-0c94e441bb52@virtuozzo.com>
+ <alpine.BSF.2.22.395.2004021132270.75834@zero.eik.bme.hu>
+ <53df0069-8a7a-9de8-29cb-21362d88bb4e@virtuozzo.com>
+ <87pncq0xdt.fsf@dusky.pond.sub.org>
+ <alpine.BSF.2.22.395.2004021716130.78264@zero.eik.bme.hu>
+Date: Fri, 03 Apr 2020 09:09:27 +0200
+In-Reply-To: <alpine.BSF.2.22.395.2004021716130.78264@zero.eik.bme.hu>
+ (BALATON Zoltan's message of "Thu, 2 Apr 2020 17:28:15 +0200 (CEST)")
+Message-ID: <875zeht594.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.249.245.26
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,133 +97,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: hdegoede <hdegoede@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_ffdaa53629a94b20aa7b1023911e41a6tencentcom_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-dGhhbmtzLCBidXQgbXkgbGlidXNieCB2ZXJzaW9uIGlzIGxpYnVzYngtMS4wLjE1LTQuZWw3Lng4
-Nl82NCAsDQpJIGNhbiBmaW5kIGxpYnVzYl9nZXRfcG9ydF9udW1iZXJzIGZ1bmN0aW9uIGluIGxp
-YnVzYi0xLjAuc28uMCBidXQgZmluZCBsaWJ1c2JfZ2V0X3BvcnRfbnVtYmVyDQoNCltyb290QHRd
-IyBzdHJpbmdzIC9saWI2NC9saWJ1c2ItMS4wLnNvLjAgfGdyZXAgbGlidXNiX2dldF9wb3J0X251
-bWJlcg0KbGlidXNiX2dldF9wb3J0X251bWJlcg0KW3Jvb3RAdF0jDQoNCmlzIG15IGxpYnVzYngg
-cGFja2FnZSBwcm9ibGVtPw0KDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KQmF1
-ZXINCg0KRnJvbToga3JheGVsPG1haWx0bzprcmF4ZWxAcmVkaGF0LmNvbT4NCkRhdGU6IDIwMjAt
-MDQtMDMgMTQ6NTANClRvOiBiYXVlcmNoZW4o6ZmI6JKZ6JKZKTxtYWlsdG86YmF1ZXJjaGVuQHRl
-bmNlbnQuY29tPg0KQ0M6IHFlbXUtZGV2ZWw8bWFpbHRvOnFlbXUtZGV2ZWxAbm9uZ251Lm9yZz47
-IGhkZWdvZWRlPG1haWx0bzpoZGVnb2VkZUByZWRoYXQuY29tPg0KU3ViamVjdDogUmU6IGlzIGp1
-c3QgYSB3cm9uZyBmdW5jdGlvbiBuYW1lIG9mIGxpYnVzYl9nZXRfcG9ydF9udW1iZXI/IHJlcXVl
-c3QgZm9yIGEgcmV2aWV3IG9mIHRoZSBidWcgZml4KEludGVybmV0IG1haWwpDQpPbiBUaHUsIEFw
-ciAwMiwgMjAyMCBhdCAxMTo0NzoxN0FNICswMDAwLCBiYXVlcmNoZW4o6ZmI6JKZ6JKZKSB3cm90
-ZToNCj4gRnJvbSA2YmZiMzA4Nzg2NjYwNmVkMzZhMjFlN2JkMDVmMDY3NGU2YTk3MTU4IE1vbiBT
-ZXAgMTcgMDA6MDA6MDAgMjAwMQ0KPiBGcm9tOiBCYXVlcmNoZW4gPGJhdWVyY2hlbkB0ZW5jZW50
-LmNvbT4NCj4gRGF0ZTogVGh1LCAyIEFwciAyMDIwIDE5OjE5OjAwICswODAwDQo+IFN1YmplY3Q6
-IFtQQVRDSF0gRml4OmZpeCB0aGUgd3JvbmcgZnVuY3Rpb24gbmFtZSBvZiBsaWJ1c2JfZ2V0X3Bv
-cnRfbnVtYmVyDQo+DQo+IFtkZXNjXToNCj4gbGlidXNiX2dldF9wb3J0X251bWJlcnMgaXMgY2Fs
-bGVkIGluIGZ1bmN0aW9uDQo+IHVzYl9ob3N0X2dldF9wb3J0LCBhbmQgcWVtdSBjcmFzaGVkIHdp
-dGg6DQo+IHN5bWJvbCBsb29rdXAgZXJyb3I6IHVuZGVmaW5lZCBzeW1ib2w6IGxpYnVzYl9nZXRf
-cG9ydF9udW1iZXJzDQo+IEkgY2hlY2sgL2xpYjY0L2xpYnVzYi0xLjAuc28uMCBhbmQgb3V0cHV0
-IGlzIGxpYnVzYl9nZXRfcG9ydF9udW1iZXIsIEkNCj4gY2hhbmdlIGl0IHRvIGxpYnVzYl9nZXRf
-cG9ydF9udW1iZXIsIGNyYXNoIHByb2JsZW0gaXMgZ29uZTsNCj4gc28gaXMgaXQganVzdCBhIGZ1
-bmN0aW9uIG5hbWUgYnVnPw0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBCYXVlcmNoZW4gPGJhdWVyY2hl
-bkB0ZW5jZW50LmNvbT4NCj4gLS0tDQo+ICBody91c2IvaG9zdC1saWJ1c2IuYyB8IDIgKy0NCj4g
-IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPg0KPiBkaWZm
-IC0tZ2l0IGEvaHcvdXNiL2hvc3QtbGlidXNiLmMgYi9ody91c2IvaG9zdC1saWJ1c2IuYw0KPiBp
-bmRleCAyYWM3YTkzLi43MTNkYjhkIDEwMDY0NA0KPiAtLS0gYS9ody91c2IvaG9zdC1saWJ1c2Iu
-Yw0KPiArKysgYi9ody91c2IvaG9zdC1saWJ1c2IuYw0KPiBAQCAtMjg1LDcgKzI4NSw3IEBAIHN0
-YXRpYyBpbnQgdXNiX2hvc3RfZ2V0X3BvcnQobGlidXNiX2RldmljZSAqZGV2LCBjaGFyICpwb3J0
-LCBzaXplX3QgbGVuKQ0KPiAgICAgIGludCByYywgaTsNCj4NCj4gICNpZiBMSUJVU0JfQVBJX1ZF
-UlNJT04gPj0gMHgwMTAwMDEwMg0KPiAtICAgIHJjID0gbGlidXNiX2dldF9wb3J0X251bWJlcnMo
-ZGV2LCBwYXRoLCA3KTsNCj4gKyAgICByYyA9IGxpYnVzYl9nZXRfcG9ydF9udW1iZXIoZGV2LCBw
-YXRoLCA3KTsNCg0KU3VyZWx5IG5vdCB0aGF0IHNpbXBsZS4gIGxpYnVzYl9nZXRfcG9ydF9udW1i
-ZXIgaXNuJ3QgYSBkcm9wLWluDQpyZXBsYWNlbWVudCBmb3IgbGlidXNiX2dldF9wb3J0X251bWJl
-cnMuICBBbHNvIGl0IHdhcyBwcm9iYWJseSBhZGRlZA0KbGF0ZXIgdG8gbGlidXNiLCBzbyBzb21l
-IExJQlVTQl9BUElfVkVSU0lPTiAjaWZkZWYgd2lsbCBiZSBuZWVkZWQgc28gdGhlDQpvbmUgb3Ig
-dGhlIG90aGVyIHdpbGwgYmUgdXNlZCBkZXBlbmRpbmcgb24gdGhlIGxpYnJhcnkgdmVyc2lvbi4N
-Cg0KY2hlZXJzLA0KICBHZXJkDQoNCg0K
+> On Thu, 2 Apr 2020, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>> 02.04.2020 12:36, BALATON Zoltan wrote:
+[...]
+>>>> Not much better. Could it be something like:
+[...]
+>>>>  =C2=A0=C2=A0=C2=A0 ERRP_RET(object_property_set_link(cpuobj, OBJECT(&=
+s->cpu_container[i]),
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 "memory", errp));
+>>>>  =C2=A0=C2=A0=C2=A0 ERRP_RET(object_property_set_link(cpuobj, OBJECT(s=
+), "idau", errp));
+>>>>  =C2=A0=C2=A0=C2=A0 ERRP_RET(object_property_set_bool(cpuobj, true, "r=
+ealized", errp));
+>>>>
+>>>
+>>> and turn all
+>>>
+>>> ret =3D func(...);
+>>> if (ret < 0) {
+>>>     return ret;
+>>> }
+>>>
+>>> into
+>>>
+>>> FAIL_RET(func(...))
+>>>
+>>> ?
+>>>
+>>> Not a problem to make such macro.. But I think it's a bad idea to turn =
+all the code
+>>> into sequence of macro invocations. It's hard to debug and follow.
+>>
+>> Yes.  Hiding control flow in macros is almost always too much magic.
+>> There are exceptions, but this doesn't look like one.
+>
+> I did't like this idea of mine too much either so I agree but I see no
+> other easy way to simplify this. If you propose changing function
+> return values maybe these should return errp instead of passing it as
+> a func parameter? Could that result in simpler code and less macro
+> magic needed?
 
---_000_ffdaa53629a94b20aa7b1023911e41a6tencentcom_
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: base64
+I don't think so.  Let's compare a few error handling patterns from
+error.h.
 
-PGh0bWw+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVudD0i
-dGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjxzdHlsZT5ib2R5IHsgbGluZS1oZWlnaHQ6IDEu
-NTsgfWJsb2NrcXVvdGUgeyBtYXJnaW4tdG9wOiAwcHg7IG1hcmdpbi1ib3R0b206IDBweDsgbWFy
-Z2luLWxlZnQ6IDAuNWVtOyB9Ym9keSB7IGZvbnQtc2l6ZTogMTAuNXB0OyBmb250LWZhbWlseTog
-J01pY3Jvc29mdCBZYUhlaSBVSSc7IGNvbG9yOiByZ2IoMCwgMCwgMCk7IGxpbmUtaGVpZ2h0OiAx
-LjU7IH08L3N0eWxlPg0KPC9oZWFkPg0KPGJvZHk+DQo8ZGl2PjxzcGFuPjwvc3Bhbj50aGFua3Ms
-IGJ1dCBteSBsaWJ1c2J4IHZlcnNpb24gaXMmbmJzcDtsaWJ1c2J4LTEuMC4xNS00LmVsNy54ODZf
-NjQgLDwvZGl2Pg0KPGRpdj5JIGNhbiBmaW5kJm5ic3A7bGlidXNiX2dldF9wb3J0X251bWJlcnMg
-ZnVuY3Rpb24gaW4mbmJzcDtsaWJ1c2ItMS4wLnNvLjAgYnV0IGZpbmQmbmJzcDs8c3BhbiBzdHls
-ZT0iZm9udC1zaXplOiAxMC41cHQ7IGxpbmUtaGVpZ2h0OiAxLjU7IGJhY2tncm91bmQtY29sb3I6
-IHRyYW5zcGFyZW50OyI+bGlidXNiX2dldF9wb3J0X251bWJlcjwvc3Bhbj48L2Rpdj4NCjxkaXY+
-PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTAuNXB0OyBsaW5lLWhlaWdodDogMS41OyBiYWNrZ3Jv
-dW5kLWNvbG9yOiB0cmFuc3BhcmVudDsiPjxicj4NCjwvc3Bhbj48L2Rpdj4NCjxkaXY+DQo8ZGl2
-Pltyb290QHRdIyBzdHJpbmdzIC9saWI2NC9saWJ1c2ItMS4wLnNvLjAgfGdyZXAgbGlidXNiX2dl
-dF9wb3J0X251bWJlciZuYnNwOzwvZGl2Pg0KPGRpdj5saWJ1c2JfZ2V0X3BvcnRfbnVtYmVyPC9k
-aXY+DQo8ZGl2Pltyb290QHRdIyZuYnNwOzwvZGl2Pg0KPC9kaXY+DQo8ZGl2Pjxicj4NCjwvZGl2
-Pg0KPGRpdj5pcyBteSBsaWJ1c2J4IHBhY2thZ2UgcHJvYmxlbT88L2Rpdj4NCjxkaXY+PGJyPg0K
-PC9kaXY+DQo8aHIgc3R5bGU9IndpZHRoOiAyMTBweDsgaGVpZ2h0OiAxcHg7IiBjb2xvcj0iI2I1
-YzRkZiIgc2l6ZT0iMSIgYWxpZ249ImxlZnQiPg0KPGRpdj48c3Bhbj5CYXVlcjwvc3Bhbj48L2Rp
-dj4NCjxibG9ja3F1b3RlIHN0eWxlPSJtYXJnaW4tVG9wOiAwcHg7IG1hcmdpbi1Cb3R0b206IDBw
-eDsgbWFyZ2luLUxlZnQ6IDAuNWVtIj4NCjxkaXY+Jm5ic3A7PC9kaXY+DQo8ZGl2IHN0eWxlPSJi
-b3JkZXI6bm9uZTtib3JkZXItdG9wOnNvbGlkICNCNUM0REYgMS4wcHQ7cGFkZGluZzozLjBwdCAw
-Y20gMGNtIDBjbSI+DQo8ZGl2IHN0eWxlPSJQQURESU5HLVJJR0hUOiA4cHg7IFBBRERJTkctTEVG
-VDogOHB4OyBGT05ULVNJWkU6IDEycHg7Rk9OVC1GQU1JTFk6dGFob21hO0NPTE9SOiMwMDAwMDA7
-IEJBQ0tHUk9VTkQ6ICNlZmVmZWY7IFBBRERJTkctQk9UVE9NOiA4cHg7IFBBRERJTkctVE9QOiA4
-cHgiPg0KPGRpdj48Yj5Gcm9tOjwvYj4mbmJzcDs8YSBocmVmPSJtYWlsdG86a3JheGVsQHJlZGhh
-dC5jb20iPmtyYXhlbDwvYT48L2Rpdj4NCjxkaXY+PGI+RGF0ZTo8L2I+Jm5ic3A7MjAyMC0wNC0w
-MyZuYnNwOzE0OjUwPC9kaXY+DQo8ZGl2PjxiPlRvOjwvYj4mbmJzcDs8YSBocmVmPSJtYWlsdG86
-YmF1ZXJjaGVuQHRlbmNlbnQuY29tIj5iYXVlcmNoZW4o6ZmI6JKZ6JKZKTwvYT48L2Rpdj4NCjxk
-aXY+PGI+Q0M6PC9iPiZuYnNwOzxhIGhyZWY9Im1haWx0bzpxZW11LWRldmVsQG5vbmdudS5vcmci
-PnFlbXUtZGV2ZWw8L2E+OyA8YSBocmVmPSJtYWlsdG86aGRlZ29lZGVAcmVkaGF0LmNvbSI+DQpo
-ZGVnb2VkZTwvYT48L2Rpdj4NCjxkaXY+PGI+U3ViamVjdDo8L2I+Jm5ic3A7UmU6IGlzIGp1c3Qg
-YSB3cm9uZyBmdW5jdGlvbiBuYW1lIG9mIGxpYnVzYl9nZXRfcG9ydF9udW1iZXI/IHJlcXVlc3Qg
-Zm9yIGEgcmV2aWV3IG9mIHRoZSBidWcgZml4KEludGVybmV0IG1haWwpPC9kaXY+DQo8L2Rpdj4N
-CjwvZGl2Pg0KPGRpdj4NCjxkaXY+T24gVGh1LCBBcHIgMDIsIDIwMjAgYXQgMTE6NDc6MTdBTSAm
-IzQzOzAwMDAsIGJhdWVyY2hlbijpmYjokpnokpkpIHdyb3RlOjwvZGl2Pg0KPGRpdj4mZ3Q7IEZy
-b20gNmJmYjMwODc4NjY2MDZlZDM2YTIxZTdiZDA1ZjA2NzRlNmE5NzE1OCBNb24gU2VwIDE3IDAw
-OjAwOjAwIDIwMDE8L2Rpdj4NCjxkaXY+Jmd0OyBGcm9tOiBCYXVlcmNoZW4gJmx0O2JhdWVyY2hl
-bkB0ZW5jZW50LmNvbSZndDs8L2Rpdj4NCjxkaXY+Jmd0OyBEYXRlOiBUaHUsIDIgQXByIDIwMjAg
-MTk6MTk6MDAgJiM0MzswODAwPC9kaXY+DQo8ZGl2PiZndDsgU3ViamVjdDogW1BBVENIXSBGaXg6
-Zml4IHRoZSB3cm9uZyBmdW5jdGlvbiBuYW1lIG9mIGxpYnVzYl9nZXRfcG9ydF9udW1iZXI8L2Rp
-dj4NCjxkaXY+Jmd0OyA8L2Rpdj4NCjxkaXY+Jmd0OyBbZGVzY106PC9kaXY+DQo8ZGl2PiZndDsg
-bGlidXNiX2dldF9wb3J0X251bWJlcnMgaXMgY2FsbGVkIGluIGZ1bmN0aW9uPC9kaXY+DQo8ZGl2
-PiZndDsgdXNiX2hvc3RfZ2V0X3BvcnQsIGFuZCBxZW11IGNyYXNoZWQgd2l0aDo8L2Rpdj4NCjxk
-aXY+Jmd0OyBzeW1ib2wgbG9va3VwIGVycm9yOiB1bmRlZmluZWQgc3ltYm9sOiBsaWJ1c2JfZ2V0
-X3BvcnRfbnVtYmVyczwvZGl2Pg0KPGRpdj4mZ3Q7IEkgY2hlY2sgL2xpYjY0L2xpYnVzYi0xLjAu
-c28uMCBhbmQgb3V0cHV0IGlzIGxpYnVzYl9nZXRfcG9ydF9udW1iZXIsIEk8L2Rpdj4NCjxkaXY+
-Jmd0OyBjaGFuZ2UgaXQgdG8gbGlidXNiX2dldF9wb3J0X251bWJlciwgY3Jhc2ggcHJvYmxlbSBp
-cyBnb25lOzwvZGl2Pg0KPGRpdj4mZ3Q7IHNvIGlzIGl0IGp1c3QgYSBmdW5jdGlvbiBuYW1lIGJ1
-Zz88L2Rpdj4NCjxkaXY+Jmd0OyA8L2Rpdj4NCjxkaXY+Jmd0OyBTaWduZWQtb2ZmLWJ5OiBCYXVl
-cmNoZW4gJmx0O2JhdWVyY2hlbkB0ZW5jZW50LmNvbSZndDs8L2Rpdj4NCjxkaXY+Jmd0OyAtLS08
-L2Rpdj4NCjxkaXY+Jmd0OyAmbmJzcDtody91c2IvaG9zdC1saWJ1c2IuYyB8IDIgJiM0MzstPC9k
-aXY+DQo8ZGl2PiZndDsgJm5ic3A7MSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCYjNDM7KSwg
-MSBkZWxldGlvbigtKTwvZGl2Pg0KPGRpdj4mZ3Q7IDwvZGl2Pg0KPGRpdj4mZ3Q7IGRpZmYgLS1n
-aXQgYS9ody91c2IvaG9zdC1saWJ1c2IuYyBiL2h3L3VzYi9ob3N0LWxpYnVzYi5jPC9kaXY+DQo8
-ZGl2PiZndDsgaW5kZXggMmFjN2E5My4uNzEzZGI4ZCAxMDA2NDQ8L2Rpdj4NCjxkaXY+Jmd0OyAt
-LS0gYS9ody91c2IvaG9zdC1saWJ1c2IuYzwvZGl2Pg0KPGRpdj4mZ3Q7ICYjNDM7JiM0MzsmIzQz
-OyBiL2h3L3VzYi9ob3N0LWxpYnVzYi5jPC9kaXY+DQo8ZGl2PiZndDsgQEAgLTI4NSw3ICYjNDM7
-Mjg1LDcgQEAgc3RhdGljIGludCB1c2JfaG9zdF9nZXRfcG9ydChsaWJ1c2JfZGV2aWNlICpkZXYs
-IGNoYXIgKnBvcnQsIHNpemVfdCBsZW4pPC9kaXY+DQo8ZGl2PiZndDsgJm5ic3A7ICZuYnNwOyAm
-bmJzcDtpbnQgcmMsIGk7PC9kaXY+DQo8ZGl2PiZndDsgJm5ic3A7PC9kaXY+DQo8ZGl2PiZndDsg
-Jm5ic3A7I2lmIExJQlVTQl9BUElfVkVSU0lPTiAmZ3Q7PSAweDAxMDAwMTAyPC9kaXY+DQo8ZGl2
-PiZndDsgLSAmbmJzcDsgJm5ic3A7cmMgPSBsaWJ1c2JfZ2V0X3BvcnRfbnVtYmVycyhkZXYsIHBh
-dGgsIDcpOzwvZGl2Pg0KPGRpdj4mZ3Q7ICYjNDM7ICZuYnNwOyAmbmJzcDtyYyA9IGxpYnVzYl9n
-ZXRfcG9ydF9udW1iZXIoZGV2LCBwYXRoLCA3KTs8L2Rpdj4NCjxkaXY+Jm5ic3A7PC9kaXY+DQo8
-ZGl2PlN1cmVseSBub3QgdGhhdCBzaW1wbGUuJm5ic3A7IGxpYnVzYl9nZXRfcG9ydF9udW1iZXIg
-aXNuJ3QgYSBkcm9wLWluPC9kaXY+DQo8ZGl2PnJlcGxhY2VtZW50IGZvciBsaWJ1c2JfZ2V0X3Bv
-cnRfbnVtYmVycy4mbmJzcDsgQWxzbyBpdCB3YXMgcHJvYmFibHkgYWRkZWQ8L2Rpdj4NCjxkaXY+
-bGF0ZXIgdG8gbGlidXNiLCBzbyBzb21lIExJQlVTQl9BUElfVkVSU0lPTiAjaWZkZWYgd2lsbCBi
-ZSBuZWVkZWQgc28gdGhlPC9kaXY+DQo8ZGl2Pm9uZSBvciB0aGUgb3RoZXIgd2lsbCBiZSB1c2Vk
-IGRlcGVuZGluZyBvbiB0aGUgbGlicmFyeSB2ZXJzaW9uLjwvZGl2Pg0KPGRpdj4mbmJzcDs8L2Rp
-dj4NCjxkaXY+Y2hlZXJzLDwvZGl2Pg0KPGRpdj4mbmJzcDsgR2VyZDwvZGl2Pg0KPGRpdj4mbmJz
-cDs8L2Rpdj4NCjxkaXY+Jm5ic3A7PC9kaXY+DQo8L2Rpdj4NCjwvYmxvY2txdW90ZT4NCjwvYm9k
-eT4NCjwvaHRtbD4NCg==
+ * Call a function and receive an error from it:
+ *     Error *err =3D NULL;
+ *     foo(arg, &err);
+ *     if (err) {
+ *         handle the error...
+ *     }
 
---_000_ffdaa53629a94b20aa7b1023911e41a6tencentcom_--
+Making foo() return the error object instead of void looks like an
+obvious win:
+
+       if (foo(arg)) {
+           handle the error...
+       }
+
+Except it does not work, because surely a use of @err is hiding in
+"handle the error" (or else we'd leak it).  So you actually need
+
+       err =3D foo(arg)
+       if (err) {
+           handle the error...
+       }
+
+All this saves you is initializing @err.
+
+You can save a bit more
+
+       if ((err =3D foo(arg))) {
+           handle the error...
+       }
+
+We generally frown upon assignemnts within if controlling expressions.
+
+Next:
+
+ * Receive an error and pass it on to the caller:
+ [...]
+ * But when all you do with the error is pass it on, please use
+ *     foo(arg, errp);
+ * for readability.
+
+The obvious conversion
+
+       *errp =3D foo(arg);
+
+is wrong for !errp, errp =3D=3D &error_fatal, and errp =3D=3D &error_abort.
+You'd need
+
+       err =3D foo(arg);
+       error_propagate(errp, err);
+
+or, if you're so inclined
+
+       error_propagate(errp, foo(arg));
+
+Less legible, and it creates and destroys error objects where the
+current method doesn't.
+
+Returning the error object is even less attractive for functions that
+now return values.
+
 
