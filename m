@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E34C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F6EC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:20:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBFD720737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:19:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C506E2063A
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:20:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mnN0kuMJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBFD720737
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O7iku8HT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C506E2063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKRqz-0005Bz-TZ
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 15:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40828)
+	id 1jKRrJ-0005WC-Vz
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 15:20:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jKRja-0003Sj-8N
+ (envelope-from <alex.bennee@linaro.org>) id 1jKRja-0003QP-Co
  for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:12:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jKRjZ-0002QU-8s
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:12:06 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50577)
+ (envelope-from <alex.bennee@linaro.org>) id 1jKRjY-0002PD-8h
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:12:05 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33624)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jKRjZ-0002Pa-1g
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:12:05 -0400
-Received: by mail-wm1-x341.google.com with SMTP id t128so8281811wma.0
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 12:12:04 -0700 (PDT)
+ id 1jKRjY-0002NB-2D
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:12:04 -0400
+Received: by mail-wm1-x344.google.com with SMTP id z14so2825266wmf.0
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 12:12:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BnraU9e2QlfXAnwDnsquPq2nPEANf8Vm3M5lpPbQw3c=;
- b=mnN0kuMJWeH2jNmYRvBwWcMWl9zT59HHmZ0M9fZBR3G4+3+vM5nUyBpmtYrbb2oxLd
- HsRLIU+P0k5W7bH3PX9QwtBqo6PQHjBQKm9imnkIlVI/fDvi/5VyDJ8UahZOVxSUj81I
- ZEapBaVrfvVZSwTjRCq+8AWAer+VHULRUjdPpO2FwPzbR2OCg4hViVK6z+BPCS68kHiY
- IIDSKzkx3qXTsLRm7GL3TUzpC6ZlXp+Qie23Y+XCX8q1UuXMsYwjW5M7KinrHmf1vVRe
- DcOe7BKOUmVrTyC9lQWEr0fntyeSSq5kSb7rclEDoP4dSW/NJuhMueod7ger7YvjGrkQ
- zJBg==
+ bh=jGuKGm7KMOs2UN9ivTUYCq92gardKrGXU32VGXhYNDc=;
+ b=O7iku8HTg3uKAe/7dfvlzcFGD08ng6bKMt4MS8drysmkTsZl/4npYNDV61AApVDTj6
+ 6CTljDUwfUB5MRyKOXBzGRfnLAAz3Nejn9KiiFTybxx+72uR2UkTtHhW5k969/6ytgne
+ h824DPW6+d3EXrNMdxVnSNrgTtQ+6tAzTQnT+dfBxfWeSWtR/XcxdtIBwK5PGcm7sh9D
+ ubeL7kShk9qqGbDPUM9tZagn6EFXqIAqSvX/c/s64m4jSlf6DAAyo06D+KUEO9488zgv
+ ibnRnlUXi8M0cMYCMR+ONqdyD9/EJTnfhfr/kh9P2ijvXys1McSZgWL667DsKnMPhUvd
+ EiDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BnraU9e2QlfXAnwDnsquPq2nPEANf8Vm3M5lpPbQw3c=;
- b=Y30hlB5cS2s5TeEQSYVVboN22S8f98DAJZsH9KDqyu5ikhDGUsDIjz5KM1W8JvEu9v
- caqKTaJZi4ZmLQ/hlsCiHLpRBekK4s4ySSjzxp6rT93T8TFeWy+x2IQNTO1FERhPmEa7
- pRz6OcqA99hoaEciqddWBsA9Lr9V8RXuwWCoOOlxproml9id8Uutw9l9pFVptSJ8DU5a
- KlS2uQseWIHB0/6Z0tmod+4/wTeJwQZlHBAtnuZIngE+UMVbTmeVhr2lvOf5krwZefSx
- etT3HD4TZnhsi2alkjNBVYR7Pd+V2xHWNZp9Wtm5gCd11sIYQQrnTPutN5v/yQuBliXY
- jIyg==
-X-Gm-Message-State: AGi0PuaQm1/B4uIfiq7GUsVqbDQGE7/zdn7oV6SLMklBKnT7GMXUeVwW
- LCUkp5zuFcSRscebDCH53529LA==
-X-Google-Smtp-Source: APiQypL1H+tX9Q6efzFWQ5HFlYboOz2mWWgstd2kz6XQyRYFVpI6PdoSDDLq3bkGHzQhg15js3iBUw==
-X-Received: by 2002:a1c:e055:: with SMTP id x82mr9953081wmg.20.1585941124055; 
- Fri, 03 Apr 2020 12:12:04 -0700 (PDT)
+ bh=jGuKGm7KMOs2UN9ivTUYCq92gardKrGXU32VGXhYNDc=;
+ b=JdLyk5jaxX5Spc2Gi1JT5fdCgjKCj2FcDgFy/sJdRkvCTPl2PD03xt9Jrjrt8YdNrw
+ o+7foC+auPTSkC2X3rluIJcI5zIBjT+wlzIMAYBiW8PnRoBPXruRhMwp5rzQJBtgOUxK
+ eWvQ8xuIw8UCRfjWO4aqGJY+KrhBi6gEk5VithyNlQeDMM+1xAw/SdQeHWPTnyUWacug
+ TPJxTCesY4jk7h7ewrkP+n97BCzMeFW8QQ4u8rvqeBVXJWy9s5OM7ltEtPDCVo/xXg/9
+ Vi8MVqv+6k0Gdjeq2xG7C/PQTOTh6Rhv5Kr4yflbO4QVEjvwNeXUvA0agqNo16ZXH3o7
+ xxPQ==
+X-Gm-Message-State: AGi0PuYzphuNDz0QY4lfvQubz1hA+Ve1zK5kOLwTl7W53yJmBHDyDpZ1
+ BnZN9xfSfftGJ4awdKblxOtOhoGkSHc=
+X-Google-Smtp-Source: APiQypKDZoIF/BoXfWRzAPWz4jlgHdxVnhxFL1eyJ+jvQvCWI1q1q49TFnMofuGyTwI1iMnd5FhZBQ==
+X-Received: by 2002:a1c:b356:: with SMTP id c83mr10557949wmf.10.1585941123000; 
+ Fri, 03 Apr 2020 12:12:03 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b187sm13626896wmc.14.2020.04.03.12.11.55
+ by smtp.gmail.com with ESMTPSA id k84sm12680120wmk.2.2020.04.03.12.11.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 03 Apr 2020 12:11:57 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 94EF91FF99;
+ by zen.linaroharston (Postfix) with ESMTP id 79F271FF98;
  Fri,  3 Apr 2020 20:11:51 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 10/12] target/arm: don't expose "ieee_half" via gdbstub
-Date: Fri,  3 Apr 2020 20:11:48 +0100
-Message-Id: <20200403191150.863-11-alex.bennee@linaro.org>
+Subject: [PATCH  v3 09/12] linux-user: clean-up padding on /proc/self/maps
+Date: Fri,  3 Apr 2020 20:11:47 +0100
+Message-Id: <20200403191150.863-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200403191150.863-1-alex.bennee@linaro.org>
 References: <20200403191150.863-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,43 +97,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ Riku Voipio <riku.voipio@iki.fi>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While support for parsing ieee_half in the XML description was added
-to gdb in 2019 (a6d0f249) there is no easy way for the gdbstub to know
-if the gdb end will understand it. Disable it for now and allow older
-gdbs to successfully connect to the default -cpu max SVE enabled
-QEMUs.
+Don't use magic spaces, calculate the justification for the file
+field like the kernel does with seq_pad.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/gdbstub.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
-index d9ef7d2187c..8efc535f2a0 100644
---- a/target/arm/gdbstub.c
-+++ b/target/arm/gdbstub.c
-@@ -192,7 +192,12 @@ static const struct TypeSize vec_lanes[] = {
-     /* 16 bit */
-     { "uint16", 16, 'h', 'u' },
-     { "int16", 16, 'h', 's' },
--    { "ieee_half", 16, 'h', 'f' },
-+    /*
-+     * TODO: currently there is no reliable way of telling
-+     * if the remote gdb actually understands ieee_half so
-+     * we don't expose it in the target description for now.
-+     * { "ieee_half", 16, 'h', 'f' },
-+     */
-     /* bytes */
-     { "uint8", 8, 'b', 'u' },
-     { "int8", 8, 'b', 's' },
+---
+v2
+  - change for unsigned long update
+---
+ linux-user/syscall.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 666be20f3ff..8a610b91402 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7235,6 +7235,7 @@ static int open_self_maps(void *cpu_env, int fd)
+     TaskState *ts = cpu->opaque;
+     GSList *map_info = read_self_maps();
+     GSList *s;
++    int count;
+ 
+     for (s = map_info; s; s = g_slist_next(s)) {
+         MapInfo *e = (MapInfo *) s->data;
+@@ -7253,20 +7254,24 @@ static int open_self_maps(void *cpu_env, int fd)
+             }
+ 
+             if (h2g(min) == ts->info->stack_limit) {
+-                path = "      [stack]";
++                path = "[stack]";
+             } else {
+                 path = e->path;
+             }
+ 
+-            dprintf(fd, TARGET_ABI_FMT_ptr "-" TARGET_ABI_FMT_ptr
+-                    " %c%c%c%c %08" PRIx64 " %s %d %s%s\n",
+-                    h2g(min), h2g(max - 1) + 1,
+-                    e->is_read ? 'r' : '-',
+-                    e->is_write ? 'w' : '-',
+-                    e->is_exec ? 'x' : '-',
+-                    e->is_priv ? 'p' : '-',
+-                    (uint64_t) e->offset, e->dev, e->inode,
+-                    path ? "         " : "", path ? path : "");
++            count = dprintf(fd, TARGET_ABI_FMT_ptr "-" TARGET_ABI_FMT_ptr
++                            " %c%c%c%c %08" PRIx64 " %s %d",
++                            h2g(min), h2g(max - 1) + 1,
++                            e->is_read ? 'r' : '-',
++                            e->is_write ? 'w' : '-',
++                            e->is_exec ? 'x' : '-',
++                            e->is_priv ? 'p' : '-',
++                            (uint64_t) e->offset, e->dev, e->inode);
++            if (path) {
++                dprintf(fd, "%*s%s\n", 73 - count, "", path);
++            } else {
++                dprintf(fd, "\n");
++            }
+         }
+     }
+ 
+@@ -7277,9 +7282,10 @@ static int open_self_maps(void *cpu_env, int fd)
+      * We only support execution from the vsyscall page.
+      * This is as if CONFIG_LEGACY_VSYSCALL_XONLY=y from v5.3.
+      */
+-    dprintf(fd, TARGET_FMT_lx "-" TARGET_FMT_lx
+-            " --xp 00000000 00:00 0 [vsyscall]\n",
+-            TARGET_VSYSCALL_PAGE, TARGET_VSYSCALL_PAGE + TARGET_PAGE_SIZE);
++    count = dprintf(fd, TARGET_FMT_lx "-" TARGET_FMT_lx
++                    " --xp 00000000 00:00 0",
++                    TARGET_VSYSCALL_PAGE, TARGET_VSYSCALL_PAGE + TARGET_PAGE_SIZE);
++    dprintf(fd, "%*s%s\n", 73 - count, "",  "[vsyscall]");
+ #endif
+ 
+     return 0;
 -- 
 2.20.1
 
