@@ -4,94 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772A3C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 762B9C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:38:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 406EC206F8
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:27:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C84C20721
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:38:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jU0eRxzu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 406EC206F8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtRTRokb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C84C20721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKGjN-00010c-Ck
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:27:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38492)
+	id 1jKGun-00065n-9C
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:38:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39670)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1jKGih-0000VV-0z
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:26:28 -0400
+ (envelope-from <drjones@redhat.com>) id 1jKGu5-0005YH-BO
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1jKGif-0001FO-Vz
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:26:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35192
+ (envelope-from <drjones@redhat.com>) id 1jKGu3-0004JG-Gi
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:38:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58538
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1jKGif-0001EI-SQ
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:26:25 -0400
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1jKGu3-0004IY-Av
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:38:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585898785;
+ s=mimecast20190719; t=1585899490;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ehEvQch35v+vmmZXUwVMeHs+fXrKtZpz96OIAdwMs40=;
- b=jU0eRxzuHuzGbYmUdHpbNUh11VHbbDfFXVtqpn4dal8fhv8eBc7i4aU+crX5Qamu6wTdSZ
- bqQHAY+pD77OUQnK7nN0KZFn8kSNk3sSqG7C9XyRmxiPFKgyuwncLCgOqAFQVHoGe6KXpC
- 2eCH62tuPzKr9HwmPBgmshCIcNqkL+k=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-2uny49DnPqW7sYcOH4u0OA-1; Fri, 03 Apr 2020 03:26:21 -0400
-X-MC-Unique: 2uny49DnPqW7sYcOH4u0OA-1
-Received: by mail-wr1-f72.google.com with SMTP id a10so118556wra.2
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 00:26:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=CjH2v81nieB/rc6O+FwfEuX/n9hjwek77sB6RdSXGb8=;
- b=qDrsT4xLBr87Zb5MwNbJHmCLDSWRM4bjWEWEmwvXUxhHv5ciz8KWlXgwrtveHUaAZ5
- GFNh2be0zz9FwP+wVM3OWljzhiDdSEMdvXKBihNXVVi84kXfKPvUcTDy3G0hHHXfUmGs
- 5WRmX8YWTlfL4fYtRvU8qUEVvkg0hzMwKE0r+WBNGKcN/OwM+BaWokN/eXSRP3nfqK8D
- VBJ0/Myy35tX5EXlL+4kVErC+AjVKRFUuOvWM++duT2g0o5gc+x3/l5YrL2DOtl1pZ5e
- ik1ScoEhwuIBvEXalAK/IsEg5DCPi83t1iLrJT0+NjHRDlhbxtDgQAc66tLEiySVfcZb
- iDSg==
-X-Gm-Message-State: AGi0PuZrMBsYSgJ90Bsc6MnIHdijiR8ZDvxrYcTpb1Oz6Z8fdGUo2vti
- Q18EnKSD81x3CK9JeQ/PRxb+CuBk8eayeNh3bdSYbHGxUjaWdGhj6QhbpFgwUobVZdZlR3XLKPB
- nrKiJRtA8c95u64Y=
-X-Received: by 2002:a5d:4111:: with SMTP id l17mr7987673wrp.271.1585898780440; 
- Fri, 03 Apr 2020 00:26:20 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLzvQCm6AwskT/o5nGu4bOGmdGnIOT2Vz8JfjSMdJpLUBdY6VqHIxSvN9nByDhmt0SCOQ45Pw==
-X-Received: by 2002:a5d:4111:: with SMTP id l17mr7987648wrp.271.1585898780193; 
- Fri, 03 Apr 2020 00:26:20 -0700 (PDT)
-Received: from steredhat (host32-201-dynamic.27-79-r.retail.telecomitalia.it.
- [79.27.201.32])
- by smtp.gmail.com with ESMTPSA id y20sm1656432wmi.31.2020.04.03.00.26.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 00:26:19 -0700 (PDT)
-Date: Fri, 3 Apr 2020 09:26:17 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH for-5.0] aio-posix: fix test-aio /aio/event/wait with
- fdmon-io_uring
-Message-ID: <20200403072617.k45vkexc42shi7f3@steredhat>
-References: <20200402145434.99349-1-stefanha@redhat.com>
+ bh=/ShhmZm72SQhR4eIFmmC27wtjg2NRVT2I6JWq3826bM=;
+ b=gtRTRokb4+lf8kRy3aO0kg1NW4jTTZw6r3aYXY9Obrw/WLKQQTcXNSPtmrwvea3Fq4n46O
+ 6lDXJyxn/QfdN+pLu1p85RjZEL0FfzE16EnhrpJPKVEm+zRqYyHFrSo4b2K+mgtLYPU3G/
+ nl9Dx7/HoJfRzsUCgnsRJInGeyxa6ts=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-102-27GNLgHAPASwY-YYKh5Jsw-1; Fri, 03 Apr 2020 03:38:08 -0400
+X-MC-Unique: 27GNLgHAPASwY-YYKh5Jsw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B2B38017CE;
+ Fri,  3 Apr 2020 07:38:06 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AB9EC99E09;
+ Fri,  3 Apr 2020 07:37:57 +0000 (UTC)
+Date: Fri, 3 Apr 2020 09:37:54 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests] fixup! arm/arm64: ITS: pending table
+ migration test
+Message-ID: <20200403073754.6q6njhh25s2zutic@kamzik.brq.redhat.com>
+References: <20200402145227.20109-1-eric.auger@redhat.com>
+ <20200402180148.490026-1-drjones@redhat.com>
+ <a13e00e8-b699-103a-af6c-7807b67f8c70@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402145434.99349-1-stefanha@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
+In-Reply-To: <a13e00e8-b699-103a-af6c-7807b67f8c70@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,64 +84,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org,
- Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
- Cole Robinson <crobinso@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 02, 2020 at 03:54:34PM +0100, Stefan Hajnoczi wrote:
-> When a file descriptor becomes ready we must re-arm POLL_ADD.  This is
-> done by adding an sqe to the io_uring sq ring.  The ->need_wait()
-> function wasn't taking pending sqes into account and therefore
-> io_uring_submit_and_wait() was not being called.  Polling for cqes
-> failed to detect fd readiness since we hadn't submitted the sqe to
-> io_uring.
->=20
-> This patch fixes the following tests/test-aio -p /aio/event/wait
-> failure:
->=20
->   ok 11 /aio/event/wait
->   **
->   ERROR:tests/test-aio.c:374:test_flush_event_notifier: assertion failed:=
- (aio_poll(ctx, false))
->=20
-> Reported-by: Cole Robinson <crobinso@redhat.com>
-> Fixes: 73fd282e7b6dd4e4ea1c3bbb3d302c8db51e4ccf
->        ("aio-posix: add io_uring fd monitoring implementation")
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  util/fdmon-io_uring.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+On Fri, Apr 03, 2020 at 07:07:10AM +0200, Auger Eric wrote:
+> Hi Drew,
+> 
+> On 4/2/20 8:01 PM, Andrew Jones wrote:
+> > [ Without the fix this test would hang, as timeouts don't work with
+> >   the migration scripts (yet). Use errata to skip instead of hang. ]
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  arm/gic.c  | 18 ++++++++++++++++--
+> >  errata.txt |  1 +
+> >  2 files changed, 17 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arm/gic.c b/arm/gic.c
+> > index ddf0f9d09b14..c0781f8c2c80 100644
+> > --- a/arm/gic.c
+> > +++ b/arm/gic.c
+> > @@ -12,6 +12,7 @@
+> >   * This work is licensed under the terms of the GNU LGPL, version 2.
+> >   */
+> >  #include <libcflat.h>
+> > +#include <errata.h>
+> >  #include <asm/setup.h>
+> >  #include <asm/processor.h>
+> >  #include <asm/delay.h>
+> > @@ -812,13 +813,23 @@ static void test_its_migration(void)
+> >  	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
+> >  }
+> >  
+> > +#define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
+> > +
+> >  static void test_migrate_unmapped_collection(void)
+> >  {
+> > -	struct its_collection *col;
+> > -	struct its_device *dev2, *dev7;
+> > +	struct its_collection *col = NULL;
+> > +	struct its_device *dev2 = NULL, *dev7 = NULL;
+> > +	bool test_skipped = false;
+> >  	int pe0 = 0;
+> >  	u8 config;
+> >  
+> > +	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
+> > +		report_skip("Skipping test, as this test hangs without the fix. "
+> > +			    "Set %s=y to enable.", ERRATA_UNMAPPED_COLLECTIONS);
+> > +		test_skipped = true;
+> > +		goto do_migrate;
+> out of curiosity why do you still do the migration and not directly return.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+That won't work for the same reason the migration failure doesn't work.
+The problem is with the migration scripts not completing when a migration
+test doesn't successfully migrate. I plan to fix that when I get a bit of
+time, and when I do, I'll post a patch removing this errata as well, as
+it will no longer be needed to avoid test hangs. Anybody testing on a
+kernel without the kernel fix after the migration scripts are fixed will
+just get an appropriate FAIL instead.
 
 Thanks,
-Stefano
+drew
 
->=20
-> diff --git a/util/fdmon-io_uring.c b/util/fdmon-io_uring.c
-> index 7e143ef515..b4d6109f20 100644
-> --- a/util/fdmon-io_uring.c
-> +++ b/util/fdmon-io_uring.c
-> @@ -295,7 +295,12 @@ static bool fdmon_io_uring_need_wait(AioContext *ctx=
-)
->          return true;
->      }
-> =20
-> -    /* Do we need to submit new io_uring sqes? */
-> +    /* Are there pending sqes to submit? */
-> +    if (io_uring_sq_ready(&ctx->fdmon_io_uring)) {
-> +        return true;
-> +    }
-> +
-> +    /* Do we need to process AioHandlers for io_uring changes? */
->      if (!QSLIST_EMPTY_RCU(&ctx->submit_list)) {
->          return true;
->      }
-> --=20
-> 2.25.1
->=20
+> 
+> Besides, what caused the migration to fail without 8c58be34494b is
+> bypassed so:
+> 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Tested-by: Eric Auger <eric.auger@redhat.com>
+> 
+> Thank you for the fixup
+> 
+> Eric
+> 
+> > +	}
+> > +
+> >  	if (its_setup1())
+> >  		return;
+> >  
+> > @@ -830,9 +841,12 @@ static void test_migrate_unmapped_collection(void)
+> >  	its_send_mapti(dev2, 8192, 0, col);
+> >  	gicv3_lpi_set_config(8192, LPI_PROP_DEFAULT);
+> >  
+> > +do_migrate:
+> >  	puts("Now migrate the VM, then press a key to continue...\n");
+> >  	(void)getchar();
+> >  	report_info("Migration complete");
+> > +	if (test_skipped)
+> > +		return;
+> >  
+> >  	/* on the destination, map the collection */
+> >  	its_send_mapc(col, true);
+> > diff --git a/errata.txt b/errata.txt
+> > index 7d6abc2a7bf6..b66afaa9c079 100644
+> > --- a/errata.txt
+> > +++ b/errata.txt
+> > @@ -5,4 +5,5 @@
+> >  9e3f7a296940    : 4.9                           : arm64: KVM: pmu: Fix AArch32 cycle counter access
+> >  7b6b46311a85    : 4.11                          : KVM: arm/arm64: Emulate the EL1 phys timer registers
+> >  6c7a5dce22b3    : 4.12                          : KVM: arm/arm64: fix races in kvm_psci_vcpu_on
+> > +8c58be34494b    : 5.6                           : KVM: arm/arm64: vgic-its: Fix restoration of unmapped collections
+> >  #---------------:-------------------------------:---------------------------------------------------
+> > 
+> 
+> 
 
 
