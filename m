@@ -7,95 +7,80 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3707FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1ECC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4FC820737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5494620737
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:40:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGwiBgif"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4FC820737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJv/itoy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5494620737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKQGm-0001y4-1Q
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 13:38:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56100)
+	id 1jKQIv-0003zA-Gn
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 13:40:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jKQCG-0004HO-W8
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:33:38 -0400
+ (envelope-from <eblake@redhat.com>) id 1jKQFu-00010n-Ep
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jKQCD-0002Yi-Ad
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:33:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55636
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jKQFt-0006oh-0p
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:37:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43254
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKQCA-0002VS-0b
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:33:31 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jKQFs-0006n6-Sy
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:37:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585935206;
+ s=mimecast20190719; t=1585935440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=V1BdZ+1FD20J+7FJXUiX3iZNrn1rFYrz/A/MkCPjcJI=;
- b=YGwiBgifUEb1+yxULzG5VFhxnl1D1DXWvxOtROApWlGVboSQ/D+xfJTVPJlwSK/ccsEynV
- VI7bLpvmhtbYlpVAVRH85g4oOdknmZEZN6ZcXU2f2Lin4iUuaqRDsvt967K9fKgpzReUAp
- 7yU7SBI/F72eK2rpnpun1+MBNpKvt8A=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-GPFX5giuP1GGqDrVloVZKA-1; Fri, 03 Apr 2020 13:33:23 -0400
-X-MC-Unique: GPFX5giuP1GGqDrVloVZKA-1
-Received: by mail-ed1-f72.google.com with SMTP id i10so6057940edk.13
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 10:33:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1PUwBr0dmRetM81rG+fW0RnAnduc84fHIF0VEUeAiLc=;
- b=cyLWOkGltfAd1izaCqsRZpw8IvekRrPKxFC8wTE3uRf9PrAdyvPWoapz8JF8VDQBnm
- PnMEpnh0uJea3llfzYp2A8OiLTYAJL3S3h1Lk7akiInPvtD07AuS8l+ij9hTHukQVi+V
- yNxKMOUVKi+rlm2Sq2grVYDPmSQV5Tsvx43eWYE9RD8qnE7k0FNDdrbltGXnUrho+MKg
- s4jq7ijOy9IUZXxtrn+lvBA0HWW2THIAsVsSBuuHNnirBg8+RNJ30kkfcB/2z2VS3xK8
- RDIuVg7yU+rfbw7++uSM4sAl27YVsax8rEszjx7eJ3wNBoTCxM6RSnCYr9588gVyN+Ku
- vTqw==
-X-Gm-Message-State: AGi0PuZ3SggmV+LK5NTV+KaXnJaqEX+3uQMZX2N1x33qt4cV+Rj4clei
- uKzajA39cbS0bZqPx6mmB3Y0wxIcGy3Q/HKeGh/Th0Nw4xfB/re2Si+wWwx1xk6yLaNNOTHhmDu
- yO9KBZXMgOMrqnqE=
-X-Received: by 2002:aa7:d4d1:: with SMTP id t17mr8911066edr.362.1585935202317; 
- Fri, 03 Apr 2020 10:33:22 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJMqlUf+czpz15Ry7P87bqfGkBsDVxTxENmq1M4lMUXNoZX42xikLI8cI2raxtXAXe2QPVXWA==
-X-Received: by 2002:aa7:d4d1:: with SMTP id t17mr8911052edr.362.1585935202169; 
- Fri, 03 Apr 2020 10:33:22 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id c19sm975163ejd.48.2020.04.03.10.33.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Apr 2020 10:33:21 -0700 (PDT)
+ bh=ZjIg7fGEkQnLRToFnma5xJJUMUduC/9Bq/Ewz1YShhE=;
+ b=IJv/itoy0ozTng0w4j9sRKfVvU8RWgYyZ/9eNy03SiCQKeiyo5I42hJo5wkiJdw1LoF7fg
+ uQH3H4tiedDSYActCspnbcyOpcousIOnzSH3HWFopqbB6OS2TyO0QUJh6JLobPjE0Mviyz
+ WCC9TDpSf5+MkFC97j34XlLxxxz2QEA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-LkFEHQxdNcauWS_JgJjT4w-1; Fri, 03 Apr 2020 13:37:14 -0400
+X-MC-Unique: LkFEHQxdNcauWS_JgJjT4w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FEBA801A2F;
+ Fri,  3 Apr 2020 17:37:13 +0000 (UTC)
+Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 03A49114818;
+ Fri,  3 Apr 2020 17:37:12 +0000 (UTC)
 Subject: Re: [PATCH-for-5.0?] configure: Do not leave sphinx in-tree artifacts
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 References: <20200403165422.21714-1-philmd@redhat.com>
  <CAFEAcA-BAvi3HEuvpMyyir9CqAbkg3nF3920zBVF-sPyFz++Rg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0438b8f1-91fd-5664-4375-2320a942ebea@redhat.com>
-Date: Fri, 3 Apr 2020 19:33:20 +0200
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <7c976a7a-beeb-e3ce-5760-e4239ff7dd1f@redhat.com>
+Date: Fri, 3 Apr 2020 12:37:12 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
 In-Reply-To: <CAFEAcA-BAvi3HEuvpMyyir9CqAbkg3nF3920zBVF-sPyFz++Rg@mail.gmail.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,7 +99,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/3/20 6:57 PM, Peter Maydell wrote:
+On 4/3/20 11:57 AM, Peter Maydell wrote:
 > On Fri, 3 Apr 2020 at 17:54, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
 >>
@@ -126,21 +111,31 @@ om> wrote:
 >> Reported-by: Eric Blake <eblake@redhat.com>
 >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >=20
-> This only happens for an in-tree build, right?
-
-Correct.
-
-> I think in
+> This only happens for an in-tree build, right? I think in
 > that case you're kind of OK with having random stuff
 > left in the source tree... It seems easy enough to suppress
 > them though, so I guess we might as well.
 
-Here is the post where Eric commented it:
-https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg00631.html
+It happens in VPATH too - and what's more, in VPATH, it is still=20
+creating it under srcdir rather than builddir, which feels like=20
+unnecessary pollution.  I was trying to prove whether 'make distclean'=20
+got us back to a pristine state; this was one of the files that escaped=20
+'make distclean', so our choice is to either add it to the clean rules,=20
+or to avoid creating it in the first place.  I like the approach of not=20
+creating it in the first place :)
 
->=20
-> thanks
-> -- PMM
->=20
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+That said,
+
+> +    PYTHONDONTWRITEBYTECODE=3Dyes "$sphinx_build" -c "$source_path/docs"=
+ -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
+
+is now even a longer line; is it worth adding \-newline to split it up?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
