@@ -2,88 +2,83 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C94CC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB19C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D92620757
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97EAD20757
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:52:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FF/0agqa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D92620757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5J2NHOf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97EAD20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKGBi-0004yK-CU
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 02:52:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34261)
+	id 1jKGBt-0005GD-PY
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 02:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jKGA2-0002g9-Jo
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:50:39 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jKGAC-00031I-66
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jKGA1-0002f7-Cx
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:50:38 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:38183)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
- id 1jKGA1-0002dH-4g; Fri, 03 Apr 2020 02:50:37 -0400
-Received: by mail-lf1-x141.google.com with SMTP id c5so4871785lfp.5;
- Thu, 02 Apr 2020 23:50:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=slzYGb+v5/dk7IKPCVP3MLpXBHHlWFIEKQjlrIrF0c0=;
- b=FF/0agqaVocaewikiG32abS/2mK/L00908lFmlV/SUouPIzROtTIzivtqTO3JalVoB
- q7BWFot06Rk0pTj9L8XW3POL3TPPl/3ornDCVGm1N19PGABFaNdv8OgmFtpJtdpkKGZl
- A/8KhL0RXt5oZ+sMxRUhO2wOADmx4bP5s9VXeOVNJz//m2JOl7HIIXHLIiZSogf9gYwi
- 5NXP19PbH1GQpxChecL5qBSPZKiqRnrdP54EkGxdQ7gbEcWomJaT/MqVUM4WrBX/xzSe
- G1gikpBmzIsNMhwcb5cS5+cnOqhomKmyTSm00ZQsUcXS2A0w2vPstx6Ed/8SH2bj4xkh
- ZGWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=slzYGb+v5/dk7IKPCVP3MLpXBHHlWFIEKQjlrIrF0c0=;
- b=oUtFBmd8Pbbta1xuL25dnVuBOH7f8J65E/Qt4kWNLMuKylyEfXHHizAGZvzAgnPT/j
- YgwAOICTo4UGwvbPlHWTEl9tG8WtPw27pRGYuePZVUivrsoMXcIhk67DUw+PWm9v1FHY
- etXwsF/7QmD1U1x6yRxPRvfDMcQQvhylygGvRvsKmZ3qc+j4o7U98RVPjDJtZ5MHxHOE
- P37/SK0KnHwBFc2KVXCquCDEQsrHZ2zO37o9Vn6Gueh/N7GRaWK4zC9u23kPk5VcTN0X
- mVpwPS+rT23xoAARGerIIrewvoZYP6v3HxBWiGLqNO8tEXAWhrtUZ+H0Eh19RdgOPWfC
- PuNA==
-X-Gm-Message-State: AGi0Pub04mr/O4UygUCeQb0rxkjocE2OAr9CuzBHjODB8C2wYKB2BK3O
- 5m6QxJ16ZYAJWC17DzXcu1Q=
-X-Google-Smtp-Source: APiQypJlAsexgQ9wiE9o1DFRGcV61ET9v+HaXtOWeQjsCNfyFdD1ury6tLlfRmF24Nyas2MfZY48Xw==
-X-Received: by 2002:ac2:545a:: with SMTP id d26mr4560260lfn.85.1585896635977; 
- Thu, 02 Apr 2020 23:50:35 -0700 (PDT)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- d8sm4807916lfm.28.2020.04.02.23.50.34
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 02 Apr 2020 23:50:35 -0700 (PDT)
-Date: Fri, 3 Apr 2020 08:50:33 +0200
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: Re: [PATCH v1 5/5] dma/xlnx-zdma: Reorg to fix CUR_DSCR
-Message-ID: <20200403065032.b6g6onhvvkvhfx5w@fralle-msi>
-References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
- <20200402134721.27863-6-edgar.iglesias@gmail.com>
+ (envelope-from <kraxel@redhat.com>) id 1jKGAA-0002p1-TC
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:50:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44652
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jKGAA-0002no-PS
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:50:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585896646;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cNX23+0EkkuuLBnny3uByfNuL03aQcE/4SjHEFpKkdw=;
+ b=K5J2NHOfX2nzbykgmR1ggzLKbdXLUXY9n/Gc4bFrtVfvh+cDqloCFI+ec3L348G3I2ZLSg
+ FV+9OKOzlPVt67wMmbsykk9UMAc4vbNKnVG2n+l5l8uajFoau4BCqHJjsrpe/lj+ct+XDF
+ PfhwJsJYniYlvEn6BUHouOphsXRbkzU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-314-nbygjGG3MXe-eNwULuhMzg-1; Fri, 03 Apr 2020 02:50:44 -0400
+X-MC-Unique: nbygjGG3MXe-eNwULuhMzg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB05E8017CE;
+ Fri,  3 Apr 2020 06:50:43 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-60.ams2.redhat.com
+ [10.36.113.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5601619756;
+ Fri,  3 Apr 2020 06:50:43 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 8001D1747F; Fri,  3 Apr 2020 08:50:42 +0200 (CEST)
+Date: Fri, 3 Apr 2020 08:50:42 +0200
+From: kraxel <kraxel@redhat.com>
+To: =?utf-8?B?YmF1ZXJjaGVuKOmZiOiSmeiSmSk=?= <bauerchen@tencent.com>
+Subject: Re: is just a wrong function name of libusb_get_port_number? request
+ for a review of the bug fix
+Message-ID: <20200403065042.cirj4ih3fl45wlqb@sirius.home.kraxel.org>
+References: <02a07a59c3964199b73b1145e4abe0e9@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <02a07a59c3964199b73b1145e4abe0e9@tencent.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20200402134721.27863-6-edgar.iglesias@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::141
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,107 +90,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me,
- richard.henderson@linaro.org, qemu-devel@nongnu.org,
- frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
- luc.michel@greensocs.com
+Cc: hdegoede <hdegoede@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On [2020 Apr 02] Thu 15:47:21, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Reorganize the descriptor handling so that CUR_DSCR always
-> points to the next descriptor to be processed.
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-
+On Thu, Apr 02, 2020 at 11:47:17AM +0000, bauerchen(=E9=99=88=E8=92=99=E8=
+=92=99) wrote:
+> From 6bfb3087866606ed36a21e7bd05f0674e6a97158 Mon Sep 17 00:00:00 2001
+> From: Bauerchen <bauerchen@tencent.com>
+> Date: Thu, 2 Apr 2020 19:19:00 +0800
+> Subject: [PATCH] Fix:fix the wrong function name of libusb_get_port_numbe=
+r
+>=20
+> [desc]:
+> libusb_get_port_numbers is called in function
+> usb_host_get_port, and qemu crashed with:
+> symbol lookup error: undefined symbol: libusb_get_port_numbers
+> I check /lib64/libusb-1.0.so.0 and output is libusb_get_port_number, I
+> change it to libusb_get_port_number, crash problem is gone;
+> so is it just a function name bug?
+>=20
+> Signed-off-by: Bauerchen <bauerchen@tencent.com>
 > ---
->  hw/dma/xlnx-zdma.c | 47 ++++++++++++++++++++++------------------------
->  1 file changed, 22 insertions(+), 25 deletions(-)
-> 
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index e856d233f2..1c45367f3c 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -333,10 +333,28 @@ static void zdma_load_src_descriptor(XlnxZDMA *s)
->      }
->  }
->  
-> +static void zdma_update_descr_addr(XlnxZDMA *s, bool type,
-> +                                   unsigned int basereg)
-> +{
-> +    uint64_t addr, next;
-> +
-> +    if (type == DTYPE_LINEAR) {
-> +        addr = zdma_get_regaddr64(s, basereg);
-> +        next = addr + sizeof(s->dsc_dst);
-> +    } else {
-> +        addr = zdma_get_regaddr64(s, basereg);
-> +        addr += sizeof(s->dsc_dst);
-> +        address_space_read(s->dma_as, addr, s->attr, (void *) &next, 8);
-> +    }
-> +
-> +    zdma_put_regaddr64(s, basereg, next);
-> +}
-> +
->  static void zdma_load_dst_descriptor(XlnxZDMA *s)
->  {
->      uint64_t dst_addr;
->      unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
-> +    bool dst_type;
->  
->      if (ptype == PT_REG) {
->          memcpy(&s->dsc_dst, &s->regs[R_ZDMA_CH_DST_DSCR_WORD0],
-> @@ -349,24 +367,10 @@ static void zdma_load_dst_descriptor(XlnxZDMA *s)
->      if (!zdma_load_descriptor(s, dst_addr, &s->dsc_dst)) {
->          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, AXI_RD_DST_DSCR, true);
->      }
-> -}
-> -
-> -static uint64_t zdma_update_descr_addr(XlnxZDMA *s, bool type,
-> -                                       unsigned int basereg)
-> -{
-> -    uint64_t addr, next;
->  
-> -    if (type == DTYPE_LINEAR) {
-> -        next = zdma_get_regaddr64(s, basereg);
-> -        next += sizeof(s->dsc_dst);
-> -        zdma_put_regaddr64(s, basereg, next);
-> -    } else {
-> -        addr = zdma_get_regaddr64(s, basereg);
-> -        addr += sizeof(s->dsc_dst);
-> -        address_space_read(s->dma_as, addr, s->attr, &next, 8);
-> -        zdma_put_regaddr64(s, basereg, next);
-> -    }
-> -    return next;
-> +    /* Advance the descriptor pointer.  */
-> +    dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3, TYPE);
-> +    zdma_update_descr_addr(s, dst_type, R_ZDMA_CH_DST_CUR_DSCR_LSB);
->  }
->  
->  static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
-> @@ -387,14 +391,7 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
->          dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
->                                SIZE);
->          if (dst_size == 0 && ptype == PT_MEM) {
-> -            uint64_t next;
-> -            bool dst_type = FIELD_EX32(s->dsc_dst.words[3],
-> -                                       ZDMA_CH_DST_DSCR_WORD3,
-> -                                       TYPE);
-> -
-> -            next = zdma_update_descr_addr(s, dst_type,
-> -                                          R_ZDMA_CH_DST_CUR_DSCR_LSB);
-> -            zdma_load_descriptor(s, next, &s->dsc_dst);
-> +            zdma_load_dst_descriptor(s);
->              dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
->                                    SIZE);
->          }
-> -- 
-> 2.20.1
-> 
+> =C2=A0hw/usb/host-libusb.c | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+> index 2ac7a93..713db8d 100644
+> --- a/hw/usb/host-libusb.c
+> +++ b/hw/usb/host-libusb.c
+> @@ -285,7 +285,7 @@ static int usb_host_get_port(libusb_device *dev, char=
+ *port, size_t len)
+> =C2=A0 =C2=A0 =C2=A0int rc, i;
+> =C2=A0
+> =C2=A0#if LIBUSB_API_VERSION >=3D 0x01000102
+> - =C2=A0 =C2=A0rc =3D libusb_get_port_numbers(dev, path, 7);
+> + =C2=A0 =C2=A0rc =3D libusb_get_port_number(dev, path, 7);
+
+Surely not that simple.  libusb_get_port_number isn't a drop-in
+replacement for libusb_get_port_numbers.  Also it was probably added
+later to libusb, so some LIBUSB_API_VERSION #ifdef will be needed so the
+one or the other will be used depending on the library version.
+
+cheers,
+  Gerd
+
 
