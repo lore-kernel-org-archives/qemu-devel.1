@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC1EC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDC7C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:01:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BAC5206E9
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:54:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 281712077D
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:01:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PgDa+7Ez"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BAC5206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBr49M5J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 281712077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKMmA-00040T-HQ
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 09:54:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36741)
+	id 1jKMtK-0006oO-7T
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:01:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37916)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jKMlF-0003ZN-C6
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:53:30 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jKMsH-0005xo-CS
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jKMlD-00085e-9X
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:53:29 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45124
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1jKMsG-0007Mp-1E
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:00:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60479
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jKMlD-00085G-6E
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:53:27 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKMsF-0007M8-Tz
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:00:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585922006;
+ s=mimecast20190719; t=1585922443;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=ZkxcBA3+FtaMSNeSqPsykBpuzDfcr3xJHjboFJ/V3kw=;
- b=PgDa+7EzXGjhog+R5PwRy8qCzPJMdB0xMzFBMIrPcnp010VmJ/H4jppsuV8SxJTAL42Wvm
- HgQdWwq/53YNpuXE4UzavRVLL/2u/Dj23oYT1W3P2rZWAsZXH/F3T2NNWlbjmZkAv7BdM+
- pd+EBUpLQsxmJsQvMGX1pnJflTqw22M=
+ bh=e/TOG1QFNaeICKnZrHUMIJhWhyfF+jKlfP1Oz7UKTn0=;
+ b=UBr49M5JJa7dw/DeC+WExj/c10y/xYbhBsFKTW1s4KaGgOu0c+giTaojF2wKOzB3iaUovg
+ wp0YTsO9mjk8QDY1plOY1mpsbXXsmAlYzPCR6duXS6qWHzhRBThiCaT72yx7vqXTjcmTM7
+ eIXG2mkvBAUYxT//jouRdz7csTGU4Ts=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-UR4r9RUyNJONz65uNVsltg-1; Fri, 03 Apr 2020 09:53:22 -0400
-X-MC-Unique: UR4r9RUyNJONz65uNVsltg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-471-5DwB3m9vMHWj2hldrlY5SA-1; Fri, 03 Apr 2020 10:00:26 -0400
+X-MC-Unique: 5DwB3m9vMHWj2hldrlY5SA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E304108594F;
- Fri,  3 Apr 2020 13:53:19 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.36.110.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BEF6060BF4;
- Fri,  3 Apr 2020 13:53:07 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 888E718B5FA0;
+ Fri,  3 Apr 2020 14:00:24 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 245425E000;
+ Fri,  3 Apr 2020 14:00:21 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 for-5.0] configure: warn if not using a separate build
- directory
-Date: Fri,  3 Apr 2020 14:53:06 +0100
-Message-Id: <20200403135306.665493-1-berrange@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Subject: [PATCH] nvdimm-utils: clean up headers and add license comment
+Date: Fri,  3 Apr 2020 10:00:18 -0400
+Message-Id: <20200403140018.13531-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,83 +83,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Liviu Ionescu <ilg@livius.net>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Michal=20Such=C3=A1nek?= <msuchanek@suse.de>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, sbhat@linux.ibm.com,
+ aik@ozlabs.ru, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Running configure directly from the source directory is a build
-configuration that will go away in future. It is also not currently
-covered by any automated testing. Display a deprecation warning if
-the user attempts to use an in-srcdir build setup, so that they are
-aware that they're building QEMU in an undesirable manner.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Fixes: 3f350f6bb36233be50fc2bc18dc78b6a948a5dbe
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
+ include/qemu/nvdimm-utils.h |  2 --
+ util/nvdimm-utils.c         | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 2 deletions(-)
 
-Changed in v4:
-  - Adopted Eric's suggested wording
-
- configure | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/configure b/configure
-index 22870f3867..d275c36c85 100755
---- a/configure
-+++ b/configure
-@@ -285,6 +285,16 @@ then
-   error_exit "main directory cannot contain spaces nor colons"
- fi
+diff --git a/include/qemu/nvdimm-utils.h b/include/qemu/nvdimm-utils.h
+index 4b8b198ba7..1f1dae477f 100644
+--- a/include/qemu/nvdimm-utils.h
++++ b/include/qemu/nvdimm-utils.h
+@@ -1,7 +1,5 @@
+ #ifndef NVDIMM_UTILS_H
+ #define NVDIMM_UTILS_H
 =20
-+canon_build_path=3D$(realpath -- "$PWD")
-+canon_source_path=3D$(realpath -- "$source_path")
+-#include "qemu/osdep.h"
+-
+ GSList *nvdimm_get_device_list(void);
+ #endif
+diff --git a/util/nvdimm-utils.c b/util/nvdimm-utils.c
+index 5cc768ca47..ca41d39af5 100644
+--- a/util/nvdimm-utils.c
++++ b/util/nvdimm-utils.c
+@@ -1,3 +1,32 @@
++/*
++ * NVDIMM utilities
++ *
++ * Copyright(C) 2015 Intel Corporation.
++ *
++ * Author:
++ *  Xiao Guangrong <guangrong.xiao@linux.intel.com>
++ *
++ * NFIT is defined in ACPI 6.0: 5.2.25 NVDIMM Firmware Interface Table (NF=
+IT)
++ * and the DSM specification can be found at:
++ *       http://pmem.io/documents/NVDIMM_DSM_Interface_Example.pdf
++ *
++ * Currently, it only supports PMEM Virtualization.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licens=
+es/>
++ */
 +
-+in_srcdir=3Dno
-+if [ "$canon_build_path" =3D "$canon_source_path" ]
-+then
-+    in_srcdir=3Dyes
-+fi
-+
-+
- # default parameters
- cpu=3D""
- iasl=3D"iasl"
-@@ -6751,6 +6761,22 @@ if test "$supported_os" =3D "no"; then
-     echo "us upstream at qemu-devel@nongnu.org."
- fi
++#include "qemu/osdep.h"
+ #include "qemu/nvdimm-utils.h"
+ #include "hw/mem/nvdimm.h"
 =20
-+if test "$in_srcdir" =3D "yes"; then
-+    echo
-+    echo "WARNING: SUPPORT FOR BUILDING IN THE SOURCE DIR IS DEPRECATED"
-+    echo
-+    echo "Support for running the 'configure' script directly from the"
-+    echo "source directory is deprecated. In-tree builds are not covered"
-+    echo "by automated testing and thus may not correctly build QEMU."
-+    echo "Users are recommended to use a separate build directory:"
-+    echo
-+    echo "  $ mkdir build"
-+    echo "  $ cd build"
-+    echo "  $ ../configure"
-+    echo "  $ make"
-+    echo
-+fi
-+
- config_host_mak=3D"config-host.mak"
-=20
- echo "# Automatically generated by configure - do not modify" >config-all-=
-disas.mak
 --=20
-2.24.1
+2.18.1
 
 
