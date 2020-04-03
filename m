@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F0FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0DBC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00A4920757
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D724D20757
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:03:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvBod/5X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00A4920757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OiimzsnB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D724D20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKJ9X-0001DH-4A
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 06:02:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33508)
+	id 1jKJAH-0002Ph-To
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 06:03:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jKJ8R-0008SK-VP
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:01:13 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jKJ9Q-0001MN-TM
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jKJ8Q-00078q-FJ
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:01:11 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28895
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1jKJ9P-00083S-Ls
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:02:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48785
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKJ8Q-000783-Ae
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:01:10 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKJ9P-000838-Gr
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:02:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585908069;
+ s=mimecast20190719; t=1585908131;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zKruF7v0noXtQUSlv3KIzvm1lgIaTvg/OJ5vbnaO0/s=;
- b=FvBod/5X0hkzwpEZ+733N+91kqbflDXxdpthTgNvWY5g7P2jxoiUFBHzP6uOhkAGOnGEX4
- 8TCRNjSwIToKzq2iSHNC5fzphHdac1RYdfZt3j3XuOw+aBSchg3jZ3KQ3xDra0lQ7emzun
- JGEyqCCLk7tSnlYher5uWJKIPTtgZGY=
+ bh=/elLgDl8fpYabDxKGBJXVlDfsBbk758p2L/y6alXjEw=;
+ b=OiimzsnBumjDL7uOUHTrmcBwj+4yv5mBaIxOla2gVdJjVJZ2d2CFzCT9fJZblVQm/HC/tY
+ GZnZtg4T6j78Pq+Doj1pDgVBUFjV35oZx3+WihV3kZ77brFHbvdLHSnM0GUaMAOvNJJfsB
+ PXICo3wHJaXenqyG9uIIUf/DixKJsTM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-zGuhiDvIOeGwtHbi4-gC_A-1; Fri, 03 Apr 2020 06:01:07 -0400
-X-MC-Unique: zGuhiDvIOeGwtHbi4-gC_A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-412-cSQEX1ssNc2YSzNy__0WUA-1; Fri, 03 Apr 2020 06:02:09 -0400
+X-MC-Unique: cSQEX1ssNc2YSzNy__0WUA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5D738017F6;
- Fri,  3 Apr 2020 10:01:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 906898017F5;
+ Fri,  3 Apr 2020 10:02:08 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5F6BD97AE8;
- Fri,  3 Apr 2020 10:00:54 +0000 (UTC)
-Date: Fri, 3 Apr 2020 12:00:52 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B8FD60BF1;
+ Fri,  3 Apr 2020 10:01:56 +0000 (UTC)
+Date: Fri, 3 Apr 2020 12:01:55 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 04/12] acpi: serial: don't use _STA method
-Message-ID: <20200403120052.5a40bb3f@redhat.com>
-In-Reply-To: <20200403080502.8154-5-kraxel@redhat.com>
+Subject: Re: [PATCH v2 05/12] acpi: parallel: don't use _STA method
+Message-ID: <20200403120155.6f3a4d50@redhat.com>
+In-Reply-To: <20200403080502.8154-6-kraxel@redhat.com>
 References: <20200403080502.8154-1-kraxel@redhat.com>
- <20200403080502.8154-5-kraxel@redhat.com>
+ <20200403080502.8154-6-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,7 +95,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  3 Apr 2020 10:04:54 +0200
+On Fri,  3 Apr 2020 10:04:55 +0200
 Gerd Hoffmann <kraxel@redhat.com> wrote:
 
 > The _STA method dates back to the days where we had a static DSDT.  The
@@ -106,32 +106,26 @@ Gerd Hoffmann <kraxel@redhat.com> wrote:
 > 
 > These days the DSDT is generated by qemu anyway, so if a device is not
 > present we can simply drop it from the DSDT instead.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-I'd drop this patch and squash commit message into 8/12,
-but I don't insist since get_system_io() added here is removed by 8/12,
-so either way 
+same as 4/12 applies
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-
-also for patches that modify DSDT, see comment at the start of tests/qtest/bios-tables-test.c
-to make 'make check' happy and don't break tests during bisection 
-
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/i386/acpi-build.c | 32 ++++++++------------------------
->  1 file changed, 8 insertions(+), 24 deletions(-)
+>  hw/i386/acpi-build.c | 29 ++++++++---------------------
+>  1 file changed, 8 insertions(+), 21 deletions(-)
 > 
 > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 214b98671bf2..08433a06039f 100644
+> index 08433a06039f..5d2b9b099684 100644
 > --- a/hw/i386/acpi-build.c
 > +++ b/hw/i386/acpi-build.c
-> @@ -1218,50 +1218,34 @@ static Aml *build_lpt_device_aml(void)
+> @@ -1183,39 +1183,26 @@ static Aml *build_mouse_device_aml(void)
 >      return dev;
 >  }
 >  
-> -static Aml *build_com_device_aml(uint8_t uid)
-> +static void build_com_device_aml(Aml *scope, uint8_t uid)
+> -static Aml *build_lpt_device_aml(void)
+> +static void build_lpt_device_aml(Aml *scope)
 >  {
 >      Aml *dev;
 >      Aml *crs;
@@ -140,26 +134,16 @@ to make 'make check' happy and don't break tests during bisection
 > -    Aml *else_ctx;
 > -    Aml *zero = aml_int(0);
 > -    Aml *is_present = aml_local(0);
-> -    const char *enabled_field = "CAEN";
->      uint8_t irq = 4;
->      uint16_t io_port = 0x03F8;
->  
->      assert(uid == 1 || uid == 2);
->      if (uid == 2) {
-> -        enabled_field = "CBEN";
->          irq = 3;
->          io_port = 0x02F8;
->      }
-> +    if (!memory_region_present(get_system_io(), io_port)) {
+> +
+> +    if (!memory_region_present(get_system_io(), 0x0378)) {
 > +        return;
 > +    }
 >  
->      dev = aml_device("COM%d", uid);
->      aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
->      aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
+>      dev = aml_device("LPT");
+>      aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
 >  
 > -    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
-> -    aml_append(method, aml_store(aml_name("%s", enabled_field), is_present));
+> -    aml_append(method, aml_store(aml_name("LPEN"), is_present));
 > -    if_ctx = aml_if(aml_equal(is_present, zero));
 > -    {
 > -        aml_append(if_ctx, aml_return(aml_int(0x00)));
@@ -174,25 +158,23 @@ to make 'make check' happy and don't break tests during bisection
 > +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
 >  
 >      crs = aml_resource_template();
->      aml_append(crs, aml_io(AML_DECODE16, io_port, io_port, 0x00, 0x08));
->      aml_append(crs, aml_irq_no_flags(irq));
+>      aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+>      aml_append(crs, aml_irq_no_flags(7));
 >      aml_append(dev, aml_name_decl("_CRS", crs));
 >  
 > -    return dev;
 > +    aml_append(scope, dev);
 >  }
 >  
->  static void build_isa_devices_aml(Aml *table)
-> @@ -1279,8 +1263,8 @@ static void build_isa_devices_aml(Aml *table)
+>  static void build_com_device_aml(Aml *scope, uint8_t uid)
+> @@ -1262,7 +1249,7 @@ static void build_isa_devices_aml(Aml *table)
+>      if (fdc) {
 >          aml_append(scope, build_fdc_device_aml(fdc));
 >      }
->      aml_append(scope, build_lpt_device_aml());
-> -    aml_append(scope, build_com_device_aml(1));
-> -    aml_append(scope, build_com_device_aml(2));
-> +    build_com_device_aml(scope, 1);
-> +    build_com_device_aml(scope, 2);
+> -    aml_append(scope, build_lpt_device_aml());
+> +    build_lpt_device_aml(scope);
+>      build_com_device_aml(scope, 1);
+>      build_com_device_aml(scope, 2);
 >  
->      if (ambiguous) {
->          error_report("Multiple ISA busses, unable to define IPMI ACPI data");
 
 
