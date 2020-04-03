@@ -3,89 +3,94 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3293CC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EEBC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE13520721
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61FD320721
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bjz8oRyZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE13520721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKa2a8kJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61FD320721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKLYj-0001j1-6D
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:36:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54112)
+	id 1jKLaR-00033T-JM
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:38:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jKLXk-0001Ck-Q3
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:35:30 -0400
+ (envelope-from <mst@redhat.com>) id 1jKLZh-0002Us-9X
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jKLXj-0002AU-RX
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:35:28 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38940)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jKLXj-0002AA-Hl
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:35:27 -0400
-Received: by mail-wm1-x341.google.com with SMTP id e9so7512733wme.4
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 05:35:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=dpESpO8aTr8pgvgRO6vwygG/EoOgtGErhywXRIcQWWg=;
- b=bjz8oRyZu1U0nPP40998OtzYBUruO7JQYXtooke2EAYEq48eIs63vxPPlS3njb5JyX
- xIjCoqWvp0af2dLiCUZdk3pm6yj+iDZihg+C8V6rtEfVj37B3GDBkgghNwIh98YRLBRB
- gilwghbFTLzvrO/VQKhtuDLHTc8jJPz7WwRBsEpiNpl1/pcTtQ0ODm3/XzS7UoKaF7FP
- B6HHHi8CY0mu9mVWsGaXtmA11bISjKtkSE7PwGUmGLrtunTILGzcwIo7y+xdDcW2pHzL
- IinWj0T83ZqT73LH80klZvz4PZoet0LlVDfg0dEqNIzqYop52Jd68jceQsH8QwGyL9kM
- 22zA==
+ (envelope-from <mst@redhat.com>) id 1jKLZf-00037m-Lu
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:37:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49441
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jKLZf-00037S-Da
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:37:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585917446;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Dd1gkcBsl4njgioJ3kCx8Bc/7yuYJ5E+utr3qgh6SW4=;
+ b=CKa2a8kJJMxmuh47t2tFfYaLuZdhczYmLqNkoQYXtb6RfUDCP+Lhd52OT/8t+dUHyC2S3O
+ cixUNboLZj2nQ/8gvGLefIPW5smM9iEfTkq+uW96FSsNO4PujB/Y2w3oAvOFO2m3Qlqv01
+ LgUyD/BIpUQmPBBUWVXXIDg/z0yUyao=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-e-4DvIHONW-D6hg_bTnzSQ-1; Fri, 03 Apr 2020 08:37:19 -0400
+X-MC-Unique: e-4DvIHONW-D6hg_bTnzSQ-1
+Received: by mail-wm1-f71.google.com with SMTP id z24so1987966wml.9
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 05:37:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=dpESpO8aTr8pgvgRO6vwygG/EoOgtGErhywXRIcQWWg=;
- b=CvZMuWQ9cDCcNNv951Ay8ye6Xahlwbmk97uCwumKlQPD9yZahfEc3pvut+F0nkTBsq
- FKNVpX1D1WwNVoABtK7vDO+IrcrPrDzQ24YjZUw7+WtIORRGrteOBix8Ew2p9+yBo8bP
- AhHP3G+mbPTYqFKoYk1bj2kq4zxWuourkVTIbIRd7rgoop0+VpRJ+QQyqfs/7oDCgITH
- dbhwQx9Dn+9oEkZPz7Vq64Gc04S6ziGmD97mChv2DVJ3UbqoMUcq7ut5BTgfFuNm87zj
- z57SF6LomznNy1LqSYQ8lG4X5+ZRD396AmebuyfLQJqrJaEdQXlO8w62LBmPLU5IvpFs
- 3eIg==
-X-Gm-Message-State: AGi0PuYPw769aZ62Cgj7DiF1vvKi/fji88mitatw1aUAKOf25yZLzRJ5
- eUasSm1vycW4mmCKaz6dYHkClg==
-X-Google-Smtp-Source: APiQypL/Zb3ej6kMFg5awPOxASZYIlLOrBIBiyehx9Hfqii44p31xsNb2srWLTz99QldZ9GABq1A2w==
-X-Received: by 2002:a1c:de87:: with SMTP id v129mr8654489wmg.68.1585917325908; 
- Fri, 03 Apr 2020 05:35:25 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g3sm12095325wrm.66.2020.04.03.05.35.24
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=1OMInO7xK8SDssDQloHnMaMaMNNBWAVLV22fE4/2ta4=;
+ b=fQUoFnh5/bMBvtABAmjcZ6WHJAD8IjZjEJGgp/4vLW8IHm2iW7ffgnv82I95LDoV7U
+ Rj97yYElIVV7cBCawCgVYatBxZlGCILhByFwDkBWGd3+BsZm6gtVLEMAJOgTr5gN/mfW
+ 1v89Xr2fG8R0vEWRSsfHbcNNGoEdN648XmpZ5Vc5eSTaNxtSXcTRd3KMBolAjrEts7vX
+ gE1J38oI8HhIZ6ZI3IuHaSy1i4/suliyjdJSpEznP38GOqkNZd2eaB9otiTWrz6Vw9qg
+ 4w7tQvG9MJrxTGqMPTf/0tPpWyJJzcj7Pr1I0XCGmQMaJtPsil4zOJ0gUQ/r1IBXtjgw
+ FlmA==
+X-Gm-Message-State: AGi0Pua4zmhNxaO3LQM51zGTyzvdxmYKlRv3GxAlwhzVDD7beAus29mS
+ AOVaHz9p8Acl4srDvybQxUW1EUrn3S1DDEGQ7pCVr/H5N4lLJu0FKxmC2IzhGDJM8TZNsKeFzsX
+ vrk099X0D4PXeJvg=
+X-Received: by 2002:a1c:a7c4:: with SMTP id q187mr8452791wme.88.1585917438565; 
+ Fri, 03 Apr 2020 05:37:18 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK5BgjNHY68i/NMHonlX9o7WtUdpXblyviYKgKFA2uaokzcToIH7QJqMXjzAc3Z6Kz2C/hwNA==
+X-Received: by 2002:a1c:a7c4:: with SMTP id q187mr8452762wme.88.1585917438336; 
+ Fri, 03 Apr 2020 05:37:18 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+ by smtp.gmail.com with ESMTPSA id i1sm11592848wrq.89.2020.04.03.05.37.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 05:35:24 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C21D01FF7E;
- Fri,  3 Apr 2020 13:35:23 +0100 (BST)
-References: <20200401094759.5835-1-alex.bennee@linaro.org>
- <20200401094759.5835-9-alex.bennee@linaro.org>
- <9efb706f-e296-a1b8-6c77-b859a68a8357@linaro.org>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 08/10] linux-user: factor out reading of /proc/self/maps
-In-reply-to: <9efb706f-e296-a1b8-6c77-b859a68a8357@linaro.org>
-Date: Fri, 03 Apr 2020 13:35:23 +0100
-Message-ID: <87blo8eohg.fsf@linaro.org>
+ Fri, 03 Apr 2020 05:37:17 -0700 (PDT)
+Date: Fri, 3 Apr 2020 08:37:14 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH for-5.0 v2 0/3] acpi: Fixes for inconsistency in ACPI MR
+ size during migration
+Message-ID: <20200403083639-mutt-send-email-mst@kernel.org>
+References: <20200403101827.30664-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200403101827.30664-1-shameerali.kolothum.thodi@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,50 +102,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
+ shannon.zhaosl@gmail.com, david@redhat.com, linuxarm@huawei.com,
+ qemu-devel@nongnu.org, xuwei5@hisilicon.com, dgilbert@redhat.com,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, imammedo@redhat.com,
+ lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Apr 03, 2020 at 11:18:24AM +0100, Shameer Kolothum wrote:
+> This is to fix few issues discovered while adding NVDIMM hot-add
+> support to arm/virt. These were previously part of [1] and since
+> the fixes are generic in nature and might be an issue in x86 as
+> well, they are being treated separately now.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+OK I'll queue this unless someone has any objections.
 
-> On 4/1/20 2:47 AM, Alex Benn=C3=A9e wrote:
->> +typedef struct {
->> +    uint64_t start;
->> +    uint64_t end;
-> ...
->> +                errors  =3D qemu_strtoul(fields[0], &end, 16, &e->start=
-);
->> +                errors +=3D qemu_strtoul(end + 1, NULL, 16, &e->end);
->
-> uint64_t vs unsigned long -- you want qemu_strtou64.
->
->> +                errors +=3D qemu_strtoul(fields[2], NULL, 16, &e->offse=
-t);
->
-> Likewise.
+> 1. https://patchwork.kernel.org/patch/11432371/
+>=20
+> v1 --> V2
+>  - patch #2, Addressed comments from Dave and MST
+>=20
+> Updates from [1]:
+>  -Added R-by and A-by tags.
+>  -Edited commit log for patch#2
+>  -Updated patch#3 as per David's comment
+>=20
+> David Hildenbrand (1):
+>   exec: Fix for qemu_ram_resize() callback
+>=20
+> Shameer Kolothum (2):
+>   acpi: Use macro for table-loader file name
+>   fw_cfg: Migrate ACPI table mr sizes separately
+>=20
+>  exec.c                      | 16 ++++++-
+>  hw/arm/virt-acpi-build.c    |  2 +-
+>  hw/core/machine.c           |  1 +
+>  hw/i386/acpi-build.c        |  2 +-
+>  hw/nvram/fw_cfg.c           | 91 ++++++++++++++++++++++++++++++++++++-
+>  include/hw/acpi/aml-build.h |  1 +
+>  include/hw/nvram/fw_cfg.h   |  6 +++
+>  7 files changed, 114 insertions(+), 5 deletions(-)
+>=20
+> --=20
+> 2.17.1
+>=20
 
-Actually I went to using unsigned longs in the structure as that is the
-natural size for host map info.
-
->
->> +                /* A bit ugly as strsplit doesn't skip multiple separat=
-ors */
->> +                if (g_strv_length(fields) > 6) {
->> +                    e->path =3D g_strdup(fields[g_strv_length(fields) -=
- 1]);
->> +                }
->
-> And if the path contains spaces?
-
-interesting bugs I guess - I'll see if I can do a cleaner pass.
->
->
-> r~
-
-
---=20
-Alex Benn=C3=A9e
 
