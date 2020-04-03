@@ -2,107 +2,89 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD046C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8675BC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91F612073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:11:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F34A2077D
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:13:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="grFCUDU1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91F612073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+snF9FP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F34A2077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKM6A-0006Br-Jd
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 09:11:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58869)
+	id 1jKM8v-0007VS-HU
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 09:13:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jKM5K-0005ei-60
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:10:11 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jKM80-0006sa-Oh
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:12:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jKM5I-0005Sx-LL
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:10:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23178
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jKM5I-0005Rx-GS
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:10:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585919408;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=qauU3fXtiJLJzZUPeVT/XrDy6WMM4+JenuqJbhfEx1U=;
- b=grFCUDU129r0LkdoopUxoYtoVMSci8uGemh44ZrxrFXmpIuanENhqLrB0oYQDn98UV3fIK
- AUYf409+BkVfFQ0di0zDvg6zsPua9IMyGkd1bYJTF+nKNgTSNlmg5UYbHRzTxOzOBSNNnV
- 4O8qr+XVRjihDpZKGfVpJ7R+ullEQ+c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-T9A7brYxPTCeCZ0SJQ8dcw-1; Fri, 03 Apr 2020 09:09:57 -0400
-X-MC-Unique: T9A7brYxPTCeCZ0SJQ8dcw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16733107ACC7;
- Fri,  3 Apr 2020 13:09:56 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-97.ams2.redhat.com
- [10.36.113.97])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E9F93AF;
- Fri,  3 Apr 2020 13:09:54 +0000 (UTC)
-Subject: Re: [PATCH for-5.0] vpc: Don't round up already aligned BAT sizes
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200402093603.2369-1-kwolf@redhat.com>
- <e379efcd-58ef-c9bb-0ae8-b3435f30d141@redhat.com>
- <20200403120400.GC5336@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7112a410-d081-24e0-fbd2-d8739e6a84df@redhat.com>
-Date: Fri, 3 Apr 2020 15:09:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <npiggin@gmail.com>) id 1jKM7z-0001BJ-1u
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:12:56 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42023)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1jKM7w-00010p-EF; Fri, 03 Apr 2020 09:12:52 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 22so3444656pfa.9;
+ Fri, 03 Apr 2020 06:12:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:cc:references:in-reply-to:mime-version
+ :user-agent:message-id:content-transfer-encoding;
+ bh=dUXqULEwWnQ5kJLds2Ke+YiiqXZE3O4cLsDuyGKIOqs=;
+ b=U+snF9FPGkDkhANqtLkD8bzXiGm1cIEx4W198D82lWh3VblAWcUrhSnmhnUFrYAcV6
+ GWrMIPxUMLpKyY7AH0L0HtFUET+OmnWvve9Oikf9pdHGToc0LiOCq/MSpECcHSm1NIqn
+ utUmtxQiOJ4RuYmZAH2Nd3jNdWKUotGn9OwaXAblYCeFd8EhKczAKpDMwnn0Cve865EJ
+ z9MFLPPiCbxj+NRg6nKtQ/m2Y7p8noTH1pSeRwPSIfwKgqEGHT7wk05X/6nPw+wNiyoF
+ OLd54oq/WdGkH8dsrG1w0+1L9JWUxVFY9VRyi1+5jFafgsfdX2h2v88BLK5AraV1cQhQ
+ HxIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+ :mime-version:user-agent:message-id:content-transfer-encoding;
+ bh=dUXqULEwWnQ5kJLds2Ke+YiiqXZE3O4cLsDuyGKIOqs=;
+ b=eDQ4NgmvZlBZo0ovPVKKKgIzqb7tfp2XvTkSj4yOdxVGuxEWEpaXkULWeHLCCBXEwh
+ P2wc442EW8ua9/DkoorPqVtBRMXLBkJNurN8nFZmRxppVrLYSyOvyODy0nfbduXFsgOM
+ qSkI1dL7Or/Ax+mSp3dZtX8kN9ISayG+UG/jHWNFsQMLCwTGus9qJk3q8+d6yw45e7lC
+ faBg8rt/D0mN5+kW52EpMIAR8MrsnOEFADNZcLLBvFR+VfeKPPIdorl9vUSWo0s9dlt1
+ 9h0bZC8NqF11SndXX7xmwWyaWNALCEy5MKWfI6R4vVBxeg9dZEhqembdz4cbjAPk2ejp
+ 7qBw==
+X-Gm-Message-State: AGi0PuaKY7RUbVFy3G64c2wzrGYhFgAHUGU1stpbxj01Fwq830iMujrx
+ ywcuR82DQfVdTIysFKuoTNE=
+X-Google-Smtp-Source: APiQypLLSM4penPCT48jUs/qzbdf40wsrk5FPZi2rBAqQqAs6CccFSdkCNjveVo59c7fBPDnx29vwA==
+X-Received: by 2002:a63:784f:: with SMTP id t76mr8586063pgc.204.1585919571145; 
+ Fri, 03 Apr 2020 06:12:51 -0700 (PDT)
+Received: from localhost (60-241-117-97.tpgi.com.au. [60.241.117.97])
+ by smtp.gmail.com with ESMTPSA id w205sm5788322pfc.75.2020.04.03.06.12.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Apr 2020 06:12:50 -0700 (PDT)
+Date: Fri, 03 Apr 2020 23:12:36 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 2/5] ppc/pnv: Add support for NMI interface
+To: =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org
+References: <20200325144147.221875-1-npiggin@gmail.com>
+ <20200325144147.221875-3-npiggin@gmail.com>
+ <c1cdf2a2-afe9-8771-2c00-7e6a79d5e532@kaod.org>
+ <1585899319.9tofsl4fd9.astroid@bobo.none>
+In-Reply-To: <1585899319.9tofsl4fd9.astroid@bobo.none>
 MIME-Version: 1.0
-In-Reply-To: <20200403120400.GC5336@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Ceg9A4ccInktbq10PDJSOxM4pI9zmxX3G"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1585915002.kqdz9mya1i.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,78 +96,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ceg9A4ccInktbq10PDJSOxM4pI9zmxX3G
-Content-Type: multipart/mixed; boundary="e6jOGu5SXOGqYLZgbXR7vfRhiCwBT3WnN"
-
---e6jOGu5SXOGqYLZgbXR7vfRhiCwBT3WnN
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 03.04.20 14:04, Kevin Wolf wrote:
-> Am 03.04.2020 um 10:55 hat Max Reitz geschrieben:
->> On 02.04.20 11:36, Kevin Wolf wrote:
->>> As reported on Launchpad, Azure apparently doesn't accept images for
->>> upload that are not both aligned to 1 MB blocks and have a BAT size tha=
-t
->>> matches the image size exactly.
->>>
->>> As far as I can tell, there is no real reason why we create a BAT that
->>> is one entry longer than necessary for aligned image sizes, so change
->>> that.
->>>
->>> (Even though the condition is only mentioned as "should" in the spec an=
-d
->>> previous products accepted larger BATs - but we'll try to maintain
->>> compatibility with as many of Microsoft's ever-changing interpretations
->>> of the VHD spec as possible.)
->>
->> So as far as I can tell we still don=E2=80=99t ensure that the image is =
-aligned
->> to 1 MB blocks?
->>
->> Well, as long as it=E2=80=99s at least possible for the user to create v=
-alid
->> images, that=E2=80=99s better.
+Nicholas Piggin's on April 3, 2020 5:57 pm:
+> C=C3=A9dric Le Goater's on March 26, 2020 2:38 am:
+>> [ Please use clg@kaod.org ! ]
+>>=20
+>> On 3/25/20 3:41 PM, Nicholas Piggin wrote:
+>>> This implements the NMI interface for the PNV machine, similarly to
+>>> commit 3431648272d ("spapr: Add support for new NMI interface") for
+>>> SPAPR.
+>>>=20
+>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>=20
+>> one minor comment,
+>>=20
+>> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>=20
+>>> ---
+>>>  hw/ppc/pnv.c | 30 +++++++++++++++++++++++++++++-
+>>>  1 file changed, 29 insertions(+), 1 deletion(-)
+>>>=20
+>>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>>> index b75ad06390..671535ebe6 100644
+>>> --- a/hw/ppc/pnv.c
+>>> +++ b/hw/ppc/pnv.c
+>>> @@ -27,6 +27,7 @@
+>>>  #include "sysemu/runstate.h"
+>>>  #include "sysemu/cpus.h"
+>>>  #include "sysemu/device_tree.h"
+>>> +#include "sysemu/hw_accel.h"
+>>>  #include "target/ppc/cpu.h"
+>>>  #include "qemu/log.h"
+>>>  #include "hw/ppc/fdt.h"
+>>> @@ -34,6 +35,7 @@
+>>>  #include "hw/ppc/pnv.h"
+>>>  #include "hw/ppc/pnv_core.h"
+>>>  #include "hw/loader.h"
+>>> +#include "hw/nmi.h"
+>>>  #include "exec/address-spaces.h"
+>>>  #include "qapi/visitor.h"
+>>>  #include "monitor/monitor.h"
+>>> @@ -1955,10 +1957,35 @@ static void pnv_machine_set_hb(Object *obj, boo=
+l value, Error **errp)
+>>>      }
+>>>  }
+>>>=20
+>>> +static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, run_on_cpu_data arg)
+>>> +{
+>>> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>> +    CPUPPCState *env =3D &cpu->env;
+>>> +
+>>> +    cpu_synchronize_state(cs);
+>>> +    ppc_cpu_do_system_reset(cs);
+>>> +    /*
+>>> +     * SRR1[42:45] is set to 0100 which the ISA defines as implementat=
+ion
+>>=20
+>> I see 'System Reset' in ISA 3.0
+>>> +     * dependent. POWER processors use this for xscom triggered interr=
+upts,
+>>> +     * which come from the BMC or NMI IPIs.
+>>> +     */
+>>> +    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
+>>=20
+>> So we could have used the skiboot SPR_SRR1_PM_WAKE_SRESET define ?=20
 >=20
-> Yes, we still allow other image sizes because Azure is not the only
-> product using VHD images, but it is the only one (to my knowledge) that
-> makes this requirement.
+> Ah, that's only for power-saving wakeup. But you got me to dig further
+> and I think I've got a few things wrong here.
 >=20
-> We're trying to stay compatible with at least three different Microsoft
-> products (VirtualPC, HyperV, Azure) that all have their own
-> interpretation of the spec and are inconsistent with each other.
+> The architectural power save wakeup due to sreset bit 43 needs to be
+> set, probably in excp_helper.c if (msr_pow) test.
+>=20
+>     case POWERPC_EXCP_RESET:     /* System reset exception               =
+    */
+>         /* A power-saving exception sets ME, otherwise it is unchanged */
+>         if (msr_pow) {
+>             /* indicate that we resumed from power save mode */
+>             msr |=3D 0x10000;
+>             new_msr |=3D ((target_ulong)1 << MSR_ME);
+>         }
 
-OK, nice.  Thanks for the explanation!
+Sorry I'm wrong, that's the old MSR_POW thing I guess G5 had it.
 
-Max
+'stop' state wakeup is powerpc_reset_wakeup of course, which seems to
+do the right thing with SRR1.
 
+Something like this patch should fix this issue in the ppc-5.1 branch.
+This appears to do the right thing with SRR1 in testing with Linux.
 
---e6jOGu5SXOGqYLZgbXR7vfRhiCwBT3WnN--
+---
+ hw/ppc/pnv.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
---Ceg9A4ccInktbq10PDJSOxM4pI9zmxX3G
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index ac83b8698b..596ccfd99e 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -1964,12 +1964,21 @@ static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, run=
+_on_cpu_data arg)
+=20
+     cpu_synchronize_state(cs);
+     ppc_cpu_do_system_reset(cs);
+-    /*
+-     * SRR1[42:45] is set to 0100 which the ISA defines as implementation
+-     * dependent. POWER processors use this for xscom triggered interrupts=
+,
+-     * which come from the BMC or NMI IPIs.
+-     */
+-    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
++    if (env->spr[SPR_SRR1] & PPC_BITMASK(46, 47)) {
++        /* system reset caused wake from power saving state */
++        if (!(env->spr[SPR_SRR1] & PPC_BIT(43))) {
++            warn_report("ppc_cpu_do_system_reset does not set system reset=
+ wakeup reason");
++            env->spr[SPR_SRR1] |=3D PPC_BIT(43);
++        }
++    } else {
++        /*
++	 * For non-powersave wakeup system resets, SRR1[42:45] are defined to
++	 * be implementation dependent. Set to 0b0010, which POWER9 UM defines
++	 * to be interrupt caused by SCOM, which can come from the BMC or NMI
++	 * IPIs.
++         */
++        env->spr[SPR_SRR1] |=3D PPC_BIT(44);
++    }
+ }
+=20
+ static void pnv_nmi(NMIState *n, int cpu_index, Error **errp)
+--=20
+2.23.0
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6HNZ8ACgkQ9AfbAGHV
-z0Aolgf7BdJ2fKPLWyRMQsL53CwLk4Y8erebCrQBfgjO+4mi+DTqM0N+mQKrHEhr
-sBVJvRXwrduVSJLAKKx3lj9TrTXj03VY24mvP6h31h/lKQRQphTTg0cwRuDXXd7/
-qVJvtIzmIIE+35OSi8It1osjd89LH6BYfTNajwXh4tQz9MUEETsvZULGUMhEJP2N
-F77FjxCdCV7ex8EXTncRbhnivgwapy8WrkL/+X9lS72tJmhCnX7tfB2CI6lBtlX+
-RD+deq3/wCZH5dCd/RNHhuvSpcQTCVp0HhHX2793lue8ey6n1gxQwifJf7O1tKFo
-VaD+kPTiKCM2XAvmgJsr6NOBECIkiQ==
-=n1UY
------END PGP SIGNATURE-----
-
---Ceg9A4ccInktbq10PDJSOxM4pI9zmxX3G--
-
+=
 
