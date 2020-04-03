@@ -2,128 +2,93 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EAEBC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D31A1C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63840206F5
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:19:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63840206F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+	by mail.kernel.org (Postfix) with ESMTPS id 6369620737
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:31:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhVSvNfe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6369620737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKPyY-0004NV-7I
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 13:19:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44359)
+	id 1jKQAG-0001Ad-CN
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 13:31:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mail@maciej.szmigiero.name>) id 1jKPxg-0003wH-1G
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:18:33 -0400
+ (envelope-from <philmd@redhat.com>) id 1jKQ8K-0007ql-PZ
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mail@maciej.szmigiero.name>) id 1jKPxe-0006Ey-KK
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:18:31 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:45752)
+ (envelope-from <philmd@redhat.com>) id 1jKQ8J-0006Yo-0O
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:29:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40842
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mail@maciej.szmigiero.name>)
- id 1jKPxe-0006Di-Cu
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:18:30 -0400
-Received: from MUA
- by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- (Exim 4.93.0.4) (envelope-from <mail@maciej.szmigiero.name>)
- id 1jKPxU-0001hh-6N; Fri, 03 Apr 2020 19:18:20 +0200
-Subject: Re: [PATCH v1 5/5] i386: Hyper-V VMBus ACPI DSDT entry
-To: Jon Doron <arilou@gmail.com>
-References: <20200403142308.82990-1-arilou@gmail.com>
- <20200403142308.82990-6-arilou@gmail.com>
- <76017793-735b-4bb5-0e69-ecded78af54d@maciej.szmigiero.name>
- <CAP7QCog_EmLJ=O8Xi9Tc4Jst1=z62DXim9ScCyoPv7WugrSyOw@mail.gmail.com>
- <CAP7QCogMdUis-=KsC--0ar2Zt2Vwcpn4HS+qCxPn5khtDTu+mA@mail.gmail.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Autocrypt: addr=mail@maciej.szmigiero.name; prefer-encrypt=mutual; keydata=
- mQINBFpGusUBEADXUMM2t7y9sHhI79+2QUnDdpauIBjZDukPZArwD+sDlx5P+jxaZ13XjUQc
- 6oJdk+jpvKiyzlbKqlDtw/Y2Ob24tg1g/zvkHn8AVUwX+ZWWewSZ0vcwp7u/LvA+w2nJbIL1
- N0/QUUdmxfkWTHhNqgkNX5hEmYqhwUPozFR0zblfD/6+XFR7VM9yT0fZPLqYLNOmGfqAXlxY
- m8nWmi+lxkd/PYqQQwOq6GQwxjRFEvSc09m/YPYo9hxh7a6s8hAP88YOf2PD8oBB1r5E7KGb
- Fv10Qss4CU/3zaiyRTExWwOJnTQdzSbtnM3S8/ZO/sL0FY/b4VLtlZzERAraxHdnPn8GgxYk
- oPtAqoyf52RkCabL9dsXPWYQjkwG8WEUPScHDy8Uoo6imQujshG23A99iPuXcWc/5ld9mIo/
- Ee7kN50MOXwS4vCJSv0cMkVhh77CmGUv5++E/rPcbXPLTPeRVy6SHgdDhIj7elmx2Lgo0cyh
- uyxyBKSuzPvb61nh5EKAGL7kPqflNw7LJkInzHqKHDNu57rVuCHEx4yxcKNB4pdE2SgyPxs9
- 9W7Cz0q2Hd7Yu8GOXvMfQfrBiEV4q4PzidUtV6sLqVq0RMK7LEi0RiZpthwxz0IUFwRw2KS/
- 9Kgs9LmOXYimodrV0pMxpVqcyTepmDSoWzyXNP2NL1+GuQtaTQARAQABtDBNYWNpZWogUy4g
- U3ptaWdpZXJvIDxtYWlsQG1hY2llai5zem1pZ2llcm8ubmFtZT6JAlQEEwEIAD4CGwMFCwkI
- BwIGFQoJCAsCBBYCAwECHgECF4AWIQRyeg1N257Z9gOb7O+Ef143kM4JdwUCXnd1OwUJBKdh
- dgAKCRCEf143kM4Jd1gXD/919+uXxCZ3zT4bT9wiuarM6vJ3zgaLugJTsPlOawjLs7BfQsYA
- qU7FsylpYKBqXkau5/qRQebC6mtMwmCwXGyT7LO0WMnaX8j8LLl9qKZEzJ1byE0HAzAty3sy
- PTClkFTQpfafbWMu9NhbpJY9LIdIy5GgfbIX9TInjCAHFE2Vmh3T8G9F2VzjX8+wG3WvCXR0
- UiqTapSzypfS9P9UYBHk2JlSFFowJNLOCYRVXPkC5DhLt6eCtJ1GUFsC1/0R5BdohI0lHy9h
- bfDJWq5vEQY9trkxa3uT/zObtMCd5TxxUothDz14Bb5a1YBcae+M9YXDRJf1t2nUhlvDs1im
- JGy6Sd8+9ZDGN+BFcL/ehiI9m/Rt6rVvRWzwraqSotxt9yp5eLU74o/lMj+tJ0K4w8wldPNt
- PFUEU0TzaHdySPze4/pZMpi1lO8+xjGYmXQkoF2lFzbrABvodQXmbGRJeG2iQ//JDsvM4Lau
- sZ23xo4r/NoHxxltRaUzvph0QcI7pD18XDet5BClz5J0CgQ+4/4vcCpmzKCGwNNILdiVObY9
- nk/emMiQwSsJRg/ksi7sS/XOb+K7yfZj2f/IMy6hH7pQdRSOLcUm0f/lq7YVNCe1aZIPMbJJ
- 2BmiWnzcJBtLj1NOYiQl41J56PkOoey28jOOQtQhGuzHbkEaP0IWplXY+LkBjQRaRrtSAQwA
- 1c8skXiNYGgitv7X8osxlkOGiqvy1WVV6jJsv068W6irDhVETSB6lSc7Qozk9podxjlrae9b
- vqfaJxsWhuwQjd+QKAvklWiLqw4dll2R3+aanBcRJcdZ9iw0T63ctD26xz84Wm7HIVhGOKsS
- yHHWJv2CVHjfD9ppxs62XuQNNb3vP3i7LEto9zT1Zwt6TKsJy5kWSjfRr+2eoSi0LIzBFaGN
- D8UOP8FdpS7MEkqUQPMI17E+02+5XCLh33yXgHFVyWUxChqL2r8y57iXBYE/9XF3j4+58oTD
- ne/3ef+6dwZGyqyP1C34vWoh/IBq2Ld4cKWhzOUXlqKJno0V6pR0UgnIJN7SchdZy5jd0Mrq
- yEI5k7fcQHJxLK6wvoQv3mogZok4ddLRJdADifE4+OMyKwzjLXtmjqNtW1iLGc/JjMXQxRi0
- ksC8iTXgOjY0f7G4iMkgZkBfd1zqfS+5DfcGdxgpM0m9EZ1mhERRR80U6C+ZZ5VzXga2bj0o
- ZSumgODJABEBAAGJA/IEGAEIACYCGwIWIQRyeg1N257Z9gOb7O+Ef143kM4JdwUCXnd1jQUJ
- BKdhOwHAwPQgBBkBCAAdFiEE4ndqq6COJv9aG0oJUrHW6VHQzgcFAlpGu1IACgkQUrHW6VHQ
- zgdztQv+PRhCVQ7KUuQMEvMaH+rc1GIaHT6Igbvn77bEG1Kd39jX3lJDdyZXrVqxFylLu64r
- +9kHeCslM+Uq/fUM94od7cXGkvCW7ST1MUGQ3g+/rAf88F5l+KjUzLShw2sxElP+sjGQGQ4z
- Llve5MarGtV4TH6dJlDXZTtxwHotHZDiA2bUeJYLlMAggwLM/rBS9xfytMNuFk8U0THR/TVw
- vu3VymjdOjJnSecFyu9iRskRXc8LA9JxqDbfmETePg1dPehxiwgMvdi3WdYk4BB1wMl0MdnU
- 2Ea3AdjU3nX+Uc/npPMvDuzai9ZA7/tVG1RaQhIElL85+A5Tb2Wzl0IoO1kTafkaQNBOStEe
- O1fhLSz5/3Dt+dOOqxp7VuwSHqEXb3jc6WgnwZiimF8vvGzE2PNBAuIAwGItY2fkpGblbmmN
- b/qYZEjdbVNjfJXyVyez//QoiUrQk2sC9nNL7zYTEMocuJFN90a2158h5ve1qBT0jpUx69Ok
- yR8/DxnAEmj04WSoCRCEf143kM4Jd+u9EADMw9JIY/eQBaqmGDBeGA/a4FpraT7p9zGgOLE7
- t8L3CvCDFb+M1hiyMDmUGPYacY5Ki5dGKqdd8S51nLBqmce7SoXo+gtU/8xJjzq5vC9EO4No
- Mvfyw+far7nGt5mh4S+n0l9K54QMN6owXvyT47c+eqmzOBbMyI5+cV7iks76+lnKK6M9vHpB
- 4KFSOn8v8jbqy1Vlyyeq5V7vpmSJi7ViMyDCAX5rZ+0vsJOdIdY5eOjp6yhfloQrIBD0BWKS
- Y5zIKCJogkQllM9myec0yaYcMtdqS7ZdNCCfz1u4uWXDPfV4I14CXVOt5rEqRSm0Smh38rSx
- fXEM/vBcJ5nEjL0Z5eXOIncItIaIdwe1sIvCNhQONuK8zH6u0qxpuvFsWN+Q8JUEQAmFnv8j
- 8cV+cnY3iNcIDwk/fzE/MaVJKMbqGiWc4sP8JsRoMaheNyYADCuUME6rrrQZU66hHWxafRBX
- 3Yj/z2v+lKECIAAuWdAnvQKIaPTmeWT9x17RmGz0jIlds1zzGBSyz3fFKio6cyUJjKGa+Qx5
- nCBXdh8wc2o1PzAD1sdSwoGQqCy0lZE2wO23iBpG51gFwTETK+LsY4aM6Asd4BWki+thWgg+
- 11JC/69sK/0cZe0NqlgsC9QOXH0pgANWA28eK+V2WaC61682Jn4qjEbhl1iuE3m7jv0HjrkB
- jQRaRrwiAQwAxnVmJqeP9VUTISps+WbyYFYlMFfIurl7tzK74bc67KUBp+PHuDP9p4ZcJUGC
- 3UZJP85/GlUVdE1NairYWEJQUB7bpogTuzMI825QXIB9z842HwWfP2RW5eDtJMeujzJeFaUp
- meTG9snzaYxYN3r0TDKj5dZwSIThIMQpsmhH2zylkT0jH7kBPxb8IkCQ1c6wgKITwoHFjTIO
- 0B75U7bBNSDpXUaUDvd6T3xd1Fz57ujAvKHrZfWtaNSGwLmUYQAcFvrKDGPB5Z3ggkiTtkmW
- 3OCQbnIxGJJw/+HefYhB5/kCcpKUQ2RYcYgCZ0/WcES1xU5dnNe4i0a5gsOFSOYCpNCfTHtt
- VxKxZZTQ/rxjXwTuToXmTI4Nehn96t25DHZ0t9L9UEJ0yxH2y8Av4rtf75K2yAXFZa8dHnQg
- CkyjA/gs0ujGwD+Gs7dYQxP4i+rLhwBWD3mawJxLxY0vGwkG7k7npqanlsWlATHpOdqBMUiA
- R22hs02FikAoiXNgWTy7ABEBAAGJAjwEGAEIACYCGwwWIQRyeg1N257Z9gOb7O+Ef143kM4J
- dwUCXnd1vwUJBKdgnQAKCRCEf143kM4JdzeUEACX0GJUt5QjtJRcRatnxpREcVXW5cQNy4UZ
- eSd+p6oNgLIgQzgkRTu5H08RYQHCLmy2Z2hHm4JHyHNRiQC3G7+oOt17vFEr+lCnEovCyE7i
- lvAbwJIbP75FcV1ORXDKGIowfaKxLx6LmEDZ1SQnFt3wpqb0Jo5savUDacxQjllxCaYpJcRU
- tSKay4FMFI7oFmo2dqaTD/05Eo6Gp1FgqwEFJDdTP5/0E4d6Wg/GxnUKAJORKneWMQxuawcx
- uq2dw+PxfosoNb0vrYtW5JfOgiINHp+hNuUkybjLdNuo5//lACynSn5e1MVuVdTZU4kDnMUm
- dJyxyifHe2wOUzlSiGCzcYZyUU7OMH3Dq9hPaI10ibgNmN+AroU1+D/Br8nmm41R4Xwha3n/
- XrylP3YEQ2u8JbO85V29ilz5bAd+/HfVCoPmgPctEu/CNPaP2vbRVKfzI29NBEQU5l41Rfnl
- OKsKYKdxxSBO//jLy3C28NmRTy2cdWpCo67o3mkkuPRYSFk0GgF1GF5cadLYSGsclXhK28lK
- 0fzoMtI8coxOB9BoaKYkbM5ZPq7rN/wDN4y7s1lWNUGPkz0/fUxBvhX744CTIKTqs6ln5XnX
- svlJMx2hstfnVZ3kp2yBpJvdskUeZTZQnKIwLTfGEj0sCBLG5ncoUQmmTKOGBIT5AggItm4t sg==
-Message-ID: <9b9c42d3-af9e-25e9-210e-c58ee5975941@maciej.szmigiero.name>
-Date: Fri, 3 Apr 2020 19:18:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKQ8H-0006XM-CX
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:29:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585934967;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=R3GkLnBVrlygAh564ijQ2XeDEBB+bc8f6Pu1+Pf2bBI=;
+ b=NhVSvNfeC/Fd2usg1wiwbySnsPRX1w/UzDvJvHpQNpHM20zKIG8v7ur+2d/s7CYabhAqpV
+ ds/vhZOqbthWOYB2YGcmxp6VRRQXgNDTFupSkg0JgvJ4dwMUFO9auIy/Ib25nPzsw7CXNh
+ DmHFJwLRfVXE/1YNYdCagVb+yzIzvmk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-iZHomVdsNDu2yDBEI4NcCQ-1; Fri, 03 Apr 2020 13:29:24 -0400
+X-MC-Unique: iZHomVdsNDu2yDBEI4NcCQ-1
+Received: by mail-wr1-f69.google.com with SMTP id 88so763626wrq.4
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 10:29:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=GpI5xzk/jCg0uIJw2Hn3RlhyjeM4huSMz4ugb5HgNa0=;
+ b=TbnmsoaPqqnmco1QvFme+SbZAQqM0PyGM2C/STxwrmHSoN3fp7UidUyj5LkHbRXZ9A
+ c1R81SI9j7XMHTWTs6ctYvquYoCg0I2PCoE/ejISUgxqaGpCJdTqAH1S2aeegyDUkAd1
+ Cf9lcv6vA4RFuHmPcR39NvYqww4dyUrYyXdAvTDUwZhl8TugQ0lkQNZTdKc6GeDs3sg0
+ sxCxdh/Pgb3Z+zuH72VPwXWgtGU6Itpyzgq760zz/k4Tx4Eo1Vx5Awi2XQXMnaLPPeZy
+ Z970p+e/oDtz0QQFxodgqr3Hs2tMAqaRcUDEfW7BAmw2kNkgK1yHrowXyIeKDz4qj/SH
+ zeSA==
+X-Gm-Message-State: AGi0Pubq+jCtgHEzFlNbs1hcRLSstzwXu0PWk+fsDYBN3W5DJo5W4f7j
+ h1C2vp7n1m2Wa4dzlOGOAI2S+WnwlalpGuLlvj8GeCRyjXqMtvFFoyOaTKDJo81hjoao1LACv++
+ Q/8lQqq5jcY2tbEo=
+X-Received: by 2002:a1c:3b89:: with SMTP id i131mr9698540wma.35.1585934962960; 
+ Fri, 03 Apr 2020 10:29:22 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLtmjZw7w0GY+KaNNR8UBc1AJk3+nny6WQpgnahAwRjky7F8NOee4gz1H/tcY9Zn2n5kG+u1Q==
+X-Received: by 2002:a1c:3b89:: with SMTP id i131mr9698523wma.35.1585934962724; 
+ Fri, 03 Apr 2020 10:29:22 -0700 (PDT)
+Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id a7sm11740330wmm.34.2020.04.03.10.29.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Apr 2020 10:29:21 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+Subject: [PATCH-for-5.0 0/8] Acceptance tests queue
+Date: Fri,  3 Apr 2020 19:29:11 +0200
+Message-Id: <20200403172919.24621-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <CAP7QCogMdUis-=KsC--0ar2Zt2Vwcpn4HS+qCxPn5khtDTu+mA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 37.28.154.113
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,80 +100,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Evgeny Yakovlev <eyakovlev@virtuozzo.com>, ehabkost@redhat.com,
- QEMU <qemu-devel@nongnu.org>, Liran Alon <liran.alon@oracle.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Fabien Chouteau <chouteau@adacore.com>, Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ qemu-ppc@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jon,
+I'm planning to send the first 5 patches as
+This series contains acceptance test fixes, and Travis-CI
+improvements. I plan to send a pull request with the first
+6 patches for v5.0-rc2. The last 3 patches helped debugging
+painfully the Travis failures, but can not be used because
+Avocado 78.0 is not released yet.
 
-The patches are available here:
-https://github.com/maciejsszmigiero/qemu.git in "vmbus-patches" branch.
+Patches 3 and 5 are not reviewed.
 
-Please note that these patches don't have Roman's "Signed-off-by:" tags,
-so I haven't applied mine, either.
+Up-to-patch 5 job:
+https://travis-ci.org/github/philmd/qemu/jobs/670645531
 
-If you are able to establish a proper SoB chain then please also add:
-"Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>".
+All patches job:
+https://travis-ci.org/github/philmd/qemu/jobs/670645611
 
-Thanks for the effort,
-Maciej
+Oksana Vohchana (1):
+  Acceptance test: Fix to EXEC migration
 
-On 03.04.2020 17:30, Jon Doron wrote:
->  Thank you Maciej it seems like your version is really ahead I'll do
-> the required work and merge it so i can submit a v2 with the latest
-> patchset from Roman
-> 
-> On Fri, Apr 3, 2020 at 6:06 PM Jon Doron <arilou@gmail.com> wrote:
->>
->> Thank you Maciej, I based it on top of what Denis (den@openvz.org) gave me
->> which was this:
->> https://ftp.openvz.org/virtuozzo/releases/openvz-7.0.12-288/source/SRPMS/q/qemu-kvm-vz-2.12.0-33.vz7.14.4.src.rpm
->>
->> Do you think you have a more recent version I dont mind diffing and
->> resubmitting a new version of the patchset?
->>
->> Thanks,
->> -- Jon.
->>
->> On Fri, Apr 3, 2020 at 5:56 PM Maciej S. Szmigiero
->> <mail@maciej.szmigiero.name> wrote:
->>>
->>> Hi Jon,
->>>
->>> On 03.04.2020 16:23, Jon Doron wrote:
->>>> Guest OS uses ACPI to discover vmbus presence.  Add a corresponding
->>>> entry to DSDT in case vmbus has been enabled.
->>>>
->>>> Experimentally Windows guests were found to require this entry to
->>>> include two IRQ resources, so this patch adds two semi-arbitrarily
->>>> chosen ones (7 and 13).  This results, in particular, in parallel port
->>>> conflicting with vmbus.
->>>>
->>>> TODO: discover and use spare IRQs to avoid conflicts.
->>>>
->>>> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
->>>> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
->>>> Signed-off-by: Jon Doron <arilou@gmail.com>
->>>
->>> Nice work, thanks!
->>>
->>> However, it seems to be based on the code version that was posted in
->>> February 2018, and not the latest version in OpenVZ qemu repository
->>> dated October 2019:
->>> https://src.openvz.org/projects/UP/repos/qemu/commits?until=refs%2Fheads%2Fvmbus
->>>
->>> This newer version has slightly different API here and there.
->>> Any particular reason for selecting that older version for porting?
->>>
->>> I have actually rebased this latest version on the top of the current
->>> QEMU master, and it basically seems to work fine.
->>> However, I haven't done extensive tests whether there isn't a memory leak
->>> somewhere or so on.
->>>
->>> Maciej
+Philippe Mathieu-Daud=C3=A9 (7):
+  tests/acceptance/ppc_prep_40p: Use cdn.netbsd.org hostname
+  tests/acceptance/ppc_prep_40p: Use mirror for ftp.software.ibm.com
+  tests/acceptance/machine_sparc_leon3: Disable HelenOS test
+  .travis.yml: Cache acceptance-test assets
+  tests/Makefile: Add fetch-acceptance-assets rule
+  .travis.yml: Run fetch-acceptance-assets before check-acceptance
+  NOTFORMERGE Kludge for Avocado issue #3661
+
+ .travis.yml                             | 4 +++-
+ tests/Makefile.include                  | 7 +++++++
+ tests/acceptance/machine_sparc_leon3.py | 4 ++++
+ tests/acceptance/migration.py           | 6 +++---
+ tests/acceptance/ppc_prep_40p.py        | 7 ++++---
+ tests/requirements.txt                  | 2 +-
+ 6 files changed, 22 insertions(+), 8 deletions(-)
+
+--=20
+2.21.1
 
 
