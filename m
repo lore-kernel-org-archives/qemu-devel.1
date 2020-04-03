@@ -2,77 +2,81 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 762B9C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:38:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CFAC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:40:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C84C20721
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:38:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A92F20721
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:40:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtRTRokb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C84C20721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tfWfa1aW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A92F20721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKGun-00065n-9C
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:38:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39670)
+	id 1jKGwa-00077T-Al
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:40:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1jKGu5-0005YH-BO
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:38:14 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jKGvz-0006cc-57
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:40:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1jKGu3-0004JG-Gi
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:38:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58538
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1jKGu3-0004IY-Av
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:38:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585899490;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/ShhmZm72SQhR4eIFmmC27wtjg2NRVT2I6JWq3826bM=;
- b=gtRTRokb4+lf8kRy3aO0kg1NW4jTTZw6r3aYXY9Obrw/WLKQQTcXNSPtmrwvea3Fq4n46O
- 6lDXJyxn/QfdN+pLu1p85RjZEL0FfzE16EnhrpJPKVEm+zRqYyHFrSo4b2K+mgtLYPU3G/
- nl9Dx7/HoJfRzsUCgnsRJInGeyxa6ts=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-27GNLgHAPASwY-YYKh5Jsw-1; Fri, 03 Apr 2020 03:38:08 -0400
-X-MC-Unique: 27GNLgHAPASwY-YYKh5Jsw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B2B38017CE;
- Fri,  3 Apr 2020 07:38:06 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB9EC99E09;
- Fri,  3 Apr 2020 07:37:57 +0000 (UTC)
-Date: Fri, 3 Apr 2020 09:37:54 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests] fixup! arm/arm64: ITS: pending table
- migration test
-Message-ID: <20200403073754.6q6njhh25s2zutic@kamzik.brq.redhat.com>
-References: <20200402145227.20109-1-eric.auger@redhat.com>
- <20200402180148.490026-1-drjones@redhat.com>
- <a13e00e8-b699-103a-af6c-7807b67f8c70@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jKGvx-0005iv-NY
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:40:10 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40660)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jKGvx-0005iR-Hl
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:40:09 -0400
+Received: by mail-ot1-x342.google.com with SMTP id r19so6340639otn.7
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 00:40:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=HqGl59/0JvIhcYk7SQe+U2SamldG+Jua+pGUe02QquA=;
+ b=tfWfa1aWyoTD1lO+emeeP7+w5TizgZEXZBrgr/ik0hf/pWfCpqUJyglSy3blZxqaJ0
+ YOzkqVoUIAarcLFmgvky5tZpnFDU93jJKqWpJ5OwVZwHWvUPgCEkIUMERt6okZOrZVvY
+ PdKy/oghGZddfzhZPmV0w3Tga/XcHyIUm8uOCi2BXigZbHwwDMFxopJ0ikCvAdApIGuV
+ WKEC1rEE+XGv5EsBJ9wPJqZzXqPNYhHdNgfYLtoz+ypz8W2sA7LuOzbw0UFscju80XIl
+ phbsnrjZZdMsZ8psELzVNs/uyPXHcMAeSCdSszuWO1rQVI0WsCG9mx9ZtrCC4wsURPom
+ Pl2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=HqGl59/0JvIhcYk7SQe+U2SamldG+Jua+pGUe02QquA=;
+ b=BdONy5WNPMoqYvJScb7xXOnmgiLlSeTG3WnHJySQltnC1pgrIucaHV3836VAm9otkC
+ d7HrmdLnCEb2O7R7OkWdnTnlf4L6oyq/f3FDqq/U06wBoe5+2D8RaZxCFREwu1HxFr6O
+ OX5IaMyl5rS2mDQdkEksxjKT+fdKoyzDj/wNXFhwX4c7G9n4g1jkHZ/Xq2Juk6CpfUQI
+ 1Na72ZELIEXKAOU5b0jaYylLbQakWDrLLjdTq/SYJlRbAIuXCe7HUUEE8WDAGuBJsfQJ
+ vx5RU+QUU8bffIkDG3Sjl7z52KW4dMotlg/ZCUwj737vlQgCi/M50HeCWsttbt76TWux
+ 6oHA==
+X-Gm-Message-State: AGi0PuZoiHSlN18MBdBJo08L4DvhbHsqKzdZRpqOUVjUgCm4nmVqJ3Nd
+ 2sreF8whgRVPeY39gRr+lldf4yMPLUVL67rVih0ITw==
+X-Google-Smtp-Source: APiQypLHVEpuSmLCS27FcsJqox4rb2k3e0uMhslUGNpg84KjbJBQTNKgRegEFE1uhQHUgZWAKfL5/9W8WgRQLtmkkEQ=
+X-Received: by 2002:a05:6830:11d5:: with SMTP id
+ v21mr5455785otq.91.1585899608581; 
+ Fri, 03 Apr 2020 00:40:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a13e00e8-b699-103a-af6c-7807b67f8c70@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <XSF-9CLAGYMG1ivdwoihQBZm3XT2vWdKVqHtMLExgA1LJwkSeISDoKKVEJ3E3qhZaNvki44j2CdXdQ81ljytvtS0MGmXL3gFhO2kQmWA2Kk=@protonmail.com>
+In-Reply-To: <XSF-9CLAGYMG1ivdwoihQBZm3XT2vWdKVqHtMLExgA1LJwkSeISDoKKVEJ3E3qhZaNvki44j2CdXdQ81ljytvtS0MGmXL3gFhO2kQmWA2Kk=@protonmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Apr 2020 08:39:57 +0100
+Message-ID: <CAFEAcA_-aRethWOmzaKqft8yMg6dGUUwvf1kX36R4+R=yWS2RA@mail.gmail.com>
+Subject: Re: Qemu doesn't detect hard drive
+To: "Aijaz.Baig" <Aijaz.Baig@protonmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,113 +88,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Apr 03, 2020 at 07:07:10AM +0200, Auger Eric wrote:
-> Hi Drew,
-> 
-> On 4/2/20 8:01 PM, Andrew Jones wrote:
-> > [ Without the fix this test would hang, as timeouts don't work with
-> >   the migration scripts (yet). Use errata to skip instead of hang. ]
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  arm/gic.c  | 18 ++++++++++++++++--
-> >  errata.txt |  1 +
-> >  2 files changed, 17 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arm/gic.c b/arm/gic.c
-> > index ddf0f9d09b14..c0781f8c2c80 100644
-> > --- a/arm/gic.c
-> > +++ b/arm/gic.c
-> > @@ -12,6 +12,7 @@
-> >   * This work is licensed under the terms of the GNU LGPL, version 2.
-> >   */
-> >  #include <libcflat.h>
-> > +#include <errata.h>
-> >  #include <asm/setup.h>
-> >  #include <asm/processor.h>
-> >  #include <asm/delay.h>
-> > @@ -812,13 +813,23 @@ static void test_its_migration(void)
-> >  	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
-> >  }
-> >  
-> > +#define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
-> > +
-> >  static void test_migrate_unmapped_collection(void)
-> >  {
-> > -	struct its_collection *col;
-> > -	struct its_device *dev2, *dev7;
-> > +	struct its_collection *col = NULL;
-> > +	struct its_device *dev2 = NULL, *dev7 = NULL;
-> > +	bool test_skipped = false;
-> >  	int pe0 = 0;
-> >  	u8 config;
-> >  
-> > +	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
-> > +		report_skip("Skipping test, as this test hangs without the fix. "
-> > +			    "Set %s=y to enable.", ERRATA_UNMAPPED_COLLECTIONS);
-> > +		test_skipped = true;
-> > +		goto do_migrate;
-> out of curiosity why do you still do the migration and not directly return.
+On Fri, 3 Apr 2020 at 06:18, Aijaz.Baig <Aijaz.Baig@protonmail.com> wrote:
+> I would now like to add a hard disk for persistent storage and then trans=
+fer control from busybox initrd based rootfs over to the full fledged versi=
+on offered with Linux. So I add it to the command line
+>
+> `sudo qemu-system-arm -m 1024M -M vexpress-a9 -D qemu.log -drive if=3Dnon=
+e,format=3Draw,file=3Ddisk.img -kernel buildroot-2019.02.5/output/images/zI=
+mage -dtb buildroot-2019.02.5/output/images/vexpress-v2p-ca9.dtb -append "c=
+onsole=3DttyAMA0,115200 kgdboc=3Dkbd,ttyAMA0,115200 ip=3Ddhcp nokaslr" -ini=
+trd buildroot-2019.02.5/output/images/rootfs.cpio -nographic -net nic -net =
+bridge,br=3Dmybridge -s
 
-That won't work for the same reason the migration failure doesn't work.
-The problem is with the migration scripts not completing when a migration
-test doesn't successfully migrate. I plan to fix that when I get a bit of
-time, and when I do, I'll post a patch removing this errata as well, as
-it will no longer be needed to avoid test hangs. Anybody testing on a
-kernel without the kernel fix after the migration scripts are fixed will
-just get an appropriate FAIL instead.
+This command line creates a "drive" object but doesn't plug it in to anythi=
+ng
+(it's like asking QEMU to model a board, with a hard drive sat next to it
+on the desk but no cable between them :-))
 
-Thanks,
-drew
+More generally, the vexpress-a9 board does not support hard disks.
+This is because the real hardware we're modelling here has no disk
+drive interfaces and no PCI or similar bus that you could plug a
+scsi controller into. The best it can do for storage is an SD card
+emulation, which works but the performance is not great.
 
-> 
-> Besides, what caused the migration to fail without 8c58be34494b is
-> bypassed so:
-> 
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Tested-by: Eric Auger <eric.auger@redhat.com>
-> 
-> Thank you for the fixup
-> 
-> Eric
-> 
-> > +	}
-> > +
-> >  	if (its_setup1())
-> >  		return;
-> >  
-> > @@ -830,9 +841,12 @@ static void test_migrate_unmapped_collection(void)
-> >  	its_send_mapti(dev2, 8192, 0, col);
-> >  	gicv3_lpi_set_config(8192, LPI_PROP_DEFAULT);
-> >  
-> > +do_migrate:
-> >  	puts("Now migrate the VM, then press a key to continue...\n");
-> >  	(void)getchar();
-> >  	report_info("Migration complete");
-> > +	if (test_skipped)
-> > +		return;
-> >  
-> >  	/* on the destination, map the collection */
-> >  	its_send_mapc(col, true);
-> > diff --git a/errata.txt b/errata.txt
-> > index 7d6abc2a7bf6..b66afaa9c079 100644
-> > --- a/errata.txt
-> > +++ b/errata.txt
-> > @@ -5,4 +5,5 @@
-> >  9e3f7a296940    : 4.9                           : arm64: KVM: pmu: Fix AArch32 cycle counter access
-> >  7b6b46311a85    : 4.11                          : KVM: arm/arm64: Emulate the EL1 phys timer registers
-> >  6c7a5dce22b3    : 4.12                          : KVM: arm/arm64: fix races in kvm_psci_vcpu_on
-> > +8c58be34494b    : 5.6                           : KVM: arm/arm64: vgic-its: Fix restoration of unmapped collections
-> >  #---------------:-------------------------------:---------------------------------------------------
-> > 
-> 
-> 
-
+thanks
+-- PMM
 
