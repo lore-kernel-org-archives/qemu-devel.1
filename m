@@ -2,83 +2,76 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A1BC2BA12
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21001C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8F612073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:34:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F612073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE9472073B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:43:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bADDR/ds"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9472073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKNOY-0000BM-56
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:34:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42325)
+	id 1jKNXF-00069t-2r
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:43:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43570)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jKNNX-0007zr-Va
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:33:04 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jKNWF-0005Aw-CD
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jKNNW-0003Zk-OU
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:33:03 -0400
-Received: from mga18.intel.com ([134.134.136.126]:62634)
+ (envelope-from <imammedo@redhat.com>) id 1jKNWD-00056x-60
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:42:02 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40199
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jKNNW-0003Ys-GX
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:33:02 -0400
-IronPort-SDR: 0n53VApLNFkISH/pZmRy9iHGb8WTO/kszD/0K8u4whQFaC0JsmagjVRIqjD0IJdXz9hv96aK33
- nvJW560MQ2Xg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Apr 2020 07:33:00 -0700
-IronPort-SDR: nKqQBPM2pjbJRq2UmHiUnsjlo43jFfREYVzpnzZlEPDZR7j+o2gA7vPBClEZw1t1uh4TTPjkq8
- xT5uU5OHTXug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,340,1580803200"; d="scan'208";a="329181331"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by orsmga001.jf.intel.com with ESMTP; 03 Apr 2020 07:32:59 -0700
-Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 3 Apr 2020 07:32:59 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 3 Apr 2020 07:32:59 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
- Fri, 3 Apr 2020 22:32:55 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: RE: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VMs
-Thread-Topic: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VMs
-Thread-Index: AQHWBkpi4SFlYLfwBEaCXIDf+JnUMqhlofiAgAHaG1A=
-Date: Fri, 3 Apr 2020 14:32:55 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A220D6C@SHSMSX104.ccr.corp.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <20200402181255.GE103677@xz-x1>
-In-Reply-To: <20200402181255.GE103677@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.126
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKNWD-00055g-2Z
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:42:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585924920;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ZzwgN2rWU4/RfENARbQYAxOHiEJTGraF7fcMVlmV9Zo=;
+ b=bADDR/ds+YS4sQJxPODx9X8OWVgi3h3zQ6KNfJSelk8AQS9y8/b8TxP1SKY2Nun5erZuRp
+ 0Sf7Z4qmw/tGVyzyFJ9C7Kt0M+DTGUv5tc3ZnvAGv4bTJCalyaC8QrtEtHu7v86fub1Ruc
+ 1GXOGLDCH2gEO/C36QnINAO0Nd9+zpw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-fu1vxOrNPraovwjpxbJ4GQ-1; Fri, 03 Apr 2020 10:41:56 -0400
+X-MC-Unique: fu1vxOrNPraovwjpxbJ4GQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8A8D10CE783;
+ Fri,  3 Apr 2020 14:41:54 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E61350BEE;
+ Fri,  3 Apr 2020 14:41:52 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] nvdimm-utils: clean up headers and add license comment
+Date: Fri,  3 Apr 2020 10:41:49 -0400
+Message-Id: <20200403144149.14068-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,39 +83,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, sbhat@linux.ibm.com,
+ aik@ozlabs.ru, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IEZyaWRheSwgQXBy
-aWwgMywgMjAyMCAyOjEzIEFNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4N
-Cj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAwMC8yMl0gaW50ZWxfaW9tbXU6IGV4cG9zZSBTaGFy
-ZWQgVmlydHVhbCBBZGRyZXNzaW5nIHRvDQo+IFZNcw0KPiANCj4gT24gU3VuLCBNYXIgMjksIDIw
-MjAgYXQgMDk6MjQ6MzlQTSAtMDcwMCwgTGl1IFlpIEwgd3JvdGU6DQo+ID4gVGVzdHM6IGJhc2Np
-IHZTVkEgZnVuY3Rpb25hbGl0eSB0ZXN0LA0KPiANCj4gQ291bGQgeW91IGVsYWJvcmF0ZSB3aGF0
-J3MgdGhlIGZ1bmN0aW9uYWxpdHkgdGVzdD8gIERvZXMgdGhhdCBjb250YWlucw0KPiBhdCBsZWFz
-dCBzb21lIElPcyBnbyB0aHJvdWdoIHRoZSBTVkEtY2FwYWJsZSBkZXZpY2Ugc28gdGhlIG5lc3Rl
-ZCBwYWdlDQo+IHRhYmxlIGlzIHVzZWQ/ICBJIHRob3VnaHQgaXQgd2FzIGEgeWVzLCBidXQgYWZ0
-ZXIgSSBub3RpY2UgdGhhdCB0aGUNCj4gQklORCBtZXNzYWdlIGZsYWdzIHNlZW1zIHRvIGJlIHdy
-b25nLCBJIHJlYWxseSB0aGluayBJIHNob3VsZCBhc2sgdGhpcw0KPiBsb3VkLi4NCg0KYXMganVz
-dCByZXBsaWVkLCBpbiB0aGUgdmVyaWZpY2F0aW9uLCBvbmx5IHRoZSBTUkUgYml0IGlzIHVzZWQu
-IFNvIGl0J3Mgbm90DQpzcG90dGVkLiBJbiBteSBmdW5jdGlvbmFsaXR5IHRlc3QsIEkndmUgcGFz
-c3RocnUgYSBTVkEtY2FwYWJsZSBkZXZpY2UNCmFuZCBpc3N1ZSBTVkEgdHJhbnNhY3Rpb25zLg0K
-DQo+ID4gVk0gcmVib290L3NodXRkb3duL2NyYXNoLA0KPiANCj4gV2hhdCdzIHRoZSBWTSBjcmFz
-aCB0ZXN0Pw0KDQppdCdzIGN0cmwrYyB0byBraWxsIHRoZSBWTS4NCg0KPiA+IGtlcm5lbCBidWls
-ZCBpbg0KPiA+IGd1ZXN0LCBib290IFZNIHdpdGggdlNWQSBkaXNhYmxlZCwgZnVsbCBjb21hcGls
-YXRpb24gd2l0aCBhbGwgYXJjaHMuDQo+IA0KPiBJIGJlbGlldmUgSSd2ZSBzYWlkIHNpbWlsYXIg
-dGhpbmdzLCBidXQuLi4gIEknZCBhcHByZWNpYXRlIGlmIHlvdSBjYW4NCj4gYWxzbyBzbW9rZSBv
-biAybmQtbGV2ZWwgb25seSB3aXRoIHRoZSBzZXJpZXMgYXBwbGllZC4NCg0KeWVhaCwgeW91IG1l
-YW4gdGhlIGxlZ2FjeSBjYXNlLCBJIGJvb3RlZCB3aXRoIHN1Y2ggY29uZmlnLg0KDQpSZWdhcmRz
-LA0KWWkgTGl1DQo=
+Fixes: 3f350f6bb36233be50fc2bc18dc78b6a948a5dbe
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  - add license blob to header as well
+  - trim comment a litle bit to remove unrelated NFIT/PMEM sentences
+---
+ include/qemu/nvdimm-utils.h | 23 +++++++++++++++++++++--
+ util/nvdimm-utils.c         | 23 +++++++++++++++++++++++
+ 2 files changed, 44 insertions(+), 2 deletions(-)
+
+diff --git a/include/qemu/nvdimm-utils.h b/include/qemu/nvdimm-utils.h
+index 4b8b198ba7..2d8cde085c 100644
+--- a/include/qemu/nvdimm-utils.h
++++ b/include/qemu/nvdimm-utils.h
+@@ -1,7 +1,26 @@
+ #ifndef NVDIMM_UTILS_H
+ #define NVDIMM_UTILS_H
+-
+-#include "qemu/osdep.h"
++/*
++ * NVDIMM utilities
++ *
++ * Copyright(C) 2015 Intel Corporation.
++ *
++ * Author:
++ *  Xiao Guangrong <guangrong.xiao@linux.intel.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licens=
+es/>
++ */
+=20
+ GSList *nvdimm_get_device_list(void);
+ #endif
+diff --git a/util/nvdimm-utils.c b/util/nvdimm-utils.c
+index 5cc768ca47..3d570c3c3e 100644
+--- a/util/nvdimm-utils.c
++++ b/util/nvdimm-utils.c
+@@ -1,3 +1,26 @@
++/*
++ * NVDIMM utilities
++ *
++ * Copyright(C) 2015 Intel Corporation.
++ *
++ * Author:
++ *  Xiao Guangrong <guangrong.xiao@linux.intel.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licens=
+es/>
++ */
++
++#include "qemu/osdep.h"
+ #include "qemu/nvdimm-utils.h"
+ #include "hw/mem/nvdimm.h"
+=20
+--=20
+2.18.1
+
 
