@@ -2,87 +2,92 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C76EC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CFC5C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:49:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E48AF206F5
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:47:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45DD12073B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:49:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yf018+5z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E48AF206F5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SF2HyarG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45DD12073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKH2v-0001OP-1L
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:47:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40390)
+	id 1jKH5Q-0003GT-FN
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:49:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40634)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jKH1y-0000fu-1L
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:46:23 -0400
+ (envelope-from <armbru@redhat.com>) id 1jKH3x-0002Iw-Up
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jKH1w-0003Z1-Bu
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:46:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53787
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jKH3w-0006Fs-6H
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:48:25 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33475
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jKH1w-0003Wa-6d
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:46:20 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jKH3w-0006FU-2R
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:48:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585899979;
+ s=mimecast20190719; t=1585900103;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xRZXOkP3vDYNkrOMunGOZBhisjeKpPdYz/Rjacoouq4=;
- b=Yf018+5zBb7AicYAJEcXz0pBhNigIhB6rSvX3bcNohSWl+UCPQDj7BH5sEziRXDuMtDruQ
- aZKD9qlzfuDaTpAgXNMVIIkyzG/tE4ZDKEvC+tU5ZJJZaxNH3LujSWGN/U0lpNiZ7fuqXw
- U9TMbLcVv6QgXqmC92r3TKaGQq/Puf0=
+ bh=To1AEK2euXKxnsCevNGhPO22NE0Udm6yMkoQCCaOxB0=;
+ b=SF2HyarGRKzHV2MgAl4m0QA6qUiaenPAdoDH1wLsziRhEH0KThjGbF4YVU0luqxMmVm7mD
+ 284AdrdnavGaUPerSE82REbJnCI16JHSZA0sVZ93QVCz6+xGlhTRjg9iV2oCPzuuovj85F
+ OBB3yJpKq9JvhTZ4rfaQJS9a/arD3tM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-nY_DNvh2M1W0xniN81kwIA-1; Fri, 03 Apr 2020 03:46:17 -0400
-X-MC-Unique: nY_DNvh2M1W0xniN81kwIA-1
+ us-mta-491-6FEpMo18MSGR53-yryKGgQ-1; Fri, 03 Apr 2020 03:48:20 -0400
+X-MC-Unique: 6FEpMo18MSGR53-yryKGgQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64306800D50;
- Fri,  3 Apr 2020 07:46:16 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-132.ams2.redhat.com [10.36.113.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E4A11147CE;
- Fri,  3 Apr 2020 07:46:14 +0000 (UTC)
-Date: Fri, 3 Apr 2020 09:46:13 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v10 10/14] iotests: add hmp helper with logging
-Message-ID: <20200403074613.GA5336@linux.fritz.box>
-References: <20200331000014.11581-1-jsnow@redhat.com>
- <20200331000014.11581-11-jsnow@redhat.com>
- <88146808-4acc-247e-d34b-5dd16baad0b4@redhat.com>
- <c0efeb62-b121-74a2-1929-b41a0e47c1b8@redhat.com>
- <20200331173945.GL7030@linux.fritz.box>
- <0c8ce9c5-d8b4-4b24-a6e3-4b9863c52fe0@redhat.com>
- <449f8a5e-d8a0-1993-c30c-97d67a89df1e@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B23F8017CE;
+ Fri,  3 Apr 2020 07:48:19 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-69.ams2.redhat.com
+ [10.36.112.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D9B651147CE;
+ Fri,  3 Apr 2020 07:48:18 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 67F9011385E2; Fri,  3 Apr 2020 09:48:17 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <CAFEAcA_b1gZ-B4NaEdQS2zffdvobW=FUx4ysEgXVAz+=cZ+R3Q@mail.gmail.com>
+ <87sghmbfgc.fsf@dusky.pond.sub.org>
+ <44b5ff2c-6dce-e516-a9cc-9d80354c5a72@virtuozzo.com>
+ <CAFEAcA_cmOkR4YsDmP7mDdKzs0jTu3WDO=d1uvMxHguvZjGW_g@mail.gmail.com>
+ <877dyy9shs.fsf@dusky.pond.sub.org>
+ <045198b9-29d8-231c-d35c-440723308003@virtuozzo.com>
+ <878sjegc5a.fsf@dusky.pond.sub.org>
+ <cf346d30-c233-50a1-b1fa-f5be20bfd891@virtuozzo.com>
+Date: Fri, 03 Apr 2020 09:48:17 +0200
+In-Reply-To: <cf346d30-c233-50a1-b1fa-f5be20bfd891@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Thu, 2 Apr 2020 20:17:26 +0300")
+Message-ID: <87imihrovy.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <449f8a5e-d8a0-1993-c30c-97d67a89df1e@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,163 +99,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-?= =?utf-8?Q?Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 02.04.2020 um 20:27 hat John Snow geschrieben:
-> On 4/1/20 8:40 AM, Max Reitz wrote:
-> > On 31.03.20 19:39, Kevin Wolf wrote:
-> >> Am 31.03.2020 um 19:23 hat John Snow geschrieben:
-> >>>
-> >>>
-> >>> On 3/31/20 6:21 AM, Max Reitz wrote:
-> >>>> On 31.03.20 02:00, John Snow wrote:
-> >>>>> Minor cleanup for HMP functions; helps with line length and consoli=
-dates
-> >>>>> HMP helpers through one implementation function.
-> >>>>>
-> >>>>> Although we are adding a universal toggle to turn QMP logging on or=
- off,
-> >>>>> many existing callers to hmp functions don't expect that output to =
-be
-> >>>>> logged, which causes quite a few changes in the test output.
-> >>>>>
-> >>>>> For now, offer a use_log parameter.
-> >>>>>
-> >>>>>
-> >>>>> Typing notes:
-> >>>>>
-> >>>>> QMPResponse is just an alias for Dict[str, Any]. It holds no specia=
-l
-> >>>>> meanings and it is not a formal subtype of Dict[str, Any]. It is be=
-st
-> >>>>> thought of as a lexical synonym.
-> >>>>>
-> >>>>> We may well wish to add stricter subtypes in the future for certain
-> >>>>> shapes of data that are not formalized as Python objects, at which =
-point
-> >>>>> we can simply retire the alias and allow mypy to more strictly chec=
-k
-> >>>>> usages of the name.
-> >>>>>
-> >>>>> Signed-off-by: John Snow <jsnow@redhat.com>
-> >>>>> ---
-> >>>>>  tests/qemu-iotests/iotests.py | 35 ++++++++++++++++++++++---------=
-----
-> >>>>>  1 file changed, 22 insertions(+), 13 deletions(-)
-> >>>>
-> >>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> >>>>
-> >>>>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iot=
-ests.py
-> >>>>> index b08bcb87e1..dfc753c319 100644
-> >>>>> --- a/tests/qemu-iotests/iotests.py
-> >>>>> +++ b/tests/qemu-iotests/iotests.py
-> >>>>> @@ -37,6 +37,10 @@
-> >>>>> =20
-> >>>>>  assert sys.version_info >=3D (3, 6)
-> >>>>> =20
-> >>>>> +# Type Aliases
-> >>>>> +QMPResponse =3D Dict[str, Any]
-> >>>>> +
-> >>>>> +
-> >>>>>  faulthandler.enable()
-> >>>>> =20
-> >>>>>  # This will not work if arguments contain spaces but is necessary =
-if we
-> >>>>> @@ -540,25 +544,30 @@ def add_incoming(self, addr):
-> >>>>>          self._args.append(addr)
-> >>>>>          return self
-> >>>>> =20
-> >>>>> -    def pause_drive(self, drive, event=3DNone):
-> >>>>> -        '''Pause drive r/w operations'''
-> >>>>> +    def hmp(self, command_line: str, use_log: bool =3D False) -> Q=
-MPResponse:
-> >>>>> +        cmd =3D 'human-monitor-command'
-> >>>>> +        kwargs =3D {'command-line': command_line}
-> >>>>> +        if use_log:
-> >>>>> +            return self.qmp_log(cmd, **kwargs)
-> >>>>> +        else:
-> >>>>> +            return self.qmp(cmd, **kwargs)
-> >>>>
-> >>>> Hm.  I suppose I should take this chance to understand something abo=
-ut
-> >>>> mypy.  QEMUMachine.qmp() isn=E2=80=99t typed, so mypy can=E2=80=99t =
-check that this
-> >>>> really returns QMPResponse.  Is there some flag to make it?  Like
-> >>>> --actually-check-types?
-> >>>>
-> >>>
-> >>> One of --strict's implied options, I'm not sure which. Otherwise, myp=
-y
-> >>> is geared towards a 'gradual typing' discipline.
-> >>>
-> >>> In truth, I'm a little thankful for that because it helps avoid yak
-> >>> shaving marathons.
-> >=20
-> > Sure.  I was just looking into the different options.  I was interested
-> > in whether I could come up with a mode that leaves wholly untyped code
-> > alone, but warns for code that mixes it.  Or something.
-> >=20
-> >>> It does mean that sometimes the annotations don't "do anything" yet,
-> >>> apart from offering hints and documentation in e.g. pycharm. Which do=
-es
-> >>> mean that sometimes they can be completely wrong...
-> >>>
-> >>> The more we add, the more we'll catch problems.
-> >>>
-> >>> Once this series is dusted I'll try to tackle more conversions for
-> >>> iotests, qmp, etc. I've got a few WIP patches to tackle conversions f=
-or
-> >>> tests/qemu-iotests/*.py but I am trying to shepherd this one in first
-> >>> before I go bananas.
-> >=20
-> > Sure, sure.
-> >=20
-> >>>> (--strict seems, well, overly strict?  Like not allowing generics, I
-> >>>> don=E2=80=99t see why.  Or I suppose for the time being we want to a=
-llow untyped
-> >>>> definitions, as long as they don=E2=80=99t break type assertions suc=
-h as it kind
-> >>>> of does here...?)
-> >>>>
-> >>>
-> >>> "disallow-any-generics" means disallowing `Any` generics, not
-> >>> disallowing generics ... in general. (I think? I've been using mypy i=
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+
+> 02.04.2020 18:06, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>
+>>> 02.04.2020 11:55, Markus Armbruster wrote:
+>>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>>
+>>>>> On Thu, 2 Apr 2020 at 07:11, Vladimir Sementsov-Ogievskiy
+>>>>> <vsementsov@virtuozzo.com> wrote:
+>>>>>> Somehow, in general, especially with long function names and long pa=
+rameter lists I prefer
+>>>>>>
+>>>>>> ret =3D func(..);
+>>>>>> if (ret < 0) {
+>>>>>>        return ret;
+>>>>>> }
+>>>>>
+>>>>> Personally I prefer the other approach -- this one has an extra line
+>>>>> in the source and
+>>>>> needs an extra local variable.
+>>>>
+>>>> Me too, except when func(...) is so long that
+>>>>
+>>>>       if (func(...) < 0) {
+>>>>
+>>>> becomes illegible like
+>>>>
+>>>>       if (func(... yadda, yadda,
+>>>>                yadda, ...) < 0) {
+>>>>
+>>>> Then an extra variable can improve things.
+>>>>
+>>>>>> Are you sure that adding a lot of boolean functions is a good idea? =
+I somehow feel better with more usual int functions with -errno on failure.
+>>>>>>
+>>>>>> Bool is a good return value for functions which are boolean by natur=
+e: checks, is something correspond to some criteria. But for reporting an e=
+rror I'd prefer -errno.
+>>>>>
+>>>>> When would we want to return an errno? I thought the whole point of t=
+he
+>>>>> Error* was that that was where information about the error was return=
+ed.
+>>>>> If all your callsites are just going to do "if (ret < 0) { ... } then=
+ having
+>>>>> the functions pick an errno value to return is just extra work.
+>>>>
+>>>> 0/-1 vs. true/false is a matter of convention.  Lacking convention, it=
+'s
+>>>> a matter of taste. >
+>>>> 0/-1 vs. 0/-errno depends on the function and its callers.  When -errn=
+o
+>>>> enables callers to distinguish failures in a sane and simple way, use
+>>>> it.  When -errno feels "natural", I'd say feel free to use it even whe=
 n
-> >>> strict mode for a personal project a lot lately and I use generics in=
- a
-> >>> few places, it seems OK.)
-> >>
-> >> --disallow-any-generics
-> >>       disallow usage of generic types that do not specify explicit typ=
-e parameters
-> >>
-> >> So it will complain if you say just List, and you need to be explicit =
-if
-> >> you really want List[Any]. Which I think is a reasonable thing to
-> >> require.
-> >=20
-> > OK.  So it=E2=80=99s =E2=80=9Cdisallow =E2=80=98any=E2=80=99 generics=
-=E2=80=9D, not =E2=80=9Cdisallow any =E2=80=98generic=E2=80=99s=E2=80=9D.
-> > Not easy to parse.  (Yes, yes, I should=E2=80=99ve actually read the ma=
-n page...)
-> >=20
-> > Good to know that mypy and me actually do seem to loosely agree on what
-> > a generic is. :)
-> >=20
-> > Max
-> >=20
->=20
-> Are we squared up for this series? I am actually not sure.
+>>>> all existing callers only check < 0.
+>>>>
+>>>> When you return non-null/null or true/false on success/error, neglecti=
+ng
+>>>> to document that in a function contract can perhaps be tolerated; you'=
+re
+>>>> using the return type the common, obvious way.  But when you return 0/=
+-1
+>>>> or 0/-errno, please spell it out.  I've seen too many "Operation not
+>>>> permitted" that were actually -1 mistaken for -EPERM.  Also too many
+>>>> functions that return -1 for some failures and -errno for others.
+>>>>
+>>>
+>>> I just want to add one note:
+>>>
+>>> OK, you like the pattern
+>>>
+>>>    if (func()) {
+>>>        <handle error>
+>>>    }
+>>>
+>>> , I can live with it.
+>>>
+>>> I believe, we have a lot of such patterns already in code.
+>>>
+>>> Now, we are going to add a lot of functions, returning true on success =
+and false on failure, so add a lot of patterns
+>>>
+>>>    if (!func()) {
+>>>        <handle error>
+>>>    }
+>>
+>> We already have this pattern all over the place with functions returning
+>> non-null pointers on success, null pointer on failure.
+>
+> Functions returning pointer are simpler to distinguish by name.
+>
+> Hmm, strange. But this pattern lose the pointer.. You mean
+>
+> ptr =3D func();
+> if (!ptr) {
+>   <handle error>
+> }
 
-I had a comment in patch 14 which you may or may not want to address (my
-R-b was unconditional). I think everything else was just tangential
-discussion.
+Yes, when you actually need the pointer.  Common, but not universal.
 
-Kevin
+> this is much more understandable. Usually ptr variable name and function =
+name - all will help to understand that it's all about pointer.
+>
+>
+>>
+>>> ---
+>>>
+>>> After it, looking at something like
+>>>
+>>>    if (!func()) {} / if (func()) {}
+>>>
+>>> I'll have to always jump to function definition, to check is it int or =
+bool function, to understand what exactly is meant and is there a mistake i=
+n the code..
+>>> So, I'm afraid that such conversion will not help reviewing/understandi=
+ng the code. I'd prefer to avoid using two opposite conventions in on proje=
+ct.
+>>
+>> C sucks :)
+>>
+>> Conventions help mitigate.  Here's one: when fun() returns
+>> non-negative/negative on success/error, always use
+>>
+>>      fun(...) < 0
+>
+> This reduces chances that it fit in one line..
+
+Yes, that's a drawback.
+
+> But yes, if all use this convention, it makes it obvious what happening.
+>
+>>
+>> or
+>>
+>>      fun(...) >=3D 0
+>>
+>> to check.  I dislike the latter.
+>>
+>> When returns 0/negative, always use
+>>
+>>      fun(...) < 0
+>>
+>> Avoid
+>>
+>>      fun(...) >=3D 0
+>>
+>> because that suggests it could return a positive value, which is wrong.
+>>
+>> Avoid
+>>
+>>      fun(...)
+>>
+>> because that requires the reader to know the return type.
+>
+> Exactly the problem I mention. To follow your suggestion, we'll have to u=
+pdate
+> the whole code base.. However, why not.
+
+Only if we value the consistency more than the update labor and churn.
+
+>>
+>> When its returns non-null/null or true/false on success/failure, always
+>> use
+>>
+>>      !fun(...)
+>>
+>> Avoid
+>>
+>>      fun(...)
+>>
+>> because that requires the reader to know the return type.
+>>
+>> Note that we have a usable check for failure in all cases.  Goes well
+>> with the habit to handle errors like this whenever practical
+>>
+>>      if (failed) {
+>>          handle failure
+>>          bail out
+>>      }
+>>      handle success
+>>
+>
+> OK. If convert everything to your suggestion it looks good.
+>
+> The only possible problem is boolean functions, which just check somethin=
+g, not returning the error..
+>
+> With a function like is_x_in_set(x, set), it's native to write
+>
+> if (is_x_in_set(x, set)) {
+>
+>    ...
+>
+> }
+>
+> which is a bit in conflict with your suggestion. Still, such functions sh=
+ould be simply distinguished by name.
+
+The conventions I described only apply to error checking.  I certainly
+don't mean to discourage things like
+
+    while (*p && qemu_isspace(*p)) {
+        p++;
+    }
+
+Also, they're *conventions*, not law.  The purpose of conventions is to
+help us write clearer code.  Don't make code less clear just to conform
+to a convention.  Use your judgement.
+
+>>> I can also imagine combining different function types (int/bool) in if =
+conditions o_O, what will save us from it?
+>>
+>> Can you give an example?
+>
+> I just meant something like if (f1() || !f2()) { < error > }, nothing spe=
+cial.
+
+Perfectly consistent error checking style, idiomatic C, pick one.
+
+>>> And don't forget about bool functions, which just check something, and =
+false is not an error, but just negative answer on some question.
+>>
+>> For what it's worth, GLib specifically advises against such function
+>> contracts:
+>>
+>>      By convention, if you return a boolean value indicating success the=
+n
+>>      TRUE means success and FALSE means failure.  Avoid creating
+>>      functions which have a boolean return value and a GError parameter,
+>>      but where the boolean does something other than signal whether the
+>>      GError is set.  Among other problems, it requires C callers to
+>>      allocate a temporary error.  Instead, provide a "gboolean *" out
+>>      parameter.  There are functions in GLib itself such as
+>>      g_key_file_has_key() that are deprecated because of this.
+>>
+>
+> Sounds good. But we are speaking about all functions, not only with errp =
+parameter.. Or not?
+
+The conventions I described apply to error checking, regardless of Error
+object use.  For instance, they'd apply to error-checking
+remove("some-file").
 
 
