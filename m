@@ -6,72 +6,68 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4ACFC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7819C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:12:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FA6320757
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1C3520757
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:12:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KWJGVutd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA6320757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIp4tgrP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C3520757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKJIN-0006k0-LP
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 06:11:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34816)
+	id 1jKJJM-00082L-SF
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 06:12:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jKJHe-0005tI-Nz
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:10:43 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jKJIb-00076C-Nb
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:11:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jKJHd-0001r9-EJ
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:10:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28437
+ (envelope-from <mreitz@redhat.com>) id 1jKJIa-0003aE-Gd
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:11:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51969
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKJHd-0001qd-AE
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:10:41 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jKJIa-0003ZJ-CB
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:11:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585908640;
+ s=mimecast20190719; t=1585908700;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aTFcm2tkqLnu3edypMnCFLzZ2fPDmD6TkPeu8Zyy1Kw=;
- b=KWJGVutdhJwAxmF0jyr6SX3VEGCHOev0PP7UWYXt1ck/69Qbef5fG+7Nsp04va/YiDURfX
- TLDWyd1N+iNHDT5fP0DmmeSCo1wlkcgjSUtfvT4wH4TnArhJ9lQ1nbyyPrdIQCNfLK1XJi
- YxXU1ghCisPi4Cep4uY98KAceOW7xJw=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=SM9raZenXC6EQiQs7eo5tdMZnZYHcSBHvBwpQLuDCU4=;
+ b=eIp4tgrPh9BDHS29IsrRRuDjO5gwj+82A67/vqYdEJioxI88A3EmzR2OaL7/T4WlWArUcg
+ 6eNEwaX+TmigUhYAOjFka1UPk8PzQptRTBRhOKj8EYh51DYRUJtPACjVB6MvffsXwujJDM
+ dmdMbq66AUm3hRmq00jAsOorys2fp64=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1--Muycbj1PQGK4cUnNuD6Mw-1; Fri, 03 Apr 2020 06:10:38 -0400
-X-MC-Unique: -Muycbj1PQGK4cUnNuD6Mw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-345-XzBzykFgMXy2Zj8qGpbmzg-1; Fri, 03 Apr 2020 06:11:38 -0400
+X-MC-Unique: XzBzykFgMXy2Zj8qGpbmzg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71E3B800D5C;
- Fri,  3 Apr 2020 10:10:37 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 57AAB1147D7;
- Fri,  3 Apr 2020 10:10:25 +0000 (UTC)
-Date: Fri, 3 Apr 2020 12:10:23 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 08/12] acpi: move aml builder code for serial device
-Message-ID: <20200403121023.11aa023d@redhat.com>
-In-Reply-To: <20200403080502.8154-9-kraxel@redhat.com>
-References: <20200403080502.8154-1-kraxel@redhat.com>
- <20200403080502.8154-9-kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69E7B477;
+ Fri,  3 Apr 2020 10:11:37 +0000 (UTC)
+Received: from localhost (ovpn-113-97.ams2.redhat.com [10.36.113.97])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D388760BF1;
+ Fri,  3 Apr 2020 10:11:36 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH] iotests/common.pattern: Quote echos
+Date: Fri,  3 Apr 2020 12:11:34 +0200
+Message-Id: <20200403101134.805871-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -86,141 +82,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFy?= =?UTF-8?B?Yy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  3 Apr 2020 10:04:58 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+From time to time, my shell decides to repace the bracketed numbers here
+by the numbers inside (i.e., "=3D=3D=3D Clusters to be compressed [1]" is
+printed as "=3D=3D=3D Clusters to be compressed 1").  That makes tests that
+use common.pattern fail.  Prevent that from happening by quoting the
+arguments to all echos in common.pattern.
 
-> The code uses the isa_serial_io array to figure what the device uid is.
-> Side effect is that acpi antries are not limited to port 1+2 any more,
-> we'll also get entries for ports 3+4.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/common.pattern | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/char/serial-isa.c | 32 ++++++++++++++++++++++++++++++++
->  hw/i386/acpi-build.c | 32 --------------------------------
->  2 files changed, 32 insertions(+), 32 deletions(-)
-> 
-> diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-> index f9b6eed7833d..f7c19a398ced 100644
-> --- a/hw/char/serial-isa.c
-> +++ b/hw/char/serial-isa.c
-> @@ -27,6 +27,7 @@
->  #include "qapi/error.h"
->  #include "qemu/module.h"
->  #include "sysemu/sysemu.h"
-> +#include "hw/acpi/aml-build.h"
->  #include "hw/char/serial.h"
->  #include "hw/isa/isa.h"
->  #include "hw/qdev-properties.h"
-> @@ -81,6 +82,35 @@ static void serial_isa_realizefn(DeviceState *dev, Error **errp)
->      isa_register_ioport(isadev, &s->io, isa->iobase);
->  }
->  
-> +static void serial_isa_build_aml(ISADevice *isadev, Aml *scope)
-> +{
-> +    ISASerialState *isa = ISA_SERIAL(isadev);
-> +    int i, uid = 0;
-> +    Aml *dev;
-> +    Aml *crs;
-> +
-> +    for (i = 0; i < ARRAY_SIZE(isa_serial_io); i++) {
-> +        if (isa->iobase == isa_serial_io[i]) {
-> +            uid = i + 1;
-> +        }
-> +    }
-> +    if (!uid) {
-> +        return;
-> +    }
-> +
-> +    crs = aml_resource_template();
-> +    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x00, 0x08));
-> +    aml_append(crs, aml_irq_no_flags(isa->isairq));
-> +
-> +    dev = aml_device("COM%d", uid);
-> +    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
-> +    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
-> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +
-> +    aml_append(scope, dev);
-> +}
-> +
->  static const VMStateDescription vmstate_isa_serial = {
->      .name = "serial",
->      .version_id = 3,
-> @@ -103,9 +133,11 @@ static Property serial_isa_properties[] = {
->  static void serial_isa_class_initfn(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> +    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
->  
->      dc->realize = serial_isa_realizefn;
->      dc->vmsd = &vmstate_isa_serial;
-> +    isa->build_aml = serial_isa_build_aml;
->      device_class_set_props(dc, serial_isa_properties);
->      set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->  }
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index a5bc7764e611..81805bf85f8d 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1189,36 +1189,6 @@ static void build_lpt_device_aml(Aml *scope)
->      aml_append(scope, dev);
->  }
->  
-> -static void build_com_device_aml(Aml *scope, uint8_t uid)
-> -{
-> -    Aml *dev;
-> -    Aml *crs;
-> -    uint8_t irq = 4;
-> -    uint16_t io_port = 0x03F8;
-> -
-> -    assert(uid == 1 || uid == 2);
-> -    if (uid == 2) {
-> -        irq = 3;
-> -        io_port = 0x02F8;
-> -    }
-> -    if (!memory_region_present(get_system_io(), io_port)) {
-> -        return;
-> -    }
-> -
-> -    dev = aml_device("COM%d", uid);
-> -    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
-> -    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
-> -
-> -    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-> -
-> -    crs = aml_resource_template();
-> -    aml_append(crs, aml_io(AML_DECODE16, io_port, io_port, 0x00, 0x08));
-> -    aml_append(crs, aml_irq_no_flags(irq));
-> -    aml_append(dev, aml_name_decl("_CRS", crs));
-> -
-> -    aml_append(scope, dev);
-> -}
-> -
->  static void build_isa_devices_aml(Aml *table)
->  {
->      ISADevice *fdc = pc_find_fdc0();
-> @@ -1233,8 +1203,6 @@ static void build_isa_devices_aml(Aml *table)
->          aml_append(scope, build_fdc_device_aml(fdc));
->      }
->      build_lpt_device_aml(scope);
-> -    build_com_device_aml(scope, 1);
-> -    build_com_device_aml(scope, 2);
->  
->      if (ambiguous) {
->          error_report("Multiple ISA busses, unable to define IPMI ACPI data");
+diff --git a/tests/qemu-iotests/common.pattern b/tests/qemu-iotests/common.=
+pattern
+index 4f5e5bcea0..4caa5de187 100644
+--- a/tests/qemu-iotests/common.pattern
++++ b/tests/qemu-iotests/common.pattern
+@@ -23,7 +23,7 @@ do_is_allocated() {
+     local count=3D$4
+=20
+     for ((i=3D1;i<=3D$count;i++)); do
+-        echo alloc $(( start + (i - 1) * step )) $size
++        echo "alloc $(( start + (i - 1) * step )) $size"
+     done
+ }
+=20
+@@ -39,9 +39,9 @@ do_io() {
+     local count=3D$5
+     local pattern=3D$6
+=20
+-    echo =3D=3D=3D IO: pattern $pattern >&2
++    echo "=3D=3D=3D IO: pattern $pattern" >&2
+     for ((i=3D1;i<=3D$count;i++)); do
+-        echo $op -P $pattern $(( start + (i - 1) * step )) $size
++        echo "$op -P $pattern $(( start + (i - 1) * step )) $size"
+     done
+ }
+=20
+@@ -110,31 +110,31 @@ io_test2() {
+     #        free - free - compressed
+=20
+     # Write the clusters to be compressed
+-    echo =3D=3D=3D Clusters to be compressed [1]
++    echo '=3D=3D=3D Clusters to be compressed [1]'
+     io_pattern writev $((offset + 4 * $cluster_size)) $cluster_size $((9 *=
+ $cluster_size)) $num 165
+-    echo =3D=3D=3D Clusters to be compressed [2]
++    echo '=3D=3D=3D Clusters to be compressed [2]'
+     io_pattern writev $((offset + 5 * $cluster_size)) $cluster_size $((9 *=
+ $cluster_size)) $num 165
+-    echo =3D=3D=3D Clusters to be compressed [3]
++    echo '=3D=3D=3D Clusters to be compressed [3]'
+     io_pattern writev $((offset + 8 * $cluster_size)) $cluster_size $((9 *=
+ $cluster_size)) $num 165
+=20
+     mv "$TEST_IMG" "$TEST_IMG.orig"
+     $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -c "$TEST_IMG.orig" "$TEST_IMG=
+"
+=20
+     # Write the used clusters
+-    echo =3D=3D=3D Used clusters [1]
++    echo '=3D=3D=3D Used clusters [1]'
+     io_pattern writev $((offset + 0 * $cluster_size)) $cluster_size $((9 *=
+ $cluster_size)) $num 165
+-    echo =3D=3D=3D Used clusters [2]
++    echo '=3D=3D=3D Used clusters [2]'
+     io_pattern writev $((offset + 1 * $cluster_size)) $cluster_size $((9 *=
+ $cluster_size)) $num 165
+-    echo =3D=3D=3D Used clusters [3]
++    echo '=3D=3D=3D Used clusters [3]'
+     io_pattern writev $((offset + 3 * $cluster_size)) $cluster_size $((9 *=
+ $cluster_size)) $num 165
+=20
+     # Read them
+-    echo =3D=3D=3D Read used/compressed clusters
++    echo '=3D=3D=3D Read used/compressed clusters'
+     io_pattern readv $((offset + 0 * $cluster_size)) $((2 * $cluster_size)=
+) $((9 * $cluster_size)) $num 165
+     io_pattern readv $((offset + 3 * $cluster_size)) $((3 * $cluster_size)=
+) $((9 * $cluster_size)) $num 165
+     io_pattern readv $((offset + 8 * $cluster_size)) $((1 * $cluster_size)=
+) $((9 * $cluster_size)) $num 165
+=20
+-    echo =3D=3D=3D Read zeros
++    echo '=3D=3D=3D Read zeros'
+     io_zero readv $((offset + 2 * $cluster_size)) $((1 * $cluster_size)) $=
+((9 * $cluster_size)) $num
+     io_zero readv $((offset + 6 * $cluster_size)) $((2 * $cluster_size)) $=
+((9 * $cluster_size)) $num
+ }
+--=20
+2.25.1
 
 
