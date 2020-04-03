@@ -2,88 +2,106 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60939C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D4BC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2940420721
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:43:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58A4220659
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:44:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cR+Wy/pT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2940420721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZXAaeHu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A4220659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKLfo-0006ME-7M
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:43:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54659)
+	id 1jKLgp-0007QB-Gk
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:44:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jKLdw-0003zb-3B
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:41:53 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jKLee-0005Jt-I7
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:42:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1jKLdt-0005FT-Oc
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:41:51 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53925)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jKLdt-0005Eh-FX
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:41:49 -0400
-Received: by mail-wm1-x342.google.com with SMTP id d77so7018791wmd.3
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 05:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=NXmA2DljyO1ktC8QBGi/B1PQPmHUs4fI8yXzF8+sOh0=;
- b=cR+Wy/pTyg480rOJN2N4A4x3R/Mi0FYRdzRZp70lao6NX86p1BtyLza4FxQzfd9Mjd
- YlgrIF3c3rIiZf+3NPybEHD2+TQR/M+8UnTBCKPKia/PCDJIbpCpBccb9iDmmCj+a60p
- sgTKTPnoto9j2mIBe8Pv5mzm9GN8VN58Ro4ecxk4YTwDzYKoezFUoQY9bAI7dJ0fcJ0d
- uF6xSjybZp/FtbhFU/U8wBABNp9mauxelSJ78uz5P0w0Jc2gSTuUsQQwCfFqaGgidr6F
- 4ix5ogYx00DdTZ/+jnUuGN1ec9czXu7DIoJzRPVhSpNtrbR5D0W5J1Jb/wDl8xDvRxMi
- g9dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=NXmA2DljyO1ktC8QBGi/B1PQPmHUs4fI8yXzF8+sOh0=;
- b=AVkhQ1frCmtbbKHWvHggKpgk7/rxlrRt/plK1DEf/Bw8GvlXjnkAuwM9oJqZhyq3wV
- hoHZS9LRr+8BQV5n9o6ghLzZPuOZZm88YzE7HCs1FkuhW0ISCJTnh9tHAN82rkoKfXKz
- iKKvLqgjY8U49pqxWIc6fKnp+syzLjjFle7i2mSdDdfQnNZbwnNyJwQPDUtj/8WVZYq9
- ioShFcXictDnPKLA6FHIZB43OUBu/csOlhJ3oqMhYKDnNRV7A4vq42iA+IuhP1yDZm+0
- tI4aYa7KVnjU2QbBJFfwMfOo7vnQTCFs5NspT7On3uuZfxKG1KLav3YvNaP7CdNedecj
- NOVA==
-X-Gm-Message-State: AGi0PubznMFh9nteGSAm625w6QUDKd6RlAsLq1Tb+wtq/89PpSEfcRMP
- O59ZBlVfhVdmd5iaHW79OX8=
-X-Google-Smtp-Source: APiQypJOEyLQeard6+Fv2J5f9yIOqtnZPjmTa3h94wJhG+odnAWpThnDGgIkipUx8NN4f1i/9sNs8w==
-X-Received: by 2002:a1c:9dd3:: with SMTP id g202mr8492819wme.60.1585917708375; 
- Fri, 03 Apr 2020 05:41:48 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id f25sm11133782wml.11.2020.04.03.05.41.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 05:41:47 -0700 (PDT)
-Date: Fri, 3 Apr 2020 13:41:45 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: Question about scsi device hotplug (e.g scsi-hd)
-Message-ID: <20200403124145.GC146016@stefanha-x1.localdomain>
-References: <7302c0b9f2327b9b61b4adb465f166e339e46ac1.camel@redhat.com>
- <20200401150944.GA4500@stefanha-x1.localdomain>
- <4bc42bf2-939f-f6c4-ea45-0d08eb42fc2b@redhat.com>
- <ffa77fc719232b8dc0e6e78bd3781fd77c5adcf8.camel@redhat.com>
+ (envelope-from <mreitz@redhat.com>) id 1jKLec-0005w4-J4
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:42:36 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26135
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jKLec-0005va-Ed
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:42:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585917754;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=oKYImRbzPwtf1YsDs/j9HzELgt6ZLV727Qu2d0hHjI4=;
+ b=cZXAaeHuWW7bkTxYzdx0P+DeIWZHswFvQ1hOROza2OYMXm++ftsOfWv4eKfSwdHxv7EGok
+ Yf7WzGTDUMgzdGHPCPSv4yuuOAwuVmiFUm1ilnKeGXFvvQpxnUCRb81hY1ggTCVjoGyfkH
+ +iXO4wHQOfHb2P3J94HIW5PAWH/Lot4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-dlDz4pBRPN2kkK_Pr4mWkA-1; Fri, 03 Apr 2020 08:42:31 -0400
+X-MC-Unique: dlDz4pBRPN2kkK_Pr4mWkA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9295C104FC01;
+ Fri,  3 Apr 2020 12:42:30 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-97.ams2.redhat.com
+ [10.36.113.97])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E7EE66E717;
+ Fri,  3 Apr 2020 12:42:24 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 2/2] block: Fix blk->in_flight during
+ blk_wait_while_drained()
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200403104415.20963-1-kwolf@redhat.com>
+ <20200403104415.20963-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <30e7194e-afbc-2822-f086-9891539c0e3a@redhat.com>
+Date: Fri, 3 Apr 2020 14:42:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200403104415.20963-3-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bKyqfOwhbdpXa4YI"
-Content-Disposition: inline
-In-Reply-To: <ffa77fc719232b8dc0e6e78bd3781fd77c5adcf8.camel@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+ protocol="application/pgp-signature";
+ boundary="ZO9oN9Y1RJLZjrwDguHriF17ObaPNgI0D"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,95 +113,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, s.reiter@proxmox.com, qemu-devel@nongnu.org,
+ t.lamprecht@proxmox.com, stefanha@redhat.com, dietmar@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZO9oN9Y1RJLZjrwDguHriF17ObaPNgI0D
+Content-Type: multipart/mixed; boundary="KepTs70hKfFRU6E1CFmXMsLEvMUAmDOxh"
 
---bKyqfOwhbdpXa4YI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--KepTs70hKfFRU6E1CFmXMsLEvMUAmDOxh
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 02, 2020 at 11:46:57AM +0300, Maxim Levitsky wrote:
-> On Wed, 2020-04-01 at 18:36 +0200, Paolo Bonzini wrote:
-> > On 01/04/20 17:09, Stefan Hajnoczi wrote:
-> > > > What do you think about it?
-> > >=20
-> > > Maybe aio_disable_external() is needed to postpone device emulation
-> > > until after realize has finished?
+On 03.04.20 12:44, Kevin Wolf wrote:
+> Calling blk_wait_while_drained() while blk->in_flight is increased for
+> the current request is wrong because it will cause the drain operation
+> to deadlock.
 >=20
-> Isn't that virtio specific? In theory this issue can touch any driver that
-> behaves similar to scsi.
-
-No, aio_disable_external() is a general solution for suspending file
-descriptor handlers.  In practice virtio is the main user of external
-fds (ioeventfd).  Devices that do not use ioeventfd will not perform
-device emulation from the AioContext event loop and are therefore safe.
-
-> Also due to racing, the request might already be in virtqueue and the vir=
-tio-scsi iothread might have already
-> fetched it when we place the device on the bus.
+> Many callers of blk_wait_while_drained() have already increased
+> blk->in_flight when called in a blk_aio_*() path, but can also be called
+> in synchonous code paths where blk->in_flight isn't increased. This
+> means that these calls of blk_wait_while_drained() are wrong at least in
+> some cases.
 >=20
-> In fact I don't see any locking in bus_add_child / scsi_device_find so in=
- fact if the timing is right
-> and iothread calls the scsi_device_find while main thread adds the device=
- on the bus that will cause
-> the whole thing go south.
+> In order to fix this, increase blk->in_flight even for synchronous
+> operations and temporarily decrease the counter again in
+> blk_wait_while_drained().
+>=20
+> Fixes: cf3129323f900ef5ddbccbe86e4fa801e88c566e
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/block-backend.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-Thread-safety with IOThreads is a separate issue and also worth fixing.
-It requires a different and complementary solution from the
-single-threaded ioeventfd bug we've been discussing so far.
+blk_co_pdiscard() and blk_co_flush() are called from outside of
+block-backend.c (namely from mirror.c and nbd/server.c).  Is that OK?
 
-It looks like virtio_scsi_acquire/release() were intended to provide
-thread-safety for virtio-scsi:
+Max
 
-  static bool virtio_scsi_data_plane_handle_cmd(VirtIODevice *vdev,
-                                                VirtQueue *vq)
-  {
-      bool progress;
-      VirtIOSCSI *s =3D VIRTIO_SCSI(vdev);
 
-      virtio_scsi_acquire(s);
-      assert(s->ctx && s->dataplane_started);
-      progress =3D virtio_scsi_handle_cmd_vq(s, vq);
-      virtio_scsi_release(s);
-      return progress;
-  }
+--KepTs70hKfFRU6E1CFmXMsLEvMUAmDOxh--
 
-If the monitor code calls virtio_scsi_acquire() then further request
-processing will have to wait until the monitor code is finished.
-
-> IMHO the right solution for this is first to realize the device and then =
-place it
-> on the bus, and even that I am not sure that will fix the race completely.
->
-> IMHO the correct solution here is to stop querying the bus children on th=
-e guest controlled IO path=20
-> (scsi_device_find) but rather use the hotplug handlers to
-> store the active luns of the scsi device in parallel (and with proper loc=
-king).
-
-It would be nice to have a general solution in qdev core that makes
-thread-safe hotplug easy for all devices.
-
-Stefan
-
---bKyqfOwhbdpXa4YI
+--ZO9oN9Y1RJLZjrwDguHriF17ObaPNgI0D
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6HLwkACgkQnKSrs4Gr
-c8gv4QgAxFe7UW0rVpnYkAVi40QggyE3l0qlumqbk83Vt97ua5YxStn7rJlasTQK
-B4LhgGXmdE3lsthnqfmjKfnd1jXqH5RlCLPwuH0gb1uIQ59wRhOptRiQPMpP3j5z
-mJlAaEikAunNuowWXxQe4Z5lVZJeV+EEdQlVBRAEHaOjfo/G7V5/TpNmT3LX+BnV
-97o7NvBWhsHvrrcTq4az+mjQgONjs4nOqS+52yLZ/+rAzHhG05QTZNftS1vbm1WL
-7OCDRVqCV/iGATy/l/hu2HYuzKZSzkPbGAWb1a0sKcD/0qKvqycnY/TBjP0JXIwo
-c2KlNZMq2iGWNPi+rlpv5kt//6adiw==
-=U1me
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6HLykACgkQ9AfbAGHV
+z0CLGggAlm3BVMslHN3gBTGcmlw2849DlEcyyVNELH5otZSOXHA75es0jYtfA8ZH
+NT6JBaxWy7inXkDqqT50Zvh3bOZmHt7yAvJ5ls5gqvmfgdrfk10usUdcdFoPeKCK
+Qx5CwXPO0l6PS627TwfgSGvlObmMiucb/34j/ErROSmQQr77TrShwDhXPdLR5exC
+uzOuyVYJq0uIGY1YxqCjbOMGL5GbAMMfvMvsgG2D6FWSdqPafmSYItngR2u4w6Hn
+w/L/TyO7P3wyA09romLibWAO/UW61aFq2VBo+ZtSqN02o/lDnT7zdNrHBzl2thsu
+r6L3bwb5PAXPFWacYcnsyd7QygbPyQ==
+=7BK3
 -----END PGP SIGNATURE-----
 
---bKyqfOwhbdpXa4YI--
+--ZO9oN9Y1RJLZjrwDguHriF17ObaPNgI0D--
+
 
