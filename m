@@ -2,80 +2,83 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 608F5C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A1BC2BA12
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:34:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCE5C2073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:31:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eKgDhWf0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE5C2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E8F612073B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:34:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F612073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKNLk-0005z1-NI
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:31:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41812)
+	id 1jKNOY-0000BM-56
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:34:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42325)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jKNKp-0004vd-Fd
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:30:16 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jKNNX-0007zr-Va
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jKNKn-0008KQ-An
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:30:14 -0400
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:45146)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jKNKl-0008AE-KJ
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:30:12 -0400
-Received: by mail-oi1-x230.google.com with SMTP id l22so6191500oii.12
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 07:30:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=e5yU0lW4ZFb8OqVCgMorUOPRAWFHRZbxYVR3j7F2LVM=;
- b=eKgDhWf0BC2dBb0nZ6ZiiIIIRZDPfH4e12YMqxFDLA143t13hdvQPYziUkbrTygnFV
- RPT7k0mM2/I94jSNceVG1U8CRTOPD9bV3MQGUc75pRG8ahc2XOHJPqErkjxM2FRoqhXE
- zyY975fF5dAvoZBdkXunzg98ZZcCrcyFs7goSXzHSXkJV/wepEXGz9SZQwMvQxrn5vLh
- dx8FJQ8P8jLjN4iPUChuxfZPJQ0/hbHrpBm4+PPaW5PjHf6AczpeLmXPeMAEmUMX2uR7
- r2sdLdA98TasL5DgLhlfuU/4Kx0TcOsm5pHS8jin1Z50jZJy6IWGX8i5ajXxINxIfiN0
- Vfew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=e5yU0lW4ZFb8OqVCgMorUOPRAWFHRZbxYVR3j7F2LVM=;
- b=Fx0Zqiju2s3YfZ/B4FBH0jqZ7v23EJ2C4pY+HU3WmQ4Qo6xYl1xSub82g9r51hR7jj
- bbVDNLa7y4c90GMo+LVDt65vocoy9HWvgTSR4MI9SC7cg8+X2fS8EcTwVjZGLjazsKEy
- niiOhwO+VD/OcyGZ8x0yxUygKTu2gN7/qvVhH9Bmi9wTazRA9il7vj8C/XRk0f/mJLq+
- iwUk+kuSCnnGuRGBvMfwXsQWZ4FXlzX81i3WNyU7T6742wIhAKHLBpp0UmmmBG9zotYQ
- WhOzHNg+teCoLXNpro/wnqt2kySiv4ltk69FZTAmWmSsbfVwYGiUqwU46ul9mVOeJjgQ
- 4sMw==
-X-Gm-Message-State: AGi0Pub/2OC5IqErB+Wv2KDOoTwp28z0q94tvpp7gG6Ebz3t/vALcCpP
- 5HQjfHRZt5atnM8V/pEZVWzZox7BjNOeqlrawKx60Q==
-X-Google-Smtp-Source: APiQypLcv8C10Mm228qurRyu30mm5CONh8CXFxJKQR/qzbsZW+8J6WCITt5/MCBMPWrH6C4+y1pLE9geqFfP8nPuzt4=
-X-Received: by 2002:a05:6808:8cb:: with SMTP id
- k11mr3001670oij.48.1585924209436; 
- Fri, 03 Apr 2020 07:30:09 -0700 (PDT)
+ (envelope-from <yi.l.liu@intel.com>) id 1jKNNW-0003Zk-OU
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:33:03 -0400
+Received: from mga18.intel.com ([134.134.136.126]:62634)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jKNNW-0003Ys-GX
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:33:02 -0400
+IronPort-SDR: 0n53VApLNFkISH/pZmRy9iHGb8WTO/kszD/0K8u4whQFaC0JsmagjVRIqjD0IJdXz9hv96aK33
+ nvJW560MQ2Xg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Apr 2020 07:33:00 -0700
+IronPort-SDR: nKqQBPM2pjbJRq2UmHiUnsjlo43jFfREYVzpnzZlEPDZR7j+o2gA7vPBClEZw1t1uh4TTPjkq8
+ xT5uU5OHTXug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,340,1580803200"; d="scan'208";a="329181331"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by orsmga001.jf.intel.com with ESMTP; 03 Apr 2020 07:32:59 -0700
+Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Apr 2020 07:32:59 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Apr 2020 07:32:59 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
+ Fri, 3 Apr 2020 22:32:55 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VMs
+Thread-Topic: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VMs
+Thread-Index: AQHWBkpi4SFlYLfwBEaCXIDf+JnUMqhlofiAgAHaG1A=
+Date: Fri, 3 Apr 2020 14:32:55 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A220D6C@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <20200402181255.GE103677@xz-x1>
+In-Reply-To: <20200402181255.GE103677@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200403092553.25803-1-cohuck@redhat.com>
-In-Reply-To: <20200403092553.25803-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Apr 2020 15:29:58 +0100
-Message-ID: <CAFEAcA8Y9Qbo_er1STfV0U2P-DW2KoEomx4Pv98VK9MXAJEpKA@mail.gmail.com>
-Subject: Re: [PULL for-5.0 0/2] s390x fixes for -rc2
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::230
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,36 +90,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 3 Apr 2020 at 10:26, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> The following changes since commit 2833ad487cfff7dc33703e4731b75facde1c561e:
->
->   Update version for v5.0.0-rc1 release (2020-03-31 18:02:47 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20200403
->
-> for you to fetch changes up to 5c30ef937f522a65df78dd9f496483fe4fc44d5e:
->
->   vl/s390x: fixup ram sizes for compat machines (2020-04-02 17:10:09 +0200)
->
-> ----------------------------------------------------------------
-> - fix cpu number reporting in the stsi 3.2.2 block for kvm
-> - fix migration for old machines with odd ram sizes
->
-
-
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IEZyaWRheSwgQXBy
+aWwgMywgMjAyMCAyOjEzIEFNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4N
+Cj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAwMC8yMl0gaW50ZWxfaW9tbXU6IGV4cG9zZSBTaGFy
+ZWQgVmlydHVhbCBBZGRyZXNzaW5nIHRvDQo+IFZNcw0KPiANCj4gT24gU3VuLCBNYXIgMjksIDIw
+MjAgYXQgMDk6MjQ6MzlQTSAtMDcwMCwgTGl1IFlpIEwgd3JvdGU6DQo+ID4gVGVzdHM6IGJhc2Np
+IHZTVkEgZnVuY3Rpb25hbGl0eSB0ZXN0LA0KPiANCj4gQ291bGQgeW91IGVsYWJvcmF0ZSB3aGF0
+J3MgdGhlIGZ1bmN0aW9uYWxpdHkgdGVzdD8gIERvZXMgdGhhdCBjb250YWlucw0KPiBhdCBsZWFz
+dCBzb21lIElPcyBnbyB0aHJvdWdoIHRoZSBTVkEtY2FwYWJsZSBkZXZpY2Ugc28gdGhlIG5lc3Rl
+ZCBwYWdlDQo+IHRhYmxlIGlzIHVzZWQ/ICBJIHRob3VnaHQgaXQgd2FzIGEgeWVzLCBidXQgYWZ0
+ZXIgSSBub3RpY2UgdGhhdCB0aGUNCj4gQklORCBtZXNzYWdlIGZsYWdzIHNlZW1zIHRvIGJlIHdy
+b25nLCBJIHJlYWxseSB0aGluayBJIHNob3VsZCBhc2sgdGhpcw0KPiBsb3VkLi4NCg0KYXMganVz
+dCByZXBsaWVkLCBpbiB0aGUgdmVyaWZpY2F0aW9uLCBvbmx5IHRoZSBTUkUgYml0IGlzIHVzZWQu
+IFNvIGl0J3Mgbm90DQpzcG90dGVkLiBJbiBteSBmdW5jdGlvbmFsaXR5IHRlc3QsIEkndmUgcGFz
+c3RocnUgYSBTVkEtY2FwYWJsZSBkZXZpY2UNCmFuZCBpc3N1ZSBTVkEgdHJhbnNhY3Rpb25zLg0K
+DQo+ID4gVk0gcmVib290L3NodXRkb3duL2NyYXNoLA0KPiANCj4gV2hhdCdzIHRoZSBWTSBjcmFz
+aCB0ZXN0Pw0KDQppdCdzIGN0cmwrYyB0byBraWxsIHRoZSBWTS4NCg0KPiA+IGtlcm5lbCBidWls
+ZCBpbg0KPiA+IGd1ZXN0LCBib290IFZNIHdpdGggdlNWQSBkaXNhYmxlZCwgZnVsbCBjb21hcGls
+YXRpb24gd2l0aCBhbGwgYXJjaHMuDQo+IA0KPiBJIGJlbGlldmUgSSd2ZSBzYWlkIHNpbWlsYXIg
+dGhpbmdzLCBidXQuLi4gIEknZCBhcHByZWNpYXRlIGlmIHlvdSBjYW4NCj4gYWxzbyBzbW9rZSBv
+biAybmQtbGV2ZWwgb25seSB3aXRoIHRoZSBzZXJpZXMgYXBwbGllZC4NCg0KeWVhaCwgeW91IG1l
+YW4gdGhlIGxlZ2FjeSBjYXNlLCBJIGJvb3RlZCB3aXRoIHN1Y2ggY29uZmlnLg0KDQpSZWdhcmRz
+LA0KWWkgTGl1DQo=
 
