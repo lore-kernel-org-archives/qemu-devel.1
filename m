@@ -7,95 +7,93 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B2EC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 20:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70217C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 20:57:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99FB1207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 20:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 389B3206F6
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 20:57:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAy+cXst"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99FB1207FF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2PzJ/TW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 389B3206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKT8D-0008RQ-QP
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 16:41:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50675)
+	id 1jKTNb-0003Yg-BT
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 16:57:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jKT6m-0007on-JN
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 16:40:09 -0400
+ (envelope-from <philmd@redhat.com>) id 1jKTLs-00035I-IF
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 16:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jKT6k-0005m1-DR
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 16:40:07 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54203
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jKTLp-0005Sb-Ne
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 16:55:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26613
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKT6k-0005iT-3z
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 16:40:06 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKTLp-0005P4-Du
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 16:55:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585946405;
+ s=mimecast20190719; t=1585947340;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fCwL5UGRxirWMJAyxl8IQ720bqbrq1qlcUmoZxs9f1U=;
- b=fAy+cXst52d0TZsDO49tg7upAh6iECsZtVDg9bnoDg6v3WcGBBY3E82+kZHK2CL8VECpsr
- eWY3QghcDzv4JZTEeLLvnH5/Xuxdf47vlCjEV4/kA7CTFafbfPWN4Kr055YrGFwZ5UehQu
- JPpOZNO0FsUtdfI8IpTT4Mk4LHXbjhE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-q46eBUHROp6YfDnH5lV9xA-1; Fri, 03 Apr 2020 16:39:59 -0400
-X-MC-Unique: q46eBUHROp6YfDnH5lV9xA-1
-Received: by mail-wm1-f69.google.com with SMTP id 2so3318732wmf.1
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 13:39:59 -0700 (PDT)
+ bh=oS3xyQ7zLxTHoHn9YcWNVnliigynbar24G9Z1YUsETw=;
+ b=X2PzJ/TWGfPTOSfpyhgofE/O4VnLTvdUUBWeqVOpmNL1sSVzw+8vs+HtXG1LdOvlZDCV7x
+ U1W1SJwVQ979IAZPmKgrLL5OTIT4xyleLXcL9ijXYO3EhYQ6547soKHU1xpRapWcz4u4DC
+ igb525QN2SGVrzwFsC7tKX6OJVH56Bs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-398-rm8yBUZ0P36Qvaq3-KjyxQ-1; Fri, 03 Apr 2020 16:55:39 -0400
+X-MC-Unique: rm8yBUZ0P36Qvaq3-KjyxQ-1
+Received: by mail-wr1-f71.google.com with SMTP id 88so1044879wrq.4
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 13:55:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=k5VPogT4d1yb7Bu8EbYFVw4i6MZaE+cuiYcRgEwgv1M=;
- b=Vzhf++4tZniF0t29d9x4aTJ/RLXaMsZWL5yii63v74LV5NqUtvSo2glSxq2Wb8MWsh
- cbcqFZ3lswHabv7YQ2+lu9YBgNkEIPgl7zIxmwIPCe9/ZX8UiHc53bAp5ROShv9tJGKY
- oKzXCmZUjfvKayL7w9Slp1SEziLE4xO2ThIjRbY3xMnNJvIg6YYUQoIUSZ9YgslOpCPf
- mjgyQUwSUP7TUSaiHPQPpadXx+0oJbn2lznSis7W4n4/glksGFGDdfflnPEZRvgB2Vk8
- SQY6gUOI4gNctwJmK4g+L8kJ4naU3xwZhTUV4NBls5Hs3q6Kc/raiqJmgbAIb86fuPAy
- dMUA==
-X-Gm-Message-State: AGi0PuZUCB0JdneOd+ruM8LjGZ4nHOqi4os3OXjHoflN75GCYmyMYQqC
- 3md7b+jlB0mnsd/x4GKyh0oCUSYgZLUEcD0s4wh6ekygaxnUz7Cy5/deiWvyk2qADkD09AWUgni
- 3fNHCu27FCBdw01g=
-X-Received: by 2002:a5d:4acd:: with SMTP id y13mr10925952wrs.61.1585946398600; 
- Fri, 03 Apr 2020 13:39:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLdSuR+vJDWLXzTloyQjkrT0b/+GTdA34UBAetkj4Yt81tD5Z08pb3hYRzczFBbDjuaLcbZVg==
-X-Received: by 2002:a5d:4acd:: with SMTP id y13mr10925930wrs.61.1585946398380; 
- Fri, 03 Apr 2020 13:39:58 -0700 (PDT)
+ bh=nRFtehB20Ey0QXmW52crkJQ3bG+D7LP1F1/RJK+TPqQ=;
+ b=dClK0UIEGcYt8c20ybAaKwcWHnDC1rbHdIFZNlPAyWau/Dzho1ZYCH/7SYMiDFy/nj
+ xPTCFZGOoW+KlycVS0NVCK6wlhGJvczThGAeET3/rwaYJF6WoPwUn4AqcLPpN79qH/I8
+ 7N5cqwM5BBF4Kj43NBd74kimevTz6hnmLj/NZxKx1L6n+NxySnVZOY9FQNmL49QodG3N
+ K05RQ6vAB2RoiiuHojIOTkqimfzZhOr/T/vHd8te6z4NN6kHX9JXX223VuEC12uPiN23
+ Dk5vPTa9StRRdh5y4ldOo6eAoteN9zs9vY7tk97pJyeN4YfSBIrL4sh2hcnpVTZ/D3ZL
+ PfUA==
+X-Gm-Message-State: AGi0PubQyaAgwF1EOJ9OBu30iwSxvXMTn5CFwD3xdnU2suvoXmi0ms0/
+ 1E0ws+lAfQ4vkaoTC2ByuWBd7TXPdv1/KhnJdy/dPcAvR+irPRD+rFiaeqCHNTccSckkfr8gfP7
+ wNB5z65j3WX/FFjg=
+X-Received: by 2002:adf:fc45:: with SMTP id e5mr11797217wrs.56.1585947337759; 
+ Fri, 03 Apr 2020 13:55:37 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIrfZdDpEU/V7fiJNw1MCmB/HR6YPBz5+hKRdiuEFzLLZ5dErdBGJiS8h8nKY99p0O5E5KcTw==
+X-Received: by 2002:adf:fc45:: with SMTP id e5mr11797203wrs.56.1585947337556; 
+ Fri, 03 Apr 2020 13:55:37 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id b67sm12912908wmh.29.2020.04.03.13.39.57
+ by smtp.gmail.com with ESMTPSA id b127sm11022164wmd.2.2020.04.03.13.55.20
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Apr 2020 13:39:57 -0700 (PDT)
-Subject: Re: [PATCH v3 04/12] linux-user: more debug for init_guest_space
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200403191150.863-1-alex.bennee@linaro.org>
- <20200403191150.863-5-alex.bennee@linaro.org>
+ Fri, 03 Apr 2020 13:55:36 -0700 (PDT)
+Subject: Re: [PATCH for-5.0] dump: Fix writing of ELF section
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20200324173630.12221-1-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <df6ebd03-cac2-70cc-7cb9-3753e30f9e45@redhat.com>
-Date: Fri, 3 Apr 2020 22:39:56 +0200
+Message-ID: <63099477-98e6-8c16-1c8c-a9a617062143@redhat.com>
+Date: Fri, 3 Apr 2020 22:55:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200403191150.863-5-alex.bennee@linaro.org>
+In-Reply-To: <20200324173630.12221-1-peter.maydell@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,62 +105,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/3/20 9:11 PM, Alex Benn=C3=A9e wrote:
-> Searching for memory space can cause problems so lets extend the
-> CPU_LOG_PAGE output so you can watch init_guest_space fail to
-> allocate memory. A more involved fix is actually required to make this
-> function play nicely with the large guard pages the sanitiser likes to
+On 3/24/20 6:36 PM, Peter Maydell wrote:
+> In write_elf_section() we set the 'shdr' pointer to point to local
+> structures shdr32 or shdr64, which we fill in to be written out to
+> the ELF dump.  Unfortunately the address we pass to fd_write_vmcore()
+> has a spurious '&' operator, so instead of writing out the section
+> header we write out the literal pointer value followed by whatever is
+> on the stack after the 'shdr' local variable.
 
-TIL "in an effort to differentiate British English from American, many=20
-British publishers have begun giving -ise endings even to words that=20
-have always been spelled -ize."
-
-https://grammarist.com/spelling/sanitise-sanitize/
-
-> use.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+How did you notice this? While reviewing around?
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> ---
->   linux-user/elfload.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 8198be04460..619c054cc48 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2172,6 +2172,8 @@ unsigned long init_guest_space(unsigned long host_s=
-tart,
+> Pass the correct address into fd_write_vmcore().
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I have not tested this because I can't reproduce the conditions
+> under which we try to actually use write_elf_section() (they
+> must be rare, because currently we produce a bogus ELF file
+> for this code path). In dump_init() s->list.num must be
+> at least UINT16_MAX-1, which I think means it has to be a
+> paging-enabled dump and the guest's page table must be
+> extremely fragmented ?
+> ---
+>   dump/dump.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/dump/dump.c b/dump/dump.c
+> index 6fb6e1245ad..22ed1d3b0d4 100644
+> --- a/dump/dump.c
+> +++ b/dump/dump.c
+> @@ -364,7 +364,7 @@ static void write_elf_section(DumpState *s, int type,=
+ Error **errp)
+>           shdr =3D &shdr64;
+>       }
 >  =20
->           /* Check to see if the address is valid.  */
->           if (host_start && real_start !=3D current_start) {
-> +            qemu_log_mask(CPU_LOG_PAGE, "invalid %lx && %lx !=3D %lx\n",
-> +                          host_start, real_start, current_start);
->               goto try_again;
->           }
->  =20
-> @@ -2240,7 +2242,11 @@ unsigned long init_guest_space(unsigned long host_=
-start,
->            * probably a bad strategy if not, which means we got here
->            * because of trouble with ARM commpage setup.
->            */
-> -        munmap((void *)real_start, real_size);
-> +        if (munmap((void *)real_start, real_size) !=3D 0) {
-> +            error_report("%s: failed to unmap %lx:%lx (%s)", __func__,
-> +                         real_start, real_size, strerror(errno));
-> +            abort();
-> +        }
->           current_start +=3D align;
->           if (host_start =3D=3D current_start) {
->               /* Theoretically possible if host doesn't have any suitably
+> -    ret =3D fd_write_vmcore(&shdr, shdr_size, s);
+> +    ret =3D fd_write_vmcore(shdr, shdr_size, s);
+>       if (ret < 0) {
+>           error_setg_errno(errp, -ret,
+>                            "dump: failed to write section header table");
 >=20
 
 
