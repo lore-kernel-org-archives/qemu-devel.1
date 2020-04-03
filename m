@@ -2,89 +2,80 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA00AC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F58DC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:06:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 885D2206F8
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC7C32080C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:06:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tcUIogvK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 885D2206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/LLfocT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC7C32080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKHL9-0002Cu-NE
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 04:06:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42109)
+	id 1jKHLf-0003Rb-27
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 04:06:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1jKHJw-0000bS-1P
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:04:57 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jKHKM-00012L-31
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1jKHJu-0006zj-Vj
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:04:55 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35390)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1jKHJu-0006xb-QM; Fri, 03 Apr 2020 04:04:54 -0400
-Received: by mail-pl1-x644.google.com with SMTP id c12so2420922plz.2;
- Fri, 03 Apr 2020 01:04:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:subject:to:cc:references:in-reply-to:mime-version
- :user-agent:message-id:content-transfer-encoding;
- bh=lEpqq3JA9iuwDGTpovSHin12JFafCJybb5KoETxs7js=;
- b=tcUIogvKcP3LFEwi+5YQHwsNJ0NxWFp53B4A/4bIGLEIb/QAUm3uQaaD7ZHMwCFsVp
- Y7jfUuEBmTds67EDbanBBJzHxGcnGwSHuj+sEKRufWPNo6TM3VEIjrPQN3/gSxR98Syd
- GeDJbDndH1jVJaJ0OI9TijV8GtAutyl6c56yjl0RR4Hz0zRDLhnE9wvh7Low3p0WHeBL
- ZmcHyrVfZrP1/ODoc5qLX7kLFmhHkgnLJjgDVVdcZztNi0YqHZVbnza9AQ4xamEDVmpt
- 9uepZjFt1m2HVxnBntjAgHpuwaV8vhtKrT5qSFdOdhfjdKP9WcyeA3fZOHs18ZlZDOjn
- bJYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
- :mime-version:user-agent:message-id:content-transfer-encoding;
- bh=lEpqq3JA9iuwDGTpovSHin12JFafCJybb5KoETxs7js=;
- b=Kcm55IwIA9bxk+enSwvVWq0lmZL0cxDr5kXPLgqWNoNKtjRALM8odf5gxH4l4z7n0d
- ZbjsabVXXTjD4niKf28doAQrvf87W4j2vSvHg9zoLjofH6wc8LcIlJugKreA85WrYXST
- PlQMGN3zto3zbAtdoMXDuRpDodsoxh+nphM1pigiQPM77qmm3xcw6gZFs40j+4zmPTuT
- nV6HSd6zaLfL5J9y5pOxX0jVkCebOvJtO9odXcDVpWBZdLsWVW8GjSjcnC14N/NqxZGo
- B2bQgzTAZowbOzwfJE9gZvvNHt10if+Mie86hfaNHCKGOt2DKnpeKKZbH5dG7lc9m1jS
- 1qyQ==
-X-Gm-Message-State: AGi0PuYhwgURsuqPYatQ5DXkHCEy2xja9sWcGU0aq3ctUKohpa09Qpyt
- epTnX8UCRufocuERArLJl8U=
-X-Google-Smtp-Source: APiQypLvXwg5YhXveFNIP1UanSYTUE8nCeZhG+ZnjwaaHlfxnRIvQEQINpizuuFYqbQ7te17aB5I8Q==
-X-Received: by 2002:a17:902:a416:: with SMTP id
- p22mr6924998plq.57.1585901093796; 
- Fri, 03 Apr 2020 01:04:53 -0700 (PDT)
-Received: from localhost (60-241-117-97.tpgi.com.au. [60.241.117.97])
- by smtp.gmail.com with ESMTPSA id q71sm5361364pfc.92.2020.04.03.01.04.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 01:04:53 -0700 (PDT)
-Date: Fri, 03 Apr 2020 18:04:47 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 3/5] nmi: add MCE class for implementing machine check
- injection commands
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200325144147.221875-1-npiggin@gmail.com>
- <20200325144147.221875-4-npiggin@gmail.com>
- <20200331002203.GB47772@umbus.fritz.box>
-In-Reply-To: <20200331002203.GB47772@umbus.fritz.box>
+ (envelope-from <kraxel@redhat.com>) id 1jKHKK-0007oi-LM
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:05:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32188
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jKHKK-0007nr-Eq
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:05:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585901120;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fyGr9EDP8Lt47BNdtDV45HB9ePlMiacy+4RxxiFGp9U=;
+ b=X/LLfocTbOx5/QNOzhUGPBEZwCBYQw3z5eLGXyj7qz3stJgs08D/NzxC6EkrldMvJBsoa0
+ +aK1FNR1cpZMXzmcxCrKPYf1pC5V41FZ+XBhQ5R2fgJ45fYUImEjkVsEvY8UdgCIL0mEDJ
+ wbobkhzaTJXFbNg4QJr43aw+3QCVAhE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-rxfCmH3lOduVPwIVp0sFNg-1; Fri, 03 Apr 2020 04:05:15 -0400
+X-MC-Unique: rxfCmH3lOduVPwIVp0sFNg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A8951005516;
+ Fri,  3 Apr 2020 08:05:14 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-60.ams2.redhat.com
+ [10.36.113.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C9F671147CE;
+ Fri,  3 Apr 2020 08:05:13 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 6465C17524; Fri,  3 Apr 2020 10:05:03 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 12/12] acpi: factor out fw_cfg_add_acpi_dsdt()
+Date: Fri,  3 Apr 2020 10:05:02 +0200
+Message-Id: <20200403080502.8154-13-kraxel@redhat.com>
+In-Reply-To: <20200403080502.8154-1-kraxel@redhat.com>
+References: <20200403080502.8154-1-kraxel@redhat.com>
 MIME-Version: 1.0
-User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1585900632.k0ft0cc80l.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,52 +87,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>,
- qemu-devel@nongnu.org, =?iso-8859-1?q?C=E9dric?= Le Goater <clg@fr.ibm.com>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Gibson's on March 31, 2020 10:22 am:
-> On Thu, Mar 26, 2020 at 12:41:45AM +1000, Nicholas Piggin wrote:
->> Like commit 9cb805fd26 ("cpus: Define callback for QEMU "nmi" command")
->> this implements a machine check injection command framework and defines
->> a monitor command for ppc.
->>=20
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->=20
-> So, AFAICT, both x86 and ppc have something called an MCE, and while
-> I'm guessing they're somewhat related, they don't work quite the same
-> way - different information provided to the handler and so forth.
->=20
-> I think it's reasonable to overload the "mce" HMP command based on
-> target for the different types.  However, I think calling the
-> interface classes which are specific to the ppc type just "mce" could
-> be pretty confusing.
+Add helper function to add fw_cfg device,
+also move code to hw/i386/fw_cfg.c.
 
-Okay. So, convert i386 first?
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/i386/fw_cfg.h     |  1 +
+ hw/i386/acpi-build.c | 24 +-----------------------
+ hw/i386/fw_cfg.c     | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 30 insertions(+), 23 deletions(-)
 
-> In addition, I think this is adding an HMP command to inject the event
-> without any corresponding way of injecting via QMP.  I believe that's
-> frowned upon.
+diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+index 9e742787792b..275f15c1c5e8 100644
+--- a/hw/i386/fw_cfg.h
++++ b/hw/i386/fw_cfg.h
+@@ -25,5 +25,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+                                uint16_t apic_id_limit);
+ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
+ void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
++void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
+=20
+ #endif
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 23817d9005cc..55ece91655cf 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1874,30 +1874,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+=20
+     /* create fw_cfg node, unconditionally */
+     {
+-        /* when using port i/o, the 8-bit data register *always* overlaps
+-         * with half of the 16-bit control register. Hence, the total size
+-         * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
+-         * DMA control register is located at FW_CFG_DMA_IO_BASE + 4 */
+-        uint8_t io_size =3D object_property_get_bool(OBJECT(x86ms->fw_cfg)=
+,
+-                                                   "dma_enabled", NULL) ?
+-                          ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t=
+) :
+-                          FW_CFG_CTL_SIZE;
+-
+         scope =3D aml_scope("\\_SB.PCI0");
+-        dev =3D aml_device("FWCF");
+-
+-        aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
+-
+-        /* device present, functioning, decoding, not shown in UI */
+-        aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
+-
+-        crs =3D aml_resource_template();
+-        aml_append(crs,
+-            aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_=
+size)
+-        );
+-        aml_append(dev, aml_name_decl("_CRS", crs));
+-
+-        aml_append(scope, dev);
++        fw_cfg_add_acpi_dsdt(scope, x86ms->fw_cfg);
+         aml_append(dsdt, scope);
+     }
+=20
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index da60ada59462..c55abfb01abb 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -15,6 +15,7 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/numa.h"
+ #include "hw/acpi/acpi.h"
++#include "hw/acpi/aml-build.h"
+ #include "hw/firmware/smbios.h"
+ #include "hw/i386/fw_cfg.h"
+ #include "hw/timer/hpet.h"
+@@ -179,3 +180,30 @@ void fw_cfg_build_feature_control(MachineState *ms, FW=
+CfgState *fw_cfg)
+     *val =3D cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
+     fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
+ }
++
++void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
++{
++    /*
++     * when using port i/o, the 8-bit data register *always* overlaps
++     * with half of the 16-bit control register. Hence, the total size
++     * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
++     * DMA control register is located at FW_CFG_DMA_IO_BASE + 4
++     */
++    Object *obj =3D OBJECT(fw_cfg);
++    uint8_t io_size =3D object_property_get_bool(obj, "dma_enabled", NULL)=
+ ?
++        ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t) :
++        FW_CFG_CTL_SIZE;
++    Aml *dev =3D aml_device("FWCF");
++    Aml *crs =3D aml_resource_template();
++
++    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
++
++    /* device present, functioning, decoding, not shown in UI */
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
++
++    aml_append(crs,
++        aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_size=
+));
++
++    aml_append(dev, aml_name_decl("_CRS", crs));
++    aml_append(scope, dev);
++}
+--=20
+2.18.2
 
-I attempted that but didn't get too far. I guess it's more of a
-special test than a management function (nmi has valid uses in=20
-administering a machine), so maybe we can get an exemption. One issue
-is different QMP command for powerpc vs x86.
-
-I think error injection as a general concept might be valid there, but
-the better interface for that level would be higher up, e.g, not
-specifying register settings but rather "simulate uncorrected memory
-error on this byte".
-
-Do you think that is reasonable reason to avoid adding QMP for this
-nasty low level thing?
-
-Thanks,
-Nick
-
-=
 
