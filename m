@@ -2,79 +2,80 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC59C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 09:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F6A6C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 09:46:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8531E20721
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 09:44:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6783920721
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 09:46:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XTm2ybCM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8531E20721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q44pjh36"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6783920721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKIsR-0003tP-Mu
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 05:44:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59169)
+	id 1jKItt-000558-JI
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 05:46:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jKIrb-0003Mx-9H
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:43:48 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jKItB-0004VJ-Q1
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:45:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jKIrZ-0006u1-QX
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:43:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34228
+ (envelope-from <imammedo@redhat.com>) id 1jKIt9-0008As-N0
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:45:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23053
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKIrZ-0006tU-NH
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:43:45 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKIt8-0008A5-RS
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:45:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585907025;
+ s=mimecast20190719; t=1585907122;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Frdcg7uowSM6NnXylagsf4PoqdD5UWhwJAApShRkbLA=;
- b=XTm2ybCMGH6dZH+uVV/HkQ+jcQOqeZFyaCMUlGbjSBmx25YUt0lvRVhku3YcZ0zez5ftrQ
- mwMuYD6CC9IogQhgvWfukaqQOuDcCAdHiTkqxHFOFoDIx0snq2bWymdz/YPBp7H78KNiQw
- 1lVxcuAUeNUqUXX5oY4VwHtnw0070xw=
+ bh=B416If9r0QtvvendAleiNCuTYOggUqubG9J1w5R85qk=;
+ b=Q44pjh36mHviOFSwBuvq0wJv9KpKtYpqbqHGVV/q3u+vRehXRiCu/HKB6Oma8EAW47PV1k
+ WMqLgUcB7jL7WOmD3gg/tZXZsCSsDv3ADXEfwlX3TtTnPQ8oEn5eoi1H08KZSnC3flIUNY
+ DxkvBuFW99gAwfhE+s4bIqC3alk3V7w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-UgXO02poN9Oz_CKyEuKW0g-1; Fri, 03 Apr 2020 05:43:41 -0400
-X-MC-Unique: UgXO02poN9Oz_CKyEuKW0g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-313-YtF_c4bCPcyHhY94hzI3YQ-1; Fri, 03 Apr 2020 05:45:18 -0400
+X-MC-Unique: YtF_c4bCPcyHhY94hzI3YQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1FAB190B2A2;
- Fri,  3 Apr 2020 09:43:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EEF9190B2A3;
+ Fri,  3 Apr 2020 09:45:17 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 025B21001B09;
- Fri,  3 Apr 2020 09:43:29 +0000 (UTC)
-Date: Fri, 3 Apr 2020 11:43:28 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 43D305DA7D;
+ Fri,  3 Apr 2020 09:45:05 +0000 (UTC)
+Date: Fri, 3 Apr 2020 11:45:03 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 02/12] acpi: add aml builder stubs
-Message-ID: <20200403114328.764cdaf3@redhat.com>
-In-Reply-To: <20200403080502.8154-3-kraxel@redhat.com>
+Subject: Re: [PATCH v2 03/12] acpi: drop pointless _STA method
+Message-ID: <20200403114503.1150ebaf@redhat.com>
+In-Reply-To: <20200403080502.8154-4-kraxel@redhat.com>
 References: <20200403080502.8154-1-kraxel@redhat.com>
- <20200403080502.8154-3-kraxel@redhat.com>
+ <20200403080502.8154-4-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,118 +97,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  3 Apr 2020 10:04:52 +0200
+On Fri,  3 Apr 2020 10:04:53 +0200
 Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-> Needed when moving aml builder code to devices.
+> When returning a constant there is no point in having a method
+> in the first place, _STA can be a simple integer instead.
 > 
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 > ---
->  hw/acpi/aml-build-stub.c | 79 ++++++++++++++++++++++++++++++++++++++++
->  hw/acpi/Makefile.objs    |  4 +-
->  2 files changed, 81 insertions(+), 2 deletions(-)
->  create mode 100644 hw/acpi/aml-build-stub.c
+>  hw/i386/acpi-build.c | 14 +++-----------
+>  1 file changed, 3 insertions(+), 11 deletions(-)
 > 
-> diff --git a/hw/acpi/aml-build-stub.c b/hw/acpi/aml-build-stub.c
-> new file mode 100644
-> index 000000000000..58b2e162277f
-> --- /dev/null
-> +++ b/hw/acpi/aml-build-stub.c
-> @@ -0,0 +1,79 @@
-> +/*
-> + * ACPI aml builder stubs for platforms that don't support ACPI.
-> + *
-> + * Copyright (c) 2006 Fabrice Bellard
-> + * Copyright (c) 2016 Red Hat, Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/aml-build.h"
-> +
-> +void aml_append(Aml *parent_ctx, Aml *child)
-> +{
-> +}
-> +
-> +Aml *aml_resource_template(void)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_device(const char *name_format, ...)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_eisaid(const char *str)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_name_decl(const char *name, Aml *val)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_io(AmlIODecode dec, uint16_t min_base, uint16_t max_base,
-> +            uint8_t aln, uint8_t len)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_irq_no_flags(uint8_t irq)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_int(const uint64_t val)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_package(uint8_t num_elements)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_dma(AmlDmaType typ, AmlDmaBusMaster bm, AmlTransferSize sz,
-> +             uint8_t channel)
-> +{
-> +    return NULL;
-> +}
-> +
-> +Aml *aml_buffer(int buffer_size, uint8_t *byte_list)
-> +{
-> +    return NULL;
-> +}
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 777da07f4d70..cab9bcd457dc 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -20,6 +20,6 @@ common-obj-$(CONFIG_TPM) += tpm.o
->  common-obj-$(CONFIG_IPMI) += ipmi.o
->  common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
->  else
-> -common-obj-y += acpi-stub.o
-> +common-obj-y += acpi-stub.o aml-build-stub.o
->  endif
-> -common-obj-$(CONFIG_ALL) += acpi-stub.o acpi-x86-stub.o ipmi-stub.o
-> +common-obj-$(CONFIG_ALL) += acpi-stub.o aml-build-stub.o acpi-x86-stub.o ipmi-stub.o
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 9a19c14e661b..214b98671bf2 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1151,14 +1151,11 @@ static Aml *build_kbd_device_aml(void)
+>  {
+>      Aml *dev;
+>      Aml *crs;
+> -    Aml *method;
+>  
+>      dev = aml_device("KBD");
+>      aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0303")));
+>  
+> -    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+> -    aml_append(method, aml_return(aml_int(0x0f)));
+> -    aml_append(dev, method);
+> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+>  
+>      crs = aml_resource_template();
+>      aml_append(crs, aml_io(AML_DECODE16, 0x0060, 0x0060, 0x01, 0x01));
+> @@ -1173,14 +1170,11 @@ static Aml *build_mouse_device_aml(void)
+>  {
+>      Aml *dev;
+>      Aml *crs;
+> -    Aml *method;
+>  
+>      dev = aml_device("MOU");
+>      aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0F13")));
+>  
+> -    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+> -    aml_append(method, aml_return(aml_int(0x0f)));
+> -    aml_append(dev, method);
+> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+>  
+>      crs = aml_resource_template();
+>      aml_append(crs, aml_irq_no_flags(12));
+> @@ -2238,9 +2232,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>                                             TPM_CRB_ADDR_SIZE, AML_READ_WRITE));
+>          aml_append(dev, aml_name_decl("_CRS", crs));
+>  
+> -        method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+> -        aml_append(method, aml_return(aml_int(0x0f)));
+> -        aml_append(dev, method);
+> +        aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+>  
+>          tpm_build_ppi_acpi(tpm, dev);
+>  
 
 
