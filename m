@@ -2,64 +2,82 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB1D4C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFECAC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:40:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EB95206B8
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:29:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB95206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AB43A2078C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 13:40:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JwXsXmJH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB43A2078C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKMO5-0003QI-M3
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 09:29:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33547)
+	id 1jKMYc-0007Ci-Rr
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 09:40:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34820)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jKMNT-0002nm-MW
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:28:56 -0400
+ (envelope-from <eblake@redhat.com>) id 1jKMXg-0006JM-2D
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:39:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jKMNS-00027A-DV
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:28:55 -0400
-Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:37286)
+ (envelope-from <eblake@redhat.com>) id 1jKMXf-0003tb-1A
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:39:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29465
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jKMNS-0001ra-8N
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:28:54 -0400
-Received: from player737.ha.ovh.net (unknown [10.110.171.96])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 5D03F207DD1
- for <qemu-devel@nongnu.org>; Fri,  3 Apr 2020 15:28:45 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player737.ha.ovh.net (Postfix) with ESMTPSA id 299DD7A2CBE7;
- Fri,  3 Apr 2020 13:28:39 +0000 (UTC)
-Subject: Re: [PATCH for-5.0] hw/gpio/aspeed_gpio.c: Don't directly include
- assert.h
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200403124712.24826-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ed43d629-c6ad-f3ff-6e40-aa9ccddbebc2@kaod.org>
-Date: Fri, 3 Apr 2020 15:28:39 +0200
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jKMXe-0003tI-Ta
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 09:39:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585921166;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LFf5S60hh4aoIBnSJ56VUr02qB1rzy3wiVeTGa6KS4I=;
+ b=JwXsXmJHYcAjnoWct1Rv4MZm92IPt0ghrW6leeoOTV6yRQJgRKNHDXdvR7240mTBy+EUdo
+ Ofk0yC8rsvj5KFA0g1IAuCfrIFivtjzPz9EfaYT0nzNBc3Ncf9t4Z+2osHaccyG1BaUNiA
+ Hsb5Su+3EnIk60eNlJ+1byF4YO+VtIc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-464-Fgrycq5QNL2WJ46vx81hgQ-1; Fri, 03 Apr 2020 09:39:21 -0400
+X-MC-Unique: Fgrycq5QNL2WJ46vx81hgQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D128149C2;
+ Fri,  3 Apr 2020 13:39:20 +0000 (UTC)
+Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CE3F31001B30;
+ Fri,  3 Apr 2020 13:39:19 +0000 (UTC)
+Subject: Re: [PATCH] iotests/common.pattern: Quote echos
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200403101134.805871-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <4ebf9849-ad4a-3eb7-e265-1d8f933324ea@redhat.com>
+Date: Fri, 3 Apr 2020 08:39:19 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200403124712.24826-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200403101134.805871-1-mreitz@redhat.com>
 Content-Language: en-US
-X-Ovh-Tracer-Id: 4182718157698534355
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrtdeigdeigecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.59.196
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,52 +89,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/3/20 2:47 PM, Peter Maydell wrote:
-> Remove a direct include of assert.h -- this is already
-> provided by qemu/osdep.h, and it breaks our rule that the
-> first include must always be osdep.h.
->=20
-> In particular we must get the assert() macro via osdep.h
-> to avoid compile failures on mingw (see the comment in
-> osdep.h where we redefine assert() for that platform).
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 4/3/20 5:11 AM, Max Reitz wrote:
+>>From time to time, my shell decides to repace the bracketed numbers here
+> by the numbers inside (i.e., "=== Clusters to be compressed [1]" is
+> printed as "=== Clusters to be compressed 1").  That makes tests that
 
+Namely, any time your environment has a file named '1' in the directory 
+where you are running iotests.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
+> use common.pattern fail.  Prevent that from happening by quoting the
+> arguments to all echos in common.pattern.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-> Reported via a random comment on our github mirror...
-> we should probably do a proper clean-includes run post-5.0.
+>   tests/qemu-iotests/common.pattern | 22 +++++++++++-----------
+>   1 file changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/common.pattern b/tests/qemu-iotests/common.pattern
+> index 4f5e5bcea0..4caa5de187 100644
+> --- a/tests/qemu-iotests/common.pattern
+> +++ b/tests/qemu-iotests/common.pattern
+> @@ -23,7 +23,7 @@ do_is_allocated() {
+>       local count=$4
+>   
+>       for ((i=1;i<=$count;i++)); do
+> -        echo alloc $(( start + (i - 1) * step )) $size
+> +        echo "alloc $(( start + (i - 1) * step )) $size"
 
-with a 'sort' maybe.
+No real change on this line because $size is safe, but also no harm at 
+being consistent, and makes it easier to not have to audit $size for 
+being safe.
 
-Thanks,
+>       # Write the clusters to be compressed
+> -    echo === Clusters to be compressed [1]
+> +    echo '=== Clusters to be compressed [1]'
 
-C.=20
+This one is definitely needed to avoid inadvertent globbing.
 
->=20
->  hw/gpio/aspeed_gpio.c | 2 --
->  1 file changed, 2 deletions(-)
->=20
-> diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
-> index 41e11ea9b04..e52fcfd9a03 100644
-> --- a/hw/gpio/aspeed_gpio.c
-> +++ b/hw/gpio/aspeed_gpio.c
-> @@ -6,8 +6,6 @@
->   * SPDX-License-Identifier: GPL-2.0-or-later
->   */
-> =20
-> -#include <assert.h>
-> -
->  #include "qemu/osdep.h"
->  #include "qemu/host-utils.h"
->  #include "qemu/log.h"
->=20
+>       # Read them
+> -    echo === Read used/compressed clusters
+> +    echo '=== Read used/compressed clusters'
+
+And this one does not buy any safety, but again consistency doesn't hurt.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
