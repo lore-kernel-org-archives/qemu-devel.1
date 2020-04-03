@@ -2,107 +2,81 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D66C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 09:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCD5C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:02:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EEAA20737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 09:57:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F46720757
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 10:02:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="haIGk96f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EEAA20737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKOlTqQe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F46720757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKJ4Y-0007Mt-8s
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 05:57:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32891)
+	id 1jKJ9D-0000cs-57
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 06:01:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jKJ3m-0006sJ-SN
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:56:23 -0400
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jKJ8C-0008Fs-JD
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:00:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jKJ3l-0001ya-9y
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:56:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37746
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jKJ3l-0001xe-5f
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 05:56:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585907779;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=RP3PNYYZP/0OVDKk6hg0Bg3EO5pqFtFmPiubzXt07gI=;
- b=haIGk96fLHAr38iII11dXvG1dO89fD8p2J/HCMPzZN1afcHnFDkMXXE3zLmk00q5v7gTUi
- TObjyRc3A7/USu9GiXcTxRxLlUy+JPxGkFojYPSwz59YBnZTEy0mWlWczKMKbDWD9HPFq7
- gDiwQwH5KjzmwADW6/xjSZt5zgWo3Cc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-V4LzXWA6MEKKwjSGapMmKw-1; Fri, 03 Apr 2020 05:56:13 -0400
-X-MC-Unique: V4LzXWA6MEKKwjSGapMmKw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E237107ACC7;
- Fri,  3 Apr 2020 09:56:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-97.ams2.redhat.com
- [10.36.113.97])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 65FD7A63DC;
- Fri,  3 Apr 2020 09:56:10 +0000 (UTC)
-Subject: Re: [PATCH for-5.0? v3] qemu-img: Report convert errors by bytes, not
- sectors
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200402135717.476398-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0f3c843f-1e68-7e5c-c623-1d42f82a7508@redhat.com>
-Date: Fri, 3 Apr 2020 11:56:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jKJ8A-0006bu-Qm
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:00:56 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42881)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jKJ8A-0006W7-H8
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 06:00:54 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h15so7763600wrx.9
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 03:00:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vc5Xg30ucEwTjNoWSlNkQrdAMkSjcfl5FF66NJ6114E=;
+ b=PKOlTqQeAOa3NJlZUVKYikwALL1d14sA0thtujxxbs2kLsLbT3mIpSyzJKqv13t/XQ
+ 7x4pYTuJFmzxooTs4grnnhLx/2RKksaGcw4yhwHTSz2oI0m83Md69xd52fV4tW/+bRcI
+ gRdG35/AHbCa8mgknZaFEtrwdab7dbH/DY6iqADMy4Oi+21DEu0kvtT2a+qLBFq+0Iwo
+ 4yYfGp6bPY3AYaA9pHLPhWVPajzdXAHP5yfYsgYOc+oRVg26NRedD7vfbQEcRZ5uEufx
+ 4FhKvZVRwN91kZFAI5+LO58byfYsKxmrHa9GWSMQwpIYYYtUfvrxY3agN0oPJh7kD2gx
+ Bdfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vc5Xg30ucEwTjNoWSlNkQrdAMkSjcfl5FF66NJ6114E=;
+ b=mWycRpo4C9kYewUvce4f2+a4ltOmkBkf6H5TbsXOVhZTZptmqsqJkLmjOlwW9HZXfp
+ gHbfJM0H9iiyxBR/uS7Z7Vt7IVGcWqxnfcED8omGZZOhaRMIWgPlF9/l/J+/JVkMBBKw
+ KFTgi4r3RFREmfVwAST3ktQE/ZIZqdtA0u2pcge1owP4M2YRts1xCcgY43NCweMRbVK9
+ lMLiVIKvPXzz0bN1BViN6VzUwhZ5BHHjq9E4s6MWR/3HtyI+awSGLpyQGH+qxC/Rj2/D
+ l9H5/kbuSAp7rnXulrfvHtvn1lKkv5uQZwA536gCFQ3k7wKhE3/3l+f+3X+4m6AntBuH
+ 15mg==
+X-Gm-Message-State: AGi0PuYZ0lDqlplntD4wP37MR8l4EDIKffjnop+Ni8TLgY+qO7bTg60I
+ G3O11vvSgaKskmwCqusGickcHawRWiS/tc00I6o=
+X-Google-Smtp-Source: APiQypLg+TE8io85Pf0mI28ka+Da1R2ud3EMOBGtEF7CI8g9aDvr8B4PxqZLcliHEO5a8pKLz8fWWNSwc5yM7JcqAMM=
+X-Received: by 2002:adf:a459:: with SMTP id e25mr955214wra.402.1585908052333; 
+ Fri, 03 Apr 2020 03:00:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200402135717.476398-1-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="fui2I4J2ve27T8MdEnjVJiSNNjD1XyK9Z"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200325100520.206210-1-jiaxun.yang@flygoat.com>
+ <CAHiYmc4+mjtFxvTvrKohG2YBAMVqEAVVDT1e-XfJLC9D_+fnyA@mail.gmail.com>
+In-Reply-To: <CAHiYmc4+mjtFxvTvrKohG2YBAMVqEAVVDT1e-XfJLC9D_+fnyA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Fri, 3 Apr 2020 12:00:31 +0200
+Message-ID: <CAHiYmc7bQ-kdFtqbdKTnPor0vs4qLiu-4YAFatxE40DFioPyWA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] target/mips: Add loongson gs464 core
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: multipart/alternative; boundary="0000000000001b1e1705a25ffea5"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,65 +88,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: chenhc@lemote.com, aleksandar.rikalo@rt-rk.com,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fui2I4J2ve27T8MdEnjVJiSNNjD1XyK9Z
-Content-Type: multipart/mixed; boundary="tsPeKRA6ryDl1Co5gOuxpBAGLEASf7f1v"
-
---tsPeKRA6ryDl1Co5gOuxpBAGLEASf7f1v
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--0000000000001b1e1705a25ffea5
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 02.04.20 15:57, Eric Blake wrote:
-> Various qemu-img commands are inconsistent on whether they report
-> status/errors in terms of bytes or sector offsets.  The latter is
-> confusing (especially as more places move to 4k block sizes), so let's
-> switch everything to just use bytes everywhere.  One iotest is
-> impacted.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
-> v3: Fix affected iotest [patchew]
->=20
->  qemu-img.c                 | 8 ++++----
->  tests/qemu-iotests/244.out | 2 +-
->  2 files changed, 5 insertions(+), 5 deletions(-)
+00:02 Pet, 27.03.2020. Aleksandar Markovic <aleksandar.qemu.devel@gmail.com=
+>
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> 12:05 Sre, 25.03.2020. Jiaxun Yang <jiaxun.yang@flygoat.com> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > Loongson gs464 core can be found in Loongson-3A1000 processor.
+> > This patchset add minimal support for that core.
+> > There are still some instructions missing, I'm going to work on
+> > them later.
+> >
+> > The corresponding hw board is also missing. I'm using modified kernel
+> > for malta for testing purpose and planing to take the design of Lemote'=
+s
+> > KVM virtual machine.
+> >
+> > Official manual of this core can be found here [1] (In Chinese).
+> > My collection of instruction documents mainly based on Chinese
+> > version of manual, binutils gas code and experiments on real machine
+> > can be found here [2] (In English).
+> >
+> > [1]:
+http://loongson.cn/uploadfile/cpu/3A1000/Loongson_3A1000_cpu_user_2.pdf
+> > [2]:
+https://github.com/FlyGoat/loongson-insn/blob/master/loongson-ext.md
+> >
+>
+> Thanks, Jiaxun!
+>
+> Just to mention whay you probably know, since this is a new feature, this
+is too late for 5.0, so we are shooting for integrsying it in 5.1.
+>
+> Speak to you later of course in more details.
+>
 
-Thanks, applied to my block branch:
+Jiaxun, hello again.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+May I ask you to provide us the automatic english transl
+tion of document [1]?
 
-Max
+translate.google.com site has the festure of uploading and translating a
+pdf file. Unfortunately, one can't download resulting pdf file. But, there
+is a workaround: one can "print" the page to pdf format from the browser.
 
+There may be other ways of automatic translation of pdfs, but the one above
+seems pretty reasonable.
 
---tsPeKRA6ryDl1Co5gOuxpBAGLEASf7f1v--
+Yours,
+Aleksandar
 
---fui2I4J2ve27T8MdEnjVJiSNNjD1XyK9Z
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Yours,
+> Aleksandar
+>
+> > Jiaxun Yang (3):
+> >   target/mips: Introduce loongson ext & mmi ASE flags
+> >   target/mips: Add loongson ext lsdc2 instrustions
+> >   target/mips: Add loongson gs464 core
+> >
+> >  target/mips/mips-defs.h          |   2 +
+> >  target/mips/translate.c          | 166 ++++++++++++++++++++++++++++++-
+> >  target/mips/translate_init.inc.c |  25 ++++-
+> >  3 files changed, 188 insertions(+), 5 deletions(-)
+> >
+> > --
+> > 2.26.0.rc2
+> >
+> >
 
------BEGIN PGP SIGNATURE-----
+--0000000000001b1e1705a25ffea5
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6HCDgACgkQ9AfbAGHV
-z0BSTgf/VmfZeGTzdrWhETqtTvrWUIm2+x+vO2wGK49dZF7a/V6xWJqBZizy1Bgf
-7bNyhe4pKdZuiRG1ZV8GrjSlHJCJv5JkxLT/lt6CDSUtT9tMIbJH08ppHZTpfAwo
-b2s3R5Xm+R5TLwKj3wEZ5iuIYWuURCzKvbRoChvm3fQtwuxxSDk3/zPq12+f9TbC
-OAyb7Zhn0FtoHXpBT/3mYTMBIO8/SKTuPi5GPJQ/AQbzrRcUvazQhbOi2xRMxk57
-sEOPafMDDWLCnpRQvB/6TUyMt/crIPrt0wnODrD+SM285FIJRKqVJ8w9wgog0yJm
-1RZwcdqZlvW3NubzdZlCMAg9p/ugog==
-=s2qe
------END PGP SIGNATURE-----
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">00:02 Pet, 27.03.2020. Aleksandar Markovic &lt;<a href=3D"ma=
+ilto:aleksandar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&g=
+t; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br=
+>
+&gt;<br>
+&gt; 12:05 Sre, 25.03.2020. Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@f=
+lygoat.com">jiaxun.yang@flygoat.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=
+=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt; &gt;<br>
+&gt; &gt; Loongson gs464 core can be found in Loongson-3A1000 processor.<br=
+>
+&gt; &gt; This patchset add minimal support for that core.<br>
+&gt; &gt; There are still some instructions missing, I&#39;m going to work =
+on<br>
+&gt; &gt; them later.<br>
+&gt; &gt;<br>
+&gt; &gt; The corresponding hw board is also missing. I&#39;m using modifie=
+d kernel<br>
+&gt; &gt; for malta for testing purpose and planing to take the design of L=
+emote&#39;s<br>
+&gt; &gt; KVM virtual machine.<br>
+&gt; &gt;<br>
+&gt; &gt; Official manual of this core can be found here [1] (In Chinese).<=
+br>
+&gt; &gt; My collection of instruction documents mainly based on Chinese<br=
+>
+&gt; &gt; version of manual, binutils gas code and experiments on real mach=
+ine<br>
+&gt; &gt; can be found here [2] (In English).<br>
+&gt; &gt;<br>
+&gt; &gt; [1]: <a href=3D"http://loongson.cn/uploadfile/cpu/3A1000/Loongson=
+_3A1000_cpu_user_2.pdf">http://loongson.cn/uploadfile/cpu/3A1000/Loongson_3=
+A1000_cpu_user_2.pdf</a><br>
+&gt; &gt; [2]: <a href=3D"https://github.com/FlyGoat/loongson-insn/blob/mas=
+ter/loongson-ext.md">https://github.com/FlyGoat/loongson-insn/blob/master/l=
+oongson-ext.md</a><br>
+&gt; &gt;<br>
+&gt;<br>
+&gt; Thanks, Jiaxun!<br>
+&gt;<br>
+&gt; Just to mention whay you probably know, since this is a new feature, t=
+his is too late for 5.0, so we are shooting for integrsying it in 5.1.<br>
+&gt;<br>
+&gt; Speak to you later of course in more details.<br>
+&gt;</p>
+<p dir=3D"ltr">Jiaxun, hello again.</p>
+<p dir=3D"ltr">May I ask you to provide us the automatic english transl<br>
+tion of document [1]?</p>
+<p dir=3D"ltr"><a href=3D"http://translate.google.com">translate.google.com=
+</a> site has the festure of uploading and translating a pdf file. Unfortun=
+ately, one can&#39;t download resulting pdf file. But, there is a workaroun=
+d: one can &quot;print&quot; the page to pdf format from the browser.</p>
+<p dir=3D"ltr">There may be other ways of automatic translation of pdfs, bu=
+t the one above seems pretty reasonable.</p>
+<p dir=3D"ltr">Yours,<br>
+Aleksandar<br><br></p>
+<p dir=3D"ltr">&gt; Yours,<br>
+&gt; Aleksandar<br>
+&gt;<br>
+&gt; &gt; Jiaxun Yang (3):<br>
+&gt; &gt; =C2=A0 target/mips: Introduce loongson ext &amp; mmi ASE flags<br=
+>
+&gt; &gt; =C2=A0 target/mips: Add loongson ext lsdc2 instrustions<br>
+&gt; &gt; =C2=A0 target/mips: Add loongson gs464 core<br>
+&gt; &gt;<br>
+&gt; &gt; =C2=A0target/mips/mips-defs.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A02 +<br>
+&gt; &gt; =C2=A0target/mips/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+ 166 ++++++++++++++++++++++++++++++-<br>
+&gt; &gt; =C2=A0target/mips/translate_init.inc.c |=C2=A0 25 ++++-<br>
+&gt; &gt; =C2=A03 files changed, 188 insertions(+), 5 deletions(-)<br>
+&gt; &gt;<br>
+&gt; &gt; -- <br>
+&gt; &gt; 2.26.0.rc2<br>
+&gt; &gt;<br>
+&gt; &gt;<br>
+</p>
 
---fui2I4J2ve27T8MdEnjVJiSNNjD1XyK9Z--
-
+--0000000000001b1e1705a25ffea5--
 
