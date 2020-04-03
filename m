@@ -2,76 +2,61 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDC7C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6D0C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:02:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 281712077D
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:01:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBr49M5J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 281712077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 349C52077D
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:02:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 349C52077D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKMtK-0006oO-7T
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:01:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37916)
+	id 1jKMu6-0007nq-BK
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:02:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jKMsH-0005xo-CS
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:00:46 -0400
+ (envelope-from <clg@kaod.org>) id 1jKMsm-0006NU-BV
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jKMsG-0007Mp-1E
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:00:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60479
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1jKMsk-0007nP-Gk
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:01:16 -0400
+Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:35672)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jKMsF-0007M8-Tz
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:00:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585922443;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=e/TOG1QFNaeICKnZrHUMIJhWhyfF+jKlfP1Oz7UKTn0=;
- b=UBr49M5JJa7dw/DeC+WExj/c10y/xYbhBsFKTW1s4KaGgOu0c+giTaojF2wKOzB3iaUovg
- wp0YTsO9mjk8QDY1plOY1mpsbXXsmAlYzPCR6duXS6qWHzhRBThiCaT72yx7vqXTjcmTM7
- eIXG2mkvBAUYxT//jouRdz7csTGU4Ts=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-5DwB3m9vMHWj2hldrlY5SA-1; Fri, 03 Apr 2020 10:00:26 -0400
-X-MC-Unique: 5DwB3m9vMHWj2hldrlY5SA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 888E718B5FA0;
- Fri,  3 Apr 2020 14:00:24 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 245425E000;
- Fri,  3 Apr 2020 14:00:21 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] nvdimm-utils: clean up headers and add license comment
-Date: Fri,  3 Apr 2020 10:00:18 -0400
-Message-Id: <20200403140018.13531-1-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jKMsk-0007jA-1a
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:01:14 -0400
+Received: from player697.ha.ovh.net (unknown [10.108.35.27])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id D424122AC02
+ for <qemu-devel@nongnu.org>; Fri,  3 Apr 2020 16:01:11 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player697.ha.ovh.net (Postfix) with ESMTPSA id 37CB5111A0115;
+ Fri,  3 Apr 2020 14:01:05 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v4 1/4] target/ppc: Introduce ppc_radix64_xlate() for Radix
+ tree translation
+Date: Fri,  3 Apr 2020 16:00:53 +0200
+Message-Id: <20200403140056.59465-2-clg@kaod.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200403140056.59465-1-clg@kaod.org>
+References: <20200403140056.59465-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 4730749936739257318
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrtdeigdejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeljedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 178.33.253.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,73 +68,315 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, sbhat@linux.ibm.com,
- aik@ozlabs.ru, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- david@gibson.dropbear.id.au
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixes: 3f350f6bb36233be50fc2bc18dc78b6a948a5dbe
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- include/qemu/nvdimm-utils.h |  2 --
- util/nvdimm-utils.c         | 29 +++++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+), 2 deletions(-)
+This is moving code under a new ppc_radix64_xlate() routine shared by
+the MMU Radix page fault handler and the 'get_phys_page_debug' PPC
+callback. The difference being that 'get_phys_page_debug' does not
+generate exceptions.
 
-diff --git a/include/qemu/nvdimm-utils.h b/include/qemu/nvdimm-utils.h
-index 4b8b198ba7..1f1dae477f 100644
---- a/include/qemu/nvdimm-utils.h
-+++ b/include/qemu/nvdimm-utils.h
-@@ -1,7 +1,5 @@
- #ifndef NVDIMM_UTILS_H
- #define NVDIMM_UTILS_H
+The specific part of process-scoped Radix translation is moved under
+ppc_radix64_process_scoped_xlate() in preparation of the future support
+for partition-scoped Radix translation. Routines raising the exceptions
+now take a 'cause_excp' bool to cover the 'get_phys_page_debug' case.
+
+It should be functionally equivalent.
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ target/ppc/mmu-radix64.c | 219 ++++++++++++++++++++++-----------------
+ 1 file changed, 123 insertions(+), 96 deletions(-)
+
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index d2422d1c54c9..4b0d0ff50a3c 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -219,17 +219,127 @@ static bool validate_pate(PowerPCCPU *cpu, uint64_=
+t lpid, ppc_v3_pate_t *pate)
+     return true;
+ }
 =20
--#include "qemu/osdep.h"
--
- GSList *nvdimm_get_device_list(void);
- #endif
-diff --git a/util/nvdimm-utils.c b/util/nvdimm-utils.c
-index 5cc768ca47..ca41d39af5 100644
---- a/util/nvdimm-utils.c
-+++ b/util/nvdimm-utils.c
-@@ -1,3 +1,32 @@
-+/*
-+ * NVDIMM utilities
-+ *
-+ * Copyright(C) 2015 Intel Corporation.
-+ *
-+ * Author:
-+ *  Xiao Guangrong <guangrong.xiao@linux.intel.com>
-+ *
-+ * NFIT is defined in ACPI 6.0: 5.2.25 NVDIMM Firmware Interface Table (NF=
-IT)
-+ * and the DSM specification can be found at:
-+ *       http://pmem.io/documents/NVDIMM_DSM_Interface_Example.pdf
-+ *
-+ * Currently, it only supports PMEM Virtualization.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licens=
-es/>
-+ */
++static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
++                                            vaddr eaddr, uint64_t pid,
++                                            ppc_v3_pate_t pate, hwaddr *=
+g_raddr,
++                                            int *g_prot, int *g_page_siz=
+e,
++                                            bool cause_excp)
++{
++    CPUState *cs =3D CPU(cpu);
++    uint64_t offset, size, prtbe_addr, prtbe0, pte;
++    int fault_cause =3D 0;
++    hwaddr pte_addr;
 +
-+#include "qemu/osdep.h"
- #include "qemu/nvdimm-utils.h"
- #include "hw/mem/nvdimm.h"
++    /* Index Process Table by PID to Find Corresponding Process Table En=
+try */
++    offset =3D pid * sizeof(struct prtb_entry);
++    size =3D 1ULL << ((pate.dw1 & PATE1_R_PRTS) + 12);
++    if (offset >=3D size) {
++        /* offset exceeds size of the process table */
++        if (cause_excp) {
++            ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
++        }
++        return 1;
++    }
++    prtbe_addr =3D (pate.dw1 & PATE1_R_PRTB) + offset;
++    prtbe0 =3D ldq_phys(cs->as, prtbe_addr);
++
++    /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
++    *g_page_size =3D PRTBE_R_GET_RTS(prtbe0);
++    pte =3D ppc_radix64_walk_tree(cpu, eaddr & R_EADDR_MASK,
++                                prtbe0 & PRTBE_R_RPDB, prtbe0 & PRTBE_R_=
+RPDS,
++                                g_raddr, g_page_size, &fault_cause, &pte=
+_addr);
++
++    if (!(pte & R_PTE_VALID) ||
++        ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, g_prot)) {
++        /* No valid pte or access denied due to protection */
++        if (cause_excp) {
++            ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
++        }
++        return 1;
++    }
++
++    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, g_prot);
++
++    return 0;
++}
++
++static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
++                             bool relocation,
++                             hwaddr *raddr, int *psizep, int *protp,
++                             bool cause_excp)
++{
++    uint64_t lpid =3D 0, pid =3D 0;
++    ppc_v3_pate_t pate;
++    int psize, prot;
++    hwaddr g_raddr;
++
++    /* Virtual Mode Access - get the fully qualified address */
++    if (!ppc_radix64_get_fully_qualified_addr(&cpu->env, eaddr, &lpid, &=
+pid)) {
++        if (cause_excp) {
++            ppc_radix64_raise_segi(cpu, rwx, eaddr);
++        }
++        return 1;
++    }
++
++    /* Get Process Table */
++    if (cpu->vhyp) {
++        PPCVirtualHypervisorClass *vhc;
++        vhc =3D PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->get_pate(cpu->vhyp, &pate);
++    } else {
++        if (!ppc64_v3_get_pate(cpu, lpid, &pate)) {
++            if (cause_excp) {
++                ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
++            }
++            return 1;
++        }
++        if (!validate_pate(cpu, lpid, &pate)) {
++            if (cause_excp) {
++                ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_R_BADCONFIG)=
+;
++            }
++            return 1;
++        }
++        /* We don't support guest mode yet */
++        if (lpid !=3D 0) {
++            error_report("PowerNV guest support Unimplemented");
++            exit(1);
++        }
++    }
++
++    *psizep =3D INT_MAX;
++    *protp =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++
++    /*
++     * Perform process-scoped translation if relocation enabled.
++     *
++     * - Translates an effective address to a host real address in
++     *   quadrants 0 and 3 when HV=3D1.
++     */
++    if (relocation) {
++        int ret =3D ppc_radix64_process_scoped_xlate(cpu, rwx, eaddr, pi=
+d,
++                                                   pate, &g_raddr, &prot=
+,
++                                                   &psize, cause_excp);
++        if (ret) {
++            return ret;
++        }
++        *psizep =3D MIN(*psizep, psize);
++        *protp &=3D prot;
++    } else {
++        g_raddr =3D eaddr & R_EADDR_MASK;
++    }
++
++    *raddr =3D g_raddr;
++    return 0;
++}
++
+ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                                  int mmu_idx)
+ {
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    PPCVirtualHypervisorClass *vhc;
+-    hwaddr raddr, pte_addr;
+-    uint64_t lpid =3D 0, pid =3D 0, offset, size, prtbe0, pte;
+-    int page_size, prot, fault_cause =3D 0;
+-    ppc_v3_pate_t pate;
++    int page_size, prot;
+     bool relocation;
++    hwaddr raddr;
+=20
+     assert(!(msr_hv && cpu->vhyp));
+     assert((rwx =3D=3D 0) || (rwx =3D=3D 1) || (rwx =3D=3D 2));
+@@ -262,55 +372,12 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, v=
+addr eaddr, int rwx,
+                       TARGET_FMT_lx "\n", env->spr[SPR_LPCR]);
+     }
+=20
+-    /* Virtual Mode Access - get the fully qualified address */
+-    if (!ppc_radix64_get_fully_qualified_addr(env, eaddr, &lpid, &pid)) =
+{
+-        ppc_radix64_raise_segi(cpu, rwx, eaddr);
++    /* Translate eaddr to raddr (where raddr is addr qemu needs for acce=
+ss) */
++    if (ppc_radix64_xlate(cpu, eaddr, rwx, relocation, &raddr,
++                          &page_size, &prot, true)) {
+         return 1;
+     }
+=20
+-    /* Get Process Table */
+-    if (cpu->vhyp) {
+-        vhc =3D PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+-        vhc->get_pate(cpu->vhyp, &pate);
+-    } else {
+-        if (!ppc64_v3_get_pate(cpu, lpid, &pate)) {
+-            ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
+-            return 1;
+-        }
+-        if (!validate_pate(cpu, lpid, &pate)) {
+-            ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_R_BADCONFIG);
+-        }
+-        /* We don't support guest mode yet */
+-        if (lpid !=3D 0) {
+-            error_report("PowerNV guest support Unimplemented");
+-            exit(1);
+-       }
+-    }
+-
+-    /* Index Process Table by PID to Find Corresponding Process Table En=
+try */
+-    offset =3D pid * sizeof(struct prtb_entry);
+-    size =3D 1ULL << ((pate.dw1 & PATE1_R_PRTS) + 12);
+-    if (offset >=3D size) {
+-        /* offset exceeds size of the process table */
+-        ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
+-        return 1;
+-    }
+-    prtbe0 =3D ldq_phys(cs->as, (pate.dw1 & PATE1_R_PRTB) + offset);
+-
+-    /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+-    page_size =3D PRTBE_R_GET_RTS(prtbe0);
+-    pte =3D ppc_radix64_walk_tree(cpu, eaddr & R_EADDR_MASK,
+-                                prtbe0 & PRTBE_R_RPDB, prtbe0 & PRTBE_R_=
+RPDS,
+-                                &raddr, &page_size, &fault_cause, &pte_a=
+ddr);
+-    if (!pte || ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, &pro=
+t)) {
+-        /* Couldn't get pte or access denied due to protection */
+-        ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
+-        return 1;
+-    }
+-
+-    /* Update Reference and Change Bits */
+-    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, &prot);
+-
+     tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MASK,
+                  prot, mmu_idx, 1UL << page_size);
+     return 0;
+@@ -318,58 +385,18 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, v=
+addr eaddr, int rwx,
+=20
+ hwaddr ppc_radix64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong ead=
+dr)
+ {
+-    CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    PPCVirtualHypervisorClass *vhc;
+-    hwaddr raddr, pte_addr;
+-    uint64_t lpid =3D 0, pid =3D 0, offset, size, prtbe0, pte;
+-    int page_size, fault_cause =3D 0;
+-    ppc_v3_pate_t pate;
++    int psize, prot;
++    hwaddr raddr;
+=20
+     /* Handle Real Mode */
+-    if (msr_dr =3D=3D 0) {
++    if ((msr_dr =3D=3D 0) && (msr_hv || cpu->vhyp)) {
+         /* In real mode top 4 effective addr bits (mostly) ignored */
+         return eaddr & 0x0FFFFFFFFFFFFFFFULL;
+     }
+=20
+-    /* Virtual Mode Access - get the fully qualified address */
+-    if (!ppc_radix64_get_fully_qualified_addr(env, eaddr, &lpid, &pid)) =
+{
+-        return -1;
+-    }
+-
+-    /* Get Process Table */
+-    if (cpu->vhyp) {
+-        vhc =3D PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+-        vhc->get_pate(cpu->vhyp, &pate);
+-    } else {
+-        if (!ppc64_v3_get_pate(cpu, lpid, &pate)) {
+-            return -1;
+-        }
+-        if (!validate_pate(cpu, lpid, &pate)) {
+-            return -1;
+-        }
+-        /* We don't support guest mode yet */
+-        if (lpid !=3D 0) {
+-            error_report("PowerNV guest support Unimplemented");
+-            exit(1);
+-       }
+-    }
+-
+-    /* Index Process Table by PID to Find Corresponding Process Table En=
+try */
+-    offset =3D pid * sizeof(struct prtb_entry);
+-    size =3D 1ULL << ((pate.dw1 & PATE1_R_PRTS) + 12);
+-    if (offset >=3D size) {
+-        /* offset exceeds size of the process table */
+-        return -1;
+-    }
+-    prtbe0 =3D ldq_phys(cs->as, (pate.dw1 & PATE1_R_PRTB) + offset);
+-
+-    /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+-    page_size =3D PRTBE_R_GET_RTS(prtbe0);
+-    pte =3D ppc_radix64_walk_tree(cpu, eaddr & R_EADDR_MASK,
+-                                prtbe0 & PRTBE_R_RPDB, prtbe0 & PRTBE_R_=
+RPDS,
+-                                &raddr, &page_size, &fault_cause, &pte_a=
+ddr);
+-    if (!pte) {
++    if (ppc_radix64_xlate(cpu, eaddr, 0, msr_dr, &raddr, &psize,
++                          &prot, false)) {
+         return -1;
+     }
 =20
 --=20
-2.18.1
+2.25.1
 
 
