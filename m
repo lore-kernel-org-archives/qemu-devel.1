@@ -2,86 +2,86 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3960FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A9EC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:38:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 063E020737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:36:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AF4D20737
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 17:38:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7Odwos9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 063E020737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WX3Z74Lv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AF4D20737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKQFN-0007qW-6R
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 13:36:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50863)
+	id 1jKQGd-0001py-Ks
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 13:38:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51157)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jKQ8q-0008NG-5u
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:30:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1jKQ94-0000C5-8R
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jKQ8l-0006xj-DZ
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:30:03 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25841
+ (envelope-from <philmd@redhat.com>) id 1jKQ93-0007FZ-0W
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:30:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21470
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKQ8l-0006xC-7z
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:29:59 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKQ92-0007F0-SD
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 13:30:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585934998;
+ s=mimecast20190719; t=1585935016;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QNPn2H1M50FjhhDecltPYfWD8OWcf2g/i9c77dxqyhw=;
- b=f7Odwos90rVEN+uyuzqY8oNuVHwbi4411CJu+FmKyEgvGfo7sqiydQZoA84w3coaovvhuy
- LCc/2OuJ86WeR26sSxWpWDun/shWUdhcgep8lSlGD2znTQbM8/ceoNa6Wj/S7/qVlGS87e
- DR+a350MWjXfIjC+NIdHPAULPKwSMdc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-1zLYyqcuMz-wqnnCYpdR-A-1; Fri, 03 Apr 2020 13:29:56 -0400
-X-MC-Unique: 1zLYyqcuMz-wqnnCYpdR-A-1
-Received: by mail-wr1-f70.google.com with SMTP id 91so2581015wro.1
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 10:29:55 -0700 (PDT)
+ bh=jbfl8o13DzBPrY5EilVoi9iUGJebFFDNwXZZwzDmirk=;
+ b=WX3Z74Lv2hAF3P+7zwaQOyC2UQnhYDq4bO5ob+DCPzROiaYbg+X96CnBpszrAgLV26Aggr
+ DzXTOGQAX5euRIqMGl67JfHqKCRZpUle+vqd+ryXMA8GlqHeUplMadHQqKfiTJx4TkNM60
+ Gte5VUaf7fTUTSVmCLMlIDbSPCKPJkg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-Dbeud51CNPu0mGL0-fCnYA-1; Fri, 03 Apr 2020 13:30:13 -0400
+X-MC-Unique: Dbeud51CNPu0mGL0-fCnYA-1
+Received: by mail-wm1-f72.google.com with SMTP id s15so2362205wmc.0
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 10:30:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=TSlBrLwxhAdexcEXjJ1NeQ0BcWKn/T2U+OvtZXNY8Dg=;
- b=oIs06VliUOl16OnrxFjx+p6xn0qOvotT7cOqeA+r3XKV1v/72DbTPRdNnWwHfmHpXQ
- UrdRo3PGFeG8MtGpccoPRHnYynY6f4vqZxbADhq0yAjzPS5cY5dFKF7wQ1bd/AVpIUbs
- Tu8mkTJGCuvUMhMDvtLKwNkk1hhR0VvH0v+/Tkm2yZYo7TiIX95VhcBohj6MngTbhdFz
- SM5sYGKTSmFEyvw8iVZZX4CTi7HE4C/PKvLBVV29XW0oKgG0bAaGQZMMTUJLiuaLswFT
- MyXJO3NUgKmAgNDPUeT5lLo+5JogcxuQ3u73V21H+L2RIp8TBR6f2ip61gmSY8TCXZ7r
- 3B0A==
-X-Gm-Message-State: AGi0PuYuN9puB5yzMyuXzSLugdqUaXBAo5sVFErsmR+WElogdKdctZwW
- T+IIwtwJ/RyLzXB9SwNPEC7WDDCQCaM5bTizKuHk0EQlu3+tAgQ9lI0rTrFNeaRzOF/MNc0Oq4r
- bfQ+o858uaL7036I=
-X-Received: by 2002:adf:e3c5:: with SMTP id k5mr9869984wrm.216.1585934994978; 
- Fri, 03 Apr 2020 10:29:54 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLyaTwJHCZLWKzOmMoJaerfxtpfUAWojGsHQ84eGpJgGnsOMWM0I/lNhw4DuJLL637YOzFXow==
-X-Received: by 2002:adf:e3c5:: with SMTP id k5mr9869957wrm.216.1585934994716; 
- Fri, 03 Apr 2020 10:29:54 -0700 (PDT)
+ bh=MP4WKd472qe39iLYnvNgwwSGSAWZeFWSQ2XzRTk1W0g=;
+ b=gf4RmEZ8YiQsN/mVunNO4iRdhO/EBRe2KoY/W6q2X9NpHmZ/71/komPSKvhpT+yaWe
+ YPoOeSSLT5CeSHVssACp9t9BZIAA6BVtBYYRwAbWDSvyEUYyXQXyUYlPz2NoKMD9aGjr
+ H3lSwIofNKehOmAGyqI5tRt9SlsV94C77kaEkPbbNDRpO09c4PzKrvqaGULZR0QEy5Vb
+ GcVLE4jLZ90lmaA4DL1Mnc5Yjhrv/zPRv2gyxpwCyL91nvLcG9aLMWLS9JqZ10E61FPH
+ /Gqw/PB9nj3RrESNozGSeNHPbxUL4cfpuC2s7ot+VXjF6RZYnad/MojVNqnmgOfhQqU8
+ 44oQ==
+X-Gm-Message-State: AGi0PuYrBMGK+Uz8jM2HL3nMLjwQGgd2noAY0tj7ZNzsF7BheJYCPE9M
+ +ULYDfMfoVPYJUVRUXO439/zNc+bS1/+jY33+mVz++np+Wgvg4YODRbBvFC1t3/gk71uFW6/Wz/
+ HfO2UsWDzaHr35tc=
+X-Received: by 2002:a5d:6a46:: with SMTP id t6mr9815775wrw.93.1585935011888;
+ Fri, 03 Apr 2020 10:30:11 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJEXPojlWWMEP02qw87wGH9dOMY1WtyywmbfJnAbtqjWkb0lmuZTWLm48Zgcjq8TxcyjrcCGw==
+X-Received: by 2002:a5d:6a46:: with SMTP id t6mr9815757wrw.93.1585935011712;
+ Fri, 03 Apr 2020 10:30:11 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id f25sm12024235wml.11.2020.04.03.10.29.52
+ by smtp.gmail.com with ESMTPSA id f62sm11860854wmf.44.2020.04.03.10.30.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 10:29:53 -0700 (PDT)
+ Fri, 03 Apr 2020 10:30:11 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 5/8] .travis.yml: Cache acceptance-test assets
-Date: Fri,  3 Apr 2020 19:29:16 +0200
-Message-Id: <20200403172919.24621-6-philmd@redhat.com>
+Subject: [NOTFORMERGE PATCH 8/8] Kludge for Avocado issue #3661
+Date: Fri,  3 Apr 2020 19:29:19 +0200
+Message-Id: <20200403172919.24621-9-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200403172919.24621-1-philmd@redhat.com>
 References: <20200403172919.24621-1-philmd@redhat.com>
@@ -92,8 +92,7 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,36 +115,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Keep all acceptance-test assets in the same cache bucket.
-
-As of v5.0.0-rc1, the cache is 2610.11MB:
-https://travis-ci.org/github/philmd/qemu/jobs/670558103
+Use a feature from unreleased Avocado v78.0.
+See https://github.com/avocado-framework/avocado/issues/3661
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- .travis.yml | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/requirements.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index e0c72210b7..2fd63eceaa 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -318,8 +318,10 @@ jobs:
-       env:
-         - CONFIG=3D"--enable-tools --target-list=3Daarch64-softmmu,alpha-s=
-oftmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-so=
-ftmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sp=
-arc-softmmu,x86_64-softmmu,xtensa-softmmu"
-         - TEST_CMD=3D"make check-acceptance"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-acceptance"
-       after_script:
-         - python3 -c 'import json; r =3D json.load(open("tests/results/lat=
-est/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"=
-] not in ("PASS", "SKIP")]' | xargs cat
-+        - du -chs $HOME/avocado/data/cache
-       addons:
-         apt:
-           packages:
+diff --git a/tests/requirements.txt b/tests/requirements.txt
+index f9c84b4ba1..d625b32dbb 100644
+--- a/tests/requirements.txt
++++ b/tests/requirements.txt
+@@ -1,5 +1,5 @@
+ # Add Python module requirements, one per line, to be installed
+ # in the tests/venv Python virtual environment. For more info,
+ # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+-avocado-framework=3D=3D76.0
++-e git+https://github.com/avocado-framework/avocado.git@f9b4dc7c58a6424eb8=
+d0ed6781a1d76ae3a5ab06#egg=3Davocado-framework
+ pycdlib=3D=3D1.9.0
 --=20
 2.21.1
 
