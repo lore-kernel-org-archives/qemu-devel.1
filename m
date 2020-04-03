@@ -2,100 +2,95 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E74C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A3AC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1B0A206E9
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:53:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D83A206F6
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiLolQWk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1B0A206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfzZt9qr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D83A206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKPZr-00031G-RY
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 12:53:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41148)
+	id 1jKPb2-00040q-Kz
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 12:55:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jKPZ1-0002DX-Lh
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 12:53:04 -0400
+ (envelope-from <philmd@redhat.com>) id 1jKPaR-0003Yh-E2
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 12:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jKPYz-0004OV-MP
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 12:53:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23621
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jKPaQ-0005M3-0R
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 12:54:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50560
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKPYz-0004Nu-Fj
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 12:53:01 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jKPaP-0005LN-Rn
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 12:54:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585932780;
+ s=mimecast20190719; t=1585932868;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=W3NugmdaZPLvfahTX1fNLae6Me4NOTXg6W2A5gp3jnk=;
- b=UiLolQWk9eye41FZtqLaj9XGixPaS4lOc+S51wotUnzafl7viWHNuqWbRae9go9Dxh97Lt
- VOXxc409t6aFp+mePJBwzZiJXhqOieRaIo5scwIjns1jfM47XKNQoj3nJLbBZ+w9SGX1Gt
- BNfuI+w1fbAhrjin5NgHcc1+Qg3kyUY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-QXQKAnTGNIey6169tE7ztg-1; Fri, 03 Apr 2020 12:52:57 -0400
-X-MC-Unique: QXQKAnTGNIey6169tE7ztg-1
-Received: by mail-ed1-f71.google.com with SMTP id q29so6002374edc.1
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 09:52:57 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=o1XD0Qodnbges3d/qyEnRtQpf1zDSXoUMfhIfOe0AOQ=;
+ b=bfzZt9qrfpwPKPAXFklKdLSPDxKCWYjqdajR8vmTWWzIFXcnBX+/TTJwyqPTZjN8MxGv3F
+ gRU5+fiuR3k7cMhAShfHLXE6nfhfuYqvm9Uh4dVpKKfXnv0OuM5cue4Xa2QS6ev/3u4EaB
+ pTsUnp3vR720jh4lUeUXk1sm8vu2J6o=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-a_ggHFCmN56V7ZsJ1oK2Rg-1; Fri, 03 Apr 2020 12:54:26 -0400
+X-MC-Unique: a_ggHFCmN56V7ZsJ1oK2Rg-1
+Received: by mail-wm1-f70.google.com with SMTP id w8so3030292wmk.5
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 09:54:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=W3NugmdaZPLvfahTX1fNLae6Me4NOTXg6W2A5gp3jnk=;
- b=Un45oVxdAkWhsdnC65RvGFvbtrGL7fHh8Y9/cWsxi96sP9V1CRrX1UzWGPWAycn2EO
- AxIEgIiOY8H+v0ko5eXAxFyOopkVnH8EukGs5udk3XdqSu+Z08nshUCe9JDirs0RymuI
- cQESA1RCl/+h3oYkSNVcF4NW4Q2Q+uw8JhN89z2fOg/y/yV6gyKy2y8DayabqIpTiWzU
- ajULfK4GcHSUeby/MO2/I+/NwJuKcXVgSXO7QrsdS+9wXRm+mYq4tFMR+kUW5vLxwtgD
- TUE7EG8OCnKV+QUpeM+IPo2qLXKJ4wesm7tNq2WlNgFzvyLFXvSjWyRkZLqVuMlU9rV9
- jBFw==
-X-Gm-Message-State: AGi0PuYlBhdjFXdQUhziYUCDAmOG/eg4oHLipQQY9kAvaqZJZORVtxtT
- IAL8zmwY9DvBi4RI+a/mCVnM0Jl6Od3tKqFdzC65HTKjwmtI77l9pGYhaB+pVFh9lX/YZQrwQC1
- 34J9b9RMoexWFU6c=
-X-Received: by 2002:a17:906:3788:: with SMTP id
- n8mr9544632ejc.306.1585932775975; 
- Fri, 03 Apr 2020 09:52:55 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKlRU81FdHUuxf2b58UzIkqkC8Y6IhBfwqBYlp9dk33UZ5sqCiLvfCH/TNzujOImi7x5Iauuw==
-X-Received: by 2002:a17:906:3788:: with SMTP id
- n8mr9544592ejc.306.1585932775552; 
- Fri, 03 Apr 2020 09:52:55 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ bh=ZymZDW6hnWGsTglc2odogyoM9NQtmfDEskQEt3SBLUM=;
+ b=mJfSDl6XeqG/l4Dh1HQuO58sApI+SbKsaOBfmZBHJBta/TCpAwoF62vs5ri2l8msZt
+ GUSlDqr8yxg5jJwuL2oS5XRA1AzUYYLIWeHSBhUroDyD3+8mVTOtOOCrhr5gRTOP7KKC
+ 2+TjumikAWTrAQxmyEoAPpiRd0mLkPY8qUX6VEN0Qscb+IHzIIUVr/jD65Rt/oqBcEvW
+ aQzIMDWqLqE8WerjDF4NhAANBwI7dWoEO9n7pbjDdt6gd2gOc5Uj711hsprIYUJCSRuu
+ 7c++jp0qSB6VqRRI1vgvyEXr5Z3PIJueaz5SnrpfT0ku5D3LTayURhwhPR48LKhuXDlt
+ mnhg==
+X-Gm-Message-State: AGi0PuY/SgC7eB2FhtBXOSM/oit4RUd0APCWggJRYEqguknS9t89MPTz
+ LTMLxJR+xn4R4Dtw75apQUo9dSBL30ZOn88epVyCgp/Jcp8v81a2G0hO36sigUZETR+gKznP8Tt
+ P10OkoTw28flX0AA=
+X-Received: by 2002:a5d:6a4e:: with SMTP id t14mr10346881wrw.101.1585932865358; 
+ Fri, 03 Apr 2020 09:54:25 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIZzvGHnIBFgWKNJMjMmTW6do5oNqimaOYH6s/cNQD6fC3XZYNWYg4orRWfImPCtsU0SzuifQ==
+X-Received: by 2002:a5d:6a4e:: with SMTP id t14mr10346868wrw.101.1585932865140; 
+ Fri, 03 Apr 2020 09:54:25 -0700 (PDT)
+Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id s29sm1494932edc.25.2020.04.03.09.52.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Apr 2020 09:52:54 -0700 (PDT)
-Subject: Re: [PATCH v2] nvdimm-utils: clean up headers and add license comment
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20200403144149.14068-1-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a8145b0f-4a06-2997-8516-0f06ece28379@redhat.com>
-Date: Fri, 3 Apr 2020 18:52:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by smtp.gmail.com with ESMTPSA id a13sm12568593wrh.80.2020.04.03.09.54.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Apr 2020 09:54:24 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Subject: [PATCH-for-5.0?] configure: Do not leave sphinx in-tree artifacts
+Date: Fri,  3 Apr 2020 18:54:22 +0200
+Message-Id: <20200403165422.21714-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200403144149.14068-1-imammedo@redhat.com>
-Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,103 +102,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, sbhat@linux.ibm.com,
- aik@ozlabs.ru, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- david@gibson.dropbear.id.au
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor,
+When ./configure checks the sphinx version is new enough, it leaves
+the docs/sphinx/__pycache__/ directory. Avoid this by using the '-B'
+option (don't write .py[co] files on import) via the
+PYTHONDONTWRITEBYTECODE environment variable.
 
-On 4/3/20 4:41 PM, Igor Mammedov wrote:
-> Fixes: 3f350f6bb36233be50fc2bc18dc78b6a948a5dbe
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> v2:
->    - add license blob to header as well
->    - trim comment a litle bit to remove unrelated NFIT/PMEM sentences
-> ---
->   include/qemu/nvdimm-utils.h | 23 +++++++++++++++++++++--
->   util/nvdimm-utils.c         | 23 +++++++++++++++++++++++
->   2 files changed, 44 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/qemu/nvdimm-utils.h b/include/qemu/nvdimm-utils.h
-> index 4b8b198ba7..2d8cde085c 100644
-> --- a/include/qemu/nvdimm-utils.h
-> +++ b/include/qemu/nvdimm-utils.h
-> @@ -1,7 +1,26 @@
->   #ifndef NVDIMM_UTILS_H
->   #define NVDIMM_UTILS_H
+Reported-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think most of the files in the tree use the pattern "license comment 
-before the ifdef guard", but I won't write a script to prove me 
-right/wrong :)
-
-> -
-> -#include "qemu/osdep.h"
-> +/*
-> + * NVDIMM utilities
-> + *
-> + * Copyright(C) 2015 Intel Corporation.
-> + *
-> + * Author:
-> + *  Xiao Guangrong <guangrong.xiao@linux.intel.com>
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
-> + */
-
-So here goes the ifdef:
-
-     #ifndef NVDIMM_UTILS_H
-     #define NVDIMM_UTILS_H
-
->   
->   GSList *nvdimm_get_device_list(void);
->   #endif
-> diff --git a/util/nvdimm-utils.c b/util/nvdimm-utils.c
-> index 5cc768ca47..3d570c3c3e 100644
-> --- a/util/nvdimm-utils.c
-> +++ b/util/nvdimm-utils.c
-> @@ -1,3 +1,26 @@
-> +/*
-> + * NVDIMM utilities
-> + *
-> + * Copyright(C) 2015 Intel Corporation.
-> + *
-> + * Author:
-> + *  Xiao Guangrong <guangrong.xiao@linux.intel.com>
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
-> + */
-> +
-> +#include "qemu/osdep.h"
->   #include "qemu/nvdimm-utils.h"
->   #include "hw/mem/nvdimm.h"
->   
-> 
+diff --git a/configure b/configure
+index 22870f3867..ed524399c7 100755
+--- a/configure
++++ b/configure
+@@ -4936,7 +4936,7 @@ has_sphinx_build() {
+     # sphinx-build doesn't exist at all or if it is too old.
+     mkdir -p "$TMPDIR1/sphinx"
+     touch "$TMPDIR1/sphinx/index.rst"
+-    "$sphinx_build" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMP=
+DIR1/sphinx/out" >/dev/null 2>&1
++    PYTHONDONTWRITEBYTECODE=3Dyes "$sphinx_build" -c "$source_path/docs" -=
+b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
+ }
+=20
+ # Check if tools are available to build documentation.
+--=20
+2.21.1
 
 
