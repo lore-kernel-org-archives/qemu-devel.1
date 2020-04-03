@@ -2,96 +2,81 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A29AC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A13C2BA12
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:51:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8173206F5
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:50:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B97C206F5
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:51:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BDmknDBb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8173206F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQvEwfS4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B97C206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKNeC-0002Gx-2I
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:50:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44780)
+	id 1jKNfg-0003NP-Cl
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:51:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jKNdO-0001qf-GI
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:49:27 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jKNeQ-0002fv-7K
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jKNdN-0000dv-GH
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:49:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40985
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1jKNeP-0001Pp-1M
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:50:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28159
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jKNdN-0000cd-CB
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:49:25 -0400
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jKNeO-0001PD-TB
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:50:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585925364;
+ s=mimecast20190719; t=1585925428;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XqIFfPaja508cOpcL0/rROrYdrZZLRizsRZBk78lhoE=;
- b=BDmknDBbOyjNot7EUg6+cj1OscRKkKOT6t3nJvqKIlYDzPlzH0hq/UhfTc4DN6UAPz8WNg
- GeNd/HAK0RqLqLuUFO7L63PAjIRTlF3z1NPbI5Kgt3Ysw/F//X8V+jQX+3LOM4E9CQp6uz
- BtuASV+oVvjamU70vrwCnFuGh7I488g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231--ByamJX3M62NIlSO_wUiOw-1; Fri, 03 Apr 2020 10:49:23 -0400
-X-MC-Unique: -ByamJX3M62NIlSO_wUiOw-1
-Received: by mail-wm1-f71.google.com with SMTP id e16so2134563wmh.5
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 07:49:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=2yQcmseEyeVg6GPm96uWfFnmAMUahKPoXBAjzFAW3yI=;
- b=L+FWs31GqQ/Cbedh44ifHhH9Q+aqSYk+tOhKSYZLQ0Etwd+arqvOPWVMxrM01ZnUBS
- useC/fOMQ98PBag50Df48kx93Clriqe1bJc+ib7lrMeL0FK5US7vXiBGarsH/nNfbay7
- weBvkF23bVGY4DkhMaOV0fZ+SF1gW/WTsMtCTZJBvJCPWE8i0uMDVNlN55zvtAtP/jVo
- HFoH9ZxnEnilMqtXlC85KA+w5qoIxClle1YKmePJJ+aJ6/vQFa+aXhV161ASmh909LXh
- DWJRNn6IEqEHZ95u+YoiO3QD6SPH79ENdXcVgIMIPPY+pnCh8xH2WlvU/u9WVjB3WXyX
- TeSw==
-X-Gm-Message-State: AGi0PuZrp5WjQ7m3LbPatTj6Pa7r1zZeY2MRHS1WffrW45Oc6FnmKNZD
- +bBSBuKU8Z3bOyIuzwb7XN4/5cA+No8QfkYJA8nOaEoJAjmo4nT8VDZk6PzO4JciOvsYuTqovF3
- qW+ricUi8ZgUjMpM=
-X-Received: by 2002:a5d:4844:: with SMTP id n4mr1876789wrs.314.1585925362129; 
- Fri, 03 Apr 2020 07:49:22 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ0AZHkfLKjPMnhj2b2pI772WnqimjJzNleJGck0W25rIEhP0qlqVTo5gotJo7M/k58Z4J98w==
-X-Received: by 2002:a5d:4844:: with SMTP id n4mr1876773wrs.314.1585925361963; 
- Fri, 03 Apr 2020 07:49:21 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::3])
- by smtp.gmail.com with ESMTPSA id a13sm12168426wrh.80.2020.04.03.07.49.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 07:49:21 -0700 (PDT)
-Date: Fri, 3 Apr 2020 10:49:16 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 22/22] intel_iommu: modify x-scalable-mode to be
- string option
-Message-ID: <20200403144916.GM103677@xz-x1>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-23-git-send-email-yi.l.liu@intel.com>
+ bh=BKX+ya1UavVEfubPGRUXTecUf4mH6xSiQgkhK9oE4MI=;
+ b=QQvEwfS4N0XcQaLQ2h5qUW9+79ganQu+y85+aOzo3lXbQnh3CR5FGmeY3IZCIXoA2M2imA
+ lEVNj9rG8P0XhMVRtDWBg2R/xSasigWPFWC0/KS9Dtr7bnoGvz+gFxtWvLkOwWvmqR2Yyu
+ 7n60A6jJi1CHZPW71QbXnjULWQGYbyc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-M9RWldS5OlKaMerI5kPMOQ-1; Fri, 03 Apr 2020 10:50:25 -0400
+X-MC-Unique: M9RWldS5OlKaMerI5kPMOQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BADE98017F3;
+ Fri,  3 Apr 2020 14:50:23 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-132.ams2.redhat.com [10.36.113.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D66FB50BEE;
+ Fri,  3 Apr 2020 14:50:18 +0000 (UTC)
+Date: Fri, 3 Apr 2020 16:50:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH for-5.0 2/2] block: Fix blk->in_flight during
+ blk_wait_while_drained()
+Message-ID: <20200403145017.GE5336@linux.fritz.box>
+References: <20200403104415.20963-1-kwolf@redhat.com>
+ <20200403104415.20963-3-kwolf@redhat.com>
+ <30e7194e-afbc-2822-f086-9891539c0e3a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-23-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <30e7194e-afbc-2822-f086-9891539c0e3a@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="8P1HSweYDcXXzwPJ"
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,52 +88,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, hao.wu@intel.com,
- yi.y.sun@intel.com, Richard Henderson <rth@twiddle.net>,
- david@gibson.dropbear.id.au
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, s.reiter@proxmox.com,
+ qemu-devel@nongnu.org, t.lamprecht@proxmox.com, stefanha@redhat.com,
+ dietmar@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 29, 2020 at 09:25:01PM -0700, Liu Yi L wrote:
-> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabiliti=
-es
-> related to scalable mode translation, thus there are multiple combination=
-s.
-> While this vIOMMU implementation wants simplify it for user by providing
-> typical combinations. User could config it by "x-scalable-mode" option. T=
-he
-> usage is as below:
->=20
-> "-device intel-iommu,x-scalable-mode=3D["legacy"|"modern"|"off"]"
->=20
->  - "legacy": gives support for SL page table
->  - "modern": gives support for FL page table, pasid, virtual command
->  - "off": no scalable mode support
->  -  if not configured, means no scalable mode support, if not proper
->     configured, will throw error
->=20
-> Note: this patch is supposed to be merged when  the whole vSVA patch seri=
-es
-> were merged.
->=20
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+--8P1HSweYDcXXzwPJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Am 03.04.2020 um 14:42 hat Max Reitz geschrieben:
+> On 03.04.20 12:44, Kevin Wolf wrote:
+> > Calling blk_wait_while_drained() while blk->in_flight is increased for
+> > the current request is wrong because it will cause the drain operation
+> > to deadlock.
+> >=20
+> > Many callers of blk_wait_while_drained() have already increased
+> > blk->in_flight when called in a blk_aio_*() path, but can also be calle=
+d
+> > in synchonous code paths where blk->in_flight isn't increased. This
+> > means that these calls of blk_wait_while_drained() are wrong at least i=
+n
+> > some cases.
+> >=20
+> > In order to fix this, increase blk->in_flight even for synchronous
+> > operations and temporarily decrease the counter again in
+> > blk_wait_while_drained().
+> >=20
+> > Fixes: cf3129323f900ef5ddbccbe86e4fa801e88c566e
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  block/block-backend.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> blk_co_pdiscard() and blk_co_flush() are called from outside of
+> block-backend.c (namely from mirror.c and nbd/server.c).  Is that OK?
 
---=20
-Peter Xu
+Hm... I think you're right that the NBD server has a problem now because
+we might now decrease blk->in_flight without having increased it.
+(Mirror should be fine anyway because it sets disable_request_queuing.)
+
+At first I was going to suggest that we could do the opposite of this
+patch and just move the dec/wait/inc sequence (which this patch removes
+for read/write) to all coroutine entry functions, so direct calls
+wouldn't incorrectly decrease the counter.
+
+But this is not what we want either, we do want to queue requests for
+drained BlockBackends even in the blk_co_*() API.
+
+Do you have another idea or do we have to turn blk_co_*() into wrappers
+around the existing functions, which would gain an additional bool
+parameter that tells whether we need to dec/inc or not?
+
+Kevin
+
+--8P1HSweYDcXXzwPJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJeh00pAAoJEH8JsnLIjy/W6q8P/01U203iHotCGLaYOkdmep9E
+tMf9vzIdZHXRARhYNxmurEllp+2wdAZPZ2KQLI9tZ2pE3zPGeBElV56WysROGUvA
+x6ybxQfb7mi/k71cegMrvbVCPyN9GhpAaB4iLPMQf7seTCKiWGSzVaA7iZWK+kVf
+jwf22vYpWWV3/PNLoebkSyBBP3Ub+lSzoe9jcGMflADLF+xKTuW2HI6pTMVvtXsF
+Kwww+o30b8plb8QlK4BJSaa7KLGsW0N0284oz1kaaiGOIyhXRN7e5b4MM8nNTq9E
+yKhkrGKjCbdiz3oEfO1b4HkzVALjzG6XoKNEWMC+90cVfIpAuqoV5I9zJgO5ff45
+HfpE/uwg7UAT+ZaH1KZrWMkDwtj2ug5LwCWZChUU0P93ft5CNwX058diIjr3F1wk
+zX+/fJ73pRPlRYrRFgudKEvCieoV3BXTgerdw9mlwnbAFsIw4Md0JYtpg5RqhxN5
+OMl9gvUwilXxSTpKn167XGAgME/OESxpMFZrW2EW+29w9EN1rRiRcHqd5wAOORBJ
+qvj8YLNenbXf8QUZSo6d8KmVW+gLvQuj092xGx6yQ95W/QXBm2fhRM0DqEwGbynd
+7V5EZnG6S31Ljg29Sh7wekk3AvVU8KFrNjIVsZubhGlFVGxtaIlgK/NE7A+tILRq
++J58UiV7KLAU83x5+t+I
+=SFYQ
+-----END PGP SIGNATURE-----
+
+--8P1HSweYDcXXzwPJ--
 
 
