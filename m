@@ -2,85 +2,97 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 916F1C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:44:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7E1C2BA12
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:46:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BDD32078C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:44:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 059372078C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:46:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bgMs9tcW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BDD32078C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wxm5p02I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 059372078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKNYQ-00075R-J6
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:44:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43691)
+	id 1jKNaw-0008VA-5V
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:46:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jKNWl-0005oS-04
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:42:36 -0400
+ (envelope-from <peterx@redhat.com>) id 1jKNaA-00085B-1P
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:46:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jKNWj-0005bv-5t
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:42:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20285
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1jKNa8-0001ES-Es
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:46:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58430
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jKNWj-0005bK-1Y
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:42:33 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jKNa8-000179-9S
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:46:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585924952;
+ s=mimecast20190719; t=1585925163;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Nuh6dmuWiAnHcERJDynhNjc3xxpwYwJGgua2pN0SnPc=;
- b=bgMs9tcWsbv2JAW6gFFprzeUlyGV8VZh3mpDYWq6Nsf9rg1KAIPpQFvMzH+WFvk7OF3tJY
- RpYvPIGC3u+Bq2U3yGK6hwZYcWQmMhznjD4smZVxNosNeu+eOSw7mCJkZKOCwsc86rLSan
- AA7pG1fj4EYYuyfh29epqN/gzspqXVo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-RpQSYkaONvueTcttUtYtuQ-1; Fri, 03 Apr 2020 10:42:27 -0400
-X-MC-Unique: RpQSYkaONvueTcttUtYtuQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66CC28017FF;
- Fri,  3 Apr 2020 14:42:26 +0000 (UTC)
-Received: from [10.3.113.246] (ovpn-113-246.phx2.redhat.com [10.3.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C0715DA2C;
- Fri,  3 Apr 2020 14:42:25 +0000 (UTC)
-Subject: Re: [PATCH v4 for-5.0] configure: warn if not using a separate build
- directory
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200403135306.665493-1-berrange@redhat.com>
- <93fbf486-d1c3-ec03-ea8d-163bb2374260@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <813a6453-0cc1-2ee7-20fb-3ba624aad57a@redhat.com>
-Date: Fri, 3 Apr 2020 09:42:24 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ bh=KKckvpAHQV4ln32weHY6ZBYp4aHjGyUifqexfJYTH8o=;
+ b=Wxm5p02IU0uHl7DxSK4fHWhWFIXfIL14LizyrzcJfqXu01T3AP45KKvczXK/tkS+b+RvX1
+ UR1UXOjDsE9JXWx5duXMjCctztdEHMAZ5DoEtUXjp5N+HqcXU2eu7U9q9uu74ogx5mqvGh
+ DXbLKyYznv/DHZlEosR1W3iszkjiv7I=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-479-GbYyJsXSOaGB8Ls-YrCFGg-1; Fri, 03 Apr 2020 10:45:55 -0400
+X-MC-Unique: GbYyJsXSOaGB8Ls-YrCFGg-1
+Received: by mail-wr1-f69.google.com with SMTP id 91so2325864wro.1
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 07:45:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=iN/CbA1yKfXyMnQx0SzzSH5BI6P5yxTNjMIXWyXOGOY=;
+ b=mo1wXWHR5Hdi2AD+SyCN3Tjo/RaDyRPXIL/cpcjaMcJyUAmSt0OwuT2lKvDHuBpvrt
+ ilzuXj88RR0H4OXyKLhu2imIGgwCXZWx5UW7xsofPBB4xzAJu5kCCTY/cBPILGhfBMux
+ hlFlLxAaA1gSxaG4G+xhd4cW9dOPQQmboAO0zdL9mnwBJCtMfRNcBgKNQedHlAyaGP0o
+ gBclC74LhVZHmtFxmg15PqSMi6agyk/UAsQ7ZYIkDZoOsLrvv86dGX3YEc35r2Nh/41Q
+ 7GnxNq9jtJf6ygXUb5j5QVEcFX1BHh2QteMTU7V7LL/ic3HwtzqlIRIYF+sAgkzHdydq
+ jmYg==
+X-Gm-Message-State: AGi0Pub1cJqcPYo6qsbxTz3DW8NuZyYztOi94geG8FULTfUhYzt/cEz1
+ 70w9mKfpxi1DeQXsDB78H7Co5Y7EL1RxOCU5yaW/VyL05mN0XZ+0CrXsj7Gv+BRvWSsg8S/T6o0
+ 9UWTBekqp7/9akb8=
+X-Received: by 2002:adf:ef08:: with SMTP id e8mr9992260wro.66.1585925154482;
+ Fri, 03 Apr 2020 07:45:54 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJQUSM+EcrNQwnOPmHznd6lP97OMO57MVRtXCwy5VT9rjOUXg+VldAWcpLpM/epVCYWtsVK9A==
+X-Received: by 2002:adf:ef08:: with SMTP id e8mr9992229wro.66.1585925154195;
+ Fri, 03 Apr 2020 07:45:54 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::3])
+ by smtp.gmail.com with ESMTPSA id j68sm12524581wrj.32.2020.04.03.07.45.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Apr 2020 07:45:53 -0700 (PDT)
+Date: Fri, 3 Apr 2020 10:45:48 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 16/22] intel_iommu: replay pasid binds after context
+ cache invalidation
+Message-ID: <20200403144548.GK103677@xz-x1>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-17-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <93fbf486-d1c3-ec03-ea8d-163bb2374260@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <1585542301-84087-17-git-send-email-yi.l.liu@intel.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,226 +104,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Liviu Ionescu <ilg@livius.net>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
+ alex.williamson@redhat.com, pbonzini@redhat.com, hao.wu@intel.com,
+ yi.y.sun@intel.com, Richard Henderson <rth@twiddle.net>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/3/20 9:02 AM, Eric Blake wrote:
-> On 4/3/20 8:53 AM, Daniel P. Berrang=C3=A9 wrote:
->> Running configure directly from the source directory is a build
->> configuration that will go away in future. It is also not currently
->> covered by any automated testing. Display a deprecation warning if
->> the user attempts to use an in-srcdir build setup, so that they are
->> aware that they're building QEMU in an undesirable manner.
->>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> ---
->>
->> Changed in v4:
->> =C2=A0=C2=A0 - Adopted Eric's suggested wording
+On Sun, Mar 29, 2020 at 09:24:55PM -0700, Liu Yi L wrote:
+> This patch replays guest pasid bindings after context cache
+> invalidation. This is a behavior to ensure safety. Actually,
+> programmer should issue pasid cache invalidation with proper
+> granularity after issuing a context cache invalidation.
 >=20
->> +if test "$in_srcdir" =3D "yes"; then
->> +=C2=A0=C2=A0=C2=A0 echo
->> +=C2=A0=C2=A0=C2=A0 echo "WARNING: SUPPORT FOR BUILDING IN THE SOURCE DI=
-R IS DEPRECATED"
->> +=C2=A0=C2=A0=C2=A0 echo
->> +=C2=A0=C2=A0=C2=A0 echo "Support for running the 'configure' script dir=
-ectly from the"
->> +=C2=A0=C2=A0=C2=A0 echo "source directory is deprecated. In-tree builds=
- are not=20
->> covered"
->> +=C2=A0=C2=A0=C2=A0 echo "by automated testing and thus may not correctl=
-y build QEMU."
->> +=C2=A0=C2=A0=C2=A0 echo "Users are recommended to use a separate build =
-directory:"
->> +=C2=A0=C2=A0=C2=A0 echo
->> +=C2=A0=C2=A0=C2=A0 echo "=C2=A0 $ mkdir build"
->> +=C2=A0=C2=A0=C2=A0 echo "=C2=A0 $ cd build"
->> +=C2=A0=C2=A0=C2=A0 echo "=C2=A0 $ ../configure"
->> +=C2=A0=C2=A0=C2=A0 echo "=C2=A0 $ make"
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 51 ++++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/i386/intel_iommu_internal.h |  6 ++++-
+>  hw/i386/trace-events           |  1 +
+>  3 files changed, 57 insertions(+), 1 deletion(-)
 >=20
-> Late question, but:
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index d87f608..883aeac 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -68,6 +68,10 @@ static void vtd_address_space_refresh_all(IntelIOMMUSt=
+ate *s);
+>  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *=
+n);
+> =20
+>  static void vtd_pasid_cache_reset(IntelIOMMUState *s);
+> +static void vtd_pasid_cache_sync(IntelIOMMUState *s,
+> +                                 VTDPASIDCacheInfo *pc_info);
+> +static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
+> +                                  VTDBus *vtd_bus, uint16_t devfn);
+> =20
+>  static void vtd_panic_require_caching_mode(void)
+>  {
+> @@ -1853,7 +1857,10 @@ static void vtd_iommu_replay_all(IntelIOMMUState *=
+s)
+> =20
+>  static void vtd_context_global_invalidate(IntelIOMMUState *s)
+>  {
+> +    VTDPASIDCacheInfo pc_info;
+> +
+>      trace_vtd_inv_desc_cc_global();
+> +
+>      /* Protects context cache */
+>      vtd_iommu_lock(s);
+>      s->context_cache_gen++;
+> @@ -1870,6 +1877,9 @@ static void vtd_context_global_invalidate(IntelIOMM=
+UState *s)
+>       * VT-d emulation codes.
+>       */
+>      vtd_iommu_replay_all(s);
+> +
+> +    pc_info.flags =3D VTD_PASID_CACHE_GLOBAL;
+> +    vtd_pasid_cache_sync(s, &pc_info);
+>  }
+> =20
+>  /**
+> @@ -2005,6 +2015,22 @@ static void vtd_context_device_invalidate(IntelIOM=
+MUState *s,
+>                   * happened.
+>                   */
+>                  vtd_sync_shadow_page_table(vtd_as);
+> +                /*
+> +                 * Per spec, context flush should also followed with PAS=
+ID
+> +                 * cache and iotlb flush. Regards to a device selective
+> +                 * context cache invalidation:
+
+If context entry flush should also follow another pasid cache flush,
+then this is still needed?  Shouldn't the pasid flush do the same
+thing again?
+
+> +                 * if (emaulted_device)
+> +                 *    modify the pasid cache gen and pasid-based iotlb g=
+en
+> +                 *    value (will be added in following patches)
+
+Let's avoid using "following patches" because it'll be helpless after
+merged.  Also, the pasid cache gen is gone.
+
+> +                 * else if (assigned_device)
+> +                 *    check if the device has been bound to any pasid
+> +                 *    invoke pasid_unbind regards to each bound pasid
+> +                 * Here, we have vtd_pasid_cache_devsi() to invalidate p=
+asid
+> +                 * caches, while for piotlb in QEMU, we don't have it ye=
+t, so
+> +                 * no handling. For assigned device, host iommu driver w=
+ould
+> +                 * flush piotlb when a pasid unbind is pass down to it.
+> +                 */
+> +                 vtd_pasid_cache_devsi(s, vtd_bus, devfn_it);
+>              }
+>          }
+>      }
+> @@ -2619,6 +2645,12 @@ static gboolean vtd_flush_pasid(gpointer key, gpoi=
+nter value,
+>          /* Fall through */
+>      case VTD_PASID_CACHE_GLOBAL:
+>          break;
+> +    case VTD_PASID_CACHE_DEVSI:
+> +        if (pc_info->vtd_bus !=3D vtd_bus ||
+> +            pc_info->devfn =3D=3D devfn) {
+
+Do you mean "!=3D"?
+
+> +            return false;
+> +        }
+> +        break;
+>      default:
+>          error_report("invalid pc_info->flags");
+>          abort();
+> @@ -2827,6 +2859,11 @@ static void vtd_replay_guest_pasid_bindings(IntelI=
+OMMUState *s,
+>          walk_info.flags |=3D VTD_PASID_TABLE_DID_SEL_WALK;
+>          /* loop all assigned devices */
+>          break;
+> +    case VTD_PASID_CACHE_DEVSI:
+> +        walk_info.vtd_bus =3D pc_info->vtd_bus;
+> +        walk_info.devfn =3D pc_info->devfn;
+> +        vtd_replay_pasid_bind_for_dev(s, start, end, &walk_info);
+> +        return;
+>      case VTD_PASID_CACHE_FORCE_RESET:
+>          /* For force reset, no need to go further replay */
+>          return;
+> @@ -2912,6 +2949,20 @@ static void vtd_pasid_cache_sync(IntelIOMMUState *=
+s,
+>      vtd_iommu_unlock(s);
+>  }
+> =20
+> +static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
+> +                                  VTDBus *vtd_bus, uint16_t devfn)
+> +{
+> +    VTDPASIDCacheInfo pc_info;
+> +
+> +    trace_vtd_pasid_cache_devsi(devfn);
+> +
+> +    pc_info.flags =3D VTD_PASID_CACHE_DEVSI;
+> +    pc_info.vtd_bus =3D vtd_bus;
+> +    pc_info.devfn =3D devfn;
+> +
+> +    vtd_pasid_cache_sync(s, &pc_info);
+> +}
+> +
+>  /**
+>   * Caller of this function should hold iommu_lock
+>   */
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_interna=
+l.h
+> index b9e48ab..9122601 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -529,14 +529,18 @@ struct VTDPASIDCacheInfo {
+>  #define VTD_PASID_CACHE_GLOBAL         (1ULL << 1)
+>  #define VTD_PASID_CACHE_DOMSI          (1ULL << 2)
+>  #define VTD_PASID_CACHE_PASIDSI        (1ULL << 3)
+> +#define VTD_PASID_CACHE_DEVSI          (1ULL << 4)
+>      uint32_t flags;
+>      uint16_t domain_id;
+>      uint32_t pasid;
+> +    VTDBus *vtd_bus;
+> +    uint16_t devfn;
+>  };
+>  #define VTD_PASID_CACHE_INFO_MASK    (VTD_PASID_CACHE_FORCE_RESET | \
+>                                        VTD_PASID_CACHE_GLOBAL  | \
+>                                        VTD_PASID_CACHE_DOMSI  | \
+> -                                      VTD_PASID_CACHE_PASIDSI)
+> +                                      VTD_PASID_CACHE_PASIDSI | \
+> +                                      VTD_PASID_CACHE_DEVSI)
+>  typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
+> =20
+>  /* PASID Table Related Definitions */
+> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+> index 60d20c1..3853fa8 100644
+> --- a/hw/i386/trace-events
+> +++ b/hw/i386/trace-events
+> @@ -26,6 +26,7 @@ vtd_pasid_cache_gsi(void) ""
+>  vtd_pasid_cache_reset(void) ""
+>  vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation do=
+main 0x%"PRIx16
+>  vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC =
+invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
+> +vtd_pasid_cache_devsi(uint16_t devfn) "Dev selective PC invalidation dev=
+: 0x%"PRIx16
+>  vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
+>  vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu=
+8" devfn %"PRIu8" not present"
+>  vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t=
+ domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64"=
+ domain 0x%"PRIx16
+> --=20
+> 2.7.4
 >=20
-> Since this is just a warning, we still manage to complete the=20
-> ./configure run, including whatever generated files it leaves in-tree.=20
-> Is there any additional step we need to recommend prior to 'mkdir build'=
-=20
-> that will clean up the in-tree artifacts, so that the user then=20
-> attempting the VPATH build won't still have a broken build due to the=20
-> leftovers from the in-tree attempt?=C2=A0 'make distclean', perhaps?
->=20
-> /me starts testing; I'll reply back once it finishes...
-
-tl;dr: 'make distclean' isn't perfect (it still leaves 2 directories=20
-behind), but does clean up a lot of directories and .mak files, and IS=20
-necessary before you can build in the subdirectory; but at least make=20
-warns you.  Still, I'd prefer adding that step in the warning, rather=20
-than getting an error several steps later.
-
-On a fresh git checkout:
-
-$ ./configure
-...
-$ git clean -dfxn
-Would remove aarch64-linux-user/
-Would remove aarch64-softmmu/
-Would remove aarch64_be-linux-user/
-Would remove alpha-linux-user/
-Would remove alpha-softmmu/
-Would remove arm-linux-user/
-Would remove arm-softmmu/
-Would remove armeb-linux-user/
-Would remove config-all-disas.mak
-Would remove config-host.mak
-Would remove config.log
-Would remove config.status
-Would remove cris-linux-user/
-Would remove cris-softmmu/
-Would remove docs/sphinx/__pycache__/
-Would remove hppa-linux-user/
-Would remove hppa-softmmu/
-Would remove i386-linux-user/
-Would remove i386-softmmu/
-Would remove linux-headers/asm
-Would remove lm32-softmmu/
-Would remove m68k-linux-user/
-Would remove m68k-softmmu/
-Would remove microblaze-linux-user/
-Would remove microblaze-softmmu/
-Would remove microblazeel-linux-user/
-Would remove microblazeel-softmmu/
-Would remove mips-linux-user/
-Would remove mips-softmmu/
-Would remove mips64-linux-user/
-Would remove mips64-softmmu/
-Would remove mips64el-linux-user/
-Would remove mips64el-softmmu/
-Would remove mipsel-linux-user/
-Would remove mipsel-softmmu/
-Would remove mipsn32-linux-user/
-Would remove mipsn32el-linux-user/
-Would remove moxie-softmmu/
-Would remove nios2-linux-user/
-Would remove nios2-softmmu/
-Would remove or1k-linux-user/
-Would remove or1k-softmmu/
-Would remove ppc-linux-user/
-Would remove ppc-softmmu/
-Would remove ppc64-linux-user/
-Would remove ppc64-softmmu/
-Would remove ppc64abi32-linux-user/
-Would remove ppc64le-linux-user/
-Would remove riscv32-linux-user/
-Would remove riscv32-softmmu/
-Would remove riscv64-linux-user/
-Would remove riscv64-softmmu/
-Would remove rx-softmmu/
-Would remove s390x-linux-user/
-Would remove s390x-softmmu/
-Would remove sh4-linux-user/
-Would remove sh4-softmmu/
-Would remove sh4eb-linux-user/
-Would remove sh4eb-softmmu/
-Would remove sparc-linux-user/
-Would remove sparc-softmmu/
-Would remove sparc32plus-linux-user/
-Would remove sparc64-linux-user/
-Would remove sparc64-softmmu/
-Would remove tests/qemu-iotests/common.env
-Would remove tests/qgraph/
-Would remove tests/tcg/config-aarch64-linux-user.mak
-Would remove tests/tcg/config-aarch64-softmmu.mak
-Would remove tests/tcg/config-aarch64_be-linux-user.mak
-Would remove tests/tcg/config-alpha-linux-user.mak
-Would remove tests/tcg/config-alpha-softmmu.mak
-Would remove tests/tcg/config-arm-linux-user.mak
-Would remove tests/tcg/config-arm-softmmu.mak
-Would remove tests/tcg/config-armeb-linux-user.mak
-Would remove tests/tcg/config-cris-linux-user.mak
-Would remove tests/tcg/config-cris-softmmu.mak
-Would remove tests/tcg/config-hppa-linux-user.mak
-Would remove tests/tcg/config-hppa-softmmu.mak
-Would remove tests/tcg/config-i386-linux-user.mak
-Would remove tests/tcg/config-i386-softmmu.mak
-Would remove tests/tcg/config-lm32-softmmu.mak
-Would remove tests/tcg/config-m68k-linux-user.mak
-Would remove tests/tcg/config-m68k-softmmu.mak
-Would remove tests/tcg/config-mips-linux-user.mak
-Would remove tests/tcg/config-mips-softmmu.mak
-Would remove tests/tcg/config-mips64-linux-user.mak
-Would remove tests/tcg/config-mips64-softmmu.mak
-Would remove tests/tcg/config-mips64el-linux-user.mak
-Would remove tests/tcg/config-mips64el-softmmu.mak
-Would remove tests/tcg/config-mipsel-linux-user.mak
-Would remove tests/tcg/config-mipsel-softmmu.mak
-Would remove tests/tcg/config-mipsn32-linux-user.mak
-Would remove tests/tcg/config-mipsn32el-linux-user.mak
-Would remove tests/tcg/config-ppc-linux-user.mak
-Would remove tests/tcg/config-ppc-softmmu.mak
-Would remove tests/tcg/config-ppc64-linux-user.mak
-Would remove tests/tcg/config-ppc64-softmmu.mak
-Would remove tests/tcg/config-ppc64abi32-linux-user.mak
-Would remove tests/tcg/config-ppc64le-linux-user.mak
-Would remove tests/tcg/config-riscv64-linux-user.mak
-Would remove tests/tcg/config-riscv64-softmmu.mak
-Would remove tests/tcg/config-s390x-linux-user.mak
-Would remove tests/tcg/config-s390x-softmmu.mak
-Would remove tests/tcg/config-sh4-linux-user.mak
-Would remove tests/tcg/config-sh4-softmmu.mak
-Would remove tests/tcg/config-sh4eb-linux-user.mak
-Would remove tests/tcg/config-sh4eb-softmmu.mak
-Would remove tests/tcg/config-sparc64-linux-user.mak
-Would remove tests/tcg/config-sparc64-softmmu.mak
-Would remove tests/tcg/config-x86_64-linux-user.mak
-Would remove tests/tcg/config-x86_64-softmmu.mak
-Would remove tests/tcg/config-xtensa-linux-user.mak
-Would remove tests/tcg/config-xtensa-softmmu.mak
-Would remove tests/tcg/config-xtensaeb-linux-user.mak
-Would remove tests/tcg/config-xtensaeb-softmmu.mak
-Would remove tilegx-linux-user/
-Would remove tricore-softmmu/
-Would remove unicore32-softmmu/
-Would remove x86_64-linux-user/
-Would remove x86_64-softmmu/
-Would remove xtensa-linux-user/
-Would remove xtensa-softmmu/
-Would remove xtensaeb-linux-user/
-Would remove xtensaeb-softmmu/
-$ make distclean
-...
-$ git clean -dfxn
-Would remove docs/sphinx/__pycache__/
-Would remove tests/qgraph/
-$ ./configure
-...
-$ mkdir build
-$ cd build
-$ ../configure
-$ make
-Makefile:58: *** This is an out of tree build but your source tree=20
-(/home/eblake/qemu-tmp) seems to have been used for an in-tree build.=20
-You can fix this by running "make distclean && rm -rf *-linux-user=20
-*-softmmu" in your source tree.  Stop.
-$ cd ..
-$ make distclean && rm -rf *-linux-user *-softmmu
-$ cd build
-$ make
-...
-
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Peter Xu
 
 
