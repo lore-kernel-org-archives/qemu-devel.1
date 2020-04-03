@@ -6,41 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06854C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:37:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FFFC2BA12
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3CC9206F8
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:37:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3CC9206F8
+	by mail.kernel.org (Postfix) with ESMTPS id F161A206F8
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 16:37:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F161A206F8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKPJT-0004xg-RE
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 12:36:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45799)
+	id 1jKPJV-00050A-1u
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 12:37:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mail@maciej.szmigiero.name>) id 1jKNkd-0004p7-2y
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:56:56 -0400
+ (envelope-from <mail@maciej.szmigiero.name>) id 1jKOaz-00025R-OS
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 11:51:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mail@maciej.szmigiero.name>) id 1jKNkb-00061N-Qh
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:56:54 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:45014)
+ (envelope-from <mail@maciej.szmigiero.name>) id 1jKOay-00049P-Ao
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 11:51:01 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:55924)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mail@maciej.szmigiero.name>)
- id 1jKNkb-0005we-Hx
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:56:53 -0400
+ id 1jKOay-00045s-35
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 11:51:00 -0400
 Received: from MUA
  by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
  (Exim 4.93.0.4) (envelope-from <mail@maciej.szmigiero.name>)
- id 1jKNkK-00038G-LM; Fri, 03 Apr 2020 16:56:36 +0200
+ id 1jKOar-0001Lo-IX; Fri, 03 Apr 2020 17:50:53 +0200
 Subject: Re: [PATCH v1 5/5] i386: Hyper-V VMBus ACPI DSDT entry
 To: Jon Doron <arilou@gmail.com>
 References: <20200403142308.82990-1-arilou@gmail.com>
  <20200403142308.82990-6-arilou@gmail.com>
+ <76017793-735b-4bb5-0e69-ecded78af54d@maciej.szmigiero.name>
+ <CAP7QCog_EmLJ=O8Xi9Tc4Jst1=z62DXim9ScCyoPv7WugrSyOw@mail.gmail.com>
+ <CAP7QCogMdUis-=KsC--0ar2Zt2Vwcpn4HS+qCxPn5khtDTu+mA@mail.gmail.com>
 From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 Autocrypt: addr=mail@maciej.szmigiero.name; prefer-encrypt=mutual; keydata=
  mQINBFpGusUBEADXUMM2t7y9sHhI79+2QUnDdpauIBjZDukPZArwD+sDlx5P+jxaZ13XjUQc
@@ -109,15 +112,15 @@ Autocrypt: addr=mail@maciej.szmigiero.name; prefer-encrypt=mutual; keydata=
  OKsKYKdxxSBO//jLy3C28NmRTy2cdWpCo67o3mkkuPRYSFk0GgF1GF5cadLYSGsclXhK28lK
  0fzoMtI8coxOB9BoaKYkbM5ZPq7rN/wDN4y7s1lWNUGPkz0/fUxBvhX744CTIKTqs6ln5XnX
  svlJMx2hstfnVZ3kp2yBpJvdskUeZTZQnKIwLTfGEj0sCBLG5ncoUQmmTKOGBIT5AggItm4t sg==
-Message-ID: <76017793-735b-4bb5-0e69-ecded78af54d@maciej.szmigiero.name>
-Date: Fri, 3 Apr 2020 16:56:30 +0200
+Message-ID: <e2e4a72e-0bb7-f343-951b-2e3639416245@maciej.szmigiero.name>
+Date: Fri, 3 Apr 2020 17:50:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200403142308.82990-6-arilou@gmail.com>
+In-Reply-To: <CAP7QCogMdUis-=KsC--0ar2Zt2Vwcpn4HS+qCxPn5khtDTu+mA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 37.28.154.113
 X-Mailman-Approved-At: Fri, 03 Apr 2020 12:36:15 -0400
@@ -133,43 +136,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Evgeny Yakovlev <eyakovlev@virtuozzo.com>, ehabkost@redhat.com,
- qemu-devel@nongnu.org, Roman Kagan <rkagan@virtuozzo.com>, pbonzini@redhat.com,
- vkuznets@redhat.com
+ QEMU <qemu-devel@nongnu.org>, Roman Kagan <rkagan@virtuozzo.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jon,
+Thanks Jon,
 
-On 03.04.2020 16:23, Jon Doron wrote:
-> Guest OS uses ACPI to discover vmbus presence.  Add a corresponding
-> entry to DSDT in case vmbus has been enabled.
-> 
-> Experimentally Windows guests were found to require this entry to
-> include two IRQ resources, so this patch adds two semi-arbitrarily
-> chosen ones (7 and 13).  This results, in particular, in parallel port
-> conflicting with vmbus.
-> 
-> TODO: discover and use spare IRQs to avoid conflicts.
-> 
-> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-
-Nice work, thanks!
-
-However, it seems to be based on the code version that was posted in 
-February 2018, and not the latest version in OpenVZ qemu repository
-dated October 2019:
-https://src.openvz.org/projects/UP/repos/qemu/commits?until=refs%2Fheads%2Fvmbus
-
-This newer version has slightly different API here and there.
-Any particular reason for selecting that older version for porting?
-
-I have actually rebased this latest version on the top of the current
-QEMU master, and it basically seems to work fine.
-However, I haven't done extensive tests whether there isn't a memory leak
-somewhere or so on.
+I will push out to what I have in a moment.
 
 Maciej
+
+On 03.04.2020 17:30, Jon Doron wrote:
+>  Thank you Maciej it seems like your version is really ahead I'll do
+> the required work and merge it so i can submit a v2 with the latest
+> patchset from Roman
+> 
+> On Fri, Apr 3, 2020 at 6:06 PM Jon Doron <arilou@gmail.com> wrote:
+>>
+>> Thank you Maciej, I based it on top of what Denis (den@openvz.org) gave me
+>> which was this:
+>> https://ftp.openvz.org/virtuozzo/releases/openvz-7.0.12-288/source/SRPMS/q/qemu-kvm-vz-2.12.0-33.vz7.14.4.src.rpm
+>>
+>> Do you think you have a more recent version I dont mind diffing and
+>> resubmitting a new version of the patchset?
+>>
+>> Thanks,
+>> -- Jon.
+>>
+>> On Fri, Apr 3, 2020 at 5:56 PM Maciej S. Szmigiero
+>> <mail@maciej.szmigiero.name> wrote:
+>>>
+>>> Hi Jon,
+>>>
+>>> On 03.04.2020 16:23, Jon Doron wrote:
+>>>> Guest OS uses ACPI to discover vmbus presence.  Add a corresponding
+>>>> entry to DSDT in case vmbus has been enabled.
+>>>>
+>>>> Experimentally Windows guests were found to require this entry to
+>>>> include two IRQ resources, so this patch adds two semi-arbitrarily
+>>>> chosen ones (7 and 13).  This results, in particular, in parallel port
+>>>> conflicting with vmbus.
+>>>>
+>>>> TODO: discover and use spare IRQs to avoid conflicts.
+>>>>
+>>>> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+>>>> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+>>>> Signed-off-by: Jon Doron <arilou@gmail.com>
+>>>
+>>> Nice work, thanks!
+>>>
+>>> However, it seems to be based on the code version that was posted in
+>>> February 2018, and not the latest version in OpenVZ qemu repository
+>>> dated October 2019:
+>>> https://src.openvz.org/projects/UP/repos/qemu/commits?until=refs%2Fheads%2Fvmbus
+>>>
+>>> This newer version has slightly different API here and there.
+>>> Any particular reason for selecting that older version for porting?
+>>>
+>>> I have actually rebased this latest version on the top of the current
+>>> QEMU master, and it basically seems to work fine.
+>>> However, I haven't done extensive tests whether there isn't a memory leak
+>>> somewhere or so on.
+>>>
+>>> Maciej
+
 
