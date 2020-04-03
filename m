@@ -2,66 +2,89 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 374A8C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A78C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:48:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F34432073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72BF220787
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:48:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Bwq5X2F7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F34432073B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VB644px9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72BF220787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKFmv-0002bG-0k
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 02:26:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60063)
+	id 1jKG8M-0007FD-Kp
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 02:48:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33909)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jKFm7-00024Q-SL
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:25:57 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jKG7g-0006iT-JR
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jKFm6-0002sP-25
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:25:55 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:58317 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jKFm4-0002ov-TE; Fri, 03 Apr 2020 02:25:54 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48tqgY1pd2z9sRY; Fri,  3 Apr 2020 17:25:45 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1585895145;
- bh=BqHNU4ipXF1bbA6x+sGMAi8JA4hIeHk4JCILiMxb0fQ=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Bwq5X2F7kaZ98bjiJuUNqgHc8aIJIDyd4t4aZSTr02iSalJfLejKGHzfk3+wMB40C
- GdJylL7HNFMWaYlgbEo84nHuONbjgHym9W+xHcUbwOMriBOoKEBVOyrbtEMf/nRIus
- FnOstqRvrcMl7sAZIxE5lgnqduasJXzZpb15fHA8=
-Date: Fri, 3 Apr 2020 16:12:40 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] ppc/pnv: Introduce common PNV_SETFIELD() and
- PNV_GETFIELD() macros
-Message-ID: <20200403051240.GV47772@umbus.fritz.box>
-References: <20200401152633.1375-1-clg@kaod.org>
- <20200402003118.GJ47772@umbus.fritz.box>
- <b7663796-c9ad-c91e-104a-dcf78e467607@kaod.org>
- <20200402065027.GM47772@umbus.fritz.box>
- <d58b2e61-8245-ecbb-6f0a-31b2ea64835f@kaod.org>
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jKG7f-00011I-IT
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:48:12 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:35602)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1jKG7f-00010i-9J; Fri, 03 Apr 2020 02:48:11 -0400
+Received: by mail-lj1-x244.google.com with SMTP id k21so5880469ljh.2;
+ Thu, 02 Apr 2020 23:48:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=KpN8FN8Gh2TEnC1CcN5yIM656FSZeo9lJZDBNNHpy+Q=;
+ b=VB644px9pQvSo5oR5F3OF15iQ9ZTILTyNIe6ajIAJoyGnDTj3Y0TVOhEgpKibrt5ud
+ dI0XL1tXRCapsq9rkHlhpqvcqgyYF430VwxvqoMKyMo06Kl1nFoBhthaKtncmilTcrEp
+ HsHnRNNlmwmcu/WI6i4WE0xzAV3fu6PSdIRNhZHGljxte3jFgk98+8uUcrZgaDu6lsAS
+ XOVuOZpvS5OlqrLmu0S3GnsbuLL3qwCxdoz9wWfFfOugwuMt/6o9GkUiqudHK+lGTBfg
+ hfEcl1BuRhwLiVrgivioMiKnHaS3XYN28XwRUe5fAt/K18a6fTp61rn1qkieW6hkEBAF
+ AXNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=KpN8FN8Gh2TEnC1CcN5yIM656FSZeo9lJZDBNNHpy+Q=;
+ b=LyQXdB6lY7IwDsZNTbZGrqZWdsF7l7bHwiCBmrvC1PLLRt3Y4WUybtSG+/trzLnF+H
+ u3z4+Kz5UeYOc3RjC3kQR8+DyJZwNLPoQ+XFhz6UEK1rnVQu21r+RbqV9LvxTYGprGQM
+ t291oTdiU7rSHvo2scINRLVo0gyx5viO9pipK1DJICbtWI5DFIgJGjWWqqAMaeXSPcMl
+ sH1zGPlCKcWuk8G5SpqKCnjQehxRih36yqwJaAEf+w6q03VTACSPnd02c5KWP7u9wIje
+ rsK+0OdJFMEEGJr5BNJGyODju3ikCuV2By1vbgN8InvzZicDeoFTO298PFxZy+hXz9TS
+ 7q/g==
+X-Gm-Message-State: AGi0Pua+I8itEdEejXFo5bEfZ30Vi/DEzdDjABjG+SoZKnWSvs5ULe2b
+ 1sAOdPjCP+k1ZDe6l3q3434=
+X-Google-Smtp-Source: APiQypKQfAosSTw40QAqbEP4Yb1U1/CxHzrCUmpWKnaUdBCrtnAW5OcbULi1HUNiDf8MqxaBaOoSsg==
+X-Received: by 2002:a05:651c:1132:: with SMTP id
+ e18mr4006061ljo.149.1585896489549; 
+ Thu, 02 Apr 2020 23:48:09 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ b16sm4435729ljh.20.2020.04.02.23.48.08
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 02 Apr 2020 23:48:08 -0700 (PDT)
+Date: Fri, 3 Apr 2020 08:48:06 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: Re: [PATCH v1 1/5] dma/xlnx-zdma: Remove comment
+Message-ID: <20200403064805.aqbdwocgk2ds46hh@fralle-msi>
+References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
+ <20200402134721.27863-2-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="i13qRg9tmWEwo36p"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d58b2e61-8245-ecbb-6f0a-31b2ea64835f@kaod.org>
+In-Reply-To: <20200402134721.27863-2-edgar.iglesias@gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,84 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
+ luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On [2020 Apr 02] Thu 15:47:17, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Remove comment.
+> 
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
---i13qRg9tmWEwo36p
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-On Thu, Apr 02, 2020 at 09:18:09AM +0200, C=E9dric Le Goater wrote:
-> On 4/2/20 8:50 AM, David Gibson wrote:
-> > On Thu, Apr 02, 2020 at 08:41:24AM +0200, C=E9dric Le Goater wrote:
-> >> On 4/2/20 2:31 AM, David Gibson wrote:
-> >>> On Wed, Apr 01, 2020 at 05:26:33PM +0200, C=E9dric Le Goater wrote:
-> >>>> Most of QEMU definitions of the register fields of the PowerNV machi=
-ne
-> >>>> come from skiboot and the models duplicate a set of macros for this
-> >>>> purpose. Make them common under the pnv_utils.h file.
-> >>>>
-> >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>>
-> >>> Hrm.  If we're touching these, would it make sense to rewrite them in
-> >>> terms of the cross-qemu generic extract64() and deposit64()?
-> >>
-> >> I won't do that because we will loose compatibility with skiboot.
-> >=20
-> > Uh.. how so?
->=20
-> What would be very nice is to use the QEMU FIELD() from "hw/registerfield=
-s.h".
->=20
-> But that's a complete different approach from what skiboot does and it wo=
-uld
-> mean rewriting all the register definitions we include in QEMU for the po=
-wernv=20
-> models and the code using the fields. It is a major change and I would ra=
-ther=20
-> have the same files on both side (without tabs on the QEMU side). I think
-> it is safer.
->=20
-> Using extract64() and deposit64() raises the same kind of problem AFAICT.=
-=20
-> If we find a clean way to keep the register definition files the same, I =
-am
-> OK with any changes.
-
-So, I wasn't suggesting changing all the users to use
-extract64()/deposit64()/FIELD().  I was suggesting making the skiboot
-like versions a wrapper than translates the arguments into the right
-form for FIELD() or whatever.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---i13qRg9tmWEwo36p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6GxcgACgkQbDjKyiDZ
-s5JALRAA5Uj21DnfjrRUCg4vsdTRIx927yMADSrBcCAxzpTrWoqOpm7Nh+0+DLSu
-51rM6XbEo1kbfA7bR/6gPYM6KbBl6R4a56yiEFoByMu2+y2lZrlxBJ1mm6sdcsjs
-vRNcWYd1zjpMULq7GcZXbeRASeqgvyKvB1RunWGVp8EJyuCEeAmVzDFQnLD4myXO
-Lm/LLkeov1YTZOfIFDEG7FKEzEoNs8owgjnUEsTGYNSMS2Lljlo1CJqn+Sh1AAZE
-amm5Pq0Yo8EABCbg3v0OHbuJ8RFFs3eFetAZJUGHkdTuN3dOaeghKKB0b/dcVz26
-IJtPr+r0QWega8kUKdiSUjGKFdCHUDckHobnCvKrvFlLIpgxoEwgOItTCCEZ2a5z
-k0rw2J2Mx9FniLVLQXTJGNfgvBSvdhQ2EfiLrQJEIa2nYyNCWLMOAIUtYq5rE48G
-6jJQNh8FB5/ei007WIQ4XU+u8Au9U78NfUuvullsgWgF5R6oULM9rQldnbGoVtOK
-W2rD3XmHAt+yDJhSJP16hxYbDp84UTR3L5fk6o60d6bqXwpfnLZJibIqvohKu1ey
-UvytcGNfeST7dERpAkgaPSgYQunIZpkcS93Bub1jIPzTO8x9domehQHBtQ7ZW5bk
-UredoO5jS5LHW8LxcIlJazriz8e7U/4zx2amdq2GTkno7VXPdS8=
-=CFwY
------END PGP SIGNATURE-----
-
---i13qRg9tmWEwo36p--
+> ---
+>  hw/dma/xlnx-zdma.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index 2d9c0a0d5e..a6c5b2304a 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -511,7 +511,6 @@ static void zdma_process_descr(XlnxZDMA *s)
+>          zdma_src_done(s);
+>      }
+>  
+> -    /* Load next descriptor.  */
+>      if (ptype == PT_REG || src_cmd == CMD_STOP) {
+>          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_CTRL2, EN, 0);
+>          zdma_set_state(s, DISABLED);
+> -- 
+> 2.20.1
+> 
 
