@@ -2,79 +2,91 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CFC8C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CF5C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:03:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCAAB20737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:00:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A92520737
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 12:03:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X4eXJJ87"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCAAB20737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuhG8RQI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A92520737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKKzd-0005K9-1h
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50216)
+	id 1jKL3A-0007LH-Kc
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 08:03:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jKKys-0004kE-6M
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 07:59:27 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jKL2Z-0006vP-AQ
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jKKyq-0007Cs-VN
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 07:59:25 -0400
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:46545)
+ (envelope-from <stefanha@gmail.com>) id 1jKL2Y-00029E-1o
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:03:15 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39663)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jKKyq-0007Cg-MY
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 07:59:24 -0400
-Received: by mail-ot1-x32f.google.com with SMTP id 111so6900269oth.13
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 04:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=rVMhZqUPGlUbxzAZJ/IO4L8uoCfj6DV0BgZYGjqkXZg=;
- b=X4eXJJ87KPRRdG3NK7U+glGjOtx6ra2QisbhitBCp18INwubUMWQktCpxEo1sjU7sj
- ibNLlgJGt9p00XoXG6a+WaVGI6M/GJg31NGh5yCPcQNrydIJn3tWE5gC5n+Yus9+r4hw
- BSZRT5wp6AuJwv9dfH8TLZD4ndQVxnIVyPdBcBBEV4d3TMP09g/cHBm4lWkoUeJflYwo
- sPUBW5OOByhVa0c3RiUSyvmmQGXZUPZci5aHHPVOP7O/i5kA8Qu33igijX5Kh9tnvBMi
- P4cY4Paua6T3CThEiC+RtUhHU5YevFPLSJfIoQkL6AEQIEzQASVtPXwIWKwUQDz3V5pS
- XlMg==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jKL2X-00028f-Mc
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 08:03:14 -0400
+Received: by mail-wm1-x341.google.com with SMTP id e9so7404101wme.4
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 05:03:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=X1eIWeKVH755NCWFhZnNjMoq3qNaBWGdjfwtLj9dcDk=;
+ b=UuhG8RQIjnLzaYG1lrk8289Oig80q0g1xvdqAR54s3E72YFp16sg2CX7/X4aSeAVYf
+ oL92PmEFAQKGLfo58hhQ5eHoRR64dFo5e4uWkfbeIOwZeXrypnL3r4QOEUDaIzqY2661
+ b9HD2GiqRgt1R7aE/mFtYuJHj56Z264eBNL9duRD8Xr4PlqVohB7W1MCqC8+aD0iz+MJ
+ CNaRsmWApprOyl8hoNkL8+Xu91wVm5LOnhDoq0xzw7PDY7n3nqKBggF/fHXJe64HF3E3
+ +WNhtapWambXxTWB1WZYC1r/m1OIIngmJ3G5CJsVPOsyMl5FFwLOF/VPWL30wUk8jH+l
+ IXnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=rVMhZqUPGlUbxzAZJ/IO4L8uoCfj6DV0BgZYGjqkXZg=;
- b=j2p2ZwQr0Api4i/z5g/80GBXv+WwhIkExU5Vut6fT/K/sperXcqqWrwvHw0JNKM3jP
- K26Karotvmh3Seprj4BfE1DHKt0QZRv0Y/bPQfjNjf1DUui6TZwcWZW1p39bYReKYqSj
- WTWFqkbY4KB1eVT08x30LjTJLw1dDf4bPZ8wypxQpNpgxUclcvUJV5tVO3PFC/foXDd2
- +69OYuxGXETC/27cmUHxHKX5xxJsqLpzbCRlbPgOh4cXaIhEFmQa6FkoiMVuttIDBC2e
- 8FoK0hLi55Puf1FHUszAhaxHJO5O3QBdMfbF+4B405W93DGBVKbzdmVtC92JupK+0SV0
- uNvA==
-X-Gm-Message-State: AGi0PubcN5PnCovZBQ1Ykfr0mCAFn5C8dstnlZ61sg86Ovw+2QxiZboK
- u9VbQSYnLvy+hcERwnE3nBU8/7pJ+MziqBLVtedzYg==
-X-Google-Smtp-Source: APiQypL/tcbavsVBYVYrsHdZSKaqwbyX3ajlvHNCoLf7uHMdEauKfms/8LapKarpmkATWh1cDFjn1J00rOJ5pYLeQtc=
-X-Received: by 2002:a9d:1920:: with SMTP id j32mr5714180ota.221.1585915163801; 
- Fri, 03 Apr 2020 04:59:23 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=X1eIWeKVH755NCWFhZnNjMoq3qNaBWGdjfwtLj9dcDk=;
+ b=nNVo4eKusLCiPHoUOjBrntpOjUQRUUAy4nHwcquomx9RBn/TOVWsw/vrFe2+337Wn/
+ YWKKc84uYstp8r0F+euIZVsD/u8IDHf8KI8pfEyDSkPDndL5rfeZTAb7ZJsaBpCBER0z
+ oibD9WuEhux8Y+kF9vTcjeScEqgUq6gQOUrBi1A6zjwa8AbBqWFDEGXv2tJFxOuFrCaX
+ I5yQ9+kJZV216r+7HhMPg07/k87xRizlEKrIcWrSlfkXWDvPw02L/4xGthwznD0tepbi
+ 4y/KAPlYIAkgw0IsWdWRfXmA7ZHZRLGFCWkC4yoSawwgz0pIJQk0NtBilqP7fiFV3sjq
+ 0Lkw==
+X-Gm-Message-State: AGi0PuY+VJqCk77GMZ00GQYmmCrG/gHdzd5O30BGxoj1tSaBKhsf196Z
+ dOXhIVoYqTGpF23SoDHwHtA=
+X-Google-Smtp-Source: APiQypIzjAwsXCK8WSTqrvGzPNxgZeRPkHCiSj4/HULZKwr/hWjZCr0aSp0dwWAqISXL27xwbfDZEQ==
+X-Received: by 2002:a1c:e30b:: with SMTP id a11mr7945466wmh.7.1585915392092;
+ Fri, 03 Apr 2020 05:03:12 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id e8sm3841402wrw.40.2020.04.03.05.03.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Apr 2020 05:03:10 -0700 (PDT)
+Date: Fri, 3 Apr 2020 13:03:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+Message-ID: <20200403120308.GB146016@stefanha-x1.localdomain>
+References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <20200401091712.GA221892@stefanha-x1.localdomain>
+ <MN2PR02MB620500A5010B71F1C0D8695E8BC90@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <CAJ+F1CLU4kPK1Tw3X7oTAWtUp0Q4Q=wm3-Uj-_2JO09vq0paBg@mail.gmail.com>
+ <20200402101942.GF28280@stefanha-x1.localdomain>
+ <20200402104645.GF423991@redhat.com>
 MIME-Version: 1.0
-References: <20200402222051.523093-1-ehabkost@redhat.com>
-In-Reply-To: <20200402222051.523093-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Apr 2020 12:59:12 +0100
-Message-ID: <CAFEAcA-4MPW1g1piKWVvMq+sS862c7+2SXfxW9J5LyfiK4oQBw@mail.gmail.com>
-Subject: Re: [PULL 0/9] x86 queue for -rc2
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="DKU6Jbt7q3WqK7+M"
+Content-Disposition: inline
+In-Reply-To: <20200402104645.GF423991@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32f
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +98,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
+ Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
+ "Harris, James R" <james.r.harris@intel.com>,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
+ Kanth Ghatraju <Kanth.Ghatraju@oracle.com>, "Zhang,
+ Tina" <tina.zhang@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2 Apr 2020 at 23:20, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> This was supposed to be submitted before -rc1, but I've dropped
-> the ball (sorry).
->
-> The following changes since commit 2833ad487cfff7dc33703e4731b75facde1c561e:
->
->   Update version for v5.0.0-rc1 release (2020-03-31 18:02:47 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
->
-> for you to fetch changes up to d965dc35592d24c0c1519f1c566223c6277cb80e:
->
->   target/i386: Add ARCH_CAPABILITIES related bits into Icelake-Server CPU model (2020-03-31 19:13:32 -0300)
->
-> ----------------------------------------------------------------
-> x86 queue for -rc2
->
-> Fixes:
-> * EPYC CPU model APIC ID topology fixes (Babu Moger)
-> * Fix crash when enabling intel-pt on older machine types
->   (Luwei Kang)
-> * Add missing ARCH_CAPABILITIES bits to Icelake-Server CPU model
->   (Xiaoyao Li)
 
+--DKU6Jbt7q3WqK7+M
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On Thu, Apr 02, 2020 at 11:46:45AM +0100, Daniel P. Berrang=E9 wrote:
+> On Thu, Apr 02, 2020 at 11:19:42AM +0100, Stefan Hajnoczi wrote:
+> > On Wed, Apr 01, 2020 at 06:58:20PM +0200, Marc-Andr=E9 Lureau wrote:
+> > > On Wed, Apr 1, 2020 at 5:51 PM Thanos Makatos
+> > > <thanos.makatos@nutanix.com> wrote:
+> > > > > > Bear in mind that since this is just a PoC lots of things can b=
+reak, e.g. some
+> > > > > > system call not intercepted etc.
+> > > > >
+> > > > > Cool, I had a quick look at libvfio and how the transport integra=
+tes
+> > > > > into libmuser.  The integration on the libmuser side is nice and =
+small.
+> > > > >
+> > > > > It seems likely that there will be several different implementati=
+ons of
+> > > > > the vfio-over-socket device side (server):
+> > > > > 1. libmuser
+> > > > > 2. A Rust equivalent to libmuser
+> > > > > 3. Maybe a native QEMU implementation for multi-process QEMU (I t=
+hink JJ
+> > > > >    has been investigating this?)
+> > > > >
+> > > > > In order to interoperate we'll need to maintain a protocol
+> > > > > specification.  Mayb You and JJ could put that together and CC th=
+e vfio,
+> > > > > rust-vmm, and QEMU communities for discussion?
+> > > >
+> > > > Sure, I can start by drafting a design doc and share it.
+> > >=20
+> > > ok! I am quite amazed you went this far with a ldpreload hack. This
+> > > demonstrates some limits of gpl projects, if it was necessary.
+> > >=20
+> > > I think with this work, and the muser experience, you have a pretty
+> > > good idea of what the protocol could look like. My approach, as I
+> > > remember, was a quite straightforward VFIO over socket translation,
+> > > while trying to see if it could share some aspects with vhost-user,
+> > > such as memory handling etc.
+> > >=20
+> > > To contrast with the work done on qemu-mp series, I'd also prefer we
+> > > focus our work on a vfio-like protocol, before trying to see how qemu
+> > > code and interface could be changed over multiple binaries etc. We
+> > > will start with some limitations, similar to the one that apply to
+> > > VFIO: migration, introspection, managements etc are mostly left out
+> > > for now. (iow, qemu-mp is trying to do too many things simultaneously)
+> >=20
+> > qemu-mp has been cut down significantly in order to make it
+> > non-invasive.  The model is now much cleaner:
+> > 1. No monitor command or command-line option forwarding.  The device
+> >    emulation program has its own command-line and monitor that QEMU
+> >    doesn't know about.
+> > 2. No per-device proxy objects.  A single RemotePCIDevice is added to
+> >    QEMU.  In the current patch series it only supports the LSI SCSI
+> >    controller but once the socket protocol is changed to
+> >    vfio-over-socket it will be possible to use any PCI device.
+> >=20
+> > We recently agreed on dropping live migration to further reduce the
+> > patch series.  If you have specific suggestions, please post reviews on
+> > the latest patch series.
+>=20
+> To clarify - the decision was to *temporarily* drop live migration, to
+> make the initial patch series smaller and thus easier to merge. It does
+> ultimately need live migration, so there would be followup patch series
+> to provide migration support, after the initial merge.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Yes.  Live migration should come from the VFIO protocol and/or vmstate
+DBus.  There is no need to implement it in a qemu-mp-specific way.
 
--- PMM
+Stefan
+
+--DKU6Jbt7q3WqK7+M
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6HJfwACgkQnKSrs4Gr
+c8g0uQf8D4QhfuGEYDXwFrBG8zihRFJML0NH5H2g7q+ytq3/hD2ZGl8Uk/EWfjZd
+9kkRzLFVaP92AxOrmExBgjyGAp93QCc8jsSWEL9l7Htb11tMP1IK9uEaZlhSimxR
+cjTTtpbaOf/p4UjBgBX6o3i/tW4Tlr5a2Q2/UwN8wlriPX+xz9CNIDxo2/bdCYRu
+erjDYUctqkJ4CXkFgeNqyOfZnj+6nxsbHg+NLJhteISnjhBtraMwnSuF8OUi+q+s
+o8UNlbCTDHtiqfc3cuQr7KHk/wudsaUcpxkNQMiltIogHM8BWMMT+1WNmcy9xYzK
+WuWdg7kh52g3FebIhX6NjmFc+MnwXw==
+=iXlg
+-----END PGP SIGNATURE-----
+
+--DKU6Jbt7q3WqK7+M--
 
