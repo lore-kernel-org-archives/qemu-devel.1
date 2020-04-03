@@ -7,75 +7,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23EFEC2BA15
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA35C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:17:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5880206F6
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:17:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCE37206F6
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 07:17:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BwlUSEU/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5880206F6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P9wVE7ov"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCE37206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKGZq-0000d8-1E
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:17:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36949)
+	id 1jKGaI-00013h-VX
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 03:17:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jKGWU-0003ji-9B
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:13:51 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jKGWa-00040X-Q9
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jKGWT-00042I-4X
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:13:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44383
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1jKGWZ-00047Z-L3
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:13:56 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60468
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jKGWT-00040u-1B
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:13:49 -0400
+ id 1jKGWZ-00047D-HU
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 03:13:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585898027;
+ s=mimecast20190719; t=1585898035;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nOxDemA543fI2L+xh6FprjzhpIkpNUjunEo/98XltUM=;
- b=BwlUSEU/Rrkl44stmGa0rZRxc0fXcyoKeu3G/RGZ5dVTyl2Nuviev9tfOcazhVl/Ql+E6P
- YZ0VkEt+7ODsWKuJt7qu7xL9p4SO8oz9S6iVmyuZpBSTJ/jwmon3nbf2RVoKvuCAnHLtqH
- L58WdVdDpzV27XixItcdM/HqPz4ArV4=
+ bh=VMgw7fPRvswGtz0UWDZWno+rhI8xWDdMNwR6QWL2h2w=;
+ b=P9wVE7ovAz8EAzZ5n0jrzyM5XzmeWQiM88FOBzvp2cZo6F3uItjFEhtDTFQr+rj5VbD9kh
+ umXdHEP/Gu++WggNxU8kq00s5+hKGu/Pq13FnD8vTMtZcOtK6gRGNYN/tuLSH9KBsRz+22
+ hBWSYS6CoQCj1J7pqjpTQ6O3T4Y0EeE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-Jv0KwsV9PPiQ_95d1iMhrg-1; Fri, 03 Apr 2020 03:13:43 -0400
-X-MC-Unique: Jv0KwsV9PPiQ_95d1iMhrg-1
+ us-mta-336-vVHercPyPrOkiD-P-tOYzw-1; Fri, 03 Apr 2020 03:13:51 -0400
+X-MC-Unique: vVHercPyPrOkiD-P-tOYzw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2663718C8C00;
- Fri,  3 Apr 2020 07:13:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47285800D5B;
+ Fri,  3 Apr 2020 07:13:50 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B4A348;
- Fri,  3 Apr 2020 07:13:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3FC575C1C6;
+ Fri,  3 Apr 2020 07:13:46 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v4 02/12] arm: pmu: Let pmu tests take a
- sub-test parameter
-Date: Fri,  3 Apr 2020 09:13:16 +0200
-Message-Id: <20200403071326.29932-3-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v4 04/12] arm: pmu: Add a pmu struct
+Date: Fri,  3 Apr 2020 09:13:18 +0200
+Message-Id: <20200403071326.29932-5-eric.auger@redhat.com>
 In-Reply-To: <20200403071326.29932-1-eric.auger@redhat.com>
 References: <20200403071326.29932-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,9 +91,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we intend to introduce more PMU tests, let's add
-a sub-test parameter that will allow to categorize
-them. Existing tests are in the cycle-counter category.
+This struct aims at storing information potentially used by
+all tests such as the pmu version, the read-only part of the
+PMCR, the number of implemented event counters, ...
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
@@ -103,85 +101,71 @@ Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 ---
 
 v2 -> v3:
-- added report_prefix_pop()
+- Fix pmcr_ro and add a comment
 ---
- arm/pmu.c         | 25 ++++++++++++++++---------
- arm/unittests.cfg |  7 ++++---
- 2 files changed, 20 insertions(+), 12 deletions(-)
+ arm/pmu.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-index d5a03a6..0122f0a 100644
+index 44f3543..d827e82 100644
 --- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -287,22 +287,29 @@ int main(int argc, char *argv[])
- {
- 	int cpi =3D 0;
+@@ -33,7 +33,14 @@
 =20
--	if (argc > 1)
--		cpi =3D atol(argv[1]);
--
- 	if (!pmu_probe()) {
- 		printf("No PMU found, test skipped...\n");
- 		return report_summary();
- 	}
+ #define NR_SAMPLES 10
 =20
-+	if (argc < 2)
-+		report_abort("no test specified");
+-static unsigned int pmu_version;
++struct pmu {
++	unsigned int version;
++	unsigned int nb_implemented_counters;
++	uint32_t pmcr_ro;
++};
 +
- 	report_prefix_push("pmu");
++static struct pmu pmu;
++
+ #if defined(__arm__)
+ #define ID_DFR0_PERFMON_SHIFT 24
+ #define ID_DFR0_PERFMON_MASK  0xf
+@@ -242,7 +249,7 @@ static bool check_cpi(int cpi)
+ static void pmccntr64_test(void)
+ {
+ #ifdef __arm__
+-	if (pmu_version =3D=3D 0x3) {
++	if (pmu.version =3D=3D 0x3) {
+ 		if (ERRATA(9e3f7a296940)) {
+ 			write_sysreg(0xdead, PMCCNTR64);
+ 			report(read_sysreg(PMCCNTR64) =3D=3D 0xdead, "pmccntr64");
+@@ -257,18 +264,24 @@ static bool pmu_probe(void)
+ {
+ 	uint32_t pmcr;
 =20
--	report(check_pmcr(), "Control register");
--	report(check_cycles_increase(),
--	       "Monotonically increasing cycle count");
--	report(check_cpi(cpi), "Cycle/instruction ratio");
--
--	pmccntr64_test();
-+	if (strcmp(argv[1], "cycle-counter") =3D=3D 0) {
-+		report_prefix_push(argv[1]);
-+		if (argc > 2)
-+			cpi =3D atol(argv[2]);
-+		report(check_pmcr(), "Control register");
-+		report(check_cycles_increase(),
-+		       "Monotonically increasing cycle count");
-+		report(check_cpi(cpi), "Cycle/instruction ratio");
-+		pmccntr64_test();
-+		report_prefix_pop();
-+	} else {
-+		report_abort("Unknown sub-test '%s'", argv[1]);
-+	}
+-	pmu_version =3D get_pmu_version();
+-	if (pmu_version =3D=3D 0 || pmu_version =3D=3D 0xf)
++	pmu.version =3D get_pmu_version();
++	if (pmu.version =3D=3D 0 || pmu.version =3D=3D 0xf)
+ 		return false;
 =20
- 	return report_summary();
+-	report_info("PMU version: %d", pmu_version);
++	report_info("PMU version: %d", pmu.version);
+=20
+ 	pmcr =3D get_pmcr();
+-	report_info("PMU implementer/ID code/counters: %#x(\"%c\")/%#x/%d",
++	report_info("PMU implementer/ID code: %#x(\"%c\")/%#x",
+ 		    (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
+ 		    ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
+-		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK,
+-		    (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK);
++		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK);
++
++	/* store read-only and RES0 fields of the PMCR bottom-half*/
++	pmu.pmcr_ro =3D pmcr & 0xFFFFFF00;
++	pmu.nb_implemented_counters =3D
++		(pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK;
++	report_info("Implements %d event counters",
++		    pmu.nb_implemented_counters);
+=20
+ 	return true;
  }
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 017958d..fe6515c 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -61,21 +61,22 @@ file =3D pci-test.flat
- groups =3D pci
-=20
- # Test PMU support
--[pmu]
-+[pmu-cycle-counter]
- file =3D pmu.flat
- groups =3D pmu
-+extra_params =3D -append 'cycle-counter 0'
-=20
- # Test PMU support (TCG) with -icount IPC=3D1
- #[pmu-tcg-icount-1]
- #file =3D pmu.flat
--#extra_params =3D -icount 0 -append '1'
-+#extra_params =3D -icount 0 -append 'cycle-counter 1'
- #groups =3D pmu
- #accel =3D tcg
-=20
- # Test PMU support (TCG) with -icount IPC=3D256
- #[pmu-tcg-icount-256]
- #file =3D pmu.flat
--#extra_params =3D -icount 8 -append '256'
-+#extra_params =3D -icount 8 -append 'cycle-counter 256'
- #groups =3D pmu
- #accel =3D tcg
-=20
 --=20
 2.20.1
 
