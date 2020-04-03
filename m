@@ -2,66 +2,71 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3494C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F5EC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE55D2080C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:56:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1C6E2080C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 08:57:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="arL3nEZP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE55D2080C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IYHCRdsN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C6E2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKI7Q-0004MG-Sq
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 04:56:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49453)
+	id 1jKI9D-0005Yk-UG
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 04:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jKI6n-0003r7-CY
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:55:26 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jKI8a-0004zC-5L
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jKI6l-00030k-PJ
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:55:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37726
+ (envelope-from <mreitz@redhat.com>) id 1jKI8Z-0006EC-CT
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:57:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33740
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jKI6l-0002yy-JW
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:55:23 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jKI8Z-0006CS-8G
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 04:57:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585904122;
+ s=mimecast20190719; t=1585904234;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=63KjWeKu8PUziGEX16GOJafoZTEdcP3NgQK1g1+W9yA=;
- b=arL3nEZPNp6NESgrweWgzU6JkRAptMXJq7sNp21g6rLyQx+R6gRabsKicNuNlkBjX3Nfsu
- +uFptvzFPuNwcazrCqWA/rn6w9sIi+hWpHOZojq3L9yv/y2YItyhNNasnIGzGg/04zqRx4
- aWHFJ7rQHl9fkSQjaKU4BJAURtLLBRo=
+ bh=fMMcSMTa7eu3IMeeA71RAUTrDD6goQQOH0s2aDiCETE=;
+ b=IYHCRdsN+b3VtzmnFijeRi9Nvl8rYCJrKMqiKqLUgFdS49J6UPNRn8l3BcYBF63T6ObB77
+ CxJ6QgYVB2SYvtr5qNNNtkxVNbRUYSy/TBef2uVkxpF4BVeKGXu1zLPXqib03aVXUxX0o1
+ UvBZ9OAjXTXmFsP3KJRBi2+WG4R3wz4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-268-_goqlZ2gPGeYAzek2pf0mA-1; Fri, 03 Apr 2020 04:55:17 -0400
-X-MC-Unique: _goqlZ2gPGeYAzek2pf0mA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-346-92jZRmM2OHS7BOaNT0Ok4A-1; Fri, 03 Apr 2020 04:57:12 -0400
+X-MC-Unique: 92jZRmM2OHS7BOaNT0Ok4A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F7D3800D5C;
- Fri,  3 Apr 2020 08:55:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 939958024D2;
+ Fri,  3 Apr 2020 08:57:11 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-97.ams2.redhat.com
  [10.36.113.97])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BB3E1001B28;
- Fri,  3 Apr 2020 08:55:14 +0000 (UTC)
-Subject: Re: [PATCH for-5.0] vpc: Don't round up already aligned BAT sizes
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200402093603.2369-1-kwolf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2839D5C296;
+ Fri,  3 Apr 2020 08:57:08 +0000 (UTC)
+Subject: Re: [PATCH v10 10/14] iotests: add hmp helper with logging
+To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20200331000014.11581-1-jsnow@redhat.com>
+ <20200331000014.11581-11-jsnow@redhat.com>
+ <88146808-4acc-247e-d34b-5dd16baad0b4@redhat.com>
+ <c0efeb62-b121-74a2-1929-b41a0e47c1b8@redhat.com>
+ <20200331173945.GL7030@linux.fritz.box>
+ <0c8ce9c5-d8b4-4b24-a6e3-4b9863c52fe0@redhat.com>
+ <449f8a5e-d8a0-1993-c30c-97d67a89df1e@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -87,18 +92,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e379efcd-58ef-c9bb-0ae8-b3435f30d141@redhat.com>
-Date: Fri, 3 Apr 2020 10:55:13 +0200
+Message-ID: <0cdd5431-4cfb-914f-d506-572313d9e45a@redhat.com>
+Date: Fri, 3 Apr 2020 10:57:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200402093603.2369-1-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <449f8a5e-d8a0-1993-c30c-97d67a89df1e@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="1QvN4a0sx2FETdurXxVPqoIWrCWOdvp6A"
+ boundary="BraTEYOaml7RhydSMRHsMYa2ftKz5u4pr"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -112,92 +117,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, qemu-block@nongnu.org, philmd@redhat.com,
+ qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1QvN4a0sx2FETdurXxVPqoIWrCWOdvp6A
-Content-Type: multipart/mixed; boundary="PAoAeta6gDfQrRTVjig8IBscUQOmKebwc"
+--BraTEYOaml7RhydSMRHsMYa2ftKz5u4pr
+Content-Type: multipart/mixed; boundary="SqiUeREnQtwYYViLTQ4EPnQbqWZxKGIMx"
 
---PAoAeta6gDfQrRTVjig8IBscUQOmKebwc
+--SqiUeREnQtwYYViLTQ4EPnQbqWZxKGIMx
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 02.04.20 11:36, Kevin Wolf wrote:
-> As reported on Launchpad, Azure apparently doesn't accept images for
-> upload that are not both aligned to 1 MB blocks and have a BAT size that
-> matches the image size exactly.
->=20
-> As far as I can tell, there is no real reason why we create a BAT that
-> is one entry longer than necessary for aligned image sizes, so change
-> that.
->=20
-> (Even though the condition is only mentioned as "should" in the spec and
-> previous products accepted larger BATs - but we'll try to maintain
-> compatibility with as many of Microsoft's ever-changing interpretations
-> of the VHD spec as possible.)
+On 02.04.20 20:27, John Snow wrote:
 
-So as far as I can tell we still don=E2=80=99t ensure that the image is ali=
-gned
-to 1 MB blocks?
+[...]
 
-Well, as long as it=E2=80=99s at least possible for the user to create vali=
-d
-images, that=E2=80=99s better.
+> Are we squared up for this series? I am actually not sure.
 
-> Fixes: https://bugs.launchpad.net/bugs/1870098
-> Reported-by: Tobias Witek
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/vpc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/block/vpc.c b/block/vpc.c
-> index 6df75e22dc..d8141b52da 100644
-> --- a/block/vpc.c
-> +++ b/block/vpc.c
-> @@ -835,7 +835,7 @@ static int create_dynamic_disk(BlockBackend *blk, uin=
-t8_t *buf,
-> =20
->      /* Write the footer (twice: at the beginning and at the end) */
->      block_size =3D 0x200000;
-> -    num_bat_entries =3D (total_sectors + block_size / 512) / (block_size=
- / 512);
-> +    num_bat_entries =3D DIV_ROUND_UP(total_sectors, block_size / 512);
+As far as I=E2=80=99m concerned, yes.  I just had this question on how to u=
+se mypy.
 
-And the old code just looks like a wrong DIV_ROUND_UP() attempt.  So:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> =20
->      ret =3D blk_pwrite(blk, offset, buf, HEADER_SIZE, 0);
->      if (ret < 0) {
->=20
+Max
 
 
+--SqiUeREnQtwYYViLTQ4EPnQbqWZxKGIMx--
 
---PAoAeta6gDfQrRTVjig8IBscUQOmKebwc--
-
---1QvN4a0sx2FETdurXxVPqoIWrCWOdvp6A
+--BraTEYOaml7RhydSMRHsMYa2ftKz5u4pr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6G+fEACgkQ9AfbAGHV
-z0DsJggAkZ9egJ/Wh75omp6zxZn2i5caL89w8UjVOeTu+k5DqpvuGpJUOb9fB7qm
-IyKAjR1EcoykNGndP8tdMtkxAzdDVBdBccxyTgcyR+H7V77AYlMOAS1Z3ML9XMQR
-WnmUhCl4QJ3qSZubAftmvtjsDGcxUMBH00rqgJMs8bK4uL6L8mcH6dH2obiMF0m4
-WTk/dvdFAnu4ytENDKBRoCrsI4ziBlVe5OjCsiBh+3aPY0/hjwFe/pyD2Wz63DKy
-/u9nCurAKz1xFWDW3quLi0ZJ9LnfTXBEDZcSds3tQTgSbopLtIruXRWv0SeJlFZP
-W3XU8n7AVg/u3328Yp1VrQzpsJbLVQ==
-=ZvQS
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6G+mMACgkQ9AfbAGHV
+z0BRZAgApNPkcwoLQ2/Q6OL9zfTK1mXQYgtU/dVQRXlicz/SHg2vX1LguFbst6nH
+o5GKmcZAaAIfD1Hy00TQfa7CeQ0d8Mwl2J82JXbUEm4KmwxZhW+pgytUYOxUrM+M
+d1RmiYfPEDpPYhiF7byRn4n0bzjEvZhPP9nWIePPoO3dXJjQ3PeL1XBqvunGgj+Q
+f1enSu0M9L626YvDcuu03ibftqt507J1TQdtmc2GP4cCMleDOjrIZ5bNYnmvSTmI
+T1aeLBwqYVEnzlmAmDeMEZeLWML4UUyrB11u2u+p4ejvHBsGPXoBDmDMXzIAdmzf
+6itsMk1n3MfMJdawraM1piOLNhopcQ==
+=88wv
 -----END PGP SIGNATURE-----
 
---1QvN4a0sx2FETdurXxVPqoIWrCWOdvp6A--
+--BraTEYOaml7RhydSMRHsMYa2ftKz5u4pr--
 
 
