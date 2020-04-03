@@ -2,84 +2,78 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912F2C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B4CC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:23:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 622EA2077D
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:21:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622EA2077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 141272077D
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 14:23:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNsRkKBx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 141272077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKNC8-0004rD-HM
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:21:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40801)
+	id 1jKNDu-0005vX-5z
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 10:23:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40973)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1jKNBT-0004Ov-89
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:20:36 -0400
+ (envelope-from <berrange@redhat.com>) id 1jKNDJ-0005Vc-1p
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1jKNBR-0004iC-8Q
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:20:34 -0400
-Received: from mga11.intel.com ([192.55.52.93]:40211)
+ (envelope-from <berrange@redhat.com>) id 1jKNDG-0005tf-UE
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:22:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53238
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jKNBR-0004OS-0j
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:20:33 -0400
-IronPort-SDR: ncnmN8L6Sq2uUPRWnwQWX89MmodqwY6bKEK9Jc3Y9KCCyMJQK72zDZztD0obBB4aSbJ3NLwzoH
- oL4fEK9Wt9xQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Apr 2020 07:20:24 -0700
-IronPort-SDR: 2rpQ7rIuR4YUY0xutP8EPYCYieB6vL0BcBNl35QFYD1nMs86yI801vsSY3VF1kc6yr5wB5UD2u
- Xfc9cs/52umA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,339,1580803200"; d="scan'208";a="250182018"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by orsmga003.jf.intel.com with ESMTP; 03 Apr 2020 07:20:23 -0700
-Received: from fmsmsx102.amr.corp.intel.com (10.18.124.200) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 3 Apr 2020 07:20:22 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- FMSMSX102.amr.corp.intel.com (10.18.124.200) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 3 Apr 2020 07:20:22 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.7]) with mapi id 14.03.0439.000;
- Fri, 3 Apr 2020 22:20:19 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>
-Subject: RE: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VMs
-Thread-Topic: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VMs
-Thread-Index: AQHWBkpi4SFlYLfwBEaCXIDf+JnUMqhk//QAgABXcoCAAiHikA==
-Date: Fri, 3 Apr 2020 14:20:18 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A220CF8@SHSMSX104.ccr.corp.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <984e6f47-2717-44fb-7ff2-95ca61d1858f@redhat.com>
- <20200402134601.GJ7174@xz-x1>
-In-Reply-To: <20200402134601.GJ7174@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jKNDG-0005tC-KR
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 10:22:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585923745;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:mime-version:mime-version:
+ content-type:content-type: content-transfer-encoding:content-transfer-encoding;
+ bh=Cesu/Rqb5ccaX21wPu/Qze+09c9Gd3ipVv7CD44dpAY=;
+ b=VNsRkKBxWzQY8ii3i+TlBow+wHsMGIisj4POIVLUXHwdidqlIqNGo8HJvAoxIVktYiqdOm
+ pt8HuNY9WYB8TCZ2HSlGZG1WnTuRrHnOdBs1oyH7TPcFEP3VFxJgdan1ZL/iXLD3DI5eel
+ 3wTRwQOPOihIyssxs5Jj4qcOra50YDM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-373-3lydG17HON-oSvni7ERhBw-1; Fri, 03 Apr 2020 10:22:19 -0400
+X-MC-Unique: 3lydG17HON-oSvni7ERhBw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 853DE13F6
+ for <qemu-devel@nongnu.org>; Fri,  3 Apr 2020 14:22:18 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AD751101D480
+ for <qemu-devel@nongnu.org>; Fri,  3 Apr 2020 14:22:17 +0000 (UTC)
+Date: Fri, 3 Apr 2020 15:22:13 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: FYI GitHub pull request / issue tracker lockdown bot
+Message-ID: <20200403142213.GO559148@redhat.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 192.55.52.93
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,29 +85,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "Sun,
- Yi Y" <yi.y.sun@intel.com>, "Wu, Hao" <hao.wu@intel.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBB
-cHJpbCAyLCAyMDIwIDk6NDYgUE0NCj4gVG86IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5j
-b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDAvMjJdIGludGVsX2lvbW11OiBleHBvc2Ug
-U2hhcmVkIFZpcnR1YWwgQWRkcmVzc2luZyB0bw0KPiBWTXMNCj4gDQo+IE9uIFRodSwgQXByIDAy
-LCAyMDIwIGF0IDA0OjMzOjAyUE0gKzA4MDAsIEphc29uIFdhbmcgd3JvdGU6DQo+ID4gPiBUaGUg
-Y29tcGxldGUgUUVNVSBzZXQgY2FuIGJlIGZvdW5kIGluIGJlbG93IGxpbms6DQo+ID4gPiBodHRw
-czovL2dpdGh1Yi5jb20vbHV4aXMxOTk5L3FlbXUuZ2l0OiBzdmFfdnRkX3YxMF92Mg0KPiA+DQo+
-ID4NCj4gPiBIaSBZaToNCj4gPg0KPiA+IEkgY291bGQgbm90IGZpbmQgdGhlIGJyYW5jaCB0aGVy
-ZS4NCj4gDQo+IEphc29uLA0KPiANCj4gSGUgdHlwZWQgd3JvbmcuLi4gSXQncyBhY3R1YWxseSAo
-SSBmb3VuZCBpdCBteXNlbGYpOg0KPiANCj4gaHR0cHM6Ly9naXRodWIuY29tL2x1eGlzMTk5OS9x
-ZW11L3RyZWUvc3ZhX3Z0ZF92MTBfcWVtdV92Mg0KdGhhbmtzLCByZWFsbHkgYSBzaWxseSB0eXBl
-IG1pc3Rha2UuDQoNClJlZ2FyZHMsDQpZaSBMaXUNCg==
+QEMU, like libvirt, has a github.com project which contains automated
+read-only mirrors of QEMU repositories.
+
+  https://github.com/qemu/
+
+An unfortunate side effect of this is that some users will try to open
+pull requests against these mirrors. These get ignored until eventually
+someone notices and closes the request. QEMU has had about 90 prs opened
+over the years.
+
+  https://github.com/qemu/qemu/pulls
+
+The same applies to the issue tracker, but fortunately github lets
+projects disable this feature, which QEMU has done.
+
+I have recently discovered that there is a nice 3rd party bot for github
+which can autorespond to pull requests with a friendly comment, close the
+request, and then lock it to prevent further comments.
+
+  https://github.com/apps/repo-lockdown
+
+I'm setting this up for libvirt and it was suggested QEMU can probably
+benefit from it too as an example see:
+
+  https://github.com/libvirt/test/issues/2
+  https://github.com/libvirt/test/pull/3
+
+
+Configuration just requires creation of a ".github/lockdown.yml" file
+which provides the friendly message to add to the merge requests. This
+can be either done per-repository, or a special repo can be created
+called ".github" and this will apply to all repos within the project.
+
+Ideally each repo would have a CONTRIBUTING.md file created too, since
+both GitHub and GitLab will direct users to this file for guidelines
+on how to contribute.
+
+I don't have time right now to do this for QEMU, so consider this email
+a friendly suggestion for some other interested person to do for QEMU...
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
