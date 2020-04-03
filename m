@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E8AC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC13C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:13:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 970C320719
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:13:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9931420719
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 19:13:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yK80QjmI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 970C320719
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BONettR/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9931420719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKRkr-0004yA-PX
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 15:13:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40233)
+	id 1jKRkv-00059l-G3
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 15:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jKRjQ-0003FP-DZ
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jKRjS-0003Ff-4H
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jKRjP-000200-1X
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:56 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40096)
+ (envelope-from <alex.bennee@linaro.org>) id 1jKRjP-00021q-Sj
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:57 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40752)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jKRjO-0001xC-LH
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:54 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s8so7674625wrt.7
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 12:11:54 -0700 (PDT)
+ id 1jKRjP-000206-MR
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 15:11:55 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a81so8870936wmf.5
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 12:11:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+bAv2HPSumCjz45QTmpT65MHVnN93v/+fTRM89VHFyg=;
- b=yK80QjmIo8e7BiILucvoVLSRw1slFmjM0ixIcZ1APs/uqRY1aqhiIjg1U8HKCBlk7a
- 2SIfRuEu55FGF5MgvxJdWuuLJ7U8mdmhVf+SJgcHlCLwNbiJQKusN1oKNZozSEFpm7OA
- tojXMZHU1vFnykDXF4MsGdJ/spSGRTUNAJJo7YaXf3JIFOdXDx6VMFdy7jq5rG+rqqyv
- GAwNglWd16vbNHK/Hsbn72X/+fC4611gFwfZC+9ifN2OzQLX1Tco8ChwoO6LTe5FlWat
- /Ukg+bnbKvUKSOA/XowjHPyhLyU0ErtjiCXwNgg5AsEBtnKUMwOelX54exmmrrmCsorU
- QkMw==
+ bh=R7MN9eSx9agbWPqT5OjGjNM4Lpuf6u0q6HsuyaT0dMs=;
+ b=BONettR/CVYQoMOwUD4wfIm3Y7+Q0ldet1ttJYyBwey05p1vyzvBKbeOTVPmtK3/Sg
+ T33I8vcG5F3OfsDlbKz++1IxtogEzpN7dypoREzNIuE3NIuYH0Bedg6/3y730smfb8Fu
+ 0vGAPnFNcuKoKuxlKZ0sX9xZMBzn+FHOHS/rEtaDrKKJwW81ju4JPNc1T7HkPtUGHBOj
+ 1mljXvF9Px61bQV1ylFzhqqw7aWLYCvsCXc+dZctNXj0A7CSBp0vBI0mz4eBaFXqgVMU
+ 32qaaXitVivYOKYde2CK2/Y9YM5+pMw49mKkBuR/6gySiXeID3L0Yx3JRDKbdWOd8u5L
+ yfyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+bAv2HPSumCjz45QTmpT65MHVnN93v/+fTRM89VHFyg=;
- b=XG/9lN/z+LMxCfP0FrGXiUdr3HrvdZjyiiH9F13PYQ4QQO8QznfwKb3yVg/gw1+oRC
- LY6DvyoKwAKX1dAopmxPphyLs559bDkUCmFqvanWbuPylfG6Td4ACalAH1yuXgFmvFO4
- w7jBFlm+AlCz9XLJjgawWIwEEKkN4Uty+i3zxDmTa367H/QmEP2UH7yK32J8KOFJxhtv
- Y2ipsg9uPgPeWtW54chLZFiKy4R2yIgbXcn9qHQoMuejQ+c2KrZxhInsEUPlWyyopsTB
- QpFT1JlXbrhCvwlk8pG9Nl0+64ugWRFEGsyNKtAkli4I9UjIx/h/imdt35tSZuC5zA7I
- TYiA==
-X-Gm-Message-State: AGi0PuZ3upSxrZvULtcbQ6TYojMjjSeEGVx9Nt4blmuxZW6vVqJWQD6E
- yI08xAM2hRYXeBFvO3tIoyBa/w==
-X-Google-Smtp-Source: APiQypJYjV20SZh9EMjLxEqPuCNt7HlmEncehjl71E+cn4bsKm5PrVAjGU2YcKF8Szt6pXqYtj/XCQ==
-X-Received: by 2002:adf:e90b:: with SMTP id f11mr10454150wrm.65.1585941113556; 
- Fri, 03 Apr 2020 12:11:53 -0700 (PDT)
+ bh=R7MN9eSx9agbWPqT5OjGjNM4Lpuf6u0q6HsuyaT0dMs=;
+ b=m5C9qU9I+mrvWJrxGeOEjLi+NR72xn9QzXJ/uEGBdD9fjm/K8iUDCbCZLKrZk1ZZC6
+ 8Cxmlbo+6oNua8Ym+0KG1rFxhHxmpl5FhHj0HwI3s0oI0U5S6SOrq8SeOt7GLkplc47X
+ biWebLSM2YzfvhVBj9IYytXeM+2VB5cx+Pr3sSDZ6zXOc+BU/ESrlgl4MOCR4WgzBa3z
+ 2Dt/42SZY8+B8H+0e1HyF5fw1l/9k+HGJ0nvBHd0mmpmC3GqwpGyebsHtIrIhR9bxR5T
+ BvcQfuKvzQAToKfWR6m0Ygn8+k3Mief5KpKd3RuoIzd7FHYsVPUOyaItXuktuJMawymr
+ +snA==
+X-Gm-Message-State: AGi0PubmTPKrAmC8dTu6pLNyGmAN2rrNdLStofzwX3Cg0t5cZbW/TeiU
+ LYeCz1PvoJSyVb9Rmt6z8nzVAA==
+X-Google-Smtp-Source: APiQypKiSj4LBhfTZybCiPsA/XuDVwyWvqnt3E9S7rFOECobzf/eMh8jgWS67YcgJRHLBsXL6ongVw==
+X-Received: by 2002:a1c:1d02:: with SMTP id d2mr1706593wmd.78.1585941114631;
+ Fri, 03 Apr 2020 12:11:54 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r5sm12481552wmr.15.2020.04.03.12.11.51
+ by smtp.gmail.com with ESMTPSA id g194sm2615680wme.32.2020.04.03.12.11.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 03 Apr 2020 12:11:51 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AE1E41FF87;
+ by zen.linaroharston (Postfix) with ESMTP id DAF421FF8F;
  Fri,  3 Apr 2020 20:11:50 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 01/12] elf-ops: bail out if we have no function symbols
-Date: Fri,  3 Apr 2020 20:11:39 +0100
-Message-Id: <20200403191150.863-2-alex.bennee@linaro.org>
+Subject: [PATCH  v3 03/12] tests/tcg: remove extraneous pasting macros
+Date: Fri,  3 Apr 2020 20:11:41 +0100
+Message-Id: <20200403191150.863-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200403191150.863-1-alex.bennee@linaro.org>
 References: <20200403191150.863-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,131 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's perfectly possible to have no function symbols in your elf file
-and if we do the undefined behaviour sanitizer rightly complains about
-us passing NULL to qsort. Check nsyms before we go ahead.
-
-While we are at it lets drop the unchecked return value and cleanup
-the fail leg by use of g_autoptr.
-
-Another fix was proposed 101 weeks ago in:
-Message-Id: 20180421232120.22208-1-f4bug@amsat.org
+We are not using them and they just get in the way.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/hw/elf_ops.h | 48 +++++++++++++++++++++++---------------------
- 1 file changed, 25 insertions(+), 23 deletions(-)
+ tests/tcg/x86_64/system/boot.S | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index a1411bfcab6..e0bb47bb678 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -104,19 +104,21 @@ static int glue(symcmp, SZ)(const void *s0, const void *s1)
-         : ((sym0->st_value > sym1->st_value) ? 1 : 0);
- }
+diff --git a/tests/tcg/x86_64/system/boot.S b/tests/tcg/x86_64/system/boot.S
+index 205cfbd3982..73b19a2bda6 100644
+--- a/tests/tcg/x86_64/system/boot.S
++++ b/tests/tcg/x86_64/system/boot.S
+@@ -41,10 +41,7 @@
+ #define XEN_ELFNOTE_PHYS32_ENTRY  18
  
--static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
--                                  int clear_lsb, symbol_fn_t sym_cb)
-+static void glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-+                                   int clear_lsb, symbol_fn_t sym_cb)
- {
--    struct elf_shdr *symtab, *strtab, *shdr_table = NULL;
--    struct elf_sym *syms = NULL;
-+    struct elf_shdr *symtab, *strtab;
-+    g_autofree struct elf_shdr *shdr_table = NULL;
-+    g_autofree struct elf_sym *syms = NULL;
-+    g_autofree char *str = NULL;
-     struct syminfo *s;
-     int nsyms, i;
--    char *str = NULL;
+ #define __ASM_FORM(x)	x
+-#define __ASM_FORM_RAW(x)     x
+-#define __ASM_FORM_COMMA(x) x,
+-#define __ASM_SEL(a,b)           __ASM_FORM(b)
+-#define __ASM_SEL_RAW(a,b)      __ASM_FORM_RAW(b)
++#define __ASM_SEL(a,b)  __ASM_FORM(b)
+ #define _ASM_PTR	__ASM_SEL(.long, .quad)
  
-     shdr_table = load_at(fd, ehdr->e_shoff,
-                          sizeof(struct elf_shdr) * ehdr->e_shnum);
--    if (!shdr_table)
--        return -1;
-+    if (!shdr_table) {
-+        return ;
-+    }
- 
-     if (must_swab) {
-         for (i = 0; i < ehdr->e_shnum; i++) {
-@@ -125,23 +127,25 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-     }
- 
-     symtab = glue(find_section, SZ)(shdr_table, ehdr->e_shnum, SHT_SYMTAB);
--    if (!symtab)
--        goto fail;
-+    if (!symtab) {
-+        return;
-+    }
-     syms = load_at(fd, symtab->sh_offset, symtab->sh_size);
--    if (!syms)
--        goto fail;
-+    if (!syms) {
-+        return;
-+    }
- 
-     nsyms = symtab->sh_size / sizeof(struct elf_sym);
- 
-     /* String table */
-     if (symtab->sh_link >= ehdr->e_shnum) {
--        goto fail;
-+        return;
-     }
-     strtab = &shdr_table[symtab->sh_link];
- 
-     str = load_at(fd, strtab->sh_offset, strtab->sh_size);
-     if (!str) {
--        goto fail;
-+        return;
-     }
- 
-     i = 0;
-@@ -170,8 +174,13 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-         }
-         i++;
-     }
--    syms = g_realloc(syms, nsyms * sizeof(*syms));
- 
-+    /* check we have symbols left */
-+    if (nsyms == 0) {
-+        return;
-+    }
-+
-+    syms = g_realloc(syms, nsyms * sizeof(*syms));
-     qsort(syms, nsyms, sizeof(*syms), glue(symcmp, SZ));
-     for (i = 0; i < nsyms - 1; i++) {
-         if (syms[i].st_size == 0) {
-@@ -182,18 +191,11 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-     /* Commit */
-     s = g_malloc0(sizeof(*s));
-     s->lookup_symbol = glue(lookup_symbol, SZ);
--    glue(s->disas_symtab.elf, SZ) = syms;
-+    glue(s->disas_symtab.elf, SZ) = g_steal_pointer(&syms);
-     s->disas_num_syms = nsyms;
--    s->disas_strtab = str;
-+    s->disas_strtab = g_steal_pointer(&str);
-     s->next = syminfos;
-     syminfos = s;
--    g_free(shdr_table);
--    return 0;
-- fail:
--    g_free(syms);
--    g_free(str);
--    g_free(shdr_table);
--    return -1;
- }
- 
- static int glue(elf_reloc, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
+ 	ELFNOTE(Xen, XEN_ELFNOTE_VIRT_BASE,      _ASM_PTR 0x100000)
 -- 
 2.20.1
 
