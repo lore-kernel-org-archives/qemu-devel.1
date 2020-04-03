@@ -2,65 +2,88 @@ Return-Path: <SRS0=URa6=5T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52801C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D5FC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2416320757
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:49:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2416320757
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id CFDDD20757
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Apr 2020 06:50:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ogurwqdy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFDDD20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKG96-0000Ff-8l
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 02:49:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34032)
+	id 1jKGA0-00026N-V2
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 02:50:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <t.lamprecht@proxmox.com>) id 1jKG8N-0007YG-8M
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:48:56 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jKG96-0000Ya-O4
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <t.lamprecht@proxmox.com>) id 1jKG8L-0001WI-43
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:48:55 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:5232)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <t.lamprecht@proxmox.com>)
- id 1jKG8H-0001PD-QE; Fri, 03 Apr 2020 02:48:49 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 083A342980;
- Fri,  3 Apr 2020 08:48:39 +0200 (CEST)
-Subject: Re: bdrv_drained_begin deadlock with io-threads
-To: Kevin Wolf <kwolf@redhat.com>, Dietmar Maurer <dietmar@proxmox.com>
-References: <20200401103748.GA4680@linux.fritz.box>
- <997901084.0.1585755465486@webmail.proxmox.com>
- <20200401181256.GB27663@linux.fritz.box>
- <1403939459.52.1585765681569@webmail.proxmox.com>
- <20200401184431.GD27663@linux.fritz.box>
- <903538836.29.1585818619688@webmail.proxmox.com>
- <20200402121403.GB4006@linux.fritz.box>
- <20200402142524.GD4006@linux.fritz.box>
- <1043934808.59.1585842050330@webmail.proxmox.com>
- <20200402164744.GE4006@linux.fritz.box>
- <20200402171007.GF4006@linux.fritz.box>
-From: Thomas Lamprecht <t.lamprecht@proxmox.com>
-Message-ID: <45d640cb-a8bc-1bee-127e-ef28188a5623@proxmox.com>
-Date: Fri, 3 Apr 2020 08:48:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:75.0) Gecko/20100101
- Thunderbird/75.0
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jKG95-0001xI-Ol
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 02:49:40 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:34446)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1jKG95-0001we-HP; Fri, 03 Apr 2020 02:49:39 -0400
+Received: by mail-lf1-x141.google.com with SMTP id e7so4879158lfq.1;
+ Thu, 02 Apr 2020 23:49:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=xMW0H0Y8GIX7/ZZDMb64Yogczz9CLtZk8w7p+2So+cM=;
+ b=ogurwqdyxhbS4oNCa8AE1iqIb9W0ZJf8ArmH0xfkNuaokjR1rKo4nxQBOW1eCRRG4O
+ 14oofDB8xJR3Ecj7DdZRtfVJEIYLDON3aRKQHZA8jc2mvg+8Vu5tVogBM+P1Lz6skXKo
+ 0WpZ2/CBQjM22x34ThrTSglZs4/qJf1M8HP6XK4PY+wPgOOEmWbCYZDOpnsoqJQv3+5d
+ 3+/hnOz09lIMh7LRvAryv/Nn2ZNi7M+nUstotvU2PhYCwP3DavUDRADK7p3VtRUQCJRM
+ w0B6d6gGdBN78HmDe4pGBT44lDOKQhw2eXW/9yC6eUiP6Rw73hK023hSc3r7LhQTvgUu
+ phhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=xMW0H0Y8GIX7/ZZDMb64Yogczz9CLtZk8w7p+2So+cM=;
+ b=Eh/w0OJy61jpA3bWdD9MYpGKmC9mLQtxdfHOYMDhdcoholDS+G2SMVptE8wDL1zkbB
+ XpnWs/wvuF3oZUp2ivs+Mv+HouO34jDl7vQM89hfvDNfCwcO4oTzb0aCMP5zWFn5ahRo
+ qu+046fwC/5jwPvYl/ar3MpBPjxYIuSKsN1D1fH8uGVrMQ+hJANvYlFh6X4pU1hSwzmn
+ wrEC0x1qsn/Wkqrdevv0SyVoydetJ+TxnIHuRYc3SxORyAUd+0OZLzblSVgzSQXy5LOY
+ Ug6JJrg14JaYvVFzvj8FdfwLzX3a0fQfkNedI3ly3zEdbPTBPEVzjKx0kx2Vt4CVjx7n
+ 5xpA==
+X-Gm-Message-State: AGi0PuYfljsOufTOO/3tJiugxTmZa8V0PZNrgbF/yn6B0IxAg9B0Hv7g
+ kIE5BM5dZFkhoyOKQyIAZbs=
+X-Google-Smtp-Source: APiQypJRIrnSNa46p0RnCEi4a6julMnql8DxxtkBeg6qiTlczQMi+Dui5K/YIB7r2W65XYy9vYDolQ==
+X-Received: by 2002:ac2:5092:: with SMTP id f18mr4441648lfm.162.1585896578052; 
+ Thu, 02 Apr 2020 23:49:38 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ d9sm4553415ljg.39.2020.04.02.23.49.36
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 02 Apr 2020 23:49:37 -0700 (PDT)
+Date: Fri, 3 Apr 2020 08:49:35 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: Re: [PATCH v1 3/5] dma/xlnx-zdma: Clear DMA_DONE when halting
+Message-ID: <20200403064934.lczyn7ipthaf44in@fralle-msi>
+References: <20200402134721.27863-1-edgar.iglesias@gmail.com>
+ <20200402134721.27863-4-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402171007.GF4006@linux.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.186.127.180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200402134721.27863-4-edgar.iglesias@gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,44 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
+ luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/2/20 7:10 PM, Kevin Wolf wrote:
-> Am 02.04.2020 um 18:47 hat Kevin Wolf geschrieben:
->> So I think this is the bug: Calling blk_wait_while_drained() from
->> anywhere between blk_inc_in_flight() and blk_dec_in_flight() is wrong
->> because it will deadlock the drain operation.
->>
->> blk_aio_read/write_entry() take care of this and drop their reference
->> around blk_wait_while_drained(). But if we hit the race condition that
->> drain hasn't yet started there, but it has when we get to
->> blk_co_preadv() or blk_co_pwritev_part(), then we're in a buggy code
->> path.
+On [2020 Apr 02] Thu 15:47:19, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 > 
-> With the following patch, it seems to survive for now. I'll give it some
-> more testing tomorrow (also qemu-iotests to check that I didn't
-> accidentally break something else.)
+> Clear DMA_DONE when halting the DMA channel.
 > 
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-So I only followed the discussion loosely, but tried some simple reproducing
-to ensure it was an issue independent of some artifacts on Dietmar's setup.
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-Before that patch I got always a hang before reaching the fifth drive-backup
-+ block-job-cancel cycle. With your patch applied I had no hang so far,
-currently into >885 cycles (and yes I confirmed stress -d 5 was really
-running).
-
-So, FWIW, the patch definitively fixes the issue or at least the symptoms
-here, I cannot comment on its correctness or the like at all, as I'm
-currently missing to much background.
-
-cheers,
-Thomas
-
+> ---
+>  hw/dma/xlnx-zdma.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index 6a4699757a..dd893bc420 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -520,6 +520,7 @@ static void zdma_process_descr(XlnxZDMA *s)
+>      if (src_cmd == CMD_HALT) {
+>          zdma_set_state(s, PAUSED);
+>          ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_PAUSE, 1);
+> +        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_DONE, false);
+>          zdma_ch_imr_update_irq(s);
+>          return;
+>      }
+> -- 
+> 2.20.1
+> 
 
