@@ -2,83 +2,87 @@ Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2D3C43331
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 04:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A560C2BA16
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 04:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C8AD2051A
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 04:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 494D62051A
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 04:22:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sCPByA7w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C8AD2051A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfc9HIrb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 494D62051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKaJu-0007IS-AT
-	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 00:22:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49464)
+	id 1jKaJv-0007Kk-F0
+	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 00:22:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dnbrdsky@gmail.com>) id 1jKaJ4-0006B2-HB
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 00:21:19 -0400
+ (envelope-from <dnbrdsky@gmail.com>) id 1jKaJ5-0006B3-AV
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 00:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dnbrdsky@gmail.com>) id 1jKaJ3-0005DP-BP
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 00:21:18 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:43652)
+ (envelope-from <dnbrdsky@gmail.com>) id 1jKaJ4-0005Dy-1r
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 00:21:19 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45292)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dnbrdsky@gmail.com>) id 1jKaJ3-0005CS-48
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 00:21:17 -0400
-Received: by mail-pf1-x442.google.com with SMTP id f206so4635031pfa.10
- for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 21:21:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <dnbrdsky@gmail.com>) id 1jKaJ3-0005DN-Sw
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 00:21:18 -0400
+Received: by mail-pg1-x543.google.com with SMTP id o26so4595479pgc.12
+ for <qemu-devel@nongnu.org>; Fri, 03 Apr 2020 21:21:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WDNgH8TyYnmqTPxz2CDj5/AODsJMGgFpNcBmolWpUa8=;
- b=sCPByA7w8DvWJkHk+ApD7Zay99LEC+TKM6DNxBzA1NGdwmaFtIxtNigjL5Ks1spNid
- 2yI786zBu017rb6TEhXEEOh7GeevhD635G7xBCD97nZcbygVcbe1Pf+o5hxExkCqazS6
- 0Etpwb1Nq68Mnoe0V01WwBi50Di9MZwmrFryaSv/VcrSG+hkCU9vjNUMofUgWtGROJPn
- AaQ1PGSvYc1dq2uTYh40j42As91DDG78vcGlWEsOY4ZTsB68eyty3bCEDzbPJmRnAfxG
- xhoFwJQU21li0X2QEk2HtNqvA7W/nvqyON6sh/xvmVWO45vN/aAXvT70sHst/F6bhT8H
- jgSg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=nWeGXS7WL3l3NDU7ev51tis49vFdTNvDe5Ybx9a0DK0=;
+ b=mfc9HIrbNt+JDuoYq2MH4Y3M58z/4lPaPmTpCC9j43fe1j7jtSY/ELWYwJrkweOzyU
+ kRpwq3fGXlzxs3uH8AFp3T1BJmZU5/ELoQc7CbnhbgOSk8lwDTQQaBwC318rYFp439nh
+ H88ranldIMhUlc+BH9Ybnr2X3P+gXIGsqO6+zHcp0xeN2F/dUvPV49kKufUQi1nNoGUc
+ 55KXhrGsMJZrhb+mrCrq2QGGtEwRWsHsmGVNiHqDCHGM40GqYY7pcD8+nSCL7X7vabBd
+ NZrB9BobPkopPTHukNMozg6AqwttQLFMWvEn25gct4wJw69ikH7PlruEbFiCJu9xgxYi
+ r5jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WDNgH8TyYnmqTPxz2CDj5/AODsJMGgFpNcBmolWpUa8=;
- b=ho95t49BrMEidjyeTDTAAOLeaZl6f0wZHOrahEomGLpiw7Ua/j4We9cuNglYc/LnYA
- yYmvOoB75snNGal8achRZ9DbmmGxbNq3ZCCp8ja+qEsEoOEjx0PFxyaxU71lNmjEGrVj
- CVFZ65ivmk6REC7mRhzoRuYLS2pRcfQy/jqh84RegLa/1q2HCQ4BtKfcRZ2VdUEaIBv+
- p2T6w3Il48wv4wq60uJweGxNoAve5W4yJvf7LF51ryHUGGRRi0uE/QRMTN1dY+LYnZOm
- 0ko09rJvnlxZuzDREdh/d7Bg2KGJ8S60oGU9BJ8zolfMnlM7fFwoy30QXTrSbbTZtZGb
- EcUQ==
-X-Gm-Message-State: AGi0PuZ5yFnRsvQvhLQtYCmYANnuPL4j6Wt9lxd7FmnnljWgy5UkVAoz
- QXL70kYX3n/Oj1XYHdJWt9Q=
-X-Google-Smtp-Source: APiQypLVdA/3EP2WOdU8unsXccc/YFWIjUut1MhLOBkBWpy5J7eJHhYyYleCQq8C7d539l4CDPH/LA==
-X-Received: by 2002:a62:ae05:: with SMTP id q5mr11771670pff.307.1585974075777; 
- Fri, 03 Apr 2020 21:21:15 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=nWeGXS7WL3l3NDU7ev51tis49vFdTNvDe5Ybx9a0DK0=;
+ b=TyBFCyp9JWsTzf64vcYEzOxjI0sZgeRy97MwnsymPNm9mbil4TTq7O60amAU9AFeab
+ VX087o8lrdSGK7O9TTfMt2qb1yK/T++wSVKnFm3g8sibXh4w8HqxoishU25Zd9MW6yVj
+ y40FL3awP8nk0Vlggc4la33MzkU37FIJ9eMppe34UweLJhFLUezdCQXSqWB0+KUXTMyc
+ YiF6+AIQBKlP4D7LG7DZjXE53Gnho9ePKoiuDYxMPC79LiJ8hc1cAHEfopLvl0NSDV1k
+ NLwKyKq8KMDHUn1+gONNLqYGZvcp0vKR9tohSMEhmKLxABW2t+ZEaOPyh0gTq/SDkaH6
+ M/7Q==
+X-Gm-Message-State: AGi0PuZwPalrJwGeX/jSlKhkLBcXpZ/uwbatGTNvF8QXWN8zXsb+fup/
+ E4nPtEbwHJXqzq7e9lxhUj3TU73OVSw=
+X-Google-Smtp-Source: APiQypJWgImXZzUXebK1tWyOBrW40g8R3Sx0qZY086n55S93OBWY6iV/yCyhAQJ5ayw6EhmTX1Cu/w==
+X-Received: by 2002:a62:5187:: with SMTP id
+ f129mr11953775pfb.144.1585974076814; 
+ Fri, 03 Apr 2020 21:21:16 -0700 (PDT)
 Received: from esc.telus (d216-232-186-112.bchsia.telus.net. [216.232.186.112])
- by smtp.gmail.com with ESMTPSA id 189sm6746048pfg.170.2020.04.03.21.21.15
+ by smtp.gmail.com with ESMTPSA id 189sm6746048pfg.170.2020.04.03.21.21.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Apr 2020 21:21:15 -0700 (PDT)
+ Fri, 03 Apr 2020 21:21:16 -0700 (PDT)
 From: dnbrdsky@gmail.com
 To: dnbrdsky@gmail.com
-Subject: [PATCH v5 0/2] Replaced locks with lock guard macros
-Date: Fri,  3 Apr 2020 21:21:06 -0700
-Message-Id: <20200404042108.389635-1-dnbrdsky@gmail.com>
+Subject: [PATCH v5 1/2] lockable: fix __COUNTER__ macro to be referenced
+ properly
+Date: Fri,  3 Apr 2020 21:21:07 -0700
+Message-Id: <20200404042108.389635-2-dnbrdsky@gmail.com>
 X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200404042108.389635-1-dnbrdsky@gmail.com>
+References: <20200404042108.389635-1-dnbrdsky@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,49 +101,55 @@ Sender: "Qemu-devel"
 
 From: Daniel Brodsky <dnbrdsky@gmail.com>
 
-This patch set adds:
-- a fix for lock guard macros so they can be used multiple times in
-the same function
-- replacement of locks with lock guards where appropriate
+- __COUNTER__ doesn't work with ## concat
+- replaced ## with glue() macro so __COUNTER__ is evaluated
 
-v4 -> v5:
-- added G_GNUC_UNUSED to lock guard macro to supress unused var warning
+Fixes: 3284c3ddc4
 
-v3 -> v4:
-- removed unneeded unlocks from areas where lock guards are now used
-- dropped change to lock guard in iscsi.c as it changed old functionality
+Signed-off-by: Daniel Brodsky <dnbrdsky@gmail.com>
+---
+ include/qemu/lockable.h | 7 ++++---
+ include/qemu/rcu.h      | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-v2 -> v3:
-- added __COUNTER__ fix for additional lock guard macro
-- added missing include header in platform.c
-
-v1 -> v2:
-- fixed whitespace churn
-- added cover letter so patch set referenced correctly
-
-Daniel Brodsky (2):
-  lockable: fix __COUNTER__ macro to be referenced properly
-  lockable: replaced locks with lock guard macros where appropriate
-
- block/iscsi.c           |  7 ++----
- block/nfs.c             | 51 +++++++++++++++++++----------------------
- cpus-common.c           | 14 ++++-------
- hw/display/qxl.c        | 43 ++++++++++++++++------------------
- hw/vfio/platform.c      |  5 ++--
- include/qemu/lockable.h |  7 +++---
- include/qemu/rcu.h      |  2 +-
- migration/migration.c   |  3 +--
- migration/multifd.c     |  8 +++----
- migration/ram.c         |  3 +--
- monitor/misc.c          |  4 +---
- ui/spice-display.c      | 14 +++++------
- util/log.c              |  4 ++--
- util/qemu-timer.c       | 17 +++++++-------
- util/rcu.c              |  8 +++----
- util/thread-pool.c      |  3 +--
- util/vfio-helpers.c     |  5 ++--
- 17 files changed, 88 insertions(+), 110 deletions(-)
-
+diff --git a/include/qemu/lockable.h b/include/qemu/lockable.h
+index 1aeb2cb1a6..b620023141 100644
+--- a/include/qemu/lockable.h
++++ b/include/qemu/lockable.h
+@@ -152,7 +152,7 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(QemuLockable, qemu_lockable_auto_unlock)
+  *   }
+  */
+ #define WITH_QEMU_LOCK_GUARD(x) \
+-    WITH_QEMU_LOCK_GUARD_((x), qemu_lockable_auto##__COUNTER__)
++    WITH_QEMU_LOCK_GUARD_((x), glue(qemu_lockable_auto, __COUNTER__))
+ 
+ /**
+  * QEMU_LOCK_GUARD - Lock an object until the end of the scope
+@@ -169,8 +169,9 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(QemuLockable, qemu_lockable_auto_unlock)
+  *       return; <-- mutex is automatically unlocked
+  *   }
+  */
+-#define QEMU_LOCK_GUARD(x) \
+-    g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ = \
++#define QEMU_LOCK_GUARD(x)                                       \
++    g_autoptr(QemuLockable)                                      \
++    glue(qemu_lockable_auto, __COUNTER__) G_GNUC_UNUSED =        \
+             qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE((x)))
+ 
+ #endif
+diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+index 9c82683e37..570aa603eb 100644
+--- a/include/qemu/rcu.h
++++ b/include/qemu/rcu.h
+@@ -170,7 +170,7 @@ static inline void rcu_read_auto_unlock(RCUReadAuto *r)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(RCUReadAuto, rcu_read_auto_unlock)
+ 
+ #define WITH_RCU_READ_LOCK_GUARD() \
+-    WITH_RCU_READ_LOCK_GUARD_(_rcu_read_auto##__COUNTER__)
++    WITH_RCU_READ_LOCK_GUARD_(glue(_rcu_read_auto, __COUNTER__))
+ 
+ #define WITH_RCU_READ_LOCK_GUARD_(var) \
+     for (g_autoptr(RCUReadAuto) var = rcu_read_auto_lock(); \
 -- 
 2.26.0
 
