@@ -2,68 +2,114 @@ Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DA0C43331
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 02:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C980DC43331
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 03:38:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BD982063A
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 02:54:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BD982063A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 93DE1206F6
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 03:38:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="sq71Nh65"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93DE1206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKYxF-0004Ad-DI
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 22:54:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35634)
+	id 1jKZdE-0001Mo-LE
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 23:38:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41759)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jKYwY-0003gK-KS
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 22:53:59 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jKZcY-0000sl-TY
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 23:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jKYwW-00081U-Ds
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 22:53:57 -0400
-Resent-Date: Fri, 03 Apr 2020 22:53:57 -0400
-Resent-Message-Id: <E1jKYwW-00081U-Ds@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21142)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jKZcV-0001Pl-4H
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 23:37:22 -0400
+Received: from mail-eopbgr30095.outbound.protection.outlook.com
+ ([40.107.3.95]:12376 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jKYwW-0007yq-6F; Fri, 03 Apr 2020 22:53:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1585968801; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=HvaRFzwxBlp9pbxJkPeHGR5WZJWMPTDCQR9K/YyQrYUyCLmxb/bfb+Jfopg4NcduSfAcN9IIxAb6hcr7B/URwafp4J7RtWzINyB03QO2QOzCn8qtS8W3bAdzZ6huRN5vNfMpc0bt5UiClXLA7edDH/pS4FlVCGQtN+gn8+jt1VU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1585968801;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=W3PIw/zztqZcCyZiNeN9sqJsIgG+Tlao/X2X9V4+r6g=; 
- b=Z/HaJZfrM59RXzCuq5nv4ijIqpVSPcSrI38dYze9SimqDWrJTKt+YM0wQ1oBJ2G1IvRLjpTqzwagYMvlJsdyl3lsIfm+M5ez7aCmYHQ3KR2mMZt89K+HxfE9lLqs01A5HoG/nxioYHmu3yH1OeAd+t0b4OkZpz69hAyqsBSS45U=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1585968797208487.2354965944198;
- Fri, 3 Apr 2020 19:53:17 -0700 (PDT)
-In-Reply-To: <20200403165752.18009-1-berto@igalia.com>
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jKZcU-0001Nl-JV; Fri, 03 Apr 2020 23:37:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nHgl3qCzYnhuUe67cLvZYVueVzhAiPZvn4lCDPdp1NGKTvSDqljagUXxQFhAWA9cUyZzNb3KdOwiyqoM+EkXtsX74fwZQp3XTm0k5KoWhW3WRz0QyygpJTv0aVJio6iJCxoGxa0R6aT0RxXrpzAuaiKlh8VTqXyAZLBQzMnA/JGvogW+KVIcrm1KdkRIQosME4Nh4wNRQUSfbbkfNqOtKMb3frGx67UsGWdoc+RkwhAXUN8jX/CzXpg+WsWfjOtRb/7DioPuTHbxhskAI6GMutwxPOJ3cUOWv4GL1IqsZ1Z9AotU/z9czM+EJqSIX5WKdc+K+KouTRkHvCbyPxMotQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DaXYBaKB+Q22rK01Wj2m+fdN3NZ7P9HOB7+W0d3rfDo=;
+ b=iDHwKewtwEXI172JzyNUv1FkDlumXFRtkZOsXdDqMD/UmBgNPXOU5d938rnUtKIfslE1CmMo6M3Rjtu5cJIHpQIjOiVSU1k5fGK3FnHVyJlVsZjfzWCb6IrKE8vB+EdRc1RXn3V5ep2iPcLSzy2Nz0b9sKT91ECvP7131uz3UsDXKoVPts+9YDboemKOYh2/d8SEqFPtsI/oAkPLFjdiyhhTEDu1oZvuEj8XCwBhe7lSMps2agGm+D0WVxO+PWR63EUjJ2HP6W1AU7WStlvlpf3h3e6GfIHUz0acqJsJst8QkoY+qOOAS9l2SbZgxSkvGO+4bvcfbAKwe0Dp5e+gsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DaXYBaKB+Q22rK01Wj2m+fdN3NZ7P9HOB7+W0d3rfDo=;
+ b=sq71Nh65ZhufxugcsJBiO+mcNt9sQZcJ+AYDC1gKUfyfaEJ4AhRSfVIN/ZATacCWdw+y0RxUPcqlipTyqnAArFiXYwW58JIMnfXwaLvYTCPEWxck3V3nteLZNjALLM8Vjj53SKx6kik0zJeRCo2wFg5pW9dUclQ8DN5Xp0ymwEU=
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
+ AM6PR08MB4883.eurprd08.prod.outlook.com (10.255.96.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.20; Sat, 4 Apr 2020 03:37:15 +0000
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::41e2:2f20:9b54:a0f5]) by AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::41e2:2f20:9b54:a0f5%7]) with mapi id 15.20.2878.017; Sat, 4 Apr 2020
+ 03:37:15 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
 Subject: Re: [PATCH for-5.0] qcow2: Check request size in
  qcow2_co_pwritev_compressed_part()
-Message-ID: <158596879542.23425.4558100332300922178@39012742ff91>
+Thread-Topic: [PATCH for-5.0] qcow2: Check request size in
+ qcow2_co_pwritev_compressed_part()
+Thread-Index: AQHWCdkWb/Viu575KUagEAeNTTMcb6hoTmFD
+Date: Sat, 4 Apr 2020 03:37:15 +0000
+Message-ID: <AM6PR08MB50482A2E371C9AF7EDFA2E7CF4C40@AM6PR08MB5048.eurprd08.prod.outlook.com>
+References: <20200403165752.18009-1-berto@igalia.com>
+In-Reply-To: <20200403165752.18009-1-berto@igalia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-originating-ip: [109.252.115.13]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 037aa331-705c-49c1-39ad-08d7d84977e5
+x-ms-traffictypediagnostic: AM6PR08MB4883:
+x-ld-processed: 0bc7f26d-0264-416e-a6fc-8352af79c58f,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB48832AF9CEC292231A0A6C3AF4C40@AM6PR08MB4883.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:268;
+x-forefront-prvs: 03630A6A4A
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB5048.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(136003)(376002)(346002)(366004)(39840400004)(396003)(8676002)(66556008)(186003)(7696005)(86362001)(5660300002)(2906002)(9686003)(107886003)(81166006)(71200400001)(44832011)(66446008)(478600001)(53546011)(81156014)(26005)(4326008)(55016002)(54906003)(316002)(52536014)(66946007)(110136005)(64756008)(66476007)(8936002)(33656002)(6506007)(76116006)(586874002);
+ DIR:OUT; SFP:1102; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: VuMAIlq/pN9TrA425qQFODgZI0eLla5KcUCM3+2rFJHHHqIOxfH4ftRA2JmWGD5Hp1PySJlO/8zQ+SnP0EM/FJ0Pdp1/Ce2AGml1VBiGHtqQoxdMOK2DITKb/vFdAim3i7I2QNCXBUkd4W6O45+xRlGhUvQwCqWiHDdSSmAg8m8/TevtkjKL5LDXP0GM/+qW+VoLVZLyCjdoDS1cvMmzGv9ccHHYCMy781rfRrRvhfm3AIafD5ahlCZvJuggnQ3YOLsjjXekbc//OggbK1ozz9Bkj8iF/GPP2liOkoOkIcWluTMlRqjjHzfBfA54HgNx8ES+LQbQ8BjlsGY0f6po/v46G1gf8wGkbaw1h1ADgfu2cs/7K/KGpPctXQ2SQf5xgfr/pz2QbYBFhP8Mld1ZKpCGFcO51N3Op62k0DFyFDXnwCqp4x2zMeswe8GJc7VZPDFm8K41F+Xa3/5yfj+991SSCN5FZhm8l8KOVdZPthTg6PwMwzAVqCiwBOWO8mU+
+x-ms-exchange-antispam-messagedata: ZSIatapKlZ2ox3jyZbg0PukmoeDqq4P9hIcK5sPZqdqH91PvAp+GxnmIniyHtoI2kx5SQeI/8VSFZVaQRCwyD1CWc/P1kBxNtDwPI4unLuCSL4dMxu1HGMN0TUQ/HCPblfLiAykry5faB6dV+d8H1w==
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: berto@igalia.com
-Date: Fri, 3 Apr 2020 19:53:17 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 037aa331-705c-49c1-39ad-08d7d84977e5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Apr 2020 03:37:15.0678 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: L4VtYqbyvVhqFpRrdFQ4daZpPMY/KQBN4284J6GCJaSPpTbPyO/AR6ukn0C369lBdP93eok7Jsemg+Q/7dj4aFolomSfYig3uT5CqmICIxA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4883
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.95
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,45 +121,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, pbutsykin@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, andrey.shinkevich@virtuozzo.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQwMzE2NTc1Mi4xODAw
-OS0xLWJlcnRvQGlnYWxpYS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
-T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
-IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKTm90IHJ1bjogMjU5CkZhaWx1cmVz
-OiAwNTMKRmFpbGVkIDEgb2YgMTE2IGlvdGVzdHMKbWFrZTogKioqIFtjaGVjay10ZXN0cy9jaGVj
-ay1ibG9jay5zaF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
-Li4uLgogIFRFU1QgICAgY2hlY2stcXRlc3QtYWFyY2g2NDogdGVzdHMvcXRlc3QvcW9zLXRlc3QK
-VHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgotLS0KICAgIHJhaXNlIENhbGxlZFBy
-b2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBD
-b21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5x
-ZW11Lmluc3RhbmNlLnV1aWQ9YmJlZGQ3MDM3MzNkNDdlMDk0NTNlZTVkOWFlMTM1ZTEnLCAnLXUn
-LCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScs
-ICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
-JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEn
-LCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hl
-dzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcv
-dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdTRvaWxsNmUvc3JjL2RvY2tlci1zcmMuMjAyMC0w
-NC0wMy0yMi4zOS4xNC4yODgzMTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3Jywg
-Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
-dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
-YmJlZGQ3MDM3MzNkNDdlMDk0NTNlZTVkOWFlMTM1ZTEKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
-XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtdTRvaWxsNmUvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0Bj
-ZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDE0bTEuNTQ2cwp1c2VyICAgIDBtOC40OTdzCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDQw
-MzE2NTc1Mi4xODAwOS0xLWJlcnRvQGlnYWxpYS5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2Vu
-dG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+=0A=
+=0A=
+________________________________________=0A=
+From: Alberto Garcia <berto@igalia.com>=0A=
+Sent: Friday, April 3, 2020 7:57 PM=0A=
+To: qemu-devel@nongnu.org=0A=
+Cc: Alberto Garcia; qemu-block@nongnu.org; Andrey Shinkevich; Max Reitz; Ke=
+vin Wolf; Vladimir Sementsov-Ogievskiy; Pavel Butsykin=0A=
+Subject: [PATCH for-5.0] qcow2: Check request size in qcow2_co_pwritev_comp=
+ressed_part()=0A=
+=0A=
+When issuing a compressed write request the number of bytes must be a=0A=
+multiple of the cluster size.=0A=
+=0A=
+With the current code such requests are allowed and we hit an=0A=
+assertion:=0A=
+=0A=
+   $ qemu-img create -f qcow2 img.qcow2 1M=0A=
+   $ qemu-io -c 'write -c 0 32k' img.qcow2=0A=
+=0A=
+   qemu-io: block/qcow2.c:4257: qcow2_co_pwritev_compressed_task:=0A=
+   Assertion `bytes =3D=3D s->cluster_size || (bytes < s->cluster_size &&=
+=0A=
+              (offset + bytes =3D=3D bs->total_sectors << BDRV_SECTOR_BITS)=
+)' failed.=0A=
+   Aborted=0A=
+=0A=
+This patch fixes a regression introduced in 0d483dce38=0A=
+=0A=
+The condition that QEMU supports writing compressed data of the size equal =
+to one cluster was introduced with earlier patches.=0A=
+=0A=
+Andrey=0A=
+=0A=
+Signed-off-by: Alberto Garcia <berto@igalia.com>=0A=
+---=0A=
+ block/qcow2.c | 2 +-=0A=
+ 1 file changed, 1 insertion(+), 1 deletion(-)=0A=
+=0A=
+diff --git a/block/qcow2.c b/block/qcow2.c=0A=
+index 2bb536b014..923ad428f0 100644=0A=
+--- a/block/qcow2.c=0A=
++++ b/block/qcow2.c=0A=
+@@ -4345,7 +4345,7 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs=
+,=0A=
+         return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, N=
+ULL);=0A=
+     }=0A=
+=0A=
+-    if (offset_into_cluster(s, offset)) {=0A=
++    if (offset_into_cluster(s, offset | bytes)) {=0A=
+         return -EINVAL;=0A=
+     }=0A=
+=0A=
+--=0A=
+2.20.1=0A=
+=0A=
 
