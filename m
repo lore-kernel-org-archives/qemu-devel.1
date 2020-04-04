@@ -2,84 +2,88 @@ Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C61C2BA16
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 11:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2AF2C2BA16
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 11:40:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 398D7206C3
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 11:00:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7UXEcua"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 398D7206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 950CA20769
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 11:40:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 950CA20769
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKgXI-0003SH-7s
-	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 07:00:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43043)
+	id 1jKh9q-0001pc-Mc
+	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 07:40:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47509)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jKgWV-0002rI-4G
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 06:59:36 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jKh9G-0001Of-Pa
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 07:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jKgWT-00078I-34
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 06:59:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42162
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <yi.l.liu@intel.com>) id 1jKh9E-0005yc-MG
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 07:39:37 -0400
+Received: from mga06.intel.com ([134.134.136.31]:9990)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jKgWS-00077W-Su
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 06:59:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585997971;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XxBVjsGz7aZHo7XaZUUImpN4YNnqVmFw4Lz7sDBYcKo=;
- b=N7UXEcua5KwMGOwp+qgZr6LPWUBz2jQ8VCkPQ3B1XgEoAmOTzY8F4/j7t8ZdPbvYHopRuz
- +eono68XVNhqIwDV3jB8kkLLjJUFCAe1Ed9ZL78EXuzoyPtAiMXpi9hmBej6gkt+KFoZEn
- 5dQEaOQE/qqs+ZY2KAbtg/56TkcPd7g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-4cCJFAR-PmGqbmZayrQdUQ-1; Sat, 04 Apr 2020 06:59:30 -0400
-X-MC-Unique: 4cCJFAR-PmGqbmZayrQdUQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 271711005509;
- Sat,  4 Apr 2020 10:59:29 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-152.ams2.redhat.com
- [10.36.112.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 986DA5DA76;
- Sat,  4 Apr 2020 10:59:28 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 17A171138610; Sat,  4 Apr 2020 12:59:27 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Questionable aspects of QEMU Error's design
-References: <87o8sblgto.fsf@dusky.pond.sub.org>
- <87blo7heag.fsf@dusky.pond.sub.org>
-Date: Sat, 04 Apr 2020 12:59:27 +0200
-In-Reply-To: <87blo7heag.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Sat, 04 Apr 2020 09:59:35 +0200")
-Message-ID: <87sghjfre8.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jKh9E-0005sL-EE
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 07:39:36 -0400
+IronPort-SDR: +f8wrzGiReWfdhvVW8OTyF+U+mnRFaNt0eXCaD52BVbDOMryIPPlezGCZRYpVwUYvp8bSAlOzL
+ 1JhigPi92LjA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Apr 2020 04:39:32 -0700
+IronPort-SDR: 4wgZsb05D7VLxi1sLvg3AyX90sCy/OyltFJiQNcb64CkMLDQxprKxTL+mHroiNFLqf+g+dGkFE
+ dBYHunkUuQwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,343,1580803200"; d="scan'208";a="241349948"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by fmsmga007.fm.intel.com with ESMTP; 04 Apr 2020 04:39:32 -0700
+Received: from fmsmsx101.amr.corp.intel.com (10.18.124.199) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 4 Apr 2020 04:39:32 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ fmsmsx101.amr.corp.intel.com (10.18.124.199) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 4 Apr 2020 04:39:31 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.138]) with mapi id 14.03.0439.000;
+ Sat, 4 Apr 2020 19:39:28 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH v2 13/22] intel_iommu: add PASID cache management
+ infrastructure
+Thread-Topic: [PATCH v2 13/22] intel_iommu: add PASID cache management
+ infrastructure
+Thread-Index: AQHWBkpjDlzgAqAO2kCfS3rvS1hmKKhkcUmAgADtXCD///hbAIACJjmw//+XZYCAAcnKoA==
+Date: Sat, 4 Apr 2020 11:39:27 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A221B8C@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-14-git-send-email-yi.l.liu@intel.com>
+ <20200402000225.GC7174@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A21EAAD@SHSMSX104.ccr.corp.intel.com>
+ <20200402134436.GI7174@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A220DE7@SHSMSX104.ccr.corp.intel.com>
+ <20200403161931.GO103677@xz-x1>
+In-Reply-To: <20200403161931.GO103677@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.31
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,123 +95,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Markus Armbruster <armbru@redhat.com> writes:
->
->> QEMU's Error was patterned after GLib's GError.  Differences include:
-> [...]
->> * Return value conventions
->>
->>   Common: non-void functions return a distinct error value on failure
->>   when such a value can be defined.  Patterns:
->>
->>   - Functions returning non-null pointers on success return null pointer
->>     on failure.
->>
->>   - Functions returning non-negative integers on success return a
->>     negative error code on failure.
->>
->>   Different: GLib discourages void functions, because these lead to
->>   awkward error checking code.  We have tons of them, and tons of
->>   awkward error checking code:
->>
->>     Error *err =3D NULL;
->>     frobnicate(arg, &err);
->>     if (err) {
->>         ... recover ...
->>         error_propagate(errp, err);
->>     }
->>
->>   instead of
->>
->>     if (!frobnicate(arg, errp))
->>         ... recover ...
->>     }
->>
->>   Can also lead to pointless creation of Error objects.
->>
->>   I consider this a design mistake.  Can we still fix it?  We have more
->>   than 2000 void functions taking an Error ** parameter...
->>
->>   Transforming code that receives and checks for errors with Coccinelle
->>   shouldn't be hard.  Transforming code that returns errors seems more
->>   difficult.  We need to transform explicit and implicit return to
->>   either return true or return false, depending on what we did to the
->>   @errp parameter on the way to the return.  Hmm.
-> [...]
->
-> To figure out what functions with an Error ** parameter return, I used
-> Coccinelle to find such function definitions and print the return types.
-> Summary of results:
->
->    2155 void
->     873 signed integer
->     494 pointer
->     153 bool
->      33 unsigned integer
->       6 enum
->    ---------------------
->    3714 total
->
-> I then used Coccinelle to find checked calls of void functions (passing
-> &error_fatal or &error_abort is not considered "checking" here).  These
-> calls become simpler if we make the functions return a useful value.  I
-> found a bit under 600 direct calls, and some 50 indirect calls.
->
-> Most frequent direct calls:
->
->     127 object_property_set_bool
->      27 qemu_opts_absorb_qdict
->      16 visit_type_str
->      14 visit_type_int
->      10 visit_type_uint32
->
-> Let's have a closer look at object_property_set() & friends.  Out of
-> almost 1000 calls, some 150 are checked.  While I'm sure many of the
-> unchecked calls can't actually fail, I am concerned some unchecked calls
-> can.
->
-> If we adopt the convention to return a value that indicates success /
-> failure, we should consider converting object.h to it sooner rather than
-> later.
->
-> Please understand these are rough numbers from quick & dirty scripts.
-
-Paolo, Daniel, Eduardo,
-
-Please pick one for QOM:
-
-* Do nothing.  Looks like
-
-     object_property_set_bool(..., &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-
-* Return true on success, false on error.  Looks like
-
-     if (!object_property_set_bool(..., errp)) {
-         return;
-     }
-
-* Return 0 on success, -1 on error.  Looks like
-
-     if (object_property_set_bool(..., errp) < 0) {
-         return;
-     }
-
-  This is slightly more likely to require line wrapping than the
-  previous one.
-
+SGkgUGV0ZXIsDQoNCj4gRnJvbTogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiBTZW50
+OiBTYXR1cmRheSwgQXByaWwgNCwgMjAyMCAxMjoyMCBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5s
+LmxpdUBpbnRlbC5jb20+DQo+IA0KPiBPbiBGcmksIEFwciAwMywgMjAyMCBhdCAwMzowNTo1N1BN
+ICswMDAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gPiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJl
+ZGhhdC5jb20+DQo+ID4gPiBTZW50OiBUaHVyc2RheSwgQXByaWwgMiwgMjAyMCA5OjQ1IFBNDQo+
+ID4gPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gPiBTdWJqZWN0OiBS
+ZTogW1BBVENIIHYyIDEzLzIyXSBpbnRlbF9pb21tdTogYWRkIFBBU0lEIGNhY2hlIG1hbmFnZW1l
+bnQNCj4gPiA+IGluZnJhc3RydWN0dXJlDQo+ID4gPg0KPiA+ID4gT24gVGh1LCBBcHIgMDIsIDIw
+MjAgYXQgMDY6NDY6MTFBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+ID4NCj4gPiA+IFsu
+Li5dDQo+ID4gPg0KPiA+ID4gPiA+ID4gKy8qKg0KPiA+ID4gPiA+ID4gKyAqIFRoaXMgZnVuY3Rp
+b24gcmVwbGF5IHRoZSBndWVzdCBwYXNpZCBiaW5kaW5ncyB0byBob3RzIGJ5DQo+ID4gPiA+ID4g
+PiArICogd2Fsa2luZyB0aGUgZ3Vlc3QgUEFTSUQgdGFibGUuIFRoaXMgZW5zdXJlcyBob3N0IHdp
+bGwgaGF2ZQ0KPiA+ID4gPiA+ID4gKyAqIGxhdGVzdCBndWVzdCBwYXNpZCBiaW5kaW5ncy4gQ2Fs
+bGVyIHNob3VsZCBob2xkIGlvbW11X2xvY2suDQo+ID4gPiA+ID4gPiArICovDQo+ID4gPiA+ID4g
+PiArc3RhdGljIHZvaWQgdnRkX3JlcGxheV9ndWVzdF9wYXNpZF9iaW5kaW5ncyhJbnRlbElPTU1V
+U3RhdGUgKnMsDQo+ID4gPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBWVERQQVNJRENhY2hlSW5mbw0KPiA+ID4gPiA+ID4gKypwY19pbmZvKSB7DQo+
+ID4gPiA+ID4gPiArICAgIFZUREhvc3RJT01NVUNvbnRleHQgKnZ0ZF9kZXZfaWN4Ow0KPiA+ID4g
+PiA+ID4gKyAgICBpbnQgc3RhcnQgPSAwLCBlbmQgPSBWVERfSFBBU0lEX01BWDsNCj4gPiA+ID4g
+PiA+ICsgICAgdnRkX3Bhc2lkX3RhYmxlX3dhbGtfaW5mbyB3YWxrX2luZm8gPSB7LmZsYWdzID0g
+MH07DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBTbyB2dGRfcGFzaWRfdGFibGVfd2Fsa19pbmZvIGlz
+IHN0aWxsIHVzZWQuICBJIHRob3VnaHQgd2UgaGFkDQo+ID4gPiA+ID4gcmVhY2hlZCBhIGNvbnNl
+bnN1cyB0aGF0IHRoaXMgY2FuIGJlIGRyb3BwZWQ/DQo+ID4gPiA+DQo+ID4gPiA+IHllYWgsIEkg
+ZGlkIGhhdmUgY29uc2lkZXJlZCB5b3VyIHN1Z2dlc3Rpb24gYW5kIHBsYW4gdG8gZG8gaXQuIEJ1
+dA0KPiA+ID4gPiB3aGVuIEkgc3RhcnRlZCBjb2RpbmcsIGl0IGxvb2tzIGEgbGl0dGxlIGJpdCB3
+ZWlyZCB0byBtZToNCj4gPiA+ID4gRm9yIG9uZSwgdGhlcmUgaXMgYW4gaW5wdXQgVlREUEFTSURD
+YWNoZUluZm8gaW4gdGhpcyBmdW5jdGlvbi4gSXQgbWF5DQo+ID4gPiA+IGJlIG5hdHVyZSB0byB0
+aGluayBhYm91dCBwYXNzaW5nIHRoZSBwYXJhbWV0ZXIgdG8gZnVydGhlciBjYWxsaW5nDQo+ID4g
+PiA+ICh2dGRfcmVwbGF5X3Bhc2lkX2JpbmRfZm9yX2RldigpKS4gQnV0LCB3ZSBjYW4ndCBkbyB0
+aGF0LiBUaGUNCj4gPiA+ID4gdnRkX2J1cy9kZXZmbiBmaWVsZHMgc2hvdWxkIGJlIGZpbGxlZCB3
+aGVuIGxvb3BpbmcgdGhlIGFzc2lnbmVkDQo+ID4gPiA+IGRldmljZXMsIG5vdCB0aGUgb25lIHBh
+c3NlZCBieSB2dGRfcmVwbGF5X2d1ZXN0X3Bhc2lkX2JpbmRpbmdzKCkgY2FsbGVyLg0KPiA+ID4N
+Cj4gPiA+IEhhY2t5IHdheSBpcyB3ZSBjYW4gZGlyZWN0bHkgbW9kaWZ5IFZURFBBU0lEQ2FjaGVJ
+bmZvKiB3aXRoIGJ1cy9kZXZmbiBmb3INCj4gdGhlDQo+ID4gPiBsb29wLiAgT3RoZXJ3aXNlIHdl
+IGNhbiBkdXBsaWNhdGUgdGhlIG9iamVjdCB3aGVuIGxvb3BpbmcsIHNvIHRoYXQgd2UgY2FuIGF2
+b2lkDQo+ID4gPiBpbnRyb2R1Y2luZyBhIG5ldyBzdHJ1Y3Qgd2hpY2ggc2VlbXMgdG8gY29udGFp
+biBtb3N0bHkgdGhlIHNhbWUgaW5mb3JtYXRpb24uDQo+ID4NCj4gPiBJIHNlZS4gUGxlYXNlIHNl
+ZSBiZWxvdyByZXBseS4NCj4gPg0KPiA+ID4gPiBGb3IgdHdvLCByZXVzaW5nIHRoZSBWVERQQVNJ
+RENhY2hlSW5mbyBmb3IgcGFzc2luZyB3YWxrIGluZm8gbWF5DQo+ID4gPiA+IHJlcXVpcmUgdGhl
+IGZpbmFsIHVzZXIgZG8gdGhlIHNhbWUgdGhpbmcgYXMgd2hhdCB0aGUNCj4gPiA+ID4gdnRkX3Jl
+cGxheV9ndWVzdF9wYXNpZF9iaW5kaW5ncygpIGhhcyBkb25lIGhlcmUuDQo+ID4gPg0KPiA+ID4g
+SSBkb24ndCBzZWUgaXQgaGFwcGVuLCBjb3VsZCB5b3UgZXhwbGFpbj8NCj4gPg0KPiA+IG15IGNv
+bmNlcm4gaXMgYXJvdW5kIGZsYWdzIGZpZWxkIGluIFZURFBBU0lEQ2FjaGVJbmZvLiBUaGUgZmxh
+Z3Mgbm90DQo+ID4gb25seSBpbmRpY2F0ZXMgdGhlIGludmFsaWRhdGlvbiBncmFudWxhcml0eSwg
+YnV0IGFsc28gaW5kaWNhdGVzIHRoZQ0KPiA+IGZpZWxkIHByZXNlbmNlLiBlLmcuIFZURF9QQVNJ
+RF9DQUNIRV9ERVZTSSBpbmRpY2F0ZXMgdGhlIHZ0ZF9idXMvZGV2Zm4NCj4gPiBmaWVsZHMgYXJl
+IHZhbGlkLiBJZiByZXVzZSBpdCB0byBwYXNzIHdhbGsgaW5mbyB0byB2dGRfc21fcGFzaWRfdGFi
+bGVfd2Fsa19vbmUsDQo+ID4gaXQgd291bGQgYmUgbWVhbmluZ2xlc3MgYXMgdnRkX2J1cy9kZXZm
+biBmaWVsZHMgYXJlIGFsd2F5cyB2YWxpZC4gQnV0DQo+ID4gSSdtIGZpbmUgdG8gcmV1c2UgaXQn
+cyBtb3JlIHByZWZlcmVkLiBJbnN0ZWFkIG9mIG1vZGlmeWluZyB0aGUgdnRkX2J1cy9kZXZuDQo+
+ID4gaW4gVlREUEFTSURDYWNoZUluZm8qLCBJJ2QgcmF0aGVyIHRvIGRlZmluZSBhbm90aGVyIFZU
+RFBBU0lEQ2FjaGVJbmZvIHZhcmlhYmxlDQo+ID4gYW5kIHBhc3MgaXQgdG8gdnRkX3NtX3Bhc2lk
+X3RhYmxlX3dhbGtfb25lLiBUaGlzIG1heSBub3QgYWZmZWN0IHRoZSBmdXR1cmUNCj4gPiBjYWxs
+ZXIgb2YgdnRkX3JlcGxheV9ndWVzdF9wYXNpZF9iaW5kaW5ncygpIGFzIHZ0ZF9idXMvZGV2Zm4g
+ZmllbGQgYXJlIG5vdA0KPiA+IGRlc2lnbmVkIHRvIGJyaW5nIHNvbWV0aGluZyBiYWNrIHRvIGNh
+bGxlci4NCj4gDQo+IFllYWgsIGxldCdzIGdpdmUgaXQgYSBzaG90LiAgSSBrbm93IGl0J3Mgbm90
+IGlkZWFsLCBidXQgSU1ITyBpdCdzDQo+IHN0aWxsIGJldHRlciB0aGFuIGRlZmluaW5nIHRoZSBw
+YWdlX3dhbGsgc3RydWN0IGFuZCB0aGF0IG1pZ2h0IGNvbmZ1c2UNCj4gcmVhZGVycyBvbiB3aGF0
+J3MgdGhlIGRpZmZlcmVuY2UgYmV0d2VlbiB0aGUgdHdvLiAgV2hlbiBkdXBsaWNhdGluZw0KPiB0
+aGUgb2JqZWN0LCB3ZSBjYW4gYWRkIHNvbWUgY29tbWVudCBleHBsYWluaW5nIHRoaXMuDQoNCmdv
+dCBpdC4gSSdsbCBkcm9wIHRoZSBwYWdlX3dhbGsgc3RydWN0IGFuZCBhZGQgYWRkaXRpb25hbCBj
+b21tZW50cy4gOi0pDQoNClJlZ2FyZHMsDQpZaSBMaXUNCg==
 
