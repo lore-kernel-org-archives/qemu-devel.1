@@ -1,63 +1,85 @@
 Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 447D4C2BA16
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 10:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C61C2BA16
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 11:00:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E1E82072B
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 10:43:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E1E82072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mrbrklyn.com
+	by mail.kernel.org (Postfix) with ESMTPS id 398D7206C3
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 11:00:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7UXEcua"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 398D7206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKgGe-000675-8c
-	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 06:43:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
+	id 1jKgXI-0003SH-7s
+	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 07:00:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ruben@mrbrklyn.com>) id 1jKdMT-000344-En
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 03:37:02 -0400
+ (envelope-from <armbru@redhat.com>) id 1jKgWV-0002rI-4G
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 06:59:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ruben@mrbrklyn.com>) id 1jKdMR-0004WW-Mm
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 03:37:01 -0400
-Received: from www2.mrbrklyn.com ([96.57.23.82]:42699 helo=mrbrklyn.com)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ruben@mrbrklyn.com>)
- id 1jKdMR-0004UN-HL; Sat, 04 Apr 2020 03:36:59 -0400
-Received: from stat37.mrbrklyn.com (www.mrbrklyn.com [96.57.23.83])
- by mrbrklyn.com (Postfix) with ESMTP id 46ED6163FA2;
- Sat,  4 Apr 2020 03:36:58 -0400 (EDT)
-Date: Sat, 04 Apr 2020 00:37:53 -0400
-User-Agent: K-9 Mail for Android
-In-Reply-To: <de4b6733-859b-eebe-32ab-c0eb0fcb6311@redhat.com>
-References: <de92e66d-c474-dd1b-ddab-194b2f92d1dd@redhat.com>
- <de4b6733-859b-eebe-32ab-c0eb0fcb6311@redhat.com>
+ (envelope-from <armbru@redhat.com>) id 1jKgWT-00078I-34
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 06:59:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42162
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jKgWS-00077W-Su
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 06:59:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585997971;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XxBVjsGz7aZHo7XaZUUImpN4YNnqVmFw4Lz7sDBYcKo=;
+ b=N7UXEcua5KwMGOwp+qgZr6LPWUBz2jQ8VCkPQ3B1XgEoAmOTzY8F4/j7t8ZdPbvYHopRuz
+ +eono68XVNhqIwDV3jB8kkLLjJUFCAe1Ed9ZL78EXuzoyPtAiMXpi9hmBej6gkt+KFoZEn
+ 5dQEaOQE/qqs+ZY2KAbtg/56TkcPd7g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-4cCJFAR-PmGqbmZayrQdUQ-1; Sat, 04 Apr 2020 06:59:30 -0400
+X-MC-Unique: 4cCJFAR-PmGqbmZayrQdUQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 271711005509;
+ Sat,  4 Apr 2020 10:59:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-152.ams2.redhat.com
+ [10.36.112.152])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 986DA5DA76;
+ Sat,  4 Apr 2020 10:59:28 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 17A171138610; Sat,  4 Apr 2020 12:59:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <87blo7heag.fsf@dusky.pond.sub.org>
+Date: Sat, 04 Apr 2020 12:59:27 +0200
+In-Reply-To: <87blo7heag.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Sat, 04 Apr 2020 09:59:35 +0200")
+Message-ID: <87sghjfre8.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
- boundary="----PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6"
-Content-Transfer-Encoding: 7bit
-Subject: Re: QEMU participation to Google Season of Docs
-To: qemu-discuss@nongnu.org, John Snow <jsnow@redhat.com>,
- =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?ISO-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Stefan Weil <sw@weilnetz.de>
-From: Ruben <ruben@mrbrklyn.com>
-Message-ID: <834E48D0-E9DE-41DC-8E40-3657FB69698C@mrbrklyn.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 96.57.23.82
-X-Mailman-Approved-At: Sat, 04 Apr 2020 06:42:18 -0400
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,175 +91,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+ =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-------PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Markus Armbruster <armbru@redhat.com> writes:
 
-Its ingoogle=2E=2E=2E We don't do google=2E
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> QEMU's Error was patterned after GLib's GError.  Differences include:
+> [...]
+>> * Return value conventions
+>>
+>>   Common: non-void functions return a distinct error value on failure
+>>   when such a value can be defined.  Patterns:
+>>
+>>   - Functions returning non-null pointers on success return null pointer
+>>     on failure.
+>>
+>>   - Functions returning non-negative integers on success return a
+>>     negative error code on failure.
+>>
+>>   Different: GLib discourages void functions, because these lead to
+>>   awkward error checking code.  We have tons of them, and tons of
+>>   awkward error checking code:
+>>
+>>     Error *err =3D NULL;
+>>     frobnicate(arg, &err);
+>>     if (err) {
+>>         ... recover ...
+>>         error_propagate(errp, err);
+>>     }
+>>
+>>   instead of
+>>
+>>     if (!frobnicate(arg, errp))
+>>         ... recover ...
+>>     }
+>>
+>>   Can also lead to pointless creation of Error objects.
+>>
+>>   I consider this a design mistake.  Can we still fix it?  We have more
+>>   than 2000 void functions taking an Error ** parameter...
+>>
+>>   Transforming code that receives and checks for errors with Coccinelle
+>>   shouldn't be hard.  Transforming code that returns errors seems more
+>>   difficult.  We need to transform explicit and implicit return to
+>>   either return true or return false, depending on what we did to the
+>>   @errp parameter on the way to the return.  Hmm.
+> [...]
+>
+> To figure out what functions with an Error ** parameter return, I used
+> Coccinelle to find such function definitions and print the return types.
+> Summary of results:
+>
+>    2155 void
+>     873 signed integer
+>     494 pointer
+>     153 bool
+>      33 unsigned integer
+>       6 enum
+>    ---------------------
+>    3714 total
+>
+> I then used Coccinelle to find checked calls of void functions (passing
+> &error_fatal or &error_abort is not considered "checking" here).  These
+> calls become simpler if we make the functions return a useful value.  I
+> found a bit under 600 direct calls, and some 50 indirect calls.
+>
+> Most frequent direct calls:
+>
+>     127 object_property_set_bool
+>      27 qemu_opts_absorb_qdict
+>      16 visit_type_str
+>      14 visit_type_int
+>      10 visit_type_uint32
+>
+> Let's have a closer look at object_property_set() & friends.  Out of
+> almost 1000 calls, some 150 are checked.  While I'm sure many of the
+> unchecked calls can't actually fail, I am concerned some unchecked calls
+> can.
+>
+> If we adopt the convention to return a value that indicates success /
+> failure, we should consider converting object.h to it sooner rather than
+> later.
+>
+> Please understand these are rough numbers from quick & dirty scripts.
 
+Paolo, Daniel, Eduardo,
 
+Please pick one for QOM:
 
-On April 3, 2020 9:37:09 PM EDT, John Snow <jsnow@redhat=2Ecom> wrote:
->
->
->On 4/1/20 12:37 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi,
->>=20
->> Google recently announced their 'Season of Docs' project:
->> https://developers=2Egoogle=2Ecom/season-of-docs
->>=20
->> QEMU project seems to fit all the requirements=2E
->>=20
->> Who is interested in [co-]mentoring?
->>=20
->> Relevant links:
->> https://developers=2Egoogle=2Ecom/season-of-docs/docs/admin-guide
->> https://developers=2Egoogle=2Ecom/season-of-docs/docs/timeline
->>=20
->> [Following is extracted from the previous links:]
->>=20
->> Example projects:
->>=20
->> * Build a documentation site on a platform to be decided
->> =C2=A0 by the technical writer and open source mentor, and publish
->> =C2=A0 an initial set of basic documents on the site=2E Examples of
->> =C2=A0 platforms include:
->>=20
->> =C2=A0 - A static site generator such as Hugo, Jekyll, Sphinx, =2E=2E=
-=2E
->>=20
->> * Refactor the open source project's existing documentation to
->> =C2=A0 provide an improved user experience or a more accessible
->> =C2=A0 information architecture=2E
->>=20
->> * Write a conceptual overview of, or introduction to, a product
->> =C2=A0 or feature=2E Often a team creates their technical documentation
->> =C2=A0 from the bottom up, with the result that there's a lot of
->> =C2=A0 detail but it's hard to understand the product as a whole=2E A
->> =C2=A0 technical writer can fix this=2E
->>=20
->> * Create a tutorial for a high-profile use case=2E
->>=20
->> * Create a set of focused how-to guides for specific tasks=2E
->>=20
->> * Create a contributor=E2=80=99s guide that includes basic information
->> =C2=A0 about getting started as a contributor to the open source
->> =C2=A0 project, as well as any rules around licence agreements,
->> =C2=A0 processes for pull requests and reviews, building the project,
->> =C2=A0 and so on=2E
->>=20
->> Previous experience with similar programs, such as Google Summer
->> of Code or others: If you or any of your mentors have taken part
->> in Google Summer of Code or a similar program, mention this in
->> your application=2E Describe your achievements in that program=2E
->> Explain how this experience may influence the way you work in
->> Season of Docs=2E
->>=20
->> The 2020 season of Season of Docs is limited to a maximum of
->> 50 technical writing projects in total=2E
->> As a guideline, we expect to accept a maximum of 2 projects
->> per organization, so that we don't end up with too many
->> accepted projects=2E However, if the free selection process
->> doesn't fill all the slots, the Google program administrators
->> may allocate additional slots to some organizations=2E
->>=20
->
->This looks like it could be very good for us=2E
->
->My only concern is that the scope and breadth of QEMU is huge and it
->may
->be a lot for a newcomer to tackle appropriately for top-level docs, so
->I
->feel like it requires a mentor who has a good understanding of the
->broad
->picture of QEMU=2E
->
->Like the description says, we often write things bottom-up in areas of
->very specific focus=2E The broad picture is sometimes harder to conjure
->accurately=2E
->
->I have a lot of opinions and thoughts on python and how docs should be
->laid out, but I'm afraid I'm not so good at understanding all of the
->options and "use cases" of QEMU to confidently lay out a top-level TOC=2E
->Maybe if we collaborated on a TOC we could give a clear project
->guideline to a GSoC/GSoD contributor=2E
->
->(Or maybe I'm overthinking it=2E)
->
->--js
+* Do nothing.  Looks like
 
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
-------PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6
-Content-Type: text/html;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+     object_property_set_bool(..., &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+     }
 
-<html><head></head><body>Its ingoogle=2E=2E=2E We don't do google=2E<br><br=
-><br><br><div class=3D"gmail_quote">On April 3, 2020 9:37:09 PM EDT, John S=
-now &lt;jsnow@redhat=2Ecom&gt; wrote:<blockquote class=3D"gmail_quote" styl=
-e=3D"margin: 0pt 0pt 0pt 0=2E8ex; border-left: 1px solid rgb(204, 204, 204)=
-; padding-left: 1ex;">
-<pre class=3D"k9mail"><br><br>On 4/1/20 12:37 PM, Philippe Mathieu-Daud=C3=
-=A9 wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin: 0pt 0pt 1e=
-x 0=2E8ex; border-left: 1px solid #729fcf; padding-left: 1ex;">Hi,<br><br>G=
-oogle recently announced their 'Season of Docs' project:<br><a href=3D"http=
-s://developers=2Egoogle=2Ecom/season-of-docs">https://developers=2Egoogle=
-=2Ecom/season-of-docs</a><br><br>QEMU project seems to fit all the requirem=
-ents=2E<br><br>Who is interested in [co-]mentoring?<br><br>Relevant links:<=
-br><a href=3D"https://developers=2Egoogle=2Ecom/season-of-docs/docs/admin-g=
-uide">https://developers=2Egoogle=2Ecom/season-of-docs/docs/admin-guide</a>=
-<br><a href=3D"https://developers=2Egoogle=2Ecom/season-of-docs/docs/timeli=
-ne">https://developers=2Egoogle=2Ecom/season-of-docs/docs/timeline</a><br><=
-br>[Following is extracted from the previous links:]<br><br>Example project=
-s:<br><br>* Build a documentation site on a platform to be decided<br>&nbsp=
-; by the technical writer and open source mentor, and publish<br>&nbsp; an =
-initial set of basic documents on the site=2E Examples of<br>&nbsp; platfor=
-ms include:<br><br>&nbsp; - A static site generator such as Hugo, Jekyll, S=
-phinx, =2E=2E=2E<br><br>* Refactor the open source project's existing docum=
-entation to<br>&nbsp; provide an improved user experience or a more accessi=
-ble<br>&nbsp; information architecture=2E<br><br>* Write a conceptual overv=
-iew of, or introduction to, a product<br>&nbsp; or feature=2E Often a team =
-creates their technical documentation<br>&nbsp; from the bottom up, with th=
-e result that there's a lot of<br>&nbsp; detail but it's hard to understand=
- the product as a whole=2E A<br>&nbsp; technical writer can fix this=2E<br>=
-<br>* Create a tutorial for a high-profile use case=2E<br><br>* Create a se=
-t of focused how-to guides for specific tasks=2E<br><br>* Create a contribu=
-tor=E2=80=99s guide that includes basic information<br>&nbsp; about getting=
- started as a contributor to the open source<br>&nbsp; project, as well as =
-any rules around licence agreements,<br>&nbsp; processes for pull requests =
-and reviews, building the project,<br>&nbsp; and so on=2E<br><br>Previous e=
-xperience with similar programs, such as Google Summer<br>of Code or others=
-: If you or any of your mentors have taken part<br>in Google Summer of Code=
- or a similar program, mention this in<br>your application=2E Describe your=
- achievements in that program=2E<br>Explain how this experience may influen=
-ce the way you work in<br>Season of Docs=2E<br><br>The 2020 season of Seaso=
-n of Docs is limited to a maximum of<br>50 technical writing projects in to=
-tal=2E<br>As a guideline, we expect to accept a maximum of 2 projects<br>pe=
-r organization, so that we don't end up with too many<br>accepted projects=
-=2E However, if the free selection process<br>doesn't fill all the slots, t=
-he Google program administrators<br>may allocate additional slots to some o=
-rganizations=2E<br><br></blockquote><br>This looks like it could be very go=
-od for us=2E<br><br>My only concern is that the scope and breadth of QEMU i=
-s huge and it may<br>be a lot for a newcomer to tackle appropriately for to=
-p-level docs, so I<br>feel like it requires a mentor who has a good underst=
-anding of the broad<br>picture of QEMU=2E<br><br>Like the description says,=
- we often write things bottom-up in areas of<br>very specific focus=2E The =
-broad picture is sometimes harder to conjure<br>accurately=2E<br><br>I have=
- a lot of opinions and thoughts on python and how docs should be<br>laid ou=
-t, but I'm afraid I'm not so good at understanding all of the<br>options an=
-d "use cases" of QEMU to confidently lay out a top-level TOC=2E<br>Maybe if=
- we collaborated on a TOC we could give a clear project<br>guideline to a G=
-SoC/GSoD contributor=2E<br><br>(Or maybe I'm overthinking it=2E)<br><br>--j=
-s<br><br></pre></blockquote></div><br>-- <br>Sent from my Android device wi=
-th K-9 Mail=2E Please excuse my brevity=2E</body></html>
-------PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6--
+* Return true on success, false on error.  Looks like
+
+     if (!object_property_set_bool(..., errp)) {
+         return;
+     }
+
+* Return 0 on success, -1 on error.  Looks like
+
+     if (object_property_set_bool(..., errp) < 0) {
+         return;
+     }
+
+  This is slightly more likely to require line wrapping than the
+  previous one.
+
 
