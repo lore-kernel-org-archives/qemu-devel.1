@@ -2,64 +2,83 @@ Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AE5C2BA16
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 08:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FBEC2BA16
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 08:30:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7E3A206B8
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 08:23:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7E3A206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A070F206F5
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 08:30:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MwmXuLVM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A070F206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKe57-0004XU-Qe
-	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 04:23:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46620)
+	id 1jKeBz-0006xK-Mx
+	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 04:30:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47543)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jKe4G-00041k-Uj
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:22:18 -0400
+ (envelope-from <arilou@gmail.com>) id 1jKeB6-0005j7-R6
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jKe4F-0002R4-Cm
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:22:16 -0400
-Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:53055)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jKe4F-0002NS-7G
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:22:15 -0400
-Received: from player691.ha.ovh.net (unknown [10.110.103.211])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id BD5EA1362E2
- for <qemu-devel@nongnu.org>; Sat,  4 Apr 2020 10:22:12 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player691.ha.ovh.net (Postfix) with ESMTPSA id 26A9911313B57;
- Sat,  4 Apr 2020 08:22:04 +0000 (UTC)
-Subject: Re: [PATCH v2] ppc/pnv: Create BMC devices at machine init
-To: Nathan Chancellor <natechancellor@gmail.com>
-References: <20191121162340.11049-1-clg@kaod.org>
- <20200404071707.GA24708@ubuntu-m2-xlarge-x86>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <8d46dc9f-bc7e-b449-42f3-54d2d0f304b3@kaod.org>
-Date: Sat, 4 Apr 2020 10:22:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <arilou@gmail.com>) id 1jKeB5-0001tI-G7
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:29:20 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54820)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <arilou@gmail.com>) id 1jKeB5-0001sE-86
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:29:19 -0400
+Received: by mail-wm1-x342.google.com with SMTP id h2so1455939wmb.4
+ for <qemu-devel@nongnu.org>; Sat, 04 Apr 2020 01:29:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Srf7i30Ku8smhkHYNpy3IFa6BKpkll1EVMIgxQH4lSc=;
+ b=MwmXuLVMeuSeh6y91ALypxjigkpq7Y6PsMViaUNm1hY0VASQxtTBWaH62S6y9DBHOJ
+ Ca20fQLRm9O50jxVdoNX7/FnjPB+ABkg2GmFRzgqJgOM4bCBadB8kDDrv6et6Jdr1dZS
+ 4ZtySwmXg19OMTbsDmZ+gle7yxenRxx3+ke0dzzOrq/7d8QyA8m/GvJnHZe2WxqcL+Rz
+ RwpCbD7lylD6HVM9XO3TKhmUPkV0RQrU/qcWhLQhiW9T3Rq0X9xg+wwuqztFesBGsxej
+ sb4EFd/+cqE1GRmuoescSQvfs0DMoN1Agu/wrUKSxyQVqm6Ws/sKFsT7RNUiFSYopniR
+ yuqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Srf7i30Ku8smhkHYNpy3IFa6BKpkll1EVMIgxQH4lSc=;
+ b=Hic4VO/RLd6A4XzoBazHqgyRGW49K7rQDeOH4EMeL2eiPQK64dz6sQ5H4QbdUa0pq5
+ q1ZacsVQydPpQaSygFc4AmarijRt36as1nf7VUVpgUW7z2CiJeDuoM+Vn4supGwUEd8+
+ VAvLmdGth8Osl7cCLuNFChO1EJdtc/dKEvnoIRZ8e2uBizz1S6xSn6cEY6m0ZNY7dGVQ
+ pgpOcYGcJDoo9fC/TSc3GtfUNfRaubjBGVmgrVvtUKhLfyC7eXwtqIwRZArQBPn4WZkb
+ TnR9wY4JqB2TwyM3csqRSmZZ3HKIMXo/bf20rDKt42/6m5dHNMVGyghHn3YBofh8unC1
+ 3RaA==
+X-Gm-Message-State: AGi0Pua1jrhVPVikFF1Cg3w3uYWJA2McK4/f0G4nzxPsIS8sGSM3vL4o
+ EQWoIQ4UWNjoklbaA/YYi18Wna9Uhfxtsg==
+X-Google-Smtp-Source: APiQypKFn0uuZFlwmzJGmxtlot02mblcChAJtWovyTtlLPiTfNtgc8KHlWipt4PIYmUU79yrQps6Rg==
+X-Received: by 2002:a1c:5410:: with SMTP id i16mr12667153wmb.150.1585988957489; 
+ Sat, 04 Apr 2020 01:29:17 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-155-40.inter.net.il. [84.229.155.40])
+ by smtp.gmail.com with ESMTPSA id
+ a10sm15884778wrm.87.2020.04.04.01.29.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 04 Apr 2020 01:29:16 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/7] hyperv: VMBus implementation
+Date: Sat,  4 Apr 2020 11:28:53 +0300
+Message-Id: <20200404082900.33711-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200404071707.GA24708@ubuntu-m2-xlarge-x86>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 4878524299193191185
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrtdekgddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.74.148
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,105 +90,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, qemu-devel@nongnu.org,
- Oliver O'Halloran <oohall@gmail.com>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: mail@maciej.szmigiero.name, eyakovlev@virtuozzo.com, ehabkost@redhat.com,
+ rvkagan@gmail.com, liran.alon@oracle.com, pbonzini@redhat.com,
+ vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/4/20 9:17 AM, Nathan Chancellor wrote:
-> Hi C=C3=A9dric,
->=20
-> On Thu, Nov 21, 2019 at 05:23:40PM +0100, C=C3=A9dric Le Goater wrote:
->> The BMC of the OpenPOWER systems monitors the machine state using
->> sensors, controls the power and controls the access to the PNOR flash
->> device containing the firmware image required to boot the host.
->>
->> QEMU models the power cycle process, access to the sensors and access
->> to the PNOR device. But, for these features to be available, the QEMU
->> PowerNV machine needs two extras devices on the command line, an IPMI
->> BT device for communication and a BMC backend device:
->>
->>   -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D=
-10
->>
->> The BMC properties are then defined accordingly in the device tree and
->> OPAL self adapts. If a BMC device and an IPMI BT device are not
->> available, OPAL does not try to communicate with the BMC in any
->> manner. This is not how real systems behave.
->>
->> To be closer to the default behavior, create an IPMI BMC simulator
->> device and an IPMI BT device at machine initialization time. We loose
->> the ability to define an external BMC device but there are benefits:
->>
->>   - a better match with real systems,
->>   - a better test coverage of the OPAL code,
->>   - system powerdown and reset commands that work,
->>   - a QEMU device tree compliant with the specifications (*).
->>
->> (*) Still needs a MBOX device.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> I just started testing QEMU v5.0.0-rc1 against the little Linux booting
-> framework that I helped set up for ClangBuiltLinux and this commit has
-> caused some problems because we specify the exact same devices as you
-> note in the commit message:
->=20
-> https://github.com/ClangBuiltLinux/boot-utils/blob/5d9d3f626940a6a176c0=
-80717a367c1599f63680/boot-qemu.sh#L154-L155
->=20
-> $ timeout 3m unbuffer qemu-system-ppc64 -device ipmi-bmc-sim,id=3Dbmc0 =
-\
->                                         -device isa-ipmi-bt,bmc=3Dbmc0,=
-irq=3D10 \
->                                         -L images/ppc64le/ \
->                                         -bios skiboot.lid \
->                                         -machine powernv \
->                                         -display none \
->                                         -initrd images/ppc64le/rootfs.c=
-pio \
->                                         -kernel zImage.epapr \
->                                         -m 2G \
->                                         -serial mon:stdio
-> qemu-system-ppc64: error creating device tree: node: FDT_ERR_EXISTS
+This is a rebase of the old patchset from Roman for HyperV VMBus
+implementation.
 
-sigh ...
+How to use:
+-device vmbus-bridge
 
-> It seems to me like if the machine is silently creating these devices,
+Later on new paravirtualized devices can be implemented on top of it
+(Network/SCSI/etc.)
 
-yes. It now does at the machine init time.
+VMBus is a collection of technologies.  At its lowest layer, it's a message
+passing and signaling mechanism, allowing efficient passing of messages to and
+from guest VMs.  A layer higher, it's a mechanism for defining channels of
+communication, where each channel is tagged with a type (which implies a
+protocol) and a instance ID.  A layer higher than that, it's a bus driver,
+serving as the basis of device enumeration within a VM, where a channel can
+optionally be exposed as a paravirtual device.  When a server-side (paravirtual
+back-end) component wishes to offer a channel to a guest VM, it does so by
+specifying a channel type, a mode, and an instance ID.  VMBus then exposes this
+in the guest.
 
-> it should just warn that the user is trying to create a device that
-> already exists?=20
+More information about VMBus can be found in the file
+vmbuskernelmodeclientlibapi.h in Microsoft's WDK.
 
-That is more complex because the machine only knows very late about=20
-the user created devices, at reset time. We could check this specific
-case (two sets of IPMI devices) and warn the user before exiting.=20
+Jon Doron (7):
+  hyperv: expose API to determine if synic is enabled
+  hyperv: SControl is optional to enable SynIc
+  vmbus: add vmbus protocol definitions
+  vmbus: vmbus implementation
+  i386:pc: whitelist dynamic vmbus-bridge
+  i386: Hyper-V VMBus ACPI DSDT entry
+  vmbus: add infrastructure to save/load vmbus requests
 
-> If not, then I assume I will just need to hack up a check for QEMU=20
-> 5.0.0+ and just not add those devices?=20
+ Makefile.objs                    |    1 +
+ hw/hyperv/Kconfig                |    5 +
+ hw/hyperv/Makefile.objs          |    1 +
+ hw/hyperv/hyperv.c               |  250 ++-
+ hw/hyperv/trace-events           |   18 +
+ hw/hyperv/vmbus.c                | 2778 ++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c             |   43 +
+ hw/i386/pc_piix.c                |    2 +
+ hw/i386/pc_q35.c                 |    2 +
+ include/hw/hyperv/hyperv.h       |    3 +
+ include/hw/hyperv/vmbus-bridge.h |   35 +
+ include/hw/hyperv/vmbus-proto.h  |  222 +++
+ include/hw/hyperv/vmbus.h        |  230 +++
+ target/i386/hyperv.c             |    2 +
+ 14 files changed, 3510 insertions(+), 82 deletions(-)
+ create mode 100644 hw/hyperv/trace-events
+ create mode 100644 hw/hyperv/vmbus.c
+ create mode 100644 include/hw/hyperv/vmbus-bridge.h
+ create mode 100644 include/hw/hyperv/vmbus-proto.h
+ create mode 100644 include/hw/hyperv/vmbus.h
 
-May be we can improve the behavior. See below.
-
-> We use that script with QEMU 3.1.0 in our CI and I use it locally=20
-> with QEMU 4.2.0 so universally getting rid of them doesn't seem=20
-> logical.
->=20
-> Curious for your thoughts on what to do and cheers,
-A solution might be to tie theses default IPMI devices to=20
-defaults_enabled(). Which means that to create a custom set of=20
-devices you would need to use -nodefaults now. Would that be OK ? =20
-
-Creating these devices at reset would be much easier but it is=20
-considered a bad practice to do so.=20
-
-Any other ideas ?=20
-
-Thanks,
-
-C.
+-- 
+2.24.1
 
 
