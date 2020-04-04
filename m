@@ -2,160 +2,92 @@ Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D0AC43331
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 01:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B0FC43331
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 01:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 658532064A
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 01:38:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 044A120737
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 01:59:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UdnNv3fd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 658532064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="up4P0szH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 044A120737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKXlb-0006SR-JQ
-	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 21:38:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56408)
+	id 1jKY5u-0002FI-6n
+	for qemu-devel@archiver.kernel.org; Fri, 03 Apr 2020 21:59:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58325)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jKXkU-0005a1-UY
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 21:37:28 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jKY5J-0001eU-HD
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 21:58:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jKXkT-0001D9-1M
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 21:37:26 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30283
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jKXkS-0001BN-S7
- for qemu-devel@nongnu.org; Fri, 03 Apr 2020 21:37:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585964244;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=l4r0RTUZoX34aIRsxNl2Z8H5XHyDMsseQaf1OrA0Yks=;
- b=UdnNv3fd4NOTfitt7BzXfZWeJI88SNBi9aneEPSEo2VTVyx/8yO9D0Apx4SJEEaju8+AjJ
- 1og+hK4CrR1czTr8QEXJJ3+TGGs3ow1SnvyQFK/DJatNyqsxE3vuGnrbug//WLmJPnc4h2
- zxHhaxlOxFb0Es5U+k6rQPurAQFhUl0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-QEf4DtrROnmamH9Cb5xhng-1; Fri, 03 Apr 2020 21:37:20 -0400
-X-MC-Unique: QEf4DtrROnmamH9Cb5xhng-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5C92800D5C;
- Sat,  4 Apr 2020 01:37:18 +0000 (UTC)
-Received: from [10.10.115.46] (ovpn-115-46.rdu2.redhat.com [10.10.115.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A2BC1001B09;
- Sat,  4 Apr 2020 01:37:09 +0000 (UTC)
-Subject: Re: QEMU participation to Google Season of Docs
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Stefan Weil <sw@weilnetz.de>
-References: <de92e66d-c474-dd1b-ddab-194b2f92d1dd@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <de4b6733-859b-eebe-32ab-c0eb0fcb6311@redhat.com>
-Date: Fri, 3 Apr 2020 21:37:09 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <npiggin@gmail.com>) id 1jKY5I-000240-5h
+ for qemu-devel@nongnu.org; Fri, 03 Apr 2020 21:58:57 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40778)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1jKY5E-00022F-PK; Fri, 03 Apr 2020 21:58:52 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id kx8so3843925pjb.5;
+ Fri, 03 Apr 2020 18:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:cc:references:in-reply-to:mime-version
+ :user-agent:message-id:content-transfer-encoding;
+ bh=nFwsdp5bfnRad92fgp2iuX/n0SGcq6Dvu2Vbv3r4tyU=;
+ b=up4P0szHGyjaMIGR3mnbCT4bblGHtlLTaXC1MXfsjG6f8xb3pBDHLA8PMo2D54M1Qe
+ xFehYH44BBSgov69iYhl4Hr7Y8yQLC/h2pbj+uG9MU4xpFUUvpUqUUmVLgBRFp6ZNna/
+ lBQFwolTyD6MRVZbP+4eFDHXaWSKhhFkeyDso9fEtqm26rOrdr0JVeCqMdssr4vl8E3y
+ Oz1itXrBtOCAUFAVMy812m0R+vE8CFDsHJtFViTdIuCg/xh0EmYA94FE1TVfZIldjdeJ
+ 2M97miH0Oim0i4bbeMCKDSS/X34RFXrHmS6RdWHL9lhqxOteUnO5JkCh2FBstQhb0QY8
+ FStw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+ :mime-version:user-agent:message-id:content-transfer-encoding;
+ bh=nFwsdp5bfnRad92fgp2iuX/n0SGcq6Dvu2Vbv3r4tyU=;
+ b=DMdWXCu/8b4jfLMZcQsnmifhhHSZbwV7QWK1wKlKzX0zoXI78TwXnwJ/8//DDiplKw
+ LDmnuBR48XCZzjx76M13V0z+k2CJoCnx3doC3vEEIaTyZRDjMMLNrRWtFmgJkDBvL6Ih
+ PD5qUuoya2AvgLjekclCIKVyhXmdb2I6Icks9hxCaMEYue+UjlhK9dAm5AoEHXUU1JFt
+ w0RzOkNuikEIb5RqJA6cvMmN3kGol95EskXj4u3ZKq3Bz/eLRs3pi88V8sIjQ3fvATvB
+ qZmneBIONYGqEDI9V0FKvjJyGLxMFufBfFtIAjXfKzxQs2hsI1z7ZhVraky1AKHZBSOq
+ p4LA==
+X-Gm-Message-State: AGi0PuYPq0aKZSdyo896um1ixVNi9PDv588sEfcDuc7AAUjF6zPH9Thz
+ 7cUOGFbGHlQ1xfATUZWsZWk=
+X-Google-Smtp-Source: APiQypLUSEYiZhpQdA7H5dt+vQ5Yo0LFWDs0i+wHIAWxe67DfdalA2sXiDxXTszlPcVYj+S+tvCBxA==
+X-Received: by 2002:a17:902:aa88:: with SMTP id
+ d8mr10403583plr.201.1585965531309; 
+ Fri, 03 Apr 2020 18:58:51 -0700 (PDT)
+Received: from localhost (60-241-117-97.tpgi.com.au. [60.241.117.97])
+ by smtp.gmail.com with ESMTPSA id v25sm6186329pgl.55.2020.04.03.18.58.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Apr 2020 18:58:50 -0700 (PDT)
+Date: Sat, 04 Apr 2020 11:58:28 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 2/5] ppc/pnv: Add support for NMI interface
+To: =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org
+References: <20200325144147.221875-1-npiggin@gmail.com>
+ <20200325144147.221875-3-npiggin@gmail.com>
+ <c1cdf2a2-afe9-8771-2c00-7e6a79d5e532@kaod.org>
+ <1585899319.9tofsl4fd9.astroid@bobo.none>
+ <1585915002.kqdz9mya1i.astroid@bobo.none>
+ <500c5162-ef10-1913-0ef0-de5fb1b8b28d@kaod.org>
+In-Reply-To: <500c5162-ef10-1913-0ef0-de5fb1b8b28d@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <de92e66d-c474-dd1b-ddab-194b2f92d1dd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1585964288.dzemne94wb.astroid@bobo.none>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -167,96 +99,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- qemu-discuss@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+C=C3=A9dric Le Goater's on April 4, 2020 1:47 am:
+> On 4/3/20 3:12 PM, Nicholas Piggin wrote:
+>> Nicholas Piggin's on April 3, 2020 5:57 pm:
+>>> C=C3=A9dric Le Goater's on March 26, 2020 2:38 am:
+>>>> [ Please use clg@kaod.org ! ]
+>>>>
+>>>> On 3/25/20 3:41 PM, Nicholas Piggin wrote:
+>>>>> This implements the NMI interface for the PNV machine, similarly to
+>>>>> commit 3431648272d ("spapr: Add support for new NMI interface") for
+>>>>> SPAPR.
+>>>>>
+>>>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>>>
+>>>> one minor comment,
+>>>>
+>>>> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>>
+>>>>> ---
+>>>>>  hw/ppc/pnv.c | 30 +++++++++++++++++++++++++++++-
+>>>>>  1 file changed, 29 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>>>>> index b75ad06390..671535ebe6 100644
+>>>>> --- a/hw/ppc/pnv.c
+>>>>> +++ b/hw/ppc/pnv.c
+>>>>> @@ -27,6 +27,7 @@
+>>>>>  #include "sysemu/runstate.h"
+>>>>>  #include "sysemu/cpus.h"
+>>>>>  #include "sysemu/device_tree.h"
+>>>>> +#include "sysemu/hw_accel.h"
+>>>>>  #include "target/ppc/cpu.h"
+>>>>>  #include "qemu/log.h"
+>>>>>  #include "hw/ppc/fdt.h"
+>>>>> @@ -34,6 +35,7 @@
+>>>>>  #include "hw/ppc/pnv.h"
+>>>>>  #include "hw/ppc/pnv_core.h"
+>>>>>  #include "hw/loader.h"
+>>>>> +#include "hw/nmi.h"
+>>>>>  #include "exec/address-spaces.h"
+>>>>>  #include "qapi/visitor.h"
+>>>>>  #include "monitor/monitor.h"
+>>>>> @@ -1955,10 +1957,35 @@ static void pnv_machine_set_hb(Object *obj, b=
+ool value, Error **errp)
+>>>>>      }
+>>>>>  }
+>>>>>
+>>>>> +static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, run_on_cpu_data arg)
+>>>>> +{
+>>>>> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>>>> +    CPUPPCState *env =3D &cpu->env;
+>>>>> +
+>>>>> +    cpu_synchronize_state(cs);
+>>>>> +    ppc_cpu_do_system_reset(cs);
+>>>>> +    /*
+>>>>> +     * SRR1[42:45] is set to 0100 which the ISA defines as implement=
+ation
+>>>>
+>>>> I see 'System Reset' in ISA 3.0
+>>>>> +     * dependent. POWER processors use this for xscom triggered inte=
+rrupts,
+>>>>> +     * which come from the BMC or NMI IPIs.
+>>>>> +     */
+>>>>> +    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
+>>>>
+>>>> So we could have used the skiboot SPR_SRR1_PM_WAKE_SRESET define ?=20
+>>>
+>>> Ah, that's only for power-saving wakeup. But you got me to dig further
+>>> and I think I've got a few things wrong here.
+>>>
+>>> The architectural power save wakeup due to sreset bit 43 needs to be
+>>> set, probably in excp_helper.c if (msr_pow) test.
+>>>
+>>>     case POWERPC_EXCP_RESET:     /* System reset exception             =
+      */
+>>>         /* A power-saving exception sets ME, otherwise it is unchanged =
+*/
+>>>         if (msr_pow) {
+>>>             /* indicate that we resumed from power save mode */
+>>>             msr |=3D 0x10000;
+>>>             new_msr |=3D ((target_ulong)1 << MSR_ME);
+>>>         }
+>>=20
+>> Sorry I'm wrong, that's the old MSR_POW thing I guess G5 had it.
+>>=20
+>> 'stop' state wakeup is powerpc_reset_wakeup of course, which seems to
+>> do the right thing with SRR1.
+>>=20
+>> Something like this patch should fix this issue in the ppc-5.1 branch.
+>> This appears to do the right thing with SRR1 in testing with Linux.
+>>=20
+>> ---
+>>  hw/ppc/pnv.c | 21 +++++++++++++++------
+>>  1 file changed, 15 insertions(+), 6 deletions(-)
+>>=20
+>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>> index ac83b8698b..596ccfd99e 100644
+>> --- a/hw/ppc/pnv.c
+>> +++ b/hw/ppc/pnv.c
+>> @@ -1964,12 +1964,21 @@ static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, =
+run_on_cpu_data arg)
+>> =20
+>>      cpu_synchronize_state(cs);
+>>      ppc_cpu_do_system_reset(cs);
+>> -    /*
+>> -     * SRR1[42:45] is set to 0100 which the ISA defines as implementati=
+on
+>> -     * dependent. POWER processors use this for xscom triggered interru=
+pts,
+>> -     * which come from the BMC or NMI IPIs.
+>> -     */
+>> -    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
+>> +    if (env->spr[SPR_SRR1] & PPC_BITMASK(46, 47)) {
+>> +        /* system reset caused wake from power saving state */
+>> +        if (!(env->spr[SPR_SRR1] & PPC_BIT(43))) {
+>> +            warn_report("ppc_cpu_do_system_reset does not set system re=
+set wakeup reason");
+>> +            env->spr[SPR_SRR1] |=3D PPC_BIT(43);
+>> +        }
+>> +    } else {
+>> +        /*
+>> +	 * For non-powersave wakeup system resets, SRR1[42:45] are defined to
+>> +	 * be implementation dependent. Set to 0b0010, which POWER9 UM defines
+>> +	 * to be interrupt caused by SCOM, which can come from the BMC or NMI
+>> +	 * IPIs.
+>> +         */
+>> +        env->spr[SPR_SRR1] |=3D PPC_BIT(44);
+>> +    }
+>>  }
+>=20
+> That looks correct according to the UM.
+>=20
+> Do we care about the other non-powersave wakeup system resets ?=20
+>=20
+>   0011 Interrupt caused by hypervisor door bell.
+>   0101 Interrupt caused by privileged door bell.
 
+I think that's a typo in the UM, and those are powersave ones.
 
-On 4/1/20 12:37 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi,
 >=20
-> Google recently announced their 'Season of Docs' project:
-> https://developers.google.com/season-of-docs
->=20
-> QEMU project seems to fit all the requirements.
->=20
-> Who is interested in [co-]mentoring?
->=20
-> Relevant links:
-> https://developers.google.com/season-of-docs/docs/admin-guide
-> https://developers.google.com/season-of-docs/docs/timeline
->=20
-> [Following is extracted from the previous links:]
->=20
-> Example projects:
->=20
-> * Build a documentation site on a platform to be decided
-> =C2=A0 by the technical writer and open source mentor, and publish
-> =C2=A0 an initial set of basic documents on the site. Examples of
-> =C2=A0 platforms include:
->=20
-> =C2=A0 - A static site generator such as Hugo, Jekyll, Sphinx, ...
->=20
-> * Refactor the open source project's existing documentation to
-> =C2=A0 provide an improved user experience or a more accessible
-> =C2=A0 information architecture.
->=20
-> * Write a conceptual overview of, or introduction to, a product
-> =C2=A0 or feature. Often a team creates their technical documentation
-> =C2=A0 from the bottom up, with the result that there's a lot of
-> =C2=A0 detail but it's hard to understand the product as a whole. A
-> =C2=A0 technical writer can fix this.
->=20
-> * Create a tutorial for a high-profile use case.
->=20
-> * Create a set of focused how-to guides for specific tasks.
->=20
-> * Create a contributor=E2=80=99s guide that includes basic information
-> =C2=A0 about getting started as a contributor to the open source
-> =C2=A0 project, as well as any rules around licence agreements,
-> =C2=A0 processes for pull requests and reviews, building the project,
-> =C2=A0 and so on.
->=20
-> Previous experience with similar programs, such as Google Summer
-> of Code or others: If you or any of your mentors have taken part
-> in Google Summer of Code or a similar program, mention this in
-> your application. Describe your achievements in that program.
-> Explain how this experience may influence the way you work in
-> Season of Docs.
->=20
-> The 2020 season of Season of Docs is limited to a maximum of
-> 50 technical writing projects in total.
-> As a guideline, we expect to accept a maximum of 2 projects
-> per organization, so that we don't end up with too many
-> accepted projects. However, if the free selection process
-> doesn't fill all the slots, the Google program administrators
-> may allocate additional slots to some organizations.
->=20
+> The reason is that I sometime see CPU lockups under load, or with a KVM g=
+uest,=20
+> and I haven't found why yet.
 
-This looks like it could be very good for us.
+I can't tell what's going on there, does it keep taking e80 interrupts
+and never clear the doorbell message? Linux wakeup replay code has
+always been solid.
 
-My only concern is that the scope and breadth of QEMU is huge and it may
-be a lot for a newcomer to tackle appropriately for top-level docs, so I
-feel like it requires a mentor who has a good understanding of the broad
-picture of QEMU.
-
-Like the description says, we often write things bottom-up in areas of
-very specific focus. The broad picture is sometimes harder to conjure
-accurately.
-
-I have a lot of opinions and thoughts on python and how docs should be
-laid out, but I'm afraid I'm not so good at understanding all of the
-options and "use cases" of QEMU to confidently lay out a top-level TOC.
-Maybe if we collaborated on a TOC we could give a clear project
-guideline to a GSoC/GSoD contributor.
-
-(Or maybe I'm overthinking it.)
-
---js
-
+Thanks,
+Nick
+=
 
