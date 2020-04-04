@@ -2,68 +2,82 @@ Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 744D6C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 08:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E38C2BA16
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 09:08:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 495AF2072B
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 08:44:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 495AF2072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C0C9206C3
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 09:08:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XO+eg7Wh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0C9206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKePx-0007eo-E2
-	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 04:44:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49739)
+	id 1jKemt-00086Q-L7
+	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 05:08:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jKePO-0007Ef-Ol
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:44:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jKemJ-0007hD-8A
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 05:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jKePN-0001Pm-5E
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:44:06 -0400
-Resent-Date: Sat, 04 Apr 2020 04:44:06 -0400
-Resent-Message-Id: <E1jKePN-0001Pm-5E@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21163)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jKePM-0001Ou-U2
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 04:44:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1585989831; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=VZuZ7WI8QlGNfyfuILNOKmeNMzcVTUfGS33Rxm0tLllf1LdI+xxGLfErN5Ju9F/XtLjxyguc8lEjjdnuBSfJDdM8yh4zi1vXj/gx4bJ81WULEsfV99RcWPVEbt7xIiITECO8z/AAGNBpDzBnJghaxn4KoZG3Mk12iDx0A5UG8rI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1585989831;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=J1Tz25PADWMfItqgvHpaogcXiPkCOpsMO2ZG36GO6tM=; 
- b=HVCMurHgfbS/83XdNNi8DS4mTMse+gu/jfXvLWU/vc0s8/l5kijKbvV2c8q8S7iKwP9IAVK1HvSTGf7u5GTIGwiRNSNrW7WGLzlJaoJNjUTojOZtIgjbca/oSDc935m1Fbp5esIwhHnvNYvNcmpnzbEEk6tGCsqqylNARSPDtUE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1585989825671408.52273328890954;
- Sat, 4 Apr 2020 01:43:45 -0700 (PDT)
-In-Reply-To: <20200404082900.33711-1-arilou@gmail.com>
-Subject: Re: [PATCH v2 0/7] hyperv: VMBus implementation
-Message-ID: <158598982454.1341.10449643863637275398@39012742ff91>
+ (envelope-from <peter.maydell@linaro.org>) id 1jKemH-00089U-SC
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 05:07:46 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40742)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jKemH-000895-Jp
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 05:07:45 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y71so8461868oia.7
+ for <qemu-devel@nongnu.org>; Sat, 04 Apr 2020 02:07:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=8g0lmOr9Oz5b+wZDZoTqLY0iLXCNRrLHsVWoWCaNYTI=;
+ b=XO+eg7Wh3AaZIQBqc21WSIxVuorW/HIr5SvmC5R4qrbUmZYe9d5ArqPsuz74bxV8Bq
+ crhmrWeQpp2tO4S3OcOVcyq4p/yjDWXXScJ8xRwnVuEptVBILq/seANllic31vypGJgf
+ 0zSk65ibn7S+5YJFvcmDpFljRlJfo3smk0EoUrRCw2QnNKOcBf+c7x09cFnq3JtUIh8a
+ sTUkC8UoJ52MkTAH9ALQWXiRiJ/2tYhY3/0hNDzA6kqbq1rnwFSpxkVvVHq525ljAhor
+ JL7r2gXbVavhvYSB3H6IC0yVpeXbfnX012HnONW49Jm2ovpRLLY3MYn0k0cPq65CjJN2
+ IGZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=8g0lmOr9Oz5b+wZDZoTqLY0iLXCNRrLHsVWoWCaNYTI=;
+ b=Vd5q/KR+/YvMbl0XoS5T+FMbB86B/FeVT+KxfXh3Gb4f9BHIy2sLwJ8J7MjVUTjxnN
+ /DG3XEdFrIUTUoSlxMTbjJVJTO/6r4vVNoROSTokkD62/f8rAL71lkqjk8fFESBOz0hs
+ Avc5r2V3vWHLirW0N0wYaTtsbZSZS0qX30VxGmBaRmVyfeqgHiNcuk0pBDVTHv2aCjeZ
+ ZgoNvIM5Vs1HLyFZdyUsaSirbGg0FePBsNzKqGY7Z4xY4DNBw4iH0bm+BsElv1VhAc7G
+ EuhAJ68/bGAGvQ71341keDw7eSUXbprUoGzXqsG4W91oNanFn2CeG3oPYIsi+9SfZU8F
+ TdkA==
+X-Gm-Message-State: AGi0PuZt+2l4h5cCINpQL/1UxT3JqWG20SwlQkNaurrNIk2btLRFOw7+
+ cxTgkOBcv8uiSLJBJz3tZsXxm67A5CpQWAxhhVjjjA==
+X-Google-Smtp-Source: APiQypJ+4J4Ya47dI+BPjwuVQgzW+6SzETlIRIW0PiSfeygmLuU+JCwsHfPPACUGsLn2NKs8wsSx6l0Fr9sOVEJraek=
+X-Received: by 2002:a05:6808:8cb:: with SMTP id
+ k11mr5710715oij.48.1585991264449; 
+ Sat, 04 Apr 2020 02:07:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: arilou@gmail.com
-Date: Sat, 4 Apr 2020 01:43:45 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+References: <20200324173630.12221-1-peter.maydell@linaro.org>
+ <63099477-98e6-8c16-1c8c-a9a617062143@redhat.com>
+In-Reply-To: <63099477-98e6-8c16-1c8c-a9a617062143@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 4 Apr 2020 10:07:33 +0100
+Message-ID: <CAFEAcA-9zHCHjyJ58sjzHkNVf=GQ7_HyLyQpiOLYbr55T-DZ1Q@mail.gmail.com>
+Subject: Re: [PATCH for-5.0] dump: Fix writing of ELF section
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,57 +89,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: mail@maciej.szmigiero.name, eyakovlev@virtuozzo.com, ehabkost@redhat.com,
- rvkagan@gmail.com, qemu-devel@nongnu.org, liran.alon@oracle.com,
- pbonzini@redhat.com, vkuznets@redhat.com, arilou@gmail.com
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQwNDA4MjkwMC4zMzcx
-MS0xLWFyaWxvdUBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2Fu
-IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBv
-dXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFi
-bHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5F
-VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4
-Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIEND
-ICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni8uLi94ZW5wdi94ZW5fbWFjaGluZV9wdi5vCiAg
-Q0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L2t2bS9jbG9jay5vCiAgQ0MgICAgICB4ODZf
-NjQtc29mdG1tdS9ody9pMzg2L2t2bS9hcGljLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2h5cGVy
-di92bWJ1cy5jOjE3NTg6NTc6IGVycm9yOiB1c2Ugb2YgbG9naWNhbCAnJiYnIHdpdGggY29uc3Rh
-bnQgb3BlcmFuZCBbLVdlcnJvciwtV2NvbnN0YW50LWxvZ2ljYWwtb3BlcmFuZF0KICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgbXNnLT52ZXJzaW9uX3JlcXVlc3RlZCAmJiAweGZmZmYs
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XiAgfn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9oeXBlcnYvdm1idXMuYzoxNzU4OjU3OiBu
-b3RlOiB1c2UgJyYnIGZvciBhIGJpdHdpc2Ugb3BlcmF0aW9uCi0tLQogICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfl5+fn5+fn5+fgoxIGVycm9y
-IGdlbmVyYXRlZC4KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYva3ZtL2lvYXBpYy5v
-Cm1ha2VbMV06ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogaHcvaHlwZXJ2
-L3ZtYnVzLm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
-cy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo1Mjc6IHg4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3Ig
-MgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2Nr
-ZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkp
-Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vz
-cy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAn
-cnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD0wOGE1MWY5YThmYTU0ZTRm
-OTk3ZTgwZTkzOTg2YzhlOCcsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2Nv
-bXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11
-JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0
-JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0v
-dmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2Vy
-LWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAtaGw4ZTNfcHUvc3JjL2RvY2tlci1zcmMuMjAyMC0wNC0wNC0wNC4zOS4zMS4xNzAzNDov
-dmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAn
-dGVzdC1kZWJ1ZyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1m
-aWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0wOGE1MWY5YThmYTU0ZTRmOTk3ZTgw
-ZTkzOTg2YzhlOAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVh
-dmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1obDhlM19wdS9zcmMn
-Cm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LWRlYnVnQGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAg
-ICA0bTEyLjk2MHMKdXNlciAgICAwbTguMTMxcwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA0MDQwODI5MDAuMzM3MTEtMS1hcmlsb3VA
-Z21haWwuY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Fri, 3 Apr 2020 at 21:55, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> On 3/24/20 6:36 PM, Peter Maydell wrote:
+> > In write_elf_section() we set the 'shdr' pointer to point to local
+> > structures shdr32 or shdr64, which we fill in to be written out to
+> > the ELF dump.  Unfortunately the address we pass to fd_write_vmcore()
+> > has a spurious '&' operator, so instead of writing out the section
+> > header we write out the literal pointer value followed by whatever is
+> > on the stack after the 'shdr' local variable.
+>
+> How did you notice this? While reviewing around?
+
+Coverity, but I forgot to quote the CID in the commit message.
+
+-- PMM
 
