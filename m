@@ -1,90 +1,62 @@
 Return-Path: <SRS0=dPN4=5U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 464B2C2BA17
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447D4C2BA16
 	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 10:43:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08158206C3
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 10:43:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HTuB8au7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08158206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E1E82072B
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Apr 2020 10:43:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E1E82072B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mrbrklyn.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jKgGe-00066p-4E
+	id 1jKgGe-000675-8c
 	for qemu-devel@archiver.kernel.org; Sat, 04 Apr 2020 06:43:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39980)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <natechancellor@gmail.com>) id 1jKd3L-0008Ma-GF
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 03:17:16 -0400
+ (envelope-from <ruben@mrbrklyn.com>) id 1jKdMT-000344-En
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 03:37:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <natechancellor@gmail.com>) id 1jKd3K-0001ug-7Q
- for qemu-devel@nongnu.org; Sat, 04 Apr 2020 03:17:15 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45190)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <natechancellor@gmail.com>)
- id 1jKd3H-0001rt-D1; Sat, 04 Apr 2020 03:17:11 -0400
-Received: by mail-ot1-x342.google.com with SMTP id c9so9778454otl.12;
- Sat, 04 Apr 2020 00:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=ocAQZbJHFdTGhkYtuoMJ19OnRrOVnmlc/UOXXoN4tBU=;
- b=HTuB8au7If018Dci+O5VzlEo6SY6vsuB8aVDK2ldLdyDfhDWZ/mG3LzcQrmfE8vuR/
- 7xPNMiELC5QYFBOfMkhWJ6pUvJiIy6ZNBb8n2eYqVjY2nIsImN8+JSOQWOEOus5k6auu
- EwhR3HjDf457g7JB8xWhO1XSIe647vWo7Jo8REAsbvrRu5CiznqCCvVMecoxmCp7080/
- rQfvZLHGCdxDF1o1s0lpU9h24pBtNrAHjBpvhLsATImhighpOq52C2VxafJMcZccA4Ey
- ZvygnpPGo1BDL3ocoVgsHd0oKIPb6DpxPLICkesg5z7s5UMPzysLYodttL8Z+ci66Nyd
- ANZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=ocAQZbJHFdTGhkYtuoMJ19OnRrOVnmlc/UOXXoN4tBU=;
- b=WZpw2eZp58lAZ9ZhbmmVOT1t/lUfnU+Z9d+eZyv9YT8IMYsAmR6rrgDpvUORtVaa2l
- iff49INfqRK1MjnO/Y9SVMxEvLDuyOmQho2F37zFg371MrxwwPvCFOg2rPChJlYpmJNf
- k+GR2L9EkgYtGMaDSEC8IssmS6q6OUNsKqVLF/Miu3BqClbVkMrbFFZfAe0fmBIf/YOx
- HdFKaZWNTHiejgnKEQ/FDllDJIjuVlvDq/XyV4lSjNgqPa+8uLGkvtAPOIjSXdRPKV8O
- 2xj3Qr7UDtQg9XuMz/FXkUUijWiweWWeOnDHgd5ao6L/baDQZSDIHun7nNENnKSKXkq6
- /SyA==
-X-Gm-Message-State: AGi0PubRlZxwIID017QA9pLXWWgBJVl73PXqAE58aZZ4Ic0qbFHMH5FC
- l2IvPvYwD6BxNc5MDYlWSmg=
-X-Google-Smtp-Source: APiQypIsymx+7axl0/snwvyifsrA9bHiRy/1v3qk1IyysmnIP5osGcqqbXPtnbwQ77oqLwlOzzXfOg==
-X-Received: by 2002:a05:6830:2428:: with SMTP id
- k8mr9833678ots.345.1585984629914; 
- Sat, 04 Apr 2020 00:17:09 -0700 (PDT)
-Received: from ubuntu-m2-xlarge-x86 ([2604:1380:4111:8b00::1])
- by smtp.gmail.com with ESMTPSA id g72sm2729480otg.79.2020.04.04.00.17.08
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 04 Apr 2020 00:17:09 -0700 (PDT)
-Date: Sat, 4 Apr 2020 00:17:07 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v2] ppc/pnv: Create BMC devices at machine init
-Message-ID: <20200404071707.GA24708@ubuntu-m2-xlarge-x86>
-References: <20191121162340.11049-1-clg@kaod.org>
+ (envelope-from <ruben@mrbrklyn.com>) id 1jKdMR-0004WW-Mm
+ for qemu-devel@nongnu.org; Sat, 04 Apr 2020 03:37:01 -0400
+Received: from www2.mrbrklyn.com ([96.57.23.82]:42699 helo=mrbrklyn.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ruben@mrbrklyn.com>)
+ id 1jKdMR-0004UN-HL; Sat, 04 Apr 2020 03:36:59 -0400
+Received: from stat37.mrbrklyn.com (www.mrbrklyn.com [96.57.23.83])
+ by mrbrklyn.com (Postfix) with ESMTP id 46ED6163FA2;
+ Sat,  4 Apr 2020 03:36:58 -0400 (EDT)
+Date: Sat, 04 Apr 2020 00:37:53 -0400
+User-Agent: K-9 Mail for Android
+In-Reply-To: <de4b6733-859b-eebe-32ab-c0eb0fcb6311@redhat.com>
+References: <de92e66d-c474-dd1b-ddab-194b2f92d1dd@redhat.com>
+ <de4b6733-859b-eebe-32ab-c0eb0fcb6311@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191121162340.11049-1-clg@kaod.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: multipart/alternative;
+ boundary="----PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6"
+Content-Transfer-Encoding: 7bit
+Subject: Re: QEMU participation to Google Season of Docs
+To: qemu-discuss@nongnu.org, John Snow <jsnow@redhat.com>,
+ =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?ISO-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Stefan Weil <sw@weilnetz.de>
+From: Ruben <ruben@mrbrklyn.com>
+Message-ID: <834E48D0-E9DE-41DC-8E40-3657FB69698C@mrbrklyn.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 96.57.23.82
 X-Mailman-Approved-At: Sat, 04 Apr 2020 06:42:18 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,71 +69,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, Oliver O'Halloran <oohall@gmail.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Cédric,
+------PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 21, 2019 at 05:23:40PM +0100, Cédric Le Goater wrote:
-> The BMC of the OpenPOWER systems monitors the machine state using
-> sensors, controls the power and controls the access to the PNOR flash
-> device containing the firmware image required to boot the host.
-> 
-> QEMU models the power cycle process, access to the sensors and access
-> to the PNOR device. But, for these features to be available, the QEMU
-> PowerNV machine needs two extras devices on the command line, an IPMI
-> BT device for communication and a BMC backend device:
-> 
->   -device ipmi-bmc-sim,id=bmc0 -device isa-ipmi-bt,bmc=bmc0,irq=10
-> 
-> The BMC properties are then defined accordingly in the device tree and
-> OPAL self adapts. If a BMC device and an IPMI BT device are not
-> available, OPAL does not try to communicate with the BMC in any
-> manner. This is not how real systems behave.
-> 
-> To be closer to the default behavior, create an IPMI BMC simulator
-> device and an IPMI BT device at machine initialization time. We loose
-> the ability to define an external BMC device but there are benefits:
-> 
->   - a better match with real systems,
->   - a better test coverage of the OPAL code,
->   - system powerdown and reset commands that work,
->   - a QEMU device tree compliant with the specifications (*).
-> 
-> (*) Still needs a MBOX device.
-> 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Its ingoogle=2E=2E=2E We don't do google=2E
 
-I just started testing QEMU v5.0.0-rc1 against the little Linux booting
-framework that I helped set up for ClangBuiltLinux and this commit has
-caused some problems because we specify the exact same devices as you
-note in the commit message:
 
-https://github.com/ClangBuiltLinux/boot-utils/blob/5d9d3f626940a6a176c080717a367c1599f63680/boot-qemu.sh#L154-L155
 
-$ timeout 3m unbuffer qemu-system-ppc64 -device ipmi-bmc-sim,id=bmc0 \
-                                        -device isa-ipmi-bt,bmc=bmc0,irq=10 \
-                                        -L images/ppc64le/ \
-                                        -bios skiboot.lid \
-                                        -machine powernv \
-                                        -display none \
-                                        -initrd images/ppc64le/rootfs.cpio \
-                                        -kernel zImage.epapr \
-                                        -m 2G \
-                                        -serial mon:stdio
-qemu-system-ppc64: error creating device tree: node: FDT_ERR_EXISTS
+On April 3, 2020 9:37:09 PM EDT, John Snow <jsnow@redhat=2Ecom> wrote:
+>
+>
+>On 4/1/20 12:37 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Hi,
+>>=20
+>> Google recently announced their 'Season of Docs' project:
+>> https://developers=2Egoogle=2Ecom/season-of-docs
+>>=20
+>> QEMU project seems to fit all the requirements=2E
+>>=20
+>> Who is interested in [co-]mentoring?
+>>=20
+>> Relevant links:
+>> https://developers=2Egoogle=2Ecom/season-of-docs/docs/admin-guide
+>> https://developers=2Egoogle=2Ecom/season-of-docs/docs/timeline
+>>=20
+>> [Following is extracted from the previous links:]
+>>=20
+>> Example projects:
+>>=20
+>> * Build a documentation site on a platform to be decided
+>> =C2=A0 by the technical writer and open source mentor, and publish
+>> =C2=A0 an initial set of basic documents on the site=2E Examples of
+>> =C2=A0 platforms include:
+>>=20
+>> =C2=A0 - A static site generator such as Hugo, Jekyll, Sphinx, =2E=2E=
+=2E
+>>=20
+>> * Refactor the open source project's existing documentation to
+>> =C2=A0 provide an improved user experience or a more accessible
+>> =C2=A0 information architecture=2E
+>>=20
+>> * Write a conceptual overview of, or introduction to, a product
+>> =C2=A0 or feature=2E Often a team creates their technical documentation
+>> =C2=A0 from the bottom up, with the result that there's a lot of
+>> =C2=A0 detail but it's hard to understand the product as a whole=2E A
+>> =C2=A0 technical writer can fix this=2E
+>>=20
+>> * Create a tutorial for a high-profile use case=2E
+>>=20
+>> * Create a set of focused how-to guides for specific tasks=2E
+>>=20
+>> * Create a contributor=E2=80=99s guide that includes basic information
+>> =C2=A0 about getting started as a contributor to the open source
+>> =C2=A0 project, as well as any rules around licence agreements,
+>> =C2=A0 processes for pull requests and reviews, building the project,
+>> =C2=A0 and so on=2E
+>>=20
+>> Previous experience with similar programs, such as Google Summer
+>> of Code or others: If you or any of your mentors have taken part
+>> in Google Summer of Code or a similar program, mention this in
+>> your application=2E Describe your achievements in that program=2E
+>> Explain how this experience may influence the way you work in
+>> Season of Docs=2E
+>>=20
+>> The 2020 season of Season of Docs is limited to a maximum of
+>> 50 technical writing projects in total=2E
+>> As a guideline, we expect to accept a maximum of 2 projects
+>> per organization, so that we don't end up with too many
+>> accepted projects=2E However, if the free selection process
+>> doesn't fill all the slots, the Google program administrators
+>> may allocate additional slots to some organizations=2E
+>>=20
+>
+>This looks like it could be very good for us=2E
+>
+>My only concern is that the scope and breadth of QEMU is huge and it
+>may
+>be a lot for a newcomer to tackle appropriately for top-level docs, so
+>I
+>feel like it requires a mentor who has a good understanding of the
+>broad
+>picture of QEMU=2E
+>
+>Like the description says, we often write things bottom-up in areas of
+>very specific focus=2E The broad picture is sometimes harder to conjure
+>accurately=2E
+>
+>I have a lot of opinions and thoughts on python and how docs should be
+>laid out, but I'm afraid I'm not so good at understanding all of the
+>options and "use cases" of QEMU to confidently lay out a top-level TOC=2E
+>Maybe if we collaborated on a TOC we could give a clear project
+>guideline to a GSoC/GSoD contributor=2E
+>
+>(Or maybe I'm overthinking it=2E)
+>
+>--js
 
-It seems to me like if the machine is silently creating these devices,
-it should just warn that the user is trying to create a device that
-already exists? If not, then I assume I will just need to hack up a
-check for QEMU 5.0.0+ and just not add those devices? We use that script
-with QEMU 3.1.0 in our CI and I use it locally with QEMU 4.2.0 so
-universally getting rid of them doesn't seem logical.
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+------PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6
+Content-Type: text/html;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Curious for your thoughts on what to do and cheers,
-Nathan
+<html><head></head><body>Its ingoogle=2E=2E=2E We don't do google=2E<br><br=
+><br><br><div class=3D"gmail_quote">On April 3, 2020 9:37:09 PM EDT, John S=
+now &lt;jsnow@redhat=2Ecom&gt; wrote:<blockquote class=3D"gmail_quote" styl=
+e=3D"margin: 0pt 0pt 0pt 0=2E8ex; border-left: 1px solid rgb(204, 204, 204)=
+; padding-left: 1ex;">
+<pre class=3D"k9mail"><br><br>On 4/1/20 12:37 PM, Philippe Mathieu-Daud=C3=
+=A9 wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin: 0pt 0pt 1e=
+x 0=2E8ex; border-left: 1px solid #729fcf; padding-left: 1ex;">Hi,<br><br>G=
+oogle recently announced their 'Season of Docs' project:<br><a href=3D"http=
+s://developers=2Egoogle=2Ecom/season-of-docs">https://developers=2Egoogle=
+=2Ecom/season-of-docs</a><br><br>QEMU project seems to fit all the requirem=
+ents=2E<br><br>Who is interested in [co-]mentoring?<br><br>Relevant links:<=
+br><a href=3D"https://developers=2Egoogle=2Ecom/season-of-docs/docs/admin-g=
+uide">https://developers=2Egoogle=2Ecom/season-of-docs/docs/admin-guide</a>=
+<br><a href=3D"https://developers=2Egoogle=2Ecom/season-of-docs/docs/timeli=
+ne">https://developers=2Egoogle=2Ecom/season-of-docs/docs/timeline</a><br><=
+br>[Following is extracted from the previous links:]<br><br>Example project=
+s:<br><br>* Build a documentation site on a platform to be decided<br>&nbsp=
+; by the technical writer and open source mentor, and publish<br>&nbsp; an =
+initial set of basic documents on the site=2E Examples of<br>&nbsp; platfor=
+ms include:<br><br>&nbsp; - A static site generator such as Hugo, Jekyll, S=
+phinx, =2E=2E=2E<br><br>* Refactor the open source project's existing docum=
+entation to<br>&nbsp; provide an improved user experience or a more accessi=
+ble<br>&nbsp; information architecture=2E<br><br>* Write a conceptual overv=
+iew of, or introduction to, a product<br>&nbsp; or feature=2E Often a team =
+creates their technical documentation<br>&nbsp; from the bottom up, with th=
+e result that there's a lot of<br>&nbsp; detail but it's hard to understand=
+ the product as a whole=2E A<br>&nbsp; technical writer can fix this=2E<br>=
+<br>* Create a tutorial for a high-profile use case=2E<br><br>* Create a se=
+t of focused how-to guides for specific tasks=2E<br><br>* Create a contribu=
+tor=E2=80=99s guide that includes basic information<br>&nbsp; about getting=
+ started as a contributor to the open source<br>&nbsp; project, as well as =
+any rules around licence agreements,<br>&nbsp; processes for pull requests =
+and reviews, building the project,<br>&nbsp; and so on=2E<br><br>Previous e=
+xperience with similar programs, such as Google Summer<br>of Code or others=
+: If you or any of your mentors have taken part<br>in Google Summer of Code=
+ or a similar program, mention this in<br>your application=2E Describe your=
+ achievements in that program=2E<br>Explain how this experience may influen=
+ce the way you work in<br>Season of Docs=2E<br><br>The 2020 season of Seaso=
+n of Docs is limited to a maximum of<br>50 technical writing projects in to=
+tal=2E<br>As a guideline, we expect to accept a maximum of 2 projects<br>pe=
+r organization, so that we don't end up with too many<br>accepted projects=
+=2E However, if the free selection process<br>doesn't fill all the slots, t=
+he Google program administrators<br>may allocate additional slots to some o=
+rganizations=2E<br><br></blockquote><br>This looks like it could be very go=
+od for us=2E<br><br>My only concern is that the scope and breadth of QEMU i=
+s huge and it may<br>be a lot for a newcomer to tackle appropriately for to=
+p-level docs, so I<br>feel like it requires a mentor who has a good underst=
+anding of the broad<br>picture of QEMU=2E<br><br>Like the description says,=
+ we often write things bottom-up in areas of<br>very specific focus=2E The =
+broad picture is sometimes harder to conjure<br>accurately=2E<br><br>I have=
+ a lot of opinions and thoughts on python and how docs should be<br>laid ou=
+t, but I'm afraid I'm not so good at understanding all of the<br>options an=
+d "use cases" of QEMU to confidently lay out a top-level TOC=2E<br>Maybe if=
+ we collaborated on a TOC we could give a clear project<br>guideline to a G=
+SoC/GSoD contributor=2E<br><br>(Or maybe I'm overthinking it=2E)<br><br>--j=
+s<br><br></pre></blockquote></div><br>-- <br>Sent from my Android device wi=
+th K-9 Mail=2E Please excuse my brevity=2E</body></html>
+------PAWDPBAK5OCFZ4YLF5Z1RM678HM6N6--
 
