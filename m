@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 963C9C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFF0C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:15:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E0CA2051A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 114C92054F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:15:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n8489t6r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E0CA2051A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rGq0gr2T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 114C92054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOm9-000286-H3
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:14:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50131)
+	id 1jLOmq-0003D1-5g
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:15:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50100)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jLOjp-0006kX-Va
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOjn-0006ij-CL
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jLOjp-0002rh-2v
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:17 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:55398)
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOjm-0002ki-Ag
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:15 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40186)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jLOjo-0002q5-Sr
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:17 -0400
-Received: by mail-wm1-x336.google.com with SMTP id r16so14045012wmg.5
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 03:12:16 -0700 (PDT)
+ id 1jLOjm-0002k7-4U
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:14 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s8so14576850wrt.7
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 03:12:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=WGk0JhktO1LmmcqBkiisXztczdE5FcLoayAA+KbaRqU=;
- b=n8489t6rTifoqv28F8kszo5RbV9peFZKJIrT25zK1vQqjDEtBLdVtxKYejSPD9wLBh
- xj406121Sc7/0tld8CNUAK0ikZDa8ppHGyCKxANbbF/vB+xwXqLL1DOuHW/EunWF+Qyv
- rufRmkqkNZAOwY7y9T+j0f5jnZazptvd2rmhm4MC4sRqfQrwmgYCZpASUU6dfgjmCTNR
- NNKVrcIcPBt+8RXyz5O48upjTBp5OUjY//HxXmJNaGayDWFilvgZjY77L/3mn0XvfKaN
- yombsRFyj8Mv+UbDGmv26gGX/tqS4qPopO2xndyiC7DodC02V+SQZOPU+bKBsFAU8ooW
- B8cA==
+ bh=UsmjsPrqu/tMkzebNtgKAC7Wj/hA5gO7KEKMoSm+cTo=;
+ b=rGq0gr2T54Kd376rXedZbjxb4QI/1ZqMBU9/jImwIc8eLcou3oMlki44pt7j9KBkHH
+ IH9F4dz/NDTuD2fWmLGxWGHWJ2ECIRaDacG8JF1UvGaOWxf8xSYSbKbozC8eeHEFRMH2
+ ohKg0ryuhQDROZzSEQzl8gr/rzI1dNsUr0Fe7ZwdA2TukrPdGJokgNfuvu8VKxyU27jL
+ MU8U9qQeu5L+8Pn6DmrhVnmcYUAF1DSlcy93Ym2nTl/TxIyJhZNJ6lseR0uUgOj3cw3A
+ O5X2ZEY42dcaUmFXeiompj2SgHBBIYhxp8nilwF4JTjglaKcaxWTnkIOjPm4nY4BzWdV
+ nqAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WGk0JhktO1LmmcqBkiisXztczdE5FcLoayAA+KbaRqU=;
- b=MDCuPGGdBppVRhobn1jVB8I4KO54EOebpZqmqXUWurnfNnnRGvPvRQmYSukp5qN56x
- 1QfZlcRacuLNxdySeK0JWtPIExbilxLF8zgYvXnw4IWEBoGMwS93UM3SUIpBSxPHK+Yd
- bDU/eafcbJbQygDKATBRDIFpLW+r9b/ThnLuDumEhiI/sFLk5uOHGQuMv39pphu9XzWI
- eZRxyUDMWWrqVyA6vTVPBTyjlHPGc31J+QHBZ55etYFuAmp+KUThpUK+yFgvAOi1fvsd
- 4aIf9NHldGGL/ApB4tkK5AOM0DaWD8W4JUclhSPU92VpBcpTks9JABbsNCP166xWLUXs
- Lx2Q==
-X-Gm-Message-State: AGi0PuZ0KyZHM1CQ/6hrF4p++cQvl0h8EkUjzlDCJdkz37UWW9mMLrtl
- craXUAplNaz8pvIprK5s5wQ4fLUvuPifkg==
-X-Google-Smtp-Source: APiQypJtKD7/UgTCW48KV5cm05PB3xgGmMb5c91KpttFcWGtDPkONKf/92wkOKL8EsJb12KyWCTiLA==
-X-Received: by 2002:a1c:6605:: with SMTP id a5mr21961062wmc.32.1586167935642; 
- Mon, 06 Apr 2020 03:12:15 -0700 (PDT)
+ bh=UsmjsPrqu/tMkzebNtgKAC7Wj/hA5gO7KEKMoSm+cTo=;
+ b=tKKDEYBIeOGce1On0xeJ5EE1jHF7MMB1lcjM+ZMuHNQhnLv/cIsK8RLcWJoETDqWCC
+ YAMXIZNBEbdEaXvsjV1LxWsaMeBQ9lDYwu9Y6zT+FnMpTj2scbvmhMhtZELLnWu4D6j+
+ CFx57lBix8M01Kuz4gA37VyRl4z1qT/b7BOheujKqPmd7lRgm5FYQTfTHou4YbJ57KYN
+ 5awWWiwClmI9RuHg8EuTSUg1ANJ5efC8ymol+nFQ6/R53XviOeo01TarLp7q04piKFxf
+ 8edwHIv1vN8TlcTW9t1vLUl6PROItRPrcJWc0n8MN1ItfgAbB+dw2bZ0KLRRpOmCuymz
+ zXQA==
+X-Gm-Message-State: AGi0Pua1CKYw47qbs95jCn3T/sT3pFi1CvHDoLARB010Jxyu2LmkO3uv
+ E1cHXWqWb+hzeWoIHNm5ZBfqxdaLH1G7DA==
+X-Google-Smtp-Source: APiQypLHouNldcqU2CpoCyddMDnkJu1KFJ1nkmE2fUR3Q3EDvlifux4KFuBxlvKEW1ec4UquHI7TNQ==
+X-Received: by 2002:a05:6000:2:: with SMTP id h2mr1460205wrx.112.1586167932813; 
+ Mon, 06 Apr 2020 03:12:12 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f187sm25163765wme.9.2020.04.06.03.12.14
+ by smtp.gmail.com with ESMTPSA id f187sm25163765wme.9.2020.04.06.03.12.11
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 03:12:15 -0700 (PDT)
+ Mon, 06 Apr 2020 03:12:12 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/11] dma/xlnx-zdma: Populate DBG0.CMN_BUF_FREE
-Date: Mon,  6 Apr 2020 11:12:02 +0100
-Message-Id: <20200406101205.23027-9-peter.maydell@linaro.org>
+Subject: [PULL 05/11] hw/gpio/aspeed_gpio.c: Don't directly include assert.h
+Date: Mon,  6 Apr 2020 11:11:59 +0100
+Message-Id: <20200406101205.23027-6-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200406101205.23027-1-peter.maydell@linaro.org>
 References: <20200406101205.23027-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,36 +98,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Remove a direct include of assert.h -- this is already
+provided by qemu/osdep.h, and it breaks our rule that the
+first include must always be osdep.h.
 
-Populate DBG0.CMN_BUF_FREE so that SW can see some free space.
+In particular we must get the assert() macro via osdep.h
+to avoid compile failures on mingw (see the comment in
+osdep.h where we redefine assert() for that platform).
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Message-id: 20200402134721.27863-3-edgar.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20200403124712.24826-1-peter.maydell@linaro.org
 ---
- hw/dma/xlnx-zdma.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/gpio/aspeed_gpio.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-index a6c5b2304a8..6a4699757af 100644
---- a/hw/dma/xlnx-zdma.c
-+++ b/hw/dma/xlnx-zdma.c
-@@ -680,6 +680,12 @@ static RegisterAccessInfo zdma_regs_info[] = {
-     },{ .name = "ZDMA_CH_DBG0",  .addr = A_ZDMA_CH_DBG0,
-         .rsvd = 0xfffffe00,
-         .ro = 0x1ff,
-+
-+        /*
-+         * There's SW out there that will check the debug regs for free space.
-+         * Claim that we always have 0x100 free.
-+         */
-+        .reset = 0x100
-     },{ .name = "ZDMA_CH_DBG1",  .addr = A_ZDMA_CH_DBG1,
-         .rsvd = 0xfffffe00,
-         .ro = 0x1ff,
+diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
+index 41e11ea9b04..e52fcfd9a03 100644
+--- a/hw/gpio/aspeed_gpio.c
++++ b/hw/gpio/aspeed_gpio.c
+@@ -6,8 +6,6 @@
+  * SPDX-License-Identifier: GPL-2.0-or-later
+  */
+ 
+-#include <assert.h>
+-
+ #include "qemu/osdep.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/log.h"
 -- 
 2.20.1
 
