@@ -2,66 +2,78 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C7FC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05264C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD0102072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:28:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD0102072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id BC2DA206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:30:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2Jl3IUP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC2DA206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOzR-0004s6-Vi
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:28:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51560)
+	id 1jLP15-0006Xu-TE
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:30:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51669)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1jLOtS-0007gp-SS
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:22:16 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jLOu1-0008JI-6c
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1jLOtI-0000Lm-42
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:22:13 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2517 helo=huawei.com)
+ (envelope-from <imammedo@redhat.com>) id 1jLOu0-0000tP-5F
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:22:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35864
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1jLOtH-0000I1-Ln
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:22:04 -0400
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
- by Forcepoint Email with ESMTP id 7BF00715EB37C17E0AC9;
- Mon,  6 Apr 2020 18:21:52 +0800 (CST)
-Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.178]) by
- DGGEMM404-HUB.china.huawei.com ([10.3.20.212]) with mapi id 14.03.0487.000;
- Mon, 6 Apr 2020 18:21:42 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: [PATCH  v3 06/12] gdbstub: fix compiler complaining
-Thread-Topic: [PATCH  v3 06/12] gdbstub: fix compiler complaining
-Thread-Index: AQHWCevDTrLZ5qVCuEuUMRmztNFdkahr5I2Q
-Date: Mon, 6 Apr 2020 10:21:42 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83B6E40C6@dggemm531-mbx.china.huawei.com>
-References: <20200403191150.863-1-alex.bennee@linaro.org>
- <20200403191150.863-7-alex.bennee@linaro.org>
-In-Reply-To: <20200403191150.863-7-alex.bennee@linaro.org>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.205.93]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jLOu0-0000tB-0b
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:22:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586168567;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1Ev05IAUZmw/tNQvGgvEzD0sONNSxLf7AjQW1zqs9oY=;
+ b=Q2Jl3IUP6+FEgCCZoeNncqOUb3/ILDc6H6Y0Qm4BsyELSsnU66UAvZlvlgWOb1bGNNtk3U
+ Dp8Lw5kAIWZUqhMetvCrwnb1LxappwlYR06soAPmXK6SfSIGahdjDdqXOmEUvUJjNi28Ty
+ H9GfZCESm1dohkUnJNUp+CmgjbOquNw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-9E5af-AvOjSYomBq8FLGDA-1; Mon, 06 Apr 2020 06:22:46 -0400
+X-MC-Unique: 9E5af-AvOjSYomBq8FLGDA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E079E107ACCA;
+ Mon,  6 Apr 2020 10:22:44 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58F2C100EBA4;
+ Mon,  6 Apr 2020 10:22:33 +0000 (UTC)
+Date: Mon, 6 Apr 2020 12:22:31 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v2 06/12] acpi: add ISADeviceClass->build_aml()
+Message-ID: <20200406122231.2bb67a7a@redhat.com>
+In-Reply-To: <20200403080502.8154-7-kraxel@redhat.com>
+References: <20200403080502.8154-1-kraxel@redhat.com>
+ <20200403080502.8154-7-kraxel@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.188
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,55 +85,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Euler Robot <euler.robot@huawei.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogQWxleCBCZW5uw6llIFttYWlsdG86
-YWxleC5iZW5uZWVAbGluYXJvLm9yZ10NCj5TZW50OiBTYXR1cmRheSwgQXByaWwgNCwgMjAyMCAz
-OjEyIEFNDQo+VG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPkNjOiBEZW5pcyBQbG90bmlrb3Yg
-PGRwbG90bmlrb3ZAdmlydHVvenpvLmNvbT47IEV1bGVyIFJvYm90DQo+PGV1bGVyLnJvYm90QGh1
-YXdlaS5jb20+OyBDaGVucXVuIChrdWhuKSA8a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+Ow0KPlJp
-Y2hhcmQgSGVuZGVyc29uIDxyaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnPjsgQWxleCBCZW5u
-w6llDQo+PGFsZXguYmVubmVlQGxpbmFyby5vcmc+OyBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8
-cGhpbG1kQHJlZGhhdC5jb20+DQo+U3ViamVjdDogW1BBVENIIHYzIDA2LzEyXSBnZGJzdHViOiBm
-aXggY29tcGlsZXIgY29tcGxhaW5pbmcNCj4NCj5Gcm9tOiBEZW5pcyBQbG90bmlrb3YgPGRwbG90
-bmlrb3ZAdmlydHVvenpvLmNvbT4NCj4NCj4gICAgLi9nZGJzdHViLmM6IEluIGZ1bmN0aW9uIOKA
-mGhhbmRsZV9xdWVyeV90aHJlYWRfZXh0cmHigJk6DQo+ICAgICAgICAvdXNyL2luY2x1ZGUvZ2xp
-Yi0yLjAvZ2xpYi9nbGliLWF1dG9jbGVhbnVwcy5oOjI4OjEwOg0KPiAgICBlcnJvcjog4oCYY3B1
-X25hbWXigJkgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uDQo+ICAg
-IFstV2Vycm9yPW1heWJlLXVuaW5pdGlhbGl6ZWRdDQo+ICAgICAgICBnX2ZyZWUgKCpwcCk7DQo+
-ICAgICAgICAgICAgICAgXg0KPiAgICAuL2dkYnN0dWIuYzoyMDYzOjI2OiBub3RlOiDigJhjcHVf
-bmFtZeKAmSB3YXMgZGVjbGFyZWQgaGVyZQ0KPiAgICAgICAgZ19hdXRvZnJlZSBjaGFyICpjcHVf
-bmFtZTsNCj4gICAgICAgICAgICAgICAgICAgICAgICAgXg0KPiAgICBjYzE6IGFsbCB3YXJuaW5n
-cyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycw0KPg0KPlNpZ25lZC1vZmYtYnk6IERlbmlzIFBsb3Ru
-aWtvdiA8ZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tPg0KPk1lc3NhZ2UtSWQ6IDwyMDIwMDMyNjE1
-MTQwNy4yNTA0Ni0xLWRwbG90bmlrb3ZAdmlydHVvenpvLmNvbT4NCj5SZXBvcnRlZC1ieTogRXVs
-ZXIgUm9ib3QgPGV1bGVyLnJvYm90QGh1YXdlaS5jb20+DQo+UmVwb3J0ZWQtYnk6IENoZW4gUXVu
-IDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj5SZXZpZXdlZC1ieTogUmljaGFyZCBIZW5kZXJz
-b24gPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+DQo+U2lnbmVkLW9mZi1ieTogQWxleCBC
-ZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPg0KPlJldmlld2VkLWJ5OiBQaGlsaXBwZSBN
-YXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5jb20+DQo+LS0tDQpBZGQgTWlyb3NsYXYgUmV6
-YW5pbmEncyAgIlJldmlld2VkLWJ5IiB0YWcuDQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2
-ZS9odG1sL3FlbXUtZGV2ZWwvMjAyMC0wMy9tc2cwNzY1MS5odG1sDQoNClJldmlld2VkLWJ5OiBN
-aXJvc2xhdiBSZXphbmluYSA8bXJlemFuaW5AcmVkaGF0LmNvbT4NCg0KVGhhbmtzLg0KPiBnZGJz
-dHViLmMgfCA0ICsrLS0NCj4gMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxl
-dGlvbnMoLSkNCj4NCj5kaWZmIC0tZ2l0IGEvZ2Ric3R1Yi5jIGIvZ2Ric3R1Yi5jDQo+aW5kZXgg
-MDEzZmIxYWMwZjEuLjE3MWUxNTA5NTA5IDEwMDY0NA0KPi0tLSBhL2dkYnN0dWIuYw0KPisrKyBi
-L2dkYnN0dWIuYw0KPkBAIC0yMDYwLDggKzIwNjAsOCBAQCBzdGF0aWMgdm9pZA0KPmhhbmRsZV9x
-dWVyeV90aHJlYWRfZXh0cmEoR2RiQ21kQ29udGV4dCAqZ2RiX2N0eCwgdm9pZCAqdXNlcl9jdHgp
-DQo+ICAgICAgICAgLyogUHJpbnQgdGhlIENQVSBtb2RlbCBhbmQgbmFtZSBpbiBtdWx0aXByb2Nl
-c3MgbW9kZSAqLw0KPiAgICAgICAgIE9iamVjdENsYXNzICpvYyA9IG9iamVjdF9nZXRfY2xhc3Mo
-T0JKRUNUKGNwdSkpOw0KPiAgICAgICAgIGNvbnN0IGNoYXIgKmNwdV9tb2RlbCA9IG9iamVjdF9j
-bGFzc19nZXRfbmFtZShvYyk7DQo+LSAgICAgICAgZ19hdXRvZnJlZSBjaGFyICpjcHVfbmFtZTsN
-Cj4tICAgICAgICBjcHVfbmFtZSAgPSBvYmplY3RfZ2V0X2Nhbm9uaWNhbF9wYXRoX2NvbXBvbmVu
-dChPQkpFQ1QoY3B1KSk7DQo+KyAgICAgICAgZ19hdXRvZnJlZSBjaGFyICpjcHVfbmFtZSA9DQo+
-KyAgICAgICAgICAgIG9iamVjdF9nZXRfY2Fub25pY2FsX3BhdGhfY29tcG9uZW50KE9CSkVDVChj
-cHUpKTsNCj4gICAgICAgICBnX3N0cmluZ19wcmludGYocnMsICIlcyAlcyBbJXNdIiwgY3B1X21v
-ZGVsLCBjcHVfbmFtZSwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgY3B1LT5oYWx0ZWQgPyAi
-aGFsdGVkICIgOiAicnVubmluZyIpOw0KPiAgICAgfSBlbHNlIHsNCj4tLQ0KPjIuMjAuMQ0KDQo=
+On Fri,  3 Apr 2020 10:04:56 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+> Also add isa_aml_build() function which walks all isa devices.
+> This allows to move aml builder code to isa devices.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/hw/isa/isa.h |  2 ++
+>  hw/i386/acpi-build.c |  1 +
+>  hw/isa/isa-bus.c     | 15 +++++++++++++++
+>  3 files changed, 18 insertions(+)
+> 
+> diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+> index e9ac1f1205a4..1534f8826453 100644
+> --- a/include/hw/isa/isa.h
+> +++ b/include/hw/isa/isa.h
+> @@ -70,6 +70,7 @@ typedef struct IsaDmaClass {
+>  
+>  typedef struct ISADeviceClass {
+>      DeviceClass parent_class;
+> +    void (*build_aml)(ISADevice *dev, Aml *scope);
+>  } ISADeviceClass;
+>  
+>  struct ISABus {
+> @@ -108,6 +109,7 @@ ISADevice *isa_try_create(ISABus *bus, const char *name);
+>  ISADevice *isa_create_simple(ISABus *bus, const char *name);
+>  
+>  ISADevice *isa_vga_init(ISABus *bus);
+> +void isa_build_aml(ISABus *bus, Aml *scope);
+>  
+>  /**
+>   * isa_register_ioport: Install an I/O port region on the ISA bus.
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 5d2b9b099684..77fc9df74735 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1259,6 +1259,7 @@ static void build_isa_devices_aml(Aml *table)
+>          error_report("No ISA bus, unable to define IPMI ACPI data");
+>      } else {
+>          build_acpi_ipmi_devices(scope, BUS(obj), "\\_SB.PCI0.ISA");
+> +        isa_build_aml(ISA_BUS(obj), scope);
+
+is it possible to have more than 1 ISA bus on pc/q35 machine?
+
+I'm asking because there is following clause
+  if (ambiguous) {
+just above this context while devices you are moving here all defined
+unconditionally before that
+
+>      }
+>  
+>      aml_append(table, scope);
+> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+> index 798dd9194e8f..1f2189f4d5db 100644
+> --- a/hw/isa/isa-bus.c
+> +++ b/hw/isa/isa-bus.c
+> @@ -207,6 +207,21 @@ ISADevice *isa_vga_init(ISABus *bus)
+>      }
+>  }
+>  
+> +void isa_build_aml(ISABus *bus, Aml *scope)
+> +{
+> +    BusChild *kid;
+> +    ISADevice *dev;
+> +    ISADeviceClass *dc;
+> +
+> +    QTAILQ_FOREACH(kid, &bus->parent_obj.children, sibling) {
+> +        dev = ISA_DEVICE(kid->child);
+> +        dc = ISA_DEVICE_GET_CLASS(dev);
+> +        if (dc->build_aml) {
+> +            dc->build_aml(dev, scope);
+> +        }
+> +    }
+> +}
+> +
+>  static void isabus_dev_print(Monitor *mon, DeviceState *dev, int indent)
+>  {
+>      ISADevice *d = ISA_DEVICE(dev);
+
 
