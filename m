@@ -2,84 +2,90 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C051FC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DDFC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88CE520644
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:24:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E35C2075E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:29:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ry/Zvir+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CE520644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EmgHkCpS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E35C2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56699 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLNzn-00088A-PG
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:24:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41281)
+	id 1jLO4i-0001wI-Cu
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:29:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jLNsE-0004hl-02
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:16:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jLNl7-0002SB-DF
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:09:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jLNsB-0006Xv-5a
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:16:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27634
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jLNsB-0006X7-16
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:16:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586164608;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Gq7YWLjq5eX5E8Nx5BIaB0j4PUge91Tq/2My6a2X1go=;
- b=Ry/Zvir+eU+4/4LPgTocEfKxwMHbUx3CL1IEFb4+ZkEHbOlPQf8RwomK6J7GLEEEv5sG8E
- A69mHjhThb4a7qWNQoXc0sZs0sf2yv/UaZaVNZMNbwUmZot/kSYQ9LNNVIr80ia53fTj6r
- +Kyefemhbs0Mc74K+XdLoGWIPNNNOLM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-fkjEJ6ZIMgmqxAk4rSEYuw-1; Mon, 06 Apr 2020 05:16:31 -0400
-X-MC-Unique: fkjEJ6ZIMgmqxAk4rSEYuw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5CAF801E67;
- Mon,  6 Apr 2020 09:16:29 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DB788101D480;
- Mon,  6 Apr 2020 09:16:21 +0000 (UTC)
-Date: Mon, 6 Apr 2020 10:16:18 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v4 for-5.0] configure: warn if not using a separate build
- directory
-Message-ID: <20200406091618.GG794362@redhat.com>
-References: <20200403135306.665493-1-berrange@redhat.com>
- <CAFEAcA_CSiw4ojYHVD6S73O-iRuXt6gTS=3VdAO545q8ye0+Ww@mail.gmail.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1jLNkz-0002mT-Pp
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:09:32 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38101)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jLNky-0002l5-Vh
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:09:25 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f20so5902795wmh.3
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 02:09:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ODvrgbntrYR+c5NW+GPbnJ8NbTUzTBdQLQq9ToxxXOk=;
+ b=EmgHkCpSec60COah1Ba5e14TVQw/mMPaHiMYm3KslhkuVNn2cfcN7f7ZMyaqHK8SI8
+ HGGAGwYd4k4B4nUY1MI2kAtwKAkfk27MKxP+jew4qeCZKmb3jmM0nItWlacjZ0Rwt9WF
+ ydrWdDaiuDOMVJmIIMn9p+3dwVwviOlqdi3k0I47VqtyY/8XJBvrGnaygaNU+A9xT5Zm
+ R0busLrgftgxBqUTHgnoW41TLm95+HBgxAnzUvuCK8dBbWoxKNwpV1oWcPOzBTXoqoKa
+ IG1u5MmhhsdqpgexYLfFQJDCz7V80PokDjvPtFsUElsqoZlPHNWQLJFte8GJDzq0WdtT
+ Fu1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ODvrgbntrYR+c5NW+GPbnJ8NbTUzTBdQLQq9ToxxXOk=;
+ b=mNKfHhi59Cyf2Xb22LV79ggAzEGDREUR4Stk7IU0e84XD5vEheiKWf0GYxy+m8BMxZ
+ k2mJeCbAOts8gdZqn2VjMFGAp6UaGsqi2ipvLdPQYonsnKI7gFoO10RQ8B0YwMn6h5ds
+ ndQjDLpjVCk0i0dC1/oaWKHhTUJYkQ4tAnsGU6BOONR/T2h1QVNgRIFCNc/ZEc6UB1hD
+ b4KNBlUxmIH+ZB++nAWDh+csNyATaXjA08ONYh/jfrAuAc1ysgJLXeKn6QIPsKbTv/Ss
+ vxjtvLTjDLiWlGvbAAILakk/7wFkVV0Tc531dONzhOWUIR7Y2ELnuKZpCR5Z3HZrzHED
+ MsPw==
+X-Gm-Message-State: AGi0PubWEyPU1c8ZB69rSBtlOuvwuVjznzLc/jHanpttKHPPxIHgZjgW
+ yNhxmibBNYrqiJkhoNPb2ILuGA==
+X-Google-Smtp-Source: APiQypK9QK/so2dXmEFZinsp1+8nptUh4gRV4nq5J6GA0PX8WCY4hq7SKbKA9c9CP2FLqAq80324ag==
+X-Received: by 2002:a1c:b005:: with SMTP id z5mr20759541wme.145.1586164162384; 
+ Mon, 06 Apr 2020 02:09:22 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p5sm26812329wrg.49.2020.04.06.02.09.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Apr 2020 02:09:21 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 7B3511FF7E;
+ Mon,  6 Apr 2020 10:09:20 +0100 (BST)
+References: <20200403191150.863-1-alex.bennee@linaro.org>
+ <20200403191150.863-9-alex.bennee@linaro.org>
+ <830061f9-91cd-145c-4388-f2bfe9a3d7a6@linaro.org>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v3 08/12] linux-user: factor out reading of /proc/self/maps
+In-reply-to: <830061f9-91cd-145c-4388-f2bfe9a3d7a6@linaro.org>
+Date: Mon, 06 Apr 2020 10:09:19 +0100
+Message-ID: <87pnclaslc.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_CSiw4ojYHVD6S73O-iRuXt6gTS=3VdAO545q8ye0+Ww@mail.gmail.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,80 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Liviu Ionescu <ilg@livius.net>, Paolo Bonzini <pbonzini@redhat.com>,
- Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Apr 05, 2020 at 03:38:55PM +0100, Peter Maydell wrote:
-> On Fri, 3 Apr 2020 at 14:53, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
-> >
-> > Running configure directly from the source directory is a build
-> > configuration that will go away in future. It is also not currently
-> > covered by any automated testing. Display a deprecation warning if
-> > the user attempts to use an in-srcdir build setup, so that they are
-> > aware that they're building QEMU in an undesirable manner.
-> >
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
->=20
-> > +if test "$in_srcdir" =3D "yes"; then
-> > +    echo
-> > +    echo "WARNING: SUPPORT FOR BUILDING IN THE SOURCE DIR IS DEPRECATE=
-D"
-> > +    echo
-> > +    echo "Support for running the 'configure' script directly from the=
-"
-> > +    echo "source directory is deprecated. In-tree builds are not cover=
-ed"
-> > +    echo "by automated testing and thus may not correctly build QEMU."
-> > +    echo "Users are recommended to use a separate build directory:"
-> > +    echo
-> > +    echo "  $ mkdir build"
-> > +    echo "  $ cd build"
-> > +    echo "  $ ../configure"
-> > +    echo "  $ make"
-> > +    echo
-> > +fi
->=20
-> So here's my stab at some text here; I'm aiming at nudging users
-> towards out-of-tree builds if they were simply not thinking about
-> it, but not actively marking them as 'deprecated', since it sounded
-> to me like we were planning to keep at least the basic
-> 'configure+make+make install' sequence of commands working.
->=20
-> echo "NOTE: we recommend against building in the source directory"
-> echo
-> echo "You've run the 'configure' script directly from the source"
-> echo "directory. This will work, but we recommend using a separate"
-> echo "build directory, especially if you plan to work with the QEMU"
-> echo "sources rather than just building it once. You can switch to"
-> echo "a separate build directory like this:"
 
-I'm fine with that text too.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-I'll submit another version of the patch with that incorporated
+> On 4/3/20 12:11 PM, Alex Benn=C3=A9e wrote:
+>> +                e->is_read  =3D fields[1][0] =3D=3D 'r' ? true : false;
+>> +                e->is_write =3D fields[1][1] =3D=3D 'w' ? true : false;
+>> +                e->is_exec  =3D fields[1][2] =3D=3D 'x' ? true : false;
+>> +                e->is_priv  =3D fields[1][3] =3D=3D 'p' ? true : false;
+>
+> Drop the redundant ? true : false.  That is of course the result of the b=
+oolean
+> operation.
+
+doh! Fortunately the compiler was smart enough to see through my idiocy...
+
+>
+>> +                errors +=3D qemu_strtoi(fields[4], NULL, 10, &e->inode);
+>
+> The root of the typedef chain for ino_t is
+>
+> /usr/include/asm-generic/posix_types.h:typedef __kernel_ulong_t __kernel_=
+ino_t;
+>
+> so I think you should just go ahead and use unsigned long here too.  Or m=
+aybe
+> even uint64_t, because 32-bit has ino64_t, and could in fact have a Large
+> Number here.
+
+Will fix.
+
+>
+>
+> r~
 
 
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Alex Benn=C3=A9e
 
