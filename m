@@ -2,99 +2,97 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D31C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1364C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:03:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE2CC2063A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7988B2063A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:03:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpb5yrMu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE2CC2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="px0BepA7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7988B2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOal-0005GM-1s
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:02:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45475)
+	id 1jLObV-0006M7-JF
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:03:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45037)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jLOL3-0001gi-N6
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:46:43 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOJA-00070w-8q
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jLOL2-0005zo-MY
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:46:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55828
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jLOL2-0005yu-J2
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:46:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586166399;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3NSYbYw054NJkVL1fjapqeca668ySsYwttmemYsyJFg=;
- b=dpb5yrMuvFLw2wPuagsWdBrBngm9CC3rriQch4AyDLfhAq2RHTyVxYDnN7rnzSZAaMJngZ
- SfOJ902Zg662T3uV87owNZqwOOeqbdpG4t43W0TzWswrFVB4DQQ5vQfWrAa3/A9C5Ajoe3
- Ct1ImRyPdTuGeICnWD3JRjWN2xRfrlo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-_Y_96KRcM3OMfdo4raZXjw-1; Mon, 06 Apr 2020 05:46:38 -0400
-X-MC-Unique: _Y_96KRcM3OMfdo4raZXjw-1
-Received: by mail-wm1-f69.google.com with SMTP id o5so4703178wmo.6
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 02:46:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iO2rTxUejhgnMtVFCGlSVDFN+aK0Hsbfz46oSCWfJHk=;
- b=Oa1BxreD1USjms5MdcYHUuisJ8a5FMhHds7OKXvmCVuyii2q+E0MxWGA/Z5tjlrVuE
- p4YO69CfklJQPc1B7OoKATB0xMfo49nNmAvAH4neOb7xHpHzFsaaimQdpUv2nXTqZktQ
- N62l4FVhOihH8aCH4WWyNVpSqB1hazKWjIUDPQJ8tmv11MqIGIL43byM2fU79GsK6j1g
- ybDZlnO7e6PyMe0ogmi6rLvm+gym8Q782M6NyGljmai2CetPmr0ZcF9XnFPmGFXD9f0G
- Uj4yKcwoPKyrnc7iZRZ0Srg9HIhVJ+YtbPvg8/Fqpk9XV42qmMCFUCPR8Rxsmfi7/HTu
- /skw==
-X-Gm-Message-State: AGi0PuYbXWZGW5CtEf2LFo86MSh6xIF1Paq7YCWJ0n0a2Wbus/9/9EWk
- 71BnSSAyYJsJoA7hAytT1/7PNNb6Z8hop7zKxLfy1UuAg4Xr5T6mHCIwHLXqr/R+Q16K2+H1ALs
- Xuwf7Mnw1P8iHrAo=
-X-Received: by 2002:a7b:c343:: with SMTP id l3mr22544379wmj.38.1586166397206; 
- Mon, 06 Apr 2020 02:46:37 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKuD8AFuVst9vzuntesfb9xe5JjUaehSfhYlqaiN9ob+zKyrlBmhNrTgqsWjFD896+Pc2r8JA==
-X-Received: by 2002:a7b:c343:: with SMTP id l3mr22544357wmj.38.1586166396946; 
- Mon, 06 Apr 2020 02:46:36 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
- by smtp.gmail.com with ESMTPSA id 189sm24744000wme.31.2020.04.06.02.46.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 06 Apr 2020 02:46:36 -0700 (PDT)
-Subject: Re: [PATCH] qom-qmp-cmds: remove unnecessary alloc in qmp_object_add
- to fix memleak
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200313075858.15860-1-pannengyuan@huawei.com>
- <87a74fdznz.fsf@dusky.pond.sub.org> <87k12t9l7e.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3fe7d100-9e13-3d3e-c40a-1c19502fb0b4@redhat.com>
-Date: Mon, 6 Apr 2020 11:46:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOJ8-0004Dy-7n
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:44 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:47298)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1jLOJ7-0004CL-Vq
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:42 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369gvI3028669;
+ Mon, 6 Apr 2020 09:44:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=Mp0pIOa7jmLQH3zhd/vSln1/RYrdggQWV5RgSTlLgKM=;
+ b=px0BepA7t/PuoGKVeDEcN56Xr3om1YtwNAZHM6lCw/nlXvyZYXeycUnahzf1XzuLsaHC
+ eUz0oy/AAjuRVgaJpUht83lEZ+pzRR8qdH0XDD8pfnLxPsMVPAwWHCHOJTTnaeTvELrP
+ A2eUHCXgXHY7OnFC5iXPLT+60p3OFdXrRkQ099AIZtIWaziNvwRvyFDChqYVhL8oY/79
+ N90IW9yGxkICPAXFnpFK4Pg3KXVeT5Y1IccM9wUmmd8xEJ9fQOEJFC3TdCVHXHrzW31Y
+ OuvjwUOCBg5RG02Dj4KMsyuSYpJnWOz99hxep/prp4GJJ/dYID3w6aWg3CA6/ig6spyb ew== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 306jvmwrdv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 06 Apr 2020 09:44:20 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369fN8r066116;
+ Mon, 6 Apr 2020 09:42:19 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3020.oracle.com with ESMTP id 307419xhnc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 06 Apr 2020 09:42:19 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369gHIX013753;
+ Mon, 6 Apr 2020 09:42:17 GMT
+Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 06 Apr 2020 02:42:17 -0700
+From: elena.ufimtseva@oracle.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 27/36] multi-process: add support to parse device option
+Date: Mon,  6 Apr 2020 02:41:17 -0700
+Message-Id: <3bcef025cd4ea036d5834add99b44f72076f1076.1586165556.git.elena.ufimtseva@oracle.com>
+X-Mailer: git-send-email 2.25.GIT
+In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
+References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <87k12t9l7e.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ phishscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060084
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ suspectscore=1
+ mlxlogscore=999 mlxscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060084
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,39 +104,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, berrange@redhat.com, ehabkost@redhat.com,
- Pan Nengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org,
- euler.robot@huawei.com, zhang.zhanghailiang@huawei.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/04/20 08:34, Markus Armbruster wrote:
-> Paolo, looks like this has fallen through the cracks.  If you'd prefer
-> me to take it, let me know.
->=20
-> Markus Armbruster <armbru@redhat.com> writes:
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Actually it was in my latest pull request, but between this version,=20
-Marc-Andr=C3=A9 and mine you might have missed it:
+Enable remote process to parse device command line option
 
-commit 7f5d9b206d1e86425faa5b84b551068bf044b823
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu Mar 26 10:41:21 2020 +0100
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+---
+ remote/remote-opts.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-    object-add: don't create return value if failed
-   =20
-    No need to return an empty value from object-add (it would also leak
-    if the command failed).  While at it, remove the "if" around object_unr=
-ef
-    since object_unref handles NULL arguments just fine.
-   =20
-    Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-    Message-Id: <20200325184723.2029630-4-marcandre.lureau@redhat.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Thanks,
-
-Paolo
+diff --git a/remote/remote-opts.c b/remote/remote-opts.c
+index cb7837bf13..f077221c71 100644
+--- a/remote/remote-opts.c
++++ b/remote/remote-opts.c
+@@ -57,6 +57,13 @@ void parse_cmdline(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++            case QEMU_OPTION_device:
++                if (!qemu_opts_parse_noisily(qemu_find_opts("device"),
++                                            optarg, true)) {
++                    error_report("Unable to process device command");
++                    exit(1);
++                }
++            break;
+             default:
+                 break;
+             }
+@@ -71,5 +78,8 @@ void parse_cmdline(int argc, char **argv, char **envp)
+         exit(0);
+     }
+ 
++    qemu_opts_foreach(qemu_find_opts("device"), device_init_func, NULL,
++                      &error_fatal);
++
+     return;
+ }
+-- 
+2.25.GIT
 
 
