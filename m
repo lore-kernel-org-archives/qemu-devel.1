@@ -2,81 +2,79 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6547DC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 12:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5382AC2BABC
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 12:53:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F767208E4
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 12:18:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DC0E22204
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 12:53:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OvyOKW1n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F767208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sTyPuxhj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DC0E22204
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLQhx-0006ru-BL
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 08:18:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39436)
+	id 1jLRFk-0008Ty-Ad
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 08:53:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jLQhF-0006Na-8v
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 08:17:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jLRF2-0007si-5d
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 08:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jLQhE-0000EB-5N
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 08:17:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25761
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jLQhE-0000DR-1f
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 08:17:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586175463;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7g2kGVN11f2hjwa108QxOoDTcbkZoYTXX/ylc9bm8ho=;
- b=OvyOKW1nY012vkuPNqfi4rphTciUXyeifGvLc3THXv/1P/iVnGaPoXRX/fDIWajd75H4X/
- PjZlHsI0Pn8lC1tjykwOPlJhsnq5hDQPh3pFz8Vh40QaZX1CfPjuVt7UA0W2lRRLdSRss4
- nRDLtlVi7Qc+sJzIlwduL1FcZ4bBTQE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-OgPnRytnMtui0UhbqRidHQ-1; Mon, 06 Apr 2020 08:17:41 -0400
-X-MC-Unique: OgPnRytnMtui0UhbqRidHQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81BCE18A8C81;
- Mon,  6 Apr 2020 12:17:40 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88F88BEA62;
- Mon,  6 Apr 2020 12:17:07 +0000 (UTC)
-Date: Mon, 6 Apr 2020 14:17:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 07/12] acpi: move aml builder code for rtc device
-Message-ID: <20200406141705.77d90b68@redhat.com>
-In-Reply-To: <20200406082517.uyz7zv4jiqqjbcli@sirius.home.kraxel.org>
-References: <20200403080502.8154-1-kraxel@redhat.com>
- <20200403080502.8154-8-kraxel@redhat.com>
- <20200403120921.258db9a5@redhat.com>
- <20200406082517.uyz7zv4jiqqjbcli@sirius.home.kraxel.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1jLRF0-0007K9-JE
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 08:52:39 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40796)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jLRF0-0007Jb-73
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 08:52:38 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r19so15130607otn.7
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 05:52:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=8Tw2ZKzXe0m4v78hh6UdCKpCVFPhn+c3/4+FVZ/dArU=;
+ b=sTyPuxhjyPZTStaIB2szt3y1f1QQtbKbBGy6TfiG2KKwlqrWaTQNroPYJZTh8GxKtW
+ 8iKmnv+aM+hVDig18relzqTr99IffQrTtRzTUwYBNM/3lkOhj+i9NLkwD0OmrCjq4ClU
+ vlUN8EMIzubLElsUp0LIfcEf1Flk6omxDE/9U7cAPeOpKlHWbc2YzI4237w80ExTBQJz
+ HGNay3zyUi60mAoyNkxc7Fz6mWMu8yDnizdJMRi+FhYMDyLSp8aaLK+b0PDEpDKmV6S+
+ mYRwai2nQFS7NWfYwpjqpPCVy3rNGn/t3nTY9sU23ZhRH3WnalPhlw08qc97gsRqLnwb
+ 9ixA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=8Tw2ZKzXe0m4v78hh6UdCKpCVFPhn+c3/4+FVZ/dArU=;
+ b=iKAwiTTWFBtb5JUG6SEkJCbdY4VOqUH4GDTlesufzgnWcwIiZxbmw5z/+LBLTZyp6D
+ pjkehihYrnfbgyIzZkR8XisMeai5a7o94+ZYTFClDhgLxFw6YE02VYYjdGGOgVrZJLH8
+ PQ5ThcUosYHxBvf3yKfceaAGN32PQHtsl0UGs4X1XY4bcOzyNJANx+zSXbAF15GGCpsS
+ Lz65Ta3mNzWJNT6QwKxkH45LdV5Zn3BDBcGvfivpTJhOWWAhBc7v37vLmBVYGRs3PbLC
+ +8c3lYUzDDE6ecQa0euShbD35EMkBor58H324BoiaJpi0K8n7ObpUKo+nbikUnjx0Z/c
+ ynuw==
+X-Gm-Message-State: AGi0Puaa9FRvKDiCbqmAwemjRPCgPltMFvv134gJg8S53GjjE9PtAPtw
+ YqwPTfv+B+MOU6LqaUmcswjONAhO4EFWnubz80I8wkIafwk=
+X-Google-Smtp-Source: APiQypJkULmheFB27xUrpxx19WZ4oVmzaxiKM9HClA1GTJwSuf5J6m2sIFEGGrSsJaUodX/hMWYZ9PhabHv2868v4jI=
+X-Received: by 2002:a9d:1920:: with SMTP id j32mr16446205ota.221.1586177557080; 
+ Mon, 06 Apr 2020 05:52:37 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200406101205.23027-1-peter.maydell@linaro.org>
+In-Reply-To: <20200406101205.23027-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Apr 2020 13:52:25 +0100
+Message-ID: <CAFEAcA8dQnKyOcQwk1JKksVeQtb9t2s+=H7YkH-77d4wfKfwxg@mail.gmail.com>
+Subject: Re: [PULL 00/11] target-arm queue
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,48 +86,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFy?= =?UTF-8?B?Yy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Apr 2020 10:25:17 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Mon, 6 Apr 2020 at 11:12, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> A collection of bug fixes for rc2...
+>
+> The following changes since commit 146aa0f104bb3bf88e43c4082a0bfc4bbda4fbd8:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2020-04-03 15:30:11 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200406
+>
+> for you to fetch changes up to 8893790966d9c964557ad01be4a68ef50696ace8:
+>
+>   dma/xlnx-zdma: Reorg to fix CUR_DSCR (2020-04-06 10:59:56 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * don't expose "ieee_half" via gdbstub (prevents gdb crashes or errors
+>    with older GDB versions)
+>  * hw/arm/collie: Put StrongARMState* into a CollieMachineState struct
+>  * PSTATE.PAN should not clear exec bits
+>  * hw/gpio/aspeed_gpio.c: Don't directly include assert.h
+>    (fixes compilation on some Windows build scenarios)
+>  * dump: Fix writing of ELF section
+>  * dma/xlnx-zdma: various bug fixes
+>  * target/arm/helperc. delete obsolete TODO comment
 
-> On Fri, Apr 03, 2020 at 12:09:21PM +0200, Igor Mammedov wrote:
-> > On Fri,  3 Apr 2020 10:04:57 +0200
-> > Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >   
-> > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > > ---  
-> > [...]  
-> > > +static void rtc_build_aml(ISADevice *isadev, Aml *scope)
-> > > +{
-> > > +    Aml *dev;
-> > > +    Aml *crs;
-> > > +
-> > > +    crs = aml_resource_template();
-> > > +    aml_append(crs, aml_io(AML_DECODE16, 0x0070, 0x0070, 0x10, 0x02));
-> > > +    aml_append(crs, aml_irq_no_flags(8));
-> > > +    aml_append(crs, aml_io(AML_DECODE16, 0x0072, 0x0072, 0x02, 0x06));  
-> > 
-> > since this is made a part of device, can we fetch io port values from
-> > device instead of hard-codding values here?  
-> 
-> No, the rtc device hasn't a configurable io port address.
-what I'm after is consistent code, so if we switch to taking
-io_base/irq from ISA device, then do it everywhere.
-So we don't have a zoo of devices doing the same thing in multiple
-ways.
 
-> 
-> cheers,
->   Gerd
-> 
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
