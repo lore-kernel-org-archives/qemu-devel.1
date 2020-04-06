@@ -2,97 +2,148 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D135FC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED10C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:00:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99F692063A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:59:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NqN7yCX7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F692063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6151206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:00:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6151206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOXo-00009R-P7
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:59:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44369)
+	id 1jLOYi-0001nT-Vv
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:00:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGz-0002f6-3d
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:30 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLOPn-0002TR-E0
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGx-0002Ry-L8
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:29 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:35098)
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLOPk-00022g-Mg
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:51:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37122
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOGx-0002RP-Cw
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:27 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369e7Hk089733;
- Mon, 6 Apr 2020 09:42:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=Sw6vucOkSSS3zuorTyAuM8T7i6NrbGQ0PafIY8KIoTE=;
- b=NqN7yCX7Bk+9vwpHGpJI3iJzWqauUOIXX8hzfkkM/5EnIrWShxsvN1iix3YrP2+Fcuax
- 9XuVALgO+N/3H+cRrRueAXyYDZGNZZK/IkO5FfAdWXMcRAFYXj+BSDAYMePzC00HwhJ6
- sVlZyCc0967DUlXfgS+a6QuyYIvYNo/5aPyqEdySR6h320RxpRQ0MWCmEgd8dK+95KaN
- 7YWrHkEY44F8X0WdcFB5104Z8GP2XRfDSwvAygFyoobrLnbW9sbmST2vlvbuRyqGw8Sm
- le8izJzva4VRYSkUTTWIvXji6EtSlf3tUAoSNC1/rJryWtV3EnYCdhba62Ng7EMcO3hS 9g== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 306hnqwtya-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:21 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369fNBP066100;
- Mon, 6 Apr 2020 09:42:21 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 307419xhq2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:21 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369gIMe013759;
- Mon, 6 Apr 2020 09:42:19 GMT
-Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:42:18 -0700
-From: elena.ufimtseva@oracle.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 28/36] multi-process: send heartbeat messages to remote
-Date: Mon,  6 Apr 2020 02:41:18 -0700
-Message-Id: <5b04d390bd21b04c384bb05f577b089cb81b03c3.1586165556.git.elena.ufimtseva@oracle.com>
-X-Mailer: git-send-email 2.25.GIT
-In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
-References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jLOPk-00020u-GJ
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:51:32 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0369Xbj2131941
+ for <qemu-devel@nongnu.org>; Mon, 6 Apr 2020 05:51:31 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 306kuv8gfv-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 05:51:30 -0400
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Mon, 6 Apr 2020 10:51:18 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 6 Apr 2020 10:51:15 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 0369pPAg34210142
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 6 Apr 2020 09:51:25 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 36543A405B;
+ Mon,  6 Apr 2020 09:51:25 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AEB06A4064;
+ Mon,  6 Apr 2020 09:51:24 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.23.63])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  6 Apr 2020 09:51:24 +0000 (GMT)
+Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: Fix build on systems without
+ KVM
+To: David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, 
+ Cornelia Huck <cohuck@redhat.com>
+References: <20200406075931.26232-1-borntraeger@de.ibm.com>
+ <20200406075931.26232-2-borntraeger@de.ibm.com>
+ <27304f4e-3801-3200-c5ba-9fb5ac0f8715@redhat.com>
+ <95faf831-5382-0c3e-fed4-67485f04a4b7@de.ibm.com>
+ <9062115a-58c1-833a-b9ac-83b3905f9039@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Mon, 6 Apr 2020 11:51:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
- phishscore=0
- malwarescore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060084
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- phishscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=3
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060083
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+In-Reply-To: <9062115a-58c1-833a-b9ac-83b3905f9039@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20040609-0012-0000-0000-0000039F3DC4
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040609-0013-0000-0000-000021DC5B0B
+Message-Id: <a0dd3211-d159-955e-0e0b-dd73933ad369@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-06_05:2020-04-03,
+ 2020-04-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 adultscore=0
+ malwarescore=0 priorityscore=1501 impostorscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=768 clxscore=1015 spamscore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060078
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,188 +155,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Bruce Rogers <brogers@suse.com>, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-In order to detect remote processes which are hung, the
-proxy periodically sends heartbeat messages to confirm if
-the remote process is alive
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
----
- hw/proxy/qemu-proxy.c         | 86 +++++++++++++++++++++++++++++++++++
- include/hw/proxy/qemu-proxy.h |  3 ++
- include/io/mpqemu-link.h      |  1 +
- io/mpqemu-link.c              |  5 ++
- 4 files changed, 95 insertions(+)
+On 06.04.20 11:32, David Hildenbrand wrote:
+> On 06.04.20 11:29, Christian Borntraeger wrote:
+>>
+>>
+>> On 06.04.20 11:07, David Hildenbrand wrote:
+>>>
+>>>>  static inline bool s390_is_pv(void)
+>>>> @@ -41,6 +42,7 @@ int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
+>>>>  void s390_pv_perf_clear_reset(void);
+>>>>  int s390_pv_verify(void);
+>>>>  void s390_pv_unshare(void);
+>>>> +void s390_machine_inject_pv_error(CPUState *cs);
+>>>>  #else /* CONFIG_KVM */
+>>>>  static inline bool s390_is_pv(void) { return false; }
+>>>>  static inline int s390_pv_vm_enable(void) { return 0; }
+>>>> @@ -50,6 +52,7 @@ static inline int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) {
+>>>>  static inline void s390_pv_perf_clear_reset(void) {}
+>>>>  static inline int s390_pv_verify(void) { return 0; }
+>>>>  static inline void s390_pv_unshare(void) {}
+>>>> +static inline void s390_machine_inject_pv_error(CPUState *cs) {};
+>>>
+>>> I'd suggest renaming that to s390_pv_inject_error() or similar right away.
+>>
+> 
+> Me again: I guess "s390_pv_inject_reset_error()" is what it's really
+> doing :)
 
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index 730e28483e..162014353f 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -21,6 +21,78 @@
- 
- static void probe_pci_info(PCIDevice *dev);
- 
-+static void childsig_handler(int sig, siginfo_t *siginfo, void *ctx)
-+{
-+    /* TODO: Add proper handler. */
-+    printf("Child (pid %d) is dead? Signal is %d, Exit code is %d.\n",
-+           siginfo->si_pid, siginfo->si_signo, siginfo->si_code);
-+}
-+
-+static void hb_msg(PCIProxyDev *dev)
-+{
-+    DeviceState *ds = DEVICE(dev);
-+    MPQemuMsg msg = { 0 };
-+    uint64_t ret;
-+
-+    if (event_notifier_get_fd(&dev->en_ping) == -1) {
-+        return;
-+    }
-+
-+    memset(&msg, 0, sizeof(MPQemuMsg));
-+
-+    msg.num_fds = 1;
-+    msg.cmd = PROXY_PING;
-+    msg.bytestream = 0;
-+    msg.size = 0;
-+    msg.fds[0] = event_notifier_get_fd(&dev->en_ping);
-+
-+    mpqemu_msg_send(&msg, dev->mpqemu_link->com);
-+
-+    ret = wait_for_remote(msg.fds[0]);
-+
-+    if (ret) {
-+        printf("Lost contact with remote device %s\n", ds->id);
-+        /* TODO: Initiate error recovery */
-+    }
-+}
-+
-+#define NOP_INTERVAL 1000
-+
-+static void remote_ping(void *opaque)
-+{
-+    PCIProxyDev *dev = opaque;
-+
-+    hb_msg(dev);
-+
-+    timer_mod(dev->hb_timer,
-+              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NOP_INTERVAL);
-+}
-+
-+static void start_hb_timer(PCIProxyDev *dev)
-+{
-+    dev->hb_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
-+                                 remote_ping,
-+                                 dev);
-+
-+    timer_mod(dev->hb_timer,
-+              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NOP_INTERVAL);
-+}
-+
-+static void stop_hb_timer(PCIProxyDev *dev)
-+{
-+    timer_del(dev->hb_timer);
-+    timer_free(dev->hb_timer);
-+}
-+
-+static void set_sigchld_handler(void)
-+{
-+    struct sigaction sa_sigterm;
-+    memset(&sa_sigterm, 0, sizeof(sa_sigterm));
-+    sa_sigterm.sa_sigaction = childsig_handler;
-+    sa_sigterm.sa_flags = SA_SIGINFO | SA_NOCLDWAIT | SA_NOCLDSTOP;
-+    sigaction(SIGCHLD, &sa_sigterm, NULL);
-+}
-+
- static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val, int l,
-                           unsigned int op)
- {
-@@ -204,6 +276,19 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
-     setup_irqfd(dev);
- 
-     probe_pci_info(PCI_DEVICE(dev));
-+
-+    set_sigchld_handler();
-+
-+    event_notifier_init(&dev->en_ping, 0);
-+
-+    start_hb_timer(dev);
-+}
-+
-+static void pci_proxy_dev_exit(PCIDevice *pdev)
-+{
-+    PCIProxyDev *dev = PCI_PROXY_DEV(pdev);
-+
-+    stop_hb_timer(dev);
- }
- 
- static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
-@@ -211,6 +296,7 @@ static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
-     k->realize = pci_proxy_dev_realize;
-+    k->exit = pci_proxy_dev_exit;
-     k->config_read = pci_proxy_read_config;
-     k->config_write = pci_proxy_write_config;
- }
-diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
-index 0d8ec6d686..26f0a41110 100644
---- a/include/hw/proxy/qemu-proxy.h
-+++ b/include/hw/proxy/qemu-proxy.h
-@@ -55,6 +55,9 @@ struct PCIProxyDev {
-     EventNotifier intr;
-     EventNotifier resample;
- 
-+    EventNotifier en_ping;
-+    QEMUTimer *hb_timer;
-+
-     int socket;
- 
-     ProxyMemoryRegion region[PCI_NUM_REGIONS];
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index 102c736705..45ea1fcafa 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -50,6 +50,7 @@ typedef enum {
-     SET_IRQFD,
-     GET_PCI_INFO,
-     RET_PCI_INFO,
-+    PROXY_PING,
-     MAX,
- } mpqemu_cmd_t;
- 
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index 4a998b3568..ff8a7da4a4 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -374,6 +374,11 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
-             return false;
-         }
-         break;
-+    case PROXY_PING:
-+        if (msg->size != 0) {
-+            return false;
-+        }
-+        break;
-     default:
-         break;
-     }
--- 
-2.25.GIT
+I will use that unless Conny complains.
 
 
