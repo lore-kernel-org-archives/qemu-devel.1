@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC54C2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 01:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A84EFC2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 01:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3066A2068E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 01:02:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3066A2068E
+	by mail.kernel.org (Postfix) with ESMTPS id 7AD4020678
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 01:21:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AD4020678
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rkmorris.us
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLG9W-0003Ry-Bv
-	for qemu-devel@archiver.kernel.org; Sun, 05 Apr 2020 21:02:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47968)
+	id 1jLGSC-0005kX-LG
+	for qemu-devel@archiver.kernel.org; Sun, 05 Apr 2020 21:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jLG8X-000323-On
- for qemu-devel@nongnu.org; Sun, 05 Apr 2020 21:01:14 -0400
+ (envelope-from <bounces@canonical.com>) id 1jLGRc-0005Lj-0U
+ for qemu-devel@nongnu.org; Sun, 05 Apr 2020 21:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jLG8W-0003lw-Gv
- for qemu-devel@nongnu.org; Sun, 05 Apr 2020 21:01:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42576)
+ (envelope-from <bounces@canonical.com>) id 1jLGRa-0006aO-SW
+ for qemu-devel@nongnu.org; Sun, 05 Apr 2020 21:20:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44224)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jLG8W-0003kx-4g
- for qemu-devel@nongnu.org; Sun, 05 Apr 2020 21:01:12 -0400
+ id 1jLGRa-0006ZN-Na
+ for qemu-devel@nongnu.org; Sun, 05 Apr 2020 21:20:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jLG8U-0001oF-IE
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 01:01:10 +0000
+ id 1jLGRZ-0002tT-7w
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 01:20:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 731792E8108
- for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 01:01:10 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 2F57B2E8108
+ for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 01:20:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Apr 2020 00:51:45 -0000
+Date: Mon, 06 Apr 2020 01:14:35 -0000
 From: Russell Morris <ubuntu@rkmorris.us>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,7 +55,7 @@ X-Launchpad-Bug-Commenters: 6-u3untu-h eminus
 X-Launchpad-Bug-Reporter: Emin Ghuliev (eminus)
 X-Launchpad-Bug-Modifier: Russell Morris (6-u3untu-h)
 References: <155352235092.32006.12315829232895734213.malonedeb@soybean.canonical.com>
-Message-Id: <158613430543.23887.16301552370281152983.malone@soybean.canonical.com>
+Message-Id: <158613567537.12209.9434473780461723852.malone@chaenomeles.canonical.com>
 Subject: [Bug 1821595] Re: Failed to emulate MMIO access with
  EmulatorReturnStatus: 2
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a296f04231dee355be5db73cc878b9e21689a253";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 39f70b03aa6ffc44fca0dba386ef543c741bf415
+X-Launchpad-Hash: 65e62b21e2da79f4df8357becb6013cb6df354b2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,45 +82,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+FYI, I was curious if this was a Ryzen issue or not (which I am running), s=
+o I tried another machine - here are the two combos I tried,
+1) Ryzen 5 2600X, Windows 19041.172
+2) Core i5-6600K, Windows 18363.720
 
-Having a similar issue here, running "QEMU emulator version 4.2.91
-(v5.0.0-rc1-31-g146aa0f104-dirty)"
-
-Configuration / build command line,
-./configure --cross-prefix=3Dx86_64-w64-mingw32- --target-list=3Dx86_64-sof=
-tmmu --enable-whpx --enable-fdt --enable-gtk --enable-vnc --disable-pie --e=
-nable-opengl && make -j16 && make -j16 installer
-
-And the QEMU command line,
-qemu-system-x86_64.exe \
-    -m 2G \
-    -machine q35 \
-    -cpu Penryn \
-    -accel whpx \
-    -device isa-applesmc,osk=3D"ourhardworkbythesewordsguardedpleasedontste=
-al(c)AppleComputerInc" \
-    -smbios type=3D2 \
-    -drive if=3Dpflash,format=3Draw,readonly,file=3D"./firmware/OVMF_CODE.f=
-d"\
-    -drive if=3Dpflash,format=3Draw,file=3D"./firmware/OVMF_VARS-1024x768.f=
-d" \
-    -usb -device usb-kbd -device usb-mouse \
-    -netdev user,id=3Dnet0 \
-    -device e1000-82545em,netdev=3Dnet0,id=3Dnet0,mac=3D52:54:00:c9:18:27 \
-    -device ich9-ahci,id=3Dsata \
-    -drive id=3DESP,if=3Dnone,format=3Dqcow2,file=3DESP.qcow2 \
-    -device ide-hd,bus=3Dsata.2,drive=3DESP \
-    -drive id=3DInstallMedia,format=3Draw,if=3Dnone,file=3DBaseSystem.img \
-    -device ide-hd,bus=3Dsata.3,drive=3DInstallMedia \
-    -drive id=3DSystemDisk,if=3Dnone,file=3DMyDisk.qcow2 \
-    -device ide-hd,bus=3Dsata.4,drive=3DSystemDisk \
-
-
-If I remove (only), -accel whpx \ =3D> Then it all runs, just very slowly ;=
--).
-
-Any suggestions, things to try?
+Same issue on both.
 
 Thanks!
 
