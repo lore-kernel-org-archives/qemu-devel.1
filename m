@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D17BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B74C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04C12206F5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50F52206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="y6ldnnIA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04C12206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="m4oMxuUx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50F52206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOOh-0000Di-6X
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:50:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44510)
+	id 1jLOOk-0000JI-FE
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:50:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOH6-0002wq-TE
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:38 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGm-00026E-80
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOH5-0002Zb-5o
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:36 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:45722)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGk-0002Iw-Lw
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:16 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:45598)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOH4-0002Yy-Ts
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:35 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dSE4025474;
- Mon, 6 Apr 2020 09:42:29 GMT
+ id 1jLOGk-0002H4-DN
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:14 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dnfo069764;
+ Mon, 6 Apr 2020 09:42:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=V34vqiNMw97o1dTPzX27wWZMFaoDykDwdyaDjPR3ekE=;
- b=y6ldnnIAg+1sJaif4fvWln7q6dsx5pGfJLSddNi59G9LDonBi/7VXAkSRRootTtpySM0
- RgbLroGQIZJbKF4tJ4GdoFpgEz2iC50QiBZaTNnmefQwpNZDSP+JrgeFLDVo0mYQh0tx
- 8XXAgb8xa9tL4JSDan9TWi5OoCKzDDmliZOyK0i/uw1oetrW6JZOYTv8Ad0Xaz4HPjVK
- fjIyEgNS1QyyoABcvkBYTyqVMSU5whpbSLrupBnGk4iiXHN6CYNg0VFFQyZ+nLT0tzqP
- Ugrj3BSLCJLPsW5JNGrx4xGrtcgtqyFBXnJrnqBVeoE3GYb3I8l2pQiRJcbiCb+bDgy+ tA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 306jvmwr73-1
+ bh=4mO2dJF75SlZTMUcGzJgBWOZymNp9EgvlBVCh8v7ZU8=;
+ b=m4oMxuUxSrbuaiVpyRW4oI7eWq3K3JPPnje5Mw/p8lM/oD3qzORqK9d1akk5WaK7t5dM
+ 4aBkYKN6gzMSAGZidXDv/KtudfdlRApW3hx1aSMnrNAJNQ2u/7h5lj9Lylukk8fcB2W0
+ CVNMRjympEplXFT+ZsyTDNXh6BAvxToqXWbhBKUeYxIR/crdjeOG7NKl+2lJ2R9J1R8b
+ W8bgkqSAeXENdtLdYeTP/yZNMVuhXi081zDX7mYQae1WAN4UNwVFrfK/CJ/KcJM1bgun
+ tCdmiw6mQbktkbJpuDZVrZRHEl9ITuY/+BUiUK0GxMhN/eTNSJbbMYCqBkRh4DWZ4L7r iQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 306j6m5tbg-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:28 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369bM7G056443;
- Mon, 6 Apr 2020 09:42:28 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 3073qcndad-1
+ Mon, 06 Apr 2020 09:42:08 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369fNjo066109;
+ Mon, 6 Apr 2020 09:42:07 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 307419xh6j-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:28 +0000
+ Mon, 06 Apr 2020 09:42:07 +0000
 Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369gQvt013893;
- Mon, 6 Apr 2020 09:42:27 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369g6Em031919;
+ Mon, 6 Apr 2020 09:42:06 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:42:26 -0700
+ with ESMTP ; Mon, 06 Apr 2020 02:42:06 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 33/36] multi-process/mon: enable QMP module support in the
- remote process
-Date: Mon,  6 Apr 2020 02:41:23 -0700
-Message-Id: <cfe4594113d6888873155a21f533e225b33ed0bb.1586165556.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v6 21/36] multi-process: PCI BAR read/write handling for proxy
+ & remote endpoints
+Date: Mon,  6 Apr 2020 02:41:11 -0700
+Message-Id: <848b7213d9c1de43f5f5c8518a4f5bcd46faec7e.1586165556.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
@@ -79,21 +79,21 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxscore=0 mlxlogscore=999
- spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=1
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004060083
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ phishscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060084
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- suspectscore=1
- mlxlogscore=999 mlxscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060083
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxlogscore=999 spamscore=0
+ priorityscore=1501 suspectscore=1 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060083
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,251 +117,298 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+From: Jagannathan Raman <jag.raman@oracle.com>
 
-Build system changes to enable QMP module in the remote process
+Proxy device object implements handler for PCI BAR writes and reads.
+The handler uses BAR_WRITE/BAR_READ message to communicate to the
+remote process with the BAR address and value to be written/read.
+The remote process implements handler for BAR_WRITE/BAR_READ
+message.
 
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- Makefile.objs               | 10 ++++++++++
- Makefile.target             | 35 +++++++++++++++++++++++++++++++++--
- block/Makefile.objs         |  3 +++
- block/monitor/Makefile.objs |  2 ++
- hmp-commands.hx             |  1 +
- hw/core/Makefile.objs       |  1 +
- monitor/Makefile.objs       |  4 ++++
- monitor/misc.c              |  8 ++++++++
- qapi/Makefile.objs          |  2 ++
- qom/Makefile.objs           |  1 +
- stubs/monitor.c             |  1 +
- ui/Makefile.objs            |  2 ++
- 12 files changed, 68 insertions(+), 2 deletions(-)
+ hw/proxy/qemu-proxy.c         | 64 ++++++++++++++++++++++++++++++
+ include/hw/proxy/qemu-proxy.h | 20 +++++++++-
+ include/io/mpqemu-link.h      | 12 ++++++
+ io/mpqemu-link.c              |  6 +++
+ remote/remote-main.c          | 73 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 173 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index ff3f06b146..cdb55b2f82 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -32,6 +32,7 @@ remote-pci-obj-$(CONFIG_MPQEMU) += migration/
- remote-pci-obj-$(CONFIG_MPQEMU) += remote/
- remote-pci-obj-$(CONFIG_MPQEMU) += accel/
- remote-pci-obj-$(CONFIG_MPQEMU) += util/
-+remote-pci-obj-$(CONFIG_MPQEMU) += monitor/
+diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+index 87cf39c672..7fd0a312a5 100644
+--- a/hw/proxy/qemu-proxy.c
++++ b/hw/proxy/qemu-proxy.c
+@@ -169,3 +169,67 @@ static void pci_proxy_dev_register_types(void)
  
- remote-pci-obj-$(CONFIG_MPQEMU) += cpus-common.o
- remote-pci-obj-$(CONFIG_MPQEMU) += dma-helpers.o
-@@ -45,6 +46,10 @@ remote-pci-obj-$(CONFIG_MPQEMU) += qemu-parse.o
- # remote-lsi-obj-y is code used to implement remote LSI device
+ type_init(pci_proxy_dev_register_types)
  
- remote-lsi-obj-$(CONFIG_MPQEMU) += hw/
-+remote-lsi-obj-$(CONFIG_MPQEMU) += ui/
-+remote-lsi-obj-$(CONFIG_MPQEMU) += block/
++static void send_bar_access_msg(PCIProxyDev *dev, MemoryRegion *mr,
++                                bool write, hwaddr addr, uint64_t *val,
++                                unsigned size, bool memory)
++{
++    MPQemuLinkState *mpqemu_link = dev->mpqemu_link;
++    MPQemuMsg msg;
++    int wait;
 +
-+#remote-lsi-obj-$(CONFIG_MPQEMU) += device-hotplug.o
- 
- #######################################################################
- # crypto-obj-y is code used by both qemu system emulation and qemu-img
-@@ -113,6 +118,11 @@ common-obj-y += util/machine-notify.o
- 
- endif # CONFIG_SOFTMMU
- 
-+remote-pci-obj-$(CONFIG_MPQEMU) += qapi/
-+remote-pci-obj-$(CONFIG_MPQEMU) += blockdev-nbd.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += job-qmp.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += balloon.o
++    memset(&msg, 0, sizeof(MPQemuMsg));
 +
- #######################################################################
- # Target-independent parts used in system and user emulation
- common-obj-y += cpus-common.o
-diff --git a/Makefile.target b/Makefile.target
-index adc76886f8..1e9e102df8 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -142,13 +142,32 @@ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/hax-stub.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/whpx-stub.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/vl-stub.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/net-stub.o
--remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/replay.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/xen-mapcache.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/audio.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/migration.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/ui-stub.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/gdbstub.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/qapi-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/qapi-misc.o
- 
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += remote/memory.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += arch_init.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += monitor/misc.o
++    msg.bytestream = 0;
++    msg.size = sizeof(msg.data1);
++    msg.data1.bar_access.addr = mr->addr + addr;
++    msg.data1.bar_access.size = size;
++    msg.data1.bar_access.memory = memory;
 +
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-introspect.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-block-core.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-block.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-misc.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-machine-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-misc-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-visit-machine-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-visit-misc-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-types-machine-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-types-misc-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-init-commands.o
- endif
- 
- #########################################################
-@@ -204,6 +223,10 @@ endif
- generated-files-y += hmp-commands.h hmp-commands-info.h
- generated-files-y += config-devices.h
- 
-+ifdef CONFIG_MPQEMU
-+generated-files-y += hmp-scsi-commands.h hmp-scsi-commands-info.h
-+endif
++    if (write) {
++        msg.cmd = BAR_WRITE;
++        msg.data1.bar_access.val = *val;
++    } else {
++        wait = GET_REMOTE_WAIT;
 +
- endif # CONFIG_SOFTMMU
- 
- dummy := $(call unnest-vars,,obj-y)
-@@ -289,10 +312,18 @@ hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
- hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$(TARGET_DIR)$@")
- 
-+ifdef CONFIG_MPQEMU
-+hmp-scsi-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
-+	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -tgt scsi < $< > $@)
++        msg.cmd = BAR_READ;
++        msg.num_fds = 1;
++        msg.fds[0] = wait;
++    }
 +
-+hmp-scsi-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
-+	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -tgt scsi < $< > $@)
-+endif
++    mpqemu_msg_send(&msg, mpqemu_link->dev);
 +
- clean: clean-target
- 	rm -f *.a *~ $(PROGS)
- 	rm -f $(shell find . -name '*.[od]')
--	rm -f hmp-commands.h gdbstub-xml.c
-+	rm -f hmp-commands.h gdbstub-xml.c hmp-scsi-commands.h hmp-scsi-commands-info.h
- 	rm -f trace/generated-helpers.c trace/generated-helpers.c-timestamp
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	rm -f *.stp
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 3e7513967c..734548d48f 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -76,3 +76,6 @@ parallels.o-cflags := $(LIBXML2_CFLAGS)
- parallels.o-libs   := $(LIBXML2_LIBS)
- 
- remote-pci-obj-$(CONFIG_MPQEMU) += stream.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += qapi-sysemu.o
++    if (!write) {
++        *val = wait_for_remote(wait);
++        PUT_REMOTE_WAIT(wait);
++    }
++}
 +
-+remote-lsi-obj-$(CONFIG_MPQEMU) += monitor/
-diff --git a/block/monitor/Makefile.objs b/block/monitor/Makefile.objs
-index 0a74f9a8b5..a0c898711f 100644
---- a/block/monitor/Makefile.objs
-+++ b/block/monitor/Makefile.objs
-@@ -1 +1,3 @@
- common-obj-y += block-hmp-cmds.o
++void proxy_default_bar_write(void *opaque, hwaddr addr, uint64_t val,
++                             unsigned size)
++{
++    ProxyMemoryRegion *pmr = opaque;
 +
-+remote-lsi-obj-$(CONFIG_MPQEMU) += block-hmp-cmds.o
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1b60676d7c..54d01a055f 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -12,6 +12,7 @@ HXCOMM HXCOMM can be used for comments, discarded from both rST and C.
-         .params     = "[cmd]",
-         .help       = "show the help",
-         .cmd        = hmp_do_help_cmd,
-+        .targets    = "scsi",
-         .flags      = "p",
-     },
- 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index e3e80848c8..251b77bc4c 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -49,3 +49,4 @@ remote-pci-obj-$(CONFIG_MPQEMU) += numa.o
- remote-pci-obj-$(CONFIG_MPQEMU) += cpu.o
- remote-pci-obj-$(CONFIG_MPQEMU) += vmstate-if.o
- remote-pci-obj-$(CONFIG_MPQEMU) += resettable.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += machine-qmp-cmds.o
-diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
-index a8533c9dd7..b6949be297 100644
---- a/monitor/Makefile.objs
-+++ b/monitor/Makefile.objs
-@@ -4,3 +4,7 @@ common-obj-y += qmp-cmds.o qmp-cmds-control.o
- common-obj-y += hmp-cmds.o
- 
- storage-daemon-obj-y += monitor.o qmp.o qmp-cmds-control.o
++    send_bar_access_msg(pmr->dev, &pmr->mr, true, addr, &val, size,
++                        pmr->memory);
++}
 +
-+remote-pci-obj-$(CONFIG_MPQEMU) += monitor.o qmp.o hmp.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += qmp-cmds.o qmp-cmds-control.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += hmp-cmds.o
-diff --git a/monitor/misc.c b/monitor/misc.c
-index c0eee6f4ab..edda4cce17 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -1679,13 +1679,21 @@ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp)
- 
- /* Please update hmp-commands.hx when adding or changing commands */
- static HMPCommand hmp_info_cmds[] = {
-+#if defined(SCSI_PROCESS)
-+#include "hmp-scsi-commands-info.h"
-+#else
- #include "hmp-commands-info.h"
-+#endif
-     { NULL, NULL, },
- };
- 
- /* hmp_cmds and hmp_info_cmds would be sorted at runtime */
- HMPCommand hmp_cmds[] = {
-+#if defined(SCSI_PROCESS)
-+#include "hmp-scsi-commands.h"
-+#else
- #include "hmp-commands.h"
-+#endif
-     { NULL, NULL, },
- };
- 
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index 4673ab7490..f7433d6a73 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -36,3 +36,5 @@ QAPI_MODULES_STORAGE_DAEMON = block-core char common control crypto
- QAPI_MODULES_STORAGE_DAEMON += introspect job qom sockets pragma transaction
- 
- storage-daemon-obj-y += $(QAPI_MODULES_STORAGE_DAEMON:%=qapi-commands-%.o)
++uint64_t proxy_default_bar_read(void *opaque, hwaddr addr, unsigned size)
++{
++    ProxyMemoryRegion *pmr = opaque;
++    uint64_t val;
 +
-+remote-pci-obj-$(CONFIG_MPQEMU) += $(QAPI_COMMON_MODULES:%=qapi-commands-%.o)
-diff --git a/qom/Makefile.objs b/qom/Makefile.objs
-index 7e9455db90..546f9fbde6 100644
---- a/qom/Makefile.objs
-+++ b/qom/Makefile.objs
-@@ -6,3 +6,4 @@ storage-daemon-obj-y += qom-qmp-cmds.o
- 
- remote-pci-obj-$(CONFIG_MPQEMU) += object.o qom-qobject.o container.o
- remote-pci-obj-$(CONFIG_MPQEMU) += object_interfaces.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += qom-qmp-cmds.o qom-hmp-cmds.o
-diff --git a/stubs/monitor.c b/stubs/monitor.c
-index 959460834b..1f8fa301f5 100644
---- a/stubs/monitor.c
-+++ b/stubs/monitor.c
-@@ -36,6 +36,7 @@
- #pragma weak monitor_printf
- #pragma weak monitor_cur_is_qmp
- #pragma weak qmp_device_list_properties
-+#pragma weak monitor_fdsets_cleanup
- 
- __thread Monitor *cur_mon;
- 
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index e6da6ff047..c3ac572d6b 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -68,3 +68,5 @@ console-gl.o-libs += $(OPENGL_LIBS)
- egl-helpers.o-libs += $(OPENGL_LIBS)
- egl-context.o-libs += $(OPENGL_LIBS)
- egl-headless.o-libs += $(OPENGL_LIBS)
++    send_bar_access_msg(pmr->dev, &pmr->mr, false, addr, &val, size,
++                        pmr->memory);
 +
-+remote-lsi-obj-$(CONFIG_MPQEMU) += vnc-stubs.o
++     return val;
++}
++
++const MemoryRegionOps proxy_default_ops = {
++    .read = proxy_default_bar_read,
++    .write = proxy_default_bar_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
+diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
+index d7eaf26f29..9e4127eccb 100644
+--- a/include/hw/proxy/qemu-proxy.h
++++ b/include/hw/proxy/qemu-proxy.h
+@@ -26,14 +26,25 @@
+ #define PCI_PROXY_DEV_GET_CLASS(obj) \
+             OBJECT_GET_CLASS(PCIProxyDevClass, (obj), TYPE_PCI_PROXY_DEV)
+ 
+-typedef struct PCIProxyDev {
++typedef struct PCIProxyDev PCIProxyDev;
++
++typedef struct ProxyMemoryRegion {
++    PCIProxyDev *dev;
++    MemoryRegion mr;
++    bool memory;
++    bool present;
++    uint8_t type;
++} ProxyMemoryRegion;
++
++struct PCIProxyDev {
+     PCIDevice parent_dev;
+ 
+     MPQemuLinkState *mpqemu_link;
+ 
+     int socket;
+ 
+-} PCIProxyDev;
++    ProxyMemoryRegion region[PCI_NUM_REGIONS];
++};
+ 
+ typedef struct PCIProxyDevClass {
+     PCIDeviceClass parent_class;
+@@ -43,4 +54,9 @@ typedef struct PCIProxyDevClass {
+     char *command;
+ } PCIProxyDevClass;
+ 
++void proxy_default_bar_write(void *opaque, hwaddr addr, uint64_t val,
++                             unsigned size);
++
++uint64_t proxy_default_bar_read(void *opaque, hwaddr addr, unsigned size);
++
+ #endif /* QEMU_PROXY_H */
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index 7228a1915e..41cf092f9e 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -31,6 +31,8 @@
+ /**
+  * mpqemu_cmd_t:
+  * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
++ * BAR_WRITE        Writes to PCI BAR region
++ * BAR_READ         Reads from PCI BAR region
+  *
+  * proc_cmd_t enum type to specify the command to be executed on the remote
+  * device.
+@@ -41,6 +43,8 @@ typedef enum {
+     CONNECT_DEV,
+     PCI_CONFIG_WRITE,
+     PCI_CONFIG_READ,
++    BAR_WRITE,
++    BAR_READ,
+     MAX,
+ } mpqemu_cmd_t;
+ 
+@@ -56,6 +60,13 @@ typedef struct {
+     ram_addr_t offsets[REMOTE_MAX_FDS];
+ } sync_sysmem_msg_t;
+ 
++typedef struct {
++    hwaddr addr;
++    uint64_t val;
++    unsigned size;
++    bool memory;
++} bar_access_msg_t;
++
+ /**
+  * MPQemuMsg:
+  * @cmd: The remote command
+@@ -78,6 +89,7 @@ typedef struct {
+     union {
+         uint64_t u64;
+         sync_sysmem_msg_t sync_sysmem;
++        bar_access_msg_t bar_access;
+     } data1;
+ 
+     int fds[REMOTE_MAX_FDS];
+diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+index 643c0588ce..2b67ef6410 100644
+--- a/io/mpqemu-link.c
++++ b/io/mpqemu-link.c
+@@ -367,6 +367,12 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
+             return false;
+         }
+         break;
++    case BAR_WRITE:
++    case BAR_READ:
++        if (msg->size != sizeof(msg->data1)) {
++            return false;
++        }
++        break;
+     default:
+         break;
+     }
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index b5ed31f63b..4f512aa5a8 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -33,6 +33,7 @@
+ #include "sysemu/sysemu.h"
+ #include "block/block.h"
+ #include "exec/ramlist.h"
++#include "exec/memattrs.h"
+ 
+ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+                         MPQemuChannel *chan);
+@@ -102,6 +103,66 @@ exit:
+     notify_proxy(wait, ret);
+ }
+ 
++/* TODO: confirm memtx attrs. */
++static void process_bar_write(MPQemuMsg *msg, Error **errp)
++{
++    bar_access_msg_t *bar_access = &msg->data1.bar_access;
++    AddressSpace *as =
++        bar_access->memory ? &address_space_memory : &address_space_io;
++    MemTxResult res;
++
++    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
++                           (uint8_t *)&bar_access->val, bar_access->size, true);
++
++    if (res != MEMTX_OK) {
++        error_setg(errp, "Could not perform address space write operation,"
++                   " inaccessible address: %lx.", bar_access->addr);
++    }
++}
++
++static void process_bar_read(MPQemuMsg *msg, Error **errp)
++{
++    bar_access_msg_t *bar_access = &msg->data1.bar_access;
++    AddressSpace *as;
++    int wait = msg->fds[0];
++    MemTxResult res;
++    uint64_t val = 0;
++
++    as = bar_access->memory ? &address_space_memory : &address_space_io;
++
++    assert(bar_access->size <= sizeof(uint64_t));
++
++    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
++                           (uint8_t *)&val, bar_access->size, false);
++
++    if (res != MEMTX_OK) {
++        error_setg(errp, "Could not perform address space read operation,"
++                   " inaccessible address: %lx.", bar_access->addr);
++        val = (uint64_t)-1;
++        goto fail;
++    }
++
++    switch (bar_access->size) {
++    case 4:
++        val = *((uint32_t *)&val);
++        break;
++    case 2:
++        val = *((uint16_t *)&val);
++        break;
++    case 1:
++        val = *((uint8_t *)&val);
++        break;
++    default:
++        error_setg(errp, "Invalid PCI BAR read size");
++        return;
++    }
++
++fail:
++    notify_proxy(wait, val);
++
++    PUT_REMOTE_WAIT(wait);
++}
++
+ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+                         MPQemuChannel *chan)
+ {
+@@ -131,6 +192,18 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+     case PCI_CONFIG_READ:
+         process_config_read(LINK_TO_DEV(link), msg);
+         break;
++    case BAR_WRITE:
++        process_bar_write(msg, &err);
++        if (err) {
++            goto finalize_loop;
++        }
++        break;
++    case BAR_READ:
++        process_bar_read(msg, &err);
++        if (err) {
++            goto finalize_loop;
++        }
++        break;
+     default:
+         error_setg(&err, "Unknown command");
+         goto finalize_loop;
 -- 
 2.25.GIT
 
