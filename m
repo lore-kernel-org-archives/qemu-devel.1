@@ -2,89 +2,80 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7ACDC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6B3C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:10:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A149B2063A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:09:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33313206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:10:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HgiuCOPn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A149B2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HQk2tIDq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33313206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOge-00045W-Nn
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:09:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48462)
+	id 1jLOiM-0005RA-ET
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:10:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jLOZQ-0003Zc-BS
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:01:33 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOZb-0003tu-Cq
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jLOZP-0001ez-7i
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:01:32 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:37851)
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOZa-0001ls-3A
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:01:43 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:47074)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
- id 1jLOZP-0001e2-0G; Mon, 06 Apr 2020 06:01:31 -0400
-Received: by mail-lj1-x241.google.com with SMTP id r24so13971353ljd.4;
- Mon, 06 Apr 2020 03:01:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=cFvR39LrJejlyXEicAvpk6riu/od5qgMWNd/mQ8Q/IA=;
- b=HgiuCOPnC2uMTIAKa61hLev+yh/4i4zU7/9TWNEyH2pUDfion3cG0pwW/k+8lEe3QN
- 0902V5faWgjBNen4ZWbeoLUAaZ48pbyJiBdW8umDR/I+y2uN733D/uW/57eAPm12ShZi
- j2dk4QlOZOBd4IIIgKnaN/I19BqIJfOzDTwtMkqM+48VfIziOBdWAspKfxcUKcM236CE
- Xxup5zEA5XnZjxNecYpGLmEiHE6nfqtX662fEQhCjLsPIY0PEK1NEMxkLsI/8uqI7qi0
- hN/N4CKTl5hGCsDsMBK6TwlMy7hcqRawggHgbNnvI6f7mOCWwUf3q8NL/Ib8/BPmhMWP
- lK4Q==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jLOZZ-0001ld-VS
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:01:42 -0400
+Received: by mail-oi1-x241.google.com with SMTP id q204so12498595oia.13
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 03:01:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=OJ8S7AnKW5WZF+go9NXLWgFfIZ41YHnovmvRKzZrJfU=;
+ b=HQk2tIDqeL1HlbV8KQXBt3rwNduEWFG8ZyDBItzBoctqHGtFVOVDEt6w1ume6wWeUX
+ liu0RtEyb4G+WVXsIkQ5QvhTwjk84qqeNP1EJAJnGCEukuOOMZSzrr5OLr+0u7s+8Tt0
+ sNcZ0GGswqeLK1jZExvDEQ5Y8oSr+NNfdWPMObZU0Em2951qy32RRpgCXD6XsvoQLMMN
+ t1KLzpMWn+ILsQXu7Ed/HppN4EMChhle/CFCiN/AgZfaf1avtw+uv3qkih1tZKFpEHYc
+ LXVeeIOuBqxsNdE20TcAukRTc5zaOKhg/aU4t8FaU/r3IEz59BjtwjguweNWNExb9SLa
+ uB8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=cFvR39LrJejlyXEicAvpk6riu/od5qgMWNd/mQ8Q/IA=;
- b=ACJKa4G3QIaLUJaJU16LaNFqlfCJ8EDNIkeaQNLrTgfKKaVQtk+woFif6g6hjz40qA
- jl40AWf78VfYH5w2d/Vl8BapD0rxsTL5JqTM/zCutsV0Dp4gqxLjzHfcRoULWybqJpRs
- +r8Eudpqtc+70SSIZINmp9qARMDpzjSBpvIqGBvJrsGdH8G3wNWde/rxSlmD/die0j0Q
- HHzke15xU4XCmCEu8kwLvmeMQCOTmyeLSAjuGQTKVv3ObQ2xwhW5qTEYWGCgxrvZXF3N
- kHyeFMny7QSdLkNgp49EXdpRwdOZPQjAOnowMQs455whgA5ycZLCHKoPzQJoAbsOX2kx
- KZng==
-X-Gm-Message-State: AGi0PuYrELwyHp7krsYoJznsM/ZOYB8h0nN+Q5GL9xCwtr5Y/nhNixnQ
- vq859D2jG/0hmCabkV7cxn8=
-X-Google-Smtp-Source: APiQypLUhKrR1vPFtC0CCtzPENK6geGrPdJgM79NTQMRehz9FkuiTr4aa3MaWO9w44S44bZgepyaJg==
-X-Received: by 2002:a2e:3a19:: with SMTP id h25mr12062672lja.133.1586167289273; 
- Mon, 06 Apr 2020 03:01:29 -0700 (PDT)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- 6sm11185546lft.83.2020.04.06.03.01.28
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 06 Apr 2020 03:01:29 -0700 (PDT)
-Date: Mon, 6 Apr 2020 12:01:26 +0200
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: Re: [PATCH v1 1/2] dma/xlnx-zdma: Fix descriptor loading (MEM) wrt
- endianness
-Message-ID: <20200406100126.umprjykxky3oxfur@fralle-msi>
-References: <20200404122718.25111-1-edgar.iglesias@gmail.com>
- <20200404122718.25111-2-edgar.iglesias@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=OJ8S7AnKW5WZF+go9NXLWgFfIZ41YHnovmvRKzZrJfU=;
+ b=sBtuy1seTlEXIBfax+6FS6JhucsJtXRFKB2/cCqVnxHW2STaOwQcmzNcuXV1H1LtoH
+ i4fo6EydZGYkuq149FlrCk9Tk0h+v4peWGSFBjHdY4/p64rsPinSCwyM4NTEDeizm6+X
+ +5t7k7TqLjbIJhtSe7kg3M6mkKkVKoZ3u1QoH7DUaUWFdE2UeHXFzXm7Qsz3FQaMA4U3
+ rXlYWeCGDXLMu+dQDZI1lCfwLl7ODgEvGbCqlJmaXiO74FR3KiBb9yc18LkqWVxpizHi
+ eQNOzvTc5MpJhcP4iWc444QNzlm7kA1RH6Kuy1NXdLdStBIY3qJonP4GYhbKwaJbew2j
+ 8Eng==
+X-Gm-Message-State: AGi0PuYAKnIA28nH8RNv6NtaBCq3LX2cKuvgaBRKBijNW0sJcB95lh9K
+ FG8QAGVAvHeWTxR0ACe04NPCIFwpIybLvUOo6Xcc0gIKy60=
+X-Google-Smtp-Source: APiQypKeljibhpwASjlqIdECMCvjif96mxNpYOUkVAU7H7ygS8nfBuaT09Aa5gO31FgEGn1y+3WqpsUT5CkYtYmXo1o=
+X-Received: by 2002:a05:6808:8cb:: with SMTP id
+ k11mr11432224oij.48.1586167300962; 
+ Mon, 06 Apr 2020 03:01:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200404122718.25111-2-edgar.iglesias@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20200324173630.12221-1-peter.maydell@linaro.org>
+In-Reply-To: <20200324173630.12221-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Apr 2020 11:01:29 +0100
+Message-ID: <CAFEAcA-HEZ8S_Dt86uwrm2neOBZNaPVOuPK3i+HHhMUCD+G6YQ@mail.gmail.com>
+Subject: Re: [PATCH for-5.0] dump: Fix writing of ELF section
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::241
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,69 +87,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me,
- richard.henderson@linaro.org, qemu-devel@nongnu.org,
- frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
- luc.michel@greensocs.com
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On [2020 Apr 04] Sat 14:27:17, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Fix descriptor loading from memory wrt host endianness.
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+I forgot to cc qemu-stable, so doing that now (I've also added the
+Cc: tag to the commit message for when I send this in the target-arm
+pullreq today); for the record, the Coverity id is CID 1421970
+(also added to the commit message).
 
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+thanks
+-- PMM
 
+On Tue, 24 Mar 2020 at 17:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> In write_elf_section() we set the 'shdr' pointer to point to local
+> structures shdr32 or shdr64, which we fill in to be written out to
+> the ELF dump.  Unfortunately the address we pass to fd_write_vmcore()
+> has a spurious '&' operator, so instead of writing out the section
+> header we write out the literal pointer value followed by whatever is
+> on the stack after the 'shdr' local variable.
+>
+> Pass the correct address into fd_write_vmcore().
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/dma/xlnx-zdma.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index 1c45367f3c..5f4775f663 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -299,19 +299,22 @@ static void zdma_put_regaddr64(XlnxZDMA *s, unsigned int basereg, uint64_t addr)
->      s->regs[basereg + 1] = addr >> 32;
->  }
->  
-> -static bool zdma_load_descriptor(XlnxZDMA *s, uint64_t addr, void *buf)
-> +static bool zdma_load_descriptor(XlnxZDMA *s, uint64_t addr,
-> +                                 XlnxZDMADescr *descr)
->  {
->      /* ZDMA descriptors must be aligned to their own size.  */
->      if (addr % sizeof(XlnxZDMADescr)) {
->          qemu_log_mask(LOG_GUEST_ERROR,
->                        "zdma: unaligned descriptor at %" PRIx64,
->                        addr);
-> -        memset(buf, 0x0, sizeof(XlnxZDMADescr));
-> +        memset(descr, 0x0, sizeof(XlnxZDMADescr));
->          s->error = true;
->          return false;
+> I have not tested this because I can't reproduce the conditions
+> under which we try to actually use write_elf_section() (they
+> must be rare, because currently we produce a bogus ELF file
+> for this code path). In dump_init() s->list.num must be
+> at least UINT16_MAX-1, which I think means it has to be a
+> paging-enabled dump and the guest's page table must be
+> extremely fragmented ?
+> ---
+>  dump/dump.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/dump/dump.c b/dump/dump.c
+> index 6fb6e1245ad..22ed1d3b0d4 100644
+> --- a/dump/dump.c
+> +++ b/dump/dump.c
+> @@ -364,7 +364,7 @@ static void write_elf_section(DumpState *s, int type, Error **errp)
+>          shdr = &shdr64;
 >      }
->  
-> -    address_space_read(s->dma_as, addr, s->attr, buf, sizeof(XlnxZDMADescr));
-> +    descr->addr = address_space_ldq_le(s->dma_as, addr, s->attr, NULL);
-> +    descr->size = address_space_ldl_le(s->dma_as, addr + 8, s->attr, NULL);
-> +    descr->attr = address_space_ldl_le(s->dma_as, addr + 12, s->attr, NULL);
->      return true;
->  }
->  
-> @@ -344,7 +347,7 @@ static void zdma_update_descr_addr(XlnxZDMA *s, bool type,
->      } else {
->          addr = zdma_get_regaddr64(s, basereg);
->          addr += sizeof(s->dsc_dst);
-> -        address_space_read(s->dma_as, addr, s->attr, (void *) &next, 8);
-> +        next = address_space_ldq_le(s->dma_as, addr, s->attr, NULL);
->      }
->  
->      zdma_put_regaddr64(s, basereg, next);
-> -- 
+>
+> -    ret = fd_write_vmcore(&shdr, shdr_size, s);
+> +    ret = fd_write_vmcore(shdr, shdr_size, s);
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret,
+>                           "dump: failed to write section header table");
+> --
 > 2.20.1
-> 
+>
 
