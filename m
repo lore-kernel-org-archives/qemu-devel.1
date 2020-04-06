@@ -2,157 +2,84 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87180C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CCD1C2BA1A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:59:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57B5A20672
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 512AA206C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:59:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBXIoWwD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B5A20672
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="clotFUMs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512AA206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLXnd-0003iZ-He
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 15:52:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56488)
+	id 1jLXuY-0006IL-Gc
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 15:59:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jLXms-0002uJ-3p
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:52:03 -0400
+ (envelope-from <eblake@redhat.com>) id 1jLXto-0005sp-MU
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:59:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jLXmq-0006Up-Nf
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:52:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36769
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jLXtn-0002zZ-CS
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:59:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42117
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jLXmq-0006UE-K3
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:52:00 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jLXtm-0002yO-W7
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:59:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586202719;
+ s=mimecast20190719; t=1586203150;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=tbwP8yJvSTO0MRps4XTF5IGYqUsUqVZ2szwqog79DHw=;
- b=VBXIoWwDXOy5yW5XFpDzWHUeTVVsGn1vJ1LqRXfU0Uq5OmvLH77cAOs7LxRfYPeqBFzXmk
- +0NQyjAcaPj7vSDbysz5RAQK47+mvqgjicv5lZ5lI8pDI7yecZvc1Uo3+1+zeyyIy23UNc
- ooB4GDhSwy4Y5LNFSOdQKHOpnPJCpyM=
+ in-reply-to:in-reply-to:references:references;
+ bh=l9+ji3xaXKxyfr2ITKBdZWIG6xJgpqEZtRAIct9C+KY=;
+ b=clotFUMspZLiX43qanTqCVRcNsgfuKqSUfZx0tq/09zL9aR6gOR/CqR2kQIYnwxKgJtzLy
+ jFAv09OqeneYHpj2IB2TYwECkPOGq1PwL2rIuW06tL0rCU/1zwPFwwX60w48GUnLkX25t8
+ LARll+xAiEWv4w6OlfN9IhejW9gvmu0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-4oQDEjb9MzKwqKtpAe9dCg-1; Mon, 06 Apr 2020 15:51:54 -0400
-X-MC-Unique: 4oQDEjb9MzKwqKtpAe9dCg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-361-1Du1Zg5ePnqAnCdwSecYfw-1; Mon, 06 Apr 2020 15:59:04 -0400
+X-MC-Unique: 1Du1Zg5ePnqAnCdwSecYfw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB101800D4E
- for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 19:51:53 +0000 (UTC)
-Received: from [10.10.115.55] (ovpn-115-55.rdu2.redhat.com [10.10.115.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 41CF85C1B0;
- Mon,  6 Apr 2020 19:51:53 +0000 (UTC)
-Subject: Re: FYI GitHub pull request / issue tracker lockdown bot
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200403142213.GO559148@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <b321b36e-d18f-623b-f8a1-93bd4b3fb779@redhat.com>
-Date: Mon, 6 Apr 2020 15:51:52 -0400
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 965CE18C43C7;
+ Mon,  6 Apr 2020 19:59:03 +0000 (UTC)
+Received: from [10.3.114.49] (ovpn-114-49.phx2.redhat.com [10.3.114.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D92778F34F;
+ Mon,  6 Apr 2020 19:59:00 +0000 (UTC)
+Subject: Re: [PATCH 1/4] atomics: convert to reStructuredText
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200406191320.13371-1-pbonzini@redhat.com>
+ <20200406191320.13371-2-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d0585240-030b-00c3-cece-bec1d2fa2870@redhat.com>
+Date: Mon, 6 Apr 2020 14:58:59 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200403142213.GO559148@redhat.com>
+In-Reply-To: <20200406191320.13371-2-pbonzini@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -164,60 +91,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Ying Fang <fangying1@huawei.com>, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 4/6/20 2:13 PM, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   docs/devel/atomics.rst | 447 +++++++++++++++++++++++++++++++++++++++++
+>   docs/devel/atomics.txt | 403 -------------------------------------
+>   docs/devel/index.rst   |   1 +
+>   3 files changed, 448 insertions(+), 403 deletions(-)
+>   create mode 100644 docs/devel/atomics.rst
+>   delete mode 100644 docs/devel/atomics.txt
+> 
+
+Pre-existing grammar nits, that you may want to touch up while reformatting:
+
+> +Compiler memory barrier
+> +=======================
+> +
+> +``barrier()`` prevents the compiler from moving the memory accesses either
+> +side of it to the other side.  The compiler barrier has no direct effect
+
+s/either/on either/
 
 
-On 4/3/20 10:22 AM, Daniel P. Berrang=C3=A9 wrote:
-> QEMU, like libvirt, has a github.com project which contains automated
-> read-only mirrors of QEMU repositories.
->=20
->   https://github.com/qemu/
->=20
-> An unfortunate side effect of this is that some users will try to open
-> pull requests against these mirrors. These get ignored until eventually
-> someone notices and closes the request. QEMU has had about 90 prs opened
-> over the years.
->=20
->   https://github.com/qemu/qemu/pulls
->=20
-> The same applies to the issue tracker, but fortunately github lets
-> projects disable this feature, which QEMU has done.
->=20
-> I have recently discovered that there is a nice 3rd party bot for github
-> which can autorespond to pull requests with a friendly comment, close the
-> request, and then lock it to prevent further comments.
->=20
->   https://github.com/apps/repo-lockdown
->=20
-> I'm setting this up for libvirt and it was suggested QEMU can probably
-> benefit from it too as an example see:
->=20
->   https://github.com/libvirt/test/issues/2
->   https://github.com/libvirt/test/pull/3
->=20
->=20
-> Configuration just requires creation of a ".github/lockdown.yml" file
-> which provides the friendly message to add to the merge requests. This
-> can be either done per-repository, or a special repo can be created
-> called ".github" and this will apply to all repos within the project.
->=20
-> Ideally each repo would have a CONTRIBUTING.md file created too, since
-> both GitHub and GitLab will direct users to this file for guidelines
-> on how to contribute.
->=20
-> I don't have time right now to do this for QEMU, so consider this email
-> a friendly suggestion for some other interested person to do for QEMU...
->=20
-> Regards,
-> Daniel
->=20
+> +``qemu/atomic.h`` provides the following set of atomic read-modify-write
+> +operations::
+> +
+> +    void atomic_inc(ptr)
+> +    void atomic_dec(ptr)
+> +    void atomic_add(ptr, val)
+> +    void atomic_sub(ptr, val)
+> +    void atomic_and(ptr, val)
+> +    void atomic_or(ptr, val)
+> +
+> +    typeof(*ptr) atomic_fetch_inc(ptr)
+> +    typeof(*ptr) atomic_fetch_dec(ptr)
+> +    typeof(*ptr) atomic_fetch_add(ptr, val)
+> +    typeof(*ptr) atomic_fetch_sub(ptr, val)
+> +    typeof(*ptr) atomic_fetch_and(ptr, val)
+> +    typeof(*ptr) atomic_fetch_or(ptr, val)
+> +    typeof(*ptr) atomic_fetch_xor(ptr, val)
+> +    typeof(*ptr) atomic_fetch_inc_nonzero(ptr)
+> +    typeof(*ptr) atomic_xchg(ptr, val)
+> +    typeof(*ptr) atomic_cmpxchg(ptr, old, new)
+> +
+> +all of which return the old value of ``*ptr``.  These operations are
+> +polymorphic; they operate on any type that is as wide as a pointer.
 
-This looks cool. Who has access to our github to request it start
-scanning our repo to look for said .github/lockdown.yml file?
+Is th is 'as wide as a pointer' or 'no wider than a pointer'? In other 
+words, can 'val' be a narrower type?
 
---js
+
+> +However, and this is the important difference between
+> +atomic_mb_read/atomic_mb_set and sequential consistency, it is important
+> +for both threads to access the same volatile variable.  It is not the
+> +case that everything visible to thread A when it writes volatile field f
+> +becomes visible to thread B after it reads volatile field g. The store
+> +and load have to "match" (i.e., be performed on the same volatile
+> +field) to achieve the right semantics.
+> +
+> +
+> +These operations operate on any type that is as wide as an int or smaller.
+
+Is that all operations in this same section, or only the last set of two 
+operations (atomic_mb_read/set)?  What is the appropriate code to use if 
+a pointer is wider than int?
+
+
+> +
+> +You can see that the two possible definitions of ``atomic_mb_read()``
+> +and ``atomic_mb_set()`` are the following:
+> +
+> +  1) | atomic_mb_read(p)   = atomic_read(p); smp_mb_acquire()
+> +     | atomic_mb_set(p, v) = smp_mb_release(); atomic_set(p, v); smp_mb()
+> +
+> +  2) | atomic_mb_read(p)   = smp_mb() atomic_read(p); smp_mb_acquire()
+
+Missing semicolon after smp_mb()
+
+> +     | atomic_mb_set(p, v) = smp_mb_release(); atomic_set(p, v);
+> +
+> +Usually the former is used, because ``smp_mb()`` is expensive and a program
+> +normally has more reads than writes.  Therefore it makes more sense to
+> +make ``atomic_mb_set()`` the more expensive operation.
+> +
+
+> +Memory barrier pairing
+> +----------------------
+> +
+> +A useful rule of thumb is that memory barriers should always, or almost
+> +always, be paired with another barrier.  In the case of QEMU, however,
+> +note that the other barrier may actually be in a driver that runs in
+> +the guest!
+> +
+> +For the purposes of pairing, ``smp_read_barrier_depends()`` and ``smp_rmb()``
+> +both count as read barriers.  A read barrier shall pair with a write
+> +barrier or a full barrier; a write barrier shall pair with a read
+
+'shall' is awkward (if this is not a formal RFC-style requirement), 
+better for colloquial English is 'must' or 'should' (twice)
+
+> +barrier or a full barrier.  A full barrier can pair with anything.
+
+> +Comparison with Linux kernel memory barriers
+> +============================================
+> +
+> +Here is a list of differences between Linux kernel atomic operations
+> +and memory barriers, and the equivalents in QEMU:
+> +
+> +- atomic operations in Linux are always on a 32-bit int type and
+> +  use a boxed atomic_t type; atomic operations in QEMU are polymorphic
+> +  and use normal C types.
+> +
+> +- Originally, atomic_read and atomic_set in Linux gave no guarantee
+> +  at all. Linux 4.1 updated them to implement volatile
+> +  semantics via ACCESS_ONCE (or the more recent READ/WRITE_ONCE).
+> +
+> +  QEMU's atomic_read/set implement, if the compiler supports it, C11
+> +  atomic relaxed semantics, and volatile semantics otherwise.
+
+Reads better as:
+
+QEMU's atomic_read/set implement C11 atomic relaxed semantics if the 
+compiler supports it, and volatile semantics otherwise.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
