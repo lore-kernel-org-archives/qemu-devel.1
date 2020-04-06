@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B22C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EE5C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDC162063A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:59:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B13F22063A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:59:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jQkhXT1M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDC162063A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xKMU61KF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B13F22063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOXH-0007Xt-12
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:59:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44987)
+	id 1jLOXZ-00089Y-T6
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:59:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIw-0006XS-Km
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:33 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIL-0005gr-Gw
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIv-00042b-2M
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:30 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:36838)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIJ-0003dN-B5
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:53 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47066)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOIu-00041l-Pm
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:29 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369hpLH093026;
- Mon, 6 Apr 2020 09:44:14 GMT
+ id 1jLOIJ-0003cU-25
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:51 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369heQ5073032;
+ Mon, 6 Apr 2020 09:43:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=1PhzKLozBMPHH7oqxxC9Ov6cuOiC3lWW+T0/mLX01j8=;
- b=jQkhXT1MOpd41igH4GxelcfLH4QTc+TTA7Su3HtOjmm3FpWWIJQfJckqI1yTGWp6J/lZ
- S2X6A7gP+Y5utnK4chznX9nnPRghjOgUvRnJ7+PH4T1l7z3zELN3s6nP/nruJ1Ospfop
- lbVcfMspJW7V/8cbqXxnXn9/MycjSkV1PlLjYXMq528e5JyjdWGNmUXArqUC9VP+bNI5
- KAU/X08dnN8BEi0wFnkd8rNV6gGB6Y9y8jz9i3VStLhgYQcAJ4Hp228mfjimxTlUP37h
- rMxWxsBXl3hyCTYMrA9TMoP9xvWoD4ovAp9SsAprkobLhvg60eItEvrcBwgEKQgjx65Z YA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 306hnqwu7r-1
+ bh=rhVR2dPIww6dDESuuvSXnMdKtTtRaFanuh6jModnbhE=;
+ b=xKMU61KFaNsb/ld8K2z5sIEoQnNesusECb7Ge0Jqqf5fj2aIf1yMDsoXUfW8VNi7uZ/S
+ zABflOgRXYzZpH9ltBAQ6EWgu3Nob0nMO2DCIhm8nOwjjxxw9g6qfDs6vTJNrBhIdzRF
+ lm2EYPDDp8FRhOUJsnNYDX0Fx201N5rNZGlu6Dh3fEw2NyVgfl7mAU3TSHM+UFM0bM9p
+ McMeXjmcaFjgRnOtHMmFlyXgReFrvs8OKQoPO+xweOL/u3t9gFxMbfv7EvbtbB2NYmf/
+ hmcOqRPYnMxPMw8JtIOXGFZ8DHfR5f+1zVozAYaZ5GjtjmBPAztYI781H88Q5BJWy+6T mA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 306j6m5tj5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:44:14 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369ciqa092283;
- Mon, 6 Apr 2020 09:42:13 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 3073spk6ey-1
+ Mon, 06 Apr 2020 09:43:45 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369bKlm056262;
+ Mon, 6 Apr 2020 09:41:44 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 3073qcnc4b-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:13 +0000
+ Mon, 06 Apr 2020 09:41:44 +0000
 Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369gC6K032002;
- Mon, 6 Apr 2020 09:42:12 GMT
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369fgtO030556;
+ Mon, 6 Apr 2020 09:41:42 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:42:12 -0700
+ with ESMTP ; Mon, 06 Apr 2020 02:41:41 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 24/36] multi-process: Retrieve PCI info from remote process
-Date: Mon,  6 Apr 2020 02:41:14 -0700
-Message-Id: <c873c6abec14cb5ddd82e855424013f7b5d7be9d.1586165556.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v6 06/36] monitor: destaticize HMP commands
+Date: Mon,  6 Apr 2020 02:40:56 -0700
+Message-Id: <5b37943ea8f27258f29b1c8a5cd8a4905ae82739.1586165555.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
@@ -78,21 +78,21 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- phishscore=0 spamscore=0
- malwarescore=0 suspectscore=3 adultscore=0 bulkscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxscore=0 mlxlogscore=999
+ spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=1
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004060083
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- phishscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=3
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060084
+ mlxlogscore=999 spamscore=0
+ priorityscore=1501 suspectscore=1 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060084
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,207 +118,425 @@ Sender: "Qemu-devel"
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-Retrieve PCI configuration info about the remote device and
-configure the Proxy PCI object based on the returned information
-
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- hw/proxy/qemu-proxy.c    | 84 ++++++++++++++++++++++++++++++++++++++++
- include/io/mpqemu-link.h | 10 +++++
- remote/remote-main.c     | 21 ++++++++++
- 3 files changed, 115 insertions(+)
+ hmp-commands.hx            |  4 +-
+ monitor/misc.c             | 76 +++++++++++++++++++-------------------
+ monitor/monitor-internal.h | 38 +++++++++++++++++++
+ 3 files changed, 78 insertions(+), 40 deletions(-)
 
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index a78694736b..730e28483e 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -19,6 +19,8 @@
- #include "sysemu/kvm.h"
- #include "util/event_notifier-posix.c"
- 
-+static void probe_pci_info(PCIDevice *dev);
-+
- static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val, int l,
-                           unsigned int op)
- {
-@@ -182,8 +184,12 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
- {
-     PCIProxyDev *dev = PCI_PROXY_DEV(device);
-     PCIProxyDevClass *k = PCI_PROXY_DEV_GET_CLASS(dev);
-+    uint8_t *pci_conf = device->config;
-     Error *local_err = NULL;
- 
-+    pci_conf[PCI_LATENCY_TIMER] = 0xff;
-+    pci_conf[PCI_INTERRUPT_PIN] = 0x01;
-+
-     if (k->realize) {
-         k->realize(dev, &local_err);
-         if (local_err) {
-@@ -196,6 +202,8 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
-     configure_memory_sync(dev->sync, dev->mpqemu_link);
- 
-     setup_irqfd(dev);
-+
-+    probe_pci_info(PCI_DEVICE(dev));
- }
- 
- static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
-@@ -291,3 +299,79 @@ const MemoryRegionOps proxy_default_ops = {
-         .max_access_size = 1,
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 7f0f3974ad..02cae25c24 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -11,7 +11,7 @@ HXCOMM HXCOMM can be used for comments, discarded from both rST and C.
+         .args_type  = "name:S?",
+         .params     = "[cmd]",
+         .help       = "show the help",
+-        .cmd        = do_help_cmd,
++        .cmd        = hmp_do_help_cmd,
+         .flags      = "p",
      },
- };
-+
-+static void probe_pci_info(PCIDevice *dev)
-+{
-+    PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(dev);
-+    DeviceClass *dc = DEVICE_CLASS(pc);
-+    PCIProxyDev *pdev = PCI_PROXY_DEV(dev);
-+    MPQemuLinkState *mpqemu_link = pdev->mpqemu_link;
-+    MPQemuMsg msg, ret;
-+    uint32_t orig_val, new_val, class;
-+    uint8_t type;
-+    int i, size;
-+    char *name;
-+
-+    memset(&msg, 0, sizeof(MPQemuMsg));
-+    msg.bytestream = 0;
-+    msg.size = 0;
-+    msg.cmd = GET_PCI_INFO;
-+    mpqemu_msg_send(&msg, mpqemu_link->dev);
-+
-+    mpqemu_msg_recv(&ret, mpqemu_link->dev);
-+
-+    pc->vendor_id = ret.data1.ret_pci_info.vendor_id;
-+    pc->device_id = ret.data1.ret_pci_info.device_id;
-+    pc->class_id = ret.data1.ret_pci_info.class_id;
-+    pc->subsystem_id = ret.data1.ret_pci_info.subsystem_id;
-+
-+    config_op_send(pdev, 11, &class, 1, PCI_CONFIG_READ);
-+    switch (class) {
-+    case PCI_BASE_CLASS_BRIDGE:
-+        set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+        break;
-+    case PCI_BASE_CLASS_STORAGE:
-+        set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+        break;
-+    case PCI_BASE_CLASS_NETWORK:
-+        set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-+        break;
-+    case PCI_BASE_CLASS_INPUT:
-+        set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
-+        break;
-+    case PCI_BASE_CLASS_DISPLAY:
-+        set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+        break;
-+    case PCI_BASE_CLASS_PROCESSOR:
-+        set_bit(DEVICE_CATEGORY_CPU, dc->categories);
-+        break;
-+    default:
-+        set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+        break;
-+    }
-+
-+    for (i = 0; i < 6; i++) {
-+        config_op_send(pdev, 0x10 + (4 * i), &orig_val, 4, PCI_CONFIG_READ);
-+        new_val = 0xffffffff;
-+        config_op_send(pdev, 0x10 + (4 * i), &new_val, 4, PCI_CONFIG_WRITE);
-+        config_op_send(pdev, 0x10 + (4 * i), &new_val, 4, PCI_CONFIG_READ);
-+        size = (~(new_val & 0xFFFFFFF0)) + 1;
-+        config_op_send(pdev, 0x10 + (4 * i), &orig_val, 4, PCI_CONFIG_WRITE);
-+        type = (new_val & 0x1) ?
-+                   PCI_BASE_ADDRESS_SPACE_IO : PCI_BASE_ADDRESS_SPACE_MEMORY;
-+
-+        if (size) {
-+            pdev->region[i].dev = pdev;
-+            pdev->region[i].present = true;
-+            if (type == PCI_BASE_ADDRESS_SPACE_MEMORY) {
-+                pdev->region[i].memory = true;
-+            }
-+            name = g_strdup_printf("bar-region-%d", i);
-+            memory_region_init_io(&pdev->region[i].mr, OBJECT(pdev),
-+                                  &proxy_default_ops, &pdev->region[i],
-+                                  name, size);
-+            pci_register_bar(dev, i, type, &pdev->region[i].mr);
-+            g_free(name);
-+        }
-+    }
-+}
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index 14e4be2bd0..102c736705 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -48,6 +48,8 @@ typedef enum {
-     BAR_WRITE,
-     BAR_READ,
-     SET_IRQFD,
-+    GET_PCI_INFO,
-+    RET_PCI_INFO,
-     MAX,
- } mpqemu_cmd_t;
  
-@@ -70,6 +72,13 @@ typedef struct {
-     bool memory;
- } bar_access_msg_t;
+@@ -555,7 +555,7 @@ ERST
+         .args_type  = "fmt:/,val:l",
+         .params     = "/fmt expr",
+         .help       = "print expression value (use $reg for CPU register access)",
+-        .cmd        = do_print,
++        .cmd        = hmp_do_print,
+     },
  
-+typedef struct {
-+    uint16_t vendor_id;
-+    uint16_t device_id;
-+    uint16_t class_id;
-+    uint16_t subsystem_id;
-+} ret_pci_info_msg_t;
-+
- /**
-  * MPQemuMsg:
-  * @cmd: The remote command
-@@ -98,6 +107,7 @@ typedef struct {
-         sync_sysmem_msg_t sync_sysmem;
-         bar_access_msg_t bar_access;
-         set_irqfd_msg_t set_irqfd;
-+        ret_pci_info_msg_t ret_pci_info;
-     } data1;
- 
-     int fds[REMOTE_MAX_FDS];
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 697fb992a1..d249eba9e8 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -165,6 +165,24 @@ fail:
-     PUT_REMOTE_WAIT(wait);
+ SRST
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 6c45fa490f..c0eee6f4ab 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -178,12 +178,12 @@ int hmp_compare_cmd(const char *name, const char *list)
+     return 0;
  }
  
-+static void process_get_pci_info_msg(MPQemuLinkState *link, MPQemuMsg *msg)
-+{
-+    PCIDevice *pci_dev = LINK_TO_DEV(link);
-+    PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
-+    MPQemuMsg ret = { 0 };
-+
-+    ret.cmd = RET_PCI_INFO;
-+
-+    ret.data1.ret_pci_info.vendor_id = pc->vendor_id;
-+    ret.data1.ret_pci_info.device_id = pc->device_id;
-+    ret.data1.ret_pci_info.class_id = pc->class_id;
-+    ret.data1.ret_pci_info.subsystem_id = pc->subsystem_id;
-+
-+    ret.size = sizeof(ret.data1);
-+
-+    mpqemu_msg_send(&ret, link->dev);
-+}
-+
- static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-                         MPQemuChannel *chan)
+-static void do_help_cmd(Monitor *mon, const QDict *qdict)
++void hmp_do_help_cmd(Monitor *mon, const QDict *qdict)
  {
-@@ -219,6 +237,9 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-     case SET_IRQFD:
-         process_set_irqfd_msg(LINK_TO_DEV(link), msg);
-         break;
-+    case GET_PCI_INFO:
-+        process_get_pci_info_msg(link, msg);
-+        break;
-     default:
-         error_setg(&err, "Unknown command");
-         goto finalize_loop;
+     help_cmd(mon, qdict_get_try_str(qdict, "name"));
+ }
+ 
+-static void hmp_trace_event(Monitor *mon, const QDict *qdict)
++void hmp_trace_event(Monitor *mon, const QDict *qdict)
+ {
+     const char *tp_name = qdict_get_str(qdict, "name");
+     bool new_state = qdict_get_bool(qdict, "option");
+@@ -227,7 +227,7 @@ static void hmp_trace_file(Monitor *mon, const QDict *qdict)
+ }
+ #endif
+ 
+-static void hmp_info_help(Monitor *mon, const QDict *qdict)
++void hmp_info_help(Monitor *mon, const QDict *qdict)
+ {
+     help_cmd(mon, "info");
+ }
+@@ -315,7 +315,7 @@ int monitor_get_cpu_index(void)
+     return cs ? cs->cpu_index : UNASSIGNED_CPU_INDEX;
+ }
+ 
+-static void hmp_info_registers(Monitor *mon, const QDict *qdict)
++void hmp_info_registers(Monitor *mon, const QDict *qdict)
+ {
+     bool all_cpus = qdict_get_try_bool(qdict, "cpustate_all", false);
+     CPUState *cs;
+@@ -338,7 +338,7 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+ }
+ 
+ #ifdef CONFIG_TCG
+-static void hmp_info_jit(Monitor *mon, const QDict *qdict)
++void hmp_info_jit(Monitor *mon, const QDict *qdict)
+ {
+     if (!tcg_enabled()) {
+         error_report("JIT information is only available with accel=tcg");
+@@ -349,13 +349,13 @@ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+     dump_drift_info();
+ }
+ 
+-static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
++void hmp_info_opcount(Monitor *mon, const QDict *qdict)
+ {
+     dump_opcount_info();
+ }
+ #endif
+ 
+-static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
++void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
+ {
+     int64_t max = qdict_get_try_int(qdict, "max", 10);
+     bool mean = qdict_get_try_bool(qdict, "mean", false);
+@@ -366,7 +366,7 @@ static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
+     qsp_report(max, sort_by, coalesce);
+ }
+ 
+-static void hmp_info_history(Monitor *mon, const QDict *qdict)
++void hmp_info_history(Monitor *mon, const QDict *qdict)
+ {
+     MonitorHMP *hmp_mon = container_of(mon, MonitorHMP, common);
+     int i;
+@@ -386,7 +386,7 @@ static void hmp_info_history(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
++void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+ {
+     CPUState *cs = mon_get_cpu();
+ 
+@@ -397,7 +397,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+     cpu_dump_statistics(cs, 0);
+ }
+ 
+-static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
++void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+ {
+     const char *name = qdict_get_try_str(qdict, "name");
+     bool has_vcpu = qdict_haskey(qdict, "vcpu");
+@@ -457,7 +457,7 @@ void qmp_client_migrate_info(const char *protocol, const char *hostname,
+     error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "protocol", "spice");
+ }
+ 
+-static void hmp_logfile(Monitor *mon, const QDict *qdict)
++void hmp_logfile(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
+ 
+@@ -467,7 +467,7 @@ static void hmp_logfile(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_log(Monitor *mon, const QDict *qdict)
++void hmp_log(Monitor *mon, const QDict *qdict)
+ {
+     int mask;
+     const char *items = qdict_get_str(qdict, "items");
+@@ -484,7 +484,7 @@ static void hmp_log(Monitor *mon, const QDict *qdict)
+     qemu_set_log(mask);
+ }
+ 
+-static void hmp_singlestep(Monitor *mon, const QDict *qdict)
++void hmp_singlestep(Monitor *mon, const QDict *qdict)
+ {
+     const char *option = qdict_get_try_str(qdict, "option");
+     if (!option || !strcmp(option, "on")) {
+@@ -496,7 +496,7 @@ static void hmp_singlestep(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_gdbserver(Monitor *mon, const QDict *qdict)
++void hmp_gdbserver(Monitor *mon, const QDict *qdict)
+ {
+     const char *device = qdict_get_try_str(qdict, "device");
+     if (!device)
+@@ -512,7 +512,7 @@ static void hmp_gdbserver(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_watchdog_action(Monitor *mon, const QDict *qdict)
++void hmp_watchdog_action(Monitor *mon, const QDict *qdict)
+ {
+     const char *action = qdict_get_str(qdict, "action");
+     if (select_watchdog_action(action) == -1) {
+@@ -654,7 +654,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+     }
+ }
+ 
+-static void hmp_memory_dump(Monitor *mon, const QDict *qdict)
++void hmp_memory_dump(Monitor *mon, const QDict *qdict)
+ {
+     int count = qdict_get_int(qdict, "count");
+     int format = qdict_get_int(qdict, "format");
+@@ -664,7 +664,7 @@ static void hmp_memory_dump(Monitor *mon, const QDict *qdict)
+     memory_dump(mon, count, format, size, addr, 0);
+ }
+ 
+-static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
++void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
+ {
+     int count = qdict_get_int(qdict, "count");
+     int format = qdict_get_int(qdict, "format");
+@@ -694,7 +694,7 @@ static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
+     return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
+ }
+ 
+-static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
++void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
+ {
+     hwaddr addr = qdict_get_int(qdict, "addr");
+     Error *local_err = NULL;
+@@ -714,7 +714,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
+     memory_region_unref(mr);
+ }
+ 
+-static void hmp_gva2gpa(Monitor *mon, const QDict *qdict)
++void hmp_gva2gpa(Monitor *mon, const QDict *qdict)
+ {
+     target_ulong addr = qdict_get_int(qdict, "addr");
+     MemTxAttrs attrs;
+@@ -769,7 +769,7 @@ out:
+     return ret;
+ }
+ 
+-static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
++void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
+ {
+     hwaddr addr = qdict_get_int(qdict, "addr");
+     Error *local_err = NULL;
+@@ -796,7 +796,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
+ }
+ #endif
+ 
+-static void do_print(Monitor *mon, const QDict *qdict)
++void hmp_do_print(Monitor *mon, const QDict *qdict)
+ {
+     int format = qdict_get_int(qdict, "format");
+     hwaddr val = qdict_get_int(qdict, "val");
+@@ -822,7 +822,7 @@ static void do_print(Monitor *mon, const QDict *qdict)
+     monitor_printf(mon, "\n");
+ }
+ 
+-static void hmp_sum(Monitor *mon, const QDict *qdict)
++void hmp_sum(Monitor *mon, const QDict *qdict)
+ {
+     uint32_t addr;
+     uint16_t sum;
+@@ -842,7 +842,7 @@ static void hmp_sum(Monitor *mon, const QDict *qdict)
+ 
+ static int mouse_button_state;
+ 
+-static void hmp_mouse_move(Monitor *mon, const QDict *qdict)
++void hmp_mouse_move(Monitor *mon, const QDict *qdict)
+ {
+     int dx, dy, dz, button;
+     const char *dx_str = qdict_get_str(qdict, "dx_str");
+@@ -866,7 +866,7 @@ static void hmp_mouse_move(Monitor *mon, const QDict *qdict)
+     qemu_input_event_sync();
+ }
+ 
+-static void hmp_mouse_button(Monitor *mon, const QDict *qdict)
++void hmp_mouse_button(Monitor *mon, const QDict *qdict)
+ {
+     static uint32_t bmap[INPUT_BUTTON__MAX] = {
+         [INPUT_BUTTON_LEFT]       = MOUSE_EVENT_LBUTTON,
+@@ -883,7 +883,7 @@ static void hmp_mouse_button(Monitor *mon, const QDict *qdict)
+     mouse_button_state = button_state;
+ }
+ 
+-static void hmp_ioport_read(Monitor *mon, const QDict *qdict)
++void hmp_ioport_read(Monitor *mon, const QDict *qdict)
+ {
+     int size = qdict_get_int(qdict, "size");
+     int addr = qdict_get_int(qdict, "addr");
+@@ -917,7 +917,7 @@ static void hmp_ioport_read(Monitor *mon, const QDict *qdict)
+                    suffix, addr, size * 2, val);
+ }
+ 
+-static void hmp_ioport_write(Monitor *mon, const QDict *qdict)
++void hmp_ioport_write(Monitor *mon, const QDict *qdict)
+ {
+     int size = qdict_get_int(qdict, "size");
+     int addr = qdict_get_int(qdict, "addr");
+@@ -939,7 +939,7 @@ static void hmp_ioport_write(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_boot_set(Monitor *mon, const QDict *qdict)
++void hmp_boot_set(Monitor *mon, const QDict *qdict)
+ {
+     Error *local_err = NULL;
+     const char *bootdevice = qdict_get_str(qdict, "bootdevice");
+@@ -952,7 +952,7 @@ static void hmp_boot_set(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
++void hmp_info_mtree(Monitor *mon, const QDict *qdict)
+ {
+     bool flatview = qdict_get_try_bool(qdict, "flatview", false);
+     bool dispatch_tree = qdict_get_try_bool(qdict, "dispatch_tree", false);
+@@ -965,7 +965,7 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
+ 
+ int64_t dev_time;
+ 
+-static void hmp_info_profile(Monitor *mon, const QDict *qdict)
++void hmp_info_profile(Monitor *mon, const QDict *qdict)
+ {
+     static int64_t last_cpu_exec_time;
+     int64_t cpu_exec_time;
+@@ -982,7 +982,7 @@ static void hmp_info_profile(Monitor *mon, const QDict *qdict)
+     dev_time = 0;
+ }
+ #else
+-static void hmp_info_profile(Monitor *mon, const QDict *qdict)
++void hmp_info_profile(Monitor *mon, const QDict *qdict)
+ {
+     monitor_printf(mon, "Internal profiler not compiled\n");
+ }
+@@ -991,7 +991,7 @@ static void hmp_info_profile(Monitor *mon, const QDict *qdict)
+ /* Capture support */
+ static QLIST_HEAD (capture_list_head, CaptureState) capture_head;
+ 
+-static void hmp_info_capture(Monitor *mon, const QDict *qdict)
++void hmp_info_capture(Monitor *mon, const QDict *qdict)
+ {
+     int i;
+     CaptureState *s;
+@@ -1002,7 +1002,7 @@ static void hmp_info_capture(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_stopcapture(Monitor *mon, const QDict *qdict)
++void hmp_stopcapture(Monitor *mon, const QDict *qdict)
+ {
+     int i;
+     int n = qdict_get_int(qdict, "n");
+@@ -1018,7 +1018,7 @@ static void hmp_stopcapture(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
++void hmp_wavcapture(Monitor *mon, const QDict *qdict)
+ {
+     const char *path = qdict_get_str(qdict, "path");
+     int freq = qdict_get_try_int(qdict, "freq", 44100);
+@@ -1071,7 +1071,7 @@ static void hmp_warn_acl(void)
+     warn_acl = true;
+ }
+ 
+-static void hmp_acl_show(Monitor *mon, const QDict *qdict)
++void hmp_acl_show(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     QAuthZList *auth = find_auth(mon, aclname);
+@@ -1098,7 +1098,7 @@ static void hmp_acl_show(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_acl_reset(Monitor *mon, const QDict *qdict)
++void hmp_acl_reset(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     QAuthZList *auth = find_auth(mon, aclname);
+@@ -1115,7 +1115,7 @@ static void hmp_acl_reset(Monitor *mon, const QDict *qdict)
+     monitor_printf(mon, "acl: removed all rules\n");
+ }
+ 
+-static void hmp_acl_policy(Monitor *mon, const QDict *qdict)
++void hmp_acl_policy(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     const char *policy = qdict_get_str(qdict, "policy");
+@@ -1156,7 +1156,7 @@ static QAuthZListFormat hmp_acl_get_format(const char *match)
+     }
+ }
+ 
+-static void hmp_acl_add(Monitor *mon, const QDict *qdict)
++void hmp_acl_add(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     const char *match = qdict_get_str(qdict, "match");
+@@ -1209,7 +1209,7 @@ static void hmp_acl_add(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
+-static void hmp_acl_remove(Monitor *mon, const QDict *qdict)
++void hmp_acl_remove(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     const char *match = qdict_get_str(qdict, "match");
+diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+index 8f60ccc70a..bc8c9fa16b 100644
+--- a/monitor/monitor-internal.h
++++ b/monitor/monitor-internal.h
+@@ -183,4 +183,42 @@ int hmp_compare_cmd(const char *name, const char *list);
+ void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
+                                  Error **errp);
+ 
++void hmp_do_help_cmd(Monitor *mon, const QDict *qdict);
++void hmp_trace_event(Monitor *mon, const QDict *qdict);
++void hmp_info_help(Monitor *mon, const QDict *qdict);
++void hmp_info_registers(Monitor *mon, const QDict *qdict);
++void hmp_info_jit(Monitor *mon, const QDict *qdict);
++void hmp_info_opcount(Monitor *mon, const QDict *qdict);
++void hmp_info_sync_profile(Monitor *mon, const QDict *qdict);
++void hmp_info_history(Monitor *mon, const QDict *qdict);
++void hmp_info_cpustats(Monitor *mon, const QDict *qdict);
++void hmp_info_trace_events(Monitor *mon, const QDict *qdict);
++void hmp_logfile(Monitor *mon, const QDict *qdict);
++void hmp_log(Monitor *mon, const QDict *qdict);
++void hmp_singlestep(Monitor *mon, const QDict *qdict);
++void hmp_gdbserver(Monitor *mon, const QDict *qdict);
++void hmp_watchdog_action(Monitor *mon, const QDict *qdict);
++void hmp_memory_dump(Monitor *mon, const QDict *qdict);
++void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict);
++void hmp_gpa2hva(Monitor *mon, const QDict *qdict);
++void hmp_gva2gpa(Monitor *mon, const QDict *qdict);
++void hmp_gpa2hpa(Monitor *mon, const QDict *qdict);
++void hmp_do_print(Monitor *mon, const QDict *qdict);
++void hmp_sum(Monitor *mon, const QDict *qdict);
++void hmp_mouse_move(Monitor *mon, const QDict *qdict);
++void hmp_mouse_button(Monitor *mon, const QDict *qdict);
++void hmp_ioport_read(Monitor *mon, const QDict *qdict);
++void hmp_ioport_write(Monitor *mon, const QDict *qdict);
++void hmp_boot_set(Monitor *mon, const QDict *qdict);
++void hmp_info_mtree(Monitor *mon, const QDict *qdict);
++void hmp_info_profile(Monitor *mon, const QDict *qdict);
++void hmp_info_capture(Monitor *mon, const QDict *qdict);
++void hmp_stopcapture(Monitor *mon, const QDict *qdict);
++void hmp_wavcapture(Monitor *mon, const QDict *qdict);
++void hmp_acl_show(Monitor *mon, const QDict *qdict);
++void hmp_acl_reset(Monitor *mon, const QDict *qdict);
++void hmp_acl_policy(Monitor *mon, const QDict *qdict);
++void hmp_acl_add(Monitor *mon, const QDict *qdict);
++void hmp_acl_remove(Monitor *mon, const QDict *qdict);
++
+ #endif
 -- 
 2.25.GIT
 
