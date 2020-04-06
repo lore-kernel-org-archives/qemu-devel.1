@@ -2,148 +2,98 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED10C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB22C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:01:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6151206F8
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:00:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6151206F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 363FE2063A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:01:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uis10KAt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 363FE2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOYi-0001nT-Vv
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:00:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46497)
+	id 1jLOZ0-0002KJ-9Q
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:01:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLOPn-0002TR-E0
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:51:39 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOJC-00077h-JM
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLOPk-00022g-Mg
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:51:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37122
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOJB-0004Ft-7G
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:46 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:37032)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jLOPk-00020u-GJ
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:51:32 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0369Xbj2131941
- for <qemu-devel@nongnu.org>; Mon, 6 Apr 2020 05:51:31 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 306kuv8gfv-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 05:51:30 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 6 Apr 2020 10:51:18 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 6 Apr 2020 10:51:15 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 0369pPAg34210142
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 6 Apr 2020 09:51:25 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 36543A405B;
- Mon,  6 Apr 2020 09:51:25 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AEB06A4064;
- Mon,  6 Apr 2020 09:51:24 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.23.63])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  6 Apr 2020 09:51:24 +0000 (GMT)
-Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: Fix build on systems without
- KVM
-To: David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, 
- Cornelia Huck <cohuck@redhat.com>
-References: <20200406075931.26232-1-borntraeger@de.ibm.com>
- <20200406075931.26232-2-borntraeger@de.ibm.com>
- <27304f4e-3801-3200-c5ba-9fb5ac0f8715@redhat.com>
- <95faf831-5382-0c3e-fed4-67485f04a4b7@de.ibm.com>
- <9062115a-58c1-833a-b9ac-83b3905f9039@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Mon, 6 Apr 2020 11:51:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1jLOJA-0004Ey-UO
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:44:45 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369i3Q5093135;
+ Mon, 6 Apr 2020 09:44:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=jbQyi+l5kcRmEtgZvNOXkZwgs6yQkKCSn5xC7Wm2LPw=;
+ b=uis10KAtowgcUHfYe78p2M1bXPWBY5z4zQhmOUgwuSfUv4xIFGQabHVjQkOn5bH05A5S
+ TMzWwt7FluntTjYyuuJMHPtqGOiaEUaCG1yCqq8PP7UNN5tNqIsf55HtMVUbdjxYl+mK
+ tXUbi2utUUbfethi685q9/aKilQvwiJGkuO7xHYeRRcbk1lTurCezWThfk0wPVwfEv2W
+ WZ2YZQ2gv5oM6h96VA341RzD8Itavp0qiqOAyxhjYEa/QQLiQwu/6cWe4e7kDMAY76oH
+ WN31OKG4bqbzzSvQgpmO/iqk37AZZ3aUJkwvCyzg2dRTd90Hz2qvGA+JWUUqEZDxxuZ8 8A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 306hnqwu8m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 06 Apr 2020 09:44:23 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369chFP092235;
+ Mon, 6 Apr 2020 09:42:23 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 3073spk6ke-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 06 Apr 2020 09:42:22 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369gLXR032052;
+ Mon, 6 Apr 2020 09:42:22 GMT
+Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 06 Apr 2020 02:42:21 -0700
+From: elena.ufimtseva@oracle.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 30/36] multi-process: perform device reset in the remote
+ process
+Date: Mon,  6 Apr 2020 02:41:20 -0700
+Message-Id: <472b75b4180021fdf2d4de540de0b94e34ffe964.1586165556.git.elena.ufimtseva@oracle.com>
+X-Mailer: git-send-email 2.25.GIT
+In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
+References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <9062115a-58c1-833a-b9ac-83b3905f9039@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20040609-0012-0000-0000-0000039F3DC4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040609-0013-0000-0000-000021DC5B0B
-Message-Id: <a0dd3211-d159-955e-0e0b-dd73933ad369@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-06_05:2020-04-03,
- 2020-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 adultscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- phishscore=0 mlxlogscore=768 clxscore=1015 spamscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060078
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ phishscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 adultscore=0 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060083
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ phishscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=1
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060084
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,42 +105,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Bruce Rogers <brogers@suse.com>, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
+Perform device reset in the remote process when QEMU performs
+device reset. This is required to reset the internal state
+(like registers, etc...) of emulated devices
 
-On 06.04.20 11:32, David Hildenbrand wrote:
-> On 06.04.20 11:29, Christian Borntraeger wrote:
->>
->>
->> On 06.04.20 11:07, David Hildenbrand wrote:
->>>
->>>>  static inline bool s390_is_pv(void)
->>>> @@ -41,6 +42,7 @@ int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
->>>>  void s390_pv_perf_clear_reset(void);
->>>>  int s390_pv_verify(void);
->>>>  void s390_pv_unshare(void);
->>>> +void s390_machine_inject_pv_error(CPUState *cs);
->>>>  #else /* CONFIG_KVM */
->>>>  static inline bool s390_is_pv(void) { return false; }
->>>>  static inline int s390_pv_vm_enable(void) { return 0; }
->>>> @@ -50,6 +52,7 @@ static inline int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) {
->>>>  static inline void s390_pv_perf_clear_reset(void) {}
->>>>  static inline int s390_pv_verify(void) { return 0; }
->>>>  static inline void s390_pv_unshare(void) {}
->>>> +static inline void s390_machine_inject_pv_error(CPUState *cs) {};
->>>
->>> I'd suggest renaming that to s390_pv_inject_error() or similar right away.
->>
-> 
-> Me again: I guess "s390_pv_inject_reset_error()" is what it's really
-> doing :)
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+---
+ hw/proxy/qemu-proxy.c    | 25 +++++++++++++++++++++++++
+ include/io/mpqemu-link.h |  1 +
+ remote/remote-main.c     | 13 +++++++++++++
+ 3 files changed, 39 insertions(+)
 
-I will use that unless Conny complains.
+diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+index 162014353f..cffc227acd 100644
+--- a/hw/proxy/qemu-proxy.c
++++ b/hw/proxy/qemu-proxy.c
+@@ -291,14 +291,39 @@ static void pci_proxy_dev_exit(PCIDevice *pdev)
+     stop_hb_timer(dev);
+ }
+ 
++static void proxy_device_reset(DeviceState *dev)
++{
++    PCIProxyDev *pdev = PCI_PROXY_DEV(dev);
++    MPQemuMsg msg;
++    int wait = -1;
++
++    memset(&msg, 0, sizeof(MPQemuMsg));
++
++    msg.bytestream = 0;
++    msg.size = sizeof(msg.data1);
++    msg.cmd = DEVICE_RESET;
++
++    wait = GET_REMOTE_WAIT;
++    msg.num_fds = 1;
++    msg.fds[0] = wait;
++
++    mpqemu_msg_send(&msg, pdev->mpqemu_link->com);
++
++    (void)wait_for_remote(wait);
++
++    PUT_REMOTE_WAIT(wait);
++}
++
+ static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
+ {
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     k->realize = pci_proxy_dev_realize;
+     k->exit = pci_proxy_dev_exit;
+     k->config_read = pci_proxy_read_config;
+     k->config_write = pci_proxy_write_config;
++    dc->reset = proxy_device_reset;
+ }
+ 
+ static const TypeInfo pci_proxy_dev_type_info = {
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index 45ea1fcafa..22fb234744 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -51,6 +51,7 @@ typedef enum {
+     GET_PCI_INFO,
+     RET_PCI_INFO,
+     PROXY_PING,
++    DEVICE_RESET,
+     MAX,
+ } mpqemu_cmd_t;
+ 
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 18184b3f4b..6e198de35f 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -38,6 +38,7 @@
+ #include "exec/address-spaces.h"
+ #include "remote/iohub.h"
+ #include "remote-opts.h"
++#include "sysemu/reset.h"
+ 
+ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+                         MPQemuChannel *chan);
+@@ -185,6 +186,15 @@ static void process_get_pci_info_msg(MPQemuLinkState *link, MPQemuMsg *msg)
+     mpqemu_msg_send(&ret, link->dev);
+ }
+ 
++static void process_device_reset_msg(MPQemuMsg *msg)
++{
++    qemu_devices_reset();
++
++    if (msg->num_fds == 1) {
++            notify_proxy(msg->fds[0], 0);
++    }
++}
++
+ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+                         MPQemuChannel *chan)
+ {
+@@ -247,6 +257,9 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+         wait = msg->fds[0];
+         notify_proxy(wait, 0);
+         break;
++    case DEVICE_RESET:
++        process_device_reset_msg(msg);
++        break;
+     default:
+         error_setg(&err, "Unknown command");
+         goto finalize_loop;
+-- 
+2.25.GIT
 
 
