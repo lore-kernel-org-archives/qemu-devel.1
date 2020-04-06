@@ -2,79 +2,102 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0682C2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B63CC2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:18:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AF7C249C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:18:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2DC6249C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtgoaV1Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF7C249C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="hQqdR5jE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2DC6249C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLVNn-0004A8-MV
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:17:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57558)
+	id 1jLVNs-0004JT-WA
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:18:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jLVL4-0008S7-4e
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:15:11 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1jLVMc-0002dg-TX
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jLVL2-0007zc-Je
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:15:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53621
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <anthony.perard@citrix.com>) id 1jLVMb-0000MR-Ux
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:16:46 -0400
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:35047)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jLVL2-0007zW-Fz
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:15:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586193308;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZN2/Xav/cHCLfERaCl6an3xHsCGU37logxuocf2uq6A=;
- b=gtgoaV1QlVucoBVso+tP57BTX0guidCvsnp6C9TuEF+ss6cP0NLR7j/3Ntdbqcp8WgePfJ
- nzDaM+gHfMPHw19W+IU9LosmVxlVDfqajR6/ePy3dY0D2MQOm0rUXgTHEeBKfRoUiRIVJL
- p3ZeROEqgkAmQ5oZ1b73gvsfvzfuHEA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-iCHzJDrrMTObu264NITJuA-1; Mon, 06 Apr 2020 13:15:03 -0400
-X-MC-Unique: iCHzJDrrMTObu264NITJuA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD0A318A3010;
- Mon,  6 Apr 2020 17:14:13 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-113-74.ams2.redhat.com [10.36.113.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9267D11CC05;
- Mon,  6 Apr 2020 17:14:11 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH for-5.0 v2 2/3] block: Increase BB.in_flight for coroutine
- interfaces
-Date: Mon,  6 Apr 2020 19:14:02 +0200
-Message-Id: <20200406171403.6761-3-kwolf@redhat.com>
-In-Reply-To: <20200406171403.6761-1-kwolf@redhat.com>
-References: <20200406171403.6761-1-kwolf@redhat.com>
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1jLVMZ-0000Jj-G0; Mon, 06 Apr 2020 13:16:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1586193403;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:content-transfer-encoding:in-reply-to;
+ bh=dw9qolkhXIn6b0T6yhcbrD/aJmWH4v6hLGN3vF3fBK8=;
+ b=hQqdR5jE63yWB5w7Ig8d2yj03df7FGQtChTFInojnWKL5Qn+NuDiyP6Y
+ +khI4iJ4SbzX8fPbYpV/1/kGpfrcWaEDRn8wZl1cqtxzn8lp1wgG7fTvR
+ OjGYTJWDXjkgnzJaKWyM+qxrkzo4mS2LCoBtkaxtO55L+99IaDbZ4m9w5 M=;
+Authentication-Results: esa5.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+ ip4:168.245.78.127 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: 61p/Hxv70zQnfNanLwCuMtI/mdPU1ZSSxLjAFfIgef6sApVUYnSJHMAYfOnW8uANV8AS2N0yIT
+ Vf5v+Gaf8ayKF/U65vNby/Q7N4/I0KbK6CJoGwtUDEig5ia3pGgahxl5DxhFbP2iIkmEJTVTRr
+ GlWxFF0NpRtXbvUqwyXTeoER8101SH6FWaDPaopeKkipPXDaLfWYySeqtr8JnNpaUepwhNdNxD
+ Xty56atu35YBojAZtk94S+7IiroEpM1m7hWd6TBP5Q/no0osAtmn6sfC030hQzwynqpZg1JS85
+ 9lk=
+X-SBRS: 2.7
+X-MesageID: 15573591
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.72,351,1580792400"; d="scan'208";a="15573591"
+Date: Mon, 6 Apr 2020 18:16:37 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH for-5.0] xen-block: Fix uninitialized variable
+Message-ID: <20200406171637.GU4088@perard.uk.xensource.com>
+References: <20200406164207.1446817-1-anthony.perard@citrix.com>
+ <325e0ffb-2f1b-cbfd-6b24-0d912a9aabe2@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <325e0ffb-2f1b-cbfd-6b24-0d912a9aabe2@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.155.168
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,254 +109,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, s.reiter@proxmox.com,
- qemu-devel@nongnu.org, dietmar@proxmox.com, stefanha@redhat.com,
- mreitz@redhat.com, t.lamprecht@proxmox.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-External callers of blk_co_*() don't currently increase the
-BlockBackend.in_flight counter, but calls from blk_aio_*() do, so there
-is an inconsistency whether the counter has been increased or not.
+On Mon, Apr 06, 2020 at 06:50:41PM +0200, Philippe Mathieu-Daudé wrote:
+> On 4/6/20 6:42 PM, Anthony PERARD wrote:
+> > Since 7f5d9b206d1e ("object-add: don't create return value if
+> > failed"), qmp_object_add() don't write any value in 'ret_data', thus
+> > has random data. Then qobject_unref() fails and abort().
+> > 
+> > Fix by initialising 'ret_data' properly.
+> 
+> Or move qobject_unref() after the error check?
+> 
+> -- >8 --
+> diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+> index 07bb32e22b..f3f1cbef65 100644
+> --- a/hw/block/xen-block.c
+> +++ b/hw/block/xen-block.c
+> @@ -869,7 +869,6 @@ static XenBlockIOThread *xen_block_iothread_create(const
+> char *id,
+>      qdict_put_str(opts, "id", id);
+>      qmp_object_add(opts, &ret_data, &local_err);
+>      qobject_unref(opts);
+> -    qobject_unref(ret_data);
+> 
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> @@ -878,6 +877,7 @@ static XenBlockIOThread *xen_block_iothread_create(const
+> char *id,
+>          g_free(iothread);
+>          return NULL;
+>      }
+> +    qobject_unref(ret_data);
 
-This patch moves the actual operations to static functions that can
-later know they will always be called with in_flight increased exactly
-once, even for external callers using the blk_co_*() coroutine
-interfaces.
+That won't help, qmp_object_add() doesn't change the value of ret_data
+at all. The other users of qmp_object_add() passes an initialised
+'ret_data', so we should do the same I think.
 
-If the public blk_co_*() interface is unused, remove it.
+Thanks,
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/sysemu/block-backend.h |  1 -
- block/block-backend.c          | 94 +++++++++++++++++++++++++++-------
- 2 files changed, 76 insertions(+), 19 deletions(-)
-
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.=
-h
-index b198deca0b..9bbdbd63d7 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -171,7 +171,6 @@ BlockAIOCB *blk_aio_pdiscard(BlockBackend *blk, int64_t=
- offset, int bytes,
-                              BlockCompletionFunc *cb, void *opaque);
- void blk_aio_cancel(BlockAIOCB *acb);
- void blk_aio_cancel_async(BlockAIOCB *acb);
--int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
- int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
- BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *=
-buf,
-                           BlockCompletionFunc *cb, void *opaque);
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 17b2e87afa..d330e08b05 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1147,9 +1147,10 @@ static void coroutine_fn blk_wait_while_drained(Bloc=
-kBackend *blk)
-     }
- }
-=20
--int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
--                               unsigned int bytes, QEMUIOVector *qiov,
--                               BdrvRequestFlags flags)
-+/* To be called between exactly one pair of blk_inc/dec_in_flight() */
-+static int coroutine_fn
-+blk_do_preadv(BlockBackend *blk, int64_t offset, unsigned int bytes,
-+              QEMUIOVector *qiov, BdrvRequestFlags flags)
- {
-     int ret;
-     BlockDriverState *bs;
-@@ -1178,10 +1179,24 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, i=
-nt64_t offset,
-     return ret;
- }
-=20
--int coroutine_fn blk_co_pwritev_part(BlockBackend *blk, int64_t offset,
--                                     unsigned int bytes,
--                                     QEMUIOVector *qiov, size_t qiov_offse=
-t,
--                                     BdrvRequestFlags flags)
-+int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
-+                               unsigned int bytes, QEMUIOVector *qiov,
-+                               BdrvRequestFlags flags)
-+{
-+    int ret;
-+
-+    blk_inc_in_flight(blk);
-+    ret =3D blk_do_preadv(blk, offset, bytes, qiov, flags);
-+    blk_dec_in_flight(blk);
-+
-+    return ret;
-+}
-+
-+/* To be called between exactly one pair of blk_inc/dec_in_flight() */
-+static int coroutine_fn
-+blk_do_pwritev_part(BlockBackend *blk, int64_t offset, unsigned int bytes,
-+                    QEMUIOVector *qiov, size_t qiov_offset,
-+                    BdrvRequestFlags flags)
- {
-     int ret;
-     BlockDriverState *bs;
-@@ -1214,6 +1229,20 @@ int coroutine_fn blk_co_pwritev_part(BlockBackend *b=
-lk, int64_t offset,
-     return ret;
- }
-=20
-+int coroutine_fn blk_co_pwritev_part(BlockBackend *blk, int64_t offset,
-+                                     unsigned int bytes,
-+                                     QEMUIOVector *qiov, size_t qiov_offse=
-t,
-+                                     BdrvRequestFlags flags)
-+{
-+    int ret;
-+
-+    blk_inc_in_flight(blk);
-+    ret =3D blk_do_pwritev_part(blk, offset, bytes, qiov, qiov_offset, fla=
-gs);
-+    blk_dec_in_flight(blk);
-+
-+    return ret;
-+}
-+
- int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-                                 unsigned int bytes, QEMUIOVector *qiov,
-                                 BdrvRequestFlags flags)
-@@ -1394,7 +1423,7 @@ static void blk_aio_read_entry(void *opaque)
-     }
-=20
-     assert(qiov->size =3D=3D acb->bytes);
--    rwco->ret =3D blk_co_preadv(rwco->blk, rwco->offset, acb->bytes,
-+    rwco->ret =3D blk_do_preadv(rwco->blk, rwco->offset, acb->bytes,
-                               qiov, rwco->flags);
-     blk_aio_complete(acb);
- }
-@@ -1412,8 +1441,8 @@ static void blk_aio_write_entry(void *opaque)
-     }
-=20
-     assert(!qiov || qiov->size =3D=3D acb->bytes);
--    rwco->ret =3D blk_co_pwritev(rwco->blk, rwco->offset, acb->bytes,
--                               qiov, rwco->flags);
-+    rwco->ret =3D blk_do_pwritev_part(rwco->blk, rwco->offset, acb->bytes,
-+                                    qiov, 0, rwco->flags);
-     blk_aio_complete(acb);
- }
-=20
-@@ -1498,7 +1527,9 @@ void blk_aio_cancel_async(BlockAIOCB *acb)
-     bdrv_aio_cancel_async(acb);
- }
-=20
--int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
-+/* To be called between exactly one pair of blk_inc/dec_in_flight() */
-+static int coroutine_fn
-+blk_do_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
- {
-     blk_wait_while_drained(blk);
-=20
-@@ -1514,8 +1545,10 @@ static void blk_ioctl_entry(void *opaque)
-     BlkRwCo *rwco =3D opaque;
-     QEMUIOVector *qiov =3D rwco->iobuf;
-=20
--    rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset,
--                             qiov->iov[0].iov_base);
-+    blk_inc_in_flight(rwco->blk);
-+    rwco->ret =3D blk_do_ioctl(rwco->blk, rwco->offset, qiov->iov[0].iov_b=
-ase);
-+    blk_dec_in_flight(rwco->blk);
-+
-     aio_wait_kick();
- }
-=20
-@@ -1529,7 +1562,7 @@ static void blk_aio_ioctl_entry(void *opaque)
-     BlkAioEmAIOCB *acb =3D opaque;
-     BlkRwCo *rwco =3D &acb->rwco;
-=20
--    rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset, rwco->iobuf);
-+    rwco->ret =3D blk_do_ioctl(rwco->blk, rwco->offset, rwco->iobuf);
-=20
-     blk_aio_complete(acb);
- }
-@@ -1540,7 +1573,9 @@ BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned=
- long int req, void *buf,
-     return blk_aio_prwv(blk, req, 0, buf, blk_aio_ioctl_entry, 0, cb, opaq=
-ue);
- }
-=20
--int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
-+/* To be called between exactly one pair of blk_inc/dec_in_flight() */
-+static int coroutine_fn
-+blk_do_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
- {
-     int ret;
-=20
-@@ -1559,7 +1594,7 @@ static void blk_aio_pdiscard_entry(void *opaque)
-     BlkAioEmAIOCB *acb =3D opaque;
-     BlkRwCo *rwco =3D &acb->rwco;
-=20
--    rwco->ret =3D blk_co_pdiscard(rwco->blk, rwco->offset, acb->bytes);
-+    rwco->ret =3D blk_do_pdiscard(rwco->blk, rwco->offset, acb->bytes);
-     blk_aio_complete(acb);
- }
-=20
-@@ -1571,6 +1606,17 @@ BlockAIOCB *blk_aio_pdiscard(BlockBackend *blk,
-                         cb, opaque);
- }
-=20
-+int coroutine_fn blk_co_pdiscard(BlockBackend *blk, int64_t offset, int by=
-tes)
-+{
-+    int ret;
-+
-+    blk_inc_in_flight(blk);
-+    ret =3D blk_do_pdiscard(blk, offset, bytes);
-+    blk_dec_in_flight(blk);
-+
-+    return ret;
-+}
-+
- static void blk_pdiscard_entry(void *opaque)
- {
-     BlkRwCo *rwco =3D opaque;
-@@ -1585,7 +1631,8 @@ int blk_pdiscard(BlockBackend *blk, int64_t offset, i=
-nt bytes)
-     return blk_prw(blk, offset, NULL, bytes, blk_pdiscard_entry, 0);
- }
-=20
--int blk_co_flush(BlockBackend *blk)
-+/* To be called between exactly one pair of blk_inc/dec_in_flight() */
-+static int coroutine_fn blk_do_flush(BlockBackend *blk)
- {
-     blk_wait_while_drained(blk);
-=20
-@@ -1601,7 +1648,7 @@ static void blk_aio_flush_entry(void *opaque)
-     BlkAioEmAIOCB *acb =3D opaque;
-     BlkRwCo *rwco =3D &acb->rwco;
-=20
--    rwco->ret =3D blk_co_flush(rwco->blk);
-+    rwco->ret =3D blk_do_flush(rwco->blk);
-     blk_aio_complete(acb);
- }
-=20
-@@ -1611,6 +1658,17 @@ BlockAIOCB *blk_aio_flush(BlockBackend *blk,
-     return blk_aio_prwv(blk, 0, 0, NULL, blk_aio_flush_entry, 0, cb, opaqu=
-e);
- }
-=20
-+int coroutine_fn blk_co_flush(BlockBackend *blk)
-+{
-+    int ret;
-+
-+    blk_inc_in_flight(blk);
-+    ret =3D blk_do_flush(blk);
-+    blk_dec_in_flight(blk);
-+
-+    return ret;
-+}
-+
- static void blk_flush_entry(void *opaque)
- {
-     BlkRwCo *rwco =3D opaque;
---=20
-2.20.1
-
+-- 
+Anthony PERARD
 
