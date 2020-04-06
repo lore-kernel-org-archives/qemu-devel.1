@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E5FC2BA18
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 07:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE71C2BA18
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 07:51:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5884020672
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 07:36:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5884020672
+	by mail.kernel.org (Postfix) with ESMTPS id E511D206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 07:51:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E511D206F5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLMJG-0007hP-J2
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 03:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57025)
+	id 1jLMXt-0003cM-5L
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 03:51:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59183)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jLMIc-00079O-5O
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:36:03 -0400
+ (envelope-from <bounces@canonical.com>) id 1jLMXH-0003DK-7y
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jLMIa-0006jC-TY
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:36:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40880)
+ (envelope-from <bounces@canonical.com>) id 1jLMXG-00082N-2P
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:51:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44026)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jLMIa-0006hB-3K
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:36:00 -0400
+ id 1jLMXF-00081S-TU
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:51:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jLMIX-000409-Sf
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 07:35:57 +0000
+ id 1jLMXE-0005nv-BU
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 07:51:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B6F7B2E8107
- for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 07:35:57 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 551292E8041
+ for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 07:51:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Apr 2020 07:23:13 -0000
+Date: Mon, 06 Apr 2020 07:36:22 -0000
 From: Emin Ghuliev <1821595@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,7 +55,7 @@ X-Launchpad-Bug-Commenters: 6-u3untu-h eminus
 X-Launchpad-Bug-Reporter: Emin Ghuliev (eminus)
 X-Launchpad-Bug-Modifier: Emin Ghuliev (eminus)
 References: <155352235092.32006.12315829232895734213.malonedeb@soybean.canonical.com>
-Message-Id: <158615779327.24177.8814115759092314270.malone@soybean.canonical.com>
+Message-Id: <158615858240.24479.3722931441898569253.malone@soybean.canonical.com>
 Subject: [Bug 1821595] Re: Failed to emulate MMIO access with
  EmulatorReturnStatus: 2
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a296f04231dee355be5db73cc878b9e21689a253";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d940f31bf993f03f6f82a1803737898bf048571a
+X-Launchpad-Hash: b46236e523d4055b8dbde2a53abe196a5b5aaba9
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,9 +82,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Which OS do you try with qemu? IIRC Windows 10 should work well with
-WHPX. Also,this issue is qemu depended that they don't handle specific
-MMIO instruction/exit.
+Sorry for the typo. I should have mentioned that this issue is WHPX
+related. I have created an issue in WHPX Github page about it.
 
 -- =
 
