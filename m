@@ -2,63 +2,93 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 076D8C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8638C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:35:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C74AF2312A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:35:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB1212419A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:35:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="TKtLg4sW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74AF2312A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pdkdQ5UR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1212419A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLSqX-0000h6-UY
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 10:35:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32955)
+	id 1jLSr0-0001Td-Sd
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 10:35:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33046)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jLSpp-0008OL-14
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:34:45 -0400
+ (envelope-from <xadimgnik@gmail.com>) id 1jLSqC-0000Pa-3a
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jLSpn-0006MG-TT
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:34:44 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:47347)
+ (envelope-from <xadimgnik@gmail.com>) id 1jLSqA-0006am-SC
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:35:08 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:33640)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jLSpn-0006BP-Jz; Mon, 06 Apr 2020 10:34:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
- bh=4GWbeQ2pliEe6uGlHb33wkxZbf0DrTbM06Aojy9guGw=; 
- b=TKtLg4sWr9gVXdx2sFgvcRhrxvvlrcUdqJIwLN3iRHAt5xoqKKFKnj77CbrsEJWOWZmNjMkxN0X+qFT8T6REhkwAIZoBl/E/UH3Z7m9EQdC+Z9+J4IuMd7k4Dgt32GjI0K7vF5V+FrWLa3TCagA3szZntsJ3p6ZajkqDYCtcDqPsfHAyaiaa84HENWCOCYlKFand4mHu6Qv652XBWb55QMh8Mw0wgJKe3GPNi2+EbmAEEt9zz5g6pqRpaX56Ku7xX7fn2/Lg+H6ffvVtW4VD5sJ0E0xhNWkdLODuRJn11jFRnDjEbYl7o5zH0ckhNQx6owoTCmh3TmoQ5kzeCqQVVQ==;
-Received: from [81.0.35.113] (helo=perseus.local)
- by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jLSpO-0006Kr-2U; Mon, 06 Apr 2020 16:34:18 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1jLSpA-0006zs-0M; Mon, 06 Apr 2020 16:34:04 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] qcow2: Check request size in
- qcow2_co_pwritev_compressed_part()
-Date: Mon,  6 Apr 2020 16:34:01 +0200
-Message-Id: <20200406143401.26854-1-berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.71) (envelope-from <xadimgnik@gmail.com>)
+ id 1jLSq7-0006YP-7T; Mon, 06 Apr 2020 10:35:03 -0400
+Received: by mail-ed1-x541.google.com with SMTP id z65so19535543ede.0;
+ Mon, 06 Apr 2020 07:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
+ :mime-version:content-transfer-encoding:content-language
+ :thread-index; bh=r6CtmB4j4V2k6M3wBOMBHNekQuJS84n0cWUZYh7Xr0s=;
+ b=pdkdQ5URjzKugWUK7rOnvbHEaUCOEJXeYvpH3jkGjwv3zAkjCOLid1O5lPDqlfAhrl
+ FheawOsD6wLlZI6bgbMmM579MLQqy5eXjkVO8BVXtFKPxagQCTqdg3CptY8ot2vk8CW1
+ 4yZogXe7f2uIMYGVprtEQZnVmpbqt77vyHw/2jAAcFb6jpRAnsP7Ac6RBhMQ9wxkrsv5
+ 3Y2okln5rTfDBGrYtxqSdSot+kSxlpUpwBdPAbvRcHxgae2LGVYw0gUbA8Zc1oAcruKZ
+ H7WO8SxvltFZbISarudq56eGPMAVasZhrayHHox61ZbYn6dR1CUiGL3PKikWZkNGEAiE
+ B17Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
+ :subject:date:message-id:mime-version:content-transfer-encoding
+ :content-language:thread-index;
+ bh=r6CtmB4j4V2k6M3wBOMBHNekQuJS84n0cWUZYh7Xr0s=;
+ b=ps4a8//X34ghU+G+x8HHqieUZ57vd5UTy7Gnssr2c0X5f2IYUETTO+Nrtckj5EbVcc
+ DK1OCBATtRYC5eWZAEghVHxS1g/TvGqljQovB6PUFQrgwzVq9kzH85+ai0/aT9YluIRQ
+ HZJrqdKykR6100C9m51dKiWtcp++NHy4LrXfHQA6cMwzIenOfPoYSOry4edUoHZ5SZFf
+ YPLLcVhTpeg2im1zSgBnqRy2doc2ai0KV0BG8ERX7ECkZmAir+tHmN1QMiZQGLExRNN+
+ x3CgcDvOAzd2/znzLSG98ESk13wtOXG/bGMBxWHJyPOrsjTGQeJmdzC2euC51gKCdmuE
+ eIbQ==
+X-Gm-Message-State: AGi0PuajbTVV/sDNOc75IvlttMlLo+loijiw7rnGhbYGq5nzRygcHPz/
+ U4TxwseM7cvxW2S+yRNcSVo=
+X-Google-Smtp-Source: APiQypKcJbxoUZFcZkGGrcOhxkkoYgyDyAYDNNzeMEuP8jE+elB+gIFwl7Rnnr6glCfhHrKy1rzmFw==
+X-Received: by 2002:aa7:c609:: with SMTP id h9mr19021258edq.93.1586183701711; 
+ Mon, 06 Apr 2020 07:35:01 -0700 (PDT)
+Received: from CBGR90WXYV0 (54-240-197-238.amazon.com. [54.240.197.238])
+ by smtp.gmail.com with ESMTPSA id t25sm2427160edi.11.2020.04.06.07.35.00
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 06 Apr 2020 07:35:01 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: "Paul Durrant" <paul@xen.org>
+To: "'Anthony PERARD'" <anthony.perard@citrix.com>,
+	<qemu-devel@nongnu.org>
+References: <20200406105954.GT4088@perard.uk.xensource.com>
+ <20200406140217.1441858-1-anthony.perard@citrix.com>
+In-Reply-To: <20200406140217.1441858-1-anthony.perard@citrix.com>
+Subject: RE: [PATCH v2 for-5.0] xen-block: Fix double qlist remove and request
+ leak
+Date: Mon, 6 Apr 2020 15:34:59 +0100
+Message-ID: <002901d60c20$8dcc94d0$a965be70$@xen.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: en-gb
+Thread-Index: AQId5Ykq0Zul8aMjLjRNg1HUybzDSQHmJUNIp81CgpA=
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,53 +100,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- Pavel Butsykin <pbutsykin@virtuozzo.com>, Max Reitz <mreitz@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reply-To: paul@xen.org
+Cc: 'Kevin Wolf' <kwolf@redhat.com>,
+ 'Stefano Stabellini' <sstabellini@kernel.org>, qemu-block@nongnu.org,
+ qemu-stable@nongnu.org, 'Max Reitz' <mreitz@redhat.com>,
+ 'Stefan Hajnoczi' <stefanha@redhat.com>, xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When issuing a compressed write request the number of bytes must be a
-multiple of the cluster size or reach the end of the last cluster.
+> -----Original Message-----
+> From: Anthony PERARD <anthony.perard@citrix.com>
+> Sent: 06 April 2020 15:02
+> To: qemu-devel@nongnu.org
+> Cc: qemu-stable@nongnu.org; Anthony PERARD <anthony.perard@citrix.com>; Stefano Stabellini
+> <sstabellini@kernel.org>; Paul Durrant <paul@xen.org>; Stefan Hajnoczi <stefanha@redhat.com>; Kevin
+> Wolf <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>; xen-devel@lists.xenproject.org; qemu-
+> block@nongnu.org
+> Subject: [PATCH v2 for-5.0] xen-block: Fix double qlist remove and request leak
+> 
+> Commit a31ca6801c02 ("qemu/queue.h: clear linked list pointers on
+> remove") revealed that a request was removed twice from a list, once
+> in xen_block_finish_request() and a second time in
+> xen_block_release_request() when both function are called from
+> xen_block_complete_aio(). But also, the `requests_inflight' counter is
+> decreased twice, and thus became negative.
+> 
+> This is a bug that was introduced in bfd0d6366043
 
-With the current code such requests are allowed and we hit an
-assertion:
+NIT: I guess you should quote the patch title here as well.
 
-   $ qemu-img create -f qcow2 img.qcow2 1M
-   $ qemu-io -c 'write -c 0 32k' img.qcow2
+> , where a `finished'
+> list was removed.
+> 
+> That commit also introduced a leak of request in xen_block_do_aio().
+> That function calls xen_block_finish_request() but the request is
+> never released after that.
+> 
+> To fix both issue, we do two changes:
+> - we squash finish_request() and release_request() together as we want
+>   to remove a request from 'inflight' list to add it to 'freelist'.
+> - before releasing a request, we need to let now the result to the
+>   other end,
 
-   qemu-io: block/qcow2.c:4257: qcow2_co_pwritev_compressed_task:
-   Assertion `bytes == s->cluster_size || (bytes < s->cluster_size &&
-              (offset + bytes == bs->total_sectors << BDRV_SECTOR_BITS))' failed.
-   Aborted
+"we need to let the other end know the result"
 
-This patch fixes a regression introduced in 0d483dce38
+> thus we should call xen_block_send_response() before
+>   releasing a request.
+> 
+> The first change fix the double QLIST_REMOVE() as we remove the extra
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2.c | 5 +++++
- 1 file changed, 5 insertions(+)
+s/fix/fixes
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2bb536b014..587cf51948 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4349,6 +4349,11 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
-         return -EINVAL;
-     }
- 
-+    if (offset_into_cluster(s, bytes) &&
-+        (offset + bytes) != (bs->total_sectors << BDRV_SECTOR_BITS)) {
-+        return -EINVAL;
-+    }
-+
-     while (bytes && aio_task_pool_status(aio) == 0) {
-         uint64_t chunk_size = MIN(bytes, s->cluster_size);
- 
--- 
-2.20.1
+> call. The second change makes the leak go away because if we want to
+> call finish_request(), we need to call a function that do all of
+
+s/do/does
+
+> finish, send response, and release.
+> 
+> Fixes: bfd0d6366043 ("xen-block: improve response latency")
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+
+The code looks ok, so with the cosmetic fixes...
+
+Reviewed-by: Paul Durrant <paul@xen.org>
 
 
