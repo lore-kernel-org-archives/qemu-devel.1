@@ -2,73 +2,104 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66189C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A202AC2BA1A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:33:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F2592072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:22:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F2592072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6B38C206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:33:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZPE76x5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B38C206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLZCD-0007eP-Dm
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 17:22:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37141)
+	id 1jLZNO-0002X6-ID
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 17:33:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jLZBS-0007EK-VH
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:21:32 -0400
+ (envelope-from <philmd@redhat.com>) id 1jLZM8-0001yN-HJ
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jLZBR-0003WW-Lr
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:21:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57174)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jLZBR-0003US-Gc
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:21:29 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jLZBP-0004xC-RQ
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 21:21:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CE1512E8107
- for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 21:21:27 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1jLZM7-0001kH-0j
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:32:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44852
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jLZM6-0001k2-Tq
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:32:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586208750;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3IOdilOVJ0ZFuZqInR9eshu0baX3Gp2zkP93AuNlSoY=;
+ b=fZPE76x5vOAdP2d6BmUIKUjCXckqtToDHIML1hpVXTIm3hCrGAcST405cwBZERnb5R3CyY
+ 6+fZIVEREGEkrlvhbb84uncE142cRR0Bdi+Fc0JnD88tZOAOSHqPgqeMyeQBWgidMgUGkO
+ NiwtmIfFvuhLrsqIvFgL63yclKQ+9nc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-485-lgbCwWccO7i_a84JPNDCeA-1; Mon, 06 Apr 2020 17:32:28 -0400
+X-MC-Unique: lgbCwWccO7i_a84JPNDCeA-1
+Received: by mail-wr1-f72.google.com with SMTP id k11so562556wrm.19
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 14:32:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TUe1wXIN/bBmtlPyhV1bcLb7zBp2UnhdpxKjiyRuSBE=;
+ b=FxGf1xBbOK6I/KaGXbLEcYcC+SwyFxAKbHruBYx5+Zz7FGWpA70tqPFtw9PWSpt8H2
+ kVfTJxm6uN8dchuex6yW9UI8go5YlqvWlC88YtgBhXJMRG5CzdTTPARx9Gv5X+jAspFV
+ ENVv21VEs6CSIZkI48iqZfkW57j3JM22UNphUqkm2fIjHQx+8LbyGvg1x1xLsGQ4EyMh
+ o70wzdXnmbrKX+2vyKmZ4juj6CZVuPgkSh/tA417mKucqMdyFbYsDfkIniRUmiZz6aFY
+ df/DLXfSiK28fjHLeEMLKPZSXoXEVR7v0EuaFVytvZsyQwmEFpz+Ivo8oRYa87cw+dau
+ A6jw==
+X-Gm-Message-State: AGi0PuZFILeh93OKJmq8pNG3c07zA2f7kNdIlUwZOOiO/dF4FH0qEuKk
+ EQpj+iMWc/RvSwPXLTxF0HJX9LOTCHlY+PnJEe36wkfGEVB2J8aXKDtww/c0tAbwdwurDHytWQS
+ XiBqaKS/8lYSnzKY=
+X-Received: by 2002:a7b:cc01:: with SMTP id f1mr1100355wmh.39.1586208747683;
+ Mon, 06 Apr 2020 14:32:27 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJr7+5DPRhHhiSRKYbNBo8bF4Do53ptKGTz7mv4jYnPIAj+MI23tRKQwxDuoFdHoqTupXM5kg==
+X-Received: by 2002:a7b:cc01:: with SMTP id f1mr1100339wmh.39.1586208747449;
+ Mon, 06 Apr 2020 14:32:27 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id r15sm29954881wra.19.2020.04.06.14.32.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Apr 2020 14:32:26 -0700 (PDT)
+Subject: Re: [PATCH v3 12/12] configure: Add -Werror to PIE probe
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200403191150.863-1-alex.bennee@linaro.org>
+ <20200403191150.863-13-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4653925a-716c-e0b4-6901-f0ad34f5cfe8@redhat.com>
+Date: Mon, 6 Apr 2020 23:32:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200403191150.863-13-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Apr 2020 21:07:15 -0000
-From: martin short <1663287@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: mips
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bacam martin-sk th-huth yongbok-kim
-X-Launchpad-Bug-Reporter: Brian Campbell (bacam)
-X-Launchpad-Bug-Modifier: martin short (martin-sk)
-References: <20170209154937.3933.99004.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158620723534.21403.16504598011986972232.malone@gac.canonical.com>
-Subject: [Bug 1663287] Re: Illegal delay slot code causes abort on mips64
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a296f04231dee355be5db73cc878b9e21689a253";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 05b62a19ed5dff3438010f77cc2a3f1e4b77638d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,83 +108,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1663287 <1663287@bugs.launchpad.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found the exact same bug. Tested on several hosts and qemu releases.
-The newest one I tested was on FreeBSD 12.1 host and qemu-4.1.1_1 built
-from ports.
+On 4/3/20 9:11 PM, Alex Benn=C3=A9e wrote:
+> From: Richard Henderson <richard.henderson@linaro.org>
+>=20
+> Without -Werror, the probe may succeed, but then compilation fails
+> later when -Werror is added for other reasons.  Shows up on windows,
+> where the compiler complains about -fPIC.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Message-Id: <20200401214756.6559-1-richard.henderson@linaro.org>
 
-Instructions:
-  4000d0:	0320f809 	jalr	t9
-  4000d4:	45454545 	0x45454545         # bc1any4t $fcc1,0x800101f8
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-I was running qemu-mips as:
+> ---
+>   configure | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/configure b/configure
+> index 22870f38672..233c671aaa9 100755
+> --- a/configure
+> +++ b/configure
+> @@ -2119,7 +2119,7 @@ if compile_prog "-Werror -fno-pie" "-no-pie"; then
+>   fi
+>  =20
+>   if test "$static" =3D "yes"; then
+> -  if test "$pie" !=3D "no" && compile_prog "-fPIE -DPIE" "-static-pie"; =
+then
+> +  if test "$pie" !=3D "no" && compile_prog "-Werror -fPIE -DPIE" "-stati=
+c-pie"; then
+>       QEMU_CFLAGS=3D"-fPIE -DPIE $QEMU_CFLAGS"
+>       QEMU_LDFLAGS=3D"-static-pie $QEMU_LDFLAGS"
+>       pie=3D"yes"
+> @@ -2132,7 +2132,7 @@ if test "$static" =3D "yes"; then
+>   elif test "$pie" =3D "no"; then
+>     QEMU_CFLAGS=3D"$CFLAGS_NOPIE $QEMU_CFLAGS"
+>     QEMU_LDFLAGS=3D"$LDFLAGS_NOPIE $QEMU_LDFLAGS"
+> -elif compile_prog "-fPIE -DPIE" "-pie"; then
+> +elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
+>     QEMU_CFLAGS=3D"-fPIE -DPIE $QEMU_CFLAGS"
+>     QEMU_LDFLAGS=3D"-pie $QEMU_LDFLAGS"
+>     pie=3D"yes"
+>=20
 
-qemu-system-mipsel -s -m 1024 -M malta \
-        -kernel vmlinux-3.16.0-6-4kc-malta -initrd initrd.img-3.16.0-6-4kc-=
-malta \
-	-device virtio-blk-pci,drive=3Dhd0 -drive if=3Dnone,id=3Dhd0,format=3Dqcow=
-2,file=3Ddebian_wheezy_mipsel_standard.qcow2    \
-	-append "root=3D/dev/vda1" \
-	-device virtio-net-pci,netdev=3Dnet0 \
-	-netdev user,id=3Dnet0,hostfwd=3Dtcp::1666-:22,ipv6=3Doff  \
-	-curses =
-
-
-abort() was in target/mips/translate.c:12945, in gen_branch().
-
-Doesn't really matter if the instruction is supported on given CPU, user
-can crash the qemu within guest.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1663287
-
-Title:
-  Illegal delay slot code causes abort on mips64
-
-Status in QEMU:
-  New
-
-Bug description:
-  During some randomised testing of an experimental MIPS implementation
-  I found an instruction sequence that also causes aborts on mainline
-  qemu's MIPS support.  The problem is triggered by an MSA branch
-  instruction appearing in a delay slot when emulating a processor
-  without MSA support.
-
-  For example, with the current repository HEAD
-  (f073cd3a2bf1054135271b837c58a7da650dd84b) configured for
-  mips64-softmmu, if I run the attached binary using
-
-      mips64-softmmu/qemu-system-mips64 -bios ../abort2.bin -machine
-  mipssim -nographic
-
-  it will report
-
-      unknown branch 0x13000
-      Aborted (core dumped)
-
-  The binary contains the following two instructions:
-
-      00200008 jr at
-      47081e61 bz.b       w8,0xffffffffbfc0798c
-
-  The jr sets up a jump, and hflags is set accordingly in
-  gen_compute_branch (in target/mips/translate.c).  When processing the
-  bz.b, check_insn generates an exception because the instruction isn't
-  support, but gen_msa_branch skips the usual delay slot check for the
-  same reason, and sets more bits in hflags, leading to an abort in
-  gen_branch because the hflags are now invalid.
-
-  I suspect the best fix is to remove the instruction set condition from
-  the delay slot check in gen_msa_branch.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1663287/+subscriptions
 
