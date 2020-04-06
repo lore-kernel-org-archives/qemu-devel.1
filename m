@@ -7,95 +7,93 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D31C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA35C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:53:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D5AF206F5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:53:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAA05206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:53:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qtGXMYqB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5AF206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KRpMP119"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAA05206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLORJ-0005Qf-IQ
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:53:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44271)
+	id 1jLORR-0005lt-UM
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:53:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGq-0002Gs-35
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:21 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOHa-0004DF-86
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGo-0002LU-5K
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:19 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:45480)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOHU-0002vj-Ec
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:06 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:35652)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOGn-0002Kv-Rn
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:18 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369cxbO025132;
- Mon, 6 Apr 2020 09:42:12 GMT
+ id 1jLOHT-0002tk-W0
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:00 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dobV089398;
+ Mon, 6 Apr 2020 09:42:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=FSSEMZbZRp9M2EFIdlYF63J5crNdAd2cSzpn8GgSEFw=;
- b=qtGXMYqBN8pNq0+uZhMqwu3BeceOPe3Ogif28PNuXdNzxZUZgRerw0xZmMgHO5MD3Yzs
- vCpIMYlv5qh4SRjRb4R8GFdlp4J59lON8QVVsAnf30o9yzRPNd/1CptEb2Xz1TpTePDO
- yOWZMZF2/FBckzfTkyPOoDShhCSqHF6nj3L7GZb07dg8N8V/CcmD+Z4F/RGR+NFI06SC
- P9geAWu7xGHzSa19CxwGqXCkyPMEUGS0rKW7E4zG8kzUoeO/QzBAEvdXriBWCF/WXKvZ
- Swk2cz/ilf4YjguHayrO3L/gwMH7mcrk36/67Uwsfwdn1MZhg8/LcVD/wiWhcfyIUkGw 0A== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 306jvmwr5x-1
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=RQXcq9eBEi0i4j9+fGB9tNKSkYIyD8rqWv0FMKs9Mi0=;
+ b=KRpMP119a6tB0ByDPHcnhVMEv+7r4XbFgLDahBC5UMZ9N/smrt4UGzEI/dycsW5NIGlM
+ BTPdrYbbCW0JAj2IIqnKMiV+DTgY8JOrzvwkAQC9zS8r6eZhoOcq+y9Ugrclu5BIfzdI
+ DDjDAAZLfeGdb8xSJEe2gDAPQvPtaqdGpvV12M76EikqM+VQ1czNzV8NLa+EqqPsF5Fh
+ 2fPPiU2kndpv8xg9cm6zyU390xcRfyI42zmXgfGcPGxj8UxZi1UwrKc0jXXprLW6HEej
+ AHU9SgD8A+ozojv6UFiAUiiQrxLqsD+pKKQZKLTIS74tzLok38gEPcUQpV82AKnGBijv bw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 306hnqwu08-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:12 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369cjB6092316;
- Mon, 6 Apr 2020 09:42:11 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 3073spk6cr-1
+ Mon, 06 Apr 2020 09:42:32 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369bLlY056283;
+ Mon, 6 Apr 2020 09:42:32 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 3073qcndbs-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:11 +0000
+ Mon, 06 Apr 2020 09:42:31 +0000
 Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369g8Jt013703;
- Mon, 6 Apr 2020 09:42:08 GMT
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369gUZF030870;
+ Mon, 6 Apr 2020 09:42:30 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:42:08 -0700
+ with ESMTP ; Mon, 06 Apr 2020 02:42:29 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 22/36] multi-process: Synchronize remote memory
-Date: Mon,  6 Apr 2020 02:41:12 -0700
-Message-Id: <4d80a92957c091e3d9c8f18ccc13a1bc278c5aeb.1586165556.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v6 35/36] multi-process: add the concept description to
+ docs/devel/qemu-multiprocess
+Date: Mon,  6 Apr 2020 02:41:25 -0700
+Message-Id: <6710cfbdfc8e01326e9d8b134c7187f76b2e749b.1586165556.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- phishscore=0 spamscore=0
- malwarescore=0 suspectscore=4 adultscore=0 bulkscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxscore=0 mlxlogscore=999
+ spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=3
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004060083
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- suspectscore=4
- mlxlogscore=999 mlxscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ phishscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=3
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2004060083
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
- 0369cxbO025132
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,421 +117,1148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jagannathan Raman <jag.raman@oracle.com>
+From: John G Johnson <john.g.johnson@oracle.com>
 
-Add memory-listener object which is used to keep the view of the RAM
-in sync between QEMU and remote process.
-A MemoryListener is registered for system-memory AddressSpace. The
-listener sends SYNC_SYSMEM message to the remote process when memory
-listener commits the changes to memory, the remote process receives
-the message and processes it in the handler for SYNC_SYSMEM message.
-
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- MAINTAINERS                    |   2 +
- Makefile.target                |   3 +
- hw/proxy/memory-sync.c         | 212 +++++++++++++++++++++++++++++++++
- hw/proxy/qemu-proxy.c          |   6 +
- include/hw/proxy/memory-sync.h |  37 ++++++
- include/hw/proxy/qemu-proxy.h  |   6 +
- remote/remote-main.c           |  11 ++
- 7 files changed, 277 insertions(+)
- create mode 100644 hw/proxy/memory-sync.c
- create mode 100644 include/hw/proxy/memory-sync.h
+ MAINTAINERS                  |    1 +
+ docs/devel/index.rst         |    1 +
+ docs/devel/multi-process.rst | 1102 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 1104 insertions(+)
+ create mode 100644 docs/devel/multi-process.rst
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index e2ac5b08a4..58aea19d34 100644
+index eb5ce6ea73..668c269eb6 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2828,6 +2828,8 @@ F: remote/memory.c
- F: hw/proxy/Makefile.objs
- F: hw/proxy/qemu-proxy.c
- F: include/hw/proxy/qemu-proxy.h
-+F: include/hw/proxy/memory-sync.h
-+F: hw/proxy/memory-sync.c
-=20
+@@ -2838,6 +2838,7 @@ F: include/remote/iohub.h
+ F: remote/iohub.c
+ F: remote/remote-opts.h
+ F: remote/remote-opts.c
++F: docs/devel/multi-process.rst
+ 
  Build and test automation
  -------------------------
-diff --git a/Makefile.target b/Makefile.target
-index 500fa07fda..c64d860895 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -127,6 +127,9 @@ obj-$(CONFIG_TCG) +=3D fpu/softfloat.o
- obj-y +=3D target/$(TARGET_BASE_ARCH)/
- obj-y +=3D disas.o
- obj-$(call notempty,$(TARGET_XML_FILES)) +=3D gdbstub-xml.o
-+ifeq ($(TARGET_NAME)-$(CONFIG_MPQEMU)-$(CONFIG_USER_ONLY), x86_64-y-)
-+obj-$(CONFIG_MPQEMU) +=3D hw/proxy/memory-sync.o
-+endif
- LIBS :=3D $(libs_cpu) $(LIBS)
-=20
- obj-$(CONFIG_PLUGIN) +=3D plugins/
-diff --git a/hw/proxy/memory-sync.c b/hw/proxy/memory-sync.c
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index b734ba4655..f80e5cddf3 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -26,3 +26,4 @@ Contents:
+    bitops
+    reset
+    s390-dasd-ipl
++   multi-process
+diff --git a/docs/devel/multi-process.rst b/docs/devel/multi-process.rst
 new file mode 100644
-index 0000000000..3edbb19efe
+index 0000000000..5a991e6b40
 --- /dev/null
-+++ b/hw/proxy/memory-sync.c
-@@ -0,0 +1,212 @@
-+/*
-+ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
++++ b/docs/devel/multi-process.rst
+@@ -0,0 +1,1102 @@
++Multi-process QEMU
++===================
 +
-+#include <sys/types.h>
-+#include <stdio.h>
-+#include <string.h>
++QEMU is often used as the hypervisor for virtual machines running in the
++Oracle cloud. Since one of the advantages of cloud computing is the
++ability to run many VMs from different tenants in the same cloud
++infrastructure, a guest that compromised its hypervisor could
++potentially use the hypervisor's access privileges to access data it is
++not authorized for.
 +
-+#include "qemu/osdep.h"
-+#include "qemu/compiler.h"
-+#include "qemu/int128.h"
-+#include "qemu/range.h"
-+#include "exec/memory.h"
-+#include "exec/cpu-common.h"
-+#include "cpu.h"
-+#include "exec/ram_addr.h"
-+#include "exec/address-spaces.h"
-+#include "io/mpqemu-link.h"
-+#include "hw/proxy/memory-sync.h"
++QEMU can be susceptible to security attacks because it is a large,
++monolithic program that provides many features to the VMs it services.
++Many of these features can be configured out of QEMU, but even a reduced
++configuration QEMU has a large amount of code a guest can potentially
++attack. Disaggregating QEMU reduces the attack surface by aiding to
++limit each component in the system to only access the resources that
++it needs to perform its job.
 +
-+static const TypeInfo remote_mem_sync_type_info =3D {
-+    .name          =3D TYPE_MEMORY_LISTENER,
-+    .parent        =3D TYPE_OBJECT,
-+    .instance_size =3D sizeof(RemoteMemSync),
-+};
++QEMU services
++-------------
 +
-+static void remote_mem_sync_register_types(void)
-+{
-+    type_register_static(&remote_mem_sync_type_info);
-+}
++QEMU can be broadly described as providing three main services. One is a
++VM control point, where VMs can be created, migrated, re-configured, and
++destroyed. A second is to emulate the CPU instructions within the VM,
++often accelerated by HW virtualization features such as Intel's VT
++extensions. Finally, it provides IO services to the VM by emulating HW
++IO devices, such as disk and network devices.
 +
-+type_init(remote_mem_sync_register_types)
++A multi-process QEMU
++~~~~~~~~~~~~~~~~~~~~
 +
-+static void proxy_ml_begin(MemoryListener *listener)
-+{
-+    RemoteMemSync *sync =3D container_of(listener, RemoteMemSync, listen=
-er);
-+    int mrs;
++A multi-process QEMU involves separating QEMU services into separate
++host processes. Each of these processes can be given only the privileges
++it needs to provide its service, e.g., a disk service could be given
++access only the the disk images it provides, and not be allowed to
++access other files, or any network devices. An attacker who compromised
++this service would not be able to use this exploit to access files or
++devices beyond what the disk service was given access to.
 +
-+    for (mrs =3D 0; mrs < sync->n_mr_sections; mrs++) {
-+        memory_region_unref(sync->mr_sections[mrs].mr);
-+    }
++A QEMU control process would remain, but in multi-process mode, but will
++have no direct interfaces to the VM. During VM execution, it would still
++provide the user interface to hot-plug devices or live migrate the VM.
 +
-+    g_free(sync->mr_sections);
-+    sync->mr_sections =3D NULL;
-+    sync->n_mr_sections =3D 0;
-+}
++A first step in creating a multi-process QEMU is to separate IO services
++from the main QEMU program, which would continue to provide CPU
++emulation. i.e., the control process would also be the CPU emulation
++process. In a later phase, CPU emulation could be separated from the
++control process.
 +
-+static int get_fd_from_hostaddr(uint64_t host, ram_addr_t *offset)
-+{
-+    MemoryRegion *mr;
-+    ram_addr_t off;
++Disaggregating IO services
++--------------------------
 +
-+    mr =3D memory_region_from_host((void *)(uintptr_t)host, &off);
++Disaggregating IO services is a good place to begin for a couple of reasons.
++One is the sheer number of IO devices QEMU can emulate provides a large
++surface of interfaces which could potentially be exploited, and, indeed,
++have been a source of exploits in the past.
++Another is the modular nature of QEMU device emulation code provides
++interface points where the QEMU functions that perform device emulation
++can be separated from the QEMU functions that manage the emulation of
++guest CPU instructions.
 +
-+    if (offset) {
-+        *offset =3D off;
-+    }
++QEMU device emulation
++~~~~~~~~~~~~~~~~~~~~~
 +
-+    return memory_region_get_fd(mr);
-+}
++QEMU uses a object oriented SW architecture for device emulation code.
++Configured objects are all compiled into the QEMU binary, then objects
++are instantiated by name when used by the guest VM. For example, the
++code to emulate a device named "foo" is always present in QEMU, but its
++instantiation code is only run when the device is included in the target
++VM. (e.g., via the QEMU command line as *-device foo*)
 +
-+static bool proxy_mrs_can_merge(uint64_t host, uint64_t prev_host, size_=
-t size)
-+{
-+    bool merge;
-+    int fd1, fd2;
++The object model is hierarchical, so device emulation code names its
++parent object (such as "pci-device" for a PCI device) and QEMU will
++instantiate a parent object before calling the device's instantiation
++code.
 +
-+    fd1 =3D get_fd_from_hostaddr(host, NULL);
++Current separation models
++~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+    fd2 =3D get_fd_from_hostaddr(prev_host, NULL);
++In order to separate the device emulation code from the CPU emulation
++code, the device object code must run in a different process. There are
++a couple of existing QEMU features that can run emulation code
++separately from the main QEMU process. These are examined below.
 +
-+    merge =3D (fd1 =3D=3D fd2);
++vhost user model
++^^^^^^^^^^^^^^^^
 +
-+    merge &=3D ((prev_host + size) =3D=3D host);
++Virtio guest device drivers can be connected to vhost user applications
++in order to perform their IO operations. This model uses special virtio
++device drivers in the guest and vhost user device objects in QEMU, but
++once the QEMU vhost user code has configured the vhost user application,
++mission-mode IO is performed by the application. The vhost user
++application is a daemon process that can be contacted via a known UNIX
++domain socket.
 +
-+    return merge;
-+}
++vhost socket
++''''''''''''
 +
-+static void proxy_ml_region_addnop(MemoryListener *listener,
-+                                   MemoryRegionSection *section)
-+{
-+    RemoteMemSync *sync =3D container_of(listener, RemoteMemSync, listen=
-er);
-+    bool need_add =3D true;
-+    uint64_t mrs_size, mrs_gpa, mrs_page;
-+    uintptr_t mrs_host;
-+    RAMBlock *mrs_rb;
-+    MemoryRegionSection *prev_sec;
++As mentioned above, one of the tasks of the vhost device object within
++QEMU is to contact the vhost application and send it configuration
++information about this device instance. As part of the configuration
++process, the application can also be sent other file descriptors over
++the socket, which then can be used by the vhost user application in
++various ways, some of which are described below.
 +
-+    if (!(memory_region_is_ram(section->mr) &&
-+          !memory_region_is_rom(section->mr))) {
-+        return;
-+    }
++vhost MMIO store acceleration
++'''''''''''''''''''''''''''''
 +
-+    mrs_rb =3D section->mr->ram_block;
-+    mrs_page =3D (uint64_t)qemu_ram_pagesize(mrs_rb);
-+    mrs_size =3D int128_get64(section->size);
-+    mrs_gpa =3D section->offset_within_address_space;
-+    mrs_host =3D (uintptr_t)memory_region_get_ram_ptr(section->mr) +
-+               section->offset_within_region;
++VMs are often run using HW virtualization features via the KVM kernel
++driver. This driver allows QEMU to accelerate the emulation of guest CPU
++instructions by running the guest in a virtual HW mode. When the guest
++executes instructions that cannot be executed by virtual HW mode,
++execution returns to the KVM driver so it can inform QEMU to emulate the
++instructions in SW.
 +
-+    if (get_fd_from_hostaddr(mrs_host, NULL) <=3D 0) {
-+        return;
-+    }
++One of the events that can cause a return to QEMU is when a guest device
++driver accesses an IO location. QEMU then dispatches the memory
++operation to the corresponding QEMU device object. In the case of a
++vhost user device, the memory operation would need to be sent over a
++socket to the vhost application. This path is accelerated by the QEMU
++virtio code by setting up an eventfd file descriptor that the vhost
++application can directly receive MMIO store notifications from the KVM
++driver, instead of needing them to be sent to the QEMU process first.
 +
-+    mrs_host =3D mrs_host & ~(mrs_page - 1);
-+    mrs_gpa =3D mrs_gpa & ~(mrs_page - 1);
-+    mrs_size =3D ROUND_UP(mrs_size, mrs_page);
++vhost interrupt acceleration
++''''''''''''''''''''''''''''
 +
-+    if (sync->n_mr_sections) {
-+        prev_sec =3D sync->mr_sections + (sync->n_mr_sections - 1);
-+        uint64_t prev_gpa_start =3D prev_sec->offset_within_address_spac=
-e;
-+        uint64_t prev_size =3D int128_get64(prev_sec->size);
-+        uint64_t prev_gpa_end   =3D range_get_last(prev_gpa_start, prev_=
-size);
-+        uint64_t prev_host_start =3D
-+            (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
-+            prev_sec->offset_within_region;
-+        uint64_t prev_host_end =3D range_get_last(prev_host_start, prev_=
-size);
++Another optimization used by the vhost application is the ability to
++directly inject interrupts into the VM via the KVM driver, again,
++bypassing the need to send the interrupt back to the QEMU process first.
++The QEMU virtio setup code configures the KVM driver with an eventfd
++that triggers the device interrupt in the guest when the eventfd is
++written. This irqfd file descriptor is then passed to the vhost user
++application program.
 +
-+        if (mrs_gpa <=3D (prev_gpa_end + 1)) {
-+            if (mrs_gpa < prev_gpa_start) {
-+                assert(0);
-+            }
++vhost access to guest memory
++''''''''''''''''''''''''''''
 +
-+            if ((section->mr =3D=3D prev_sec->mr) &&
-+                proxy_mrs_can_merge(mrs_host, prev_host_start,
-+                                    (mrs_gpa - prev_gpa_start))) {
-+                uint64_t max_end =3D MAX(prev_host_end, mrs_host + mrs_s=
-ize);
-+                need_add =3D false;
-+                prev_sec->offset_within_address_space =3D
-+                    MIN(prev_gpa_start, mrs_gpa);
-+                prev_sec->offset_within_region =3D
-+                    MIN(prev_host_start, mrs_host) -
-+                    (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr);
-+                prev_sec->size =3D int128_make64(max_end - MIN(prev_host=
-_start,
-+                                                             mrs_host));
-+            }
-+        }
-+    }
++The vhost application is also allowed to directly access guest memory,
++instead of needing to send the data as messages to QEMU. This is also
++done with file descriptors sent to the vhost user application by QEMU.
++These descriptors can be passed to ``mmap()`` by the vhost application
++to map the guest address space into the vhost application.
 +
-+    if (need_add) {
-+        ++sync->n_mr_sections;
-+        sync->mr_sections =3D g_renew(MemoryRegionSection, sync->mr_sect=
-ions,
-+                                    sync->n_mr_sections);
-+        sync->mr_sections[sync->n_mr_sections - 1] =3D *section;
-+        sync->mr_sections[sync->n_mr_sections - 1].fv =3D NULL;
-+        memory_region_ref(section->mr);
-+    }
-+}
++IOMMUs introduce another level of complexity, since the address given to
++the guest virtio device to DMA to or from is not a guest physical
++address. This case is handled by having vhost code within QEMU register
++as a listener for IOMMU mapping changes. The vhost application maintains
++a cache of IOMMMU translations: sending translation requests back to
++QEMU on cache misses, and in turn receiving flush requests from QEMU
++when mappings are purged.
 +
-+static void proxy_ml_commit(MemoryListener *listener)
-+{
-+    RemoteMemSync *sync =3D container_of(listener, RemoteMemSync, listen=
-er);
-+    MPQemuMsg msg;
-+    MemoryRegionSection section;
-+    ram_addr_t offset;
-+    uintptr_t host_addr;
-+    int region;
++applicability to device separation
++''''''''''''''''''''''''''''''''''
 +
-+    memset(&msg, 0, sizeof(MPQemuMsg));
++Much of the vhost model can be re-used by separated device emulation. In
++particular, the ideas of using a socket between QEMU and the device
++emulation application, using a file descriptor to inject interrupts into
++the VM via KVM, and allowing the application to ``mmap()`` the guest
++should be re used.
 +
-+    msg.cmd =3D SYNC_SYSMEM;
-+    msg.bytestream =3D 0;
-+    msg.num_fds =3D sync->n_mr_sections;
-+    msg.size =3D sizeof(msg.data1);
-+    assert(msg.num_fds <=3D REMOTE_MAX_FDS);
++There are, however, some notable differences between how a vhost
++application works and the needs of separated device emulation. The most
++basic is that vhost uses custom virtio device drivers which always
++trigger IO with MMIO stores. A separated device emulation model must
++work with existing IO device models and guest device drivers. MMIO loads
++break vhost store acceleration since they are synchronous - guest
++progress cannot continue until the load has been emulated. By contrast,
++stores are asynchronous, the guest can continue after the store event
++has been sent to the vhost application.
 +
-+    for (region =3D 0; region < sync->n_mr_sections; region++) {
-+        section =3D sync->mr_sections[region];
-+        msg.data1.sync_sysmem.gpas[region] =3D
-+            section.offset_within_address_space;
-+        msg.data1.sync_sysmem.sizes[region] =3D int128_get64(section.siz=
-e);
-+        host_addr =3D (uintptr_t)memory_region_get_ram_ptr(section.mr) +
-+                    section.offset_within_region;
-+        msg.fds[region] =3D get_fd_from_hostaddr(host_addr, &offset);
-+        msg.data1.sync_sysmem.offsets[region] =3D offset;
-+    }
-+    mpqemu_msg_send(&msg, sync->mpqemu_link->com);
-+}
++Another difference is that in the vhost user model, a single daemon can
++support multiple QEMU instances. This is contrary to the security regime
++desired, in which the emulation application should only be allowed to
++access the files or devices the VM it's running on behalf of can access.
++#### qemu-io model
 +
-+void deconfigure_memory_sync(RemoteMemSync *sync)
-+{
-+    memory_listener_unregister(&sync->listener);
-+}
++Qemu-io is a test harness used to test changes to the QEMU block backend
++object code. (e.g., the code that implements disk images for disk driver
++emulation) Qemu-io is not a device emulation application per se, but it
++does compile the QEMU block objects into a separate binary from the main
++QEMU one. This could be useful for disk device emulation, since its
++emulation applications will need to include the QEMU block objects.
 +
-+/*
-+ * TODO: Memory Sync need not be instantianted once per every proxy devi=
-ce.
-+ *       All remote devices are going to get the exact same updates at t=
-he
-+ *       same time. It therefore makes sense to have a broadcast model.
-+ *
-+ *       Broadcast model would involve running the MemorySync object in =
-a
-+ *       thread. MemorySync would contain a list of mpqemu-link objects
-+ *       that need notification. proxy_ml_commit() could send the same
-+ *       message to all the links at the same time.
-+ */
-+void configure_memory_sync(RemoteMemSync *sync, MPQemuLinkState *mpqemu_=
-link)
-+{
-+    sync->n_mr_sections =3D 0;
-+    sync->mr_sections =3D NULL;
++New separation model based on proxy objects
++-------------------------------------------
 +
-+    sync->mpqemu_link =3D mpqemu_link;
++A different model based on proxy objects in the QEMU program
++communicating with remote emulation programs could provide separation
++while minimizing the changes needed to the device emulation code. The
++rest of this section is a discussion of how a proxy object model would
++work.
 +
-+    sync->listener.begin =3D proxy_ml_begin;
-+    sync->listener.commit =3D proxy_ml_commit;
-+    sync->listener.region_add =3D proxy_ml_region_addnop;
-+    sync->listener.region_nop =3D proxy_ml_region_addnop;
-+    sync->listener.priority =3D 10;
++Remote emulation processes
++~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+    memory_listener_register(&sync->listener, &address_space_memory);
-+}
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index 7fd0a312a5..2ac4c1528a 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -13,6 +13,8 @@
- #include "io/mpqemu-link.h"
- #include "hw/proxy/qemu-proxy.h"
- #include "hw/pci/pci.h"
-+#include "hw/proxy/memory-sync.h"
-+#include "qom/object.h"
-=20
- static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val=
-, int l,
-                           unsigned int op)
-@@ -138,6 +140,10 @@ static void pci_proxy_dev_realize(PCIDevice *device,=
- Error **errp)
-             error_propagate(errp, local_err);
-         }
-     }
++The remote emulation process will run the QEMU object hierarchy without
++modification. The device emulation objects will be also be based on the
++QEMU code, because for anything but the simplest device, it would not be
++a tractable to re-implement both the object model and the many device
++backends that QEMU has.
 +
-+    dev->sync =3D REMOTE_MEM_SYNC(object_new(TYPE_MEMORY_LISTENER));
++The processes will communicate with the QEMU process over UNIX domain
++sockets. The processes can be executed either as standalone processes,
++or be executed by QEMU. In both cases, the host backends the emulation
++processes will provide are specified on its command line, as they would
++be for QEMU. For example:
 +
-+    configure_memory_sync(dev->sync, dev->mpqemu_link);
- }
-=20
- static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
-diff --git a/include/hw/proxy/memory-sync.h b/include/hw/proxy/memory-syn=
-c.h
-new file mode 100644
-index 0000000000..d8329c9b52
---- /dev/null
-+++ b/include/hw/proxy/memory-sync.h
-@@ -0,0 +1,37 @@
-+/*
-+ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
++::
 +
-+#ifndef MEMORY_SYNC_H
-+#define MEMORY_SYNC_H
++    disk-proc -blockdev driver=file,node-name=file0,filename=disk-file0  \
++    -blockdev driver=qcow2,node-name=drive0,file=file0
 +
-+#include <sys/types.h>
++would indicate process *disk-proc* uses a qcow2 emulated disk named
++*file0* as its backend.
 +
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "exec/memory.h"
-+#include "io/mpqemu-link.h"
++Emulation processes may emulate more than one guest controller. A common
++configuration might be to put all controllers of the same device class
++(e.g., disk, network, etc.) in a single process, so that all backends of
++the same type can be managed by a single QMP monitor.
 +
-+#define TYPE_MEMORY_LISTENER "memory-listener"
-+#define REMOTE_MEM_SYNC(obj) \
-+            OBJECT_CHECK(RemoteMemSync, (obj), TYPE_MEMORY_LISTENER)
++communication with QEMU
++^^^^^^^^^^^^^^^^^^^^^^^
 +
-+typedef struct RemoteMemSync {
-+    Object obj;
++Remote emulation processes will recognize a *-socket* argument that
++specifies the path of a UNIX domain socket used to communicate with the
++QEMU process. If no *-socket* argument is present, the process will use
++file descriptor 0 to communicate with QEMU. For example,
 +
-+    MemoryListener listener;
++::
 +
-+    int n_mr_sections;
-+    MemoryRegionSection *mr_sections;
++    disk-proc -socket /tmp/disk0-sock <backend list>
 +
-+    MPQemuLinkState *mpqemu_link;
-+} RemoteMemSync;
++will communicate with QEMU using the socket path */tmp/disk0-sock*.
 +
-+void configure_memory_sync(RemoteMemSync *sync, MPQemuLinkState *mpqemu_=
-link);
-+void deconfigure_memory_sync(RemoteMemSync *sync);
++remote process QMP monitor
++^^^^^^^^^^^^^^^^^^^^^^^^^^
 +
-+#endif
-diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.=
-h
-index 9e4127eccb..6d14876ba9 100644
---- a/include/hw/proxy/qemu-proxy.h
-+++ b/include/hw/proxy/qemu-proxy.h
-@@ -14,6 +14,7 @@
-=20
- #include "io/mpqemu-link.h"
- #include "hw/pci/pci.h"
-+#include "hw/proxy/memory-sync.h"
-=20
- #define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
-=20
-@@ -39,8 +40,13 @@ typedef struct ProxyMemoryRegion {
- struct PCIProxyDev {
-     PCIDevice parent_dev;
-=20
-+    int n_mr_sections;
-+    MemoryRegionSection *mr_sections;
++Remote emulation processes can be monitored via QMP, similar to QEMU
++itself. The QMP monitor socket is specified the same as for a QEMU
++process:
 +
-     MPQemuLinkState *mpqemu_link;
-=20
-+    RemoteMemSync *sync;
++::
 +
-     int socket;
-=20
-     ProxyMemoryRegion region[PCI_NUM_REGIONS];
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 4f512aa5a8..ed51499ace 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -34,6 +34,7 @@
- #include "block/block.h"
- #include "exec/ramlist.h"
- #include "exec/memattrs.h"
-+#include "exec/address-spaces.h"
-=20
- static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-                         MPQemuChannel *chan);
-@@ -204,6 +205,16 @@ static void process_msg(GIOCondition cond, MPQemuLin=
-kState *link,
-             goto finalize_loop;
-         }
-         break;
-+    case SYNC_SYSMEM:
-+        /*
-+         * TODO: ensure no active DMA is happening when
-+         * sysmem is being updated
-+         */
-+        remote_sysmem_reconfig(msg, &err);
-+        if (err) {
-+            goto finalize_loop;
-+        }
-+        break;
-     default:
-         error_setg(&err, "Unknown command");
-         goto finalize_loop;
---=20
++    disk-proc -qmp unix:/tmp/disk-mon,server
++
++can be monitored over the UNIX socket path */tmp/disk-mon*.
++
++QEMU command line
++~~~~~~~~~~~~~~~~~
++
++The QEMU command line options will need to be modified to indicate which
++items are emulated by a separate program, and which remain emulated by
++QEMU itself.
++
++identifying remote emulation processes
++^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++
++Remote emulation processes will be identified to QEMU using a *-remote*
++command line option. This option can either specify a command that QEMU
++will execute, or can specify a UNIX domain socket that QEMU can use to
++connect to an existing process. Both forms require a "id" option that
++identifies the process to later *-device* options. The process version
++is:
++
++::
++
++    -remote id=disk-proc,rid=0,exec="disc-proc",command="<backend list>"
++
++And the socket version is:
++
++::
++
++    -remote id=disk-proc,rid=0,socket="/tmp/disk0-sock"
++
++In the latter case, the remote process must be given the same socket on
++its command line when it is executed:
++
++::
++
++    disk-proc -socket /tmp/disk0-sock <backend list>
++
++identifying devices emulated remotely
++^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++
++Devices that are to be emulated in a separate process will identify
++the remote process with a "rid" option on their *-device* command
++line specification. e.g., an LSI SCSI controller and disk can be
++specified as:
++
++::
++
++    -device lsi53c895a,id=scsi0
++    -device scsi-hd,drive=drive0,bus=scsi0.0,scsi-id=0
++
++If these devices are emulated by remote process "disk-proc," as
++described in the previous section, the QEMU command line would be:
++
++::
++
++    -device lsi53c895a,id=scsi0,rid=0
++    -device scsi-hd,drive=drive0,bus=scsi0.0,scsi-id=0,rid=0
++
++Some devices are implicitly created by the machine object. e.g., the q35
++machine object will create its PCI bus, and attach an ich9-ahci IDE
++controller to it. In this case, options will need to be added to the
++*-machine* command line. e.g.,
++
++::
++
++    -machine pc-q35,ide-remote=disk-proc
++
++will use the remote process with an "id" of "disk-proc" to emulate the
++IDE controller and its disks.
++
++The disks themselves still need to be specified with *-remote* option,
++as in the example above. e.g.,
++
++::
++
++    -device ide-hd,drive=drive0,bus=ide.0,unit=0,remote=disk-proc
++
++QEMU management of remote processes
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Each *-remote* instance on the QEMU command line will create a remote
++process proxy instance in QEMU. They will be held on a *QList* that can
++be searched for by its "id" property. The remote process proxy will also
++establish a communication channel between QEMU and the remote process.
++This can be done in one of two methods: direction execution of the
++process by QEMU with ``fork()`` and ``exec()`` system calls, or by
++connecting to an existing process.
++
++direct execution
++^^^^^^^^^^^^^^^^
++
++When the remote process is directly executed, the remote process proxy
++will setup a communication channel between itself and the emulation
++process. This channel will be created using ``socketpair()`` and the
++remote process side of the pair will be given to the process as file
++descriptor 0.
++
++connecting to an existing process
++^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++
++Some environments wish to deny QEMU the ability to execute ``fork()``
++and ``exec()`` In these case, emulation processes will be started before
++QEMU, and a UNIX domain socket will be given to each emulation process
++to communicate with QEMU over. After communication is established, the
++socket will be unlinked from the file system space by the QEMU process.
++
++communication with emulation process
++^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++
++primary socket
++''''''''''''''
++
++Whether the process was executed by QEMU or externally, there will be a
++primary socket for communication between QEMU and the remote process.
++This channel will handle configuration commands from QEMU to the
++process, either from the QEMU command line, or from QMP commands that
++affect the devices being emulated by the process. This channel will only
++allow one message to be pending at a time; if additional messages
++arrive, they must wait for previous ones to be acknowledged from the
++remote side.
++
++secondary sockets
++'''''''''''''''''
++
++The primary socket can pass the file descriptors of secondary sockets
++for operations that occur in parallel with commands on the primary
++channel. These include MMIO operations generated by the guest, interrupt
++notifications generated by the devices being emulated, or *vmstate* for
++live migration. These secondary sockets will be created at the behest of
++the device proxies that require them. A disk device proxy wouldn't need
++any secondary sockets, but a disk controller device proxy may need both
++an MMIO socket and an interrupt socket.
++
++emulation process attached via QMP command
++^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++
++The command "device-add" QMP command facilitates device hot-plug that is
++tp. This command's arguments will be the same as the *-remote*
++command line when it's used to attach to a remote process. i.e., it will
++need an "id" argument so that hot-plugged devices can later find it, and
++a "socket" argument to identify the UNIX domain socket that will be used
++to communicate with QEMU.
++
++QEMU device proxy objects
++~~~~~~~~~~~~~~~~~~~~~~~~~
++
++QEMU has an object model based on sub-classes inherited from the
++"object" super-class. The sub-classes that are of interest here are the
++"device" and "bus" sub-classes whose child sub-classes make up the
++device tree of a QEMU emulated system.
++
++The proxy object model will use device proxy objects to replace the
++device emulation code within the QEMU process. These objects will live
++in the same place in the object and bus hierarchies as the objects they
++replace. i.e., the proxy object for an LSI SCSI controller will be a
++sub-class of the "pci-device" class, and will have the same PCI bus
++parent and the same SCSI bus child objects as the LSI controller object
++it replaces.
++
++After the QEMU command line has been parsed, the remote devices will be
++instantiated in the same manner as local devices are. (i.e.,
++``qdev_device_add()``). In order to distinguish them from regular
++*-device* device objects, their class name will be the name of the class
++it replaces, with "-proxy" appended. e.g., the "lsi53c895a" proxy class
++will be "lsi53c895a-proxy."
++
++device JSON description
++^^^^^^^^^^^^^^^^^^^^^^^
++
++The remote process needs a JSON representation of the command line
++options used to create the object. This JSON representation is used to
++create the corresponding object in the emulation process. e.g., for an
++LSI SCSI controller invoked as:
++
++::
++
++     -device lsi53c895a,id=scsi0,remote=lsi-scsi
++
++the proxy object would create a
++
++::
++
++    { "driver" : "lsi53c895a", "id" : "scsi0" }
++
++JSON description. The "driver" option is assigned to the device name
++when the command line is parsed, so the "-proxy" appended by the command
++line parsing code is removed. The "remote" option isn't needed in the
++JSON description since it only applies to the proxy object in the QEMU
++process.
++
++device object whitelist
++^^^^^^^^^^^^^^^^^^^^^^^
++
++Some device objects may not need a proxy. These are devices with no
++direct guest interfaces. (e.g., no MMIO, PIO, or interrupts). There will
++be a whitelist of such devices, and any devices on this list will not be
++instantiated in QEMU. Their JSON representation will still be sent to
++the remote process, so the object can be created there.
++
++object initialization
++^^^^^^^^^^^^^^^^^^^^^
++
++QEMU object initialization occurs in two phases. The first
++initialization happens once per object class. (i.e., there can be many
++SCSI disks in an emulated system, but the "scsi-hd" class has its
++``class_init()`` function called only once) The second phase happens
++when each object's ``instance_init()`` function is called to initialize
++each instance of the object.
++
++All device objects are sub-classes of the "device" class, so they also
++have a ``realize()`` function that is called after ``instance_init()``
++is called and after the object's static properties have been
++initialized. Many device objects don't even provide an instance\_init()
++function, and do all their per-instance work in ``realize()``.
++
++class\_init
++'''''''''''
++
++The ``class_init()`` method of a proxy object will, in general behave
++similarly to the object it replaces, including setting any static
++properties and methods needed by the proxy.
++
++instance\_init / realize
++''''''''''''''''''''''''
++
++The ``instance_init()`` and ``realize()`` functions would only need to
++perform tasks related to being a proxy, such are registering its own
++MMIO handlers, or creating a child bus that other proxy devices can be
++attached to later.
++
++Other tasks will are device-specific. For example, PCI device objects
++will initialize the PCI config space in order to make a valid PCI device
++tree within the QEMU process.
++
++address space registration
++^^^^^^^^^^^^^^^^^^^^^^^^^^
++
++Most devices are driven by guest device driver accesses to IO addresses
++or ports. The QEMU device emulation code uses QEMU's memory region
++function calls (such as ``memory_region_init_io()``) to add callback
++functions that QEMU will invoke when the guest accesses the device's
++areas of the IO address space. When a guest driver does access the
++device, the VM will exit HW virtualization mode and return to QEMU,
++which will then lookup and execute the corresponding callback function.
++
++A proxy object would need to mirror the memory region calls the actual
++device emulator would perform in its initialization code, but with its
++own callbacks. When invoked by QEMU as a result of a guest IO operation,
++they will forward the operation to the device emulation process.
++
++PCI config space
++^^^^^^^^^^^^^^^^
++
++PCI devices also have a configuration space that can be accessed by the
++guest driver. Guest accesses to this space is not handled by the device
++emulation object, but by its PCI parent object. Much of this space is
++read-only, but certain registers (especially BAR and MSI-related ones)
++need to be propagated to the emulation process.
++
++PCI parent proxy
++''''''''''''''''
++
++One way to propagate guest PCI config accesses is to create a
++"pci-device-proxy" class that can serve as the parent of a PCI device
++proxy object. This class's parent would be "pci-device" and it would
++override the PCI parent's ``config_read()`` and ``config_write()``
++methods with ones that forward these operations to the emulation
++program.
++
++interrupt receipt
++^^^^^^^^^^^^^^^^^
++
++A proxy for a device that generates interrupts will need to create a
++socket to receive interrupt indications from the emulation process. An
++incoming interrupt indication would then be sent up to its bus parent to
++be injected into the guest. For example, a PCI device object may use
++``pci_set_irq()``.
++
++live migration
++^^^^^^^^^^^^^^
++
++The proxy will register to save and restore any *vmstate* it needs over
++a live migration event. The device proxy does not need to manage the
++remote device's *vmstate*; that will be handled by the remote process
++proxy (see below).
++
++QEMU remote device operation
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Generic device operations, such as DMA, will be performed by the remote
++process proxy by sending messages to the remote process.
++
++DMA operations
++^^^^^^^^^^^^^^
++
++DMA operations would be handled much like vhost applications do. One of
++the initial messages sent to the emulation process is a guest memory
++table. Each entry in this table consists of a file descriptor and size
++that the emulation process can ``mmap()`` to directly access guest
++memory, similar to ``vhost_user_set_mem_table()``. Note guest memory
++must be backed by file descriptors, such as when QEMU is given the
++*-mem-path* command line option.
++
++IOMMU operations
++^^^^^^^^^^^^^^^^
++
++When the emulated system includes an IOMMU, the remote process proxy in
++QEMU will need to create a socket for IOMMU requests from the emulation
++process. It will handle those requests with an
++``address_space_get_iotlb_entry()`` call. In order to handle IOMMU
++unmaps, the remote process proxy will also register as a listener on the
++device's DMA address space. When an IOMMU memory region is created
++within the DMA address space, an IOMMU notifier for unmaps will be added
++to the memory region that will forward unmaps to the emulation process
++over the IOMMU socket.
++
++device hot-plug via QMP
++^^^^^^^^^^^^^^^^^^^^^^^
++
++An QMP "device\_add" command can add a device emulated by a remote
++process. It will also have "rid" option to the command, just as the
++*-device* command line option does. The remote process may either be one
++started at QEMU startup, or be one added by the "add-process" QMP
++command described above. In either case, the remote process proxy will
++forward the new device's JSON description to the corresponding emulation
++process.
++
++live migration
++^^^^^^^^^^^^^^
++
++The remote process proxy will also register for live migration
++notifications with ``vmstate_register()``. When called to save state,
++the proxy will send the remote process a secondary socket file
++descriptor to save the remote process's device *vmstate* over. The
++incoming byte stream length and data will be saved as the proxy's
++*vmstate*. When the proxy is resumed on its new host, this *vmstate*
++will be extracted, and a secondary socket file descriptor will be sent
++to the new remote process through which it receives the *vmstate* in
++order to restore the devices there.
++
++device emulation in remote process
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++The parts of QEMU that the emulation program will need include the
++object model; the memory emulation objects; the device emulation objects
++of the targeted device, and any dependent devices; and, the device's
++backends. It will also need code to setup the machine environment,
++handle requests from the QEMU process, and route machine-level requests
++(such as interrupts or IOMMU mappings) back to the QEMU process.
++
++initialization
++^^^^^^^^^^^^^^
++
++The process initialization sequence will follow the same sequence
++followed by QEMU. It will first initialize the backend objects, then
++device emulation objects. The JSON descriptions sent by the QEMU process
++will drive which objects need to be created.
++
++-  address spaces
++
++Before the device objects are created, the initial address spaces and
++memory regions must be configured with ``memory_map_init()``. This
++creates a RAM memory region object (*system\_memory*) and an IO memory
++region object (*system\_io*).
++
++-  RAM
++
++RAM memory region creation will follow how ``pc_memory_init()`` creates
++them, but must use ``memory_region_init_ram_from_fd()`` instead of
++``memory_region_allocate_system_memory()``. The file descriptors needed
++will be supplied by the guest memory table from above. Those RAM regions
++would then be added to the *system\_memory* memory region with
++``memory_region_add_subregion()``.
++
++-  PCI
++
++IO initialization will be driven by the JSON descriptions sent from the
++QEMU process. For a PCI device, a PCI bus will need to be created with
++``pci_root_bus_new()``, and a PCI memory region will need to be created
++and added to the *system\_memory* memory region with
++``memory_region_add_subregion_overlap()``. The overlap version is
++required for architectures where PCI memory overlaps with RAM memory.
++
++MMIO handling
++^^^^^^^^^^^^^
++
++The device emulation objects will use ``memory_region_init_io()`` to
++install their MMIO handlers, and ``pci_register_bar()`` to associate
++those handlers with a PCI BAR, as they do within QEMU currently.
++
++In order to use ``address_space_rw()`` in the emulation process to
++handle MMIO requests from QEMU, the PCI physical addresses must be the
++same in the QEMU process and the device emulation process. In order to
++accomplish that, guest BAR programming must also be forwarded from QEMU
++to the emulation process.
++
++interrupt injection
++^^^^^^^^^^^^^^^^^^^
++
++When device emulation wants to inject an interrupt into the VM, the
++request climbs the device's bus object hierarchy until the point where a
++bus object knows how to signal the interrupt to the guest. The details
++depend on the type of interrupt being raised.
++
++-  PCI pin interrupts
++
++On x86 systems, there is an emulated IOAPIC object attached to the root
++PCI bus object, and the root PCI object forwards interrupt requests to
++it. The IOAPIC object, in turn, calls the KVM driver to inject the
++corresponding interrupt into the VM. The simplest way to handle this in
++an emulation process would be to setup the root PCI bus driver (via
++``pci_bus_irqs()``) to send a interrupt request back to the QEMU
++process, and have the device proxy object reflect it up the PCI tree
++there.
++
++-  PCI MSI/X interrupts
++
++PCI MSI/X interrupts are implemented in HW as DMA writes to a
++CPU-specific PCI address. In QEMU on x86, a KVM APIC object receives
++these DMA writes, then calls into the KVM driver to inject the interrupt
++into the VM. A simple emulation process implementation would be to send
++the MSI DMA address from QEMU as a message at initialization, then
++install an address space handler at that address which forwards the MSI
++message back to QEMU.
++
++DMA operations
++^^^^^^^^^^^^^^
++
++When a emulation object wants to DMA into or out of guest memory, it
++first must use dma\_memory\_map() to convert the DMA address to a local
++virtual address. The emulation process memory region objects setup above
++will be used to translate the DMA address to a local virtual address the
++device emulation code can access.
++
++IOMMU
++^^^^^
++
++When an IOMMU is in use in QEMU, DMA translation uses IOMMU memory
++regions to translate the DMA address to a guest physical address before
++that physical address can be translated to a local virtual address. The
++emulation process will need similar functionality.
++
++-  IOTLB cache
++
++The emulation process will maintain a cache of recent IOMMU translations
++(the IOTLB). When the translate() callback of an IOMMU memory region is
++invoked, the IOTLB cache will be searched for an entry that will map the
++DMA address to a guest PA. On a cache miss, a message will be sent back
++to QEMU requesting the corresponding translation entry, which be both be
++used to return a guest address and be added to the cache.
++
++-  IOTLB purge
++
++The IOMMU emulation will also need to act on unmap requests from QEMU.
++These happen when the guest IOMMU driver purges an entry from the
++guest's translation table.
++
++live migration
++^^^^^^^^^^^^^^
++
++When a remote process receives a live migration indication from QEMU, it
++will set up a channel using the received file descriptor with
++``qio_channel_socket_new_fd()``. This channel will be used to create a
++*QEMUfile* that can be passed to ``qemu_save_device_state()`` to send
++the process's device state back to QEMU. This method will be reversed on
++restore - the channel will be passed to ``qemu_loadvm_state()`` to
++restore the device state.
++
++Accelerating device emulation
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++The messages that are required to be sent between QEMU and the emulation
++process can add considerable latency to IO operations. The optimizations
++described below attempt to ameliorate this effect by allowing the
++emulation process to communicate directly with the kernel KVM driver.
++The KVM file descriptors created would be passed to the emulation process
++via initialization messages, much like the guest memory table is done.
++#### MMIO acceleration
++
++Vhost user applications can receive guest virtio driver stores directly
++from KVM. The issue with the eventfd mechanism used by vhost user is
++that it does not pass any data with the event indication, so it cannot
++handle guest loads or guest stores that carry store data. This concept
++could, however, be expanded to cover more cases.
++
++The expanded idea would require a new type of KVM device:
++*KVM\_DEV\_TYPE\_USER*. This device has two file descriptors: a master
++descriptor that QEMU can use for configuration, and a slave descriptor
++that the emulation process can use to receive MMIO notifications. QEMU
++would create both descriptors using the KVM driver, and pass the slave
++descriptor to the emulation process via an initialization message.
++
++data structures
++^^^^^^^^^^^^^^^
++
++-  guest physical range
++
++The guest physical range structure describes the address range that a
++device will respond to. It includes the base and length of the range, as
++well as which bus the range resides on (e.g., on an x86machine, it can
++specify whether the range refers to memory or IO addresses).
++
++A device can have multiple physical address ranges it responds to (e.g.,
++a PCI device can have multiple BARs), so the structure will also include
++an enumerated identifier to specify which of the device's ranges is
++being referred to.
++
+++--------+----------------------------+
++| Name   | Description                |
+++========+============================+
++| addr   | range base address         |
+++--------+----------------------------+
++| len    | range length               |
+++--------+----------------------------+
++| bus    | addr type (memory or IO)   |
+++--------+----------------------------+
++| id     | range ID (e.g., PCI BAR)   |
+++--------+----------------------------+
++
++-  MMIO request structure
++
++This structure describes an MMIO operation. It includes which guest
++physical range the MMIO was within, the offset within that range, the
++MMIO type (e.g., load or store), and its length and data. It also
++includes a sequence number that can be used to reply to the MMIO, and
++the CPU that issued the MMIO.
++
+++----------+------------------------+
++| Name     | Description            |
+++==========+========================+
++| rid      | range MMIO is within   |
+++----------+------------------------+
++| offset   | offset withing *rid*   |
+++----------+------------------------+
++| type     | e.g., load or store    |
+++----------+------------------------+
++| len      | MMIO length            |
+++----------+------------------------+
++| data     | store data             |
+++----------+------------------------+
++| seq      | sequence ID            |
+++----------+------------------------+
++
++-  MMIO request queues
++
++MMIO request queues are FIFO arrays of MMIO request structures. There
++are two queues: pending queue is for MMIOs that haven't been read by the
++emulation program, and the sent queue is for MMIOs that haven't been
++acknowledged. The main use of the second queue is to validate MMIO
++replies from the emulation program.
++
++-  scoreboard
++
++Each CPU in the VM is emulated in QEMU by a separate thread, so multiple
++MMIOs may be waiting to be consumed by an emulation program and multiple
++threads may be waiting for MMIO replies. The scoreboard would contain a
++wait queue and sequence number for the per-CPU threads, allowing them to
++be individually woken when the MMIO reply is received from the emulation
++program. It also tracks the number of posted MMIO stores to the device
++that haven't been replied to, in order to satisfy the PCI constraint
++that a load to a device will not complete until all previous stores to
++that device have been completed.
++
++-  device shadow memory
++
++Some MMIO loads do not have device side-effects. These MMIOs can be
++completed without sending a MMIO request to the emulation program if the
++emulation program shares a shadow image of the device's memory image
++with the KVM driver.
++
++The emulation program will ask the KVM driver to allocate memory for the
++shadow image, and will then use ``mmap()`` to directly access it. The
++emulation program can control KVM access to the shadow image by sending
++KVM an access map telling it which areas of the image have no
++side-effects (and can be completed immediately), and which require a
++MMIO request to the emulation program. The access map can also inform
++the KVM drive which size accesses are allowed to the image.
++
++master descriptor
++^^^^^^^^^^^^^^^^^
++
++The master descriptor is used by QEMU to configure the new KVM device.
++The descriptor would be returned by the KVM driver when QEMU issues a
++*KVM\_CREATE\_DEVICE* ``ioctl()`` with a *KVM\_DEV\_TYPE\_USER* type.
++
++KVM\_DEV\_TYPE\_USER device ops
++
++
++The *KVM\_DEV\_TYPE\_USER* operations vector will be registered by a
++``kvm_register_device_ops()`` call when the KVM system in initialized by
++``kvm_init()``. These device ops are called by the KVM driver when QEMU
++executes certain ``ioctl()`` operations on its KVM file descriptor. They
++include:
++
++-  create
++
++This routine is called when QEMU issues a *KVM\_CREATE\_DEVICE*
++``ioctl()`` on its per-VM file descriptor. It will allocate and
++initialize a KVM user device specific data structure, and assign the
++*kvm\_device* private field to it.
++
++-  ioctl
++
++This routine is invoked when QEMU issues an ``ioctl()`` on the master
++descriptor. The ``ioctl()`` commands supported are defined by the KVM
++device type. *KVM\_DEV\_TYPE\_USER* ones will need several commands:
++
++*KVM\_DEV\_USER\_SLAVE\_FD* creates the slave file descriptor thatwill
++be passed to the device emulation program. Only one slave can be created
++by each master descriptor. The file operations performed by this
++descriptor are described below.
++
++The *KVM\_DEV\_USER\_PA\_RANGE* command configures a guest physical
++address range that the slave descriptor will receive MMIO notifications
++for. The range is specified by a guest physical range structure
++argument. For buses that assign addresses to devices dynamically, this
++command can be executed while the guest is running, such as the case
++when a guest changes a device's PCI BAR registers.
++
++*KVM\_DEV\_USER\_PA\_RANGE* will use ``kvm_io_bus_register_dev()`` to
++register *kvm\_io\_device\_ops* callbacks to be invoked when the guest
++performs a MMIO operation within the range. When a range is changed,
++``kvm_io_bus_unregister_dev()`` is used to remove the previous
++instantiation.
++
++*KVM\_DEV\_USER\_TIMEOUT* will configure a timeout value that specifies
++how long KVM will wait for the emulation process to respond to a MMIO
++indication.
++
++-  destroy
++
++This routine is called when the VM instance is destroyed. It will need
++to destroy the slave descriptor; and free any memory allocated by the
++driver, as well as the *kvm\_device* structure itself.
++
++slave descriptor
++^^^^^^^^^^^^^^^^
++
++The slave descriptor will have its own file operations vector, which
++responds to system calls on the descriptor performed by the device
++emulation program.
++
++-  read
++
++A read returns any pending MMIO requests from the KVM driver as MMIO
++request structures. Multiple structures can be returned if there are
++multiple MMIO operations pending. The MMIO requests are moved from the
++pending queue to the sent queue, and if there are threads waiting for
++space in the pending to add new MMIO operations, they will be woken
++here.
++
++-  write
++
++A write also consists of a set of MMIO requests. They are compared to
++the MMIO requests in the sent queue. Matches are removed from the sent
++queue, and any threads waiting for the reply are woken. If a store is
++removed, then the number of posted stores in the per-CPU scoreboard is
++decremented. When the number is zero, and a non side-effect load was
++waiting for posted stores to complete, the load is continued.
++
++-  ioctl
++
++There are several ioctl()s that can be performed on the slave
++descriptor.
++
++A *KVM\_DEV\_USER\_SHADOW\_SIZE* ``ioctl()`` causes the KVM driver to
++allocate memory for the shadow image. This memory can later be
++``mmap()``\ ed by the emulation process to share the emulation's view of
++device memory with the KVM driver.
++
++A *KVM\_DEV\_USER\_SHADOW\_CTRL* ``ioctl()`` controls access to the
++shadow image. It will send the KVM driver a shadow control map, which
++specifies which areas of the image can complete guest loads without
++sending the load request to the emulation program. It will also specify
++the size of load operations that are allowed.
++
++-  poll
++
++An emulation program will use the ``poll()`` call with a *POLLIN* flag
++to determine if there are MMIO requests waiting to be read. It will
++return if the pending MMIO request queue is not empty.
++
++-  mmap
++
++This call allows the emulation program to directly access the shadow
++image allocated by the KVM driver. As device emulation updates device
++memory, changes with no side-effects will be reflected in the shadow,
++and the KVM driver can satisfy guest loads from the shadow image without
++needing to wait for the emulation program.
++
++kvm\_io\_device ops
++^^^^^^^^^^^^^^^^^^^
++
++Each KVM per-CPU thread can handle MMIO operation on behalf of the guest
++VM. KVM will use the MMIO's guest physical address to search for a
++matching *kvm\_io\_device* to see if the MMIO can be handled by the KVM
++driver instead of exiting back to QEMU. If a match is found, the
++corresponding callback will be invoked.
++
++-  read
++
++This callback is invoked when the guest performs a load to the device.
++Loads with side-effects must be handled synchronously, with the KVM
++driver putting the QEMU thread to sleep waiting for the emulation
++process reply before re-starting the guest. Loads that do not have
++side-effects may be optimized by satisfying them from the shadow image,
++if there are no outstanding stores to the device by this CPU. PCI memory
++ordering demands that a load cannot complete before all older stores to
++the same device have been completed.
++
++-  write
++
++Stores can be handled asynchronously unless the pending MMIO request
++queue is full. In this case, the QEMU thread must sleep waiting for
++space in the queue. Stores will increment the number of posted stores in
++the per-CPU scoreboard, in order to implement the PCI ordering
++constraint above.
++
++interrupt acceleration
++^^^^^^^^^^^^^^^^^^^^^^
++
++This performance optimization would work much like a vhost user
++application does, where the QEMU process sets up *eventfds* that cause
++the device's corresponding interrupt to be triggered by the KVM driver.
++These irq file descriptors are sent to the emulation process at
++initialization, and are used when the emulation code raises a device
++interrupt.
++
++intx acceleration
++'''''''''''''''''
++
++Traditional PCI pin interrupts are level based, so, in addition to an
++irq file descriptor, a re-sampling file descriptor needs to be sent to
++the emulation program. This second file descriptor allows multiple
++devices sharing an irq to be notified when the interrupt has been
++acknowledged by the guest, so they can re-trigger the interrupt if their
++device has not de-asserted its interrupt.
++
++intx irq descriptor
++
++
++The irq descriptors are created by the proxy object
++``using event_notifier_init()`` to create the irq and re-sampling
++*eventds*, and ``kvm_vm_ioctl(KVM_IRQFD)`` to bind them to an interrupt.
++The interrupt route can be found with
++``pci_device_route_intx_to_irq()``.
++
++intx routing changes
++
++
++Intx routing can be changed when the guest programs the APIC the device
++pin is connected to. The proxy object in QEMU will use
++``pci_device_set_intx_routing_notifier()`` to be informed of any guest
++changes to the route. This handler will broadly follow the VFIO
++interrupt logic to change the route: de-assigning the existing irq
++descriptor from its route, then assigning it the new route. (see
++``vfio_intx_update()``)
++
++MSI/X acceleration
++''''''''''''''''''
++
++MSI/X interrupts are sent as DMA transactions to the host. The interrupt
++data contains a vector that is programed by the guest, A device may have
++multiple MSI interrupts associated with it, so multiple irq descriptors
++may need to be sent to the emulation program.
++
++MSI/X irq descriptor
++
++
++This case will also follow the VFIO example. For each MSI/X interrupt,
++an *eventfd* is created, a virtual interrupt is allocated by
++``kvm_irqchip_add_msi_route()``, and the virtual interrupt is bound to
++the eventfd with ``kvm_irqchip_add_irqfd_notifier()``.
++
++MSI/X config space changes
++
++
++The guest may dynamically update several MSI-related tables in the
++device's PCI config space. These include per-MSI interrupt enables and
++vector data. Additionally, MSIX tables exist in device memory space, not
++config space. Much like the BAR case above, the proxy object must look
++at guest config space programming to keep the MSI interrupt state
++consistent between QEMU and the emulation program.
++
++--------------
++
++Disaggregated CPU emulation
++---------------------------
++
++After IO services have been disaggregated, a second phase would be to
++separate a process to handle CPU instruction emulation from the main
++QEMU control function. There are no object separation points for this
++code, so the first task would be to create one.
++
++Host access controls
++--------------------
++
++Separating QEMU relies on the host OS's access restriction mechanisms to
++enforce that the differing processes can only access the objects they
++are entitled to. There are a couple types of mechanisms usually provided
++by general purpose OSs.
++
++Discretionary access control
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Discretionary access control allows each user to control who can access
++their files. In Linux, this type of control is usually too coarse for
++QEMU separation, since it only provides three separate access controls:
++one for the same user ID, the second for users IDs with the same group
++ID, and the third for all other user IDs. Each device instance would
++need a separate user ID to provide access control, which is likely to be
++unwieldy for dynamically created VMs.
++
++Mandatory access control
++~~~~~~~~~~~~~~~~~~~~~~~~
++
++Mandatory access control allows the OS to add an additional set of
++controls on top of discretionary access for the OS to control. It also
++adds other attributes to processes and files such as types, roles, and
++categories, and can establish rules for how processes and files can
++interact.
++
++Type enforcement
++^^^^^^^^^^^^^^^^
++
++Type enforcement assigns a *type* attribute to processes and files, and
++allows rules to be written on what operations a process with a given
++type can perform on a file with a given type. QEMU separation could take
++advantage of type enforcement by running the emulation processes with
++different types, both from the main QEMU process, and from the emulation
++processes of different classes of devices.
++
++For example, guest disk images and disk emulation processes could have
++types separate from the main QEMU process and non-disk emulation
++processes, and the type rules could prevent processes other than disk
++emulation ones from accessing guest disk images. Similarly, network
++emulation processes can have a type separate from the main QEMU process
++and non-network emulation process, and only that type can access the
++host tun/tap device used to provide guest networking.
++
++Category enforcement
++^^^^^^^^^^^^^^^^^^^^
++
++Category enforcement assigns a set of numbers within a given range to
++the process or file. The process is granted access to the file if the
++process's set is a superset of the file's set. This enforcement can be
++used to separate multiple instances of devices in the same class.
++
++For example, if there are multiple disk devices provides to a guest,
++each device emulation process could be provisioned with a separate
++category. The different device emulation processes would not be able to
++access each other's backing disk images.
++
++Alternatively, categories could be used in lieu of the type enforcement
++scheme described above. In this scenario, different categories would be
++used to prevent device emulation processes in different classes from
++accessing resources assigned to other classes.
+-- 
 2.25.GIT
 
 
