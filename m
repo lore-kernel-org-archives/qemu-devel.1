@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFF0C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABE6C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:15:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 114C92054F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:15:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 532DC2054F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:15:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rGq0gr2T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 114C92054F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DOTaqpwI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 532DC2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOmq-0003D1-5g
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:15:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50100)
+	id 1jLOn0-0003TC-3D
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:15:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jLOjn-0006ij-CL
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:16 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOjs-0006oB-Jd
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jLOjm-0002ki-Ag
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:15 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40186)
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOji-0002g5-Fv
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:20 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42401)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jLOjm-0002k7-4U
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:14 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s8so14576850wrt.7
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 03:12:14 -0700 (PDT)
+ id 1jLOji-0002fD-9V
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:10 -0400
+Received: by mail-wr1-x441.google.com with SMTP id h15so16686682wrx.9
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 03:12:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=UsmjsPrqu/tMkzebNtgKAC7Wj/hA5gO7KEKMoSm+cTo=;
- b=rGq0gr2T54Kd376rXedZbjxb4QI/1ZqMBU9/jImwIc8eLcou3oMlki44pt7j9KBkHH
- IH9F4dz/NDTuD2fWmLGxWGHWJ2ECIRaDacG8JF1UvGaOWxf8xSYSbKbozC8eeHEFRMH2
- ohKg0ryuhQDROZzSEQzl8gr/rzI1dNsUr0Fe7ZwdA2TukrPdGJokgNfuvu8VKxyU27jL
- MU8U9qQeu5L+8Pn6DmrhVnmcYUAF1DSlcy93Ym2nTl/TxIyJhZNJ6lseR0uUgOj3cw3A
- O5X2ZEY42dcaUmFXeiompj2SgHBBIYhxp8nilwF4JTjglaKcaxWTnkIOjPm4nY4BzWdV
- nqAw==
+ bh=c6ExD2X3dcz39DGT8m+VPmBHG2joiEfEyC25pZS66FA=;
+ b=DOTaqpwIB1CAM2f39AnxbIyj6+33v2qPR0V28uC1RWqtslsOqYr5Tc/zAr2wqVI3Lf
+ BL1Fb6Df+K15erLciRgvG/D8+H2qZEeO1jQKPwNxo5wPCl0REp2lgifZMeMHBTq/S2s0
+ +7KjxYZ//X4xDFUAnYCxaSdycFFkJprmtnCx6IizP52V5C3qoDs5UJToAArIsQz4ZJ/e
+ nlp4ZGz+TpxM29WG338qGT7nQU2YkzJ/0LGQcbqJkSmoEj5Mkg1ufRv3HNrhT1VuAJfM
+ Cgf6BhKZ9Wl858P/vEovCrYUmaRQw76qja/JHG0DZZJayL685r/usuc4PPxo9b0kjJPa
+ BMMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UsmjsPrqu/tMkzebNtgKAC7Wj/hA5gO7KEKMoSm+cTo=;
- b=tKKDEYBIeOGce1On0xeJ5EE1jHF7MMB1lcjM+ZMuHNQhnLv/cIsK8RLcWJoETDqWCC
- YAMXIZNBEbdEaXvsjV1LxWsaMeBQ9lDYwu9Y6zT+FnMpTj2scbvmhMhtZELLnWu4D6j+
- CFx57lBix8M01Kuz4gA37VyRl4z1qT/b7BOheujKqPmd7lRgm5FYQTfTHou4YbJ57KYN
- 5awWWiwClmI9RuHg8EuTSUg1ANJ5efC8ymol+nFQ6/R53XviOeo01TarLp7q04piKFxf
- 8edwHIv1vN8TlcTW9t1vLUl6PROItRPrcJWc0n8MN1ItfgAbB+dw2bZ0KLRRpOmCuymz
- zXQA==
-X-Gm-Message-State: AGi0Pua1CKYw47qbs95jCn3T/sT3pFi1CvHDoLARB010Jxyu2LmkO3uv
- E1cHXWqWb+hzeWoIHNm5ZBfqxdaLH1G7DA==
-X-Google-Smtp-Source: APiQypLHouNldcqU2CpoCyddMDnkJu1KFJ1nkmE2fUR3Q3EDvlifux4KFuBxlvKEW1ec4UquHI7TNQ==
-X-Received: by 2002:a05:6000:2:: with SMTP id h2mr1460205wrx.112.1586167932813; 
- Mon, 06 Apr 2020 03:12:12 -0700 (PDT)
+ bh=c6ExD2X3dcz39DGT8m+VPmBHG2joiEfEyC25pZS66FA=;
+ b=DLh31y4yJbAVmX/d64sG9eyARY0OhnD/0mUKax48ouKeLRQn4/2LRXSPKZSB4xuxd0
+ LeyJQ3dezkC3wsE49JzDvGHlcesCuid0O97X4ypG5XXqi4yiKMeY4X5JZyk00AmVMA06
+ oHG6Ttl+dCJ0gBydAFLzzimaEXNMi/o6j9bvQudjP2Mj3yiOr2TU5ayyYgnaURZSNXvS
+ tJCm395OHxGq3rOCN0t9vC1ZMFIPCYfublFaBw6EsYRRNPJ69VBCrXC2vKmYSa92L1Je
+ XP61bN6Y5i5qWSW4qZ7L1AJewSasTGzDY6C2tjloy54uFk6mRuN759GIsVKmNwruvqkP
+ 7xGQ==
+X-Gm-Message-State: AGi0PuYUbwuvw8qgt4sp3hIn1U9nmR5dkI5tSfl+P6vwzwoCZwdJ1aAp
+ tkgbD4m+Oehv2nX5R7EvrB3V9DFnMLZULQ==
+X-Google-Smtp-Source: APiQypI3bY8gXArc+U8L7W4dCEZVpbrUxwuCbR7Q74lBCRCsue1hNEjJtaKz568lfvcsXANrIaJ81g==
+X-Received: by 2002:a5d:5707:: with SMTP id a7mr19360994wrv.108.1586167928812; 
+ Mon, 06 Apr 2020 03:12:08 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f187sm25163765wme.9.2020.04.06.03.12.11
+ by smtp.gmail.com with ESMTPSA id f187sm25163765wme.9.2020.04.06.03.12.08
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 03:12:12 -0700 (PDT)
+ Mon, 06 Apr 2020 03:12:08 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/11] hw/gpio/aspeed_gpio.c: Don't directly include assert.h
-Date: Mon,  6 Apr 2020 11:11:59 +0100
-Message-Id: <20200406101205.23027-6-peter.maydell@linaro.org>
+Subject: [PULL 01/11] target/arm: don't expose "ieee_half" via gdbstub
+Date: Mon,  6 Apr 2020 11:11:55 +0100
+Message-Id: <20200406101205.23027-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200406101205.23027-1-peter.maydell@linaro.org>
 References: <20200406101205.23027-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,35 +98,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove a direct include of assert.h -- this is already
-provided by qemu/osdep.h, and it breaks our rule that the
-first include must always be osdep.h.
+From: Alex Bennée <alex.bennee@linaro.org>
 
-In particular we must get the assert() macro via osdep.h
-to avoid compile failures on mingw (see the comment in
-osdep.h where we redefine assert() for that platform).
+While support for parsing ieee_half in the XML description was added
+to gdb in 2019 (a6d0f249) there is no easy way for the gdbstub to know
+if the gdb end will understand it. Disable it for now and allow older
+gdbs to successfully connect to the default -cpu max SVE enabled
+QEMUs.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200402143913.24005-1-alex.bennee@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20200403124712.24826-1-peter.maydell@linaro.org
 ---
- hw/gpio/aspeed_gpio.c | 2 --
- 1 file changed, 2 deletions(-)
+ target/arm/gdbstub.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
-index 41e11ea9b04..e52fcfd9a03 100644
---- a/hw/gpio/aspeed_gpio.c
-+++ b/hw/gpio/aspeed_gpio.c
-@@ -6,8 +6,6 @@
-  * SPDX-License-Identifier: GPL-2.0-or-later
-  */
- 
--#include <assert.h>
--
- #include "qemu/osdep.h"
- #include "qemu/host-utils.h"
- #include "qemu/log.h"
+diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+index d9ef7d2187c..8efc535f2a0 100644
+--- a/target/arm/gdbstub.c
++++ b/target/arm/gdbstub.c
+@@ -192,7 +192,12 @@ static const struct TypeSize vec_lanes[] = {
+     /* 16 bit */
+     { "uint16", 16, 'h', 'u' },
+     { "int16", 16, 'h', 's' },
+-    { "ieee_half", 16, 'h', 'f' },
++    /*
++     * TODO: currently there is no reliable way of telling
++     * if the remote gdb actually understands ieee_half so
++     * we don't expose it in the target description for now.
++     * { "ieee_half", 16, 'h', 'f' },
++     */
+     /* bytes */
+     { "uint8", 8, 'b', 'u' },
+     { "int8", 8, 'b', 's' },
 -- 
 2.20.1
 
