@@ -2,90 +2,144 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DDFC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8608C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:33:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E35C2075E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:29:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EmgHkCpS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E35C2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9AD612051A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:33:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AD612051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLO4i-0001wI-Cu
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:29:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40327)
+	id 1jLO8X-0004MB-QQ
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:33:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jLNl7-0002SB-DF
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:09:35 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLO2P-0001Af-5N
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jLNkz-0002mT-Pp
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:09:32 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38101)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jLNky-0002l5-Vh
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:09:25 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f20so5902795wmh.3
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 02:09:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ODvrgbntrYR+c5NW+GPbnJ8NbTUzTBdQLQq9ToxxXOk=;
- b=EmgHkCpSec60COah1Ba5e14TVQw/mMPaHiMYm3KslhkuVNn2cfcN7f7ZMyaqHK8SI8
- HGGAGwYd4k4B4nUY1MI2kAtwKAkfk27MKxP+jew4qeCZKmb3jmM0nItWlacjZ0Rwt9WF
- ydrWdDaiuDOMVJmIIMn9p+3dwVwviOlqdi3k0I47VqtyY/8XJBvrGnaygaNU+A9xT5Zm
- R0busLrgftgxBqUTHgnoW41TLm95+HBgxAnzUvuCK8dBbWoxKNwpV1oWcPOzBTXoqoKa
- IG1u5MmhhsdqpgexYLfFQJDCz7V80PokDjvPtFsUElsqoZlPHNWQLJFte8GJDzq0WdtT
- Fu1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ODvrgbntrYR+c5NW+GPbnJ8NbTUzTBdQLQq9ToxxXOk=;
- b=mNKfHhi59Cyf2Xb22LV79ggAzEGDREUR4Stk7IU0e84XD5vEheiKWf0GYxy+m8BMxZ
- k2mJeCbAOts8gdZqn2VjMFGAp6UaGsqi2ipvLdPQYonsnKI7gFoO10RQ8B0YwMn6h5ds
- ndQjDLpjVCk0i0dC1/oaWKHhTUJYkQ4tAnsGU6BOONR/T2h1QVNgRIFCNc/ZEc6UB1hD
- b4KNBlUxmIH+ZB++nAWDh+csNyATaXjA08ONYh/jfrAuAc1ysgJLXeKn6QIPsKbTv/Ss
- vxjtvLTjDLiWlGvbAAILakk/7wFkVV0Tc531dONzhOWUIR7Y2ELnuKZpCR5Z3HZrzHED
- MsPw==
-X-Gm-Message-State: AGi0PubWEyPU1c8ZB69rSBtlOuvwuVjznzLc/jHanpttKHPPxIHgZjgW
- yNhxmibBNYrqiJkhoNPb2ILuGA==
-X-Google-Smtp-Source: APiQypK9QK/so2dXmEFZinsp1+8nptUh4gRV4nq5J6GA0PX8WCY4hq7SKbKA9c9CP2FLqAq80324ag==
-X-Received: by 2002:a1c:b005:: with SMTP id z5mr20759541wme.145.1586164162384; 
- Mon, 06 Apr 2020 02:09:22 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p5sm26812329wrg.49.2020.04.06.02.09.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 02:09:21 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7B3511FF7E;
- Mon,  6 Apr 2020 10:09:20 +0100 (BST)
-References: <20200403191150.863-1-alex.bennee@linaro.org>
- <20200403191150.863-9-alex.bennee@linaro.org>
- <830061f9-91cd-145c-4388-f2bfe9a3d7a6@linaro.org>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v3 08/12] linux-user: factor out reading of /proc/self/maps
-In-reply-to: <830061f9-91cd-145c-4388-f2bfe9a3d7a6@linaro.org>
-Date: Mon, 06 Apr 2020 10:09:19 +0100
-Message-ID: <87pnclaslc.fsf@linaro.org>
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLO2L-0002yy-Kv
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:27:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47526)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jLO2L-0002yh-Ci
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:27:21 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03694e1k072999
+ for <qemu-devel@nongnu.org>; Mon, 6 Apr 2020 05:27:20 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 306pcyce0b-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 05:27:19 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Mon, 6 Apr 2020 10:27:01 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 6 Apr 2020 10:26:59 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0369REmx47775858
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 6 Apr 2020 09:27:14 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2888DA405C;
+ Mon,  6 Apr 2020 09:27:14 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AC9BCA4054;
+ Mon,  6 Apr 2020 09:27:13 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.23.63])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  6 Apr 2020 09:27:13 +0000 (GMT)
+Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: Fix build on systems without
+ KVM
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200406075931.26232-1-borntraeger@de.ibm.com>
+ <20200406075931.26232-2-borntraeger@de.ibm.com>
+ <20200406110447.5ad97f62.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Mon, 6 Apr 2020 11:27:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200406110447.5ad97f62.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20040609-0008-0000-0000-0000036B66C2
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040609-0009-0000-0000-00004A8CFC53
+Message-Id: <90760b85-ed98-3106-0cc4-900f55607479@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-06_05:2020-04-03,
+ 2020-04-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 clxscore=1015
+ impostorscore=0 suspectscore=0 phishscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=966 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2004060078
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,47 +151,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Bruce Rogers <brogers@suse.com>, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
 
-> On 4/3/20 12:11 PM, Alex Benn=C3=A9e wrote:
->> +                e->is_read  =3D fields[1][0] =3D=3D 'r' ? true : false;
->> +                e->is_write =3D fields[1][1] =3D=3D 'w' ? true : false;
->> +                e->is_exec  =3D fields[1][2] =3D=3D 'x' ? true : false;
->> +                e->is_priv  =3D fields[1][3] =3D=3D 'p' ? true : false;
->
-> Drop the redundant ? true : false.  That is of course the result of the b=
-oolean
-> operation.
+On 06.04.20 11:04, Cornelia Huck wrote:
+> On Mon,  6 Apr 2020 03:59:31 -0400
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> linux/kvm.h is not available on all platforms. Let us move
+>> s390_machine_inject_pv_error into pv.c as it uses KVM structures.
+>>
+>> Fixes: 49fc3220175e ("s390x: protvirt: Support unpack facility")
+>> Reported-by: Bruce Rogers <brogers@suse.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  hw/s390x/ipl.h             |  1 +
+>>  hw/s390x/pv.c              | 11 +++++++++++
+>>  hw/s390x/s390-virtio-ccw.c | 10 ----------
+>>  include/hw/s390x/pv.h      |  3 +++
+>>  4 files changed, 15 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+>> index 89b3044d7a..53cc9eb5ac 100644
+>> --- a/hw/s390x/ipl.h
+>> +++ b/hw/s390x/ipl.h
+>> @@ -14,6 +14,7 @@
+>>  #define HW_S390_IPL_H
+>>  
+>>  #include "cpu.h"
+>> +#include "exec/address-spaces.h"
+> 
+> Hm, what is now requiring including this? (No objection, but I don't
+> see it.)
 
-doh! Fortunately the compiler was smart enough to see through my idiocy...
+ipl.h has
 
->
->> +                errors +=3D qemu_strtoi(fields[4], NULL, 10, &e->inode);
->
-> The root of the typedef chain for ino_t is
->
-> /usr/include/asm-generic/posix_types.h:typedef __kernel_ulong_t __kernel_=
-ino_t;
->
-> so I think you should just go ahead and use unsigned long here too.  Or m=
-aybe
-> even uint64_t, because 32-bit has ino64_t, and could in fact have a Large
-> Number here.
+static inline bool ipl_valid_pv_header(IplParameterBlock *iplb)
+{
+[..]
+        if (!address_space_access_valid(&address_space_memory,
 
-Will fix.
-
->
->
-> r~
+and if included alone this fails to build without the include. 
 
 
---=20
-Alex Benn=C3=A9e
+> 
+>>  #include "hw/qdev-core.h"
+>>  
+>>  struct IPLBlockPVComp {
+> 
+> (...)
+> 
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index b268907395..0e8b0c63a1 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -45,7 +45,6 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "sysemu/balloon.h"
+>>  #include "hw/s390x/pv.h"
+>> -#include <linux/kvm.h>
+> 
+> In hindsight, that should have been obvious :)
+
+Yes, it is. It was added pretty late (v10 I think).
+ 
+>>  #include "migration/blocker.h"
+>>  
+>>  static Error *pv_mig_blocker;
+> 
+
 
