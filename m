@@ -1,96 +1,85 @@
 Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URI_WP_DIRINDEX
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A48BC2BA18
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C72A6C2BA18
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:04:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E13E2206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:00:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E13E2206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B28E206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:04:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B28E206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLMgS-0006OZ-Sg
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 04:00:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60577)
+	id 1jLMka-0008L1-RH
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 04:04:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLMfR-0005Wb-RE
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:59:38 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jLMjz-0007ve-4E
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 04:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLMfQ-0005Pv-MP
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:59:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31000)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jLMfQ-0005PQ-En; Mon, 06 Apr 2020 03:59:36 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0367YAI4134605; Mon, 6 Apr 2020 03:59:35 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 306pakt938-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Apr 2020 03:59:35 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0367YSWq136896;
- Mon, 6 Apr 2020 03:59:34 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 306pakt92n-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Apr 2020 03:59:34 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0367wgkN022004;
- Mon, 6 Apr 2020 07:59:33 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 306hv5xgxk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Apr 2020 07:59:33 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0367xXb154001930
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 6 Apr 2020 07:59:33 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 05F43124054;
- Mon,  6 Apr 2020 07:59:33 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E8BF512405B;
- Mon,  6 Apr 2020 07:59:32 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Mon,  6 Apr 2020 07:59:32 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH 1/1] s390x/s390-virtio-ccw: Fix build on systems without KVM
-Date: Mon,  6 Apr 2020 03:59:31 -0400
-Message-Id: <20200406075931.26232-2-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200406075931.26232-1-borntraeger@de.ibm.com>
-References: <20200406075931.26232-1-borntraeger@de.ibm.com>
+ (envelope-from <yi.l.liu@intel.com>) id 1jLMjx-0007ve-6C
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 04:04:18 -0400
+Received: from mga11.intel.com ([192.55.52.93]:58704)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jLMjw-0007tm-St
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 04:04:17 -0400
+IronPort-SDR: Ws30KHeU4Tgn/KH7mAjtgQYz+HYcT42G9lxEf9FYA87eIZaK9FKgCT8I9fMqMPwjfBdSBdmCB9
+ xjN/kCRunNgA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 06 Apr 2020 01:04:07 -0700
+IronPort-SDR: 1OJ442ZbcwfC0uDA+eB/bMqW6pbv08iG0+Ch4FZv1jzDvPXIuBJV0qg1f8I2CvoQPhulJPko93
+ qXCheqOdXo6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,350,1580803200"; d="scan'208";a="296594628"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by FMSMGA003.fm.intel.com with ESMTP; 06 Apr 2020 01:04:07 -0700
+Received: from fmsmsx156.amr.corp.intel.com (10.18.116.74) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 6 Apr 2020 01:04:07 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ fmsmsx156.amr.corp.intel.com (10.18.116.74) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 6 Apr 2020 01:04:06 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
+ Mon, 6 Apr 2020 16:04:03 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "alex.williamson@redhat.com"
+ <alex.williamson@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>
+Subject: RE: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
+Thread-Topic: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
+Thread-Index: AQHWBkpipXk9AcbvW0ea4lbMrBMnp6hg3OsAgArnvHA=
+Date: Mon, 6 Apr 2020 08:04:02 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A2230B3@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-5-git-send-email-yi.l.liu@intel.com>
+ <aa1bfbd5-e6de-6475-809e-a6ca46089aaa@redhat.com>
+In-Reply-To: <aa1bfbd5-e6de-6475-809e-a6ca46089aaa@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-06_03:2020-04-03,
- 2020-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxlogscore=999
- spamscore=0 suspectscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060059
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,125 +91,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Bruce Rogers <brogers@suse.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, 
+ Jun J" <jun.j.tian@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-linux/kvm.h is not available on all platforms. Let us move
-s390_machine_inject_pv_error into pv.c as it uses KVM structures.
+Hi Eric,
 
-Fixes: 49fc3220175e ("s390x: protvirt: Support unpack facility")
-Reported-by: Bruce Rogers <brogers@suse.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/ipl.h             |  1 +
- hw/s390x/pv.c              | 11 +++++++++++
- hw/s390x/s390-virtio-ccw.c | 10 ----------
- include/hw/s390x/pv.h      |  3 +++
- 4 files changed, 15 insertions(+), 10 deletions(-)
+> From: Auger Eric < eric.auger@redhat.com>
+> Sent: Tuesday, March 31, 2020 1:23 AM
+> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
+> Subject: Re: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
+>=20
+> Yi,
+>=20
+> On 3/30/20 6:24 AM, Liu Yi L wrote:
+> > Currently, many platform vendors provide the capability of dual stage
+> > DMA address translation in hardware. For example, nested translation
+> > on Intel VT-d scalable mode, nested stage translation on ARM SMMUv3,
+> > and etc. In dual stage DMA address translation, there are two stages
+> > address translation, stage-1 (a.k.a first-level) and stage-2 (a.k.a
+> > second-level) translation structures. Stage-1 translation results are
+> > also subjected to stage-2 translation structures. Take vSVA (Virtual
+> > Shared Virtual Addressing) as an example, guest IOMMU driver owns
+> > stage-1 translation structures (covers GVA->GPA translation), and host
+> > IOMMU driver owns stage-2 translation structures (covers GPA->HPA
+> > translation). VMM is responsible to bind stage-1 translation structures
+> > to host, thus hardware could achieve GVA->GPA and then GPA->HPA
+> > translation. For more background on SVA, refer the below links.
+> >  - https://www.youtube.com/watch?v=3DKq_nfGK5MwQ
+> >  - https://events19.lfasiallc.com/wp-content/uploads/2017/11/\
+> > Shared-Virtual-Memory-in-KVM_Yi-Liu.pdf
+> >
+[...]
+> > +void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
+> > +                         const char *mrtypename,
+> > +                         uint64_t flags)
+> > +{
+> > +    HostIOMMUContext *iommu_ctx;
+> > +
+> > +    object_initialize(_iommu_ctx, instance_size, mrtypename);
+> > +    iommu_ctx =3D HOST_IOMMU_CONTEXT(_iommu_ctx);
+> > +    iommu_ctx->flags =3D flags;
+> > +    iommu_ctx->initialized =3D true;
+> > +}
+> > +
+> > +static const TypeInfo host_iommu_context_info =3D {
+> > +    .parent             =3D TYPE_OBJECT,
+> > +    .name               =3D TYPE_HOST_IOMMU_CONTEXT,
+> > +    .class_size         =3D sizeof(HostIOMMUContextClass),
+> > +    .instance_size      =3D sizeof(HostIOMMUContext),
+> > +    .abstract           =3D true,
+> Can't we use the usual .instance_init and .instance_finalize?
+sorry, I somehow missed this comment. In prior patch, .instace_init
+was used, but the current major init method is via host_iommu_ctx_init(),
+so .instance_init is not really necessary.
+https://www.spinics.net/lists/kvm/msg210878.html
 
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 89b3044d7a..53cc9eb5ac 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -14,6 +14,7 @@
- #define HW_S390_IPL_H
- 
- #include "cpu.h"
-+#include "exec/address-spaces.h"
- #include "hw/qdev-core.h"
- 
- struct IPLBlockPVComp {
-diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
-index d3333d6e13..18f785b09e 100644
---- a/hw/s390x/pv.c
-+++ b/hw/s390x/pv.c
-@@ -13,8 +13,10 @@
- 
- #include <linux/kvm.h>
- 
-+#include "cpu.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "hw/s390x/ipl.h"
- #include "hw/s390x/pv.h"
- 
- static int __s390_pv_cmd(uint32_t cmd, const char *cmdname, void *data)
-@@ -100,3 +102,12 @@ void s390_pv_unshare(void)
- {
-     s390_pv_cmd_exit(KVM_PV_VM_UNSHARE_ALL, NULL);
- }
-+
-+void s390_machine_inject_pv_error(CPUState *cs)
-+{
-+    int r1 = (cs->kvm_run->s390_sieic.ipa & 0x00f0) >> 4;
-+    CPUS390XState *env = &S390_CPU(cs)->env;
-+
-+    /* Report that we are unable to enter protected mode */
-+    env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
-+}
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index b268907395..0e8b0c63a1 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -45,7 +45,6 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/balloon.h"
- #include "hw/s390x/pv.h"
--#include <linux/kvm.h>
- #include "migration/blocker.h"
- 
- static Error *pv_mig_blocker;
-@@ -390,15 +389,6 @@ out_err:
-     return rc;
- }
- 
--static void s390_machine_inject_pv_error(CPUState *cs)
--{
--    int r1 = (cs->kvm_run->s390_sieic.ipa & 0x00f0) >> 4;
--    CPUS390XState *env = &S390_CPU(cs)->env;
--
--    /* Report that we are unable to enter protected mode */
--    env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
--}
--
- static void s390_pv_prepare_reset(S390CcwMachineState *ms)
- {
-     CPUState *cs;
-diff --git a/include/hw/s390x/pv.h b/include/hw/s390x/pv.h
-index c6cb360f2f..b0fbed9bae 100644
---- a/include/hw/s390x/pv.h
-+++ b/include/hw/s390x/pv.h
-@@ -13,6 +13,7 @@
- #define HW_S390_PV_H
- 
- #ifdef CONFIG_KVM
-+#include "cpu.h"
- #include "hw/s390x/s390-virtio-ccw.h"
- 
- static inline bool s390_is_pv(void)
-@@ -41,6 +42,7 @@ int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
- void s390_pv_perf_clear_reset(void);
- int s390_pv_verify(void);
- void s390_pv_unshare(void);
-+void s390_machine_inject_pv_error(CPUState *cs);
- #else /* CONFIG_KVM */
- static inline bool s390_is_pv(void) { return false; }
- static inline int s390_pv_vm_enable(void) { return 0; }
-@@ -50,6 +52,7 @@ static inline int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) {
- static inline void s390_pv_perf_clear_reset(void) {}
- static inline int s390_pv_verify(void) { return 0; }
- static inline void s390_pv_unshare(void) {}
-+static inline void s390_machine_inject_pv_error(CPUState *cs) {};
- #endif /* CONFIG_KVM */
- 
- #endif /* HW_S390_PV_H */
--- 
-2.25.1
-
+Regards,
+Yi Liu
 
