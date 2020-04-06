@@ -6,81 +6,61 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4566C2BA18
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C4EC2BA18
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6306B20719
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7639820672
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:59:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZqtEmdyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6306B20719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bLORG9/0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7639820672
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLLLz-00077r-B8
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 02:35:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49836)
+	id 1jLLin-0004KS-Ic
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 02:59:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52814)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jLLKv-0006FR-PA
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:34:23 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jLLhk-0003Ue-Mr
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:57:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jLLKu-0001Ja-3V
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:34:21 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53115
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1jLLhj-0000Q1-6t
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:57:56 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:38723 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jLLKt-0001IM-SD
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:34:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586154858;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cnFq0MPCQ6xPg2xw4TVeyCm4yNs9udEv3IhLR3Ks0xU=;
- b=ZqtEmdyUEvOn0KsKP5Ry0iRZ1YYs1oFclxkH28mveokupQ6V8DN8gcp6/YawwTYE+oiCgH
- 80PpzZEU9hx42gEZr1wceGSdzeEwRgFkxZ1eVPHesop3Y9jfkwdX9mHhhBaEB8RE/ZEWLT
- UyW2YnN3EKSSuhXsmWspMd3k1Awfj4c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-8a0VPlfxOCKUx7W5cMQGOQ-1; Mon, 06 Apr 2020 02:34:16 -0400
-X-MC-Unique: 8a0VPlfxOCKUx7W5cMQGOQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 875BA107ACC4;
- Mon,  6 Apr 2020 06:34:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-152.ams2.redhat.com
- [10.36.112.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 35CA4118F4B;
- Mon,  6 Apr 2020 06:34:15 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B5C0011385C8; Mon,  6 Apr 2020 08:34:13 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: <pbonzini@redhat.com>
-Subject: Re: [PATCH] qom-qmp-cmds: remove unnecessary alloc in qmp_object_add
- to fix memleak
-References: <20200313075858.15860-1-pannengyuan@huawei.com>
- <87a74fdznz.fsf@dusky.pond.sub.org>
-Date: Mon, 06 Apr 2020 08:34:13 +0200
-In-Reply-To: <87a74fdznz.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Tue, 17 Mar 2020 11:49:20 +0100")
-Message-ID: <87k12t9l7e.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jLLhi-0000Mn-C7; Mon, 06 Apr 2020 02:57:55 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48whF95HFsz9sRf; Mon,  6 Apr 2020 16:57:49 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1586156269;
+ bh=SeReKDq3PkE2Rfj3RFIwi+8lDiPM/sCz4p6FOI4wZK0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=bLORG9/0B/r+vMpjWG/x3Ztg3X+m+TO43dVhWMh8j95DdCFPmSyGC/bgPHm43T2zE
+ tVviF+OpqAOHWs4vj+oGXLxqGbea1X0uOljmHmloImOC0bFzanyCEOTPllFWcO82Gk
+ rcOlQGV4XjHhKYhxxOJ1HIAvPlonwR0787IIMnoQ=
+Date: Mon, 6 Apr 2020 16:45:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 3/5] nmi: add MCE class for implementing machine check
+ injection commands
+Message-ID: <20200406064559.GB2945@umbus.fritz.box>
+References: <20200325144147.221875-1-npiggin@gmail.com>
+ <20200325144147.221875-4-npiggin@gmail.com>
+ <20200331002203.GB47772@umbus.fritz.box>
+ <1585900632.k0ft0cc80l.astroid@bobo.none>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="RASg3xLB4tUQ4RcS"
+Content-Disposition: inline
+In-Reply-To: <1585900632.k0ft0cc80l.astroid@bobo.none>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,54 +72,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, berrange@redhat.com, ehabkost@redhat.com,
- Pan Nengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org,
- euler.robot@huawei.com, zhang.zhanghailiang@huawei.com
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>,
+ qemu-devel@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo, looks like this has fallen through the cracks.  If you'd prefer
-me to take it, let me know.
 
-Markus Armbruster <armbru@redhat.com> writes:
+--RASg3xLB4tUQ4RcS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Pan Nengyuan <pannengyuan@huawei.com> writes:
->
->> In qmp_object_add(), user_creatable_add_type() may set errp with some er=
-ror message and
->> return NULL. In this case, qmp_object_add() still alloc memory to *ret_d=
-ata which return
->> to the caller and causes a memory leak.
->>
->> This patch do this alloc() action only if obj is not NULL to fix it. And=
- initialize ret_data
->> in xen-block to avoid a possible uninitialized error.
->>
->> The Leak stack:
->> Direct leak of 4120 byte(s) in 1 object(s) allocated from:
->>     #0 0x7f6106ce5970 in __interceptor_calloc (/lib64/libasan.so.5+0xef9=
-70)
->>     #1 0x7f6105e6a49d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
->>     #2 0x55d2c58c17fd in qdict_new /mnt/sdb/qemu-new/qemu_test/qemu/qobj=
-ect/qdict.c:29
->>     #3 0x55d2c53a0051 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu=
-/qom/qom-qmp-cmds.c:291
->>     #4 0x55d2c57b47da in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qem=
-u/qapi/qmp-dispatch.c:132
->>     #5 0x55d2c57b47da in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/q=
-api/qmp-dispatch.c:175
->>     #6 0x55d2c52f1430 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_tes=
-t/qemu/monitor/qmp.c:145
->>     #7 0x55d2c52f3087 in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qem=
-u_test/qemu/monitor/qmp.c:234
->>     #8 0x55d2c58e6153 in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/ut=
-il/async.c:136
->>
->> Fixes: 5f07c4d60d091320186e7b0edaf9ed2cc16b2d1e
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+On Fri, Apr 03, 2020 at 06:04:47PM +1000, Nicholas Piggin wrote:
+> David Gibson's on March 31, 2020 10:22 am:
+> > On Thu, Mar 26, 2020 at 12:41:45AM +1000, Nicholas Piggin wrote:
+> >> Like commit 9cb805fd26 ("cpus: Define callback for QEMU "nmi" command")
+> >> this implements a machine check injection command framework and defines
+> >> a monitor command for ppc.
+> >>=20
+> >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> >=20
+> > So, AFAICT, both x86 and ppc have something called an MCE, and while
+> > I'm guessing they're somewhat related, they don't work quite the same
+> > way - different information provided to the handler and so forth.
+> >=20
+> > I think it's reasonable to overload the "mce" HMP command based on
+> > target for the different types.  However, I think calling the
+> > interface classes which are specific to the ppc type just "mce" could
+> > be pretty confusing.
+>=20
+> Okay. So, convert i386 first?
 
+Uh.. not necessarily.  But call your version PpcMce or something
+instead.
+
+> > In addition, I think this is adding an HMP command to inject the event
+> > without any corresponding way of injecting via QMP.  I believe that's
+> > frowned upon.
+>=20
+> I attempted that but didn't get too far. I guess it's more of a
+> special test than a management function (nmi has valid uses in=20
+> administering a machine), so maybe we can get an exemption. One issue
+> is different QMP command for powerpc vs x86.
+>=20
+> I think error injection as a general concept might be valid there, but
+> the better interface for that level would be higher up, e.g, not
+> specifying register settings but rather "simulate uncorrected memory
+> error on this byte".
+>=20
+> Do you think that is reasonable reason to avoid adding QMP for this
+> nasty low level thing?
+
+Hrm, I doubt it will convince the qemu community at large.  I think
+the view is that QMP is the "real" management interface for qemu - HMP
+is somewhere in between a shim for convenience and something needed
+for backwards compat.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--RASg3xLB4tUQ4RcS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6K0CQACgkQbDjKyiDZ
+s5LwJhAA2QQuKSUk4VObkpZkb4Ui5Vt7Bbq018a79CiIVhqaMQTUzLMe7w8yolm0
+ByQwszH/kLzlFpoP23+z7Ns45NnqpVAi4VQ4QO1bm15BpBFDgYobnBX54NGQxX0c
+oD5u+ygGCw6Y+P0Ra11zF75gJ48ZaHSURITsTJQsH8CbxeEkNqKUKWaa/ldfloRP
+eBGMVI3rbcpV05YoDmHQulvYroHS+8PV0WDdgq6ILV247MBLNk0v7i+Uvad0Ur2z
+DEMgmp4MLa1rXYpIqbqQwP7M5IryQMsEbI/0aPzh5VVZCtcqK+2Ug4T4K6REmqNN
+Hg7TKb5QzLl0YdTKuWvgkpY4nU4+VAtfHyhHJZjDljHMduX8CLT8g3BBf/lHoRHu
+UkeSBKcnKpEHZHnyU6AOaPpkAa3MFr+4Hb5S3th10XTvrQX9iOOZATniHBJrpJv2
+/k8VW0SEDT87B3LAKtvkfKPhL0Soo2uOwpNlg1oADVQxhj5f4Np+AQ6/gUx8plg8
+hz6S6w1aQSGdLr48cQLwPgMwdV3VXTZqcxqVGaLZ+JszOu3eBoEr92mOtbVwnbPS
+uF4BsS+bVe1OGjU4YJ0A65c4r8vrAN4ml9iJLfHudAlFlO3rb1S2dev7+1SyPNmx
+Z6gJxxhzmB2NwfKKlVJUS9h2G82gw9P8U5JUSGugkhzAO62zz0c=
+=MxZ9
+-----END PGP SIGNATURE-----
+
+--RASg3xLB4tUQ4RcS--
 
