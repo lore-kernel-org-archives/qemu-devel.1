@@ -7,95 +7,93 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B541C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D17BC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56DDC206F5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:49:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04C12206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vYigjTGi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56DDC206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="y6ldnnIA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04C12206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLONt-00070p-HO
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:49:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44176)
+	id 1jLOOh-0000Di-6X
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:50:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGf-0001mz-FW
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:10 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOH6-0002wq-TE
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGe-0002D7-6e
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:09 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:34746)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOH5-0002Zb-5o
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:36 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:45722)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOGd-0002CI-U8
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:08 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dobT089398;
- Mon, 6 Apr 2020 09:42:02 GMT
+ id 1jLOH4-0002Yy-Ts
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:35 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dSE4025474;
+ Mon, 6 Apr 2020 09:42:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=E2poaPXRq0thx+nOqFvdQBZjmW7W6xIxA/hOatXPaB4=;
- b=vYigjTGiwcZ2D3+QqSsvm1lUuTI4e3gVIRcQ01ymWHRN3eJROF/lXC67BTdVaDPFhndZ
- PpxXzzWvLL6uQS35JyObMiIl5HIebg8bHZAQ1astlZDPMFkQwCNyb6bZRV0O6Tub0zHZ
- NIJgMYBc5obN0VWXtRIPzlnwL4/OdkJzUnSYF/mCYqHhx2QfWEYuRqFcME33xlZZ8fTl
- W4Ruh8BJFBrutQTD+J1rJMTVnKPeO3mLxydU7gEY+oJ0iaTChyeFLtGMK4qk4HQFBWQH
- ifbcbnEevlbwFhjl2PruXcHTW7tRuKnY/l1/Infiao0McKtd02qjx06HwVVhzBuuhnVl 0g== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 306hnqwtx4-1
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=V34vqiNMw97o1dTPzX27wWZMFaoDykDwdyaDjPR3ekE=;
+ b=y6ldnnIAg+1sJaif4fvWln7q6dsx5pGfJLSddNi59G9LDonBi/7VXAkSRRootTtpySM0
+ RgbLroGQIZJbKF4tJ4GdoFpgEz2iC50QiBZaTNnmefQwpNZDSP+JrgeFLDVo0mYQh0tx
+ 8XXAgb8xa9tL4JSDan9TWi5OoCKzDDmliZOyK0i/uw1oetrW6JZOYTv8Ad0Xaz4HPjVK
+ fjIyEgNS1QyyoABcvkBYTyqVMSU5whpbSLrupBnGk4iiXHN6CYNg0VFFQyZ+nLT0tzqP
+ Ugrj3BSLCJLPsW5JNGrx4xGrtcgtqyFBXnJrnqBVeoE3GYb3I8l2pQiRJcbiCb+bDgy+ tA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 306jvmwr73-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:01 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369cghc092199;
- Mon, 6 Apr 2020 09:42:01 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 3073spk64f-1
+ Mon, 06 Apr 2020 09:42:28 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369bM7G056443;
+ Mon, 6 Apr 2020 09:42:28 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 3073qcndad-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:01 +0000
+ Mon, 06 Apr 2020 09:42:28 +0000
 Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369g0P6031832;
- Mon, 6 Apr 2020 09:42:00 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369gQvt013893;
+ Mon, 6 Apr 2020 09:42:27 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:42:00 -0700
+ with ESMTP ; Mon, 06 Apr 2020 02:42:26 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 17/36] multi-process: introduce proxy object
-Date: Mon,  6 Apr 2020 02:41:07 -0700
-Message-Id: <b2517f3d54c086fbc7269a632c1f6f7216b1d99a.1586165556.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v6 33/36] multi-process/mon: enable QMP module support in the
+ remote process
+Date: Mon,  6 Apr 2020 02:41:23 -0700
+Message-Id: <cfe4594113d6888873155a21f533e225b33ed0bb.1586165556.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- phishscore=0 spamscore=0
- malwarescore=0 suspectscore=1 adultscore=0 bulkscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxscore=0 mlxlogscore=999
+ spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=1
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004060083
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- phishscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=1
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ suspectscore=1
+ mlxlogscore=999 mlxscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2004060083
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
- 0369dobT089398
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,192 +119,250 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Defines a PCI Device proxy object as a parent of TYPE_PCI_DEVICE.
-
-PCI Proxy Object registers as a PCI device with QEMU and forwards all
-PCI accesses to the remote process using the communication channel.
+Build system changes to enable QMP module in the remote process
 
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- MAINTAINERS                   |  3 ++
- hw/Makefile.objs              |  2 ++
- hw/proxy/Makefile.objs        |  1 +
- hw/proxy/qemu-proxy.c         | 56 +++++++++++++++++++++++++++++++++++
- include/hw/proxy/qemu-proxy.h | 46 ++++++++++++++++++++++++++++
- include/io/mpqemu-link.h      |  1 +
- 6 files changed, 109 insertions(+)
- create mode 100644 hw/proxy/Makefile.objs
- create mode 100644 hw/proxy/qemu-proxy.c
- create mode 100644 include/hw/proxy/qemu-proxy.h
+ Makefile.objs               | 10 ++++++++++
+ Makefile.target             | 35 +++++++++++++++++++++++++++++++++--
+ block/Makefile.objs         |  3 +++
+ block/monitor/Makefile.objs |  2 ++
+ hmp-commands.hx             |  1 +
+ hw/core/Makefile.objs       |  1 +
+ monitor/Makefile.objs       |  4 ++++
+ monitor/misc.c              |  8 ++++++++
+ qapi/Makefile.objs          |  2 ++
+ qom/Makefile.objs           |  1 +
+ stubs/monitor.c             |  1 +
+ ui/Makefile.objs            |  2 ++
+ 12 files changed, 68 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7b46ec2e71..e2ac5b08a4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2825,6 +2825,9 @@ F: include/remote/machine.h
- F: remote/machine.c
- F: include/remote/memory.h
- F: remote/memory.c
-+F: hw/proxy/Makefile.objs
-+F: hw/proxy/qemu-proxy.c
-+F: include/hw/proxy/qemu-proxy.h
-=20
- Build and test automation
- -------------------------
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index af9235b6f2..7b489b12a5 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -45,6 +45,8 @@ endif
- common-obj-y +=3D $(devices-dirs-y)
- obj-y +=3D $(devices-dirs-y)
-=20
-+common-obj-$(CONFIG_MPQEMU) +=3D proxy/
+diff --git a/Makefile.objs b/Makefile.objs
+index ff3f06b146..cdb55b2f82 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -32,6 +32,7 @@ remote-pci-obj-$(CONFIG_MPQEMU) += migration/
+ remote-pci-obj-$(CONFIG_MPQEMU) += remote/
+ remote-pci-obj-$(CONFIG_MPQEMU) += accel/
+ remote-pci-obj-$(CONFIG_MPQEMU) += util/
++remote-pci-obj-$(CONFIG_MPQEMU) += monitor/
+ 
+ remote-pci-obj-$(CONFIG_MPQEMU) += cpus-common.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += dma-helpers.o
+@@ -45,6 +46,10 @@ remote-pci-obj-$(CONFIG_MPQEMU) += qemu-parse.o
+ # remote-lsi-obj-y is code used to implement remote LSI device
+ 
+ remote-lsi-obj-$(CONFIG_MPQEMU) += hw/
++remote-lsi-obj-$(CONFIG_MPQEMU) += ui/
++remote-lsi-obj-$(CONFIG_MPQEMU) += block/
 +
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D core/
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D block/
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D pci/
-diff --git a/hw/proxy/Makefile.objs b/hw/proxy/Makefile.objs
-new file mode 100644
-index 0000000000..eb81624cf8
---- /dev/null
-+++ b/hw/proxy/Makefile.objs
-@@ -0,0 +1 @@
-+common-obj-$(CONFIG_MPQEMU) +=3D qemu-proxy.o
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-new file mode 100644
-index 0000000000..bf6c4117ef
---- /dev/null
-+++ b/hw/proxy/qemu-proxy.c
-@@ -0,0 +1,56 @@
-+/*
-+ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
++#remote-lsi-obj-$(CONFIG_MPQEMU) += device-hotplug.o
+ 
+ #######################################################################
+ # crypto-obj-y is code used by both qemu system emulation and qemu-img
+@@ -113,6 +118,11 @@ common-obj-y += util/machine-notify.o
+ 
+ endif # CONFIG_SOFTMMU
+ 
++remote-pci-obj-$(CONFIG_MPQEMU) += qapi/
++remote-pci-obj-$(CONFIG_MPQEMU) += blockdev-nbd.o
++remote-pci-obj-$(CONFIG_MPQEMU) += job-qmp.o
++remote-pci-obj-$(CONFIG_MPQEMU) += balloon.o
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
+ #######################################################################
+ # Target-independent parts used in system and user emulation
+ common-obj-y += cpus-common.o
+diff --git a/Makefile.target b/Makefile.target
+index adc76886f8..1e9e102df8 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -142,13 +142,32 @@ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/hax-stub.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/whpx-stub.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/vl-stub.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/net-stub.o
+-remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/replay.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/xen-mapcache.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/audio.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/migration.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/ui-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/gdbstub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/qapi-target.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/qapi-misc.o
+ 
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += remote/memory.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += arch_init.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += monitor/misc.o
 +
-+#include "qapi/error.h"
-+#include "io/mpqemu-link.h"
-+#include "hw/proxy/qemu-proxy.h"
-+#include "hw/pci/pci.h"
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-introspect.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-block-core.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-block.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-misc.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-machine-target.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-misc-target.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-visit-machine-target.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-visit-misc-target.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-types-machine-target.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-types-misc-target.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-init-commands.o
+ endif
+ 
+ #########################################################
+@@ -204,6 +223,10 @@ endif
+ generated-files-y += hmp-commands.h hmp-commands-info.h
+ generated-files-y += config-devices.h
+ 
++ifdef CONFIG_MPQEMU
++generated-files-y += hmp-scsi-commands.h hmp-scsi-commands-info.h
++endif
 +
-+static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
-+{
-+    PCIProxyDev *dev =3D PCI_PROXY_DEV(device);
-+    PCIProxyDevClass *k =3D PCI_PROXY_DEV_GET_CLASS(dev);
-+    Error *local_err =3D NULL;
+ endif # CONFIG_SOFTMMU
+ 
+ dummy := $(call unnest-vars,,obj-y)
+@@ -289,10 +312,18 @@ hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
+ hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$(TARGET_DIR)$@")
+ 
++ifdef CONFIG_MPQEMU
++hmp-scsi-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
++	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -tgt scsi < $< > $@)
 +
-+    if (k->realize) {
-+        k->realize(dev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+        }
-+    }
-+}
++hmp-scsi-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
++	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -tgt scsi < $< > $@)
++endif
 +
-+static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+ clean: clean-target
+ 	rm -f *.a *~ $(PROGS)
+ 	rm -f $(shell find . -name '*.[od]')
+-	rm -f hmp-commands.h gdbstub-xml.c
++	rm -f hmp-commands.h gdbstub-xml.c hmp-scsi-commands.h hmp-scsi-commands-info.h
+ 	rm -f trace/generated-helpers.c trace/generated-helpers.c-timestamp
+ ifdef CONFIG_TRACE_SYSTEMTAP
+ 	rm -f *.stp
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 3e7513967c..734548d48f 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -76,3 +76,6 @@ parallels.o-cflags := $(LIBXML2_CFLAGS)
+ parallels.o-libs   := $(LIBXML2_LIBS)
+ 
+ remote-pci-obj-$(CONFIG_MPQEMU) += stream.o
++remote-pci-obj-$(CONFIG_MPQEMU) += qapi-sysemu.o
 +
-+    k->realize =3D pci_proxy_dev_realize;
-+}
++remote-lsi-obj-$(CONFIG_MPQEMU) += monitor/
+diff --git a/block/monitor/Makefile.objs b/block/monitor/Makefile.objs
+index 0a74f9a8b5..a0c898711f 100644
+--- a/block/monitor/Makefile.objs
++++ b/block/monitor/Makefile.objs
+@@ -1 +1,3 @@
+ common-obj-y += block-hmp-cmds.o
 +
-+static const TypeInfo pci_proxy_dev_type_info =3D {
-+    .name          =3D TYPE_PCI_PROXY_DEV,
-+    .parent        =3D TYPE_PCI_DEVICE,
-+    .instance_size =3D sizeof(PCIProxyDev),
-+    .class_size    =3D sizeof(PCIProxyDevClass),
-+    .class_init    =3D pci_proxy_dev_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },
-+    },
-+};
++remote-lsi-obj-$(CONFIG_MPQEMU) += block-hmp-cmds.o
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 1b60676d7c..54d01a055f 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -12,6 +12,7 @@ HXCOMM HXCOMM can be used for comments, discarded from both rST and C.
+         .params     = "[cmd]",
+         .help       = "show the help",
+         .cmd        = hmp_do_help_cmd,
++        .targets    = "scsi",
+         .flags      = "p",
+     },
+ 
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index e3e80848c8..251b77bc4c 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -49,3 +49,4 @@ remote-pci-obj-$(CONFIG_MPQEMU) += numa.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += cpu.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += vmstate-if.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += resettable.o
++remote-pci-obj-$(CONFIG_MPQEMU) += machine-qmp-cmds.o
+diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
+index a8533c9dd7..b6949be297 100644
+--- a/monitor/Makefile.objs
++++ b/monitor/Makefile.objs
+@@ -4,3 +4,7 @@ common-obj-y += qmp-cmds.o qmp-cmds-control.o
+ common-obj-y += hmp-cmds.o
+ 
+ storage-daemon-obj-y += monitor.o qmp.o qmp-cmds-control.o
 +
-+static void pci_proxy_dev_register_types(void)
-+{
-+    type_register_static(&pci_proxy_dev_type_info);
-+}
++remote-pci-obj-$(CONFIG_MPQEMU) += monitor.o qmp.o hmp.o
++remote-pci-obj-$(CONFIG_MPQEMU) += qmp-cmds.o qmp-cmds-control.o
++remote-pci-obj-$(CONFIG_MPQEMU) += hmp-cmds.o
+diff --git a/monitor/misc.c b/monitor/misc.c
+index c0eee6f4ab..edda4cce17 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -1679,13 +1679,21 @@ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp)
+ 
+ /* Please update hmp-commands.hx when adding or changing commands */
+ static HMPCommand hmp_info_cmds[] = {
++#if defined(SCSI_PROCESS)
++#include "hmp-scsi-commands-info.h"
++#else
+ #include "hmp-commands-info.h"
++#endif
+     { NULL, NULL, },
+ };
+ 
+ /* hmp_cmds and hmp_info_cmds would be sorted at runtime */
+ HMPCommand hmp_cmds[] = {
++#if defined(SCSI_PROCESS)
++#include "hmp-scsi-commands.h"
++#else
+ #include "hmp-commands.h"
++#endif
+     { NULL, NULL, },
+ };
+ 
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index 4673ab7490..f7433d6a73 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -36,3 +36,5 @@ QAPI_MODULES_STORAGE_DAEMON = block-core char common control crypto
+ QAPI_MODULES_STORAGE_DAEMON += introspect job qom sockets pragma transaction
+ 
+ storage-daemon-obj-y += $(QAPI_MODULES_STORAGE_DAEMON:%=qapi-commands-%.o)
 +
-+type_init(pci_proxy_dev_register_types)
++remote-pci-obj-$(CONFIG_MPQEMU) += $(QAPI_COMMON_MODULES:%=qapi-commands-%.o)
+diff --git a/qom/Makefile.objs b/qom/Makefile.objs
+index 7e9455db90..546f9fbde6 100644
+--- a/qom/Makefile.objs
++++ b/qom/Makefile.objs
+@@ -6,3 +6,4 @@ storage-daemon-obj-y += qom-qmp-cmds.o
+ 
+ remote-pci-obj-$(CONFIG_MPQEMU) += object.o qom-qobject.o container.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += object_interfaces.o
++remote-pci-obj-$(CONFIG_MPQEMU) += qom-qmp-cmds.o qom-hmp-cmds.o
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index 959460834b..1f8fa301f5 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -36,6 +36,7 @@
+ #pragma weak monitor_printf
+ #pragma weak monitor_cur_is_qmp
+ #pragma weak qmp_device_list_properties
++#pragma weak monitor_fdsets_cleanup
+ 
+ __thread Monitor *cur_mon;
+ 
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index e6da6ff047..c3ac572d6b 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -68,3 +68,5 @@ console-gl.o-libs += $(OPENGL_LIBS)
+ egl-helpers.o-libs += $(OPENGL_LIBS)
+ egl-context.o-libs += $(OPENGL_LIBS)
+ egl-headless.o-libs += $(OPENGL_LIBS)
 +
-diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.=
-h
-new file mode 100644
-index 0000000000..d7eaf26f29
---- /dev/null
-+++ b/include/hw/proxy/qemu-proxy.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_PROXY_H
-+#define QEMU_PROXY_H
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+
-+#include "io/mpqemu-link.h"
-+#include "hw/pci/pci.h"
-+
-+#define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
-+
-+#define PCI_PROXY_DEV(obj) \
-+            OBJECT_CHECK(PCIProxyDev, (obj), TYPE_PCI_PROXY_DEV)
-+
-+#define PCI_PROXY_DEV_CLASS(klass) \
-+            OBJECT_CLASS_CHECK(PCIProxyDevClass, (klass), TYPE_PCI_PROXY=
-_DEV)
-+
-+#define PCI_PROXY_DEV_GET_CLASS(obj) \
-+            OBJECT_GET_CLASS(PCIProxyDevClass, (obj), TYPE_PCI_PROXY_DEV=
-)
-+
-+typedef struct PCIProxyDev {
-+    PCIDevice parent_dev;
-+
-+    MPQemuLinkState *mpqemu_link;
-+
-+    int socket;
-+
-+} PCIProxyDev;
-+
-+typedef struct PCIProxyDevClass {
-+    PCIDeviceClass parent_class;
-+
-+    void (*realize)(PCIProxyDev *dev, Error **errp);
-+
-+    char *command;
-+} PCIProxyDevClass;
-+
-+#endif /* QEMU_PROXY_H */
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index d46cb81058..73cc59b874 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-=20
-+#include "sys/eventfd.h"
- #include "qom/object.h"
- #include "qemu/thread.h"
- #include "exec/cpu-common.h"
---=20
++remote-lsi-obj-$(CONFIG_MPQEMU) += vnc-stubs.o
+-- 
 2.25.GIT
 
 
