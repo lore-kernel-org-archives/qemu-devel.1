@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80649C2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78ED4C2BA1B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:20:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52C312064A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:17:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A90D20672
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:20:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dLWfUpjU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52C312064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePE6RsG1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A90D20672
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLWJm-00054U-Gj
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:17:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37010)
+	id 1jLWMX-0007AN-Fg
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:20:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrx-0003Px-To
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:49:11 -0400
+ id 1jLVrS-0002Wy-98
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrw-0003iX-Ms
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:49:09 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:34532)
+ id 1jLVrQ-0003NH-6P
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:38 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:37133)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrw-0003i4-H6
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:49:08 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id c195so141598wme.1
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 10:49:08 -0700 (PDT)
+ id 1jLVrQ-0003Mq-0E; Mon, 06 Apr 2020 13:48:36 -0400
+Received: by mail-wm1-x331.google.com with SMTP id j19so224931wmi.2;
+ Mon, 06 Apr 2020 10:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=nkfwxbmtcGQqcNqONxBS4N4Qsj6iJU2M8QyuqgwGWzE=;
- b=dLWfUpjUZOenWr/sbg3dz0Pij4xjwUOFwsb+Q5moUMkgxhoL8wm2DnxVMbKsW1eBoY
- R97VxY0O72WkW2Hjncly8MHZ96yD4D4EMSnATiH5eZyfInP8Nrpojd4k19MxFeleiF3C
- CPidTx/sTmyG+s2EFHyQ4SSdlWg7NmNKQdc7RTTZZeh6kkfDBZe235pdtYCv9rEZGzXQ
- TTKlX17Pgfca8gxmypsTMCDCJ6FydbtxLZB1coFBOxqeAWhpiv9Pkl107FKMzu+kT+ir
- EjgZJMo64ToieWqr8ilTJxOuNi54H/fYpbCkx2N+7kjZ3qGZKTSfJmnFVdfjHVREIcU6
- pqkA==
+ bh=74G8KHhadiGPyGitkFydcSDSAs1meyukZBFpYk9pD6I=;
+ b=ePE6RsG1CEc0Y4fP5dt+8+emPTpD/Ih7zbwBNWAwYrK2Zb9fi/4BGDmqYGl3IHioN6
+ THNjNH8nzneT5eGy7s0X78BpMzMOnUMXXStcISlrd/t0Tow1q8AOosCwUp5jNj0nm+l8
+ DppPSo4hJosWL/XGXEth0TSw4LUXXXrVdpF3g3fYQ4PYVfLHcHXn2e34M7h4mr7cn7Ol
+ b8NTiSDNOwfPzzc2eOMaX+ipqrxer9sYqW7slYlo8GXfWjGMytVmQoM3wuY4jVc45PYs
+ DKCUOapPDSU+XoFfYxhX336mvL9LLm79YKlTrhmwuOsUtrab5xeFAkGJ1w1AaHSmO8jN
+ V0dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=nkfwxbmtcGQqcNqONxBS4N4Qsj6iJU2M8QyuqgwGWzE=;
- b=ZlgI9pnZpJ0vaXQiZ8wzTLgBuze+HWMuuAzvQm+uARcKfLwBdh5mFdcXhOpM2HkvxM
- hwzAIwGP6n6mgz0OXM+t7RZhS2rpxltSR/ErWuRDIcLldzFB9FRkOOKOrSlRPNeYvF80
- NM+/nL0UORSzXZh2gvpzskz97CK8SKXzIfcNI/OCq2BwTYfSVaQVvbRRVw+TpMwFxgys
- yYW38EH+NtO4OV1wi49EgIefU1Dgo1nmLh8Pi/SP0PRavvZjqNbpI+01OaGicvjng5es
- iwLWtI6c1T68LLAFsKWPidI0ObglHPoMMUWsAy37wVtW1419ABCQ1pdqQ1VctufdMspt
- b5OQ==
-X-Gm-Message-State: AGi0PuZr3rDhD+4iKyyl+m84ow8N4SBLiabPckTOqDzd7ihnIRjuAn9T
- o2/4LMsUO81fSlr5/wdLZ4p8XnYXR5I=
-X-Google-Smtp-Source: APiQypIJAsO6bfUkykEv0EHFpeDq8wqPkH8KhP/yrE+AitNxWlBtffO1Qf+akL/6t8GwN4Kh3BkV4Q==
-X-Received: by 2002:a7b:c4d0:: with SMTP id g16mr156168wmk.101.1586195344361; 
- Mon, 06 Apr 2020 10:49:04 -0700 (PDT)
+ bh=74G8KHhadiGPyGitkFydcSDSAs1meyukZBFpYk9pD6I=;
+ b=r1OQ2O4QOTPMve4kGkBXUCgmd0H3Qa3DB4aMaTC2MrvcBi8h0D6FHeDKGceoUfuc5v
+ xS0aN+F7McG4w8wJeOMYpCIb0t5sGKoFlZrcV+1lbm/AMoTVnZtVZS0FWXctBN86GMha
+ zXb1mSWbiMtPJ6sK32KlAY/AhRxTBHWI/zkWoQ7rrqJBT3WY95Bu+y8Gwwd6Gh3KIR4U
+ 4h/R/ZxRr2V76Qq6LaNc6l/PZs3hI9V2UknUwmVZ0spYg9OxdV5aOpHu0AlwWeAar9+c
+ mdHECBJBivfBWz/CtojIYIVVxHFlIyhhkdrICa/NNaScPXZJIhKY0Q98wngnw/ghYjf4
+ iEkQ==
+X-Gm-Message-State: AGi0PuYdyVYe8Nxg1YNvyZfrXs1zNOCuKLT1646oZdyzu8aweGiRmfHg
+ ZC+o1jEFVnS5TlTfZzP1EFN0JMTOVTY=
+X-Google-Smtp-Source: APiQypK/q/IVYaN6qURbBPVowpIN1qrXinNowX2GLuV7bUI18lWfmeH+KGKl939DsEJA6OJOZNVxag==
+X-Received: by 2002:a7b:c148:: with SMTP id z8mr476504wmi.31.1586195314802;
+ Mon, 06 Apr 2020 10:48:34 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.49.01
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 10:49:03 -0700 (PDT)
+ Mon, 06 Apr 2020 10:48:34 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH-for-5.1 v2 51/54] migration/colo: Add missing
+Subject: [PATCH-for-5.1 v2 36/54] hw/block/onenand: Add missing
  error-propagation code
-Date: Mon,  6 Apr 2020 19:47:40 +0200
-Message-Id: <20200406174743.16956-52-f4bug@amsat.org>
+Date: Mon,  6 Apr 2020 19:47:25 +0200
+Message-Id: <20200406174743.16956-37-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
 References: <20200406174743.16956-1-f4bug@amsat.org>
@@ -87,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32c
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,46 +98,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Running the coccinelle script produced:
+Patch created mechanically by running:
 
   $ spatch \
     --macro-file scripts/cocci-macro-file.h --include-headers \
-    --sp-file scripts/coccinelle/find-missing-error_propagate.cocci \
-    --keep-comments --smpl-spacing --dir .
-  HANDLING: ./migration/colo.c
-  [[manual check required: error_propagate() might be missing in migrate_set_block_enabled() ./migration/colo.c:439:4]]
-
-Add the missing error_propagate() after review.
+    --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
+    --keep-comments --smpl-spacing --in-place --dir hw
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- migration/colo.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/block/onenand.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index a54ac84f41..57b2adb0cc 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -437,6 +437,9 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
- 
-     /* Disable block migration */
-     migrate_set_block_enabled(false, &local_err);
+diff --git a/hw/block/onenand.c b/hw/block/onenand.c
+index 898ac563a3..1f68dba28b 100644
+--- a/hw/block/onenand.c
++++ b/hw/block/onenand.c
+@@ -810,7 +810,11 @@ static void onenand_realize(DeviceState *dev, Error **errp)
+     s->otp = memset(g_malloc((64 + 2) << PAGE_SHIFT),
+                     0xff, (64 + 2) << PAGE_SHIFT);
+     memory_region_init_ram_nomigrate(&s->ram, OBJECT(s), "onenand.ram",
+-                           0xc000 << s->shift, &error_fatal);
++                           0xc000 << s->shift, &local_err);
 +    if (local_err) {
-+        goto out;
++        error_propagate(errp, local_err);
++        return;
 +    }
-     qemu_mutex_lock_iothread();
- 
- #ifdef CONFIG_REPLICATION
+     vmstate_register_ram_global(&s->ram);
+     ram = memory_region_get_ram_ptr(&s->ram);
+     s->boot[0] = ram + (0x0000 << s->shift);
 -- 
 2.21.1
 
