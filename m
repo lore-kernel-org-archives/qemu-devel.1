@@ -2,85 +2,92 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB15BC2BA1B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A1FC2BA1E
 	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:27:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92A252072F
+	by mail.kernel.org (Postfix) with ESMTPS id 99F8B20731
 	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:27:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OHCi6bur"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92A252072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDE3vpKx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F8B20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLWSn-00010u-OQ
+	id 1jLWSn-00010x-QC
 	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:27:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39897)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jLW3L-0000Ki-0R
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:00:56 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVrh-0002xG-9Q
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jLW3J-0002Bq-So
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:00:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59416
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jLW3J-0002BU-PM
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:00:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586196052;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lcRHjxwj2IvLYyUdLYq/UMlWvaUXQxQz8jsA6VMuQkI=;
- b=OHCi6burjlJfmKU2Oht6jJEUhCJJ9KTxRa4CUGHoV/SI+TWEVIHhIleEnJ1PbRuKxMyVb9
- GlzC3991kGUIOg67+zwckyvajp9rqEV20nHzAo2JLujB9WDp6u9A8JySsB+TUoCmv7H6gr
- CCYkJZgVPXWwFXDbuO20E5nuxIFoiyw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-UbMHiyz7MBKGZynepQXUNw-1; Mon, 06 Apr 2020 14:00:35 -0400
-X-MC-Unique: UbMHiyz7MBKGZynepQXUNw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4322418C35A4;
- Mon,  6 Apr 2020 18:00:34 +0000 (UTC)
-Received: from [10.3.114.49] (ovpn-114-49.phx2.redhat.com [10.3.114.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A9385C1B0;
- Mon,  6 Apr 2020 18:00:33 +0000 (UTC)
-Subject: Re: [PATCH-for-5.1 v2 03/54] hw/arm/allwinner-a10: Move some code
- from realize() to init()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVrc-0003WQ-D9
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:53 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:36755)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVrc-0003W8-74
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:48 -0400
+Received: by mail-wm1-x333.google.com with SMTP id d202so328157wmd.1
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 10:48:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PEHTVvrf5Pm+Jom3wPMXvD0+JJqVe46WaOi392HQB5U=;
+ b=YDE3vpKxS1ahS6WZQYGQ5BsbWpk/jT6NYHZajiT55etah2+eqvbEwZPEpBKC597ynI
+ BRXH4eSKfiMD1xwJwhvG7wc/xDVFIFpy/LYXt2SFRH5i9wbNFooEA0BAL4XsZbiol5sv
+ PN2+xMNKX+u8uuDePIKN2d8taA2+cxXIgSAlX1RZszCIZaReHSnAMoQGf0c+z9ESWGRm
+ 8klfG4CpUeoux7/+RXBscbYCNDj9Wp0HbG9A5OSeqQ51IWriNbIZxfu7dzK1RQ5/HTRo
+ A9H9Eb7nLhIOIP3GNybzWApI6mFLFX3IK8evK8Wd3SCgM4qMlTDeiOccYDSfd3d5EGiQ
+ ktqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=PEHTVvrf5Pm+Jom3wPMXvD0+JJqVe46WaOi392HQB5U=;
+ b=V9/Y9e13/C/txVR4+8RQn7PtkRY2V8EQHDXwqZj1LtwUS3Pa0b2cLImlNQ6HBI19L2
+ fpxqLirl+6npFmvFPgBPuoiihzfmjexyzqpDbXmoEYDoAuC/dpcgS93yWZnSl8z9YyWD
+ PnKX5DwtHCTlWK3stQger/9whgL4SIKfR7kmC4RNc0wUO+dBTO9ZsTMlOR4GZUpDptcO
+ +UxoMDKd3WF7HZpbZC8hKSXF8uuZyv0VnDO55+rNjcBZXM0PyBERZTHDEIWMHfwKQ0j3
+ 8axY1X5uK1W/ewDnocCgrjj/JT3aH5Mj9Tfv07dcNwARUxurefxfQRsQy81m50j7FBMA
+ WxHQ==
+X-Gm-Message-State: AGi0PuZPafucs+Fr334isEAF5g8Wja+UV/QUwmuy5KNFSONysGOsv/7b
+ zeqOtm8lvp8OTisKgDru5xPxBppXgjQ=
+X-Google-Smtp-Source: APiQypJDVOA05tidm3PgFhJNZMnKiQoCASE2z/ozeyeGOArqYGwv1eqTooLnfg7fJsZQZckhholW2Q==
+X-Received: by 2002:a1c:c302:: with SMTP id t2mr160254wmf.85.1586195326597;
+ Mon, 06 Apr 2020 10:48:46 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Apr 2020 10:48:45 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
+Subject: [PATCH-for-5.1 v2 43/54] hw/mips/cps: Add missing error-propagation
+ code
+Date: Mon,  6 Apr 2020 19:47:32 +0200
+Message-Id: <20200406174743.16956-44-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
 References: <20200406174743.16956-1-f4bug@amsat.org>
- <20200406174743.16956-4-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e9eb76ff-b81b-91ad-55c1-62da93ca8cf4@redhat.com>
-Date: Mon, 6 Apr 2020 13:00:32 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200406174743.16956-4-f4bug@amsat.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,38 +99,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Allwinner-a10" <qemu-arm@nongnu.org>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/6/20 12:46 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Coccinelle reported:
->=20
->    $ spatch ... --timeout 60 --sp-file \
->      scripts/coccinelle/simplify-init-realize-error_propagate.cocci
->    HANDLING: ./hw/arm/allwinner-a10.c
->    >>> possible moves from aw_a10_init() to aw_a10_realize() in ./hw/arm/=
-allwinner-a10.c:77
->=20
-> Move the calls using &error_fatal which don't depend of input
+Patch created mechanically by running:
 
-s/of/on/ (here, and in many subsequent messages in the series)
+  $ spatch \
+    --macro-file scripts/cocci-macro-file.h --include-headers \
+    --sp-file scripts/coccinelle/object_property_missing_error_propagate.cocci \
+    --keep-comments --smpl-spacing --in-place --dir hw
 
-> updated before realize() to init().
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->   hw/arm/allwinner-a10.c | 26 +++++++++++++-------------
->   1 file changed, 13 insertions(+), 13 deletions(-)
->=20
+Unfortunately the cocci script doesn't properly patch trailing
+error_propagate() block and emitted duplicate if() block statements.
+These 3 blocks were manually removed.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/mips/cps.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 92b9b1a5f6..18943b64e0 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -102,9 +102,21 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+         sysbus_init_child_obj(OBJECT(dev), "itu", &s->itu, sizeof(s->itu),
+                               TYPE_MIPS_ITU);
+         object_property_set_int(OBJECT(&s->itu), 16, "num-fifo", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+         object_property_set_int(OBJECT(&s->itu), 16, "num-semaphores", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+         object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-present",
+                                  &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+         if (saar_present) {
+             s->itu.saar = &env->CP0_SAAR;
+         }
+@@ -122,7 +134,15 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+     sysbus_init_child_obj(OBJECT(dev), "cpc", &s->cpc, sizeof(s->cpc),
+                           TYPE_MIPS_CPC);
+     object_property_set_int(OBJECT(&s->cpc), s->num_vp, "num-vp", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_int(OBJECT(&s->cpc), 1, "vp-start-running", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->cpc), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+@@ -136,7 +156,15 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+     sysbus_init_child_obj(OBJECT(dev), "gic", &s->gic, sizeof(s->gic),
+                           TYPE_MIPS_GIC);
+     object_property_set_int(OBJECT(&s->gic), s->num_vp, "num-vp", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_int(OBJECT(&s->gic), 128, "num-irq", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->gic), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+@@ -152,10 +180,30 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+     sysbus_init_child_obj(OBJECT(dev), "gcr", &s->gcr, sizeof(s->gcr),
+                           TYPE_MIPS_GCR);
+     object_property_set_int(OBJECT(&s->gcr), s->num_vp, "num-vp", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_int(OBJECT(&s->gcr), 0x800, "gcr-rev", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_int(OBJECT(&s->gcr), gcr_base, "gcr-base", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->gic.mr), "gic", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->cpc.mr), "cpc", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->gcr), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+-- 
+2.21.1
 
 
