@@ -4,74 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B74C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B5FC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50F52206F5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:50:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F90D206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="m4oMxuUx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50F52206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Kl3lRoho"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F90D206F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOOk-0000JI-FE
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:50:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44220)
+	id 1jLOPJ-00010H-1p
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:51:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44569)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGm-00026E-80
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:17 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOHH-0003Pz-7L
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGk-0002Iw-Lw
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:16 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:45598)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOHE-0002fT-Gn
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:47 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46036)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOGk-0002H4-DN
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:14 -0400
+ id 1jLOHE-0002ew-7P
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:44 -0400
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dnfo069764;
- Mon, 6 Apr 2020 09:42:08 GMT
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369drH1069795;
+ Mon, 6 Apr 2020 09:42:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=4mO2dJF75SlZTMUcGzJgBWOZymNp9EgvlBVCh8v7ZU8=;
- b=m4oMxuUxSrbuaiVpyRW4oI7eWq3K3JPPnje5Mw/p8lM/oD3qzORqK9d1akk5WaK7t5dM
- 4aBkYKN6gzMSAGZidXDv/KtudfdlRApW3hx1aSMnrNAJNQ2u/7h5lj9Lylukk8fcB2W0
- CVNMRjympEplXFT+ZsyTDNXh6BAvxToqXWbhBKUeYxIR/crdjeOG7NKl+2lJ2R9J1R8b
- W8bgkqSAeXENdtLdYeTP/yZNMVuhXi081zDX7mYQae1WAN4UNwVFrfK/CJ/KcJM1bgun
- tCdmiw6mQbktkbJpuDZVrZRHEl9ITuY/+BUiUK0GxMhN/eTNSJbbMYCqBkRh4DWZ4L7r iQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 306j6m5tbg-1
+ bh=X9dbkBhM2qohXC9LR568CBMoVxX6ITNshH4LwP3N5oc=;
+ b=Kl3lRohoUaxhy3vH4JxZuAXydrV0pfysG/ie8Sp0brIHr4XiKYgSE7+1hTZV4VB6GmNd
+ AjvbUBBVWdJxM9bo5r4fFkpwM9ENjtIDeaAN10GgLx9KFLTQaCV/DuE5E4/v1Yf7AP7N
+ ktNKCX3e6w/weSb6S63HdWg84feQ2Wm1w3SXCSamU8CrPEDjHaEzQ/zXQLTR+QEi16He
+ MM5Pzv4DW64VqQhX4B6SnMylEdXJ7XZOz5Fhgftz/Jtp4+Py9wBCgw0dHiWsCPB+oZCI
+ Bfnytj5O7dTRtytbI7aRjZze3H0eAGJTIcL4aGY9HTC1TCCRIJPF9BTCld+xoG2PS8W+ +w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 306j6m5tde-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:08 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369fNjo066109;
- Mon, 6 Apr 2020 09:42:07 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 307419xh6j-1
+ Mon, 06 Apr 2020 09:42:38 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369gaPc107294;
+ Mon, 6 Apr 2020 09:42:38 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 3073spk6p6-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:07 +0000
+ Mon, 06 Apr 2020 09:42:37 +0000
 Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369g6Em031919;
- Mon, 6 Apr 2020 09:42:06 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369gPFL007193;
+ Mon, 6 Apr 2020 09:42:25 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:42:06 -0700
+ with ESMTP ; Mon, 06 Apr 2020 02:42:24 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 21/36] multi-process: PCI BAR read/write handling for proxy
- & remote endpoints
-Date: Mon,  6 Apr 2020 02:41:11 -0700
-Message-Id: <848b7213d9c1de43f5f5c8518a4f5bcd46faec7e.1586165556.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v6 32/36] multi-process/mon: stub functions to enable QMP
+ module for remote process
+Date: Mon,  6 Apr 2020 02:41:22 -0700
+Message-Id: <2cd34390a079c63fad4ece60d7b63bdfff64c534.1586165556.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
@@ -79,16 +79,16 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- phishscore=0
- malwarescore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060084
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ phishscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 adultscore=0 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060084
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
  mlxlogscore=999 spamscore=0
- priorityscore=1501 suspectscore=1 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 malwarescore=0
  impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 clxscore=1015
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004060083
@@ -117,298 +117,863 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jagannathan Raman <jag.raman@oracle.com>
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Proxy device object implements handler for PCI BAR writes and reads.
-The handler uses BAR_WRITE/BAR_READ message to communicate to the
-remote process with the BAR address and value to be written/read.
-The remote process implements handler for BAR_WRITE/BAR_READ
-message.
+QMP module doesn't need some functions to run independently on the
+remote processes. However, these functions are necessary for
+compilation. Therefore, these functions are stub'ed out. The
+stub functions raise an assert if QEMU is built in debug mode
+(--enable-debug).
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- hw/proxy/qemu-proxy.c         | 64 ++++++++++++++++++++++++++++++
- include/hw/proxy/qemu-proxy.h | 20 +++++++++-
- include/io/mpqemu-link.h      | 12 ++++++
- io/mpqemu-link.c              |  6 +++
- remote/remote-main.c          | 73 +++++++++++++++++++++++++++++++++++
- 5 files changed, 173 insertions(+), 2 deletions(-)
+ MAINTAINERS            |   4 +
+ accel/stubs/tcg-stub.c |  10 +++
+ configure              |   4 +
+ include/qemu-common.h  |   8 ++
+ stubs/gdbstub.c        |  23 ++++++
+ stubs/migration.c      | 162 +++++++++++++++++++++++++++++++++++++++++
+ stubs/monitor.c        |  31 ++++++++
+ stubs/net-stub.c       |  69 ++++++++++++++++++
+ stubs/qapi-misc.c      |  41 +++++++++++
+ stubs/qapi-target.c    |  56 ++++++++++++++
+ stubs/ui-stub.c        | 130 +++++++++++++++++++++++++++++++++
+ stubs/vl-stub.c        |  92 +++++++++++++++++++++++
+ 12 files changed, 630 insertions(+)
+ create mode 100644 stubs/migration.c
+ create mode 100644 stubs/qapi-misc.c
+ create mode 100644 stubs/qapi-target.c
+ create mode 100644 stubs/ui-stub.c
 
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index 87cf39c672..7fd0a312a5 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -169,3 +169,67 @@ static void pci_proxy_dev_register_types(void)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2a0fd65f7a..eb5ce6ea73 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1967,6 +1967,8 @@ F: blockdev-hmp-cmds.c
+ F: block/qapi.c
+ F: qapi/block*.json
+ F: qapi/transaction.json
++F: stubs/qapi-misc.c
++F: stubs/qapi-target.c
+ T: git https://repo.or.cz/qemu/armbru.git block-next
  
- type_init(pci_proxy_dev_register_types)
+ Dirty Bitmaps
+@@ -2081,6 +2083,7 @@ F: ui/
+ F: include/ui/
+ F: qapi/ui.json
+ F: util/drm.c
++F: stubs/ui-stub.c
  
-+static void send_bar_access_msg(PCIProxyDev *dev, MemoryRegion *mr,
-+                                bool write, hwaddr addr, uint64_t *val,
-+                                unsigned size, bool memory)
+ Cocoa graphics
+ M: Peter Maydell <peter.maydell@linaro.org>
+@@ -2112,6 +2115,7 @@ F: include/monitor/hmp-target.h
+ F: tests/qtest/test-hmp.c
+ F: include/qemu/qemu-print.h
+ F: util/qemu-print.c
++F: stubs/migration.c
+ 
+ Network device backends
+ M: Jason Wang <jasowang@redhat.com>
+diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
+index 2e4e8741fb..cdbceb5fff 100644
+--- a/accel/stubs/tcg-stub.c
++++ b/accel/stubs/tcg-stub.c
+@@ -119,4 +119,14 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
+ void page_collection_unlock(struct page_collection *set)
+ {
+ }
++
++void dump_exec_info(void)
 +{
-+    MPQemuLinkState *mpqemu_link = dev->mpqemu_link;
-+    MPQemuMsg msg;
-+    int wait;
-+
-+    memset(&msg, 0, sizeof(MPQemuMsg));
-+
-+    msg.bytestream = 0;
-+    msg.size = sizeof(msg.data1);
-+    msg.data1.bar_access.addr = mr->addr + addr;
-+    msg.data1.bar_access.size = size;
-+    msg.data1.bar_access.memory = memory;
-+
-+    if (write) {
-+        msg.cmd = BAR_WRITE;
-+        msg.data1.bar_access.val = *val;
-+    } else {
-+        wait = GET_REMOTE_WAIT;
-+
-+        msg.cmd = BAR_READ;
-+        msg.num_fds = 1;
-+        msg.fds[0] = wait;
-+    }
-+
-+    mpqemu_msg_send(&msg, mpqemu_link->dev);
-+
-+    if (!write) {
-+        *val = wait_for_remote(wait);
-+        PUT_REMOTE_WAIT(wait);
-+    }
++    qemu_debug_assert(0);
 +}
 +
-+void proxy_default_bar_write(void *opaque, hwaddr addr, uint64_t val,
-+                             unsigned size)
++void dump_opcount_info(void)
 +{
-+    ProxyMemoryRegion *pmr = opaque;
++    qemu_debug_assert(0);
++}
+ #endif
+diff --git a/configure b/configure
+index 3fbb66a5d5..582487c26c 100755
+--- a/configure
++++ b/configure
+@@ -7601,6 +7601,10 @@ if test "$mpqemu" = "yes" ; then
+   echo "CONFIG_MPQEMU=y" >> $config_host_mak
+ fi
+ 
++if test "$debug" = "yes" ; then
++  echo "CONFIG_DEBUG=y" >> $config_host_mak
++fi
 +
-+    send_bar_access_msg(pmr->dev, &pmr->mr, true, addr, &val, size,
-+                        pmr->memory);
+ if test "$bochs" = "yes" ; then
+   echo "CONFIG_BOCHS=y" >> $config_host_mak
+ fi
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index d0142f29ac..b76e309d98 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -10,6 +10,8 @@
+ #ifndef QEMU_COMMON_H
+ #define QEMU_COMMON_H
+ 
++#include <assert.h>
++
+ #define TFR(expr) do { if ((expr) != -1) break; } while (errno == EINTR)
+ 
+ /* Copyright string for -version arguments, About dialogs, etc */
+@@ -135,4 +137,10 @@ void page_size_init(void);
+  * returned. */
+ bool dump_in_progress(void);
+ 
++#ifdef CONFIG_DEBUG
++#define qemu_debug_assert(x) assert(x)
++#else
++#define qemu_debug_assert(x)
++#endif
++
+ #endif
+diff --git a/stubs/gdbstub.c b/stubs/gdbstub.c
+index 2b7aee50d3..1e65b54755 100644
+--- a/stubs/gdbstub.c
++++ b/stubs/gdbstub.c
+@@ -1,6 +1,29 @@
+ #include "qemu/osdep.h"
++#include "qemu-common.h"
+ #include "exec/gdbstub.h"       /* xml_builtin */
+ 
++#pragma weak gdbserver_start
++
+ const char *const xml_builtin[][2] = {
+   { NULL, NULL }
+ };
++
++#ifdef CONFIG_USER_ONLY
++
++int gdbserver_start(int port)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
 +}
 +
-+uint64_t proxy_default_bar_read(void *opaque, hwaddr addr, unsigned size)
++#else
++
++int gdbserver_start(const char *device)
 +{
-+    ProxyMemoryRegion *pmr = opaque;
-+    uint64_t val;
++    qemu_debug_assert(0);
 +
-+    send_bar_access_msg(pmr->dev, &pmr->mr, false, addr, &val, size,
-+                        pmr->memory);
-+
-+     return val;
++    return -ENOSYS;
 +}
 +
-+const MemoryRegionOps proxy_default_ops = {
-+    .read = proxy_default_bar_read,
-+    .write = proxy_default_bar_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
-index d7eaf26f29..9e4127eccb 100644
---- a/include/hw/proxy/qemu-proxy.h
-+++ b/include/hw/proxy/qemu-proxy.h
-@@ -26,14 +26,25 @@
- #define PCI_PROXY_DEV_GET_CLASS(obj) \
-             OBJECT_GET_CLASS(PCIProxyDevClass, (obj), TYPE_PCI_PROXY_DEV)
- 
--typedef struct PCIProxyDev {
-+typedef struct PCIProxyDev PCIProxyDev;
++#endif
+diff --git a/stubs/migration.c b/stubs/migration.c
+new file mode 100644
+index 0000000000..28ccf80f21
+--- /dev/null
++++ b/stubs/migration.c
+@@ -0,0 +1,162 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
 +
-+typedef struct ProxyMemoryRegion {
-+    PCIProxyDev *dev;
-+    MemoryRegion mr;
-+    bool memory;
-+    bool present;
-+    uint8_t type;
-+} ProxyMemoryRegion;
++#include "migration/misc.h"
++#include "migration/snapshot.h"
++#include "qapi/qapi-types-migration.h"
++#include "qapi/qapi-commands-migration.h"
++#include "qapi/qapi-types-net.h"
 +
-+struct PCIProxyDev {
-     PCIDevice parent_dev;
- 
-     MPQemuLinkState *mpqemu_link;
- 
-     int socket;
- 
--} PCIProxyDev;
-+    ProxyMemoryRegion region[PCI_NUM_REGIONS];
-+};
- 
- typedef struct PCIProxyDevClass {
-     PCIDeviceClass parent_class;
-@@ -43,4 +54,9 @@ typedef struct PCIProxyDevClass {
-     char *command;
- } PCIProxyDevClass;
- 
-+void proxy_default_bar_write(void *opaque, hwaddr addr, uint64_t val,
-+                             unsigned size);
++MigrationInfo *qmp_query_migrate(Error **errp)
++{
++    qemu_debug_assert(0);
 +
-+uint64_t proxy_default_bar_read(void *opaque, hwaddr addr, unsigned size);
++    return NULL;
++}
 +
- #endif /* QEMU_PROXY_H */
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index 7228a1915e..41cf092f9e 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -31,6 +31,8 @@
- /**
-  * mpqemu_cmd_t:
-  * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
-+ * BAR_WRITE        Writes to PCI BAR region
-+ * BAR_READ         Reads from PCI BAR region
-  *
-  * proc_cmd_t enum type to specify the command to be executed on the remote
-  * device.
-@@ -41,6 +43,8 @@ typedef enum {
-     CONNECT_DEV,
-     PCI_CONFIG_WRITE,
-     PCI_CONFIG_READ,
-+    BAR_WRITE,
-+    BAR_READ,
-     MAX,
- } mpqemu_cmd_t;
- 
-@@ -56,6 +60,13 @@ typedef struct {
-     ram_addr_t offsets[REMOTE_MAX_FDS];
- } sync_sysmem_msg_t;
- 
-+typedef struct {
-+    hwaddr addr;
-+    uint64_t val;
-+    unsigned size;
-+    bool memory;
-+} bar_access_msg_t;
++void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
++                                  Error **errp)
++{
++    qemu_debug_assert(0);
++}
 +
- /**
-  * MPQemuMsg:
-  * @cmd: The remote command
-@@ -78,6 +89,7 @@ typedef struct {
-     union {
-         uint64_t u64;
-         sync_sysmem_msg_t sync_sysmem;
-+        bar_access_msg_t bar_access;
-     } data1;
- 
-     int fds[REMOTE_MAX_FDS];
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index 643c0588ce..2b67ef6410 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -367,6 +367,12 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
-             return false;
-         }
-         break;
-+    case BAR_WRITE:
-+    case BAR_READ:
-+        if (msg->size != sizeof(msg->data1)) {
-+            return false;
-+        }
-+        break;
-     default:
-         break;
-     }
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index b5ed31f63b..4f512aa5a8 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -33,6 +33,7 @@
++MigrationCapabilityStatusList *qmp_query_migrate_capabilities(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++MigrationParameters *qmp_query_migrate_parameters(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_migrate_start_postcopy(Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_cancel(Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_continue(MigrationStatus state, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_set_downtime(double value, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_set_speed(int64_t value, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_set_cache_size(int64_t value, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++int64_t qmp_query_migrate_cache_size(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return 0;
++}
++
++void qmp_migrate(const char *uri, bool has_blk, bool blk,
++                 bool has_inc, bool inc, bool has_detach, bool detach,
++                 bool has_resume, bool resume, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_incoming(const char *uri, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_recover(const char *uri, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_migrate_pause(Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_x_colo_lost_heartbeat(Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
++                                Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_xen_set_replication(bool enable, bool primary,
++                             bool has_failover, bool failover,
++                             Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_xen_colo_do_checkpoint(Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++COLOStatus *qmp_query_colo_status(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void migration_global_dump(Monitor *mon)
++{
++    qemu_debug_assert(0);
++}
++
++int load_snapshot(const char *name, Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
++}
++
++int save_snapshot(const char *name, Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
++}
++
++AnnounceParameters *migrate_announce_params(void)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index 07b0bedaab..959460834b 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -1,4 +1,5 @@
+ #include "qemu/osdep.h"
++#include "qemu-common.h"
+ #include "qapi/error.h"
+ #include "monitor/monitor.h"
+ #include "../monitor/monitor-internal.h"
+@@ -10,6 +11,24 @@
  #include "sysemu/sysemu.h"
- #include "block/block.h"
- #include "exec/ramlist.h"
-+#include "exec/memattrs.h"
+ #include "sysemu/runstate.h"
+ #include "monitor/hmp.h"
++#include "monitor/qdev.h"
++#include "sysemu/blockdev.h"
++#include "sysemu/sysemu.h"
++
++#include "qapi/qapi-types-block-core.h"
++#include "qapi/qapi-commands-block-core.h"
++
++#pragma weak cur_mon
++#pragma weak monitor_vprintf
++#pragma weak monitor_get_fd
++#pragma weak monitor_init
++#pragma weak qapi_event_emit
++#pragma weak monitor_get_cpu_index
++#pragma weak monitor_printf
++#pragma weak monitor_cur_is_qmp
++#pragma weak qmp_device_list_properties
++#pragma weak monitor_init_qmp
++#pragma weak monitor_init_hmp
  
- static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-                         MPQemuChannel *chan);
-@@ -102,6 +103,66 @@ exit:
-     notify_proxy(wait, ret);
+ #pragma weak hmp_handle_error
+ #pragma weak cur_mon
+@@ -22,40 +41,52 @@ __thread Monitor *cur_mon;
+ 
+ int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+ {
++    qemu_debug_assert(0);
+     abort();
  }
  
-+/* TODO: confirm memtx attrs. */
-+static void process_bar_write(MPQemuMsg *msg, Error **errp)
-+{
-+    bar_access_msg_t *bar_access = &msg->data1.bar_access;
-+    AddressSpace *as =
-+        bar_access->memory ? &address_space_memory : &address_space_io;
-+    MemTxResult res;
-+
-+    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
-+                           (uint8_t *)&bar_access->val, bar_access->size, true);
-+
-+    if (res != MEMTX_OK) {
-+        error_setg(errp, "Could not perform address space write operation,"
-+                   " inaccessible address: %lx.", bar_access->addr);
-+    }
-+}
-+
-+static void process_bar_read(MPQemuMsg *msg, Error **errp)
-+{
-+    bar_access_msg_t *bar_access = &msg->data1.bar_access;
-+    AddressSpace *as;
-+    int wait = msg->fds[0];
-+    MemTxResult res;
-+    uint64_t val = 0;
-+
-+    as = bar_access->memory ? &address_space_memory : &address_space_io;
-+
-+    assert(bar_access->size <= sizeof(uint64_t));
-+
-+    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
-+                           (uint8_t *)&val, bar_access->size, false);
-+
-+    if (res != MEMTX_OK) {
-+        error_setg(errp, "Could not perform address space read operation,"
-+                   " inaccessible address: %lx.", bar_access->addr);
-+        val = (uint64_t)-1;
-+        goto fail;
-+    }
-+
-+    switch (bar_access->size) {
-+    case 4:
-+        val = *((uint32_t *)&val);
-+        break;
-+    case 2:
-+        val = *((uint16_t *)&val);
-+        break;
-+    case 1:
-+        val = *((uint8_t *)&val);
-+        break;
-+    default:
-+        error_setg(errp, "Invalid PCI BAR read size");
-+        return;
-+    }
-+
-+fail:
-+    notify_proxy(wait, val);
-+
-+    PUT_REMOTE_WAIT(wait);
-+}
-+
- static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-                         MPQemuChannel *chan)
+ int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
  {
-@@ -131,6 +192,18 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-     case PCI_CONFIG_READ:
-         process_config_read(LINK_TO_DEV(link), msg);
-         break;
-+    case BAR_WRITE:
-+        process_bar_write(msg, &err);
-+        if (err) {
-+            goto finalize_loop;
-+        }
-+        break;
-+    case BAR_READ:
-+        process_bar_read(msg, &err);
-+        if (err) {
-+            goto finalize_loop;
-+        }
-+        break;
-     default:
-         error_setg(&err, "Unknown command");
-         goto finalize_loop;
++    qemu_debug_assert(0);
+     error_setg(errp, "only QEMU supports file descriptor passing");
+     return -1;
+ }
+ 
+ void monitor_init_hmp(Chardev *chr, bool use_readline, Error **errp)
+ {
++    qemu_debug_assert(0);
+ }
+ 
+ void monitor_fdsets_cleanup(void)
+ {
++    qemu_debug_assert(0);
+ }
+ 
+ int monitor_get_cpu_index(void)
+ {
++    qemu_debug_assert(0);
++
+     return -ENOSYS;
+ }
+ int monitor_printf(Monitor *mon, const char *fmt, ...)
+ {
++    qemu_debug_assert(0);
++
+     return -ENOSYS;
+ }
+ 
+ bool monitor_cur_is_qmp(void)
+ {
++    qemu_debug_assert(0);
++
+     return false;
+ }
+ 
+ ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
+                                                    Error **errp)
+ {
++    qemu_debug_assert(0);
++
+     return NULL;
+ }
+ 
+diff --git a/stubs/net-stub.c b/stubs/net-stub.c
+index cb2274ba40..6660e83527 100644
+--- a/stubs/net-stub.c
++++ b/stubs/net-stub.c
+@@ -2,6 +2,9 @@
+ #include "qemu-common.h"
+ #include "net/net.h"
+ 
++#include "qapi/qapi-commands-net.h"
++#include "qapi/qapi-commands-rocker.h"
++
+ int qemu_find_net_clients_except(const char *id, NetClientState **ncs,
+                                  NetClientDriver type, int max)
+ {
+@@ -29,3 +32,69 @@ int qemu_find_nic_model(NICInfo *nd, const char * const *models,
+     return -ENOSYS;
+ }
+ 
++void qmp_set_link(const char *name, bool up, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_netdev_del(const char *id, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++RxFilterInfoList *qmp_query_rx_filter(bool has_name, const char *name,
++                                      Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_announce_self(AnnounceParameters *params, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++RockerSwitch *qmp_query_rocker(const char *name, Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++RockerPortList *qmp_query_rocker_ports(const char *name, Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++RockerOfDpaFlowList *qmp_query_rocker_of_dpa_flows(const char *name,
++                                                   bool has_tbl_id,
++                                                   uint32_t tbl_id,
++                                                   Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++RockerOfDpaGroupList *qmp_query_rocker_of_dpa_groups(const char *name,
++                                                     bool has_type,
++                                                     uint8_t type,
++                                                     Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_netdev_add(Netdev *arg, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void netdev_add(QemuOpts *opts, Error **errp)
++{
++    qemu_debug_assert(0);
++}
+diff --git a/stubs/qapi-misc.c b/stubs/qapi-misc.c
+new file mode 100644
+index 0000000000..3eeedd997a
+--- /dev/null
++++ b/stubs/qapi-misc.c
+@@ -0,0 +1,41 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++
++#include "qapi/qapi-commands-misc.h"
++#include "./qapi/qapi-types-dump.h"
++#include "qapi/qapi-commands-dump.h"
++
++void qmp_dump_guest_memory(bool paging, const char *file,
++                           bool has_detach, bool detach,
++                           bool has_begin, int64_t begin, bool has_length,
++                           int64_t length, bool has_format,
++                           DumpGuestMemoryFormat format, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++DumpQueryResult *qmp_query_dump(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++DumpGuestMemoryCapability *qmp_query_dump_guest_memory_capability(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_xen_load_devices_state(const char *filename, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++bool dump_in_progress(void)
++{
++    qemu_debug_assert(0);
++
++    return FALSE;
++}
+diff --git a/stubs/qapi-target.c b/stubs/qapi-target.c
+new file mode 100644
+index 0000000000..7a16164dde
+--- /dev/null
++++ b/stubs/qapi-target.c
+@@ -0,0 +1,56 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++
++#include "qapi/qapi-types-misc-target.h"
++#include "qapi/qapi-commands-misc-target.h"
++#include "qapi/qapi-types-machine-target.h"
++#include "qapi/qapi-commands-machine-target.h"
++
++#if defined(TARGET_I386)
++void qmp_rtc_reset_reinjection(Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++SevInfo *qmp_query_sev(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++SevCapability *qmp_query_sev_capabilities(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++#endif
++
++#if defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)
++CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
++                                                     CpuModelInfo *model,
++                                                     Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++#endif
++
++#if defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || \
++    defined(TARGET_S390X) || defined(TARGET_MIPS)
++CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++#endif
+diff --git a/stubs/ui-stub.c b/stubs/ui-stub.c
+new file mode 100644
+index 0000000000..a5a63ead50
+--- /dev/null
++++ b/stubs/ui-stub.c
+@@ -0,0 +1,130 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++
++#include "ui/console.h"
++#include "ui/input.h"
++#include "ui/qemu-spice.h"
++
++#include "qapi/qapi-types-ui.h"
++#include "qapi/qapi-commands-ui.h"
++
++void qmp_screendump(const char *filename, bool has_device, const char *device,
++                    bool has_head, int64_t head, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++VncInfo *qmp_query_vnc(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++VncInfo2List *qmp_query_vnc_servers(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++MouseInfoList *qmp_query_mice(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_send_key(KeyValueList *keys, bool has_hold_time, int64_t hold_time,
++                  Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void qmp_input_send_event(bool has_device, const char *device,
++                          bool has_head, int64_t head,
++                          InputEventList *events, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void vnc_display_open(const char *id, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++void vnc_display_add_client(const char *id, int csock, bool skipauth)
++{
++    qemu_debug_assert(0);
++}
++
++void qemu_input_queue_rel(QemuConsole *src, InputAxis axis, int value)
++{
++    qemu_debug_assert(0);
++}
++
++void qemu_input_queue_btn(QemuConsole *src, InputButton btn, bool down)
++{
++    qemu_debug_assert(0);
++}
++
++void qemu_input_event_sync(void)
++{
++    qemu_debug_assert(0);
++}
++
++void qemu_input_update_buttons(QemuConsole *src, uint32_t *button_map,
++                               uint32_t button_old, uint32_t button_new)
++{
++    qemu_debug_assert(0);
++}
++
++#ifdef CONFIG_SPICE
++
++int using_spice;
++
++SpiceInfo *qmp_query_spice(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
++                            const char *subject)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
++}
++
++int qemu_spice_display_add_client(int csock, int skipauth, int tls)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
++}
++
++int qemu_spice_set_passwd(const char *passwd, bool fail_if_conn,
++                          bool disconnect_if_conn)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
++}
++
++int qemu_spice_set_pw_expire(time_t expires)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
++}
++
++#endif
++
++int index_from_key(const char *key, size_t key_length)
++{
++    qemu_debug_assert(0);
++
++    return -ENOSYS;
++}
+diff --git a/stubs/vl-stub.c b/stubs/vl-stub.c
+index fff72be201..606f078274 100644
+--- a/stubs/vl-stub.c
++++ b/stubs/vl-stub.c
+@@ -8,6 +8,12 @@
+ #include "disas/disas.h"
+ #include "sysemu/runstate.h"
+ 
++#include "qapi/qapi-commands-ui.h"
++#include "qapi/qapi-commands-run-state.h"
++#include "sysemu/watchdog.h"
++#include "disas/disas.h"
++#include "audio/audio.h"
++
+ bool tcg_allowed;
+ bool xen_allowed;
+ bool boot_strict;
+@@ -21,6 +27,8 @@ int smp_threads = 1;
+ int icount_align_option;
+ int boot_menu;
+ 
++#pragma weak arch_type
++
+ unsigned int max_cpus;
+ const uint32_t arch_type;
+ const char *mem_path;
+@@ -33,6 +41,11 @@ ram_addr_t ram_size;
+ MachineState *current_machine;
+ QemuUUID qemu_uuid;
+ 
++int singlestep;
++const char *qemu_name;
++int no_shutdown;
++int autostart;
++
+ int runstate_is_running(void)
+ {
+     return 0;
+@@ -77,3 +90,82 @@ void x86_cpu_list(void)
+ {
+ }
+ #endif
++
++void qemu_system_shutdown_request(ShutdownCause reason)
++{
++    qemu_debug_assert(0);
++}
++
++void qemu_system_reset_request(ShutdownCause reason)
++{
++    qemu_debug_assert(0);
++}
++
++void qemu_system_powerdown_request(void)
++{
++    qemu_debug_assert(0);
++}
++
++void qemu_exit_preconfig_request(void)
++{
++    qemu_debug_assert(0);
++}
++
++bool runstate_needs_reset(void)
++{
++    qemu_debug_assert(0);
++
++    return FALSE;
++}
++
++bool qemu_wakeup_suspend_enabled(void)
++{
++    qemu_debug_assert(0);
++
++    return FALSE;
++}
++
++void qemu_system_wakeup_request(WakeupReason reason, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++DisplayOptions *qmp_query_display_options(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++StatusInfo *qmp_query_status(Error **errp)
++{
++    qemu_debug_assert(0);
++
++    return NULL;
++}
++
++void qmp_watchdog_set_action(WatchdogAction action, Error **errp)
++{
++    qemu_debug_assert(0);
++}
++
++int select_watchdog_action(const char *p)
++{
++    qemu_debug_assert(0);
++
++    return -1;
++}
++
++void monitor_disas(Monitor *mon, CPUState *cpu,
++                   target_ulong pc, int nb_insn, int is_physical)
++{
++    qemu_debug_assert(0);
++}
++
++int wav_start_capture(AudioState *state, CaptureState *s, const char *path,
++                      int freq, int bits, int nchannels)
++{
++    qemu_debug_assert(0);
++
++    return -1;
++}
 -- 
 2.25.GIT
 
