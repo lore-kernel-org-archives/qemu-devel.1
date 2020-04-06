@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F1C6C2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00EAC2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 216E8206C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B14F206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:54:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rgt/+zlW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216E8206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zv67Gidq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B14F206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLVwQ-0003cg-5d
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:53:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35831)
+	id 1jLVwx-0004pp-Md
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:54:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVqn-0001VQ-Hq
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:02 -0400
+ id 1jLVqk-0001TS-3N
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVql-0001ZH-3y
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:47:57 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35056)
+ id 1jLVqh-0001Rh-Jq
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:47:53 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:35397)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVqk-0001VW-U1; Mon, 06 Apr 2020 13:47:55 -0400
-Received: by mail-wm1-x341.google.com with SMTP id i19so333801wmb.0;
- Mon, 06 Apr 2020 10:47:54 -0700 (PDT)
+ id 1jLVqh-0001LY-2M
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:47:51 -0400
+Received: by mail-wm1-x329.google.com with SMTP id i19so333533wmb.0
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 10:47:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=XkypjbVuB+1GCium+eRMS4VtjczYNZWFQPGZz1SIZd4=;
- b=Rgt/+zlWav1fyZIwcpx/1XZAIgQvCyKpgG8RA8eLsgvCmxGZ4bpM9GUKvK5VhcF0wN
- YdK6g5C1OrSX7bKaq+wCLqzvxk5oByiBI9fEnzVniTNQIOB+ZjFQbihP9tAmvfPqT2gu
- nxwSxFqjDPLQavDyrVNgyQlONHVksTDvuIkfplsTzD7/jrvYfcw0/hlc71jyxz98akyf
- Blmp5mwgbBhO69bB/NAQcc+f2l1QO/IdVYzS1Nea+vLX8M5mXfTM7WlXxvlW+P5xkvkw
- B9QrXpRek1oOfMvvCZOLFBQaJL01cZpJOaOqx0RqmCnrtli9X2hs+xu80n8kLvczg+et
- CrvQ==
+ bh=iReDTzs2Dt50WrfdNdr1+4DatVHniwe5YHMC666osXs=;
+ b=Zv67GidqC99G9Gve+Ccp7YzDO1MRq3kW4OVGIlwS0rpyZYGj45aYTI/PxuIFvjdGlp
+ +y2ZB9LClb1vzF9rMAeW3dsAMdmvQLFbbX9B4Q86BCVwasrd+ZsILTTiEFPbfgwI5Llw
+ 79tKup106tKsBObTfcg5pj1nSQrpqaUA6bm++UzZ9fVb/afNf/1BQ8Di6GP8GYjVSLUJ
+ OngYWB4vWdq1zyEeLlQQJ4ERT4HrSMYEHqkYG312LRinyPbgdfnozgGngmBgONi44YoQ
+ SWylms/zKsL4hPt+KwTXSVE1FMKmwNw2jw5U6n4HRlYTl/SUEtpYTa+CsGipJMGxrBn7
+ 2jOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=XkypjbVuB+1GCium+eRMS4VtjczYNZWFQPGZz1SIZd4=;
- b=SDeogOgzY+6T1E4Cb2vx1gpXtTNbqaBcB/Kz8NBt8wseLG9ggusjrGuPKD+N1TTdVh
- T7OU9Im5WI40RtyPMSj7gXNzX6YApjTVMqj0MHj35uHIskQ4dBu8B+O024QfkQeXPIq/
- lF5Pxx4oA7QgSXT6fV7GwTiWLD70DrpCJc7MCCg9rbQZDP9SkXCWx2+Rr31/5MJsxVfn
- 8hNhAayC96j86vAQv6YT0AZJ2YOgANT57f9ZTLGgHEasOXtozKGGo1/v2q0/zbxy4O/O
- YS0jQ2yA6Iq6JTWBzIxl2GwJcfVqcbHlbjYZEZGQ+aZat4OhmeeZpA2EsKYlyVbok5ek
- qv7Q==
-X-Gm-Message-State: AGi0PubTkxhTlz2troxs47LmO+3i/Ki5IbHp3beenyF3doA3QbPZ+qHM
- IbhyFgwJDsyY+yZt+Sn81xcVaiXBFFo=
-X-Google-Smtp-Source: APiQypIXyb9dXbPn+kde5KtGb8oJIgi4447BNiqp3T9OK5kUfG1NX7t2RwOEzIkXiX0SOGQC+Y8ubQ==
-X-Received: by 2002:a05:600c:2f90:: with SMTP id
- t16mr206684wmn.66.1586195273564; 
- Mon, 06 Apr 2020 10:47:53 -0700 (PDT)
+ bh=iReDTzs2Dt50WrfdNdr1+4DatVHniwe5YHMC666osXs=;
+ b=dJFbA1+9MMzdEeK5CgkT8eVrva0DoPVN/ZiQNhtl8fDUie7utSy2vxCdgiqwfJYQnV
+ q7YqxdmIItPfrQ+Q/sLdS6HBJUbugpQNLOXIz2KYQksoe2v4R95qJDpji6j2arMyHIv1
+ 7g+ZC0i4Oa3mXc4PVuRzjmqV8K6VnJc/I3cCgaLiFWUHlKqX9nkoTAJpiMy0E+lqtDwm
+ 6yOIwlGeTArbJPXlPXOFNMH+0RkJPpNS7IgJNNqJ0cOSiFr4/vS8hf9kkJNHpomFNCxi
+ Z0yZeLnoQ6KV3182amB0u9EOiA/LNEVsaA3ahk7RuKN2LYjgvECU7NydwrjcGGA3BLYl
+ +cQg==
+X-Gm-Message-State: AGi0PubGxnQTdWXOXvOw9CrAqJmnDppbBYEXvXVNG19RiPpeyFq87KU6
+ ZzZoxOr2vAQyV59h/6QEh0JRq1+X7Gw=
+X-Google-Smtp-Source: APiQypLdx/GjEcHz6rJ7WbzX0/P9ebNLuTecdw2Ea/3fCP6OGGDNcJhQB5QpOMmbt16ngpOExEDkOQ==
+X-Received: by 2002:a05:600c:2257:: with SMTP id
+ a23mr529751wmm.128.1586195268801; 
+ Mon, 06 Apr 2020 10:47:48 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.47.52
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.47.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 10:47:53 -0700 (PDT)
+ Mon, 06 Apr 2020 10:47:48 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH-for-5.1 v2 05/54] hw/arm/aspeed_ast2600: Move some code from
- realize() to init()
-Date: Mon,  6 Apr 2020 19:46:54 +0200
-Message-Id: <20200406174743.16956-6-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v2 02/54] scripts/coccinelle: Script to simplify
+ DeviceClass error propagation
+Date: Mon,  6 Apr 2020 19:46:51 +0200
+Message-Id: <20200406174743.16956-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
 References: <20200406174743.16956-1-f4bug@amsat.org>
@@ -87,7 +88,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,121 +102,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- "open list:ASPEED BMCs" <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle reported:
-
-  $ spatch ... --timeout 60 --sp-file \
-    scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/arm/aspeed_ast2600.c
-  >>> possible moves from aspeed_soc_ast2600_init() to aspeed_soc_ast2600_realize() in ./hw/arm/aspeed_ast2600.c:243
-
-Move the calls using &error_fatal which don't depend of input
-updated before realize() to init().
+When a device uses an Error* with data not modified before realize(),
+this call can be moved to init(). Add a Coccinelle patch to find such
+uses.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/aspeed_ast2600.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ ...implify-init-realize-error_propagate.cocci | 69 +++++++++++++++++++
+ MAINTAINERS                                   |  1 +
+ 2 files changed, 70 insertions(+)
+ create mode 100644 scripts/coccinelle/simplify-init-realize-error_propagate.cocci
 
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index b08359f3ef..c8e0171824 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -114,6 +114,16 @@ static qemu_irq aspeed_soc_get_irq(AspeedSoCState *s, int ctrl)
-     return qdev_get_gpio_in(DEVICE(&s->a7mpcore), sc->irqmap[ctrl]);
- }
- 
-+/*
-+ * ASPEED ast2600 has 0xf as cluster ID
-+ *
-+ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0388e/CIHEBGFG.html
-+ */
-+static uint64_t aspeed_calc_affinity(int cpu)
+diff --git a/scripts/coccinelle/simplify-init-realize-error_propagate.cocci b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+new file mode 100644
+index 0000000000..2e3ec4d98a
+--- /dev/null
++++ b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+@@ -0,0 +1,69 @@
++// Find error-propagation calls that don't need to be in DeviceClass::realize()
++// because they don't use information user can change before calling realize(),
++// so they can be moved to DeviceClass:initfn() where error propagation is not
++// needed.
++//
++// Copyright: (C) 2020 Philippe Mathieu-Daudé
++// This work is licensed under the terms of the GNU GPLv2 or later.
++//
++// spatch \
++//  --macro-file scripts/cocci-macro-file.h \
++//  --sp-file \
++//    scripts/coccinelle/simplify-init-realize-error_propagate.cocci \
++//  --timeout 60
++//
++// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg692500.html
++
++
++@ match_class_init @
++TypeInfo info;
++identifier class_initfn;
++@@
++    info.class_init = class_initfn;
++
++
++@ match_instance_init @
++TypeInfo info;
++identifier instance_initfn;
++@@
++    info.instance_init = instance_initfn;
++
++
++@ match_realize @
++identifier match_class_init.class_initfn;
++DeviceClass *dc;
++identifier realizefn;
++@@
++void class_initfn(...)
 +{
-+    return (0xf << ARM_AFF1_SHIFT) | cpu;
++    ...
++    dc->realize = realizefn;
++    ...
 +}
 +
- static void aspeed_soc_ast2600_init(Object *obj)
- {
-     AspeedSoCState *s = ASPEED_SOC(obj);
-@@ -130,6 +140,13 @@ static void aspeed_soc_ast2600_init(Object *obj)
-         object_initialize_child(obj, "cpu[*]", OBJECT(&s->cpu[i]),
-                                 sizeof(s->cpu[i]), sc->cpu_type,
-                                 &error_abort, NULL);
-+        object_property_set_int(OBJECT(&s->cpu[i]), QEMU_PSCI_CONDUIT_SMC,
-+                                "psci-conduit", &error_abort);
-+        object_property_set_int(OBJECT(&s->cpu[i]), aspeed_calc_affinity(i),
-+                                "mp-affinity", &error_abort);
 +
-+        object_property_set_int(OBJECT(&s->cpu[i]), 1125000000, "cntfrq",
-+                                &error_abort);
-     }
++@ propagate_in_realize @
++identifier match_realize.realizefn;
++identifier err;
++identifier errp;
++identifier func_with_errp =~ "(?!object_property_set_link)";
++symbol error_abort, error_fatal;
++position pos;
++@@
++void realizefn@pos(..., Error **errp)
++{
++    ...
++    Error *err = NULL;
++    <+...
++    func_with_errp(..., \(&error_abort\|&error_fatal\));
++    ...+>
++}
++
++
++@ script:python @
++initfn << match_instance_init.instance_initfn;
++realizefn << match_realize.realizefn;
++p << propagate_in_realize.pos;
++@@
++print('>>> possible moves from {}() to {}() in {}:{}'
++      .format(initfn, realizefn, p[0].file, p[0].line))
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9d156d73b3..d06ffeddd5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2057,6 +2057,7 @@ F: scripts/coccinelle/err-bad-newline.cocci
+ F: scripts/coccinelle/error-use-after-free.cocci
+ F: scripts/coccinelle/error_propagate_null.cocci
+ F: scripts/coccinelle/remove_local_err.cocci
++F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+ F: scripts/coccinelle/use-error_fatal.cocci
  
-     snprintf(typename, sizeof(typename), "aspeed.scu-%s", socname);
-@@ -146,6 +163,9 @@ static void aspeed_soc_ast2600_init(Object *obj)
- 
-     sysbus_init_child_obj(obj, "a7mpcore", &s->a7mpcore,
-                           sizeof(s->a7mpcore), TYPE_A15MPCORE_PRIV);
-+    object_property_set_int(OBJECT(&s->a7mpcore),
-+                            ASPEED_SOC_AST2600_MAX_IRQ + GIC_INTERNAL,
-+                            "num-irq", &error_abort);
- 
-     sysbus_init_child_obj(obj, "rtc", OBJECT(&s->rtc), sizeof(s->rtc),
-                           TYPE_ASPEED_RTC);
-@@ -230,16 +250,6 @@ static void aspeed_soc_ast2600_init(Object *obj)
-                           TYPE_SYSBUS_SDHCI);
- }
- 
--/*
-- * ASPEED ast2600 has 0xf as cluster ID
-- *
-- * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0388e/CIHEBGFG.html
-- */
--static uint64_t aspeed_calc_affinity(int cpu)
--{
--    return (0xf << ARM_AFF1_SHIFT) | cpu;
--}
--
- static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
- {
-     int i;
-@@ -264,19 +274,11 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
- 
-     /* CPU */
-     for (i = 0; i < s->num_cpus; i++) {
--        object_property_set_int(OBJECT(&s->cpu[i]), QEMU_PSCI_CONDUIT_SMC,
--                                "psci-conduit", &error_abort);
-         if (s->num_cpus > 1) {
-             object_property_set_int(OBJECT(&s->cpu[i]),
-                                     ASPEED_A7MPCORE_ADDR,
-                                     "reset-cbar", &error_abort);
-         }
--        object_property_set_int(OBJECT(&s->cpu[i]), aspeed_calc_affinity(i),
--                                "mp-affinity", &error_abort);
--
--        object_property_set_int(OBJECT(&s->cpu[i]), 1125000000, "cntfrq",
--                                &error_abort);
--
-         /*
-          * TODO: the secondary CPUs are started and a boot helper
-          * is needed when using -kernel
-@@ -292,9 +294,6 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     /* A7MPCORE */
-     object_property_set_int(OBJECT(&s->a7mpcore), s->num_cpus, "num-cpu",
-                             &error_abort);
--    object_property_set_int(OBJECT(&s->a7mpcore),
--                            ASPEED_SOC_AST2600_MAX_IRQ + GIC_INTERNAL,
--                            "num-irq", &error_abort);
- 
-     object_property_set_bool(OBJECT(&s->a7mpcore), true, "realized",
-                              &error_abort);
+ GDB stub
 -- 
 2.21.1
 
