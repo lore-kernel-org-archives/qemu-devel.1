@@ -2,80 +2,81 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,PDS_TONAME_EQ_TOLOCAL_SHORT,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09260C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A48BC2BA18
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:00:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D64C4206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:00:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D64C4206C3
+	by mail.kernel.org (Postfix) with ESMTPS id E13E2206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 08:00:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E13E2206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLMgQ-0006MA-Vj
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 04:00:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60564)
+	id 1jLMgS-0006OZ-Sg
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 04:00:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLMfQ-0005WV-Mz
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:59:37 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLMfR-0005Wb-RE
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:59:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLMfP-0005PM-RO
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:59:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24836
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLMfQ-0005Pv-MP
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:59:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31000)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jLMfP-0005Oq-N5; Mon, 06 Apr 2020 03:59:35 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1jLMfQ-0005PQ-En; Mon, 06 Apr 2020 03:59:36 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0367ZFGb145535; Mon, 6 Apr 2020 03:59:34 -0400
+ 0367YAI4134605; Mon, 6 Apr 2020 03:59:35 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 306p7stvk0-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 306pakt938-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Apr 2020 03:59:34 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0367aSrv002740;
+ Mon, 06 Apr 2020 03:59:35 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0367YSWq136896;
  Mon, 6 Apr 2020 03:59:34 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 306p7stvjm-1
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 306pakt92n-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Mon, 06 Apr 2020 03:59:34 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0367wjaa004533;
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0367wgkN022004;
  Mon, 6 Apr 2020 07:59:33 GMT
 Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma01wdc.us.ibm.com with ESMTP id 306hv5pg6s-1
+ [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 306hv5xgxk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Mon, 06 Apr 2020 07:59:33 +0000
 Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
  [9.57.199.107])
  by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0367xXfH14418412
+ 0367xXb154001930
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Mon, 6 Apr 2020 07:59:33 GMT
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E4A9F124055;
- Mon,  6 Apr 2020 07:59:32 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 05F43124054;
+ Mon,  6 Apr 2020 07:59:33 +0000 (GMT)
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CAFBE124058;
+ by IMSVA (Postfix) with ESMTP id E8BF512405B;
  Mon,  6 Apr 2020 07:59:32 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.114.17.106])
  by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
  Mon,  6 Apr 2020 07:59:32 +0000 (GMT)
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 To: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH 0/1] s390x/next: build fix for non-KVM platforms
-Date: Mon,  6 Apr 2020 03:59:30 -0400
-Message-Id: <20200406075931.26232-1-borntraeger@de.ibm.com>
+Subject: [PATCH 1/1] s390x/s390-virtio-ccw: Fix build on systems without KVM
+Date: Mon,  6 Apr 2020 03:59:31 -0400
+Message-Id: <20200406075931.26232-2-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200406075931.26232-1-borntraeger@de.ibm.com>
+References: <20200406075931.26232-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
@@ -83,13 +84,13 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
  definitions=2020-04-06_03:2020-04-03,
  2020-04-06 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- phishscore=0 priorityscore=1501 adultscore=0 mlxscore=0 malwarescore=0
- clxscore=1015 mlxlogscore=955 bulkscore=0 spamscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ adultscore=0 mlxlogscore=999
+ spamscore=0 suspectscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 clxscore=1015 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2004060059
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,20 +111,115 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Bruce Rogers reported that hw/s390/ipl.c does not compile on RISC-V due
-to missing KVM headers.
-Instead of ifdef we should probably move the problematic function into
-pv.c
+linux/kvm.h is not available on all platforms. Let us move
+s390_machine_inject_pv_error into pv.c as it uses KVM structures.
 
-Christian Borntraeger (1):
-  s390x/s390-virtio-ccw: Fix build on systems without KVM
-
+Fixes: 49fc3220175e ("s390x: protvirt: Support unpack facility")
+Reported-by: Bruce Rogers <brogers@suse.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
  hw/s390x/ipl.h             |  1 +
  hw/s390x/pv.c              | 11 +++++++++++
  hw/s390x/s390-virtio-ccw.c | 10 ----------
  include/hw/s390x/pv.h      |  3 +++
  4 files changed, 15 insertions(+), 10 deletions(-)
 
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 89b3044d7a..53cc9eb5ac 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -14,6 +14,7 @@
+ #define HW_S390_IPL_H
+ 
+ #include "cpu.h"
++#include "exec/address-spaces.h"
+ #include "hw/qdev-core.h"
+ 
+ struct IPLBlockPVComp {
+diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+index d3333d6e13..18f785b09e 100644
+--- a/hw/s390x/pv.c
++++ b/hw/s390x/pv.c
+@@ -13,8 +13,10 @@
+ 
+ #include <linux/kvm.h>
+ 
++#include "cpu.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/kvm.h"
++#include "hw/s390x/ipl.h"
+ #include "hw/s390x/pv.h"
+ 
+ static int __s390_pv_cmd(uint32_t cmd, const char *cmdname, void *data)
+@@ -100,3 +102,12 @@ void s390_pv_unshare(void)
+ {
+     s390_pv_cmd_exit(KVM_PV_VM_UNSHARE_ALL, NULL);
+ }
++
++void s390_machine_inject_pv_error(CPUState *cs)
++{
++    int r1 = (cs->kvm_run->s390_sieic.ipa & 0x00f0) >> 4;
++    CPUS390XState *env = &S390_CPU(cs)->env;
++
++    /* Report that we are unable to enter protected mode */
++    env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
++}
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index b268907395..0e8b0c63a1 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -45,7 +45,6 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/balloon.h"
+ #include "hw/s390x/pv.h"
+-#include <linux/kvm.h>
+ #include "migration/blocker.h"
+ 
+ static Error *pv_mig_blocker;
+@@ -390,15 +389,6 @@ out_err:
+     return rc;
+ }
+ 
+-static void s390_machine_inject_pv_error(CPUState *cs)
+-{
+-    int r1 = (cs->kvm_run->s390_sieic.ipa & 0x00f0) >> 4;
+-    CPUS390XState *env = &S390_CPU(cs)->env;
+-
+-    /* Report that we are unable to enter protected mode */
+-    env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
+-}
+-
+ static void s390_pv_prepare_reset(S390CcwMachineState *ms)
+ {
+     CPUState *cs;
+diff --git a/include/hw/s390x/pv.h b/include/hw/s390x/pv.h
+index c6cb360f2f..b0fbed9bae 100644
+--- a/include/hw/s390x/pv.h
++++ b/include/hw/s390x/pv.h
+@@ -13,6 +13,7 @@
+ #define HW_S390_PV_H
+ 
+ #ifdef CONFIG_KVM
++#include "cpu.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
+ 
+ static inline bool s390_is_pv(void)
+@@ -41,6 +42,7 @@ int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
+ void s390_pv_perf_clear_reset(void);
+ int s390_pv_verify(void);
+ void s390_pv_unshare(void);
++void s390_machine_inject_pv_error(CPUState *cs);
+ #else /* CONFIG_KVM */
+ static inline bool s390_is_pv(void) { return false; }
+ static inline int s390_pv_vm_enable(void) { return 0; }
+@@ -50,6 +52,7 @@ static inline int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) {
+ static inline void s390_pv_perf_clear_reset(void) {}
+ static inline int s390_pv_verify(void) { return 0; }
+ static inline void s390_pv_unshare(void) {}
++static inline void s390_machine_inject_pv_error(CPUState *cs) {};
+ #endif /* CONFIG_KVM */
+ 
+ #endif /* HW_S390_PV_H */
 -- 
 2.25.1
 
