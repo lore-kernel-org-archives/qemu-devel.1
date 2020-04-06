@@ -2,65 +2,61 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C4EC2BA18
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B82F5C2BA18
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 07:09:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7639820672
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:59:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bLORG9/0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7639820672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 83373206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 07:09:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83373206F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLLin-0004KS-Ic
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 02:59:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52814)
+	id 1jLLt2-0006Yz-KL
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 03:09:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jLLhk-0003Ue-Mr
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:57:58 -0400
+ (envelope-from <bowen.wang@intel.com>) id 1jLLsJ-00065m-Th
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jLLhj-0000Q1-6t
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:57:56 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38723 helo=ozlabs.org)
+ (envelope-from <bowen.wang@intel.com>) id 1jLLsH-0000s5-P0
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:08:51 -0400
+Received: from mga12.intel.com ([192.55.52.136]:30278)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jLLhi-0000Mn-C7; Mon, 06 Apr 2020 02:57:55 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48whF95HFsz9sRf; Mon,  6 Apr 2020 16:57:49 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1586156269;
- bh=SeReKDq3PkE2Rfj3RFIwi+8lDiPM/sCz4p6FOI4wZK0=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=bLORG9/0B/r+vMpjWG/x3Ztg3X+m+TO43dVhWMh8j95DdCFPmSyGC/bgPHm43T2zE
- tVviF+OpqAOHWs4vj+oGXLxqGbea1X0uOljmHmloImOC0bFzanyCEOTPllFWcO82Gk
- rcOlQGV4XjHhKYhxxOJ1HIAvPlonwR0787IIMnoQ=
-Date: Mon, 6 Apr 2020 16:45:59 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 3/5] nmi: add MCE class for implementing machine check
- injection commands
-Message-ID: <20200406064559.GB2945@umbus.fritz.box>
-References: <20200325144147.221875-1-npiggin@gmail.com>
- <20200325144147.221875-4-npiggin@gmail.com>
- <20200331002203.GB47772@umbus.fritz.box>
- <1585900632.k0ft0cc80l.astroid@bobo.none>
+ (Exim 4.71) (envelope-from <bowen.wang@intel.com>)
+ id 1jLLsH-0000qV-Ff
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 03:08:49 -0400
+IronPort-SDR: 9qGLK1tmL0GQd7637X038lAiyeZUb+mSIdtwx3Fw3PLTaNu8HTh32Bec+aMcmSiWL7L+iRjuNX
+ SmU2MLnuuYZg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 06 Apr 2020 00:08:45 -0700
+IronPort-SDR: SacmigwGlHtEX1eGO7WFX3PTQjuLyOCjjZ6whnwUiy/H+fPqAXzUSk4cBKAQQdGVbEPcRk4nuy
+ /JcAtn3HA6JQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,350,1580803200"; d="scan'208";a="397413436"
+Received: from desktop-do5fptk.sh.intel.com (HELO localhost.localdomain)
+ ([10.239.47.198])
+ by orsmga004.jf.intel.com with ESMTP; 06 Apr 2020 00:08:44 -0700
+From: WangBowen <bowen.wang@intel.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hax: Dynamic allocate vcpu state structure
+Date: Mon,  6 Apr 2020 15:06:42 +0800
+Message-Id: <20200406070642.3005-1-bowen.wang@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="RASg3xLB4tUQ4RcS"
-Content-Disposition: inline
-In-Reply-To: <1585900632.k0ft0cc80l.astroid@bobo.none>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,90 +68,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>,
- qemu-devel@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org
+Cc: bowen.wang@intel.com, colin.xu@intel.com, wenchao.wang@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Dynamic allocating vcpu state structure according to smp value to be
+more precise and safe. Previously it will alloccate array of fixed size
+HAX_MAX_VCPU.
 
---RASg3xLB4tUQ4RcS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is achieved by using g_new0 to dynamic allocate the array. The
+allocated size is obtained from smp.max_cpus in MachineState. Also, the
+size is compared with HAX_MAX_VCPU when creating the vm. The reason for
+choosing dynamic array over linked list is because the status is visited
+by index all the time.
 
-On Fri, Apr 03, 2020 at 06:04:47PM +1000, Nicholas Piggin wrote:
-> David Gibson's on March 31, 2020 10:22 am:
-> > On Thu, Mar 26, 2020 at 12:41:45AM +1000, Nicholas Piggin wrote:
-> >> Like commit 9cb805fd26 ("cpus: Define callback for QEMU "nmi" command")
-> >> this implements a machine check injection command framework and defines
-> >> a monitor command for ppc.
-> >>=20
-> >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> >=20
-> > So, AFAICT, both x86 and ppc have something called an MCE, and while
-> > I'm guessing they're somewhat related, they don't work quite the same
-> > way - different information provided to the handler and so forth.
-> >=20
-> > I think it's reasonable to overload the "mce" HMP command based on
-> > target for the different types.  However, I think calling the
-> > interface classes which are specific to the ppc type just "mce" could
-> > be pretty confusing.
->=20
-> Okay. So, convert i386 first?
+This will lead to QEMU checking whether the smp value is larger than the
+HAX_MAX_VCPU when creating vm, if larger, the process will terminate,
+otherwise it will allocate array of size smp to store the status.
 
-Uh.. not necessarily.  But call your version PpcMce or something
-instead.
+Signed-off-by: WangBowen <bowen.wang@intel.com>
+---
+ target/i386/hax-all.c  | 25 +++++++++++++++++++------
+ target/i386/hax-i386.h |  5 +++--
+ 2 files changed, 22 insertions(+), 8 deletions(-)
 
-> > In addition, I think this is adding an HMP command to inject the event
-> > without any corresponding way of injecting via QMP.  I believe that's
-> > frowned upon.
->=20
-> I attempted that but didn't get too far. I guess it's more of a
-> special test than a management function (nmi has valid uses in=20
-> administering a machine), so maybe we can get an exemption. One issue
-> is different QMP command for powerpc vs x86.
->=20
-> I think error injection as a general concept might be valid there, but
-> the better interface for that level would be higher up, e.g, not
-> specifying register settings but rather "simulate uncorrected memory
-> error on this byte".
->=20
-> Do you think that is reasonable reason to avoid adding QMP for this
-> nasty low level thing?
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index a8b6e5aeb8..a22adec5da 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -232,10 +232,10 @@ int hax_init_vcpu(CPUState *cpu)
+     return ret;
+ }
+ 
+-struct hax_vm *hax_vm_create(struct hax_state *hax)
++struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus)
+ {
+     struct hax_vm *vm;
+-    int vm_id = 0, ret;
++    int vm_id = 0, ret, i;
+ 
+     if (hax_invalid_fd(hax->fd)) {
+         return NULL;
+@@ -259,6 +259,17 @@ struct hax_vm *hax_vm_create(struct hax_state *hax)
+         goto error;
+     }
+ 
++    if (max_cpus > HAX_MAX_VCPU) {
++        fprintf(stderr, "Maximum VCPU number QEMU supported is %d\n", HAX_MAX_VCPU);
++        goto error;
++    }
++
++    vm->numvcpus = max_cpus;
++    vm->vcpus = g_new0(struct hax_vcpu_state *, vm->numvcpus);
++    for (i = 0; i < vm->numvcpus; i++) {
++        vm->vcpus[i] = NULL;
++    }
++
+     hax->vm = vm;
+     return vm;
+ 
+@@ -272,12 +283,14 @@ int hax_vm_destroy(struct hax_vm *vm)
+ {
+     int i;
+ 
+-    for (i = 0; i < HAX_MAX_VCPU; i++)
++    for (i = 0; i < vm->numvcpus; i++)
+         if (vm->vcpus[i]) {
+             fprintf(stderr, "VCPU should be cleaned before vm clean\n");
+             return -1;
+         }
+     hax_close_fd(vm->fd);
++    vm->numvcpus = 0;
++    g_free(vm->vcpus);
+     g_free(vm);
+     hax_global.vm = NULL;
+     return 0;
+@@ -292,7 +305,7 @@ static void hax_handle_interrupt(CPUState *cpu, int mask)
+     }
+ }
+ 
+-static int hax_init(ram_addr_t ram_size)
++static int hax_init(ram_addr_t ram_size, int max_cpus)
+ {
+     struct hax_state *hax = NULL;
+     struct hax_qemu_version qversion;
+@@ -324,7 +337,7 @@ static int hax_init(ram_addr_t ram_size)
+         goto error;
+     }
+ 
+-    hax->vm = hax_vm_create(hax);
++    hax->vm = hax_vm_create(hax, max_cpus);
+     if (!hax->vm) {
+         fprintf(stderr, "Failed to create HAX VM\n");
+         ret = -EINVAL;
+@@ -352,7 +365,7 @@ static int hax_init(ram_addr_t ram_size)
+ 
+ static int hax_accel_init(MachineState *ms)
+ {
+-    int ret = hax_init(ms->ram_size);
++    int ret = hax_init(ms->ram_size, (int)ms->smp.max_cpus);
+ 
+     if (ret && (ret != -ENOSPC)) {
+         fprintf(stderr, "No accelerator found.\n");
+diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
+index 54e9d8b057..7d988f81da 100644
+--- a/target/i386/hax-i386.h
++++ b/target/i386/hax-i386.h
+@@ -47,7 +47,8 @@ struct hax_state {
+ struct hax_vm {
+     hax_fd fd;
+     int id;
+-    struct hax_vcpu_state *vcpus[HAX_MAX_VCPU];
++    int numvcpus;
++    struct hax_vcpu_state **vcpus;
+ };
+ 
+ #ifdef NEED_CPU_H
+@@ -58,7 +59,7 @@ int valid_hax_tunnel_size(uint16_t size);
+ /* Host specific functions */
+ int hax_mod_version(struct hax_state *hax, struct hax_module_version *version);
+ int hax_inject_interrupt(CPUArchState *env, int vector);
+-struct hax_vm *hax_vm_create(struct hax_state *hax);
++struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus);
+ int hax_vcpu_run(struct hax_vcpu_state *vcpu);
+ int hax_vcpu_create(int id);
+ int hax_sync_vcpu_state(CPUArchState *env, struct vcpu_state_t *state,
+-- 
+2.24.1
 
-Hrm, I doubt it will convince the qemu community at large.  I think
-the view is that QMP is the "real" management interface for qemu - HMP
-is somewhere in between a shim for convenience and something needed
-for backwards compat.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---RASg3xLB4tUQ4RcS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6K0CQACgkQbDjKyiDZ
-s5LwJhAA2QQuKSUk4VObkpZkb4Ui5Vt7Bbq018a79CiIVhqaMQTUzLMe7w8yolm0
-ByQwszH/kLzlFpoP23+z7Ns45NnqpVAi4VQ4QO1bm15BpBFDgYobnBX54NGQxX0c
-oD5u+ygGCw6Y+P0Ra11zF75gJ48ZaHSURITsTJQsH8CbxeEkNqKUKWaa/ldfloRP
-eBGMVI3rbcpV05YoDmHQulvYroHS+8PV0WDdgq6ILV247MBLNk0v7i+Uvad0Ur2z
-DEMgmp4MLa1rXYpIqbqQwP7M5IryQMsEbI/0aPzh5VVZCtcqK+2Ug4T4K6REmqNN
-Hg7TKb5QzLl0YdTKuWvgkpY4nU4+VAtfHyhHJZjDljHMduX8CLT8g3BBf/lHoRHu
-UkeSBKcnKpEHZHnyU6AOaPpkAa3MFr+4Hb5S3th10XTvrQX9iOOZATniHBJrpJv2
-/k8VW0SEDT87B3LAKtvkfKPhL0Soo2uOwpNlg1oADVQxhj5f4Np+AQ6/gUx8plg8
-hz6S6w1aQSGdLr48cQLwPgMwdV3VXTZqcxqVGaLZ+JszOu3eBoEr92mOtbVwnbPS
-uF4BsS+bVe1OGjU4YJ0A65c4r8vrAN4ml9iJLfHudAlFlO3rb1S2dev7+1SyPNmx
-Z6gJxxhzmB2NwfKKlVJUS9h2G82gw9P8U5JUSGugkhzAO62zz0c=
-=MxZ9
------END PGP SIGNATURE-----
-
---RASg3xLB4tUQ4RcS--
 
