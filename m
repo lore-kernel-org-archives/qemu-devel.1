@@ -4,79 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DC1C2BA1B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D85AC2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:12:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8E67206B8
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 534BF206B8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:12:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b22dpc9P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8E67206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DgPdyyIL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 534BF206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLWDk-0002DS-QI
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:11:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36367)
+	id 1jLWEd-0004GK-EH
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:12:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrF-0002HM-4g
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:31 -0400
+ id 1jLVrk-00034O-Sf
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrD-0003FG-PW
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:25 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:37124)
+ id 1jLVrj-0003bc-U2
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:56 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:45404)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrD-000384-Ij; Mon, 06 Apr 2020 13:48:23 -0400
-Received: by mail-wm1-x329.google.com with SMTP id j19so224074wmi.2;
- Mon, 06 Apr 2020 10:48:22 -0700 (PDT)
+ id 1jLVrj-0003ak-OB
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:55 -0400
+Received: by mail-wr1-x435.google.com with SMTP id v5so450175wrp.12
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 10:48:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=LZt0wKgOcXbd9J2Y1x7+Xq5w37mnJzb6ovGxsczGG64=;
- b=b22dpc9P0WfFSNzqmIIOCXA5j3SBgFlX8kq3DgEjbyVRZ8ab+WAskuZKaX2KGJrDLi
- 1ExUViGINuZ8wSAaG3bsdI4Qf2xLPYPAYtKbx2Ck8bI55nvlbpZFHWxggyqaEsc/B6Tx
- Az0ZZtZkK5shftM30BXtxoW3XJNu3kDjtdBv9uE0NZTpHwLXWM7hXbROSp1jTv1sFmY7
- Z+mQGb197/FlpeQAhw53ngaherhWtKlj6P1Q4JZij8cptwHc25grvofEODCHBALPRy74
- oiUSsvpP1JR2INFgYeHkNXldxDy8uwJftZN1sV5q42oQvzzAPAfzKndPrLkGSDp4lFLU
- bIZg==
+ bh=c5He7hEp7NEVkCGvyJyOgJeDmrKWTNpgA0M1S3kv/iE=;
+ b=DgPdyyILCTII19Pdnt7fkE4YNz7OZ5pbV7/56q/ppvIZNCIUPJEuU0iAR3bLl5JkNt
+ vh5dCaMLkqTwE8tWhKDeb6rPSs+nClh0FbPweTghJlUVi/DOnAoRVgcPleB1wRR8Fxur
+ CIdCyeWNtlSzII9ItYRVFUSDfj7mo3nVez5ldaTJBXHIoZdj+0RjE9wVfjxmSIUrvsgt
+ QGomxAwpKVyFyzg4uhzZJj3+Q5WC25US6ZzHmZfW6/4W6MQqAHkAAzgbAnxmMa0wi1LM
+ L+jjJ02J5f4zgVOr3EYwCQOKbv9vO1RtvW+tajtwV2qNVUbpFmZqMvF7RpowlKIWli6i
+ AU3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=LZt0wKgOcXbd9J2Y1x7+Xq5w37mnJzb6ovGxsczGG64=;
- b=bw1LJ4z8TrGtW2cYShyN9C9NT+XoT2MnJ7NnBJeSH4tqT12ePb8HBRO87A4JVGIcWr
- ITN9iJS4jCtwxeGrZIKPIwXXL+TkaWl84AaHVYxbAu6RnQfOtD+3Kt5mQCwkcfT6oft7
- Ppxz2XZM2jX25hU++x2xmNfn/mPFl9CxildemH5VtD6FufMl6BybY9PGhy4kljJug3pj
- 1d9wPlPHzauKWG5XRQs+LQFywptzgmwBhDWS8KXVYQ5CeP8tH+bEnlz5t9Baf7DretL0
- Zgsp0TtOS1k/8gznFphKvYo2ePOmQuTT3+Y/RZPMa3GPpBCMp0KT0CKDSYzLzQ/m0j5G
- kJzA==
-X-Gm-Message-State: AGi0PuaeF3oKVjMnpsPw+LL1yjSI2PtoZXtDl9Wz8ojqU9ORDzcDZMK2
- 6QHjLzh+C2igtimkMUu9/nWcHFEOd2s=
-X-Google-Smtp-Source: APiQypKWa/QU3mBr8qNVtZoW8/hCd3u7++648Q6PPb0tFKLlkmydTq29R5+wTNf/fBkbcBiEf5iVkw==
-X-Received: by 2002:a1c:e242:: with SMTP id z63mr205942wmg.72.1586195301541;
- Mon, 06 Apr 2020 10:48:21 -0700 (PDT)
+ bh=c5He7hEp7NEVkCGvyJyOgJeDmrKWTNpgA0M1S3kv/iE=;
+ b=pEBa91VlFetqPIEqbyjO5y4idxYtYGD99cUGLTIqV4h5Qi0QJSvaAqx3LLsxvs2E5f
+ JCx99gXw0s21cpyzYltPnPbdKIYA8Io5t66PK6eKsmkqJuv8M1fk9H4hC0E7fXjUo8hL
+ TNcrJhN5hUD3GQtC3tGXjnEqyFhcMCvx6T9pyZY3bhdNlHqlpUT9zD/WsHzl0mkZ0VaR
+ NAKGTfNR41Go98VW/IaBqF45hllEd6jmWrFGt1uvUxhRvWStNcZQsfazfNF3HRjfioKE
+ eW4MuRENXcyKf9t2MWvuY05gxiLE4zebqZvhn8slDQ9xAtHoad+cR/1aOWmNHU9q1PnE
+ rKyQ==
+X-Gm-Message-State: AGi0PuYYLPu8/IlvZriaBeo1pM/PfA+T/84GY5kw7aWZ5mOx1+scxc3+
+ zFvP+0Mcr/dFmMEbINU01qNc1KWYwp0=
+X-Google-Smtp-Source: APiQypK//AKIFXJDWLSisrWASMe4cOf4Ij3bf8dN8stlCKx2tBzLdj4R8lFfxWddnCJbScLWzdJ2Zg==
+X-Received: by 2002:a5d:4d51:: with SMTP id a17mr336013wru.317.1586195334556; 
+ Mon, 06 Apr 2020 10:48:54 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.20
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 10:48:20 -0700 (PDT)
+ Mon, 06 Apr 2020 10:48:54 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH-for-5.1 v2 26/54] hw/arm/fsl-imx: Add missing
+Subject: [PATCH-for-5.1 v2 47/54] hw/sd/milkymist-memcard: Add missing
  error-propagation code
-Date: Mon,  6 Apr 2020 19:47:15 +0200
-Message-Id: <20200406174743.16956-27-f4bug@amsat.org>
+Date: Mon,  6 Apr 2020 19:47:36 +0200
+Message-Id: <20200406174743.16956-48-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
 References: <20200406174743.16956-1-f4bug@amsat.org>
@@ -86,7 +87,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,11 +99,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- "open list:i.MX25 PDK" <qemu-arm@nongnu.org>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,76 +110,29 @@ Patch created mechanically by running:
 
   $ spatch \
     --macro-file scripts/cocci-macro-file.h --include-headers \
-    --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
-    --keep-comments --smpl-spacing --in-place --dir hw
+    --sp-file scripts/coccinelle/object_property_missing_error_propagate.cocci \
+    --keep-comments --smpl-spacing --dir hw
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/fsl-imx25.c |  6 +++++-
- hw/arm/fsl-imx6.c  | 18 +++++++++++++++---
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ hw/sd/milkymist-memcard.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 6f1a82ce3d..3d87fe867e 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -295,7 +295,11 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-         };
- 
-         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0, usb_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 6bf8aa0404..b3cef5bb57 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -359,7 +359,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-     /* USB */
-     for (i = 0; i < FSL_IMX6_NUM_USB_PHYS; i++) {
-         object_property_set_bool(OBJECT(&s->usbphy[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usbphy[i]), 0,
-                         FSL_IMX6_USBPHY1_ADDR + i * 0x1000);
-     }
-@@ -372,7 +376,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         };
- 
-         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0,
-                         FSL_IMX6_USBOH3_USB_ADDR + i * 0x200);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
-@@ -430,7 +438,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         };
- 
-         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0, FSL_IMX6_WDOGn_ADDR[i]);
-     }
+diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+index 926e1af475..87294c1b71 100644
+--- a/hw/sd/milkymist-memcard.c
++++ b/hw/sd/milkymist-memcard.c
+@@ -280,6 +280,10 @@ static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+     blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
+     carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+     qdev_prop_set_drive(carddev, "drive", blk, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+     if (err) {
+         error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
 -- 
 2.21.1
 
