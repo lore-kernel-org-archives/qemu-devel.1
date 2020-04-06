@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2C8C2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DBDC2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:05:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30CB52064A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:04:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A8F22064A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:05:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GG0uoRxU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30CB52064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOTaXd6c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A8F22064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLW70-0005Lw-AK
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:04:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36378)
+	id 1jLW7k-0006t3-Cr
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:05:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36326)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrF-0002IU-VO
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:27 -0400
+ id 1jLVrA-0002Bh-K8
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrE-0003FW-JW
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:25 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:37071)
+ id 1jLVr9-00033M-AU
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:20 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35064)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrE-0003Ch-2u; Mon, 06 Apr 2020 13:48:24 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id w10so515426wrm.4;
- Mon, 06 Apr 2020 10:48:23 -0700 (PDT)
+ id 1jLVr9-00030u-34; Mon, 06 Apr 2020 13:48:19 -0400
+Received: by mail-wm1-x344.google.com with SMTP id i19so335183wmb.0;
+ Mon, 06 Apr 2020 10:48:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=iPAKPkoi+HJFf28A5mZBn3JxaePmMb+vKpWg/g7b+Dc=;
- b=GG0uoRxUc8+VfK7SEVrlqHXsr7G6RT3PJlLFsn6OGv/t2KmIJPUbKP/whI/BTlWqnO
- 1qxz/Itc2t7BK9pKeOkjDP+OZrLaapNGCwHA2LWy/q7G8PV+V9vh/ic3XmnYhJffKiaT
- WcrXEmAzgarapZSoF3Hq6rr0y+94bE4CCk0/sQxjYEiEWy2AEC20KzoHLOm7p+O31bW3
- gvAf4lEdziS8z4xnndf4riyap4R1nazyl4+x3ZF4swdiH8MEY8J80gN59vaQNPztuqVw
- b7j+75uDJrOCK+8cc8rgCX/ykrR3zAlhBgnNaxN71zsvGpAZUvWLzDAzvx6Oc8kT4TuH
- TMCg==
+ bh=aQ0X+HWMU9WGFg41OMAjP3yVb6N0PLiNzSrYmZnrIlE=;
+ b=WOTaXd6c0yFH3nRGwJqIsFagkG/NlFGCO7DTapLUpuB8LaGYgMpoSA/Ev1/6NUN+FX
+ z1bw38/aezftn+wQhL8wIh0rqSJmSSiCLusI8siyYDGD0K4nSfnCLbqoA+MxAGVkuYwW
+ qqzZJgo210pou7zm7hO8TyEnE4hGBAueHUAAYT86AJCuKqCPwH8ZU4NhXBzWG7+N1G6M
+ ymFRtLb3Gr+32RfzR9+iPB/zg3kfBGPUP4/OJMEhdtmgTFYcbjOzbRvZhUGGd7aYRx+E
+ hVg8rkzGC079C0yYFyeSIS8sREVqmzvCx3qDnmk5VSVeh5Crl366UWD5fiwyXCJJ83qQ
+ 6cHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=iPAKPkoi+HJFf28A5mZBn3JxaePmMb+vKpWg/g7b+Dc=;
- b=tkk1vMzhnrcwxlc7RqdW4nwmGGl1p0NryRgkJQ1gxTRuuB408VSipDDwM17WeSWqCR
- by0hR7aDGKBH18bUJNJvE4noeWSRgue2UYgPqNSUul5EtXROEakM1LPBJ3Ipp/DJQGk2
- mLHbnbLVhHxb+yFDkGPQea/0jdp/lXNek47CiMTXLmmXpga5Sa+vF3wbIq3eBbJQRLcq
- 42Ux/IKwedTJ6rdrRiZ6qr5ahE7QYVv08Mmhfmw93Z0Q4hvIOjJA4Fm2KW5LiJPSAyys
- HEE+tngv7fZNW14DKX0moee/Sg55dEKp7tehHnh9JlUcsVcR7UeM87GrYjS2d7BfsxXd
- m0vQ==
-X-Gm-Message-State: AGi0PuaLPg/+gvE1g3wRaaGwMONxLjG2ZRkc0gJZYQyYTgAzVpAodwUm
- jvwoUBgspUnU0Ki31aCQ+b9RbZT8Q74=
-X-Google-Smtp-Source: APiQypK7A9mPm3O15qzUuzUEuuvqsU2cICUP2VTTYb9l8/WD5tnJHA2Lz9vO3G/E/yYKIY/ZrZL7Lg==
-X-Received: by 2002:adf:a347:: with SMTP id d7mr350873wrb.21.1586195302796;
- Mon, 06 Apr 2020 10:48:22 -0700 (PDT)
+ bh=aQ0X+HWMU9WGFg41OMAjP3yVb6N0PLiNzSrYmZnrIlE=;
+ b=QJGxVClMvG7K2lAzFZ7U1gURrZ7FMlNNYLLaN223PAwFSWpghyJBz5BpSatvQzgiH/
+ JtDfS5hYTSRmzYWcQhtwj9++SuqdoKaTEYktTGPRvWhro8fcfjr11dVJR9TIKKW5sPPJ
+ U8wbuFzuu/VX9uafgos0f9O+5qQMiCRfRKf0Gx6an5vjtb4EYe7UFgCp9LbIgmATt4ps
+ Ra6q7elig7WVLbJEFlCzk4GgnmQZOyxnih52Oswwh9EOCoi1iLE07c9aQMZFMVt5TDzc
+ yL08KrtWBiPi+B6c2EJfoidOf0Z3aohumP5r/vRdZKMtvR9lv4CWrYwW4aBN4JvWotPd
+ E/DA==
+X-Gm-Message-State: AGi0PuaztUFxva73RbMTLeDa39ddnX6ivA2D/QjEP553bWuHDyriU6An
+ 1FiH4nFM8U+WUpIYtkjVHLOiZmA1GR4=
+X-Google-Smtp-Source: APiQypJVnY1Bhnwe9G/r2C1COEiB/B0AzO9H4ebeQzlrZvXb5tAJpTTQOHDEPyTUULcHFKsU31pcVw==
+X-Received: by 2002:a7b:c148:: with SMTP id z8mr475442wmi.31.1586195297775;
+ Mon, 06 Apr 2020 10:48:17 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.21
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 10:48:22 -0700 (PDT)
+ Mon, 06 Apr 2020 10:48:17 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH-for-5.1 v2 27/54] hw/arm/stm32f*05_soc: Add missing
- error-propagation code
-Date: Mon,  6 Apr 2020 19:47:16 +0200
-Message-Id: <20200406174743.16956-28-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v2 23/54] hw/riscv/sifive_u: Move some code from
+ realize() to init()
+Date: Mon,  6 Apr 2020 19:47:12 +0200
+Message-Id: <20200406174743.16956-24-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
 References: <20200406174743.16956-1-f4bug@amsat.org>
@@ -86,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,63 +100,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alistair Francis <alistair@alistair23.me>,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- "open list:STM32F205" <qemu-arm@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch created mechanically by running:
+Coccinelle reported:
 
-  $ spatch \
-    --macro-file scripts/cocci-macro-file.h --include-headers \
-    --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
-    --keep-comments --smpl-spacing --in-place --dir hw
+  $ spatch ... --timeout 60 --sp-file \
+    scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+  HANDLING: ./hw/riscv/sifive_u.c
+  >>> possible moves from riscv_sifive_u_soc_init() to riscv_sifive_u_soc_realize() in ./hw/riscv/sifive_u.c:473
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Move the calls using &error_abort which don't depend of input
+updated before realize() to init().
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/stm32f205_soc.c | 6 +++++-
- hw/arm/stm32f405_soc.c | 6 +++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ hw/riscv/sifive_u.c | 42 ++++++++++++++++++++++--------------------
+ 1 file changed, 22 insertions(+), 20 deletions(-)
 
-diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-index 76b0b0e9be..b1be4fde40 100644
---- a/hw/arm/stm32f205_soc.c
-+++ b/hw/arm/stm32f205_soc.c
-@@ -106,7 +106,11 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
-     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
-     qdev_prop_set_bit(armv7m, "enable-bitband", true);
-     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
--                                     "memory", &error_abort);
-+                                     "memory", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
-index 4f10ce6176..2b8a84a695 100644
---- a/hw/arm/stm32f405_soc.c
-+++ b/hw/arm/stm32f405_soc.c
-@@ -121,7 +121,11 @@ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
-     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
-     qdev_prop_set_bit(armv7m, "enable-bitband", true);
-     object_property_set_link(OBJECT(&s->armv7m), OBJECT(system_memory),
--                                     "memory", &error_abort);
-+                                     "memory", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 96177c1977..7bf1f30a35 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -406,6 +406,8 @@ static void riscv_sifive_u_init(MachineState *machine)
+ static void riscv_sifive_u_soc_init(Object *obj)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
++    const struct MemmapEntry *memmap = sifive_u_memmap;
++    MemoryRegion *system_memory = get_system_memory();
+     SiFiveUSoCState *s = RISCV_U_SOC(obj);
+ 
+     object_initialize_child(obj, "e-cluster", &s->e_cluster,
+@@ -443,6 +445,26 @@ static void riscv_sifive_u_soc_init(Object *obj)
+                           TYPE_CADENCE_GEM);
+     object_property_set_int(OBJECT(&s->gem), GEM_REVISION, "revision",
+                             &error_abort);
++
++    /* boot rom */
++    memory_region_init_rom(&s->mask_rom, obj, "riscv.sifive.u.mrom",
++                           memmap[SIFIVE_U_MROM].size, &error_fatal);
++    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
++                                &s->mask_rom);
++
++    /*
++     * Add L2-LIM at reset size.
++     * This should be reduced in size as the L2 Cache Controller WayEnable
++     * register is incremented. Unfortunately I don't see a nice (or any) way
++     * to handle reducing or blocking out the L2 LIM while still allowing it
++     * be re returned to all enabled after a reset. For the time being, just
++     * leave it enabled all the time. This won't break anything, but will be
++     * too generous to misbehaving guests.
++     */
++    memory_region_init_ram(&s->l2lim_mem, NULL, "riscv.sifive.u.l2lim",
++                           memmap[SIFIVE_U_L2LIM].size, &error_fatal);
++    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_L2LIM].base,
++                                &s->l2lim_mem);
+ }
+ 
+ static bool sifive_u_get_start_in_flash(Object *obj, Error **errp)
+@@ -500,26 +522,6 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+     object_property_set_bool(OBJECT(&s->u_cluster), true, "realized",
+                              &error_abort);
+ 
+-    /* boot rom */
+-    memory_region_init_rom(&s->mask_rom, OBJECT(dev), "riscv.sifive.u.mrom",
+-                           memmap[SIFIVE_U_MROM].size, &error_fatal);
+-    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
+-                                &s->mask_rom);
+-
+-    /*
+-     * Add L2-LIM at reset size.
+-     * This should be reduced in size as the L2 Cache Controller WayEnable
+-     * register is incremented. Unfortunately I don't see a nice (or any) way
+-     * to handle reducing or blocking out the L2 LIM while still allowing it
+-     * be re returned to all enabled after a reset. For the time being, just
+-     * leave it enabled all the time. This won't break anything, but will be
+-     * too generous to misbehaving guests.
+-     */
+-    memory_region_init_ram(&s->l2lim_mem, NULL, "riscv.sifive.u.l2lim",
+-                           memmap[SIFIVE_U_L2LIM].size, &error_fatal);
+-    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_L2LIM].base,
+-                                &s->l2lim_mem);
+-
+     /* create PLIC hart topology configuration string */
+     plic_hart_config_len = (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1) *
+                            ms->smp.cpus;
 -- 
 2.21.1
 
