@@ -7,93 +7,95 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E21BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D35CC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:56:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16CAD206F5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:55:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27DAA206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:56:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xKN+2vBv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16CAD206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IoW6sL5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27DAA206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOTw-00017Y-8s
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:55:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44899)
+	id 1jLOUC-0001p4-86
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:56:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIE-0005aZ-A7
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:47 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGu-0002Te-Cu
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIC-0003Z0-Qy
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:46 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:36206)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGs-0002On-S0
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:24 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:45710)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOIC-0003Y4-If
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:44 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dtf4089528;
- Mon, 6 Apr 2020 09:43:37 GMT
+ id 1jLOGs-0002O1-IY
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:22 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369eShA070136;
+ Mon, 6 Apr 2020 09:42:16 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=vo9XVqRjUwLdxamis5vtm7R1B8Mjc6k73iBRSiBen4E=;
- b=xKN+2vBvhNqIovOWgZc830JzkIabzB6WoCHUoaeutPeHsL5IWqrnGFv+J9SlqAEuPyy1
- 1L33ZlWCiWL8xn6olSL8hx58vtq8II7uGGTl+T1X7/XjG05cRAmqFFVbdPZzcHrwfoar
- GrBHFETFrK3WVCD5EaJncMV0tv0ko4eSGmZSDECjs5zE7hBojj5AwfzFOmMYaOaN54OW
- YG+W5TlH+rIjqu4HkD1QWVH/7ppRDtAZpRxiBBmmK4jkrmZtINakRNeL4WrgupU0oeJq
- NiWETFcpjXycqYO9/9/yJsYfnjyrwHxWZg+CiRv966hVJJBdQuDKE0j12iLzDFKqkHwF 6A== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2130.oracle.com with ESMTP id 306hnqwu5g-1
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=9VdQsRUWq0Hfr/+CgqCStzC0T+lowcu05EYYWMkJqP8=;
+ b=IoW6sL5pbl8IYWar/gf5+TUaWxhUldFbkxnI20I9ixbeIHUPsx5/Oz0dAXWKoUS7TDXV
+ 1Y5qAzR2KRipvZZFUuIlV9XMiDbDUp8cnyShv28aSoneCW2b9DFW6J/ELqmHru03Hvbt
+ IFzIPqMMN/WHsxFEUq+9m7AAA6hR2iYzWu9LRm84p9O0pmEPvfxcJvxEQmFhK3cyIM7b
+ 65CoNRVtwcMRixyD3RAkxMyrAm1FzX/Q3Gc4rCDD3YFuTb9uz6D5LHpAuP3N+ubKZXt9
+ ADtsJ4iDmeTQJnB2ymOxflkHp77Rp2c1NOzLoHUeD1gu+EwYCCRWitrqHr1ACYbyvCdV Cg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 306j6m5tc2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:43:37 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369bLHC056293;
- Mon, 6 Apr 2020 09:41:37 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 3073qcnbwu-1
+ Mon, 06 Apr 2020 09:42:16 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369ch94092251;
+ Mon, 6 Apr 2020 09:42:16 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 3073spk6gt-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:41:37 +0000
+ Mon, 06 Apr 2020 09:42:16 +0000
 Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369fZbY013461;
- Mon, 6 Apr 2020 09:41:35 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369gFqj032026;
+ Mon, 6 Apr 2020 09:42:15 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:41:34 -0700
+ with ESMTP ; Mon, 06 Apr 2020 02:42:15 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 02/36] multi-process: Refactor machine_init and exit
- notifiers
-Date: Mon,  6 Apr 2020 02:40:52 -0700
-Message-Id: <a390c0cab4aca444ed4e2bde3bdb2a8e39fbec0d.1586165555.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v6 26/36] multi-process: add parse_cmdline in remote process
+Date: Mon,  6 Apr 2020 02:41:16 -0700
+Message-Id: <620dba4d6247004dadb2202a58d0d6e2765e417e.1586165556.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxscore=0 mlxlogscore=999
- spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ phishscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 adultscore=0 bulkscore=0 mlxlogscore=999
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004060083
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- phishscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=1
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060083
+ mlxlogscore=999 spamscore=0
+ priorityscore=1501 suspectscore=1 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060083
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ 0369eShA070136
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,212 +121,206 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Relocate machine_int and exit notifiers into common code
-
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 ---
- Makefile.objs             |  1 +
- include/sysemu/sysemu.h   |  2 ++
- softmmu/vl.c              | 40 -----------------------
- stubs/machine-init-done.c | 12 +++++++
- util/machine-notify.c     | 67 +++++++++++++++++++++++++++++++++++++++
- 5 files changed, 82 insertions(+), 40 deletions(-)
- create mode 100644 util/machine-notify.c
+ MAINTAINERS          |  2 ++
+ remote/Makefile.objs |  1 +
+ remote/remote-main.c | 20 +++++++++++-
+ remote/remote-opts.c | 75 ++++++++++++++++++++++++++++++++++++++++++++
+ remote/remote-opts.h | 15 +++++++++
+ 5 files changed, 112 insertions(+), 1 deletion(-)
+ create mode 100644 remote/remote-opts.c
+ create mode 100644 remote/remote-opts.h
 
-diff --git a/Makefile.objs b/Makefile.objs
-index a7c967633a..bfb9271862 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -79,6 +79,7 @@ qemu-seccomp.o-libs := $(SECCOMP_LIBS)
- common-obj-$(CONFIG_FDT) += device_tree.o
- 
- common-obj-y += qapi/
-+common-obj-y += util/machine-notify.o
- 
- endif # CONFIG_SOFTMMU
- 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index ef81302e1a..2438dd7bea 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -17,11 +17,13 @@ extern bool qemu_uuid_set;
- 
- void qemu_add_exit_notifier(Notifier *notify);
- void qemu_remove_exit_notifier(Notifier *notify);
-+void qemu_run_exit_notifiers(void);
- 
- extern bool machine_init_done;
- 
- void qemu_add_machine_init_done_notifier(Notifier *notify);
- void qemu_remove_machine_init_done_notifier(Notifier *notify);
-+void qemu_run_machine_init_done_notifiers(void);
- 
- extern int autostart;
- 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 814537bb42..380aefd56e 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -173,12 +173,6 @@ int icount_align_option;
- QemuUUID qemu_uuid;
- bool qemu_uuid_set;
- 
--static NotifierList exit_notifiers =
--    NOTIFIER_LIST_INITIALIZER(exit_notifiers);
--
--static NotifierList machine_init_done_notifiers =
--    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
--
- bool xen_allowed;
- uint32_t xen_domid;
- enum xen_mode xen_mode = XEN_EMULATE;
-@@ -2326,21 +2320,6 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
-     return mc;
- }
- 
--void qemu_add_exit_notifier(Notifier *notify)
--{
--    notifier_list_add(&exit_notifiers, notify);
--}
--
--void qemu_remove_exit_notifier(Notifier *notify)
--{
--    notifier_remove(notify);
--}
--
--static void qemu_run_exit_notifiers(void)
--{
--    notifier_list_notify(&exit_notifiers, NULL);
--}
--
- static const char *pid_file;
- static Notifier qemu_unlink_pidfile_notifier;
- 
-@@ -2353,25 +2332,6 @@ static void qemu_unlink_pidfile(Notifier *n, void *data)
- 
- bool machine_init_done;
- 
--void qemu_add_machine_init_done_notifier(Notifier *notify)
--{
--    notifier_list_add(&machine_init_done_notifiers, notify);
--    if (machine_init_done) {
--        notify->notify(notify, NULL);
--    }
--}
--
--void qemu_remove_machine_init_done_notifier(Notifier *notify)
--{
--    notifier_remove(notify);
--}
--
--static void qemu_run_machine_init_done_notifiers(void)
--{
--    machine_init_done = true;
--    notifier_list_notify(&machine_init_done_notifiers, NULL);
--}
--
- static const QEMUOption *lookup_opt(int argc, char **argv,
-                                     const char **poptarg, int *poptind)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 21fbf9a0f0..2a0fd65f7a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2832,6 +2832,8 @@ F: include/hw/proxy/memory-sync.h
+ F: hw/proxy/memory-sync.c
+ F: include/remote/iohub.h
+ F: remote/iohub.c
++F: remote/remote-opts.h
++F: remote/remote-opts.c
+=20
+ Build and test automation
+ -------------------------
+diff --git a/remote/Makefile.objs b/remote/Makefile.objs
+index cbb3065b69..f8d58d09e6 100644
+--- a/remote/Makefile.objs
++++ b/remote/Makefile.objs
+@@ -1,4 +1,5 @@
+ remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote-main.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote-opts.o
+ remote-pci-obj-$(CONFIG_MPQEMU) +=3D pcihost.o
+ remote-pci-obj-$(CONFIG_MPQEMU) +=3D machine.o
+ remote-pci-obj-$(CONFIG_MPQEMU) +=3D iohub.o
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index d249eba9e8..a0892c05b6 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -24,6 +24,7 @@
+ #include "io/mpqemu-link.h"
+ #include "qapi/error.h"
+ #include "qemu/main-loop.h"
++#include "qemu/cutils.h"
+ #include "sysemu/cpus.h"
+ #include "qemu-common.h"
+ #include "hw/pci/pci.h"
+@@ -36,6 +37,7 @@
+ #include "exec/memattrs.h"
+ #include "exec/address-spaces.h"
+ #include "remote/iohub.h"
++#include "remote-opts.h"
+=20
+ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+                         MPQemuChannel *chan);
+@@ -262,6 +264,7 @@ finalize_loop:
+ int main(int argc, char *argv[])
  {
-diff --git a/stubs/machine-init-done.c b/stubs/machine-init-done.c
-index cd8e81392d..fc8be8cead 100644
---- a/stubs/machine-init-done.c
-+++ b/stubs/machine-init-done.c
-@@ -3,6 +3,18 @@
- 
- bool machine_init_done = true;
- 
-+static NotifierList machine_init_done_notifiers =
-+    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
+     Error *err =3D NULL;
++    int fd =3D -1;
+=20
+     module_call_init(MODULE_INIT_QOM);
+=20
+@@ -280,13 +283,28 @@ int main(int argc, char *argv[])
+=20
+     current_machine =3D MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MA=
+CHINE)));
+=20
++    qemu_add_opts(&qemu_device_opts);
++    qemu_add_opts(&qemu_drive_opts);
++    qemu_add_drive_opts(&qemu_legacy_drive_opts);
++    qemu_add_drive_opts(&qemu_common_drive_opts);
++    qemu_add_drive_opts(&qemu_drive_opts);
++    qemu_add_drive_opts(&bdrv_runtime_opts);
 +
- void qemu_add_machine_init_done_notifier(Notifier *notify)
- {
- }
+     mpqemu_link =3D mpqemu_link_create();
+     if (!mpqemu_link) {
+         printf("Could not create MPQemu link\n");
+         return -1;
+     }
+=20
+-    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, STDIN_FILENO);
++    fd =3D qemu_parse_fd(argv[1]);
++    if (fd =3D=3D -1) {
++        printf("Failed to parse fd for remote process.\n");
++        return -EINVAL;
++    }
 +
-+void qemu_remove_machine_init_done_notifier(Notifier *notify)
-+{
-+}
++    parse_cmdline(argc - 2, argv + 2, NULL);
 +
-+void qemu_run_machine_init_done_notifiers(void)
-+{
-+    notifier_list_notify(&machine_init_done_notifiers, NULL);
-+}
-diff --git a/util/machine-notify.c b/util/machine-notify.c
++    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, fd);
+=20
+     mpqemu_link_set_callback(mpqemu_link, process_msg);
+=20
+diff --git a/remote/remote-opts.c b/remote/remote-opts.c
 new file mode 100644
-index 0000000000..63fc59a5a6
+index 0000000000..cb7837bf13
 --- /dev/null
-+++ b/util/machine-notify.c
-@@ -0,0 +1,67 @@
++++ b/remote/remote-opts.c
+@@ -0,0 +1,75 @@
 +/*
-+ * Machine notifiers.
++ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
 + *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/notify.h"
-+#include "sysemu/sysemu.h"
++#include "qemu-common.h"
 +
-+static NotifierList machine_init_done_notifiers =
-+    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
++#include "hw/boards.h"
++#include "sysemu/blockdev.h"
++#include "qapi/error.h"
++#include "qemu-options.h"
++#include "qemu-parse.h"
++#include "remote-opts.h"
 +
-+static NotifierList exit_notifiers =
-+    NOTIFIER_LIST_INITIALIZER(exit_notifiers);
-+
-+void qemu_add_machine_init_done_notifier(Notifier *notify)
++/*
++ * In remote process, we parse only subset of options. The code
++ * taken from vl.c to re-use in remote command line parser.
++ */
++void parse_cmdline(int argc, char **argv, char **envp)
 +{
-+    notifier_list_add(&machine_init_done_notifiers, notify);
-+    if (machine_init_done) {
-+        notify->notify(notify, NULL);
++    int optind;
++    const char *optarg;
++    MachineClass *mc;
++
++    /* from vl.c */
++    optind =3D 0;
++
++    /* second pass of option parsing */
++
++    for (;;) {
++        if (optind >=3D argc) {
++            break;
++        }
++        if (argv[optind][0] !=3D '-') {
++            loc_set_cmdline(argv, optind, 1);
++            drive_add(IF_DEFAULT, 0, argv[optind++], HD_OPTS);
++        } else {
++            const QEMUOption *popt;
++
++            popt =3D lookup_opt(argc, argv, &optarg, &optind);
++            #ifndef REMOTE_PROCESS
++            if (!(popt->arch_mask & arch_type)) {
++                error_report("Option not supported for this target,"
++                             " %x arch_mask, %x arch_type",
++                             popt->arch_mask, arch_type);
++                exit(1);
++            }
++            #endif
++            switch (popt->index) {
++            case QEMU_OPTION_drive:
++                if (drive_def(optarg) =3D=3D NULL) {
++                    fprintf(stderr, "Could not init drive\n");
++                    exit(1);
++                }
++                break;
++            default:
++                break;
++            }
++        }
 +    }
-+}
++    mc =3D MACHINE_GET_CLASS(current_machine);
 +
-+void qemu_remove_machine_init_done_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
++    mc->block_default_type =3D IF_IDE;
++    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
++                          &mc->block_default_type, &error_fatal)) {
++        /* We printed help */
++        exit(0);
++    }
 +
-+void qemu_run_machine_init_done_notifiers(void)
-+{
-+    machine_init_done = true;
-+    notifier_list_notify(&machine_init_done_notifiers, NULL);
++    return;
 +}
+diff --git a/remote/remote-opts.h b/remote/remote-opts.h
+new file mode 100644
+index 0000000000..263d428060
+--- /dev/null
++++ b/remote/remote-opts.h
+@@ -0,0 +1,15 @@
++/*
++ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
-+void qemu_add_exit_notifier(Notifier *notify)
-+{
-+    notifier_list_add(&exit_notifiers, notify);
-+}
++#ifndef REMOTE_OPTS_H
++#define REMOTE_OPTS_H
 +
-+void qemu_remove_exit_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
++void parse_cmdline(int argc, char **argv, char **envp);
 +
-+void qemu_run_exit_notifiers(void)
-+{
-+    notifier_list_notify(&exit_notifiers, NULL);
-+}
--- 
++#endif
++
+--=20
 2.25.GIT
 
 
