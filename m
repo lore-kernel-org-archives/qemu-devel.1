@@ -1,114 +1,101 @@
 Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD739C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:54:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 348F3C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 15:03:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92E0924682
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:54:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB4A42487B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 15:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lI7B3VhJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E0924682
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mf5GV3eo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB4A42487B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLT8S-0003vQ-Nu
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 10:54:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36260)
+	id 1jLTHj-0008Sy-4d
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 11:03:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39057)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jLT7c-0003Ov-IB
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:53:10 -0400
+ (envelope-from <philmd@redhat.com>) id 1jLTGb-0007N4-Ex
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 11:02:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jLT7Y-0008WS-Ux
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:53:06 -0400
-Received: from mail-eopbgr60094.outbound.protection.outlook.com
- ([40.107.6.94]:62526 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jLT7Y-0008Uj-DA; Mon, 06 Apr 2020 10:53:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k3onTo2ZZXEsfMvC5WfI3x2LcpKgIlbeR8l+LkRJH2sGg35AZfUpkfGeCzNRPZK+hZN/4wMkEgXfEEoisqbqOLkhhGKarCdO3COeM+OwLh59TseQcvLR/chzjqhNRm6Tt/WUaBVcLPet7g78TVzzFITM49TrgRwB+MJLoEUfDr6g69EOJRfqzMDBi/lCju1H8pVMfRYSUZnPk0abE9aiJ7SvoyMBS5EUcMA6oLq0yR6kpY3655IrpQQY5xCh1nwISM8LBsiD1Kdp3I/vA9yc6X+lVfLkmE2ktZut+t4cG7dPsy0I7Wcenx17jzeJCCX7YJwsj9YvkpA/ETASN8fGpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pj7hBRD17oWjVX/h3D7vAwuKw7wLitN1l7bI0v+3lLw=;
- b=gJ8rnAk6tbNYnKUsGu2nl5xszw94iY/P75Bjg8+w74TQWoH9owU+y+uGOg5JF8xnKeK7ivlL81sFDv/LTGFJh+KhOWKf2BZFOgoXmEg0hyZyQ0CPcEpXOaa6SZlXicXyXwc3kfN6c3Oo2kiylNcR1aTCfiiyv2hb/i+9WVzMTwj+yUrO8CkPyt+esXBpzK8LngkQFOeeOHKpzqj9dN+XB6922SrOq8cEGi+ArW+HW53bdHaqK56gUyfZmsHBd9TbZHgLN3ctWDcXzJmngGcjlUCDsx2gddWUnCAxVzDUgWXCU9t7U37GIMNwjMeJvBjR5kCRokfQa8N/sIRNeTFhLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pj7hBRD17oWjVX/h3D7vAwuKw7wLitN1l7bI0v+3lLw=;
- b=lI7B3VhJpkplcSkHa7bXqBiLo5LkilJYwlhmZHm/QItUW9+h1MR/jIybdnU2Z83KgomFa7dgxs3x9eiW3Bbey23RQaQZ6cGMvCZ2xM4zqfwomilLp8WlzCNKNLFh34HetHCSFArywbWbi4Tzg4KrR+zQa/zo6mJZQibGwwyrTA4=
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
- AM6PR08MB5208.eurprd08.prod.outlook.com (10.255.122.155) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.21; Mon, 6 Apr 2020 14:53:00 +0000
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::41e2:2f20:9b54:a0f5]) by AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::41e2:2f20:9b54:a0f5%7]) with mapi id 15.20.2878.017; Mon, 6 Apr 2020
- 14:53:00 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v2] qcow2: Check request size in
- qcow2_co_pwritev_compressed_part()
-Thread-Topic: [PATCH v2] qcow2: Check request size in
- qcow2_co_pwritev_compressed_part()
-Thread-Index: AQHWDCB88p2wqMkMHkKOqJjxfSztq6hsLbgO
-Date: Mon, 6 Apr 2020 14:52:59 +0000
-Message-ID: <AM6PR08MB5048AE188B78CD18B53DF0C9F4C20@AM6PR08MB5048.eurprd08.prod.outlook.com>
-References: <20200406143401.26854-1-berto@igalia.com>
-In-Reply-To: <20200406143401.26854-1-berto@igalia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-originating-ip: [109.252.115.13]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7b34ee1b-5d0d-451f-7367-08d7da3a3359
-x-ms-traffictypediagnostic: AM6PR08MB5208:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB52083E5D39B982F79B1A8CF0F4C20@AM6PR08MB5208.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1265;
-x-forefront-prvs: 0365C0E14B
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB5048.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(366004)(376002)(396003)(39840400004)(346002)(136003)(66556008)(64756008)(66446008)(66946007)(66476007)(76116006)(2906002)(33656002)(6506007)(7696005)(478600001)(4744005)(44832011)(110136005)(54906003)(316002)(26005)(53546011)(55016002)(8676002)(8936002)(9686003)(4326008)(81156014)(81166006)(19627405001)(5660300002)(71200400001)(107886003)(52536014)(86362001)(186003);
- DIR:OUT; SFP:1102; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rSSBfwkZT7IK5GOZtyN8sJtiDPs39IvD3uY+FN05RlIy2gVr1m9/pMhYW2xEWAQce2XI0saRXmno7J9hwBfAJOjJ4ToUm60uxyW/mXlkb10OyR2bhxR43dTZ8ZiBL1uhABGfjJpoyVDh/QljlTv1VCul1IHoVUEzU0JMQxyxREEfTg90fRkN/eKhqZFix3jkyxmQFqPwU0Murr6jsm+M7ikJvV1JIpKt+VwGQWDqHJZkRZmBcn+NZlxcKJ3rAurUslWamunauAlLlwVUPQERF31wVHm7OQZLxu47VDY5A9Ern1nBNyrgczVOe2EvG3WBKFN/1gtMto5W/XxoSGGj3CLuQHdctJiSC7xeCIEaqMMxxgbM3ZfSAP0fc5wGytBG/xdVaqQhu5EpvnTtBSHipdutpg2IpWdnTPNmGbnJLgdZCIwa0iV5XILfv3Jw3cph
-x-ms-exchange-antispam-messagedata: Z7Jqs1w4vbmoKBtqXmamgD7nYeEmT9AkjSeX3QWA+t7y1jsDxPX0z2RTJgWXmNshqR+x2olzVsJRsOeMtYmQhQrZLc5gymRcZU4Gp54DRpP/H9fbek8budgDxCFppjwJB8P0oQlZcIWBgS7XhpYr7w==
-Content-Type: multipart/alternative;
- boundary="_000_AM6PR08MB5048AE188B78CD18B53DF0C9F4C20AM6PR08MB5048eurp_"
+ (envelope-from <philmd@redhat.com>) id 1jLTGa-00013N-Hm
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 11:02:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20094
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jLTGa-00012Y-Ec
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 11:02:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586185343;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u/QvjZ9C+nmXyzkOZSsLODxrOi0SdWLy+49O50pCH/Q=;
+ b=Mf5GV3eoNsPkFUmzIvry49YYCXL+tpV8rc0eQTYvp+MuQVyqrMTAuN44Ma7q5F8pmQ2OM+
+ ZHYX3hwGXmS+9w+8h7ekKH0uVAjHucVL/CWgEM5+wpN0l4VagdIb+IBZpikROkvdTzeSfJ
+ RUDp/0N23LTgjiwHQggEvS9QxjrxwzY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-_CpqQcfHNvyQaYsltY5hiw-1; Mon, 06 Apr 2020 11:02:19 -0400
+X-MC-Unique: _CpqQcfHNvyQaYsltY5hiw-1
+Received: by mail-wr1-f71.google.com with SMTP id u16so8533661wrp.14
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 08:02:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3kt479g2qduZv3XAJABz7A0PKnNGh0ECW6vK+JW6CZU=;
+ b=kjQnVgU6UME94KdljorKHSctcfob3RU4GDg4VS2MLyKUy9u+hOr/uo8l7uIyTGZn9+
+ 0vs4XEZuG2zUMM1sI8CIErLh5TiA1qvnqNzCcwEEwF9MwHXR9KT/d9wwIMrIBPQsGljE
+ 4sEGb5sEdz/XF4QT0O/ot++eeBOEcUbTUjGzOTz6J+BioX3PvXhGtBiltuixHMLU/1Ce
+ zaJICjP8G6fXAxzR4Ve7qmJUjmcxUrZD3FoaxYtX03K9+HoSaNVPbLk4vAAmlYfenDgp
+ i4FGFw2IXdAfrgLNSRwRy9vRwxXiieZkJmc8FsefZr7bo8737ZpPhq60Zl6CGlG1VZBB
+ RBgA==
+X-Gm-Message-State: AGi0PuZZDRfrX5hZKww2cDQAiF7lLzSyhGH35GGi5gr4Lqf9yQxY6vGn
+ 8iqcqBijgCyKALnPRPfx2d5gqqoLLAMW2x0csx3elxhaH3epaAhP7fPw9UgKY7pVDN+IVTKp3NR
+ 2AzoAHGXKbYbzpAE=
+X-Received: by 2002:a5d:68ca:: with SMTP id p10mr12250332wrw.7.1586185338420; 
+ Mon, 06 Apr 2020 08:02:18 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLzhOWjgnc14RDAdNXci7LQmORhq6n5B5hrsAdHyvTNcxY88bgW2c8t+Ulmv57XOXF/vhhMSw==
+X-Received: by 2002:a5d:68ca:: with SMTP id p10mr12250307wrw.7.1586185338181; 
+ Mon, 06 Apr 2020 08:02:18 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id b66sm4700900wmh.12.2020.04.06.08.02.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Apr 2020 08:02:17 -0700 (PDT)
+Subject: Re: QEMU participation to Google Season of Docs
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <de92e66d-c474-dd1b-ddab-194b2f92d1dd@redhat.com>
+ <36614289-5498-7a78-5f8e-1b4da84261ad@redhat.com>
+ <20200402090654.GB28280@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <839ff011-b06a-c13f-1af9-9b19db4b8888@redhat.com>
+Date: Mon, 6 Apr 2020 17:02:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b34ee1b-5d0d-451f-7367-08d7da3a3359
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Apr 2020 14:52:59.9623 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Q2aJqJiXEFr8YkFleEdbi1MHWEAzwNRDfGV8kn3z44LNUUE3b9NiqvkznVAyM712RqmMEKY+S28cqfUOQ4bxgwiHFFnns7XSVhrV6cFaHoE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5208
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.94
+In-Reply-To: <20200402090654.GB28280@stefanha-x1.localdomain>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,75 +107,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-discuss@nongnu.org, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_AM6PR08MB5048AE188B78CD18B53DF0C9F4C20AM6PR08MB5048eurp_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On 4/2/20 11:06 AM, Stefan Hajnoczi wrote:
+> On Wed, Apr 01, 2020 at 06:46:02PM +0200, Paolo Bonzini wrote:
+>> On 01/04/20 18:37, Philippe Mathieu-Daud=E9 wrote:
+>>>
+>>> * Refactor the open source project's existing documentation to
+>>>  =A0 provide an improved user experience or a more accessible
+>>>  =A0 information architecture.
+>>
+>> This kind of project would be indeed very suitable to QEMU.  Stefan,
+>> perhaps you could help by providing the text for our Summer of Code
+>> submission?
+>=20
+> Philippe, would you like to be the Google Season of Docs administrator
+> for QEMU?  I don't have enough bandwidth to be involved myself.
 
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Thankfully my manager approved this, so I'm in :)
 
-________________________________
-From: Alberto Garcia <berto@igalia.com>
-Sent: Monday, April 6, 2020 5:34 PM
-To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
-Cc: Alberto Garcia <berto@igalia.com>; qemu-block@nongnu.org <qemu-block@no=
-ngnu.org>; Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>; Max Reitz <=
-mreitz@redhat.com>; Kevin Wolf <kwolf@redhat.com>; Vladimir Sementsov-Ogiev=
-skiy <vsementsov@virtuozzo.com>; Pavel Butsykin <pbutsykin@virtuozzo.com>
-Subject: [PATCH v2] qcow2: Check request size in qcow2_co_pwritev_compresse=
-d_part()
+> I can provide you the QEMU's GSoC 2020 application form which might have
+> useful snippets you can reuse for building a GSoD application for QEMU.
 
+That might help. I'll start the application draft.
 
---_000_AM6PR08MB5048AE188B78CD18B53DF0C9F4C20AM6PR08MB5048eurp_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Thanks,
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-<span style=3D"caret-color: rgb(32, 31, 30); color: rgb(32, 31, 30); font-f=
-amily: &quot;Segoe UI&quot;, &quot;Segoe UI Web (West European)&quot;, &quo=
-t;Segoe UI&quot;, -apple-system, BlinkMacSystemFont, Roboto, &quot;Helvetic=
-a Neue&quot;, sans-serif; font-size: 14.666666984558105px; background-color=
-: rgb(255, 255, 255); display: inline !important">Reviewed-by:
- Andrey Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;</span><br>
-</div>
-<div id=3D"appendonsend"></div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" co=
-lor=3D"#000000" style=3D"font-size:11pt"><b>From:</b> Alberto Garcia &lt;be=
-rto@igalia.com&gt;<br>
-<b>Sent:</b> Monday, April 6, 2020 5:34 PM<br>
-<b>To:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;<br>
-<b>Cc:</b> Alberto Garcia &lt;berto@igalia.com&gt;; qemu-block@nongnu.org &=
-lt;qemu-block@nongnu.org&gt;; Andrey Shinkevich &lt;andrey.shinkevich@virtu=
-ozzo.com&gt;; Max Reitz &lt;mreitz@redhat.com&gt;; Kevin Wolf &lt;kwolf@red=
-hat.com&gt;; Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt;;
- Pavel Butsykin &lt;pbutsykin@virtuozzo.com&gt;<br>
-<b>Subject:</b> [PATCH v2] qcow2: Check request size in qcow2_co_pwritev_co=
-mpressed_part()</font>
-<div><br>
-</div>
-</div>
-</body>
-</html>
+Phil.
 
---_000_AM6PR08MB5048AE188B78CD18B53DF0C9F4C20AM6PR08MB5048eurp_--
 
