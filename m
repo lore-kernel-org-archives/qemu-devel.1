@@ -2,74 +2,87 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 940B2C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1B1C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:17:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69B7523B44
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:17:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B7523B44
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9002F23B81
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:17:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6TJWuul"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9002F23B81
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLSYl-0000zF-Cf
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 10:17:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56296)
+	id 1jLSZX-0001xC-IJ
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 10:17:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jLSOc-0008D1-Et
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:06:40 -0400
+ (envelope-from <wainersm@redhat.com>) id 1jLSYZ-0000zM-G2
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jLSOb-000064-5e
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:06:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58388)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jLSOb-00005R-0N
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:06:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jLSOY-00073w-Rh
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 14:06:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AD1A22E8108
- for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 14:06:34 +0000 (UTC)
+ (envelope-from <wainersm@redhat.com>) id 1jLSYX-0005T0-RW
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:16:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28671
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1jLSYX-0005SJ-Ll
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:16:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586182612;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3gEqQSNWrHXHOJFGrx4macWg7VKZYEqB5XrSJWRVqAQ=;
+ b=O6TJWuul3U0/4tJMuRTlQjyljbMGSoF1uYQh9Xm8F38OPbDVey8Au5cALEPblA+LKKx11i
+ X9XE3NTTJtGrImi28LH95w819m6+ZzQ9wlQHxu2TSDg6UMo08MzSyKzzP8RmmLtXKNZJSv
+ yLuta5sYLqOtJpVdzKKocALIAygcE/Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-Rz3DaOahMHqedkOmcNi01w-1; Mon, 06 Apr 2020 10:16:46 -0400
+X-MC-Unique: Rz3DaOahMHqedkOmcNi01w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3EBA1005509;
+ Mon,  6 Apr 2020 14:16:44 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com
+ [10.97.116.15])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8287262697;
+ Mon,  6 Apr 2020 14:16:36 +0000 (UTC)
+Subject: Re: [PATCH-for-5.0 5/8] .travis.yml: Cache acceptance-test assets
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+References: <20200403172919.24621-1-philmd@redhat.com>
+ <20200403172919.24621-6-philmd@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <56193f75-ff36-0718-2da1-18033d4899f6@redhat.com>
+Date: Mon, 6 Apr 2020 11:16:34 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200403172919.24621-6-philmd@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Apr 2020 13:54:57 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: whpx
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 6-u3untu-h ajbennee eminus
-X-Launchpad-Bug-Reporter: Emin Ghuliev (eminus)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <155352235092.32006.12315829232895734213.malonedeb@soybean.canonical.com>
-Message-Id: <158618129708.24863.428231285462234220.malone@soybean.canonical.com>
-Subject: [Bug 1821595] Re: Failed to emulate MMIO access with
- EmulatorReturnStatus: 2
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a296f04231dee355be5db73cc878b9e21689a253";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 55e78d723dbcf1bf4f2b5cae9e71845918292590
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,58 +91,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1821595 <1821595@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As far as I can tell QEMU just hands this off to the whpx emulation sub-
-system:
 
-  https://docs.microsoft.com/en-us/virtualization/api/hypervisor-
-instruction-emulator/funcs/whvemulatortryemulation
+On 4/3/20 2:29 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Keep all acceptance-test assets in the same cache bucket.
+>
+> As of v5.0.0-rc1, the cache is 2610.11MB:
+> https://travis-ci.org/github/philmd/qemu/jobs/670558103
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>   .travis.yml | 2 ++
+>   1 file changed, 2 insertions(+)
 
-Basically what is happening is the guest has tried to access I/O space
-and trapped back to QEMU which then passes the instruction back to the
-whpx support library to decode and emulate.
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
--- =
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index e0c72210b7..2fd63eceaa 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -318,8 +318,10 @@ jobs:
+>         env:
+>           - CONFIG=3D"--enable-tools --target-list=3Daarch64-softmmu,alph=
+a-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el=
+-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu=
+,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
+>           - TEST_CMD=3D"make check-acceptance"
+> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-acceptance"
+>         after_script:
+>           - python3 -c 'import json; r =3D json.load(open("tests/results/=
+latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["stat=
+us"] not in ("PASS", "SKIP")]' | xargs cat
+> +        - du -chs $HOME/avocado/data/cache
+>         addons:
+>           apt:
+>             packages:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1821595
-
-Title:
-  Failed to emulate MMIO access with EmulatorReturnStatus: 2
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have compiled qemu with enable-whpx parameter for Hyper-V Platform API =
-in Mingw64 . When I tried run with Windows 7 iso file I have faced issue wi=
-th the following problem: =
-
-  qemu-system-x86_64.exe: WHPX: Failed to emulate MMIO access with Emulator=
-ReturnStatus: 2
-  qemu-system-x86_64.exe: WHPX: Failed to exec a virtual processor
-
-  =
-
-  configuration directives:
-
-  ../configure --target-list=3Dx86_64-softmmu,i386-softmmu --enable-lzo\
-   --enable-bzip2 --enable-tools --enable-sdl --enable-gtk --enable-hax\
-   --enable-vdi --enable-qcow1 --enable-whpx --disable-capstone\
-   --disable-werror --disable-stack-protector --prefix=3D"../../QEMU-bin"
-
-  =
-
-  Qemu command line:
-  qemu-system-x86_64.exe -m 1024 -cdrom "C:\Users\vmcs\Documents\en_windows=
-_7_home_premium_with_sp1_x86_dvd_u_676701.iso" -display sdl -machine q35 -a=
-ccel whpx
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1821595/+subscriptions
 
