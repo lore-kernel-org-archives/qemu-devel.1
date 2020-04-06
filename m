@@ -2,76 +2,77 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8608C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB31C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AD612051A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:33:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AD612051A
+	by mail.kernel.org (Postfix) with ESMTPS id 6F0AE2051A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:34:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0AE2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLO8X-0004MB-QQ
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42327)
+	id 1jLO9c-0005Dp-Lm
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:34:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLO2P-0001Af-5N
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:27:26 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLO4Q-0001xb-Md
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jLO2L-0002yy-Kv
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:27:25 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47526)
+ (envelope-from <borntraeger@de.ibm.com>) id 1jLO4P-0003pm-LO
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:29:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11610)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jLO2L-0002yh-Ci
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:27:21 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ id 1jLO4P-0003pN-HG
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:29:29 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03694e1k072999
- for <qemu-devel@nongnu.org>; Mon, 6 Apr 2020 05:27:20 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 306pcyce0b-1
+ 03694OC1067342
+ for <qemu-devel@nongnu.org>; Mon, 6 Apr 2020 05:29:29 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 306n245euh-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 05:27:19 -0400
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 05:29:28 -0400
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 6 Apr 2020 10:27:01 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Mon, 6 Apr 2020 10:29:23 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 6 Apr 2020 10:26:59 +0100
+ Mon, 6 Apr 2020 10:29:20 +0100
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0369REmx47775858
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 0369TMGu24051976
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 6 Apr 2020 09:27:14 GMT
+ Mon, 6 Apr 2020 09:29:22 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2888DA405C;
- Mon,  6 Apr 2020 09:27:14 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 1B132A405B;
+ Mon,  6 Apr 2020 09:29:22 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AC9BCA4054;
- Mon,  6 Apr 2020 09:27:13 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 9F1F3A4054;
+ Mon,  6 Apr 2020 09:29:21 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.23.63])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  6 Apr 2020 09:27:13 +0000 (GMT)
+ Mon,  6 Apr 2020 09:29:21 +0000 (GMT)
 Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: Fix build on systems without
  KVM
-To: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, 
+ Cornelia Huck <cohuck@redhat.com>
 References: <20200406075931.26232-1-borntraeger@de.ibm.com>
  <20200406075931.26232-2-borntraeger@de.ibm.com>
- <20200406110447.5ad97f62.cohuck@redhat.com>
+ <27304f4e-3801-3200-c5ba-9fb5ac0f8715@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -116,30 +117,30 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Mon, 6 Apr 2020 11:27:13 +0200
+Date: Mon, 6 Apr 2020 11:29:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200406110447.5ad97f62.cohuck@redhat.com>
+In-Reply-To: <27304f4e-3801-3200-c5ba-9fb5ac0f8715@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20040609-0008-0000-0000-0000036B66C2
+x-cbid: 20040609-0028-0000-0000-000003F2F84E
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040609-0009-0000-0000-00004A8CFC53
-Message-Id: <90760b85-ed98-3106-0cc4-900f55607479@de.ibm.com>
+x-cbparentid: 20040609-0029-0000-0000-000024B88B99
+Message-Id: <95faf831-5382-0c3e-fed4-67485f04a4b7@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
  definitions=2020-04-06_05:2020-04-03,
  2020-04-06 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 clxscore=1015
- impostorscore=0 suspectscore=0 phishscore=0 mlxscore=0 spamscore=0
- mlxlogscore=966 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2004060078
+ phishscore=0 mlxlogscore=815
+ priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0
+ suspectscore=0 lowpriorityscore=0 adultscore=0 mlxscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060073
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,7 +153,6 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
  Bruce Rogers <brogers@suse.com>, Halil Pasic <pasic@linux.ibm.com>,
  qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -161,70 +161,26 @@ Sender: "Qemu-devel"
 
 
 
-On 06.04.20 11:04, Cornelia Huck wrote:
-> On Mon,  6 Apr 2020 03:59:31 -0400
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 06.04.20 11:07, David Hildenbrand wrote:
 > 
->> linux/kvm.h is not available on all platforms. Let us move
->> s390_machine_inject_pv_error into pv.c as it uses KVM structures.
->>
->> Fixes: 49fc3220175e ("s390x: protvirt: Support unpack facility")
->> Reported-by: Bruce Rogers <brogers@suse.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  hw/s390x/ipl.h             |  1 +
->>  hw/s390x/pv.c              | 11 +++++++++++
->>  hw/s390x/s390-virtio-ccw.c | 10 ----------
->>  include/hw/s390x/pv.h      |  3 +++
->>  4 files changed, 15 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
->> index 89b3044d7a..53cc9eb5ac 100644
->> --- a/hw/s390x/ipl.h
->> +++ b/hw/s390x/ipl.h
->> @@ -14,6 +14,7 @@
->>  #define HW_S390_IPL_H
->>  
->>  #include "cpu.h"
->> +#include "exec/address-spaces.h"
+>>  static inline bool s390_is_pv(void)
+>> @@ -41,6 +42,7 @@ int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
+>>  void s390_pv_perf_clear_reset(void);
+>>  int s390_pv_verify(void);
+>>  void s390_pv_unshare(void);
+>> +void s390_machine_inject_pv_error(CPUState *cs);
+>>  #else /* CONFIG_KVM */
+>>  static inline bool s390_is_pv(void) { return false; }
+>>  static inline int s390_pv_vm_enable(void) { return 0; }
+>> @@ -50,6 +52,7 @@ static inline int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) {
+>>  static inline void s390_pv_perf_clear_reset(void) {}
+>>  static inline int s390_pv_verify(void) { return 0; }
+>>  static inline void s390_pv_unshare(void) {}
+>> +static inline void s390_machine_inject_pv_error(CPUState *cs) {};
 > 
-> Hm, what is now requiring including this? (No objection, but I don't
-> see it.)
+> I'd suggest renaming that to s390_pv_inject_error() or similar right away.
 
-ipl.h has
-
-static inline bool ipl_valid_pv_header(IplParameterBlock *iplb)
-{
-[..]
-        if (!address_space_access_valid(&address_space_memory,
-
-and if included alone this fails to build without the include. 
-
-
-> 
->>  #include "hw/qdev-core.h"
->>  
->>  struct IPLBlockPVComp {
-> 
-> (...)
-> 
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index b268907395..0e8b0c63a1 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -45,7 +45,6 @@
->>  #include "sysemu/sysemu.h"
->>  #include "sysemu/balloon.h"
->>  #include "hw/s390x/pv.h"
->> -#include <linux/kvm.h>
-> 
-> In hindsight, that should have been obvious :)
-
-Yes, it is. It was added pretty late (v10 I think).
- 
->>  #include "migration/blocker.h"
->>  
->>  static Error *pv_mig_blocker;
-> 
+Makes sense.
+Conny any preference?
 
 
