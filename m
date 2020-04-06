@@ -2,91 +2,120 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9F2C2BA1B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1386AC2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8250C206B8
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB2C820672
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:14:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZB6nQBo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8250C206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nZaHNXla"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB2C820672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLWFN-0005m9-N3
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:13:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36475)
+	id 1jLWG8-00078S-0s
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:14:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrM-0002Ne-4N
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:42 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLWDt-000323-OP
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrK-0003JE-2n
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:31 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:33621)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrJ-0003IJ-Sj; Mon, 06 Apr 2020 13:48:30 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id a25so549654wrd.0;
- Mon, 06 Apr 2020 10:48:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=7dngg6q086SdAwClXoi/Rsl8HHPolX2hkbDutRMMkyU=;
- b=mZB6nQBoF7efgVNMW6coPxbXImIagNrUHXbQwGp6/FNiQ/5CCYxuTz7c1XxGDfCj6/
- XMQbOknKGcCIOajrDdG+ZxqKSaTuVh1G3AD/ZObLEjzvgENtFr1iRHC4jrF7WSEePrJE
- xo7z0NgUfmpQz8dwZSBqmJlysc1SwbG42r3Z4zVcHDX0IeCBQbbreWJ8MMbOGjPJXS10
- kKc/C0LFp7yEc6sXT6oH+PTSrMsXWTuWgd26vu4sv+357XGStB/zWXIMmRVXWRLlPULF
- UbCLA2Zh/3gKXbBjbnptQCoK94i5LZG3u4KjQUQ0O/ymZimoPkpBOhb/wDeFA8YFS2Em
- tFYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=7dngg6q086SdAwClXoi/Rsl8HHPolX2hkbDutRMMkyU=;
- b=g1ocV0JjM9kUKU9N9eSbh1a1AhJW61UYBbR/PTiHyrlM+QK09PtxWDXYapNAWuUntx
- j+Xtdh3xrmrsjtaRKF9j8zW5cNYdx2r13XHpwa/WSP2c7tgrLFkDTPNr0R4zXDAt+l+J
- JWSvzNHyRoxwgl51AWBiWRl8aYMgOPhGyfZhESw822ipvb9GbRcqiU1cFP3RFnqA29Nz
- pFAYkeHO+hqwHWVqQGFoe+j773/XaIDwTeyMHsDetn6sVVDDD8cJ6y12wysKg2G+i/xN
- ZmTT3N1erZ7G8U/TnhgsCbGpqO6kULJ8SKiEeb7JLxWFL2Qcw96wRpJ31hZ0BTvSDWy/
- 5TrA==
-X-Gm-Message-State: AGi0PuZ4LmbprZpj5G6qAws+hX4megCwdcBRuFT/aW3gp1Z2/iNGaCmQ
- ne+kB4SoMxjn01DWjBSAMaLvHt0SZNE=
-X-Google-Smtp-Source: APiQypJwsJIZF70J5HlNv9xStNPqs1HsJ77tItLhRzphIRk3ZiqGHhG9BEtBK79ChMVy4lUndTQMQA==
-X-Received: by 2002:adf:fb0a:: with SMTP id c10mr364586wrr.272.1586195308694; 
- Mon, 06 Apr 2020 10:48:28 -0700 (PDT)
-Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 10:48:28 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH-for-5.1 v2 31/54] hw/riscv/sifive: Add missing
- error-propagation code
-Date: Mon,  6 Apr 2020 19:47:20 +0200
-Message-Id: <20200406174743.16956-32-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
-References: <20200406174743.16956-1-f4bug@amsat.org>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLWDs-0000pB-GP
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:11:49 -0400
+Received: from mail-eopbgr130138.outbound.protection.outlook.com
+ ([40.107.13.138]:49853 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jLWDm-0000gc-G1; Mon, 06 Apr 2020 14:11:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K+7Eez3mtV5K/MMjzwHZDz7BhHn8UMgTZ3MzAL7VyksVMjE+6dKknmmGn9n6HsDyeY1/ZwBiSfOOJTyc1RaM8QQRRU4nSKcvH71mjpN4ELHGak7CHfeRAkdryTkF70zFGdgoJGis9MJpYWGm/uBKLiLrsXGrkAry3HCY1nbzjWlE/V9ZD2MahF1q4omPl0hyUTTG6KEDXKm9QuoTiil+Bw2DknCta0TbvYjrYDD4WAy2G4cHx07qSeqE1f3YD4BHQL0PpyhkAgGHadm5HnD3TQ+IZ18WNXfQD83P9RQq/07X2z7j1N611HgtUzzj6HK57I/agaLajpNOvyhAy57SIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WoeiNAiZilabHejGMNLyh2ndw5JkHG2GO+RiqeAy+xA=;
+ b=odS8rsCINmGp6Ci/OWs9ii6SE3o73THcgFnYqszOQ01h0rgK93tia601r+DJW7E2v2Ip5pjEyJKWT4Fj4DJEB2yrDlhzI3fBxvwHWLin16sVAB7UdCArLbeYj3Ub8qvkF3MOzp28TWsjobwqt5BzsLKYRn8O0qy8LgA9aL2s6U79eotkpYJPSg2YBpcxy6M70kaha5wVr+tRQgeeJ2UBtfYr3Tozjh2NdRvhHLDreJxwqCAlVTgFVP/YrxJc+C9Mw/DktchGRE9QaLCq/8XSNprGC8MzNKKc86behusRcWbtAKubtmfn3FwdcvyPy3+Lg5gsPtRQybt63l+Yn3h1/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WoeiNAiZilabHejGMNLyh2ndw5JkHG2GO+RiqeAy+xA=;
+ b=nZaHNXlaQ4j57CfsoeyK4fxDbmabuA2UD21+ZMc3g5LqWbmuXWgWiKxr1FnEUTLWrDZauv/7zmOwl+InTjMU9jR534Kq/Kz0IsdXYyG1vr64b3KlrLPRn0RrLoCCfhgf3E7JoU9gyzqSmScPJBHf3ixjV8kzb1DZ8HmrzWxrHg4=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5527.eurprd08.prod.outlook.com (10.141.175.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.21; Mon, 6 Apr 2020 18:11:39 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Mon, 6 Apr 2020
+ 18:11:39 +0000
+Subject: Re: [PATCH for-5.0? v2] qcow2: Explicit mention of padding bytes
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200403181907.878751-1-eblake@redhat.com>
+ <8fe869d5-baf5-6d04-78d4-bee89cd7ef47@virtuozzo.com>
+ <3f720e97-a499-67f9-f85c-1dba29ec9551@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200406211137311
+Message-ID: <b5cd74fb-2d58-6b1c-1ef7-2d6d84a760fc@virtuozzo.com>
+Date: Mon, 6 Apr 2020 21:11:37 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <3f720e97-a499-67f9-f85c-1dba29ec9551@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: AM0PR04CA0030.eurprd04.prod.outlook.com
+ (2603:10a6:208:122::43) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.161) by
+ AM0PR04CA0030.eurprd04.prod.outlook.com (2603:10a6:208:122::43) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.16 via Frontend
+ Transport; Mon, 6 Apr 2020 18:11:38 +0000
+X-Tagtoolbar-Keys: D20200406211137311
+X-Originating-IP: [185.215.60.161]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f39a2a9d-4f80-40c8-60fa-08d7da55f376
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5527:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB55278692BE45B7B5740D84C6C1C20@AM7PR08MB5527.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:862;
+X-Forefront-PRVS: 0365C0E14B
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(396003)(346002)(39840400004)(366004)(136003)(376002)(26005)(16526019)(5660300002)(81166006)(956004)(6486002)(2616005)(52116002)(8936002)(8676002)(31696002)(478600001)(81156014)(186003)(36756003)(53546011)(4326008)(2906002)(16576012)(316002)(66946007)(66476007)(66556008)(31686004)(54906003)(86362001);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bbqNoRlHMe6RgsG5OeeEM/jvivhyTDbTrNCl684755X5JLBkkTGwNg26JPy/Jcke6x88TjNMNCZRmZ3mz6eJPt7khUIPQMAlPUlfkoVqRm2jX9zEQGwpgxc+cjtiK4j3y2/R0XNsAGQVSzMo4pu2u17ctlR7vG8W9EdL2Yfvl3eAtSJ7UL42UK57N60iBY6b4pV/ZfstQUgxiZNFIvbFFyi+fpiq9ddEGzmtfqCBPZMOLU2ehZOfO2IlgrbAniFwovGHqvV4uh6zSZoHnMYTw6Yxufw8nQ1KB5ylTB3M14Z2DcBWAJUvogvN5iO/bhIufJr98DdiQebRPPwg91/SY6hXqc3f4bKkq2zHBmKuRJuRmhfSA5oLluovd8nnnaaXdms8pH+QRJSLEAYUtvGTG610tNFk2FI6ZRjOOoOfxiyfrILzFJplx5Wbzoy7yomCoOWCLHL9jHctvERuZL6w5B8Xsb1Xy1t+Vtgyuj8aSp7miTYf9DdARV8A0zYU+j0/bP10tfEI68jlBSmmEFTg6Q==
+X-MS-Exchange-AntiSpam-MessageData: Y5iPxarcGmWKc1FiptV81P66XBss1GhHDvjCS+jngzh5TFj656ESQS81r1vwnTw9jhWhVKqdD+SfqdSrpEWuF/ZlenyMyVg037wA9W/kAn4EAnfwgyz3qp7DePDcMiHtcr58RZMOL9liEEsMieTPPA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f39a2a9d-4f80-40c8-60fa-08d7da55f376
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2020 18:11:39.3327 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JYMTX2ghJT0odPMA6B6PRub5PzCEOGZPWLVTWnZWhbLHAzwEp/5L16DB8BCUIIK9Zrx7DU6fiVqwK5ZiM2LZU6PojG1+S1D0Qd6v2NFlUNk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5527
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.13.138
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,93 +127,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch created mechanically by running:
+06.04.2020 16:32, Eric Blake wrote:
+> On 4/6/20 3:50 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 03.04.2020 21:19, Eric Blake wrote:
+>>> Although we already covered the need for padding bytes with our
+>>> changes in commit 3ae3fcfa, commit 66fcbca5 just added one byte and
+>>> relied on the rest of the text for implicitly covering 7 padding
+>>> bytes.=C2=A0 For consistency with other parts of the header (such as th=
+e
+>>> header extension format listing padding from n - m, or the snapshot
+>>> table entry mentioning variable padding), we might as well call out
+>>> the remaining 7 bytes as padding until such time (as any) as they gain
+>>> another meaning.
+>>>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> ---
+>>>
+>>> v2: Call out explicit byte range rather than '105 - m' [Max]
+>>>
+>>> Safe for 5.0 as it is just a doc fix, but only if we actually want it.
+>>>
+>>> =C2=A0 docs/interop/qcow2.txt | 1 +
+>>> =C2=A0 1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+>>> index 640e0eca4000..80728bc2008d 100644
+>>> --- a/docs/interop/qcow2.txt
+>>> +++ b/docs/interop/qcow2.txt
+>>> @@ -210,3 +210,4 @@ version 2.
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Available compres=
+sion type values:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 0: zlib <https://www.zlib.net/>
+>>>
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 105 - 111:=C2=A0 Padding, l=
+eave as zero.
+>>>
+>>
+>> Looking on this in separate, I'd make a software which will zero this pa=
+dding unconditionally. However, if it's an existing image which we just ope=
+n, we should keep the content we read.. On the other hand, of course, if re=
+ad the whole spec, everything is clear.
+>=20
+> Maybe:
+>  =C2=A0 105 - 111: Padding, contents defined below
 
-  $ spatch \
-    --macro-file scripts/cocci-macro-file.h --include-headers \
-    --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
-    --keep-comments --smpl-spacing --in-place --dir hw
+Works for me, no objections)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/riscv/sifive_e.c |  6 +++++-
- hw/riscv/sifive_u.c | 24 ++++++++++++++++++++----
- 2 files changed, 25 insertions(+), 5 deletions(-)
+>=20
+> rather than an explicit mention of setting to 0?
+>=20
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 0be8b52147..6d4e141ff7 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -156,7 +156,11 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-     MemoryRegion *sys_mem = get_system_memory();
- 
-     object_property_set_bool(OBJECT(&s->cpus), true, "realized",
--                            &error_abort);
-+                            &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
- 
-     /* MMIO */
-     s->plic = sifive_plic_create(memmap[SIFIVE_E_PLIC].base,
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index e13ab34de4..b07526aba1 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -508,9 +508,17 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-     NICInfo *nd = &nd_table[0];
- 
-     object_property_set_bool(OBJECT(&s->e_cpus), true, "realized",
--                             &error_abort);
-+                             &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->u_cpus), true, "realized",
--                             &error_abort);
-+                             &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     /*
-      * The cluster must be realized after the RISC-V hart array container,
-      * as the container's CPU object is only created on realize, and the
-@@ -518,9 +526,17 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-      * cluster is realized.
-      */
-     object_property_set_bool(OBJECT(&s->e_cluster), true, "realized",
--                             &error_abort);
-+                             &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->u_cluster), true, "realized",
--                             &error_abort);
-+                             &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
- 
-     /* create PLIC hart topology configuration string */
-     plic_hart_config_len = (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1) *
--- 
-2.21.1
 
+--=20
+Best regards,
+Vladimir
 
