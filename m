@@ -2,85 +2,84 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B39CC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 13:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF06BC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 13:38:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E90F02332A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 13:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E4CB23356
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 13:38:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AE/Q8wP7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E90F02332A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gv9BBtMx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4CB23356
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLRsc-0005LP-4S
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 09:33:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50328)
+	id 1jLRxB-0000Sr-CU
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 09:38:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jLRrc-0004Z2-Pz
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 09:32:34 -0400
+ (envelope-from <eblake@redhat.com>) id 1jLRwK-0008RX-4f
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 09:37:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jLRrb-0007YL-1Z
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 09:32:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50044
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jLRwI-0002M4-R5
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 09:37:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35464
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jLRra-0007XJ-TG
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 09:32:30 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jLRwI-0002LL-N8
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 09:37:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586179949;
+ s=mimecast20190719; t=1586180241;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=166AdI31MoDy3Jd//uwsQZX7dQM1UTS5BT1+m1oTWBQ=;
- b=AE/Q8wP7KY25CKDso4vs7juj5drCvB+bRLHDrJuaDwWjfYVOR+y/+T7qJE7D8QiaZ5fWQn
- DqvZi76icykw5IqvvIBMOy+Zki2YxKA2Y2Vc/DWEiSXpv/TIoi09OTjxdhCMmNMcGKN0xi
- 6Ca1tkNdCTDkn+Cwhp5gwSHacTSm0+E=
+ bh=kNAhXjvfQJB44EiT2b5BPx1E+VCAZEBcmJvCP4r0WPc=;
+ b=Gv9BBtMx24TyIiXNpETWGpW3Yjz+2kxB9gYdcliipXqc0pfinbVmbF4uW41HpJ1MgX5hfw
+ SgXlU0V9U1HIBB6BYD/0MR4s2KAvnWnN5CK/45o+anvZQNvkDLnbCVU5iRAqWDKRtZOfeo
+ mNugYc8bQf/C4D2VF98CSvKPa2fQnzc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-JxtHP2nTOUuhEKz6tOsaCA-1; Mon, 06 Apr 2020 09:32:25 -0400
-X-MC-Unique: JxtHP2nTOUuhEKz6tOsaCA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-74-E9sas1oENpacMZkAi-SbjQ-1; Mon, 06 Apr 2020 09:37:17 -0400
+X-MC-Unique: E9sas1oENpacMZkAi-SbjQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AEE61084431;
- Mon,  6 Apr 2020 13:32:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E9C5100DFC0;
+ Mon,  6 Apr 2020 13:37:13 +0000 (UTC)
 Received: from [10.3.114.49] (ovpn-114-49.phx2.redhat.com [10.3.114.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 42D9760C87;
- Mon,  6 Apr 2020 13:32:23 +0000 (UTC)
-Subject: Re: [PATCH for-5.0? v2] qcow2: Explicit mention of padding bytes
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200403181907.878751-1-eblake@redhat.com>
- <8fe869d5-baf5-6d04-78d4-bee89cd7ef47@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 708EA9D352;
+ Mon,  6 Apr 2020 13:36:59 +0000 (UTC)
+Subject: Re: [PATCH v6 08/36] multi-process: Add stub functions to facilate
+ build of multi-process
+To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
+References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
+ <3581740cf5a9eaca8c86bc28e75750be7e7b45e4.1586165555.git.elena.ufimtseva@oracle.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <3f720e97-a499-67f9-f85c-1dba29ec9551@redhat.com>
-Date: Mon, 6 Apr 2020 08:32:22 -0500
+Message-ID: <6445e96a-65bb-7a44-3ccc-461ae2b4a233@redhat.com>
+Date: Mon, 6 Apr 2020 08:36:58 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <8fe869d5-baf5-6d04-78d4-bee89cd7ef47@virtuozzo.com>
+In-Reply-To: <3581740cf5a9eaca8c86bc28e75750be7e7b45e4.1586165555.git.elena.ufimtseva@oracle.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,60 +91,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>,
- mreitz@redhat.com
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, kraxel@redhat.com, jag.raman@oracle.com, quintela@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
+ thuth@redhat.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ dgilbert@redhat.com, liran.alon@oracle.com, stefanha@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com,
+ mreitz@redhat.com, ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ thanos.makatos@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/6/20 3:50 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 03.04.2020 21:19, Eric Blake wrote:
->> Although we already covered the need for padding bytes with our
->> changes in commit 3ae3fcfa, commit 66fcbca5 just added one byte and
->> relied on the rest of the text for implicitly covering 7 padding
->> bytes.=C2=A0 For consistency with other parts of the header (such as the
->> header extension format listing padding from n - m, or the snapshot
->> table entry mentioning variable padding), we might as well call out
->> the remaining 7 bytes as padding until such time (as any) as they gain
->> another meaning.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>
->> v2: Call out explicit byte range rather than '105 - m' [Max]
->>
->> Safe for 5.0 as it is just a doc fix, but only if we actually want it.
->>
->> =C2=A0 docs/interop/qcow2.txt | 1 +
->> =C2=A0 1 file changed, 1 insertion(+)
->>
->> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
->> index 640e0eca4000..80728bc2008d 100644
->> --- a/docs/interop/qcow2.txt
->> +++ b/docs/interop/qcow2.txt
->> @@ -210,3 +210,4 @@ version 2.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Available compressio=
-n type values:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 0: zlib <https://www.zlib.net/>
->>
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 105 - 111:=C2=A0 Padding, le=
-ave as zero.
->>
->=20
-> Looking on this in separate, I'd make a software which will zero this=20
-> padding unconditionally. However, if it's an existing image which we=20
-> just open, we should keep the content we read.. On the other hand, of=20
-> course, if read the whole spec, everything is clear.
+On 4/6/20 4:40 AM, elena.ufimtseva@oracle.com wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+> 
 
-Maybe:
-   105 - 111: Padding, contents defined below
+In the subject: s/facilate/facilitate/
 
-rather than an explicit mention of setting to 0?
+> Add stub functions that are needed during compile time but not in
+> runtime.
+> 
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
 
---=20
+
+-- 
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
