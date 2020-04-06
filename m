@@ -2,97 +2,154 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1EBC2BA1A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87180C2BA1A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:52:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACE2A20672
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:50:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57B5A20672
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 19:52:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ETuvV05v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE2A20672
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBXIoWwD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B5A20672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLXku-0000aR-OB
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 15:50:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56200)
+	id 1jLXnd-0003iZ-He
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 15:52:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jLXkG-0008C1-Uc
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:49:22 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jLXms-0002uJ-3p
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jLXkE-0004xf-UU
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:49:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43624)
+ (envelope-from <jsnow@redhat.com>) id 1jLXmq-0006Up-Nf
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:52:01 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36769
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jLXkE-0004xA-Po
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:49:18 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jLXmq-0006UE-K3
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 15:52:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586202557;
+ s=mimecast20190719; t=1586202719;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QjNAoiJoQ0ywe3nRBwydYpgtpSZN6534yCfTO4GDpUo=;
- b=ETuvV05v7RoLORJcIJ21W+nByiRskFdmmnLB3UXmMdRybSkupYrxiDNCLJ9w8LRIu7AOM5
- he+8aoNHxSnpTE9nW5UczOwxoz/E1YTUnAz69kX+BgxBrA/9TwzpmFQzpsjx+mhHkRDCgr
- xDLzMfXXahQ3Qufn7r7abJ5uu5/9AGQ=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-ZUVyqtoqM1STlBtej14c7Q-1; Mon, 06 Apr 2020 15:49:15 -0400
-X-MC-Unique: ZUVyqtoqM1STlBtej14c7Q-1
-Received: by mail-qk1-f197.google.com with SMTP id d18so945651qkj.8
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 12:49:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=3SAc7/INURO0fUmTRoJHT56cMjNB24w7zVKVwcxLIzw=;
- b=EGugT3JAcwa5r84A9qJaHemoqjQJRoMs5IY24fVcYJLAOQ68SZdKLBq0ibXAOekHkM
- asuwxbm4DY6rUC9tjrIbsIaUL+mkCFVa1ypJ+Szn1vsxrbgudH4EzL9M9ffskqNhiuIS
- bfo30J0UY2JgUi6LZIynwJMWDb3UYcwNolVDbATZOFw2/B8otyTJvIXw1CrA9t1U/opz
- HqDy+h30ooH9wkklTcS+ByPg26m/Q4i4kAvskj20qjJIfhlJ2gSgLxW6h5KWeBfzRrOg
- crOt1iHhTrvNPRdDJcEnVZQL9/5+/7M7euAF6cGeYd4Ay/QUmEW8rJLdv/DTH9NDsBKJ
- H3Ww==
-X-Gm-Message-State: AGi0PubdnEA5anI61czlDj8kiggKsXXxXMjeEr2IJ+0L6zhn0I9egSx5
- 05EJzuonVP7kZM7F4Oj1+5jMMRRVkcHTF5RFgr2DF3E8fdOzNVh2DYGquevh+5OjvXaitk+Mg90
- US3WVhp0Bqn+4vCc=
-X-Received: by 2002:ac8:8d0:: with SMTP id y16mr1270776qth.340.1586202555447; 
- Mon, 06 Apr 2020 12:49:15 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIsQ+naX+Z38cNb4BpPpyftxPdr6Pz+MXwVkluFeAVGofZZPwR4AZcFrqU7Egyx3/QvySVzMQ==
-X-Received: by 2002:ac8:8d0:: with SMTP id y16mr1270746qth.340.1586202555194; 
- Mon, 06 Apr 2020 12:49:15 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::3])
- by smtp.gmail.com with ESMTPSA id f138sm2635656qke.105.2020.04.06.12.49.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 12:49:14 -0700 (PDT)
-Date: Mon, 6 Apr 2020 15:48:40 -0400
-From: Peter Xu <peterx@redhat.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 16/22] intel_iommu: replay pasid binds after context
- cache invalidation
-Message-ID: <20200406194840.GS103677@xz-x1>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-17-git-send-email-yi.l.liu@intel.com>
- <20200403144548.GK103677@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A220E44@SHSMSX104.ccr.corp.intel.com>
- <20200403161120.GN103677@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A221BD4@SHSMSX104.ccr.corp.intel.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=tbwP8yJvSTO0MRps4XTF5IGYqUsUqVZ2szwqog79DHw=;
+ b=VBXIoWwDXOy5yW5XFpDzWHUeTVVsGn1vJ1LqRXfU0Uq5OmvLH77cAOs7LxRfYPeqBFzXmk
+ +0NQyjAcaPj7vSDbysz5RAQK47+mvqgjicv5lZ5lI8pDI7yecZvc1Uo3+1+zeyyIy23UNc
+ ooB4GDhSwy4Y5LNFSOdQKHOpnPJCpyM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-165-4oQDEjb9MzKwqKtpAe9dCg-1; Mon, 06 Apr 2020 15:51:54 -0400
+X-MC-Unique: 4oQDEjb9MzKwqKtpAe9dCg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB101800D4E
+ for <qemu-devel@nongnu.org>; Mon,  6 Apr 2020 19:51:53 +0000 (UTC)
+Received: from [10.10.115.55] (ovpn-115-55.rdu2.redhat.com [10.10.115.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 41CF85C1B0;
+ Mon,  6 Apr 2020 19:51:53 +0000 (UTC)
+Subject: Re: FYI GitHub pull request / issue tracker lockdown bot
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200403142213.GO559148@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b321b36e-d18f-623b-f8a1-93bd4b3fb779@redhat.com>
+Date: Mon, 6 Apr 2020 15:51:52 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A221BD4@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <20200403142213.GO559148@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -107,149 +164,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Apr 04, 2020 at 12:00:12PM +0000, Liu, Yi L wrote:
-> Hi Peter,
->=20
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Saturday, April 4, 2020 12:11 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v2 16/22] intel_iommu: replay pasid binds after con=
-text cache
-> > invalidation
-> >=20
-> > On Fri, Apr 03, 2020 at 03:21:10PM +0000, Liu, Yi L wrote:
-> > > > From: Peter Xu <peterx@redhat.com>
-> > > > Sent: Friday, April 3, 2020 10:46 PM
-> > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > Subject: Re: [PATCH v2 16/22] intel_iommu: replay pasid binds after=
- context
-> > cache
-> > > > invalidation
-> > > >
-> > > > On Sun, Mar 29, 2020 at 09:24:55PM -0700, Liu Yi L wrote:
-> > > > > This patch replays guest pasid bindings after context cache
-> > > > > invalidation. This is a behavior to ensure safety. Actually,
-> > > > > programmer should issue pasid cache invalidation with proper
-> > > > > granularity after issuing a context cache invalidation.
-> > > > >
-> > > > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > > > Cc: Peter Xu <peterx@redhat.com>
-> > > > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > Cc: Richard Henderson <rth@twiddle.net>
-> > > > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > > > ---
-> > > > >  hw/i386/intel_iommu.c          | 51
-> > > > ++++++++++++++++++++++++++++++++++++++++++
-> > > > >  hw/i386/intel_iommu_internal.h |  6 ++++-
-> > > > >  hw/i386/trace-events           |  1 +
-> > > > >  3 files changed, 57 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > > > index d87f608..883aeac 100644
-> > > > > --- a/hw/i386/intel_iommu.c
-> > > > > +++ b/hw/i386/intel_iommu.c
-> > > > > @@ -68,6 +68,10 @@ static void
-> > > > vtd_address_space_refresh_all(IntelIOMMUState *s);
-> > > > >  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNo=
-tifier
-> > *n);
-> > > > >
-> > > > >  static void vtd_pasid_cache_reset(IntelIOMMUState *s);
-> > > > > +static void vtd_pasid_cache_sync(IntelIOMMUState *s,
-> > > > > +                                 VTDPASIDCacheInfo *pc_info);
-> > > > > +static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
-> > > > > +                                  VTDBus *vtd_bus, uint16_t devf=
-n);
-> > > > >
-> > > > >  static void vtd_panic_require_caching_mode(void)
-> > > > >  {
-> > > > > @@ -1853,7 +1857,10 @@ static void
-> > vtd_iommu_replay_all(IntelIOMMUState
-> > > > *s)
-> > > > >
-> > > > >  static void vtd_context_global_invalidate(IntelIOMMUState *s)
-> > > > >  {
-> > > > > +    VTDPASIDCacheInfo pc_info;
-> > > > > +
-> > > > >      trace_vtd_inv_desc_cc_global();
-> > > > > +
-> > > > >      /* Protects context cache */
-> > > > >      vtd_iommu_lock(s);
-> > > > >      s->context_cache_gen++;
-> > > > > @@ -1870,6 +1877,9 @@ static void
-> > > > vtd_context_global_invalidate(IntelIOMMUState *s)
-> > > > >       * VT-d emulation codes.
-> > > > >       */
-> > > > >      vtd_iommu_replay_all(s);
-> > > > > +
-> > > > > +    pc_info.flags =3D VTD_PASID_CACHE_GLOBAL;
-> > > > > +    vtd_pasid_cache_sync(s, &pc_info);
-> > > > >  }
-> > > > >
-> > > > >  /**
-> > > > > @@ -2005,6 +2015,22 @@ static void
-> > > > vtd_context_device_invalidate(IntelIOMMUState *s,
-> > > > >                   * happened.
-> > > > >                   */
-> > > > >                  vtd_sync_shadow_page_table(vtd_as);
-> > > > > +                /*
-> > > > > +                 * Per spec, context flush should also
-> > > > > followed with PASID
-> > > > > +                 * cache and iotlb flush. Regards to
-> > > > > a device selective
-> > > > > +                 * context cache invalidation:
-> > > >
-> > > > If context entry flush should also follow another pasid cache flush=
-,
-> > > > then this is still needed?  Shouldn't the pasid flush do the same
-> > > > thing again?
-> > >
-> > > yes, but how about guest software failed to follow it? It will do
-> > > the same thing when pasid cache flush comes. But this only happens
-> > > for the rid2pasid case (the IOVA page table).
-> >=20
-> > Do you mean it will not happen when nested page table is used (so it's
-> > required for nested tables)?
->=20
-> no, by the IOVA page table case, I just want to confirm the duplicate
-> replay is true. But it is not "only" case. :-) my bad. any scalable mode
-> context entry modification will result in duplicate replay as this patch
-> enforces a pasid replay after context cache invalidation. But for normal
-> guest SVM usage, it won't have such duplicate work as it only modifies
-> pasid entry.
->=20
-> > Yeah we can keep them for safe no matter what; at least I'm fine with
-> > it (I believe most of the code we're discussing is not fast path).
-> > Just want to be sure of it since if it's definitely duplicated then we
-> > can instead drop it.
->=20
-> yes, it is not fast path. BTW. I guess the iova shadow sync applies
-> the same notion. right?
 
-Yes I rem we have similar things, but the same to that - if we can
-confirm that it'll be duplicated then I think we should remove that
-too.  But feel free to ignore this question for now and keep it.  The
-comment explaining that would be helpful, as you already did.  Thanks,
 
---=20
-Peter Xu
+On 4/3/20 10:22 AM, Daniel P. Berrang=C3=A9 wrote:
+> QEMU, like libvirt, has a github.com project which contains automated
+> read-only mirrors of QEMU repositories.
+>=20
+>   https://github.com/qemu/
+>=20
+> An unfortunate side effect of this is that some users will try to open
+> pull requests against these mirrors. These get ignored until eventually
+> someone notices and closes the request. QEMU has had about 90 prs opened
+> over the years.
+>=20
+>   https://github.com/qemu/qemu/pulls
+>=20
+> The same applies to the issue tracker, but fortunately github lets
+> projects disable this feature, which QEMU has done.
+>=20
+> I have recently discovered that there is a nice 3rd party bot for github
+> which can autorespond to pull requests with a friendly comment, close the
+> request, and then lock it to prevent further comments.
+>=20
+>   https://github.com/apps/repo-lockdown
+>=20
+> I'm setting this up for libvirt and it was suggested QEMU can probably
+> benefit from it too as an example see:
+>=20
+>   https://github.com/libvirt/test/issues/2
+>   https://github.com/libvirt/test/pull/3
+>=20
+>=20
+> Configuration just requires creation of a ".github/lockdown.yml" file
+> which provides the friendly message to add to the merge requests. This
+> can be either done per-repository, or a special repo can be created
+> called ".github" and this will apply to all repos within the project.
+>=20
+> Ideally each repo would have a CONTRIBUTING.md file created too, since
+> both GitHub and GitLab will direct users to this file for guidelines
+> on how to contribute.
+>=20
+> I don't have time right now to do this for QEMU, so consider this email
+> a friendly suggestion for some other interested person to do for QEMU...
+>=20
+> Regards,
+> Daniel
+>=20
+
+This looks cool. Who has access to our github to request it start
+scanning our repo to look for said .github/lockdown.yml file?
+
+--js
 
 
