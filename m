@@ -2,102 +2,90 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1201C2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B95EC2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:51:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B327D206C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C94D206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:51:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="FeBhR/nY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B327D206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSQH5bdY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C94D206F8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLVu9-0006h4-Rd
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:51:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35017)
+	id 1jLVuX-0007Ox-7b
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:51:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthony.perard@citrix.com>) id 1jLVmc-0008Ew-CD
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:43:39 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVqs-0001cS-2s
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1jLVmZ-00079M-Tv
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:43:37 -0400
-Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:52902)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1jLVmZ-00078q-Jm
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:43:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1586195015;
- h=date:from:to:cc:subject:message-id:references:
- mime-version:in-reply-to;
- bh=bphNPG/A+OeRKQoZBapDV/s73PtCWQsb127JQKMzOao=;
- b=FeBhR/nYLKBbpRRDwTkKNSmsJ66yRATJvPIzoydcUPRKh3sxXUu8SvH5
- vwefUfz+UuccOnF+Pi3bRpP7OQ9VvFO6a3TCFZf03zdn6Ed/8D6g8r0J3
- 9HmrBk6DIGQiVDiIPzxJWQX9n3iIlOsIdQU/MK3lpLZmciuUHORNTsftq c=;
-Authentication-Results: esa4.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=anthony.perard@citrix.com;
- spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- anthony.perard@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible
-Received-SPF: Pass (esa4.hc3370-68.iphmx.com: domain of
- anthony.perard@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
- ip4:168.245.78.127 ~all"
-Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: hlwK8qzoKR3mA9SudDYB7JPSpQopwHfmD0RVWef2oBdIhmk3ijC0+3/s95S//l+6oEL8dsmgt8
- Uawkk1KEd8fi+ZuOC2BZ4QpNt5FC6GCEnEYZVho/chg/F8dlrZg6czj8gXIe8lUROYGsHwZkaq
- j+SraWWkJVFvNOLDyIeXhcspFxknIP0pUJllzFYn+l6GGDxL4WPszJx8A11HSq8WY4tHdX3CRE
- deaNLxX6QujMrG3H3CELbEh71lmlOeoZdd433K4tta+A+L6EstblMI3iZN47kIqjhMffSiFRmf
- 4N0=
-X-SBRS: 2.7
-X-MesageID: 15918507
-X-Ironport-Server: esa4.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.72,351,1580792400"; d="scan'208";a="15918507"
-Date: Mon, 6 Apr 2020 18:43:23 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC] hw/usb/xen-usb.c: Pass struct usbback_req* to
- usbback_packet_complete()
-Message-ID: <20200406174323.GV4088@perard.uk.xensource.com>
-References: <20200323164318.26567-1-peter.maydell@linaro.org>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVqn-0001bx-DV
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:02 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:34532)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVqn-0001bU-81; Mon, 06 Apr 2020 13:47:57 -0400
+Received: by mail-wm1-x332.google.com with SMTP id c195so139073wme.1;
+ Mon, 06 Apr 2020 10:47:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xfGcmES3nPX8YvO+/YU0EwpyXu9u+QJWTYG9rfArCpE=;
+ b=mSQH5bdYJwZO43gz051i5YGQvv7jfuiRVqkOL0va9nYORTZVaZeSHTMTfs7AjdAEiA
+ uzD1O2sYFsWAhRzUwefyD9H+uCwloAapePGsZc9bI0qQqZRaTp26x3HUBFWfMHVyPXVx
+ 1h15gJrk5p3zF90+mue76guNwgtL38DTslpEUZASG4KQAiwAEbg1XksGXXjRfRDkobQW
+ DVC7MyKKiVhdEe5DAxIj6sWn0qMhY6ZUsFeM3vQLvwucIMm8FaioDIvmMZypzA25d981
+ /vKZKDlE1km3FzFKazhiF+BWPiU4A3sQbTLAgQM3TK8t4hNG/JiOg8dO8FgDa/tXiDNU
+ n49A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=xfGcmES3nPX8YvO+/YU0EwpyXu9u+QJWTYG9rfArCpE=;
+ b=fg8YRbTR3a1SMDKQQADg3FZy2dcYiVz1d0XWlc6mdCLjQEbxhX/uZ+SCD1CZtJI/9S
+ WcL6CkTrZ0clcmmt0DwGA2bv0rQbzMi0jOX0zjMxw88JoBCbFRnI1MbcITZ1oEDe+Gmx
+ YxBviALW/13AhdtaQuxfg1d9tJiIFTjDSX/Ru96ByVSsRCJeHvYgNC11U2lZKndqv9jM
+ KczubSXpcW/Z5fOSUEvFFq2f8Ki7SJtHF2+HWpCOKTNMmFLDfUntDZ7UVoxN6CXoPNQr
+ mm5JplYyIhTF6deFpW3w9PHTr7gK7zw1rJ8Zl7gUuSfRIjo5SRc4Quo1Jruz7a0iPre/
+ aXTA==
+X-Gm-Message-State: AGi0PuZUan3UUShGBlhIDK5RVbDiBHDGZD5XYqJft9BVSkALgtQF9FcC
+ I6sZWNnrDMpYtQFGm3aZPlnRyvUvhQI=
+X-Google-Smtp-Source: APiQypIpUgST85aW8J2H9SlKU4Lqx40BuTT/QiyG1Q0EViBSUycX0JBUuebvsyHIe3v8XfMWt/rrKg==
+X-Received: by 2002:a1c:a344:: with SMTP id m65mr205469wme.20.1586195276046;
+ Mon, 06 Apr 2020 10:47:56 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.47.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Apr 2020 10:47:55 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
+Subject: [PATCH-for-5.1 v2 07/54] hw/arm/aspeed_soc: Simplify use of Error*
+Date: Mon,  6 Apr 2020 19:46:56 +0200
+Message-Id: <20200406174743.16956-8-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
+References: <20200406174743.16956-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200323164318.26567-1-peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 216.71.155.144
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,42 +97,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Durrant <paul@xen.org>, xen-devel@lists.xenproject.org, Stefano
- Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 23, 2020 at 04:43:18PM +0000, Peter Maydell wrote:
-> The function usbback_packet_complete() currently takes a USBPacket*,
-> which must be a pointer to the packet field within a struct
-> usbback_req; the function uses container_of() to get the struct
-> usbback_req* given the USBPacket*.
-> 
-> This is unnecessarily confusing (and in particular it confuses the
-> Coverity Scan analysis, resulting in the false positive CID 1421919
-> where it thinks that we write off the end of the structure). Since
-> both callsites already have the pointer to the struct usbback_req,
-> just pass that in directly.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This is an RFC because:
->  * I'm not very familiar with the Xen bits of QEMU
->  * the main rationale here is to change something that's
->    confusing Coverity -- the code as it stands isn't wrong
->  * the only testing I've done is "make check"
-> Still, the change seems like a good thing to me as a human reader...
-> 
-> PS: QEMU's MAINTAINERS file stanza for Xen doesn't pick up
-> that this file is Xen related, so it could use an extra F: line.
+In the previous commit we noticed we don't need two different
+Error*, drop the one less used.
 
-Looks good,
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/arm/aspeed_soc.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Thanks,
-
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index debd7c8faa..aa6d739ad0 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -234,7 +234,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     int i;
+     AspeedSoCState *s = ASPEED_SOC(dev);
+     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
+-    Error *err = NULL, *local_err = NULL;
++    Error *err = NULL;
+ 
+     /* IO space */
+     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
+@@ -413,9 +413,12 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+         qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
+                                  &err);
++        if (err) {
++            error_propagate(errp, err);
++           return;
++        }
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
+-                                 &local_err);
+-        error_propagate(&err, local_err);
++                                 &err);
+         if (err) {
+             error_propagate(errp, err);
+            return;
 -- 
-Anthony PERARD
+2.21.1
+
 
