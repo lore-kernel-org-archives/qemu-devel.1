@@ -2,68 +2,100 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB798C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23947C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FB182054F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:20:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB182054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E40BE2054F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:21:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YOKwLf2v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E40BE2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOsB-0005GJ-P5
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:20:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50511)
+	id 1jLOsJ-0005Xw-1u
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:21:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jLOm7-0002cU-5y
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:14:40 -0400
+ (envelope-from <philmd@redhat.com>) id 1jLOmI-00032O-Ey
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jLOm5-0004h9-Mn
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:14:38 -0400
-Resent-Date: Mon, 06 Apr 2020 06:14:38 -0400
-Resent-Message-Id: <E1jLOm5-0004h9-Mn@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21121)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jLOm5-0004gE-El
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:14:37 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586168048; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=E/e7j7UHgcY2V/u1o47Ys0bkksfBWNFjw9TYVjRnekx+MIdVrbUT/XtjQVWadLFprsO+ADp7A+xXT96MeN1WSTCNtt8xFtXD+43mRzOJRl9G+35BbjWLxd4n6bgbT9XCksnI3YIbPj5wRm6WbnyZnnKrwN+s3Jdk2biTBCGSKJg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1586168048;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=6guS2k0K1aAcCilb3T6qfWYfloClyx+X9/7/Jbfm514=; 
- b=XHOXBbJIDsq7ClW5bbydbLSEIO0fJq9vKHeHEJRCzJ1cVpArPTVjnW2zeU5oOvEo2k3xObfLQwZsTgXydBdoSj+vq2oETdVl3mVrNo3nlbJkjzZD21HFSzMas7rdYYjafb1H+VKgAMtp5bS8K1Sy4i3ZuSLnWeZX14XepUS9C7s=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1586168042959951.2855408957737;
- Mon, 6 Apr 2020 03:14:02 -0700 (PDT)
-In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
-Subject: Re: [PATCH v6 00/36] Initial support for multi-process qemu
-Message-ID: <158616803979.1460.13294311898021421882@39012742ff91>
+ (envelope-from <philmd@redhat.com>) id 1jLOmH-0004pF-Ci
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:14:50 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59917
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jLOmH-0004oG-8w
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:14:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586168088;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2SmZfaD8FZztWo3SmUJfLfJx+RKEm5IsODq5F9p69ak=;
+ b=YOKwLf2vM25Tv4gx3iDoqZ0B/D4pTXMu0EmYpLh2PxBx5CSBjc6ofvuqPVJ5igtTDvfCIg
+ XtRare2lklAiCglhOB0CPnomEpMAV3kcjQc2u5DgtdHX2ukI6j+Q1V6ad2Ueq+cYoXJouX
+ Hdxg8HrCA8Xck1GdoCkBXd0La9LtpsY=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-fDSAwzXZPOuioq6b8MGImA-1; Mon, 06 Apr 2020 06:14:44 -0400
+X-MC-Unique: fDSAwzXZPOuioq6b8MGImA-1
+Received: by mail-ed1-f70.google.com with SMTP id q29so11392006edc.1
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 03:14:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2SmZfaD8FZztWo3SmUJfLfJx+RKEm5IsODq5F9p69ak=;
+ b=lK0YVd7ZS8Y2czPDBh0CEqlkSuNjW+eWEzejYUjrzwjMZ0UVraaXzC0TLKhTeIhKKU
+ EkbJ5hGYuFt1GWsFAj/DRkbvgle0EPaSHtaVoeRew3TM/y16iYA5RMUZeQL0j5ZEpB8q
+ 6pOVngYoWe8Ezkt/O+WtprxktC1gtq2mLBgv57hpY3HAYIHZ0kSlh9x79dE2iSXEbOE2
+ iA/VJrfqwo30GR2a/Ts8U4VKJzj1KpSVVE5zdDOF3FHZEdVO9i3pr27Y/kcwbPuclVGH
+ mJXTKV9DWZJ58a5PVQD3rv5BtgW1zoa7w58rebvwo836jsi1sIDtjl4KD927/6MKiBO/
+ 2Big==
+X-Gm-Message-State: AGi0PuZzmwa21mo4G5qHT9MjMtIgRmm4BwbZz1VqERwph6XCMZrqdfYF
+ TzvZRV2DkmGB/cCnUZwM7c39MBRfoUXaheH6EzwqPWTzgICX3Wv1NjZsXVjR1xWhowxONlKX9HJ
+ 4W53SCeMzCfKWKOU=
+X-Received: by 2002:a50:ab5a:: with SMTP id t26mr18684371edc.380.1586168083500; 
+ Mon, 06 Apr 2020 03:14:43 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLh7Sh6ESyjp3ka8swU+vPytczudxSeQnAN7T2J+eL6xu8FPPpymGersJH5F1oRzBil954gOw==
+X-Received: by 2002:a50:ab5a:: with SMTP id t26mr18684357edc.380.1586168083323; 
+ Mon, 06 Apr 2020 03:14:43 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id oe24sm2216118ejb.47.2020.04.06.03.14.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Apr 2020 03:14:42 -0700 (PDT)
+Subject: Re: stm32f429 flash writing
+To: Mohannad Maklad <msala.work@gmail.com>, qemu-discuss@nongnu.org,
+ qemu-devel <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+References: <CADxp151=4QduaHYugXGD+gcKffUUdkxfzWNvk5xXAqMWRKEQGw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e415fc55-359b-509b-15dc-79181b0a53d7@redhat.com>
+Date: Mon, 6 Apr 2020 12:14:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: elena.ufimtseva@oracle.com
-Date: Mon, 6 Apr 2020 03:14:02 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <CADxp151=4QduaHYugXGD+gcKffUUdkxfzWNvk5xXAqMWRKEQGw@mail.gmail.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,56 +107,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- jag.raman@oracle.com, quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
- thanos.makatos@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTg2MTY1NTU1Lmdp
-dC5lbGVuYS51ZmltdHNldmFAb3JhY2xlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5k
-CnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNh
-biBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9y
-YSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VU
-X0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KCiAgQ0MgICAgICBzdHVicy94ZW4tY29tbW9uLm8KICBDQyAgICAgIHN0dWJzL3hlbi1odm0u
-bwogIENDICAgICAgc3R1YnMvcGNpLWhvc3QtcGlpeC5vCi90bXAvcWVtdS10ZXN0L3NyYy9zdHVi
-cy9tb25pdG9yLmM6MjU6MTQ6IGVycm9yOiB3ZWFrIGlkZW50aWZpZXIgJ3FhcGlfZXZlbnRfZW1p
-dCcgbmV2ZXIgZGVjbGFyZWQgWy1XZXJyb3JdCiNwcmFnbWEgd2VhayBxYXBpX2V2ZW50X2VtaXQK
-ICAgICAgICAgICAgIF4KMSBlcnJvciBnZW5lcmF0ZWQuCiAgQ0MgICAgICBzdHVicy9yYW0tYmxv
-Y2subwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHN0dWJzL21v
-bml0b3Iub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
-LgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2Nr
-ZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVk
-UHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6
-IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29t
-LnFlbXUuaW5zdGFuY2UudXVpZD1kYjVlZTgwZDhlNTk0MTQ3OGU2ODdlYmZlMGQ3ZGRiNScsICct
-dScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJt
-JywgJy1lJywgJ1RBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11JywgJy1lJywgJ0VYVFJBX0NPTkZJ
-R1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICct
-ZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYn
-LCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2Fj
-aGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtODhmY2dxNV8vc3JjL2Rv
-Y2tlci1zcmMuMjAyMC0wNC0wNi0wNi4wOS4zNS4yMTI3MzovdmFyL3RtcC9xZW11Onoscm8nLCAn
-cWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1kZWJ1ZyddJyByZXR1cm5l
-ZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUu
-aW5zdGFuY2UudXVpZD1kYjVlZTgwZDhlNTk0MTQ3OGU2ODdlYmZlMGQ3ZGRiNQptYWtlWzFdOiAq
-KiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC04OGZjZ3E1Xy9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1
-bi10ZXN0LWRlYnVnQGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICA0bTIzLjc4NnMKdXNlciAgICAw
-bTguNjY3cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvY292ZXIuMTU4NjE2NTU1NS5naXQuZWxlbmEudWZpbXRzZXZhQG9yYWNsZS5jb20vdGVz
-dGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 4/5/20 3:41 PM, Mohannad Maklad wrote:
+> Hello all,
+> 
+> I'm trying to write to stm32f429 discovery board on flash but it doesn't 
+> seem to work. Can I share the code with you?
+
+You can certainly share your code/use case!
+
+Note that the stm32f429 is not modeled in mainstream QEMU, only the 
+stm32f405.
+
+Please also include the following emails:
+- qemu-devel@nongnu.org
+- qemu-arm@nongnu.org
+
+If you want to share/attach example files, you can also fill a 
+bug/feature request here:
+https://bugs.launchpad.net/qemu/+filebug
+
+Regards,
+
+Phil.
+
 
