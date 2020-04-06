@@ -2,93 +2,81 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9061C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB2A8C2BA1E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77ABA238E4
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A719D22246
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 14:09:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OuKwj4+g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77ABA238E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="giYhbe80"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A719D22246
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLSQo-0001Qc-KK
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 10:08:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56475)
+	id 1jLSRT-0002mF-SL
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 10:09:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wrampazz@redhat.com>) id 1jLSPz-0000OT-5H
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:08:04 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1jLSNi-0007fq-ND
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wrampazz@redhat.com>) id 1jLSPy-0000ir-1o
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:08:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59967
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <ehabkost@redhat.com>) id 1jLSNg-0008IA-Os
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:05:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39431
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wrampazz@redhat.com>) id 1jLSPx-0000iP-Uw
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:08:02 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jLSNg-0008I2-L4
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 10:05:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586182081;
+ s=mimecast20190719; t=1586181940;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q0qRjobDL3VQNo5o/7V9/uUsk0yh+H9OWm1Ix/Wb63k=;
- b=OuKwj4+gsFXDICURBnoGTGLIItBqi57uaJT+J4Z7dPc6STncAMFNcVJDHoAfgmAFkbuZBZ
- NpplOh99GR6RyF7eCOpEn8AIADxy/y39Ff1zt+GE87QFtVfMHYmCF08X4aHDszCxSwVdfd
- kKW22R5n7eFgd15R4VgyMrOfsZxCCrg=
-Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
- [209.85.221.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-eE1_NT_7PnSLkmfvMG0Tvw-1; Mon, 06 Apr 2020 10:08:00 -0400
-X-MC-Unique: eE1_NT_7PnSLkmfvMG0Tvw-1
-Received: by mail-vk1-f197.google.com with SMTP id r201so5724239vkf.5
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 07:08:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Q0qRjobDL3VQNo5o/7V9/uUsk0yh+H9OWm1Ix/Wb63k=;
- b=C6uH44ik9jWyq9zCeZL4UBXJWxq9N5oqGXKl/O1CbnXt8xNTFEmkvdr656jcD3Isuk
- ZO2EO2+NGgoc8Ph4QGV2W4dwWQ1Ynr5yGl1gSiMXJEwZhvxASbBVlqKhu7+ad4x+yiT1
- IOFDKTZbgDta/7obZMNgE23KDSb3r66xPrNYYU7WZlezPHNc7jouG+LYqKkKuSZegJcT
- Qoq8nEY5sBXkr2erQNh3zNYrigDO8eMXlXI0zSuI7sHTCu+QJBPDEUA8k7akc+JapNWO
- FugUUtZ/Im83QROsvblSN7zLhLbC4pM8LUT+e10JMo86QLHbhiGaUtCnZJbBxm97mUBA
- yPiA==
-X-Gm-Message-State: AGi0PuZzQE77UeoW2fbH0iASKIe8yH2/GybRA2k/t1sDYClm09w5pXOk
- Fz0KzH+aAT0ro8jmeoA18uejER1z1dSQHDQXCuoWCLmNc897PvTTOu7FNA86Xcxrn5GFxaZ7GEG
- hySyzHHjE6aWugdJ3MTgxTUre468q4nU=
-X-Received: by 2002:a67:1947:: with SMTP id 68mr9416025vsz.145.1586182078158; 
- Mon, 06 Apr 2020 07:07:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKAreje+Dy5akOrdx8LPZbU7Tyn+/fLbnFLDExMSgAprhX6xF5m9MZK6LQ5Nq7ojMPOvaOtyY/RCqYL9nMDi9Q=
-X-Received: by 2002:a67:1947:: with SMTP id 68mr9415992vsz.145.1586182077765; 
- Mon, 06 Apr 2020 07:07:57 -0700 (PDT)
+ bh=Z+4kbNaYKSc37XZ9+Furg1Tl1WS9KYQK9628t6eyCzg=;
+ b=giYhbe80+Qk+X1dgI+1RjV0QmEzPx0wgIC42B1M+FOF1ufHsZrIdzG9ErSg2Bhgym8vgYa
+ cOJswSRgHbTfNgNLZkcrWIn+8Tq75aWvBhZOHVvPkJgKjBBu3ELlIKWUDPlq5Ni99wf87X
+ 5kUMf0EBFKnWsOA7BsWEhsW6A3+a/og=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-xr3WpJeUP1-xHtW-G5EonQ-1; Mon, 06 Apr 2020 10:05:37 -0400
+X-MC-Unique: xr3WpJeUP1-xHtW-G5EonQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AD031005509;
+ Mon,  6 Apr 2020 14:05:36 +0000 (UTC)
+Received: from localhost (ovpn-116-201.gru2.redhat.com [10.97.116.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 43D62277B6;
+ Mon,  6 Apr 2020 14:05:33 +0000 (UTC)
+Date: Mon, 6 Apr 2020 11:05:31 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+Message-ID: <20200406140531.GE299832@habkost.net>
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <87blo7heag.fsf@dusky.pond.sub.org>
+ <87sghjfre8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20200403172919.24621-1-philmd@redhat.com>
- <20200403172919.24621-4-philmd@redhat.com>
- <8c5017c2-d242-8437-60e3-3e28e2116d42@redhat.com>
-In-Reply-To: <8c5017c2-d242-8437-60e3-3e28e2116d42@redhat.com>
-From: Willian Rampazzo <wrampazz@redhat.com>
-Date: Mon, 6 Apr 2020 11:07:47 -0300
-Message-ID: <CAKJDGDb1EwZb_whT_+eFSbXzTt3hJuZ_JdWo7XSSfrmfWs8vwQ@mail.gmail.com>
-Subject: Re: [PATCH-for-5.0 3/8] tests/acceptance/ppc_prep_40p: Use mirror for
- ftp.software.ibm.com
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+In-Reply-To: <87sghjfre8.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,63 +88,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kamil Rytarowski <kamil@netbsd.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Cleber Rosa <crosa@redhat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 6, 2020 at 10:55 AM Wainer dos Santos Moschetta
-<wainersm@redhat.com> wrote:
->
->
-> On 4/3/20 2:29 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > To avoid regular failures on Travis-CI with ftp.software.ibm.com,
-> > use a mirror.
+On Sat, Apr 04, 2020 at 12:59:27PM +0200, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
+>=20
+> > Markus Armbruster <armbru@redhat.com> writes:
 > >
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > ---
-> >   tests/acceptance/ppc_prep_40p.py | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
+> >> QEMU's Error was patterned after GLib's GError.  Differences include:
+> > [...]
+> >> * Return value conventions
+> >>
+> >>   Common: non-void functions return a distinct error value on failure
+> >>   when such a value can be defined.  Patterns:
+> >>
+> >>   - Functions returning non-null pointers on success return null point=
+er
+> >>     on failure.
+> >>
+> >>   - Functions returning non-negative integers on success return a
+> >>     negative error code on failure.
+> >>
+> >>   Different: GLib discourages void functions, because these lead to
+> >>   awkward error checking code.  We have tons of them, and tons of
+> >>   awkward error checking code:
+> >>
+> >>     Error *err =3D NULL;
+> >>     frobnicate(arg, &err);
+> >>     if (err) {
+> >>         ... recover ...
+> >>         error_propagate(errp, err);
+> >>     }
+> >>
+> >>   instead of
+> >>
+> >>     if (!frobnicate(arg, errp))
+> >>         ... recover ...
+> >>     }
+> >>
+> >>   Can also lead to pointless creation of Error objects.
+> >>
+> >>   I consider this a design mistake.  Can we still fix it?  We have mor=
+e
+> >>   than 2000 void functions taking an Error ** parameter...
+> >>
+> >>   Transforming code that receives and checks for errors with Coccinell=
+e
+> >>   shouldn't be hard.  Transforming code that returns errors seems more
+> >>   difficult.  We need to transform explicit and implicit return to
+> >>   either return true or return false, depending on what we did to the
+> >>   @errp parameter on the way to the return.  Hmm.
+> > [...]
 > >
-> > diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_pr=
-ep_40p.py
-> > index 138064285a..1515561249 100644
-> > --- a/tests/acceptance/ppc_prep_40p.py
-> > +++ b/tests/acceptance/ppc_prep_40p.py
-> > @@ -30,7 +30,8 @@ def test_factory_firmware_and_netbsd(self):
-> >           :avocado: tags=3Dmachine:40p
-> >           :avocado: tags=3Dslowness:high
-> >           """
-> > -        bios_url =3D ('ftp://ftp.boulder.ibm.com/rs6000/firmware/'
-> > +        bios_url =3D ('http://ftpmirror.your.org/pub/misc/'
-> > +                    'ftp.software.ibm.com/rs6000/firmware/'
-> >                       '7020-40p/P12H0456.IMG')
->
-> I checked the bios file can be downloaded from the mirror. I cannot
-> judge the mirror is more reliable than ftp.boulder.ibm.com or not, though=
+> > To figure out what functions with an Error ** parameter return, I used
+> > Coccinelle to find such function definitions and print the return types=
 .
->
+> > Summary of results:
+> >
+> >    2155 void
+> >     873 signed integer
+> >     494 pointer
+> >     153 bool
+> >      33 unsigned integer
+> >       6 enum
+> >    ---------------------
+> >    3714 total
+> >
+> > I then used Coccinelle to find checked calls of void functions (passing
+> > &error_fatal or &error_abort is not considered "checking" here).  These
+> > calls become simpler if we make the functions return a useful value.  I
+> > found a bit under 600 direct calls, and some 50 indirect calls.
+> >
+> > Most frequent direct calls:
+> >
+> >     127 object_property_set_bool
+> >      27 qemu_opts_absorb_qdict
+> >      16 visit_type_str
+> >      14 visit_type_int
+> >      10 visit_type_uint32
+> >
+> > Let's have a closer look at object_property_set() & friends.  Out of
+> > almost 1000 calls, some 150 are checked.  While I'm sure many of the
+> > unchecked calls can't actually fail, I am concerned some unchecked call=
+s
+> > can.
+> >
+> > If we adopt the convention to return a value that indicates success /
+> > failure, we should consider converting object.h to it sooner rather tha=
+n
+> > later.
+> >
+> > Please understand these are rough numbers from quick & dirty scripts.
+>=20
+> Paolo, Daniel, Eduardo,
+>=20
+> Please pick one for QOM:
 
-During the tests I did to debug Avocado I constantly got a timeout on
-FTP. The HTTP URL seems to be more reliable. So far,
+Replying this without reading the whole discussion and context:
 
-Tested-by: Willian Rampazzo <willianr@gmail.com>
-Reviewed-by: Willian Rampazzo <willianr@gmail.com>
+>=20
+> * Do nothing.  Looks like
+>=20
+>      object_property_set_bool(..., &err);
+>      if (err) {
+>          error_propagate(errp, err);
+>          return;
+>      }
+>=20
+> * Return true on success, false on error.  Looks like
+>=20
 
-> Code-wise, looks good. So:
->
-> Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
->
-> >           bios_hash =3D '1775face4e6dc27f3a6ed955ef6eb331bf817f03'
-> >           bios_path =3D self.fetch_asset(bios_url, asset_hash=3Dbios_ha=
-sh)
->
+I prefer this one.
+
+>      if (!object_property_set_bool(..., errp)) {
+>          return;
+>      }
+>=20
+> * Return 0 on success, -1 on error.  Looks like
+>=20
+>      if (object_property_set_bool(..., errp) < 0) {
+>          return;
+>      }
+>=20
+>   This is slightly more likely to require line wrapping than the
+>   previous one.
+
+--=20
+Eduardo
 
 
