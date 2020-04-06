@@ -2,89 +2,88 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F1EC2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B6BAC2BA1E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:23:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3B7920672
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:23:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02D9920672
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:23:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WqH60DfM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3B7920672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gvIEB0pi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02D9920672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36621 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLWOv-00034C-4O
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:23:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44191)
+	id 1jLWPF-0003lg-4e
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:23:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jLWNw-0001Zb-AW
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:22:14 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVra-0002ld-Gf
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jLWNu-0002uw-Kg
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:22:12 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35868)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVrZ-0003U7-E8
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:46 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37167)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jLWNs-0002sO-NJ
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 14:22:10 -0400
-Received: by mail-wm1-x341.google.com with SMTP id d202so449327wmd.1
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 11:22:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=JtOUmlddJfiiuQ89uisdNRcm83fl7vqOjpFFcB74WbM=;
- b=WqH60DfMS9DnPYEuIwdioBViI7+GV6fUG3idD1y7gV7OYNW7hXarmJc4Tbww4pzbQk
- ++qG8P77RutdO0nLEBuimQoHa5BTqQLNZ8h+EHmDzXEz6nJuiJs9sWo8/5s/D3NKMS8e
- TbaTHcba+IhTDoulH8ypzrMUkMoMzoGdHnnFMxMYyS54qj2revwOYVAbca/E5/lideDX
- RxnW6AorYx38AwpFoWCquuGFVLbZ4wKbk5u3+H8i29i1+ikYVPcrbxATBnrW7GN455v1
- wXOy2Nq0nq0rOyHT3aYwjhNlc/oanOrB6r98eDLZm2BFOsUjP9yzjlnxG6nAtf3c7Ugu
- jaig==
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLVrZ-0003Th-89; Mon, 06 Apr 2020 13:48:45 -0400
+Received: by mail-wm1-x341.google.com with SMTP id j19so225358wmi.2;
+ Mon, 06 Apr 2020 10:48:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=F5/QTF8NoUKx5KsbybkQ+s3UGgYsvC0vkYP7rtWEAYk=;
+ b=gvIEB0pi6HBHmRx29tveqnsdgj+1thhiP4vU0NT2/+oPkh+2mfgQuB3uDO5+ZDruQu
+ 3Yq0h9+Zm8GFqQCT7edQdK2m0BLwvRiPDT5zIHvC3p32d92udfpmcld/YaCOAPZ0qMe4
+ lZrYPxhoDKdFDgE+KmxlcT9XdY2cEBWNam2h7JNgPV5+ogbiLfc2N59og21iNKyS+w79
+ k3tdkUvkFEZ3FOpuDZcAho5YO4K25up1U4LvwE9VzkAXefSUCxLaOmLAlKM8tcxxyPqf
+ 7FbTV7DE9gFSLepFlh3q2ddqg7Zq2fbF7v2J33UC0wKlZ4z5BcR3E3wVcRyXhHx0KGK5
+ yolA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=JtOUmlddJfiiuQ89uisdNRcm83fl7vqOjpFFcB74WbM=;
- b=UEjbSav4rTY/bNSACUZH4qw9Z1Q/T4grsnAeJMUesB3uOy2pEkHQ/Dptf5qF/Q3P3L
- tEqSiGquwlNAl2fHvx8+ZaUtkRj2WiAqN6Sh1t0Wcj5anlOxKLHjoR5r+S4VrsggWVyN
- e1DAWwKJhDS9jkAG5wM1igX8pQNP3NG+z+W7ll0BoNvySmJGYCoCmQojMfXTkiY286H3
- IeiaXUNH3GTFaXKPL8Cpi8htj0qkAzsCeP9huusiOq8qTNUCF1qQdsL+V+r0o6F81LXp
- AgzJz/TzaxOaBed3bUwr5iQtomoHotZaGsh1y7yGOpsgEA0KXog71jAgCqp0Cq/ufrDh
- GleQ==
-X-Gm-Message-State: AGi0PuYOgzlLxcsoGZwKGzBOFA4ZSVyd/1MPzTKkkJ8IX29s5Ehbtcxq
- 1K2iRmuTHrNUcnvrg8qMeR0Cfw==
-X-Google-Smtp-Source: APiQypIEAi/vjNIzbt8CBqVxV3Qugyan5DvcjkbiRhJ9aCFL+ZqUwqiP7ghAOaw1r68YiZkfgSC45g==
-X-Received: by 2002:a1c:e407:: with SMTP id b7mr351661wmh.32.1586197326659;
- Mon, 06 Apr 2020 11:22:06 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a67sm473564wmc.30.2020.04.06.11.22.05
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=F5/QTF8NoUKx5KsbybkQ+s3UGgYsvC0vkYP7rtWEAYk=;
+ b=aso7r3qrjOm++jpLVroY2Vg7DinXrZy8xCzJoddAoiErUQwxlz/ywmrsJvt9rBrevb
+ J12GJWPvc1olb66hVPtIJFd5qXEiFIF41i4IFuLmf1+jptZ0rsRDrPsiJOb9GeWAaGMw
+ JeWGadIUFkXJugrdF56rPS7y8OF5iahSbKYtwghox52CeHvyt4UgnDWGSbwBw24pI+XQ
+ uG/fFhH7zlt5qxqzFm2kMMHWFZqFovtzOd38NHW3TGdm+EZmpPklpRdZWGrh5ubceUJC
+ 3fYgFHYCg0iB9uwl1/M0uvd2CAhATI3LU8w9mlN0thTCXUJuG2lvkxNL5Bjk9Isly3jO
+ hEXA==
+X-Gm-Message-State: AGi0PuYkxEirMieJC5bS2bBY0osQIlu3j+356GYS8iaqhY4NBKXySp+B
+ GEtwk8dG1ntBA8avuREyX5GpJyQ7SUM=
+X-Google-Smtp-Source: APiQypLN9ktGcxuUKljYM5mrxk4pa7k2cUsX4Us1lPBFmomYAs7vmehw0LyeiK9sAevjKXsPrVhtsw==
+X-Received: by 2002:a1c:bb08:: with SMTP id l8mr193424wmf.168.1586195323572;
+ Mon, 06 Apr 2020 10:48:43 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 11:22:05 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EF63F1FF7E;
- Mon,  6 Apr 2020 19:22:04 +0100 (BST)
-References: <20200403172919.24621-1-philmd@redhat.com>
- <20200403172919.24621-7-philmd@redhat.com> <87zhboaaf5.fsf@linaro.org>
- <CAKJDGDbXMknOLw-xGGR3HJriCQB_-+1A5+eqf0DMb_hd6u99HA@mail.gmail.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Willian Rampazzo <wrampazz@redhat.com>
-Subject: Re: [PATCH-for-5.1 6/8] tests/Makefile: Add fetch-acceptance-assets
- rule
-In-reply-to: <CAKJDGDbXMknOLw-xGGR3HJriCQB_-+1A5+eqf0DMb_hd6u99HA@mail.gmail.com>
-Date: Mon, 06 Apr 2020 19:22:04 +0100
-Message-ID: <87o8s4a303.fsf@linaro.org>
+ Mon, 06 Apr 2020 10:48:41 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
+Subject: [PATCH-for-5.1 v2 41/54] hw/dma/xilinx_axidma: Add missing
+ error-propagation code
+Date: Mon,  6 Apr 2020 19:47:30 +0200
+Message-Id: <20200406174743.16956-42-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
+References: <20200406174743.16956-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::341
@@ -99,75 +98,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- qemu-devel <qemu-devel@nongnu.org>, Fabien Chouteau <chouteau@adacore.com>,
- Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
- Cleber Rosa <crosa@redhat.com>,
- =?utf-8?Q?Her?= =?utf-8?Q?v=C3=A9?= Poussineau <hpoussin@reactos.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Patch created mechanically by running:
 
-Willian Rampazzo <wrampazz@redhat.com> writes:
+  $ spatch \
+    --macro-file scripts/cocci-macro-file.h --include-headers \
+    --sp-file scripts/coccinelle/object_property_missing_error_propagate.cocci \
+    --keep-comments --smpl-spacing --dir hw
 
-> On Mon, Apr 6, 2020 at 12:41 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->>
->>
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>
->> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> > ---
->> >  tests/Makefile.include | 7 +++++++
->> >  1 file changed, 7 insertions(+)
->> >
->> > diff --git a/tests/Makefile.include b/tests/Makefile.include
->> > index 51de676298..90f457593c 100644
->> > --- a/tests/Makefile.include
->> > +++ b/tests/Makefile.include
->> > @@ -906,6 +906,13 @@ get-vm-image-fedora-31-%: check-venv
->> >  # download all vm images, according to defined targets
->> >  get-vm-images: check-venv $(patsubst %,get-vm-image-fedora-31-%, $(FE=
-DORA_31_DOWNLOAD))
->> >
->> > +fetch-acceptance-assets: check-venv
->> > +     $(call quiet-command, \
->> > +            $(TESTS_VENV_DIR)/bin/python -m avocado \
->> > +            --show=3D$(if $(DEBUG),avocado.test,$(AVOCADO_SHOW)) asse=
-ts fetch \
->> > +            tests/acceptance/*py, \
->> > +            "AVOCADO", "tests/acceptance")
->> > +
->>
->> I'm wondering if we could expand this to a rule per-test group and
->> therefor allow parallel fetching of groups of assets?
->
-> This is a valid idea! Additionally, my suggestion is to organize the
-> tests by subdirectories under `tests/acceptance/`. Doing so makes it
-> easy to handle the target rule, adding the subdirectory to the assets
-> fetch command instead of listing specific tests for each group. Making
-> a list of tests for each group requires extra editing to the makefile
-> target when a new test is added. This can lead to new tests being
-> missed in their groups by mistake.
+Then review showed this file has a 'xilinx_axidma_realize_fail'
+label that calls error_propagate().  Updated the patch to use
+the label.
 
-I'd use wildcards to build up the groups so the Makefile doesn't need to
-be messed with again.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v2: New cocci patch generated both transformations
+    (Peter noticed v1 only catched one)
+---
+ hw/dma/xilinx_axidma.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
->
->>
->> >  check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
->> >       $(call quiet-command, \
->> >              $(TESTS_VENV_DIR)/bin/python -m avocado \
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
+diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+index 018f36991b..2d36346319 100644
+--- a/hw/dma/xilinx_axidma.c
++++ b/hw/dma/xilinx_axidma.c
+@@ -531,6 +531,9 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+                              object_property_allow_set_link,
+                              OBJ_PROP_LINK_STRONG,
+                              &local_err);
++    if (local_err) {
++        goto xilinx_axidma_realize_fail;
++    }
+     object_property_add_link(OBJECT(cs), "dma", TYPE_XILINX_AXI_DMA,
+                              (Object **)&cs->dma,
+                              object_property_allow_set_link,
+@@ -540,6 +543,9 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+         goto xilinx_axidma_realize_fail;
+     }
+     object_property_set_link(OBJECT(ds), OBJECT(s), "dma", &local_err);
++    if (local_err) {
++        goto xilinx_axidma_realize_fail;
++    }
+     object_property_set_link(OBJECT(cs), OBJECT(s), "dma", &local_err);
+     if (local_err) {
+         goto xilinx_axidma_realize_fail;
+-- 
+2.21.1
 
-
---=20
-Alex Benn=C3=A9e
 
